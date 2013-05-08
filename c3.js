@@ -162,7 +162,17 @@
         xAxis2.scale(x2).orient("bottom");
         yAxis.scale(y).orient("left");
 
-        if (isTimeSeries) xAxis.tickFormat(customTimeFormat);
+        if (isTimeSeries) {
+            xAxis.tickFormat(customTimeFormat);
+            // TODO: fix
+            xAxis.tickOffset = function () {
+                return 0;
+            };
+            // TODO: fix
+            xAxis2.tickOffset = function () {
+                return 0;
+            }
+        }
         if (isCategorized) {
             xAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
             xAxis2.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
