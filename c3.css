@@ -1,0 +1,96 @@
+
+/*-- Chart --*/
+
+svg {
+  font: 10px sans-serif;
+}
+path, line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+/*-- Grid --*/
+
+.grid line {
+  stroke: #ccc;
+}
+.xgrid, .ygrid {
+  stroke-dasharray: 3 3;
+}
+.xgrid-focus {
+}
+
+/*-- Line --*/
+
+.target-line {
+  stroke-width: 1px;
+}
+/*-- Point --*/
+
+.selected-circle {
+  fill: white;
+  stroke-width: 2px;
+}
+
+/*-- Focus --*/
+
+.target.focused path {
+  stroke-width: 2px;
+}
+
+/*-- Region --*/
+
+.region {
+  fill: steelblue;
+  fill-opacity: .1;
+}
+
+/*-- Brush --*/
+
+.brush .extent {
+  fill-opacity: .1;
+}
+
+/*-- Select - Drag --*/
+
+.dragarea {
+}
+
+/*-- Legend --*/
+
+.legend-item {
+  font-size: 12px;
+}
+
+/*-- Tooltip --*/
+
+.tooltip {
+  border-collapse:collapse;
+  border-spacing:0;
+  background-color:#fff;
+  empty-cells:show;
+  -webkit-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
+     -moz-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
+          box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
+}
+.tooltip tr {
+  border:1px solid #CCC;
+}
+.tooltip th {
+  background-color: #aaa;
+  font-size:14px;
+  padding:2px 5px;
+  text-align:left;
+  color:#FFF;
+}
+.tooltip td {
+  font-size:13px;
+  padding:2px 6px;
+  text-align:center;
+  background-color:#fff;
+  border-left:1px dotted #999;
+}
+.tooltip td.value{
+  text-align: right;
+}
