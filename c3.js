@@ -1,6 +1,5 @@
 (function (window) {
 
-    // TODO: Dicide name..
     window.c3 = {};
 
     /* 
@@ -9,15 +8,15 @@
     c3.generate = function (config) {
 
         var c3 = { data : {} },
-            _cache = {};
+            cache = {};
 
         /*-- Handle Config --*/
 
-        var _checkConfig = function (key, message) {
+        function checkConfig (key, message) {
             if ( ! (key in config)) throw Error(message);
         };
 
-        var _getConfig = function (keys, defaultValue) {
+        function getConfig (keys, defaultValue) {
             var target = config;
             for (var i = 0; i < keys.length; i++) {
                 if ( ! (keys[i] in target)) return defaultValue;
@@ -27,72 +26,72 @@
         };
 
         // bindto - id to bind the chart
-        _checkConfig('bindto', 'bindto is required in config');
+        checkConfig('bindto', 'bindto is required in config');
 
-        var __size_width = _getConfig(['size','width'], 640),
-            __size_height = _getConfig(['size','height'], 480);
+        var __size_width = getConfig(['size','width'], 640),
+            __size_height = getConfig(['size','height'], 480);
 
         // data - data configuration
-        _checkConfig('data', 'data is required in config');
+        checkConfig('data', 'data is required in config');
 
-        var __data_x = _getConfig(['data','x'], 'x'),
-            __data_x_format = _getConfig(['data','x_format'], '%Y-%m-%d'),
-            __data_id_converter = _getConfig(['data','id_converter'], function(id){ return id; }),
-            __data_names = _getConfig(['data','names'], {}),
-            __data_types = _getConfig(['data','types'], {}),
-            __data_regions = _getConfig(['data','regions'], {}),
-            __data_colors = _getConfig(['data','colors'], {}),
-            __data_selection_enabled = _getConfig(['data','selection','enabled'], false);
-            __data_selection_grouped = _getConfig(['data','selection','grouped'], false);
-            __data_selection_isselectable = _getConfig(['data','selection','isselectable'], function(d){return true;});
+        var __data_x = getConfig(['data','x'], 'x'),
+            __data_x_format = getConfig(['data','x_format'], '%Y-%m-%d'),
+            __data_id_converter = getConfig(['data','id_converter'], function(id){ return id; }),
+            __data_names = getConfig(['data','names'], {}),
+            __data_types = getConfig(['data','types'], {}),
+            __data_regions = getConfig(['data','regions'], {}),
+            __data_colors = getConfig(['data','colors'], {}),
+            __data_selection_enabled = getConfig(['data','selection','enabled'], false);
+            __data_selection_grouped = getConfig(['data','selection','grouped'], false);
+            __data_selection_isselectable = getConfig(['data','selection','isselectable'], function(d){return true;});
 
         // subchart
-        var __subchart_show = _getConfig(['subchart','show'], true),
-            __subchart_size_height = __subchart_show ? _getConfig(['subchart','size','height'], 60) : 0,
-            __subchart_default = _getConfig(['subchart','default'], null);
+        var __subchart_show = getConfig(['subchart','show'], true),
+            __subchart_size_height = __subchart_show ? getConfig(['subchart','size','height'], 60) : 0,
+            __subchart_default = getConfig(['subchart','default'], null);
 
         // color
-        var __color_pattern = _getConfig(['color','pattern'], null);
+        var __color_pattern = getConfig(['color','pattern'], null);
 
         // legend
-        var __legend_show = _getConfig(['legend','show'], true),
-            __legend_item_width = _getConfig(['legend','item','width'], 80), // TODO: auto
-            __legend_item_onclick = _getConfig(['legend','item','onclick'], function(){});
+        var __legend_show = getConfig(['legend','show'], true),
+            __legend_item_width = getConfig(['legend','item','width'], 80), // TODO: auto
+            __legend_item_onclick = getConfig(['legend','item','onclick'], function(){});
 
         // axis
-        var __axis_x_type = _getConfig(['axis','x','type'], 'indexed'),
-            __axis_x_categories = _getConfig(['axis','x','categories'], ['hoge']),
-            __axis_x_tick_centered = _getConfig(['axis','x','tick','centered'], false),
-            __axis_y_max = _getConfig(['axis','y','max'], null),
-            __axis_y_min = _getConfig(['axis','y','min'], null),
-            __axis_y_center = _getConfig(['axis','y','center'], null),
-            __axis_y_text = _getConfig(['axis','y','text'], null),
-            __axis_y_rescale = _getConfig(['axis','y','rescale'], true);
+        var __axis_x_type = getConfig(['axis','x','type'], 'indexed'),
+            __axis_x_categories = getConfig(['axis','x','categories'], ['hoge']),
+            __axis_x_tick_centered = getConfig(['axis','x','tick','centered'], false),
+            __axis_y_max = getConfig(['axis','y','max'], null),
+            __axis_y_min = getConfig(['axis','y','min'], null),
+            __axis_y_center = getConfig(['axis','y','center'], null),
+            __axis_y_text = getConfig(['axis','y','text'], null),
+            __axis_y_rescale = getConfig(['axis','y','rescale'], true);
 
         // grid
-        var __grid_x_show = _getConfig(['grid','x','show'], false),
-            __grid_x_type = _getConfig(['grid','x','type'], 'tick'),
-            __grid_x_lines = _getConfig(['grid','x','lines'], null),
-            __grid_y_show = _getConfig(['grid','y','show'], false),
-            __grid_y_type = _getConfig(['grid','y','type'], 'tick'),
-            __grid_y_lines = _getConfig(['grid','y','lines'], null);
+        var __grid_x_show = getConfig(['grid','x','show'], false),
+            __grid_x_type = getConfig(['grid','x','type'], 'tick'),
+            __grid_x_lines = getConfig(['grid','x','lines'], null),
+            __grid_y_show = getConfig(['grid','y','show'], false),
+            __grid_y_type = getConfig(['grid','y','type'], 'tick'),
+            __grid_y_lines = getConfig(['grid','y','lines'], null);
 
         // point - point of each data
-        var __point_show = _getConfig(['point','show'], false),
-            __point_r = __point_show ? _getConfig(['point','r'], 2.5) : 0,
-            __point_focus_line_enabled = _getConfig(['point','focus','line','enabled'], false),
-            __point_focus_expand_enabled = _getConfig(['point','focus','expand','enabled'], __point_show),
-            __point_focus_expand_r = _getConfig(['point','focus','expand','r'], __point_focus_expand_enabled ? 4 : __point_r),
-            __point_select_r = _getConfig(['point','focus','select','r'], 8),
-            __point_onclick = _getConfig(['point','onclick'], function(){}),
-            __point_onselected = _getConfig(['point','onselected'], function(){}),
-            __point_onunselected = _getConfig(['point','onunselected'], function(){});
+        var __point_show = getConfig(['point','show'], false),
+            __point_r = __point_show ? getConfig(['point','r'], 2.5) : 0,
+            __point_focus_line_enabled = getConfig(['point','focus','line','enabled'], false),
+            __point_focus_expand_enabled = getConfig(['point','focus','expand','enabled'], __point_show),
+            __point_focus_expand_r = getConfig(['point','focus','expand','r'], __point_focus_expand_enabled ? 4 : __point_r),
+            __point_select_r = getConfig(['point','focus','select','r'], 8),
+            __point_onclick = getConfig(['point','onclick'], function(){}),
+            __point_onselected = getConfig(['point','onselected'], function(){}),
+            __point_onunselected = getConfig(['point','onunselected'], function(){});
 
         // region - region to change style
-        var __regions = _getConfig(['regions'], null);
+        var __regions = getConfig(['regions'], null);
 
         // tooltip - show when mouseover on each data
-        var __tooltip_contents = _getConfig(['tooltip','contents'], function(d) {
+        var __tooltip_contents = getConfig(['tooltip','contents'], function(d) {
             var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth()+1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
                 text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>";
             for (var i = 0; i < d.length; i++){
@@ -102,7 +101,17 @@
             return text + "</table>";
         });
 
-        /*-- Define TimeFormat --*/
+        /*-- Set Variables --*/
+
+        var clipId = config.bindto.replace('#','') + '-clip',
+            clipPath = "url(#" + clipId + ")";
+
+        var isTimeSeries = (__axis_x_type === 'timeseries'),
+            isCategorized = (__axis_x_type === 'categorized');
+
+        var dragStart = null, dragging = false;
+
+        var legendHeight = __legend_show ? 40 : 0;
 
         var customTimeFormat = timeFormat([
             [d3.time.format("%Y/%-m/%-d"), function() { return true; }],
@@ -122,17 +131,7 @@
             };
         }
 
-        /*-- Set Variables --*/
-
-        var clipId = config.bindto.replace('#','') + '-clip',
-            clipPath = "url(#" + clipId + ")";
-
-        var isTimeSeries = (__axis_x_type === 'timeseries'),
-            isCategorized = (__axis_x_type === 'categorized');
-
-        var dragStart = null, dragging = false;
-
-        var legendHeight = __legend_show ? 40 : 0;
+        /*-- Set Chart Params --*/
 
         var margin_bottom = 20 + __subchart_size_height + legendHeight,
             margin2_top = __size_height - __subchart_size_height - legendHeight,
@@ -217,8 +216,9 @@
         }
 
         // Define color
-        var color = _generateColor(__data_colors, __color_pattern);
+        var color = generateColor(__data_colors, __color_pattern);
 
+        // Define svgs
         var svg = d3.select(config.bindto).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
@@ -239,21 +239,21 @@
             .attr("width", width + 2)
             .attr("height", 40);
 
+        // Define regions
         var main = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
         var context = null;
         if (__subchart_show) {
             context = svg.append("g")
                 .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
         }
-
         var legend = null;
         if (__legend_show) {
             legend = svg.append("g")
                 .attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
         }
 
+        // Define tooltip
         var tooltip = d3.select(config.bindto)
               .style("position", "relative")
             .append("div")
@@ -264,15 +264,17 @@
 
         /*-- Define Functions --*/
 
-        var _getYDomainMin = function (targets) {
+        //-- Domain --//
+
+        function getYDomainMin (targets) {
             return (__axis_y_min !== null) ? __axis_y_min : d3.min(targets, function(t) { return d3.min(t.values, function(v) { return v.value; }); });
         };
-        var _getYDomainMax = function (targets) {
+        function getYDomainMax (targets) {
             return (__axis_y_max !== null) ? __axis_y_max : d3.max(targets, function(t) { return d3.max(t.values, function(v) { return v.value; }); });
         };
-        var _getYDomain = function (targets) {
-            var yDomainMin = _getYDomainMin(targets),
-                yDomainMax = _getYDomainMax(targets),
+        function getYDomain (targets) {
+            var yDomainMin = getYDomainMin(targets),
+                yDomainMax = getYDomainMax(targets),
                 padding = Math.abs(yDomainMax - yDomainMin) * 0.1;
             if (__axis_y_center !== null) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
@@ -281,25 +283,34 @@
             }
             return [yDomainMin-padding, yDomainMax+padding];
         };
+        function getXDomainRatio () {
+            if (brush.empty()) return 1;
+            var domain = x2.domain(), extent = brush.extent();
+            return (domain[1] - domain[0]) / (extent[1] - extent[0]);
+        }
 
-        var _hasCaches = function (ids) {
+        //-- Cache --//
+
+        function hasCaches (ids) {
             for (var i = 0; i < ids.length; i++){
-                if ( ! (ids[i] in _cache)) return false;
+                if ( ! (ids[i] in cache)) return false;
             }
             return true;
         }
-        var _addCache = function (id, target) {
-            _cache[id] = target;
+        function addCache (id, target) {
+            cache[id] = target;
         }
-        var _getCaches = function (ids) {
+        function getCaches (ids) {
             var targets = [];
             for (var i = 0; i < ids.length; i++){
-                if (ids[i] in _cache) targets.push(_cache[ids[i]]);
+                if (ids[i] in cache) targets.push(cache[ids[i]]);
             }
             return targets;
         }
 
-        var _convertRowsToData = function (rows) {
+        //-- Data --//
+
+        function convertRowsToData (rows) {
             var keys = rows[0],
                 new_row = {},
                 new_rows = [];
@@ -312,8 +323,7 @@
             }
             return new_rows;
         };
-
-        var _convertColumnsToData = function (columns) {
+        function convertColumnsToData (columns) {
             var new_rows = [];
             for (var i = 0; i < columns.length; i++) {
                 var key = columns[i][0];
@@ -326,8 +336,7 @@
             }
             return new_rows;
         };
-
-        var _convertDataToTargets = function (data) {
+        function convertDataToTargets (data) {
             var ids = d3.keys(data[0]).filter(function(key){ return key !== __data_x; });
 
             var i = 0;
@@ -350,43 +359,59 @@
 
             // cache as original id keyed
             targets.forEach(function(d){
-                _addCache(d.id_org, d);
+                addCache(d.id_org, d);
             });
 
             return targets;
         }
-
-        var _maxDataCount = function () {
+        function maxDataCount () {
             return d3.max(c3.data.targets, function(t){ return t.values.length; });
         }
-
-        var _targetsNum = function () {
-            return Object.keys(c3.data.targets).length;
-        }
-
         function isLineType (id) {
             return !(id in __data_types) || __data_types[id] === 'line';
         }
         function isBarType (id) {
             return __data_types[id] === 'bar';
         }
-
         function category (i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
 
-        var _getBrushRatio = function () {
-            if (brush.empty()) return 1;
-            var domain = x2.domain(), extent = brush.extent();
-            return (domain[1] - domain[0]) / (extent[1] - extent[0]);
-        }
+        //-- Color --//
 
-        var _dist = function (_this, _x, _y) {
+        function generateColor (_colors, _pattern) {
+            var ids = [],
+                colors = _colors,
+                pattern = (_pattern !== null) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728','#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
+
+            return function (id) {
+                // if specified, choose that color
+                if (id in colors) return _colors[id];
+
+                // if not specified, choose from pattern
+                if ( ! (ids.indexOf(id) >= 0)) {
+                    ids.push(id);
+                }
+                return pattern[ids.indexOf(id) % pattern.length];
+            }
+        };
+
+        //-- Util --//
+
+        function dist (_this, _x, _y) {
             var mouse = d3.mouse(_this);
             return Math.sqrt(Math.pow(x(_x)-mouse[0],2)+Math.pow(y(_y)-mouse[1],2))
         }
+        function isWithinRegions (x, regions) {
+            for (var i = 0; i < regions.length; i++) {
+                if (regions[i].start < x && x <= regions[i].end) return true;
+            }
+            return false;
+        }
 
-        var _selectPoint = function (target, d, i) {
+        //-- Selection --//
+
+        function selectPoint (target, d, i) {
             __point_onselected(target, d);
             // add selected-circle on low layer g
             main.select(".selected-circles-" + d.id).selectAll('.selected-circle-' + i)
@@ -400,108 +425,20 @@
               .transition().duration(100)
                 .attr("r", __point_select_r);
         };
-        var _unselectPoint = function (target, d, i) {
+        function unselectPoint (target, d, i) {
             __point_onunselected(target, d);
             // remove selected-circle from low layer g
             main.select(".selected-circles-" + d.id).selectAll(".selected-circle-" + i)
               .transition().duration(100).attr('r', 0)
                 .remove();
         };
-        var _togglePoint = function (selected, target, d, i) {
-            (selected) ? _selectPoint(target, d, i) : _unselectPoint(target, d, i);
+        function togglePoint (selected, target, d, i) {
+            (selected) ? selectPoint(target, d, i) : unselectPoint(target, d, i);
         };
 
-        // update - called when redraw
-        c3.update = function (withTransition) {
-            x.domain(brush.empty() ? x2.domain() : brush.extent());
+        //-- Shape --//
 
-            // ticks for x-axis
-            // ATTENTION: call here to update tickOffset
-            main.selectAll(".x.axis").call(xAxis);
-
-            // grid
-            if (__grid_x_show) {
-                var xgridData = null;
-                if (__grid_x_type === 'year') {
-                    xgridData = [];
-                    firstYear = firstDate.getFullYear();
-                    lastYear = lastDate.getFullYear();
-                    for (var year = firstYear; year <= lastYear; year++) {
-                        xgridData.push(new Date(year + '-01-01 00:00:00'));
-                    }
-                } else {
-                    xgridData = x.ticks(10);
-                }
-
-                var xgrid = main.select('g.xgrid').selectAll("line.xgrid")
-                    .data(xgridData);
-                // Enter
-                xgrid.enter().append('line').attr("class", "xgrid");
-                // Exit
-                xgrid.exit().remove();
-                // Update
-                main.selectAll("line.xgrid")
-                    .attr("class", "xgrid")
-                    .attr("x1", x)
-                    .attr("x2", x)
-                    .attr("y1", margin.top)
-                    .attr("y2", height);
-            }
-            if (__grid_x_lines) {
-                var xgridLine = main.selectAll("g.xgrid-line");
-                xgridLine.selectAll('line')
-                    .attr("x1", function(d){ return x(d.value); })
-                    .attr("x2", function(d){ return x(d.value); });
-                xgridLine.selectAll('text')
-                    .attr("x", function(d){ return x(d.value); });
-            }
-
-            // line and cricle
-            var mainPath = main.selectAll('.target').selectAll('path');
-            if (withTransition) mainPath = mainPath.transition();
-            mainPath.attr("d", function (d) { return _lineWithRegions(d.values, __data_regions[d.id]); });
-            var mainCircle = main.selectAll('.target').selectAll('circle');
-            if (withTransition) mainCircle = mainCircle.transition();
-            mainCircle.attr("cx", function(d) { return x(d.x); })
-                      .attr("cy", function(d) { return y(d.value); });
-
-            var targetsNum = Object.keys(c3.data.targets).length,
-                barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
-            var mainBar = main.selectAll('.target').selectAll('rect.target-bar');
-            if (withTransition) mainBar = mainBar.transition();
-            mainBar.attr("width", barWidth)
-                   .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i); });
-
-            if (__subchart_show) {
-                var contextPath = context.selectAll('.target').selectAll('path');
-                if (withTransition) contextPath = contextPath.transition();
-                contextPath.attr("d", function(d){ return line2(d.values); });
-            }
-
-            // circles for select
-            main.selectAll('.selected-circle')
-                .attr("cx", function(d) { return x(d.x); })
-                .attr("cy", function(d) { return y(d.value); });
-
-            // rect for mouseover
-            var w = ((width*_getBrushRatio())/(_maxDataCount()-1));
-            main.selectAll('rect.event-rect')
-                .attr("width", w)
-                .attr("x", function(d) { return x(d.x) - (w/2); });
-            main.selectAll('rect.region')
-                .attr("x", regionStart)
-                .attr("width", regionWidth);
-
-        }
-
-        var _isWithinRegions = function (d, regions) {
-            for (var i = 0; i < regions.length; i++) {
-                if (regions[i].start < d.x && d.x <= regions[i].end) return true;
-            }
-            return false;
-        }
-
-        var _lineWithRegions = function (d, regions) {
+        function lineWithRegions (d, regions) {
             var prev = -1,
                 s = "M";
 
@@ -520,7 +457,7 @@
             // Generate
             for (var i = 0; i < d.length; i++) {
                 // Draw as normal
-                if (typeof regions === 'undefined' || ! _isWithinRegions(d[i], regions)) {
+                if (typeof regions === 'undefined' || ! isWithinRegions(d[i].x, regions)) {
                     s += " "+x(d[i].x)+" "+y(d[i].value);
                 }
                 // Draw with region
@@ -541,12 +478,9 @@
             return s;
         };
 
-        /*-- Bind Events --*/
+        /*-- Define brush --*/
 
-        // Brush
-        var brush = d3.svg.brush()
-            .x(x2)
-            .on("brush", c3.update);
+        var brush = d3.svg.brush().x(x2).on("brush", update);
 
         /*-- Draw Chart --*/
 
@@ -554,17 +488,17 @@
         var firstDate = null,
             lastDate = null;
 
-        var _init = function(data) {
-            var targets = c3.data.targets = _convertDataToTargets(data);
+        function init (data) {
+            var targets = c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
 
             x.domain(d3.extent(data.map(function(d) { return d.x; })));
-            y.domain(_getYDomain(targets));
+            y.domain(getYDomain(targets));
             x2.domain(x.domain());
             y2.domain(y.domain());
 
-            /*-- Focus Region --*/
+            /*-- Main Region --*/
 
             var grid = main.append('g')
                 .attr("clip-path", clipPath)
@@ -654,7 +588,7 @@
 
             /*-- Cover whole with rects for events --*/
 
-            var w = ((width*_getBrushRatio())/(_maxDataCount()-1));
+            var w = ((width*getXDomainRatio())/(maxDataCount()-1));
 
             main.select('.chart').append("g")
                 .attr("class", "event-rects")
@@ -734,7 +668,7 @@
                             d3.select('.event-rect-'+i)
                                 .style('cursor', null);
                         })
-                        .filter(function(d){ return _dist(this,d.x,d.value) < __point_select_r; })
+                        .filter(function(d){ return dist(this,d.x,d.value) < __point_select_r; })
                         .each(function(d){
                             var _this = d3.select(this);
                             if ( ! _this.classed('_e_')) {
@@ -747,10 +681,10 @@
                     main.selectAll('.target-circle-'+i).each(function(d,x){
                         var _this = d3.select(this),
                             _selected = _this.classed('_s_');
-                        if (__data_selection_grouped || _dist(this, d.x, d.value) < __point_select_r*1.5) {
+                        if (__data_selection_grouped || dist(this, d.x, d.value) < __point_select_r*1.5) {
                             if (__data_selection_enabled && __data_selection_isselectable(d)) {
                                 _this.classed('_s_', !_selected);
-                                _togglePoint(!_selected, _this, d, i);
+                                togglePoint(!_selected, _this, d, i);
                             }
                             __point_onclick(d, _this);
                         }
@@ -785,7 +719,7 @@
                                     _this.classed('_i_', !_included);
                                     // TODO: included/unincluded callback here
                                     _this.classed('_s_', !_selected);
-                                    _togglePoint(!_selected, _this, d, i);
+                                    togglePoint(!_selected, _this, d, i);
                                 }
                             });
                     })
@@ -839,7 +773,7 @@
                 // ATTENTION: This must be called AFTER chart rendered and BEFORE brush called.
                 // Update extetn for Brush
                 if (__subchart_default !== null) {
-                    brush.extent((isTimeSeries) ? __subchart_default(firstDate,lastDate) : __subchart_default(0,_maxDataCount()-1));
+                    brush.extent((isTimeSeries) ? __subchart_default(firstDate,lastDate) : __subchart_default(0,maxDataCount()-1));
                 }
 
                 // Add extent rect for Brush
@@ -859,91 +793,98 @@
 
             /*-- Legend Region --*/
 
-            if (__legend_show) {
-                _draw_legend(targets);
-            }
+            if (__legend_show) drawLegend(targets);
 
             // Update main chart with settings
-            c3.update();
+            update();
 
-            /*-- Draw chart for each data --*/
-
-            _draw(targets);
-
+            // Draw chart for each data
+            draw(targets);
         };
 
-        var _draw_legend = function (targets) {
-            var ids = targets.map(function(d){ return d.id; });
+        function update (withTransition) {
+            x.domain(brush.empty() ? x2.domain() : brush.extent());
 
-            // Define g for legend area
-            var l = legend.selectAll('.legend-item')
-                .data(ids)
-              .enter().append('g')
-                .attr('class', function(d){ return 'legend-item legend-item-' + d; })
-                .style('cursor', 'pointer')
-                .on('click', function(d){
-                    __legend_item_onclick(d);
-                })
-                .on('mouseover', function(d){
-                    d3.selectAll('.legend-item').filter(function(_d){ return _d !== d; })
-                      .transition().duration(100)
-                        .style('opacity', 0.3);
-                    c3.defocus();
-                    c3.focus(d);
-                })
-                .on('mouseout', function(d){
-                    d3.selectAll('.legend-item')
-                      .transition().duration(100)
-                        .style('opacity', 1);
-                    c3.revert();
-                });
+            // ticks for x-axis
+            // ATTENTION: call here to update tickOffset
+            main.selectAll(".x.axis").call(xAxis);
 
-            l.append('rect').classed("legend-item-event",true).attr('x', -200);
-            l.append('rect').classed("legend-item-tile",true).attr('x', -200);
-            l.append('text').attr('x', -200);
+            // grid
+            if (__grid_x_show) {
+                var xgridData = null;
+                if (__grid_x_type === 'year') {
+                    xgridData = [];
+                    firstYear = firstDate.getFullYear();
+                    lastYear = lastDate.getFullYear();
+                    for (var year = firstYear; year <= lastYear; year++) {
+                        xgridData.push(new Date(year + '-01-01 00:00:00'));
+                    }
+                } else {
+                    xgridData = x.ticks(10);
+                }
 
-            legend.selectAll('rect.legend-item-event')
-                .data(ids)
-                .style('fill-opacity', 0)
-                .attr('width', __legend_item_width)
-                .attr('height', 24)
-                .attr('y', function(d,i){ return legendHeight/2 - 16; });
+                var xgrid = main.select('g.xgrid').selectAll("line.xgrid")
+                    .data(xgridData);
+                // Enter
+                xgrid.enter().append('line').attr("class", "xgrid");
+                // Exit
+                xgrid.exit().remove();
+                // Update
+                main.selectAll("line.xgrid")
+                    .attr("class", "xgrid")
+                    .attr("x1", x)
+                    .attr("x2", x)
+                    .attr("y1", margin.top)
+                    .attr("y2", height);
+            }
+            if (__grid_x_lines) {
+                var xgridLine = main.selectAll("g.xgrid-line");
+                xgridLine.selectAll('line')
+                    .attr("x1", function(d){ return x(d.value); })
+                    .attr("x2", function(d){ return x(d.value); });
+                xgridLine.selectAll('text')
+                    .attr("x", function(d){ return x(d.value); });
+            }
 
-            legend.selectAll('rect.legend-item-tile')
-                .data(ids)
-                .style('fill', function(d){ return color(d); })
-                .attr('width', 10)
-                .attr('height', 10)
-                .attr('y', function(d,i){ return legendHeight/2 - 9; });
+            // line and cricle
+            var mainPath = main.selectAll('.target').selectAll('path');
+            if (withTransition) mainPath = mainPath.transition();
+            mainPath.attr("d", function (d) { return lineWithRegions(d.values, __data_regions[d.id]); });
+            var mainCircle = main.selectAll('.target').selectAll('circle');
+            if (withTransition) mainCircle = mainCircle.transition();
+            mainCircle.attr("cx", function(d) { return x(d.x); })
+                      .attr("cy", function(d) { return y(d.value); });
 
-            legend.selectAll('text')
-                .data(ids)
-                .text(function(d){ return __data_names[d]; })
-                .attr('y', function(d,i){ return legendHeight/2; });
+            var targetsNum = Object.keys(c3.data.targets).length,
+                barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
+            var mainBar = main.selectAll('.target').selectAll('rect.target-bar');
+            if (withTransition) mainBar = mainBar.transition();
+            mainBar.attr("width", barWidth)
+                   .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i); });
 
-            _update_legend(targets);
-        };
-        var _update_legend = function (targets) {
-            var ids = targets.map(function(d){ return d.id; }),
-                padding = width/2 - __legend_item_width*Object.keys(targets).length/2;
+            if (__subchart_show) {
+                var contextPath = context.selectAll('.target').selectAll('path');
+                if (withTransition) contextPath = contextPath.transition();
+                contextPath.attr("d", function(d){ return line2(d.values); });
+            }
 
-            legend.selectAll('rect.legend-item-event')
-                .data(ids)
-              .transition()
-                .attr('x', function(d,i){ return padding + __legend_item_width*i; })
+            // circles for select
+            main.selectAll('.selected-circle')
+                .attr("cx", function(d) { return x(d.x); })
+                .attr("cy", function(d) { return y(d.value); });
 
-            legend.selectAll('rect.legend-item-tile')
-                .data(ids)
-              .transition()
-                .attr('x', function(d,i){ return padding + __legend_item_width*i; })
+            // rect for mouseover
+            var w = ((width*getXDomainRatio())/(maxDataCount()-1));
+            console.log(w);
+            main.selectAll('rect.event-rect')
+                .attr("width", w)
+                .attr("x", function(d) { return x(d.x) - (w/2); });
+            main.selectAll('rect.region')
+                .attr("x", regionStart)
+                .attr("width", regionWidth);
+        }
 
-            legend.selectAll('text')
-                .data(ids)
-              .transition()
-                .attr('x', function(d,i){ return padding + __legend_item_width*i + 14; })
-        };
-
-        var _draw = function (targets) {
+        function draw (targets) {
 
             /*-- Main --*/
 
@@ -958,7 +899,7 @@
             // Lines for each data
             f.append("path")
                 .attr("class", function(d){ return "target-line target-line-" + d.id; })
-                .attr("d", function (d) { return _lineWithRegions(d.values, __data_regions[d.id]); })
+                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); })
                 .style("stroke", function(d) { return color(d.id); })
                 .style("opacity", function(d){ return isLineType(d.id) ? 1 : 0; });
 
@@ -981,7 +922,7 @@
                         _selected = _this.classed('_s_');
                     if (__data_selection_enabled && __data_selection_isselectable(d)) {
                         _this.classed('_s_', !_selected);
-                        _togglePoint(!_selected, _this, d, i);
+                        togglePoint(!_selected, _this, d, i);
                     }
                     __point_onclick(d, _this);
                 })
@@ -989,7 +930,7 @@
 
             // Rects for each data
 
-            var targetsNum = _targetsNum(),
+            var targetsNum = Object.keys(c3.data.targets).length,
                 barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
 
             f.append('g')
@@ -1009,7 +950,7 @@
             main.selectAll('.target-line')
                 .data(targets)
               .transition()
-                .attr("d", function (d) { return _lineWithRegions(d.values, __data_regions[d.id]); });
+                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); });
 
             main.selectAll('.target-circles')
                 .data(targets)
@@ -1063,7 +1004,7 @@
             /*-- Legend --*/
 
             if (__legend_show) {
-                _draw_legend(targets);
+                drawLegend(targets);
             }
 
             /*-- Show --*/
@@ -1074,7 +1015,7 @@
                 .style("opacity", 1);
         };
 
-        var _load = function(targets, done) {
+        function load (targets, done) {
             // Update/Add data
             c3.data.targets.forEach(function(d){
                 for (var i = 0; i < targets.length; i++) {
@@ -1088,14 +1029,88 @@
             c3.data.targets = c3.data.targets.concat(targets); // add remained
 
             if (__axis_y_rescale) {
-                y.domain(_getYDomain(c3.data.targets));
+                y.domain(getYDomain(c3.data.targets));
                 y2.domain(y.domain());
                 main.select('.y.axis').transition().call(yAxis);
             }
 
-            _draw(c3.data.targets);
+            draw(c3.data.targets);
 
             done();
+        };
+
+        /*-- Draw Legend --*/
+
+        function drawLegend (targets) {
+            var ids = targets.map(function(d){ return d.id; });
+
+            // Define g for legend area
+            var l = legend.selectAll('.legend-item')
+                .data(ids)
+              .enter().append('g')
+                .attr('class', function(d){ return 'legend-item legend-item-' + d; })
+                .style('cursor', 'pointer')
+                .on('click', function(d){
+                    __legend_item_onclick(d);
+                })
+                .on('mouseover', function(d){
+                    d3.selectAll('.legend-item').filter(function(_d){ return _d !== d; })
+                      .transition().duration(100)
+                        .style('opacity', 0.3);
+                    c3.defocus();
+                    c3.focus(d);
+                })
+                .on('mouseout', function(d){
+                    d3.selectAll('.legend-item')
+                      .transition().duration(100)
+                        .style('opacity', 1);
+                    c3.revert();
+                });
+
+            l.append('rect').classed("legend-item-event",true).attr('x', -200);
+            l.append('rect').classed("legend-item-tile",true).attr('x', -200);
+            l.append('text').attr('x', -200);
+
+            legend.selectAll('rect.legend-item-event')
+                .data(ids)
+                .style('fill-opacity', 0)
+                .attr('width', __legend_item_width)
+                .attr('height', 24)
+                .attr('y', function(d,i){ return legendHeight/2 - 16; });
+
+            legend.selectAll('rect.legend-item-tile')
+                .data(ids)
+                .style('fill', function(d){ return color(d); })
+                .attr('width', 10)
+                .attr('height', 10)
+                .attr('y', function(d,i){ return legendHeight/2 - 9; });
+
+            legend.selectAll('text')
+                .data(ids)
+                .text(function(d){ return __data_names[d]; })
+                .attr('y', function(d,i){ return legendHeight/2; });
+
+            updateLegend(targets);
+        };
+
+        function updateLegend (targets) {
+            var ids = targets.map(function(d){ return d.id; }),
+                padding = width/2 - __legend_item_width*Object.keys(targets).length/2;
+
+            legend.selectAll('rect.legend-item-event')
+                .data(ids)
+              .transition()
+                .attr('x', function(d,i){ return padding + __legend_item_width*i; })
+
+            legend.selectAll('rect.legend-item-tile')
+                .data(ids)
+              .transition()
+                .attr('x', function(d,i){ return padding + __legend_item_width*i; })
+
+            legend.selectAll('text')
+                .data(ids)
+              .transition()
+                .attr('x', function(d,i){ return padding + __legend_item_width*i + 14; })
         };
 
         /*-- Event Handling --*/
@@ -1143,24 +1158,24 @@
                 args.done = function() {};
             }
             // use cache if exists
-            if ('cacheIds' in args && _hasCaches(args.cacheIds)) {
-                _load(_getCaches(args.cacheIds), args.done);
+            if ('cacheIds' in args && hasCaches(args.cacheIds)) {
+                load(getCaches(args.cacheIds), args.done);
                 return;
             }
             // load data
             if ('data' in args) {
-                _load(_convertDataToTargets(data), args.done);
+                load(convertDataToTargets(data), args.done);
             }
             else if ('url' in args) {
                 d3.csv(args.url, function(error, data){
-                    _load(_convertDataToTargets(data), args.done);
+                    load(convertDataToTargets(data), args.done);
                 });
             }
             else if ('rows' in args) {
-                _load(_convertDataToTargets(_convertRowsToData(args.rows)), args.done);
+                load(convertDataToTargets(convertRowsToData(args.rows)), args.done);
             }
             else if ('columns' in args) {
-                _load(_convertDataToTargets(_convertColumnsToData(args.columns)), args.done);
+                load(convertDataToTargets(convertColumnsToData(args.columns)), args.done);
             }
             else {
                 throw Error('url or rows or columns is required.');
@@ -1178,16 +1193,16 @@
 
             if (__legend_show) {
                 d3.selectAll('.legend-item-'+target).remove();
-                _update_legend(c3.data.targets);
+                updateLegend(c3.data.targets);
             }
 
             if (__axis_y_rescale){
-                y.domain(_getYDomain(c3.data.targets));
+                y.domain(getYDomain(c3.data.targets));
                 y2.domain(y.domain());
                 main.select('.y.axis').transition().call(yAxis);
             }
 
-            c3.update(true);
+            update(true);
         };
 
         c3.selected = function (target) {
@@ -1205,10 +1220,10 @@
             main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
                 if (indices.indexOf(i) >= 0) {
                     if (__data_selection_grouped || __data_selection_isselectable(d)) {
-                        _selectPoint(d3.select(this).classed('_s_',true), d, i);
+                        selectPoint(d3.select(this).classed('_s_',true), d, i);
                     }
                 } else if (typeof resetOther !== 'undefined' && resetOther) {
-                    _unselectPoint(d3.select(this).classed('_s_',false), d, i);
+                    unselectPoint(d3.select(this).classed('_s_',false), d, i);
                 }
             });
         }
@@ -1218,22 +1233,22 @@
             main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
                 if (typeof indices === 'undefined' || indices.indexOf(i) >= 0) {
                     if (__data_selection_grouped || __data_selection_isselectable(d)) {
-                        _unselectPoint(d3.select(this).classed('_s_',false), d, i);
+                        unselectPoint(d3.select(this).classed('_s_',false), d, i);
                     }
                 }
             });
         }
 
-        /*-- Load data and init chart --*/
+        /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
-            d3.csv(config.data.url, function(error, data) { _init(data); });
+            d3.csv(config.data.url, function(error, data) { init(data); });
         }
         else if ('rows' in config.data) {
-            _init(_convertRowsToData(config.data.rows));
+            init(convertRowsToData(config.data.rows));
         }
         else if ('columns' in config.data) {
-            _init(_convertColumnsToData(config.data.columns));
+            init(convertColumnsToData(config.data.columns));
         }
         else {
             throw Error('url or rows or columns is required.');
@@ -1242,24 +1257,7 @@
         return c3;
     };
 
-    var _generateColor = function (_colors, _pattern) {
-        var ids = [],
-            colors = _colors,
-            pattern = (_pattern !== null) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728','#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; // same as d3.scale.category10()
-
-        return function (id) {
-            // if specified, choose that color
-            if (id in colors) return _colors[id];
-
-            // if not specified, choose from pattern
-            if ( ! (ids.indexOf(id) >= 0)) {
-                ids.push(id);
-            }
-            return pattern[ids.indexOf(id) % pattern.length];
-        }
-    };
-
-    var categoryAxis = function() {
+    function categoryAxis () {
         var scale = d3.scale.linear(), orient = "bottom", tickMajorSize = 6, tickMinorSize = 6, tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 30, tickOffset = 0, categories = [];
         function axisX (selection, x) {
             selection.attr("transform", function(d){
