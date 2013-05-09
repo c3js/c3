@@ -430,6 +430,12 @@
             var mouse = d3.mouse(_this)
             return Math.sqrt(Math.pow(x(_x)-mouse[0],2)+Math.pow(y(_y)-mouse[1],2))
         }
+        function isWithinBar (_this, _x, _y) {
+            var mouse = d3.mouse(_this)
+            var xoffset = d3.select(_this).attr("width")/2 + 10, yoffset = 10
+            var sx = _x - xoffset, ex = _x + xoffset, ey = _y - yoffset
+            return sx < mouse[0] && mouse[0] < ex && ey < mouse[1]
+        }
         function isWithinRegions (x, regions) {
             var i
             for (i = 0; i < regions.length; i++) {
@@ -463,6 +469,21 @@
         }
         function togglePoint (selected, target, d, i) {
             (selected) ? selectPoint(target, d, i) : unselectPoint(target, d, i)
+        }
+
+        function selectBar (target, d, i) {
+            target.transition().duration(100)
+                .style("fill-opacity", 0.4)
+                .style("stroke-width", "1px")
+        }
+        function unselectBar (target, d, i) {
+            target.transition().duration(100)
+                .style("fill-opacity", 1)
+                .style("stroke-width", target.classed("_e_") ? "4px" : null)
+            .each('end', function(){ target.transition().style("stroke-width", null) })
+        }
+        function toggleBar (selected, target, d, i) {
+            (selected) ? selectBar(target, d, i) : unselectBar(target, d, i)
         }
 
         //-- Shape --//
@@ -663,6 +684,10 @@
                             .attr('r', __point_focus_expand_r)
                     }
 
+                    // Expand bars
+                    main.selectAll(".target-bar-"+i)
+                        .classed("_e_", true)
+
                     // Show xgrid focus line
                     main.selectAll('line.xgrid-focus')
                         .style("visibility","visible")
@@ -684,39 +709,57 @@
                         .filter(function(){ return d3.select(this).classed('_e_') })
                         .classed("_e_", false)
                         .attr('r', __point_r)
+                    // Undo expanded bar
+                    main.selectAll(".target-bar-"+i)
+                        .classed("_e_", false)
                 })
-                .on('mousemove', function(x,i){
+                .on('mousemove', function(d,i){
                     if ( ! __data_selection_enabled || dragging) return
                     if ( __data_selection_grouped) return // nothing to do when grouped
 
-                    main.selectAll('.target-circle-'+i)
+                    main.selectAll('.target-circle-'+i+', .target-bar-'+i)
                         .filter(function(d){ return __data_selection_isselectable(d) })
                         .each(function(d){
-                            d3.select(this)
-                                .classed('_e_', true)
-                                .attr('r', __point_focus_expand_r)
-                            d3.select('.event-rect-'+i)
-                                .style('cursor', null)
+                            var _this = d3.select(this).classed('_e_', true)
+                            if (this.nodeName === 'circle') _this.attr('r', __point_focus_expand_r)
+                            d3.select('.event-rect-'+i).style('cursor', null)
                         })
-                        .filter(function(d){ return dist(this,d.x,d.value) < __point_select_r })
+                        .filter(function(d){
+                            if (this.nodeName === 'circle') {
+                                return dist(this, d.x, d.value) < __point_select_r
+                            }
+                            else if (this.nodeName === 'rect') {
+                                return isWithinBar(this, x(d.x), y(d.value))
+                            }
+                        })
                         .each(function(d){
                             var _this = d3.select(this)
                             if ( ! _this.classed('_e_')) {
-                                _this.classed('_e_', true).attr('r', __point_select_r)
+                                _this.classed('_e_', true)
+                                if (this.nodeName === 'circle') _this.attr('r', __point_select_r)
                             }
                             d3.select('.event-rect-'+i).style('cursor', 'pointer')
                         })
                 })
-                .on('click', function(x,i) {
-                    main.selectAll('.target-circle-'+i).each(function(d,x){
+                .on('click', function(d,i) {
+                    main.selectAll('.target-circle-'+i+', .target-bar-'+i).each(function(d){
                         var _this = d3.select(this),
                             _selected = _this.classed('_s_')
-                        if (__data_selection_grouped || dist(this, d.x, d.value) < __point_select_r*1.5) {
+                        var isWithin = false, toggle
+                        if (this.nodeName === 'circle') {
+                            isWithin = dist(this, d.x, d.value) < __point_select_r*1.5
+                            toggle = togglePoint
+                        }
+                        else if (this.nodeName === 'rect') {
+                            isWithin = isWithinBar(this, x(d.x), y(d.value))
+                            toggle = toggleBar
+                        }
+                        if (__data_selection_grouped || isWithin) {
                             if (__data_selection_enabled && __data_selection_isselectable(d)) {
                                 _this.classed('_s_', !_selected)
-                                togglePoint(!_selected, _this, d, i)
+                                toggle(!_selected, _this, d, i)
                             }
-                            __point_onclick(d, _this)
+                            __point_onclick(d, _this) // TODO: should be __data_onclick
                         }
                     })
                 })
@@ -750,6 +793,22 @@
                                     // TODO: included/unincluded callback here
                                     _this.classed('_s_', !_selected)
                                     togglePoint(!_selected, _this, d, i)
+                                }
+                            })
+                        main.selectAll('.target-bars').selectAll('.target-bar')
+                            .filter(function(d){ return __data_selection_isselectable(d) })
+                            .each(function(d,i){
+                                var _this = d3.select(this),
+                                    _selected = _this.classed('_s_'),
+                                    _included = _this.classed('_i_'),
+                                    _x = x(d.x), _y = y(d.value),
+                                    _offset = _this.attr('width')/2,
+                                    _within = min_x < _x+_offset && _x-_offset < max_x && min_y < _y && _y < max_y
+                                if (_within ^ _included) {
+                                    _this.classed('_i_', !_included)
+                                    // TODO: included/unincluded callback here
+                                    _this.classed('_s_', !_selected)
+                                    toggleBar(!_selected, _this, d, i)
                                 }
                             })
                     })
@@ -957,15 +1016,6 @@
                 .attr("cx", function(d) { return x(d.x) })
                 .attr("cy", function(d) { return y(d.value) })
                 .attr("r", __point_r)
-                .on("click", function(d,i){
-                    var _this = d3.select(this),
-                        _selected = _this.classed('_s_')
-                    if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                        _this.classed('_s_', !_selected)
-                        togglePoint(!_selected, _this, d, i)
-                    }
-                    __point_onclick(d, _this)
-                })
 
             // Rects for each data
             barWidth = (xAxis.tickOffset()*2*0.6) / barTargetsNum
@@ -975,6 +1025,8 @@
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                 .style("fill", function(d){ return color(d.id) })
+                .style("stroke", function(d){ return color(d.id) })
+                .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
               .filter(isBarType)
               .selectAll("bar")
                 .data(function(d){ return d.values })

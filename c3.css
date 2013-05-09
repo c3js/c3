@@ -33,6 +33,22 @@ path, line {
   stroke-width: 2px;
 }
 
+/*-- Bar --*/
+
+.target-bar._e_ {
+  stroke-width: 6px;
+}
+/* TODO: use this
+.target-bar._s_ {
+  stroke-width: 1px;
+  fill-opacity: 0.4;
+}
+*/
+.selected-bar {
+  fill: white;
+  stroke-width: 2px;
+}
+
 /*-- Focus --*/
 
 .target.focused path {
