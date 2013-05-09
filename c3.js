@@ -426,14 +426,15 @@
 
         //-- Util --//
 
-        function dist (_this, _x, _y) {
-            var mouse = d3.mouse(_this)
-            return Math.sqrt(Math.pow(x(_x)-mouse[0],2)+Math.pow(y(_y)-mouse[1],2))
+        function isWithinCircle (_this, _r) {
+            var mouse = d3.mouse(_this), d3_this = d3.select(_this)
+            var cx = d3_this.attr("cx")*1, cy = d3_this.attr("cy")*1
+            return Math.sqrt(Math.pow(cx-mouse[0],2)+Math.pow(cy-mouse[1],2)) < _r
         }
-        function isWithinBar (_this, _x, _y) {
-            var mouse = d3.mouse(_this)
-            var xoffset = d3.select(_this).attr("width")/2 + 10, yoffset = 10
-            var sx = _x - xoffset, ex = _x + xoffset, ey = _y - yoffset
+        function isWithinBar (_this) {
+            var mouse = d3.mouse(_this), d3_this = d3.select(_this)
+            var x = d3_this.attr("x")*1, y = d3_this.attr("y")*1, w = d3_this.attr("width")*1
+            var sx = x - 10, ex = x + w + 10, ey = y - 10
             return sx < mouse[0] && mouse[0] < ex && ey < mouse[1]
         }
         function isWithinRegions (x, regions) {
@@ -725,11 +726,12 @@
                             d3.select('.event-rect-'+i).style('cursor', null)
                         })
                         .filter(function(d){
+                            var _this = d3.select(this)
                             if (this.nodeName === 'circle') {
-                                return dist(this, d.x, d.value) < __point_select_r
+                                return isWithinCircle(this, __point_select_r)
                             }
                             else if (this.nodeName === 'rect') {
-                                return isWithinBar(this, x(d.x), y(d.value))
+                                return isWithinBar(this, _this.attr('x'), _this.attr('y'))
                             }
                         })
                         .each(function(d){
@@ -747,11 +749,11 @@
                             _selected = _this.classed('_s_')
                         var isWithin = false, toggle
                         if (this.nodeName === 'circle') {
-                            isWithin = dist(this, d.x, d.value) < __point_select_r*1.5
+                            isWithin = isWithinCircle(this, __point_select_r*1.5)
                             toggle = togglePoint
                         }
                         else if (this.nodeName === 'rect') {
-                            isWithin = isWithinBar(this, x(d.x), y(d.value))
+                            isWithin = isWithinBar(this)
                             toggle = toggleBar
                         }
                         if (__data_selection_grouped || isWithin) {
@@ -801,9 +803,9 @@
                                 var _this = d3.select(this),
                                     _selected = _this.classed('_s_'),
                                     _included = _this.classed('_i_'),
-                                    _x = x(d.x), _y = y(d.value),
-                                    _offset = _this.attr('width')/2,
-                                    _within = min_x < _x+_offset && _x-_offset < max_x && min_y < _y && _y < max_y
+                                    _x = _this.attr("x")*1, _y = _this.attr("y")*1
+                                    _w = _this.attr('width')*1,
+                                    _within = min_x < _x+_w && _x < max_x && _y < max_y
                                 if (_within ^ _included) {
                                     _this.classed('_i_', !_included)
                                     // TODO: included/unincluded callback here
