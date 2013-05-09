@@ -617,8 +617,7 @@
                 .on('mouseover', function(d,i) {
                     if (dragging) return // do nothing if dragging
 
-                    var selected = main.selectAll('.target-circle-'+i),
-                        selectedData = d3.merge(selected.map(function(d){ return d.map(function(d){ return (typeof d !== 'undefined') ? d.__data__ : {} }) }))
+                    var selectedData = c3.data.targets.map(function(d){ return d.values[i] });
                     var j, newData
 
                     // Add id,name to selectedData
