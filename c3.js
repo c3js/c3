@@ -376,6 +376,23 @@
             }
             return false
         }
+        function getTargetsNum (filter) {
+            return typeof filter !== 'undefined' ? c3.data.targets.filter(isBarType).length : c3.data.targets.length;
+        }
+        function getBarTargetIndices () {
+            var indices = []
+            c3.data.targets.forEach(function(d,i) {
+                if (isBarType(d)) {
+                    indices.push(i)
+                }
+            })
+            return indices
+        }
+        function getBarX (barWidth, barTargetsNum, barIndices) {
+            return function (d) {
+                return x(d.x) - barWidth * (barTargetsNum/2 - barIndices.indexOf(d.i))
+            }
+        }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return !(id in __data_types) || __data_types[id] === 'line'
@@ -610,8 +627,8 @@
               .enter().append("rect")
                 .attr("class", function(d,i){ return "event-rect event-rect-"+i })
                 .style("cursor", function(d){ return __data_selection_enabled && __data_selection_grouped ? "pointer" : null })
-                .attr("x", function(d) { return x(d.x) - (rectWidth/2) })
-                .attr("y", function(d) { return 0 })
+                .attr("x", function(d){ return x(d.x) - (rectWidth/2) })
+                .attr("y", function(d){ return 0 })
                 .attr("width", rectWidth)
                 .attr("height", height)
                 .on('mouseover', function(d,i) {
@@ -817,7 +834,8 @@
         function update (withTransition) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
-            var targetsNum = Object.keys(c3.data.targets).length, rectWidth, barWidth
+            var barTargetsNum = getTargetsNum(isBarType), barWidth, barIndices, barX
+            var rectWidth
 
             x.domain(brush.empty() ? x2.domain() : brush.extent())
 
@@ -871,11 +889,14 @@
                       .attr("cy", function(d) { return y(d.value) })
 
             // bars
-            barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum
+            barWidth = (xAxis.tickOffset()*2*0.6) / barTargetsNum
+            barIndices = getBarTargetIndices()
+            barX = getBarX(barWidth, barTargetsNum, barIndices)
+
             mainBar = main.selectAll('.target').selectAll('.target-bar').filter(isBarType)
             if (withTransition) mainBar = mainBar.transition()
             mainBar.attr("width", barWidth)
-                   .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i) })
+                   .attr("x", barX)
 
             // subchart
             if (__subchart_show) {
@@ -900,8 +921,7 @@
         }
 
         function draw (targets) {
-            var targetsNum = Object.keys(c3.data.targets).length
-            var barWidth = 0, bar2Width = 0
+            var barTargetsNum = getTargetsNum(isBarType), barWidth = 0, bar2Width = 0, barIndices, barX
             var f, c
 
             /*-- Main --*/
@@ -947,7 +967,10 @@
                 })
 
             // Rects for each data
-            barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum
+            barWidth = (xAxis.tickOffset()*2*0.6) / barTargetsNum
+            barIndices = getBarTargetIndices()
+            barX = getBarX(barWidth, barTargetsNum, barIndices)
+
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                 .style("fill", function(d){ return color(d.id) })
@@ -956,7 +979,7 @@
                 .data(function(d){ return d.values })
               .enter().append("rect")
                 .attr("class", function(d,i){ return "target-bar target-bar-" + i })
-                .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i) })
+                .attr("x", barX)
                 .attr("y", function(d){ return y(d.value) })
                 .attr("width", barWidth)
                 .attr("height", function(d){ return height-y(d.value) })
@@ -996,7 +1019,9 @@
                     .attr("d", function (d) { return line2(d.values) })
 
                 // Rects for each data
-                bar2Width = (xAxis2.tickOffset()*2*0.6) / targetsNum
+                bar2Width = (xAxis2.tickOffset()*2*0.6) / barTargetsNum
+                barX = getBarX(bar2Width, barTargetsNum, barIndices)
+
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                     .style("fill", function(d){ return color(d.id) })
@@ -1005,7 +1030,7 @@
                     .data(function(d){ return d.values })
                   .enter().append("rect")
                     .attr("class", function(d,i){ return "target-bar target-bar-" + i })
-                    .attr("x", function(d){ return x2(d.x) - bar2Width * (targetsNum/2-d.i) })
+                    .attr("x", barX)
                     .attr("y", function(d){ return y2(d.value) })
                     .attr("width", bar2Width)
                     .attr("height", function(d){ return height2-y2(d.value) })
