@@ -378,10 +378,12 @@
             }
             return false;
         }
-        function isLineType (id) {
+        function isLineType (d) {
+            var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line';
         }
-        function isBarType (id) {
+        function isBarType (d) {
+            var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'bar';
         }
         function category (i) {
@@ -863,24 +865,24 @@
             }
 
             // lines and cricles
-            mainPath = main.selectAll('.target').selectAll('path');
+            mainPath = main.selectAll('.target').selectAll('.target-line').filter(isLineType);
             if (withTransition) mainPath = mainPath.transition();
-            mainPath.attr("d", function (d) { return lineWithRegions(d.values, __data_regions[d.id]); });
-            mainCircle = main.selectAll('.target').selectAll('circle');
+            mainPath.attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); });
+            mainCircle = main.selectAll('.target').selectAll('.target-circle').filter(isLineType);
             if (withTransition) mainCircle = mainCircle.transition();
             mainCircle.attr("cx", function(d) { return x(d.x); })
                       .attr("cy", function(d) { return y(d.value); });
 
             // bars
             barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
-            mainBar = main.selectAll('.target').selectAll('rect.target-bar');
+            mainBar = main.selectAll('.target').selectAll('.target-bar').filter(isBarType);
             if (withTransition) mainBar = mainBar.transition();
             mainBar.attr("width", barWidth)
                    .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i); });
 
             // subchart
             if (__subchart_show) {
-                contextPath = context.selectAll('.target').selectAll('path');
+                contextPath = context.selectAll('.target').selectAll('path').filter(isLineType);
                 if (withTransition) contextPath = contextPath.transition();
                 contextPath.attr("d", function(d){ return line2(d.values); });
             }
@@ -918,9 +920,9 @@
             // Lines for each data
             f.append("path")
                 .attr("class", function(d){ return "target-line target-line-" + d.id; })
-                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); })
                 .style("stroke", function(d) { return color(d.id); })
-                .style("opacity", function(d){ return isLineType(d.id) ? 1 : 0; });
+              .filter(isLineType)
+                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); });
 
             // Circles for each data point on lines
             f.append('g')
@@ -929,8 +931,9 @@
                 .attr("class", function(d){ return "target-circles target-circles-" + d.id; })
                 .style("fill", function(d) { return color(d.id); })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null; })
+              .filter(isLineType)
               .selectAll("circle")
-                .data(function(d) { return d.values; })
+                .data(function(d){ return d.values; })
               .enter().append("circle")
                 .attr("class", function(d,i){ return "target-circle target-circle-" + i; })
                 .attr("cx", function(d) { return x(d.x); })
@@ -944,14 +947,14 @@
                         togglePoint(!_selected, _this, d, i);
                     }
                     __point_onclick(d, _this);
-                })
-                .style("opacity", function(d){ return isLineType(d.id) ? 1 : 0; });
+                });
 
             // Rects for each data
             barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id; })
                 .style("fill", function(d){ return color(d.id); })
+              .filter(isBarType)
               .selectAll("bar")
                 .data(function(d){ return d.values; })
               .enter().append("rect")
@@ -959,17 +962,19 @@
                 .attr("x", function(d){ return x(d.x) - barWidth * (targetsNum/2-d.i); })
                 .attr("y", function(d){ return y(d.value); })
                 .attr("width", barWidth)
-                .attr("height", function(d){ return height-y(d.value); })
-                .style("opacity", function(d){ return isBarType(d.id) ? 1 : 0; });
+                .attr("height", function(d){ return height-y(d.value); });
 
-            // Update Section
+            //-- Main Update Section --//
+
             main.selectAll('.target-line')
                 .data(targets)
+              .filter(isLineType)
               .transition()
                 .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]); });
 
             main.selectAll('.target-circles')
                 .data(targets)
+              .filter(isLineType)
               .selectAll('circle')
                 .data(function(d) { return d.values; })
               .transition()
@@ -989,15 +994,16 @@
                 // Lines for each data
                 c.append("path")
                     .attr("class", function(d){ return "target-line target-line-" + d.id; })
-                    .attr("d", function (d) { return line2(d.values); })
                     .style("stroke", function(d) { return color(d.id); })
-                    .style("opacity", function(d){ return isLineType(d.id) ? 1 : 0; });
+                  .filter(isLineType)
+                    .attr("d", function (d) { return line2(d.values); });
 
                 // Rects for each data
                 bar2Width = (xAxis2.tickOffset()*2*0.6) / targetsNum;
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id; })
                     .style("fill", function(d){ return color(d.id); })
+                  .filter(isBarType)
                   .selectAll("bar")
                     .data(function(d){ return d.values; })
                   .enter().append("rect")
@@ -1005,12 +1011,13 @@
                     .attr("x", function(d){ return x2(d.x) - bar2Width * (targetsNum/2-d.i); })
                     .attr("y", function(d){ return y2(d.value); })
                     .attr("width", bar2Width)
-                    .attr("height", function(d){ return height2-y2(d.value); })
-                    .style("opacity", function(d){ return isBarType(d.id) ? 1 : 0; });
+                    .attr("height", function(d){ return height2-y2(d.value); });
 
-                // Update Section
+                //-- Context Update Section --//
+
                 context.selectAll('.target-line')
                     .data(targets)
+                  .filter(isLineType)
                   .transition()
                     .attr("d", function (d) { return line2(d.values); });
             }
