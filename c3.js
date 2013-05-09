@@ -1,14 +1,14 @@
 (function (window) {
 
     // TODO: Dicide name..
-    var chart = window.chart = {};
+    window.c3 = {};
 
     /* 
      * Generate chart according to config
      */
-    chart.generate = function (config) {
+    c3.generate = function (config) {
 
-        var _chart = { data : {} },
+        var c3 = { data : {} },
             _cache = {};
 
         /*-- Handle Config --*/
@@ -357,11 +357,11 @@
         }
 
         var _maxDataCount = function () {
-            return d3.max(_chart.data.targets, function(t){ return t.values.length; });
+            return d3.max(c3.data.targets, function(t){ return t.values.length; });
         }
 
         var _targetsNum = function () {
-            return Object.keys(_chart.data.targets).length;
+            return Object.keys(c3.data.targets).length;
         }
 
         function isLineType (id) {
@@ -412,7 +412,7 @@
         };
 
         // update - called when redraw
-        _chart.update = function (withTransition) {
+        c3.update = function (withTransition) {
             x.domain(brush.empty() ? x2.domain() : brush.extent());
 
             // ticks for x-axis
@@ -465,7 +465,7 @@
             mainCircle.attr("cx", function(d) { return x(d.x); })
                       .attr("cy", function(d) { return y(d.value); });
 
-            var targetsNum = Object.keys(_chart.data.targets).length,
+            var targetsNum = Object.keys(c3.data.targets).length,
                 barWidth = (xAxis.tickOffset()*2*0.6) / targetsNum;
             var mainBar = main.selectAll('.target').selectAll('rect.target-bar');
             if (withTransition) mainBar = mainBar.transition();
@@ -546,7 +546,7 @@
         // Brush
         var brush = d3.svg.brush()
             .x(x2)
-            .on("brush", _chart.update);
+            .on("brush", c3.update);
 
         /*-- Draw Chart --*/
 
@@ -555,7 +555,7 @@
             lastDate = null;
 
         var _init = function(data) {
-            var targets = _chart.data.targets = _convertDataToTargets(data);
+            var targets = c3.data.targets = _convertDataToTargets(data);
 
             // TODO: set names if names not specified
 
@@ -864,7 +864,7 @@
             }
 
             // Update main chart with settings
-            _chart.update();
+            c3.update();
 
             /*-- Draw chart for each data --*/
 
@@ -888,14 +888,14 @@
                     d3.selectAll('.legend-item').filter(function(_d){ return _d !== d; })
                       .transition().duration(100)
                         .style('opacity', 0.3);
-                    _chart.defocus();
-                    _chart.focus(d);
+                    c3.defocus();
+                    c3.focus(d);
                 })
                 .on('mouseout', function(d){
                     d3.selectAll('.legend-item')
                       .transition().duration(100)
                         .style('opacity', 1);
-                    _chart.revert();
+                    c3.revert();
                 });
 
             l.append('rect').classed("legend-item-event",true).attr('x', -200);
@@ -1076,7 +1076,7 @@
 
         var _load = function(targets, done) {
             // Update/Add data
-            _chart.data.targets.forEach(function(d){
+            c3.data.targets.forEach(function(d){
                 for (var i = 0; i < targets.length; i++) {
                     if (d.id === targets[i].id) {
                         d.values = targets[i].values;
@@ -1085,15 +1085,15 @@
                     }
                 }
             });
-            _chart.data.targets = _chart.data.targets.concat(targets); // add remained
+            c3.data.targets = c3.data.targets.concat(targets); // add remained
 
             if (__axis_y_rescale) {
-                y.domain(_getYDomain(_chart.data.targets));
+                y.domain(_getYDomain(c3.data.targets));
                 y2.domain(y.domain());
                 main.select('.y.axis').transition().call(yAxis);
             }
 
-            _draw(_chart.data.targets);
+            _draw(c3.data.targets);
 
             done();
         };
@@ -1104,40 +1104,40 @@
             return (typeof target === 'undefined') ? '.target' : '.target-' + target;
         };
 
-        _chart.focus = function (target) {
+        c3.focus = function (target) {
             d3.selectAll(getTargetSelector(target))
                 .classed('focused', true)
                 .transition().duration(100)
                 .style('opacity', 1);
         };
 
-        _chart.defocus = function (target) {
+        c3.defocus = function (target) {
             d3.selectAll(getTargetSelector(target))
                 .classed('focused', false)
                 .transition().duration(100)
                 .style('opacity', 0.3)
         };
 
-        _chart.revert = function (target) {
+        c3.revert = function (target) {
             d3.selectAll(getTargetSelector(target))
                 .classed('focused', false)
                 .transition().duration(100)
                 .style('opacity', 1);
         };
 
-        _chart.show = function (target) {
+        c3.show = function (target) {
             d3.selectAll(getTargetSelector(target))
                 .transition()
                 .style('opacity', 1);
         };
 
-        _chart.hide = function (target) {
+        c3.hide = function (target) {
             d3.selectAll(getTargetSelector(target))
                 .transition()
                 .style('opacity', 0);
         };
 
-        _chart.load = function (args) {
+        c3.load = function (args) {
             // check args
             if (typeof args.done === 'undefined') {
                 args.done = function() {};
@@ -1167,8 +1167,8 @@
             }
         };
 
-        _chart.unload = function (target) {
-            _chart.data.targets = _chart.data.targets.filter(function(d){
+        c3.unload = function (target) {
+            c3.data.targets = c3.data.targets.filter(function(d){
                 return d.id != target;
             });
             d3.selectAll('.target-'+target)
@@ -1178,19 +1178,19 @@
 
             if (__legend_show) {
                 d3.selectAll('.legend-item-'+target).remove();
-                _update_legend(_chart.data.targets);
+                _update_legend(c3.data.targets);
             }
 
             if (__axis_y_rescale){
-                y.domain(_getYDomain(_chart.data.targets));
+                y.domain(_getYDomain(c3.data.targets));
                 y2.domain(y.domain());
                 main.select('.y.axis').transition().call(yAxis);
             }
 
-            _chart.update(true);
+            c3.update(true);
         };
 
-        _chart.selected = function (target) {
+        c3.selected = function (target) {
             var suffix = (typeof target !== 'undefined') ? '-' + target : '';
             return d3.merge(
                 main.selectAll('.target-circles' + suffix)
@@ -1200,7 +1200,7 @@
             );
         }
 
-        _chart.select = function (indices, resetOther) {
+        c3.select = function (indices, resetOther) {
             if ( ! __data_selection_enabled) return;
             main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
                 if (indices.indexOf(i) >= 0) {
@@ -1213,7 +1213,7 @@
             });
         }
 
-        _chart.unselect = function (indices) {
+        c3.unselect = function (indices) {
             if ( ! __data_selection_enabled) return;
             main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
                 if (typeof indices === 'undefined' || indices.indexOf(i) >= 0) {
@@ -1239,7 +1239,7 @@
             throw Error('url or rows or columns is required.');
         }
 
-        return _chart;
+        return c3;
     };
 
     var _generateColor = function (_colors, _pattern) {
