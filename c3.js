@@ -367,6 +367,13 @@
         function maxDataCount () {
             return d3.max(c3.data.targets, function(t){ return t.values.length; });
         }
+        function hasTarget (id) {
+            var ids = c3.data.targets.map(function(d){ return d.id; });
+            for (var i = 0; i < ids.length; i++) {
+                if (ids[i] === id) return true;
+            }
+            return false;
+        }
         function isLineType (id) {
             return !(id in __data_types) || __data_types[id] === 'line';
         }
@@ -875,7 +882,6 @@
 
             // rect for mouseover
             var w = ((width*getXDomainRatio())/(maxDataCount()-1));
-            console.log(w);
             main.selectAll('rect.event-rect')
                 .attr("width", w)
                 .attr("x", function(d) { return x(d.x) - (w/2); });
@@ -1121,6 +1127,7 @@
 
         c3.focus = function (target) {
             d3.selectAll(getTargetSelector(target))
+                .filter(function(d){ return hasTarget(d.id); })
                 .classed('focused', true)
                 .transition().duration(100)
                 .style('opacity', 1);
@@ -1128,6 +1135,7 @@
 
         c3.defocus = function (target) {
             d3.selectAll(getTargetSelector(target))
+                .filter(function(d){ return hasTarget(d.id); })
                 .classed('focused', false)
                 .transition().duration(100)
                 .style('opacity', 0.3)
@@ -1135,6 +1143,7 @@
 
         c3.revert = function (target) {
             d3.selectAll(getTargetSelector(target))
+                .filter(function(d){ return hasTarget(d.id); })
                 .classed('focused', false)
                 .transition().duration(100)
                 .style('opacity', 1);
@@ -1202,7 +1211,7 @@
                 main.select('.y.axis').transition().call(yAxis);
             }
 
-            update(true);
+            if (c3.data.targets.length > 0) update(true);
         };
 
         c3.selected = function (target) {
