@@ -648,11 +648,12 @@
                             for (j = 0; j < selectedData.length; j++) {
                                 if (selectedData[j].id === id) {
                                     newData.push(selectedData[j])
+                                    selectedData.shift(j)
                                     break
                                 }
                             }
                         }
-                        selectedData = newData
+                        selectedData = newData.concat(selectedData) // Add remained
                     }
 
                     // Expand circles if needed
