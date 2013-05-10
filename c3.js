@@ -1006,11 +1006,11 @@
 
             // lines and cricles
             main.selectAll('.target-line')
-              .transition().duration(withTransition ? 100 : 0)
+              .transition().duration(withTransition ? 250 : 0)
                 .attr("d", lineOnMain)
             mainCircle = main.selectAll('.target-circles').selectAll('.target-circle')
                 .data(lineData)
-            mainCircle.transition().duration(withTransition ? 100 : 0)
+            mainCircle.transition().duration(withTransition ? 250 : 0)
                 .attr("cx", function(d){ return x(d.x) })
                 .attr("cy", function(d){ return y(d.value) })
             mainCircle.enter().append("circle")
@@ -1027,24 +1027,22 @@
             barY = getBarY(y)
             mainBar = main.selectAll('.target-bars').selectAll('.target-bar')
                 .data(barData)
-            mainBar.transition().duration(withTransition ? 100 : 0)
+            mainBar.transition().duration(withTransition ? 250 : 0)
                 .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
             mainBar.enter().append('rect')
                 .attr("class", function(d,i){ return "target-bar target-bar-" + i })
-                .attr("x", barX).attr("y", height).attr("width", barW).attr("height", 0)
+                .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                 .style("opacity", 0)
-              .transition().duration(withTransition ? 100 : 0)
-                .attr('y', barY).attr('height', barH)
+              .transition().duration(withTransition ? 250 : 0)
                 .style('opacity', 1)
-            mainBar.exit().transition().duration(withTransition ? 100 : 0)
-                .attr('y', height).attr('height', 0)
+            mainBar.exit().transition().duration(withTransition ? 250 : 0)
                 .style('opacity', 0)
                 .remove()
 
             // subchart
             if (withSubchart && __subchart_show) {
                 context.selectAll('.target-line')
-                  .transition().duration(withTransition ? 100 : 0)
+                  .transition().duration(withTransition ? 250 : 0)
                     .attr("d", lineOnSub)
 
                 // bars
@@ -1054,7 +1052,7 @@
                 barY = getBarY(y2)
                 contextBar = context.selectAll('.target-bars').selectAll('.target-bar')
                     .data(barData)
-                contextBar.transition().duration(withTransition ? 100 : 0)
+                contextBar.transition().duration(withTransition ? 250 : 0)
                     .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                 contextBar.enter().append('rect')
                     .attr("class", function(d,i){ return "target-bar target-bar-" + i })
