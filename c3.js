@@ -935,8 +935,8 @@
                 xgrid.enter().append('line').attr("class", "xgrid")
                 xgrid.exit().remove()
                 main.selectAll(".xgrid")
-                    .attr("x1", x)
-                    .attr("x2", x)
+                    .attr("x1", function(d){ return x(d) - xAxis.tickOffset(); })
+                    .attr("x2", function(d){ return x(d) - xAxis.tickOffset(); })
                     .attr("y1", margin.top)
                     .attr("y2", height)
             }
