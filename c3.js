@@ -1062,13 +1062,12 @@
                     .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                 contextBar.enter().append('rect')
                     .attr("class", classBar)
-                    .attr("x", barX).attr("y", height2).attr("width", barW).attr("height", 0)
+                    .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                     .style("opacity", 0)
                   .transition()
-                    .attr('y', barY).attr('height', barH)
                     .style('opacity', 1)
                 contextBar.exit().transition()
-                    .attr('y', height2).attr('height', 0).style('opacity', 0)
+                    .style('opacity', 0)
                     .remove()
             }
 
