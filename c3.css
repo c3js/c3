@@ -23,7 +23,7 @@ path, line {
 
 /*-- Line --*/
 
-.target-line {
+.__line {
   stroke-width: 1px;
 }
 /*-- Point --*/
@@ -35,11 +35,11 @@ path, line {
 
 /*-- Bar --*/
 
-.target-bar._e_ {
+.__bar._e_ {
   stroke-width: 6px;
 }
 /* TODO: use this
-.target-bar._s_ {
+.__bar._s_ {
   stroke-width: 1px;
   fill-opacity: 0.4;
 }

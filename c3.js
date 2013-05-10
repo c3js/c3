@@ -406,6 +406,13 @@
         function category (i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i
         }
+        function classShapes (d) { return "__shapes __shapes-" + d.id }
+        function classLine (d) { return classShapes(d) + " __line __line-" + d.id }
+        function classCircles (d) { return classShapes(d) + " __circles __circles-" + d.id }
+        function classBars (d) { return classShapes(d) + " __bars __bars-" + d.id }
+        function classShape (d,i) { return "__shape __shape-" + i }
+        function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
+        function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
 
         //-- Bar --//
 
@@ -726,13 +733,13 @@
 
                     // Expand circles if needed
                     if (__point_focus_expand_enabled) {
-                        main.selectAll('.target-circle-'+i)
+                        main.selectAll('.__circle-'+i)
                             .classed("_e_", true)
                             .attr('r', __point_focus_expand_r)
                     }
 
                     // Expand bars
-                    main.selectAll(".target-bar-"+i)
+                    main.selectAll(".__bar-"+i)
                         .classed("_e_", true)
 
                     // Show xgrid focus line
@@ -752,19 +759,19 @@
                     main.select('line.xgrid-focus').style("visibility", "hidden")
                     tooltip.style("visibility", "hidden")
                     // Undo expanded circles
-                    main.selectAll('.target-circle-'+i)
+                    main.selectAll('.__circle-'+i)
                         .filter(function(){ return d3.select(this).classed('_e_') })
                         .classed("_e_", false)
                         .attr('r', __point_r)
                     // Undo expanded bar
-                    main.selectAll(".target-bar-"+i)
+                    main.selectAll(".__bar-"+i)
                         .classed("_e_", false)
                 })
                 .on('mousemove', function(d,i){
                     if ( ! __data_selection_enabled || dragging) return
                     if ( __data_selection_grouped) return // nothing to do when grouped
 
-                    main.selectAll('.target-circle-'+i+', .target-bar-'+i)
+                    main.selectAll('.__shape-'+i)
                         .filter(function(d){ return __data_selection_isselectable(d) })
                         .each(function(d){
                             var _this = d3.select(this).classed('_e_', true)
@@ -790,7 +797,7 @@
                         })
                 })
                 .on('click', function(d,i) {
-                    main.selectAll('.target-circle-'+i+', .target-bar-'+i).each(function(d){
+                    main.selectAll('.__shape-'+i).each(function(d){
                         var _this = d3.select(this),
                             isSelected = _this.classed('_s_')
                         var isWithin = false, toggle
@@ -828,8 +835,7 @@
                             .attr('y', minY)
                             .attr('width', maxX-minX)
                             .attr('height', maxY-minY)
-                        main.selectAll('.target-circles, .target-bars')
-                            .selectAll('.target-circle, .target-bar')
+                        main.selectAll('.__shapes').selectAll('.__shape')
                             .filter(function(d){ return __data_selection_isselectable(d) })
                             .each(function(d,i){
                                 var _this = d3.select(this),
@@ -872,7 +878,7 @@
                           .transition().duration(100)
                             .style('opacity', 0)
                           .remove()
-                        main.selectAll('.target-circle, .target-bar')
+                        main.selectAll('.__shape')
                             .classed('_i_', false)
                         dragging = false
                         // TODO: add callback here
@@ -1005,16 +1011,16 @@
             }
 
             // lines and cricles
-            main.selectAll('.target-line')
+            main.selectAll('.__line')
               .transition().duration(withTransition ? 250 : 0)
                 .attr("d", lineOnMain)
-            mainCircle = main.selectAll('.target-circles').selectAll('.target-circle')
+            mainCircle = main.selectAll('.__circles').selectAll('.__circle')
                 .data(lineData)
             mainCircle.transition().duration(withTransition ? 250 : 0)
                 .attr("cx", function(d){ return x(d.x) })
                 .attr("cy", function(d){ return y(d.value) })
             mainCircle.enter().append("circle")
-                .attr("class", function(d,i){ return "target-circle target-circle-" + i })
+                .attr("class", classCircle)
                 .attr("cx", function(d){ return x(d.x) })
                 .attr("cy", function(d){ return y(d.value) })
                 .attr("r", __point_r)
@@ -1025,12 +1031,12 @@
             barH = getBarH(y, height)
             barX = getBarX(x, barW, barTargetsNum, barIndices)
             barY = getBarY(y)
-            mainBar = main.selectAll('.target-bars').selectAll('.target-bar')
+            mainBar = main.selectAll('.__bars').selectAll('.__bar')
                 .data(barData)
             mainBar.transition().duration(withTransition ? 250 : 0)
                 .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
             mainBar.enter().append('rect')
-                .attr("class", function(d,i){ return "target-bar target-bar-" + i })
+                .attr("class", classBar)
                 .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                 .style("opacity", 0)
               .transition().duration(withTransition ? 250 : 0)
@@ -1041,7 +1047,7 @@
 
             // subchart
             if (withSubchart && __subchart_show) {
-                context.selectAll('.target-line')
+                context.selectAll('.__line')
                   .transition().duration(withTransition ? 250 : 0)
                     .attr("d", lineOnSub)
 
@@ -1050,12 +1056,12 @@
                 barH = getBarH(y2, height2)
                 barX = getBarX(x2, barW, barTargetsNum, barIndices)
                 barY = getBarY(y2)
-                contextBar = context.selectAll('.target-bars').selectAll('.target-bar')
+                contextBar = context.selectAll('.__bars').selectAll('.__bar')
                     .data(barData)
                 contextBar.transition().duration(withTransition ? 250 : 0)
                     .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
                 contextBar.enter().append('rect')
-                    .attr("class", function(d,i){ return "target-bar target-bar-" + i })
+                    .attr("class", classBar)
                     .attr("x", barX).attr("y", height2).attr("width", barW).attr("height", 0)
                     .style("opacity", 0)
                   .transition()
@@ -1101,18 +1107,18 @@
 
             // Lines for each data
             f.append("path")
-                .attr("class", function(d){ return "target-line target-line-" + d.id })
+                .attr("class", classLine)
                 .style("stroke", function(d) { return color(d.id) })
             // Circles for each data point on lines
             f.append('g')
                 .attr("class", function(d){ return "selected-circles selected-circles-" + d.id })
             f.append('g')
-                .attr("class", function(d){ return "target-circles target-circles-" + d.id })
+                .attr("class", classCircles)
                 .style("fill", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
             // Bars for each data
             f.append('g')
-                .attr("class", function(d){ return "target-bars target-bars-" + d.id })
+                .attr("class", classBars)
                 .style("fill", function(d){ return color(d.id) })
                 .style("stroke", function(d){ return color(d.id) })
                 .style("stroke-width", 0)
@@ -1130,11 +1136,11 @@
 
                 // Lines for each data
                 c.append("path")
-                    .attr("class", function(d){ return "target-line target-line-" + d.id })
+                    .attr("class", classLine)
                     .style("stroke", function(d) { return color(d.id) })
                 // Bars for each data
                 c.append('g')
-                    .attr("class", function(d){ return "target-bars target-bars-" + d.id })
+                    .attr("class", classBars)
                     .style("fill", function(d){ return color(d.id) })
             }
 
@@ -1341,8 +1347,7 @@
         c3.selected = function (target) {
             var suffix = (typeof target !== 'undefined') ? '-' + target : ''
             return d3.merge(
-                main.selectAll('.target-circles' + suffix)
-                    .selectAll('circle')
+                main.selectAll('.__shapes' + suffix).selectAll('.__shape')
                     .filter(function(){ return d3.select(this).classed('_s_') })
                     .map(function(d){ return d.map(function(_d){ return _d.__data__ }) })
             )
@@ -1350,23 +1355,26 @@
 
         c3.select = function (indices, resetOther) {
             if ( ! __data_selection_enabled) return
-            main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
+            main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
+                var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
+                    unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
                 if (indices.indexOf(i) >= 0) {
                     if (__data_selection_grouped || __data_selection_isselectable(d)) {
-                        selectPoint(d3.select(this).classed('_s_',true), d, i)
+                        selectShape(d3.select(this).classed('_s_',true), d, i)
                     }
                 } else if (typeof resetOther !== 'undefined' && resetOther) {
-                    unselectPoint(d3.select(this).classed('_s_',false), d, i)
+                    unselectShape(d3.select(this).classed('_s_',false), d, i)
                 }
             })
         }
 
         c3.unselect = function (indices) {
             if ( ! __data_selection_enabled) return
-            main.selectAll('.target-circles').selectAll('.target-circle').each(function(d,i){
+            main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
+                var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
                 if (typeof indices === 'undefined' || indices.indexOf(i) >= 0) {
                     if (__data_selection_grouped || __data_selection_isselectable(d)) {
-                        unselectPoint(d3.select(this).classed('_s_',false), d, i)
+                        unselectShape(d3.select(this).classed('_s_',false), d, i)
                     }
                 }
             })
