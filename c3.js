@@ -432,6 +432,7 @@
 
         function setTargetType (targets, type) {
             var targetIds = typeof targets === 'undefined' ? getTargetIds() : targets
+            if (typeof targetIds === 'string') targetIds = [targetIds]
             for (var i = 0; i < targetIds.length; i++) {
                 __data_types[targetIds[i]] = type
             }
