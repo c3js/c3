@@ -866,7 +866,7 @@
                           .transition().duration(100)
                             .style('opacity', 0)
                           .remove()
-                        main.selectAll('.target-circle')
+                        main.selectAll('.target-circle, .target-bar')
                             .classed('_i_', false)
                         dragging = false
                         // TODO: add callback here
