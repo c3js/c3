@@ -317,9 +317,7 @@
         function getCaches (ids) {
             var targets = []
             for (var i = 0; i < ids.length; i++){
-                if (ids[i] in cache && hasTarget(__data_id_converter(ids[i]))) {
-                    targets.push(cloneTarget(cache[ids[i]]))
-                }
+                if (ids[i] in cache) targets.push(cloneTarget(cache[ids[i]]))
             }
             return targets
         }
