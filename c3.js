@@ -1018,9 +1018,7 @@
                 .attr("cx", function(d){ return x(d.x) })
                 .attr("cy", function(d){ return y(d.value) })
                 .attr("r", __point_r)
-            mainCircle.exit()
-                .attr("y", 0)
-                .remove()
+            mainCircle.exit().remove()
 
             // bars
             barW = getBarW(xAxis, barTargetsNum)
@@ -1071,6 +1069,10 @@
             }
 
             // circles for select
+            main.selectAll('.selected-circles')
+                .filter(function(d){ return isBarType(d); })
+                .selectAll('circle')
+                .remove()
             main.selectAll('.selected-circle')
                 .attr("cx", function(d) { return x(d.x) })
                 .attr("cy", function(d) { return y(d.value) })
