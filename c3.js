@@ -394,6 +394,18 @@
                 return x(d.x) - barWidth * (barTargetsNum/2 - barIndices.indexOf(d.i))
             }
         }
+        function getBarY (scale) {
+            return function (d) { return scale(d.value) }
+        }
+        function getBarW (axis, barTargetsNum) {
+            return (axis.tickOffset()*2*0.6) / barTargetsNum
+        }
+        function getBarH (scale, height) {
+            return function (d) {
+                var h = height-scale(d.value)
+                return h < 0 ? 0 : h
+            }
+        }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return !(id in __data_types) || __data_types[id] === 'line'
@@ -897,7 +909,8 @@
         function update (withTransition) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
-            var barTargetsNum = getTargetsNum(isBarType), barWidth, barIndices, barX
+            var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
+            var barX, barY, barW, barH
             var rectWidth
 
             x.domain(brush.empty() ? x2.domain() : brush.extent())
@@ -952,20 +965,28 @@
                       .attr("cy", function(d) { return y(d.value) })
 
             // bars
-            barWidth = (xAxis.tickOffset()*2*0.6) / barTargetsNum
-            barIndices = getBarTargetIndices()
-            barX = getBarX(barWidth, barTargetsNum, barIndices)
-
+            barW = getBarW(xAxis, barTargetsNum)
+            barH = getBarH(y, height)
+            barX = getBarX(barW, barTargetsNum, barIndices)
+            barY = getBarY(y)
             mainBar = main.selectAll('.target').selectAll('.target-bar').filter(isBarType)
             if (withTransition) mainBar = mainBar.transition()
-            mainBar.attr("width", barWidth)
-                   .attr("x", barX)
+            mainBar.attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
 
             // subchart
             if (__subchart_show) {
                 contextPath = context.selectAll('.target').selectAll('path').filter(isLineType)
                 if (withTransition) contextPath = contextPath.transition()
                 contextPath.attr("d", function(d){ return line2(d.values) })
+
+                // bars
+                barW = getBarW(xAxis2, barTargetsNum)
+                barH = getBarH(y2, height2)
+                barX = getBarX(barW, barTargetsNum, barIndices)
+                barY = getBarY(y2)
+                contextBar = context.selectAll('.target').selectAll('.target-bar').filter(isBarType)
+                if (withTransition) contextBar = contextBar.transition()
+                contextBar.attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
             }
 
             // circles for select
@@ -1022,10 +1043,10 @@
 
             // Rects for each data
             barIndices = getBarTargetIndices()
-            barW = (xAxis.tickOffset()*2*0.6) / barTargetsNum
-            barH = function(d){ return height-y(d.value) }
+            barW = getBarW(xAxis, barTargetsNum)
+            barH = getBarH(y, height)
             barX = getBarX(barW, barTargetsNum, barIndices)
-            barY = function(d){ return y(d.value) }
+            barY = getBarY(y)
 
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
@@ -1088,10 +1109,10 @@
                     .attr("d", function(d){ return line2(d.values) })
 
                 // Rects for each data
-                barW = (xAxis2.tickOffset()*2*0.6) / barTargetsNum
-                barH = function(d){ return height2-y2(d.value) }
+                barW = getBarW(xAxis2, barTargetsNum)
+                barH = getBarH(y2, height2)
                 barX = getBarX(barW, barTargetsNum, barIndices)
-                barY = function(d){ return y2(d.value) }
+                barY = getBarY(y2)
 
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id })
