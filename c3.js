@@ -819,35 +819,32 @@
                             .attr('y', min_y)
                             .attr('width', max_x-min_x)
                             .attr('height', max_y-min_y)
-                        main.selectAll('.target-circles').selectAll('.target-circle')
+                        main.selectAll('.target-circles, .target-bars')
+                            .selectAll('.target-circle, .target-bar')
                             .filter(function(d){ return __data_selection_isselectable(d) })
                             .each(function(d,i){
                                 var _this = d3.select(this),
                                     _selected = _this.classed('_s_'),
                                     _included = _this.classed('_i_'),
-                                    _x = x(d.x), _y = y(d.value),
-                                    _within = min_x < _x && _x < max_x && min_y < _y && _y < max_y
-                                if (_within ^ _included) {
-                                    _this.classed('_i_', !_included)
-                                    // TODO: included/unincluded callback here
-                                    _this.classed('_s_', !_selected)
-                                    togglePoint(!_selected, _this, d, i)
+                                    _x, _y, _w, toggle, isWithin = false
+                                if (this.nodeName === 'circle') {
+                                    _x = _this.attr("cx")*1
+                                    _y = _this.attr("cy")*1
+                                    toggle = togglePoint
+                                    isWithin = min_x < _x && _x < max_x && min_y < _y && _y < max_y
                                 }
-                            })
-                        main.selectAll('.target-bars').selectAll('.target-bar')
-                            .filter(function(d){ return __data_selection_isselectable(d) })
-                            .each(function(d,i){
-                                var _this = d3.select(this),
-                                    _selected = _this.classed('_s_'),
-                                    _included = _this.classed('_i_'),
-                                    _x = _this.attr("x")*1, _y = _this.attr("y")*1
-                                    _w = _this.attr('width')*1,
-                                    _within = min_x < _x+_w && _x < max_x && _y < max_y
-                                if (_within ^ _included) {
+                                else if (this.nodeName === 'rect') {
+                                    _x = _this.attr("x")*1
+                                    _y = _this.attr("y")*1
+                                    _w = _this.attr('width')*1
+                                    toggle = toggleBar
+                                    isWithin = min_x < _x+_w && _x < max_x && _y < max_y
+                                }
+                                if (isWithin ^ _included) {
                                     _this.classed('_i_', !_included)
                                     // TODO: included/unincluded callback here
                                     _this.classed('_s_', !_selected)
-                                    toggleBar(!_selected, _this, d, i)
+                                    toggle(!_selected, _this, d, i)
                                 }
                             })
                     })
