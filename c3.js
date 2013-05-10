@@ -984,7 +984,7 @@
         }
 
         function draw (targets) {
-            var barTargetsNum = getTargetsNum(isBarType), barWidth = 0, bar2Width = 0, barIndices, barX
+            var barTargetsNum = getTargetsNum(isBarType), barIndices, barX, barY, barW, barH
             var f, c
 
             /*-- Main --*/
@@ -1021,9 +1021,11 @@
                 .attr("r", __point_r)
 
             // Rects for each data
-            barWidth = (xAxis.tickOffset()*2*0.6) / barTargetsNum
             barIndices = getBarTargetIndices()
-            barX = getBarX(barWidth, barTargetsNum, barIndices)
+            barW = (xAxis.tickOffset()*2*0.6) / barTargetsNum
+            barH = function(d){ return height-y(d.value) }
+            barX = getBarX(barW, barTargetsNum, barIndices)
+            barY = function(d){ return y(d.value) }
 
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
@@ -1036,9 +1038,9 @@
               .enter().append("rect")
                 .attr("class", function(d,i){ return "target-bar target-bar-" + i })
                 .attr("x", barX)
-                .attr("y", function(d){ return y(d.value) })
-                .attr("width", barWidth)
-                .attr("height", function(d){ return height-y(d.value) })
+                .attr("y", barY)
+                .attr("width", barW)
+                .attr("height", barH)
 
             //-- Main Update Section --//
 
@@ -1052,21 +1054,21 @@
                 .data(targets)
               .filter(isLineType)
               .selectAll('circle')
-                .data(function(d) { return d.values })
+                .data(function(d){ return d.values })
               .transition()
-                .attr("cx", function(d) { return x(d.x) })
-                .attr("cy", function(d) { return y(d.value) })
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
 
             main.selectAll(".target-bars")
                 .data(targets)
               .filter(isBarType)
               .selectAll('rect')
-                .data(function(d) { return d.values })
+                .data(function(d){ return d.values })
               .transition()
                 .attr("x", barX)
-                .attr("y", function(d){ return y(d.value) })
-                .attr("width", barWidth)
-                .attr("height", function(d){ return height-y(d.value) })
+                .attr("y", barY)
+                .attr("width", barW)
+                .attr("height", barH)
 
             /*-- Context --*/
 
@@ -1083,11 +1085,13 @@
                     .attr("class", function(d){ return "target-line target-line-" + d.id })
                     .style("stroke", function(d) { return color(d.id) })
                   .filter(isLineType)
-                    .attr("d", function (d) { return line2(d.values) })
+                    .attr("d", function(d){ return line2(d.values) })
 
                 // Rects for each data
-                bar2Width = (xAxis2.tickOffset()*2*0.6) / barTargetsNum
-                barX = getBarX(bar2Width, barTargetsNum, barIndices)
+                barW = (xAxis2.tickOffset()*2*0.6) / barTargetsNum
+                barH = function(d){ return height2-y2(d.value) }
+                barX = getBarX(barW, barTargetsNum, barIndices)
+                barY = function(d){ return y2(d.value) }
 
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id })
@@ -1098,9 +1102,9 @@
                   .enter().append("rect")
                     .attr("class", function(d,i){ return "target-bar target-bar-" + i })
                     .attr("x", barX)
-                    .attr("y", function(d){ return y2(d.value) })
-                    .attr("width", bar2Width)
-                    .attr("height", function(d){ return height2-y2(d.value) })
+                    .attr("y", barY)
+                    .attr("width", barW)
+                    .attr("height", barH)
 
                 //-- Context Update Section --//
 
@@ -1108,18 +1112,18 @@
                     .data(targets)
                   .filter(isLineType)
                   .transition()
-                    .attr("d", function (d) { return line2(d.values) })
+                    .attr("d", function(d){ return line2(d.values) })
 
                 context.selectAll(".target-bars")
                     .data(targets)
                   .filter(isBarType)
                   .selectAll('rect')
-                    .data(function(d) { return d.values })
+                    .data(function(d){ return d.values })
                   .transition()
                     .attr("x", barX)
-                    .attr("y", function(d){ return y2(d.value) })
-                    .attr("width", bar2Width)
-                    .attr("height", function(d){ return height2-y2(d.value) })
+                    .attr("y", barY)
+                    .attr("width", barW)
+                    .attr("height", barH)
             }
 
             /*-- Legend --*/
