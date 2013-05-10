@@ -1199,7 +1199,6 @@
                     d3.selectAll('.legend-item').filter(function(_d){ return _d !== d })
                       .transition().duration(100)
                         .style('opacity', 0.3)
-                    c3.defocus()
                     c3.focus(d)
                 })
                 .on('mouseout', function(d){
@@ -1250,6 +1249,7 @@
         }
 
         c3.focus = function (target) {
+            c3.defocus()
             d3.selectAll(getTargetSelector(target))
                 .filter(function(d){ return hasTarget(d.id) })
                 .classed('focused', true)
