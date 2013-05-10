@@ -562,7 +562,7 @@
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data)
             var rectWidth
-            var grid, xgridLine, yGridData
+            var grid, xgridLine
 
             // TODO: set names if names not specified
 
@@ -614,11 +614,10 @@
 
             // Y-Grid
             if (__grid_y_show) {
-                yGridData = y.ticks(10)
                 grid.append('g')
-                    .attr('class', 'ygrid')
-                  .selectAll("line.ygrid")
-                    .data(yGridData)
+                    .attr('class', 'ygrids')
+                  .selectAll(".ygrid")
+                    .data(y.ticks(10))
                   .enter().append("line")
                     .attr("class", "ygrid")
                     .attr("x1", 0)
@@ -629,10 +628,10 @@
             if (__grid_y_lines) {
                 grid.append('g')
                     .attr('class', 'ygrid-lines')
-                  .selectAll('line.y')
+                  .selectAll('ygrid-line')
                     .data(__grid_y_lines)
                   .enter().append('line')
-                    .attr("class", function(d){ return "y " + d['class'] })
+                    .attr("class", function(d){ return "ygrid-line " + d['class'] })
                     .attr("x1", 0)
                     .attr("x2", width)
                     .attr("y1", function(d){ return y(d.value) })
@@ -912,7 +911,7 @@
             draw(targets)
         }
 
-        function update (withTransition) {
+        function update (withTransition, withY) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
             var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
@@ -940,13 +939,9 @@
 
                 xgrid = main.select('g.xgrid').selectAll("line.xgrid")
                     .data(xgridData)
-                // Enter
                 xgrid.enter().append('line').attr("class", "xgrid")
-                // Exit
                 xgrid.exit().remove()
-                // Update
                 main.selectAll("line.xgrid")
-                    .attr("class", "xgrid")
                     .attr("x1", x)
                     .attr("x2", x)
                     .attr("y1", margin.top)
@@ -959,6 +954,26 @@
                     .attr("x2", function(d){ return x(d.value) })
                 xgridLine.selectAll('text')
                     .attr("x", function(d){ return x(d.value) })
+            }
+            // Y-Grid
+            if (__grid_y_show && withY) {
+                ygrid = main.select('.ygrids').selectAll(".ygrid")
+                    .data(y.ticks(10))
+                ygrid.enter().append('line')
+                    .attr('class', 'ygrid')
+                ygrid.attr("x1", 0)
+                     .attr("x2", width)
+                     .attr("y1", y)
+                     .attr("y2", y)
+                     .attr("opacity", 0)
+                   .transition()
+                     .attr("opacity", 1)
+                ygrid.exit().remove()
+            }
+            if (__grid_y_lines && withY) {
+                main.select('.ygrid-lines').selectAll('.ygrid-line')
+                    .attr("y1", function(d){ return y(d.value) })
+                    .attr("y2", function(d){ return y(d.value) })
             }
 
             // lines and cricles
@@ -1186,6 +1201,8 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
+            update(true, true)
+
             draw(c3.data.targets)
 
             done()
@@ -1358,7 +1375,7 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
-            if (c3.data.targets.length > 0) update(true)
+            if (c3.data.targets.length > 0) update(true, true)
         }
 
         c3.selected = function (target) {
