@@ -579,12 +579,12 @@
 
             // X-Grid
             if (__grid_x_show) {
-                grid.append("g").attr("class", "xgrid")
+                grid.append("g").attr("class", "xgrids")
             }
             if (__grid_x_lines) {
                 xgridLine = grid.append('g')
                     .attr("class", "xgrid-lines")
-                  .selectAll('g.xgrid-line')
+                  .selectAll('.xgrid-line')
                     .data(__grid_x_lines)
                   .enter().append('g')
                     .attr("class", "xgrid-line")
@@ -930,18 +930,18 @@
                     xgridData = x.ticks(10)
                 }
 
-                xgrid = main.select('g.xgrid').selectAll("line.xgrid")
+                xgrid = main.select('.xgrids').selectAll(".xgrid")
                     .data(xgridData)
                 xgrid.enter().append('line').attr("class", "xgrid")
                 xgrid.exit().remove()
-                main.selectAll("line.xgrid")
+                main.selectAll(".xgrid")
                     .attr("x1", x)
                     .attr("x2", x)
                     .attr("y1", margin.top)
                     .attr("y2", height)
             }
             if (__grid_x_lines) {
-                xgridLine = main.selectAll("g.xgrid-line")
+                xgridLine = main.selectAll(".xgrid-lines")
                 xgridLine.selectAll('line')
                     .attr("x1", function(d){ return x(d.value) })
                     .attr("x2", function(d){ return x(d.value) })
