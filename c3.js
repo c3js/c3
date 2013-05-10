@@ -312,12 +312,12 @@
             return true
         }
         function addCache (id, target) {
-            cache[id] = target
+            cache[id] = cloneTarget(target)
         }
         function getCaches (ids) {
             var targets = []
             for (var i = 0; i < ids.length; i++){
-                if (ids[i] in cache) targets.push(cache[ids[i]])
+                if (ids[i] in cache) targets.push(cloneTarget(cache[ids[i]]))
             }
             return targets
         }
@@ -375,6 +375,15 @@
             })
 
             return targets
+        }
+        function cloneTarget (target) {
+            return {
+                id : target.id,
+                id_org : target.id_org,
+                values : target.values.map(function(d){
+                    return {x: d.x, value: d.value, id: d.id}
+                })
+            }
         }
         function maxDataCount () {
             return d3.max(c3.data.targets, function(t){ return t.values.length })
