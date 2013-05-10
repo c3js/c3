@@ -340,7 +340,7 @@
         }
         function convertDataToTargets (data) {
             var ids = d3.keys(data[0]).filter(function(key){ return key !== __data_x })
-            var targets, i = 0
+            var targets, currentTargetsNum = getTargetsNum(), i = 0
 
             data.forEach(function(d) {
                 d.x = (isTimeSeries) ? parseDate(d[__data_x]) : i++
@@ -354,7 +354,7 @@
                     id : convertedId,
                     id_org : id,
                     values : data.map(function(d) {
-                        return {x: d.x, value: +d[id], id: convertedId, i: i}
+                        return {x: d.x, value: +d[id], id: convertedId, i: currentTargetsNum + i}
                     })
                 }
             })
@@ -377,7 +377,8 @@
             return false
         }
         function getTargetsNum (filter) {
-            return typeof filter !== 'undefined' ? c3.data.targets.filter(isBarType).length : c3.data.targets.length;
+            if (typeof c3.data.targets === 'undefined') return 0
+            return typeof filter !== 'undefined' ? c3.data.targets.filter(filter).length : c3.data.targets.length;
         }
         function getBarTargetIndices () {
             var indices = []
@@ -1056,6 +1057,17 @@
                 .attr("cx", function(d) { return x(d.x) })
                 .attr("cy", function(d) { return y(d.value) })
 
+            main.selectAll(".target-bars")
+                .data(targets)
+              .filter(isBarType)
+              .selectAll('rect')
+                .data(function(d) { return d.values })
+              .transition()
+                .attr("x", barX)
+                .attr("y", function(d){ return y(d.value) })
+                .attr("width", barWidth)
+                .attr("height", function(d){ return height-y(d.value) })
+
             /*-- Context --*/
 
             if (__subchart_show) {
@@ -1097,6 +1109,17 @@
                   .filter(isLineType)
                   .transition()
                     .attr("d", function (d) { return line2(d.values) })
+
+                context.selectAll(".target-bars")
+                    .data(targets)
+                  .filter(isBarType)
+                  .selectAll('rect')
+                    .data(function(d) { return d.values })
+                  .transition()
+                    .attr("x", barX)
+                    .attr("y", function(d){ return y2(d.value) })
+                    .attr("width", bar2Width)
+                    .attr("height", function(d){ return height2-y2(d.value) })
             }
 
             /*-- Legend --*/
