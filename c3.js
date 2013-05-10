@@ -350,7 +350,7 @@
         }
         function convertDataToTargets (data) {
             var ids = d3.keys(data[0]).filter(function(key){ return key !== __data_x })
-            var targets, currentTargetsNum = getTargetsNum(), i = 0
+            var targets, i = 0
 
             data.forEach(function(d) {
                 d.x = (isTimeSeries) ? parseDate(d[__data_x]) : i++
@@ -364,7 +364,7 @@
                     id : convertedId,
                     id_org : id,
                     values : data.map(function(d) {
-                        return {x: d.x, value: +d[id], id: convertedId, i: currentTargetsNum + i}
+                        return {x: d.x, value: +d[id], id: convertedId}
                     })
                 }
             })
@@ -401,17 +401,18 @@
         //-- Bar --//
 
         function getBarTargetIndices () {
-            var indices = []
+            var indices = {}, i = 0
             c3.data.targets.forEach(function(d,i) {
                 if (isBarType(d)) {
-                    indices.push(i)
+                    indices[d.id] = i++
                 }
             })
             return indices
         }
         function getBarX (scale, barWidth, barTargetsNum, barIndices) {
             return function (d) {
-                return scale(d.x) - barWidth * (barTargetsNum/2 - barIndices.indexOf(d.i))
+                var barIndex = d.id in barIndices ? barIndices[d.id] : 0
+                return scale(d.x) - barWidth * (barTargetsNum/2 - barIndex)
             }
         }
         function getBarY (scale) {
@@ -1107,6 +1108,7 @@
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                 .style("fill", function(d){ return color(d.id) })
                 .style("stroke", function(d){ return color(d.id) })
+                .style("stroke-width", 0)
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
 
             /*-- Context --*/
