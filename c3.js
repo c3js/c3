@@ -203,10 +203,20 @@
             })()
         }
 
+        // For main region
+        var lineOnMain = function (d) {
+            return isLineType(d) ? lineWithRegions(d.values, __data_regions[d.id]) : ""//"M 0 0"
+        }
+
         // For brush region
-        var line2 = d3.svg.line()
-            .x(function(d){ return x2(d.x) })
-            .y(function(d){ return y2(d.value) })
+        var lineOnSub = (function () {
+            var line = d3.svg.line()
+                .x(function(d){ return x2(d.x) })
+                .y(function(d){ return y2(d.value) })
+            return function (d) {
+                return isLineType(d) ? line(d.values) : ""//"M 0 0"
+            }
+        })()
 
         // For region
         var regionStart = function (d) {
@@ -422,6 +432,13 @@
         function isBarType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return __data_types[id] === 'bar'
+        }
+
+        function lineData (d) {
+            return isLineType(d) ? d.values : []
+        }
+        function barData (d) {
+            return isBarType(d) ? d.values : []
         }
 
         //-- Color --//
@@ -971,37 +988,69 @@
             }
 
             // lines and cricles
-            mainPath = main.selectAll('.target').selectAll('.target-line').filter(isLineType)
-            if (withTransition) mainPath = mainPath.transition()
-            mainPath.attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]) })
-            mainCircle = main.selectAll('.target').selectAll('.target-circle').filter(isLineType)
-            if (withTransition) mainCircle = mainCircle.transition()
-            mainCircle.attr("cx", function(d) { return x(d.x) })
-                      .attr("cy", function(d) { return y(d.value) })
+            main.selectAll('.target-line')
+              .transition().duration(withTransition ? 100 : 0)
+                .attr("d", lineOnMain)
+            mainCircle = main.selectAll('.target-circles').selectAll('.target-circle')
+                .data(lineData)
+            mainCircle.transition().duration(withTransition ? 100 : 0)
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
+            mainCircle.enter().append("circle")
+                .attr("class", function(d,i){ return "target-circle target-circle-" + i })
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
+                .attr("r", __point_r)
+            mainCircle.exit()
+                .attr("y", 0)
+                .remove()
 
             // bars
             barW = getBarW(xAxis, barTargetsNum)
             barH = getBarH(y, height)
             barX = getBarX(x, barW, barTargetsNum, barIndices)
             barY = getBarY(y)
-            mainBar = main.selectAll('.target').selectAll('.target-bar').filter(isBarType)
-            if (withTransition) mainBar = mainBar.transition()
-            mainBar.attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+            mainBar = main.selectAll('.target-bars').selectAll('.target-bar')
+                .data(barData)
+            mainBar.transition().duration(withTransition ? 100 : 0)
+                .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+            mainBar.enter().append('rect')
+                .attr("class", function(d,i){ return "target-bar target-bar-" + i })
+                .attr("x", barX).attr("y", height).attr("width", barW).attr("height", 0)
+                .style("opacity", 0)
+              .transition()
+                .attr('y', barY).attr('height', barH)
+                .style('opacity', 1)
+            mainBar.exit().transition()
+                .attr('y', height).attr('height', 0)
+                .style('opacity', 0)
+                .remove()
 
             // subchart
             if (withSubchart && __subchart_show) {
-                contextPath = context.selectAll('.target').selectAll('path').filter(isLineType)
-                if (withTransition) contextPath = contextPath.transition()
-                contextPath.attr("d", function(d){ return line2(d.values) })
+                context.selectAll('.target-line')
+                  .transition().duration(withTransition ? 100 : 0)
+                    .attr("d", lineOnSub)
 
                 // bars
                 barW = getBarW(xAxis2, barTargetsNum)
                 barH = getBarH(y2, height2)
                 barX = getBarX(x2, barW, barTargetsNum, barIndices)
                 barY = getBarY(y2)
-                contextBar = context.selectAll('.target').selectAll('.target-bar').filter(isBarType)
-                if (withTransition) contextBar = contextBar.transition()
-                contextBar.attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                contextBar = context.selectAll('.target-bars').selectAll('.target-bar')
+                    .data(barData)
+                contextBar.transition().duration(withTransition ? 100 : 0)
+                    .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                contextBar.enter().append('rect')
+                    .attr("class", function(d,i){ return "target-bar target-bar-" + i })
+                    .attr("x", barX).attr("y", height2).attr("width", barW).attr("height", 0)
+                    .style("opacity", 0)
+                  .transition()
+                    .attr('y', barY).attr('height', barH)
+                    .style('opacity', 1)
+                contextBar.exit().transition()
+                    .attr('y', height2).attr('height', 0).style('opacity', 0)
+                    .remove()
             }
 
             // circles for select
@@ -1037,23 +1086,21 @@
             f.append("path")
                 .attr("class", function(d){ return "target-line target-line-" + d.id })
                 .style("stroke", function(d) { return color(d.id) })
-              .filter(isLineType)
-                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]) })
+                .attr("d", lineOnMain)
 
             // Circles for each data point on lines
             f.append('g')
                 .attr("class", function(d){ return "selected-circles selected-circles-" + d.id })
             f.append('g')
                 .attr("class", function(d){ return "target-circles target-circles-" + d.id })
-                .style("fill", function(d) { return color(d.id) })
+                .style("fill", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
-              .filter(isLineType)
               .selectAll("circle")
-                .data(function(d){ return d.values })
+                .data(lineData)
               .enter().append("circle")
                 .attr("class", function(d,i){ return "target-circle target-circle-" + i })
-                .attr("cx", function(d) { return x(d.x) })
-                .attr("cy", function(d) { return y(d.value) })
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
                 .attr("r", __point_r)
 
             // Rects for each data
@@ -1068,9 +1115,8 @@
                 .style("fill", function(d){ return color(d.id) })
                 .style("stroke", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
-              .filter(isBarType)
               .selectAll("bar")
-                .data(function(d){ return d.values })
+                .data(barData)
               .enter().append("rect")
                 .attr("class", function(d,i){ return "target-bar target-bar-" + i })
                 .attr("x", barX)
@@ -1082,24 +1128,21 @@
 
             main.selectAll('.target-line')
                 .data(targets)
-              .filter(isLineType)
               .transition()
-                .attr("d", function(d){ return lineWithRegions(d.values, __data_regions[d.id]) })
+                .attr("d", lineOnMain)
 
             main.selectAll('.target-circles')
                 .data(targets)
-              .filter(isLineType)
               .selectAll('circle')
-                .data(function(d){ return d.values })
+                .data(lineData)
               .transition()
                 .attr("cx", function(d){ return x(d.x) })
                 .attr("cy", function(d){ return y(d.value) })
 
             main.selectAll(".target-bars")
                 .data(targets)
-              .filter(isBarType)
               .selectAll('rect')
-                .data(function(d){ return d.values })
+                .data(barData)
               .transition()
                 .attr("x", barX)
                 .attr("y", barY)
@@ -1120,8 +1163,7 @@
                 c.append("path")
                     .attr("class", function(d){ return "target-line target-line-" + d.id })
                     .style("stroke", function(d) { return color(d.id) })
-                  .filter(isLineType)
-                    .attr("d", function(d){ return line2(d.values) })
+                    .attr("d", lineOnSub)
 
                 // Rects for each data
                 barW = getBarW(xAxis2, barTargetsNum)
@@ -1132,9 +1174,8 @@
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                     .style("fill", function(d){ return color(d.id) })
-                  .filter(isBarType)
                   .selectAll("bar")
-                    .data(function(d){ return d.values })
+                    .data(barData)
                   .enter().append("rect")
                     .attr("class", function(d,i){ return "target-bar target-bar-" + i })
                     .attr("x", barX)
@@ -1146,15 +1187,13 @@
 
                 context.selectAll('.target-line')
                     .data(targets)
-                  .filter(isLineType)
                   .transition()
-                    .attr("d", function(d){ return line2(d.values) })
+                    .attr("d", lineOnSub)
 
                 context.selectAll(".target-bars")
                     .data(targets)
-                  .filter(isBarType)
                   .selectAll('rect')
-                    .data(function(d){ return d.values })
+                    .data(barData)
                   .transition()
                     .attr("x", barX)
                     .attr("y", barY)
@@ -1404,6 +1443,16 @@
                     }
                 }
             })
+        }
+
+        c3.toLine = function (target) {
+            __data_types[target] = 'line'
+            update(true, true, true)
+        }
+
+        c3.toBar = function (target) {
+            __data_types[target] = 'bar'
+            update(true, true, true)
         }
 
         /*-- Load data and init chart with defined functions --*/
