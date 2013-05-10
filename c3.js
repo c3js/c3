@@ -205,7 +205,7 @@
 
         // For main region
         var lineOnMain = function (d) {
-            return isLineType(d) ? lineWithRegions(d.values, __data_regions[d.id]) : ""//"M 0 0"
+            return isLineType(d) ? lineWithRegions(d.values, __data_regions[d.id]) : "M " + x(d.values[0].x)+ " " + y(d.values[0].value)
         }
 
         // For brush region
@@ -214,7 +214,7 @@
                 .x(function(d){ return x2(d.x) })
                 .y(function(d){ return y2(d.value) })
             return function (d) {
-                return isLineType(d) ? line(d.values) : ""//"M 0 0"
+                return isLineType(d) ? line(d.values) : "M " + x2(d.values[0].x)+ " " + y2(d.values[0].value)
             }
         })()
 
