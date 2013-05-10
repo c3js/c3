@@ -1028,10 +1028,10 @@
                 .attr("class", function(d,i){ return "target-bar target-bar-" + i })
                 .attr("x", barX).attr("y", height).attr("width", barW).attr("height", 0)
                 .style("opacity", 0)
-              .transition()
+              .transition().duration(withTransition ? 100 : 0)
                 .attr('y', barY).attr('height', barH)
                 .style('opacity', 1)
-            mainBar.exit().transition()
+            mainBar.exit().transition().duration(withTransition ? 100 : 0)
                 .attr('y', height).attr('height', 0)
                 .style('opacity', 0)
                 .remove()
@@ -1177,6 +1177,7 @@
 
         function updateLegend (targets) {
             var ids = getTargetIds(targets), l
+            var padding = width/2 - __legend_item_width*Object.keys(targets).length/2
 
             // Define g for legend area
             l = legend.selectAll('.legend-item')
@@ -1200,36 +1201,24 @@
                         .style('opacity', 1)
                     c3.revert()
                 })
-
-            l.append('rect').classed("legend-item-event",true).attr('x', -200)
-            l.append('rect').classed("legend-item-tile",true).attr('x', -200)
-            l.append('text').attr('x', -200)
-
-            legend.selectAll('rect.legend-item-event')
-                .data(ids)
+            l.append('rect')
+                .attr("class", "legend-item-event")
                 .style('fill-opacity', 0)
+                .attr('x', -200)
+                .attr('y', function(){ return legendHeight/2 - 16 })
                 .attr('width', __legend_item_width)
                 .attr('height', 24)
-                .attr('y', function(d,i){ return legendHeight/2 - 16 })
-
-            legend.selectAll('rect.legend-item-tile')
-                .data(ids)
+            l.append('rect')
+                .attr("class", "legend-item-tile")
                 .style('fill', function(d){ return color(d) })
+                .attr('x', -200)
+                .attr('y', function(){ return legendHeight/2 - 9 })
                 .attr('width', 10)
                 .attr('height', 10)
-                .attr('y', function(d,i){ return legendHeight/2 - 9 })
-
-            legend.selectAll('text')
-                .data(ids)
+            l.append('text')
                 .text(function(d){ return __data_names[d] })
+                .attr('x', -200)
                 .attr('y', function(d,i){ return legendHeight/2 })
-
-            updateLegend(targets)
-        }
-
-        function updateLegend (targets) {
-            var ids = getTargetIds(targets),
-                padding = width/2 - __legend_item_width*Object.keys(targets).length/2
 
             legend.selectAll('rect.legend-item-event')
                 .data(ids)
