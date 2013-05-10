@@ -402,7 +402,7 @@
 
         function getBarTargetIndices () {
             var indices = {}, i = 0
-            c3.data.targets.forEach(function(d,i) {
+            c3.data.targets.forEach(function(d) {
                 if (isBarType(d)) {
                     indices[d.id] = i++
                 }
