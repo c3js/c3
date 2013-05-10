@@ -577,7 +577,7 @@
 
         /*-- Define brush --*/
 
-        var brush = d3.svg.brush().x(x2).on("brush", update)
+        var brush = d3.svg.brush().x(x2).on("brush", redraw)
 
         /*-- Draw Chart --*/
 
@@ -919,16 +919,16 @@
 
             /*-- Legend Region --*/
 
-            if (__legend_show) drawLegend(targets)
+            if (__legend_show) updateLegend(targets)
 
-            // Update main chart with settings
-            update(false, true, true)
+            // Set targets
+            updateTargets(targets)
 
-            // Draw chart for each data
-            draw(targets)
+            // Draw with targets
+            redraw(false, true, true)
         }
 
-        function update (withTransition, withY, withSubchart) {
+        function redraw (withTransition, withY, withSubchart) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
             var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
@@ -1075,10 +1075,10 @@
             main.selectAll('rect.region')
                 .attr("x", regionStart)
                 .attr("width", regionWidth)
+            // TODO: enter/exti section for data add/remove
         }
 
-        function draw (targets) {
-            var barTargetsNum = getTargetsNum(isBarType), barIndices, barX, barY, barW, barH
+        function updateTargets (targets) {
             var f, c
 
             /*-- Main --*/
@@ -1095,8 +1095,6 @@
             f.append("path")
                 .attr("class", function(d){ return "target-line target-line-" + d.id })
                 .style("stroke", function(d) { return color(d.id) })
-                .attr("d", lineOnMain)
-
             // Circles for each data point on lines
             f.append('g')
                 .attr("class", function(d){ return "selected-circles selected-circles-" + d.id })
@@ -1104,59 +1102,12 @@
                 .attr("class", function(d){ return "target-circles target-circles-" + d.id })
                 .style("fill", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
-              .selectAll("circle")
-                .data(lineData)
-              .enter().append("circle")
-                .attr("class", function(d,i){ return "target-circle target-circle-" + i })
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
-                .attr("r", __point_r)
-
-            // Rects for each data
-            barIndices = getBarTargetIndices()
-            barW = getBarW(xAxis, barTargetsNum)
-            barH = getBarH(y, height)
-            barX = getBarX(x, barW, barTargetsNum, barIndices)
-            barY = getBarY(y)
-
+            // Bars for each data
             f.append('g')
                 .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                 .style("fill", function(d){ return color(d.id) })
                 .style("stroke", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
-              .selectAll("bar")
-                .data(barData)
-              .enter().append("rect")
-                .attr("class", function(d,i){ return "target-bar target-bar-" + i })
-                .attr("x", barX)
-                .attr("y", barY)
-                .attr("width", barW)
-                .attr("height", barH)
-
-            //-- Main Update Section --//
-
-            main.selectAll('.target-line')
-                .data(targets)
-              .transition()
-                .attr("d", lineOnMain)
-
-            main.selectAll('.target-circles')
-                .data(targets)
-              .selectAll('circle')
-                .data(lineData)
-              .transition()
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
-
-            main.selectAll(".target-bars")
-                .data(targets)
-              .selectAll('rect')
-                .data(barData)
-              .transition()
-                .attr("x", barX)
-                .attr("y", barY)
-                .attr("width", barW)
-                .attr("height", barH)
 
             /*-- Context --*/
 
@@ -1172,48 +1123,16 @@
                 c.append("path")
                     .attr("class", function(d){ return "target-line target-line-" + d.id })
                     .style("stroke", function(d) { return color(d.id) })
-                    .attr("d", lineOnSub)
-
-                // Rects for each data
-                barW = getBarW(xAxis2, barTargetsNum)
-                barH = getBarH(y2, height2)
-                barX = getBarX(x2, barW, barTargetsNum, barIndices)
-                barY = getBarY(y2)
-
+                // Bars for each data
                 c.append('g')
                     .attr("class", function(d){ return "target-bars target-bars-" + d.id })
                     .style("fill", function(d){ return color(d.id) })
-                  .selectAll("bar")
-                    .data(barData)
-                  .enter().append("rect")
-                    .attr("class", function(d,i){ return "target-bar target-bar-" + i })
-                    .attr("x", barX)
-                    .attr("y", barY)
-                    .attr("width", barW)
-                    .attr("height", barH)
-
-                //-- Context Update Section --//
-
-                context.selectAll('.target-line')
-                    .data(targets)
-                  .transition()
-                    .attr("d", lineOnSub)
-
-                context.selectAll(".target-bars")
-                    .data(targets)
-                  .selectAll('rect')
-                    .data(barData)
-                  .transition()
-                    .attr("x", barX)
-                    .attr("y", barY)
-                    .attr("width", barW)
-                    .attr("height", barH)
             }
 
             /*-- Legend --*/
 
             if (__legend_show) {
-                drawLegend(targets)
+                updateLegend(targets)
             }
 
             /*-- Show --*/
@@ -1243,16 +1162,18 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
-            update(true, true, true)
+            // Set targets
+            updateTargets(c3.data.targets)
 
-            draw(c3.data.targets)
+            // Redraw with new targets
+            redraw(true, true, true)
 
             done()
         }
 
         /*-- Draw Legend --*/
 
-        function drawLegend (targets) {
+        function updateLegend (targets) {
             var ids = getTargetIds(targets), l
 
             // Define g for legend area
@@ -1416,7 +1337,7 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
-            if (c3.data.targets.length > 0) update(true, true, true)
+            if (c3.data.targets.length > 0) redraw(true, true, true)
         }
 
         c3.selected = function (target) {
@@ -1455,12 +1376,12 @@
 
         c3.toLine = function (targets) {
             setTargetType(targets, 'line')
-            update(true, true, true)
+            redraw(true, true, true)
         }
 
         c3.toBar = function (targets) {
             setTargetType(targets, 'bar')
-            update(true, true, true)
+            redraw(true, true, true)
         }
 
         /*-- Load data and init chart with defined functions --*/
