@@ -783,7 +783,7 @@
                 .on('click', function(d,i) {
                     main.selectAll('.target-circle-'+i+', .target-bar-'+i).each(function(d){
                         var _this = d3.select(this),
-                            _selected = _this.classed('_s_')
+                            isSelected = _this.classed('_s_')
                         var isWithin = false, toggle
                         if (this.nodeName === 'circle') {
                             isWithin = isWithinCircle(this, __point_select_r*1.5)
@@ -795,8 +795,8 @@
                         }
                         if (__data_selection_grouped || isWithin) {
                             if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                                _this.classed('_s_', !_selected)
-                                toggle(!_selected, _this, d, i)
+                                _this.classed('_s_', !isSelected)
+                                toggle(!isSelected, _this, d, i)
                             }
                             __point_onclick(d, _this) // TODO: should be __data_onclick
                         }
@@ -810,41 +810,41 @@
                             mouse = d3.mouse(this),
                             mx = mouse[0],
                             my = mouse[1],
-                            min_x = Math.min(sx,mx),
-                            max_x = Math.max(sx,mx),
-                            min_y = (__data_selection_grouped) ? margin.top : Math.min(sy,my),
-                            max_y = (__data_selection_grouped) ? height : Math.max(sy,my)
+                            minX = Math.min(sx,mx),
+                            maxX = Math.max(sx,mx),
+                            minY = (__data_selection_grouped) ? margin.top : Math.min(sy,my),
+                            maxY = (__data_selection_grouped) ? height : Math.max(sy,my)
                         main.select('.dragarea')
-                            .attr('x', min_x)
-                            .attr('y', min_y)
-                            .attr('width', max_x-min_x)
-                            .attr('height', max_y-min_y)
+                            .attr('x', minX)
+                            .attr('y', minY)
+                            .attr('width', maxX-minX)
+                            .attr('height', maxY-minY)
                         main.selectAll('.target-circles, .target-bars')
                             .selectAll('.target-circle, .target-bar')
                             .filter(function(d){ return __data_selection_isselectable(d) })
                             .each(function(d,i){
                                 var _this = d3.select(this),
-                                    _selected = _this.classed('_s_'),
-                                    _included = _this.classed('_i_'),
+                                    isSelected = _this.classed('_s_'),
+                                    isIncluded = _this.classed('_i_'),
                                     _x, _y, _w, toggle, isWithin = false
                                 if (this.nodeName === 'circle') {
                                     _x = _this.attr("cx")*1
                                     _y = _this.attr("cy")*1
                                     toggle = togglePoint
-                                    isWithin = min_x < _x && _x < max_x && min_y < _y && _y < max_y
+                                    isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY
                                 }
                                 else if (this.nodeName === 'rect') {
                                     _x = _this.attr("x")*1
                                     _y = _this.attr("y")*1
                                     _w = _this.attr('width')*1
                                     toggle = toggleBar
-                                    isWithin = min_x < _x+_w && _x < max_x && _y < max_y
+                                    isWithin = minX < _x+_w && _x < maxX && _y < maxY
                                 }
-                                if (isWithin ^ _included) {
-                                    _this.classed('_i_', !_included)
+                                if (isWithin ^ isIncluded) {
+                                    _this.classed('_i_', !isIncluded)
                                     // TODO: included/unincluded callback here
-                                    _this.classed('_s_', !_selected)
-                                    toggle(!_selected, _this, d, i)
+                                    _this.classed('_s_', !isSelected)
+                                    toggle(!isSelected, _this, d, i)
                                 }
                             })
                     })
