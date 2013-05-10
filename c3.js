@@ -380,6 +380,12 @@
             if (typeof c3.data.targets === 'undefined') return 0
             return typeof filter !== 'undefined' ? c3.data.targets.filter(filter).length : c3.data.targets.length;
         }
+        function category (i) {
+            return i < __axis_x_categories.length ? __axis_x_categories[i] : i
+        }
+
+        //-- Bar --//
+
         function getBarTargetIndices () {
             var indices = []
             c3.data.targets.forEach(function(d,i) {
@@ -406,6 +412,9 @@
                 return h < 0 ? 0 : h
             }
         }
+
+        //-- Type --//
+
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return !(id in __data_types) || __data_types[id] === 'line'
@@ -413,9 +422,6 @@
         function isBarType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return __data_types[id] === 'bar'
-        }
-        function category (i) {
-            return i < __axis_x_categories.length ? __axis_x_categories[i] : i
         }
 
         //-- Color --//
