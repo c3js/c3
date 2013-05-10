@@ -395,9 +395,9 @@
             })
             return indices
         }
-        function getBarX (barWidth, barTargetsNum, barIndices) {
+        function getBarX (scale, barWidth, barTargetsNum, barIndices) {
             return function (d) {
-                return x(d.x) - barWidth * (barTargetsNum/2 - barIndices.indexOf(d.i))
+                return scale(d.x) - barWidth * (barTargetsNum/2 - barIndices.indexOf(d.i))
             }
         }
         function getBarY (scale) {
@@ -896,13 +896,13 @@
             if (__legend_show) drawLegend(targets)
 
             // Update main chart with settings
-            update(false, true)
+            update(false, true, true)
 
             // Draw chart for each data
             draw(targets)
         }
 
-        function update (withTransition, withY) {
+        function update (withTransition, withY, withSubchart) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
             var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
@@ -910,6 +910,7 @@
             var rectWidth
 
             withY = (typeof withY === 'undefined') ? false : withY
+            withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
             x.domain(brush.empty() ? x2.domain() : brush.extent())
 
@@ -949,7 +950,7 @@
                     .attr("x", function(d){ return x(d.value) })
             }
             // Y-Grid
-            if (__grid_y_show && withY) {
+            if (withY && __grid_y_show) {
                 ygrid = main.select('.ygrids').selectAll(".ygrid")
                     .data(y.ticks(10))
                 ygrid.enter().append('line')
@@ -963,7 +964,7 @@
                      .attr("opacity", 1)
                 ygrid.exit().remove()
             }
-            if (__grid_y_lines && withY) {
+            if (withY && __grid_y_lines) {
                 main.select('.ygrid-lines').selectAll('.ygrid-line')
                     .attr("y1", function(d){ return y(d.value) })
                     .attr("y2", function(d){ return y(d.value) })
@@ -981,14 +982,14 @@
             // bars
             barW = getBarW(xAxis, barTargetsNum)
             barH = getBarH(y, height)
-            barX = getBarX(barW, barTargetsNum, barIndices)
+            barX = getBarX(x, barW, barTargetsNum, barIndices)
             barY = getBarY(y)
             mainBar = main.selectAll('.target').selectAll('.target-bar').filter(isBarType)
             if (withTransition) mainBar = mainBar.transition()
             mainBar.attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
 
             // subchart
-            if (__subchart_show) {
+            if (withSubchart && __subchart_show) {
                 contextPath = context.selectAll('.target').selectAll('path').filter(isLineType)
                 if (withTransition) contextPath = contextPath.transition()
                 contextPath.attr("d", function(d){ return line2(d.values) })
@@ -996,7 +997,7 @@
                 // bars
                 barW = getBarW(xAxis2, barTargetsNum)
                 barH = getBarH(y2, height2)
-                barX = getBarX(barW, barTargetsNum, barIndices)
+                barX = getBarX(x2, barW, barTargetsNum, barIndices)
                 barY = getBarY(y2)
                 contextBar = context.selectAll('.target').selectAll('.target-bar').filter(isBarType)
                 if (withTransition) contextBar = contextBar.transition()
@@ -1059,7 +1060,7 @@
             barIndices = getBarTargetIndices()
             barW = getBarW(xAxis, barTargetsNum)
             barH = getBarH(y, height)
-            barX = getBarX(barW, barTargetsNum, barIndices)
+            barX = getBarX(x, barW, barTargetsNum, barIndices)
             barY = getBarY(y)
 
             f.append('g')
@@ -1125,7 +1126,7 @@
                 // Rects for each data
                 barW = getBarW(xAxis2, barTargetsNum)
                 barH = getBarH(y2, height2)
-                barX = getBarX(barW, barTargetsNum, barIndices)
+                barX = getBarX(x2, barW, barTargetsNum, barIndices)
                 barY = getBarY(y2)
 
                 c.append('g')
@@ -1194,7 +1195,7 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
-            update(true, true)
+            update(true, true, true)
 
             draw(c3.data.targets)
 
@@ -1368,7 +1369,7 @@
                 main.select('.y.axis').transition().call(yAxis)
             }
 
-            if (c3.data.targets.length > 0) update(true, true)
+            if (c3.data.targets.length > 0) update(true, true, true)
         }
 
         c3.selected = function (target) {
