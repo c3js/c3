@@ -379,8 +379,12 @@
         function maxDataCount () {
             return d3.max(c3.data.targets, function(t){ return t.values.length })
         }
+        function getTargetIds (targets) {
+            targets = (typeof targets === 'undefined') ? c3.data.targets : targets
+            return targets.map(function(d){ return d.id; })
+        }
         function hasTarget (id) {
-            var ids = c3.data.targets.map(function(d){ return d.id }), i
+            var ids = getTargetIds(), i
             for (i = 0; i < ids.length; i++) {
                 if (ids[i] === id) return true
             }
@@ -425,6 +429,12 @@
 
         //-- Type --//
 
+        function setTargetType (targets, type) {
+            var targetIds = typeof targets === 'undefined' ? getTargetIds() : targets
+            for (var i = 0; i < targetIds.length; i++) {
+                __data_types[targetIds[i]] = type
+            }
+        }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
             return !(id in __data_types) || __data_types[id] === 'line'
@@ -433,7 +443,6 @@
             var id = (typeof d === 'string') ? d : d.id
             return __data_types[id] === 'bar'
         }
-
         function lineData (d) {
             return isLineType(d) ? d.values : []
         }
@@ -1244,8 +1253,7 @@
         /*-- Draw Legend --*/
 
         function drawLegend (targets) {
-            var ids = targets.map(function(d){ return d.id })
-            var l
+            var ids = getTargetIds(targets), l
 
             // Define g for legend area
             l = legend.selectAll('.legend-item')
@@ -1297,7 +1305,7 @@
         }
 
         function updateLegend (targets) {
-            var ids = targets.map(function(d){ return d.id }),
+            var ids = getTargetIds(targets),
                 padding = width/2 - __legend_item_width*Object.keys(targets).length/2
 
             legend.selectAll('rect.legend-item-event')
@@ -1445,13 +1453,13 @@
             })
         }
 
-        c3.toLine = function (target) {
-            __data_types[target] = 'line'
+        c3.toLine = function (targets) {
+            setTargetType(targets, 'line')
             update(true, true, true)
         }
 
-        c3.toBar = function (target) {
-            __data_types[target] = 'bar'
+        c3.toBar = function (targets) {
+            setTargetType(targets, 'bar')
             update(true, true, true)
         }
 
