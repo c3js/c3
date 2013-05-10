@@ -614,16 +614,7 @@
 
             // Y-Grid
             if (__grid_y_show) {
-                grid.append('g')
-                    .attr('class', 'ygrids')
-                  .selectAll(".ygrid")
-                    .data(y.ticks(10))
-                  .enter().append("line")
-                    .attr("class", "ygrid")
-                    .attr("x1", 0)
-                    .attr("x2", width)
-                    .attr("y1", y)
-                    .attr("y2", y)
+                grid.append('g').attr('class', 'ygrids')
             }
             if (__grid_y_lines) {
                 grid.append('g')
@@ -905,7 +896,7 @@
             if (__legend_show) drawLegend(targets)
 
             // Update main chart with settings
-            update()
+            update(false, true)
 
             // Draw chart for each data
             draw(targets)
@@ -917,6 +908,8 @@
             var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
             var barX, barY, barW, barH
             var rectWidth
+
+            withY = (typeof withY === 'undefined') ? false : withY
 
             x.domain(brush.empty() ? x2.domain() : brush.extent())
 
