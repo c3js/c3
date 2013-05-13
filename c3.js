@@ -1010,15 +1010,14 @@
             withY = (typeof withY === 'undefined') ? false : withY
             withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
-            x.domain(brush.empty() ? x2.domain() : brush.extent())
-
             // TODO: for stacked bars
             y.domain(getYDomain(c3.data.targets))
             y2.domain(y.domain())
-            main.selectAll(".y.axis").call(yAxis)
+            main.selectAll(".y.axis").transition().call(yAxis)
 
             // ticks for x-axis
             // ATTENTION: call here to update tickOffset
+            x.domain(brush.empty() ? x2.domain() : brush.extent())
             main.selectAll(".x.axis").call(xAxis)
 
             // grid
@@ -1252,12 +1251,6 @@
             })
             c3.data.targets = c3.data.targets.concat(targets) // add remained
 
-            if (__axis_y_rescale) {
-                y.domain(getYDomain(c3.data.targets))
-                y2.domain(y.domain())
-                main.select('.y.axis').transition().call(yAxis)
-            }
-
             // Set targets
             updateTargets(c3.data.targets)
 
@@ -1414,12 +1407,6 @@
             if (__legend_show) {
                 d3.selectAll('.legend-item-'+target).remove()
                 updateLegend(c3.data.targets)
-            }
-
-            if (__axis_y_rescale){
-                y.domain(getYDomain(c3.data.targets))
-                y2.domain(y.domain())
-                main.select('.y.axis').transition().call(yAxis)
             }
 
             if (c3.data.targets.length > 0) redraw(true, true, true)
