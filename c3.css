@@ -36,14 +36,14 @@ path, line {
 /*-- Bar --*/
 
 .__bar._e_ {
-  stroke-width: 6px;
+  stroke-width: 1px;
+  fill-opacity: 0.6;
 }
-/* TODO: use this
+/* TODO: use this*/
 .__bar._s_ {
   stroke-width: 1px;
-  fill-opacity: 0.4;
+  fill-opacity: 0.3;
 }
-*/
 .selected-bar {
   fill: white;
   stroke-width: 2px;

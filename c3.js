@@ -585,15 +585,8 @@
         }
 
         function selectBar (target, d, i) {
-            target.transition().duration(100)
-                .style("fill-opacity", 0.4)
-                .style("stroke-width", "1px")
         }
         function unselectBar (target, d, i) {
-            target.transition().duration(100)
-                .style("fill-opacity", 1)
-                .style("stroke-width", target.classed("_e_") ? "4px" : null)
-            .each('end', function(){ target.transition().style("stroke-width", null) })
         }
         function toggleBar (selected, target, d, i) {
             (selected) ? selectBar(target, d, i) : unselectBar(target, d, i)
