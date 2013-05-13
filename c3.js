@@ -933,6 +933,14 @@
                     })
                 )
 
+            // Define g for bar chart area
+            main.select(".chart").append("g")
+                .attr("class", "chart-bars")
+
+            // Define g for line chart area
+            main.select(".chart").append("g")
+                .attr("class", "chart-lines")
+
             // ATTENTION: This must be called AFTER chart added
             // Add Axis
             main.append("g")
@@ -957,6 +965,14 @@
                 context.append('g')
                     .attr("clip-path", clipPath)
                     .attr('class', 'chart')
+
+                // Define g for bar chart area
+                context.select(".chart").append("g")
+                    .attr("class", "chart-bars")
+
+                // Define g for line chart area
+                context.select(".chart").append("g")
+                    .attr("class", "chart-lines")
 
                 // ATTENTION: This must be called AFTER chart rendered and BEFORE brush called.
                 // Update extetn for Brush
@@ -1063,22 +1079,6 @@
                     .attr("y2", function(d){ return y(d.value) })
             }
 
-            // lines and cricles
-            main.selectAll('.__line')
-              .transition().duration(withTransition ? 250 : 0)
-                .attr("d", lineOnMain)
-            mainCircle = main.selectAll('.__circles').selectAll('.__circle')
-                .data(lineData)
-            mainCircle.transition().duration(withTransition ? 250 : 0)
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
-            mainCircle.enter().append("circle")
-                .attr("class", classCircle)
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
-                .attr("r", __point_r)
-            mainCircle.exit().remove()
-
             // bars
             barW = getBarW(xAxis, barTargetsNum)
             barH = getBarH(y, height)
@@ -1098,12 +1098,24 @@
                 .style('opacity', 0)
                 .remove()
 
+            // lines and cricles
+            main.selectAll('.__line')
+              .transition().duration(withTransition ? 250 : 0)
+                .attr("d", lineOnMain)
+            mainCircle = main.selectAll('.__circles').selectAll('.__circle')
+                .data(lineData)
+            mainCircle.transition().duration(withTransition ? 250 : 0)
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
+            mainCircle.enter().append("circle")
+                .attr("class", classCircle)
+                .attr("cx", function(d){ return x(d.x) })
+                .attr("cy", function(d){ return y(d.value) })
+                .attr("r", __point_r)
+            mainCircle.exit().remove()
+
             // subchart
             if (withSubchart && __subchart_show) {
-                context.selectAll('.__line')
-                  .transition().duration(withTransition ? 250 : 0)
-                    .attr("d", lineOnSub)
-
                 // bars
                 barW = getBarW(xAxis2, barTargetsNum)
                 barH = getBarH(y2, height2)
@@ -1122,6 +1134,11 @@
                 contextBar.exit().transition()
                     .style('opacity', 0)
                     .remove()
+
+                // lines
+                context.selectAll('.__line')
+                  .transition().duration(withTransition ? 250 : 0)
+                    .attr("d", lineOnSub)
             }
 
             // circles for select
@@ -1145,55 +1162,73 @@
         }
 
         function updateTargets (targets) {
-            var f, c
+            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate
+            var contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate
 
             /*-- Main --*/
 
-            f = main.select('.chart')
-              .selectAll('.target')
+            //-- Bar --//
+            mainBarUpdate = main.select('.chart-bars')
+              .selectAll('.chart-bar')
                 .data(targets)
-              .enter().append('g')
-                .attr('class', function(d){ return 'target target-' + d.id })
+            mainBarEnter = mainBarUpdate.enter().append('g')
+                .attr('class', function(d){ return 'chart-bar target target-' + d.id })
                 .style("pointer-events", "none")
                 .style('opacity', 0)
-
-            // Lines for each data
-            f.append("path")
-                .attr("class", classLine)
-                .style("stroke", function(d) { return color(d.id) })
-            // Circles for each data point on lines
-            f.append('g')
-                .attr("class", function(d){ return "selected-circles selected-circles-" + d.id })
-            f.append('g')
-                .attr("class", classCircles)
-                .style("fill", function(d){ return color(d.id) })
-                .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
             // Bars for each data
-            f.append('g')
+            mainBarEnter.append('g')
                 .attr("class", classBars)
                 .style("fill", function(d){ return color(d.id) })
                 .style("stroke", function(d){ return color(d.id) })
                 .style("stroke-width", 0)
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
 
+            //-- Line --//
+            mainLineUpdate = main.select('.chart-lines')
+              .selectAll('.chart-line')
+                .data(targets)
+            mainLineEnter = mainLineUpdate.enter().append('g')
+                .attr('class', function(d){ return 'chart-line target target-' + d.id })
+                .style("pointer-events", "none")
+                .style('opacity', 0)
+            // Lines for each data
+            mainLineEnter.append("path")
+                .attr("class", classLine)
+                .style("stroke", function(d){ return color(d.id) })
+            // Circles for each data point on lines
+            mainLineEnter.append('g')
+                .attr("class", function(d){ return "selected-circles selected-circles-" + d.id })
+            mainLineEnter.append('g')
+                .attr("class", classCircles)
+                .style("fill", function(d){ return color(d.id) })
+                .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
+
             /*-- Context --*/
 
             if (__subchart_show) {
-                c = context.select('.chart')
-                  .selectAll('.target')
-                    .data(targets)
-                  .enter().append('g')
-                    .attr('class', function(d){ return 'target target-' + d.id })
-                    .style('opacity', 0)
 
-                // Lines for each data
-                c.append("path")
-                    .attr("class", classLine)
-                    .style("stroke", function(d) { return color(d.id) })
+                contextBarUpdate = context.select('.chart-bars')
+                  .selectAll('.chart-bar')
+                    .data(targets)
+                contextBarEnter = contextBarUpdate.enter().append('g')
+                    .attr('class', function(d){ return 'chart-bar target target-' + d.id })
+                    .style('opacity', 0)
                 // Bars for each data
-                c.append('g')
+                contextBarEnter.append('g')
                     .attr("class", classBars)
                     .style("fill", function(d){ return color(d.id) })
+
+                //-- Line --//
+                contextLineUpdate = context.select('.chart-lines')
+                  .selectAll('.chart-line')
+                    .data(targets)
+                contextLineEnter = contextLineUpdate.enter().append('g')
+                    .attr('class', function(d){ return 'chart-line target target-' + d.id })
+                    .style('opacity', 0)
+                // Lines for each data
+                contextLineEnter.append("path")
+                    .attr("class", classLine)
+                    .style("stroke", function(d) { return color(d.id) })
             }
 
             /*-- Legend --*/
