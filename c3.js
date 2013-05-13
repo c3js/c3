@@ -39,6 +39,7 @@
             __data_id_converter = getConfig(['data','id_converter'], function(id){ return id; }),
             __data_names = getConfig(['data','names'], {}),
             __data_groups = getConfig(['data','groups'], []),
+            __data_axes = getConfig(['data','axes'], {}),
             __data_types = getConfig(['data','types'], {}),
             __data_regions = getConfig(['data','regions'], {}),
             __data_colors = getConfig(['data','colors'], {}),
@@ -67,7 +68,13 @@
             __axis_y_min = getConfig(['axis','y','min'], null),
             __axis_y_center = getConfig(['axis','y','center'], null),
             __axis_y_text = getConfig(['axis','y','text'], null),
-            __axis_y_rescale = getConfig(['axis','y','rescale'], true)
+            __axis_y_rescale = getConfig(['axis','y','rescale'], true),
+            __axis_y2_show = getConfig(['axis','y2','show'], false),
+            __axis_y2_max = getConfig(['axis','y2','max'], null),
+            __axis_y2_min = getConfig(['axis','y2','min'], null),
+            __axis_y2_center = getConfig(['axis','y2','center'], null),
+            __axis_y2_text = getConfig(['axis','y2','text'], null),
+            __axis_y2_rescale = getConfig(['axis','y2','rescale'], true)
 
         // grid
         var __grid_x_show = getConfig(['grid','x','show'], false),
@@ -134,13 +141,13 @@
 
         /*-- Set Chart Params --*/
 
-        var margin_bottom = 20 + __subchart_size_height + legendHeight,
-            margin2_top = __size_height - __subchart_size_height - legendHeight,
-            margin2_bottom = 20 + legendHeight,
-            margin3_top = __size_height - legendHeight,
-            margin = {top: 10, right: 20, bottom: margin_bottom, left: 40},
-            margin2 = {top: margin2_top, right: 20, bottom: margin2_bottom, left: 40},
-            margin3 = {top: margin3_top, right: 20, bottom: 0, left: 40},
+        var bottom = 20 + __subchart_size_height + legendHeight,
+            top2 = __size_height - __subchart_size_height - legendHeight,
+            bottom2 = 20 + legendHeight,
+            top3 = __size_height - legendHeight,
+            margin = {top: 10, right: (__axis_y2_show ? 50 : -1), bottom: bottom, left: 40},
+            margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
+            margin3 = {top: top3, right: 20, bottom: 0, left: 40},
             width = __size_width - margin.left - margin.right,
             height = __size_height - margin.top - margin.bottom,
             height2 = __size_height - margin2.top - margin2.bottom,
@@ -149,18 +156,22 @@
         var parseDate = d3.time.format(__data_x_format).parse
 
         var x = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
-            x2 = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
             y = d3.scale.linear().range([height, 10]),
-            y2 = d3.scale.linear().range([height2, 10])
+            y2 = d3.scale.linear().range([height, 10]),
+            subX = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
+            subY = d3.scale.linear().range([height2, 10]),
+            subY2 = d3.scale.linear().range([height2, 10])
 
         // TODO: Enable set position
         var xAxis = isCategorized ? categoryAxis() : d3.svg.axis(),
-            xAxis2 = isCategorized ? categoryAxis() : d3.svg.axis(),
-            yAxis = d3.svg.axis()
+            yAxis = d3.svg.axis(),
+            yAxis2 = d3.svg.axis(),
+            subXAxis = isCategorized ? categoryAxis() : d3.svg.axis()
 
         xAxis.scale(x).orient("bottom")
-        xAxis2.scale(x2).orient("bottom")
         yAxis.scale(y).orient("left")
+        yAxis2.scale(y2).orient("right")
+        subXAxis.scale(subX).orient("bottom")
 
         if (isTimeSeries) {
             xAxis.tickFormat(customTimeFormat)
@@ -169,13 +180,13 @@
                 return 0
             };
             // TODO: fix
-            xAxis2.tickOffset = function () {
+            subXAxis.tickOffset = function () {
                 return 0
             }
         }
         if (isCategorized) {
             xAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
-            xAxis2.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
+            subXAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
         }
 
         // Use custom scale if needed
@@ -183,14 +194,14 @@
             // TODO: fix this
             // TODO: fix x_grid
             (function () {
-                var _x = x, _x2 = x2
+                var _x = x, _subX = subX
                 var keys = Object.keys(x), key, i
                 x = function(d){ return _x(d) + xAxis.tickOffset() }
-                x2 = function(d){ return _x2(d) + xAxis2.tickOffset() }
+                subX = function(d){ return _subX(d) + subXAxis.tickOffset() }
                 for (i = 0; i < keys.length; i++) {
                     key = keys[i]
                     x[key] = _x[key]
-                    x2[key] = _x2[key]
+                    subX[key] = _subX[key]
                 }
                 x.domain = function (domain) {
                     if (!arguments.length) {
@@ -206,16 +217,16 @@
 
         // For main region
         var lineOnMain = function (d) {
-            return isLineType(d) ? lineWithRegions(d.values, __data_regions[d.id]) : "M " + x(d.values[0].x)+ " " + y(d.values[0].value)
+            return isLineType(d) ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : "M " + x(d.values[0].x)+ " " + getYScale(d.id)(d.values[0].value)
         }
 
         // For brush region
         var lineOnSub = (function () {
             var line = d3.svg.line()
-                .x(function(d){ return x2(d.x) })
-                .y(function(d){ return y2(d.value) })
+                .x(function(d){ return subX(d.x) })
+                .y(function(d){ return getSubYScale(d.id)(d.value) })
             return function (d) {
-                return isLineType(d) ? line(d.values) : "M " + x2(d.values[0].x)+ " " + y2(d.values[0].value)
+                return isLineType(d) ? line(d.values) : "M " + subX(d.values[0].x)+ " " + getSubYScale(d.id)(d.values[0].value)
             }
         })()
 
@@ -282,12 +293,10 @@
         //-- Domain --//
 
         function getYDomainMin (targets) {
-            return (__axis_y_min !== null) ? __axis_y_min : d3.min(targets, function(t) { return d3.min(t.values, function(v) { return v.value }) })
+            return d3.min(targets, function(t){ return d3.min(t.values, function(v){ return v.value }) })
         }
         function getYDomainMax (targets) {
             var ys = {}, j, k
-
-            if (__axis_y_max !== null) return __axis_y_max
 
             targets.forEach(function(t){
                 ys[t.id] = []
@@ -298,28 +307,35 @@
             for (j = 0; j < __data_groups.length; j++) {
                 for (k = 1; k < __data_groups[j].length; k++) {
                     if ( ! isBarType(__data_groups[j][k])) continue
+                    if (typeof ys[__data_groups[j][k]] === 'undefined') continue
                     ys[__data_groups[j][k]].forEach(function(v,i){
-                        ys[__data_groups[j][0]][i] += v*1
+                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0])){
+                            ys[__data_groups[j][0]][i] += v*1
+                        }
                     })
                 }
             }
 
             return d3.max(Object.keys(ys).map(function(key){ return d3.max(ys[key]) }))
         }
-        function getYDomain (targets) {
-            var yDomainMin = getYDomainMin(targets),
-                yDomainMax = getYDomainMax(targets),
-                padding = Math.abs(yDomainMax - yDomainMin) * 0.1
-            if (__axis_y_center !== null) {
+        function getYDomain (targets, axisId) {
+            var yTargets = getTargets(function(d){ return getAxisId(d.id) === axisId }),
+                yMin = axisId === 'y2' ? __axis_y2_min : __axis_y_min,
+                yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
+                yDomainMin = (yMin !== null) ? yMin : getYDomainMin(yTargets),
+                yDomainMax = (yMax !== null) ? yMax : getYDomainMax(yTargets),
+                padding = Math.abs(yDomainMax - yDomainMin) * 0.1,
+                center = axisId === 'y2' ? __axis_y2_center : __axis_y_center
+            if (center !== null) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax))
-                yDomainMax = yDomainAbs - __axis_y_center
-                yDomainMin = __axis_y_center - yDomainAbs
+                yDomainMax = yDomainAbs - center
+                yDomainMin = center - yDomainAbs
             }
-            return [yDomainMin-(hasBarType() ? 0 : padding), yDomainMax+padding]
+            return [hasBarType(yTargets) ? 0 : yDomainMin-padding, yDomainMax+padding]
         }
         function getXDomainRatio () {
             if (brush.empty()) return 1
-            var domain = x2.domain(), extent = brush.extent()
+            var domain = subX.domain(), extent = brush.extent()
             return (domain[1] - domain[0]) / (extent[1] - extent[0])
         }
 
@@ -340,6 +356,18 @@
                 if (ids[i] in cache) targets.push(cloneTarget(cache[ids[i]]))
             }
             return targets
+        }
+
+        //-- Axis --//
+
+        function getAxisId (id) {
+            return id in __data_axes ? __data_axes[id] : 'y'
+        }
+        function getYScale (id) {
+            return getAxisId(id) === 'y2' ? y2 : y
+        }
+        function getSubYScale (id) {
+            return getAxisId(id) === 'y2' ? subY2 : subY
         }
 
         //-- Data --//
@@ -452,15 +480,17 @@
             indices.__max__ = i-1
             return indices
         }
-        function getBarX (scale, barW, barTargetsNum, barIndices) {
+        function getBarX (barW, barTargetsNum, barIndices, isSub) {
             return function (d) {
+                var scale = isSub ? subX : x
                 var barIndex = d.id in barIndices ? barIndices[d.id] : 0
                 return scale(d.x) - barW * (barTargetsNum/2 - barIndex)
             }
         }
-        function getBarY (scale, barH, indices) {
+        function getBarY (barH, indices, isSub) {
             return function (d,i) {
                 var indicesIds = Object.keys(indices), offset = 0
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id)
                 getTargets(isBarType).forEach(function(t){
                     if (t.id === d.id || indices[t.id] !== indices[d.id]) return
                     if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id)) {
@@ -473,8 +503,9 @@
         function getBarW (axis, barTargetsNum) {
             return (axis.tickOffset()*2*0.6) / barTargetsNum
         }
-        function getBarH (scale, height) {
+        function getBarH (height, isSub) {
             return function (d) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id)
                 var h = height-scale(d.value)
                 return h < 0 ? 0 : h
             }
@@ -489,18 +520,19 @@
                 __data_types[targetIds[i]] = type
             }
         }
-        function hasType (type) {
+        function hasType (targets, type) {
             var has = false
-            Object.keys(__data_types).forEach(function(key){
-                if (__data_types[key] === type) has = true
+            targets.forEach(function(t){
+                if (__data_types[t.id] === type) has = true
+                if (!(t.id in __data_types) && type === 'line') has = true
             })
             return has
         }
-        function hasLineType () {
-            return hasType('line')
+        function hasLineType (targets) {
+            return hasType(targets, 'line')
         }
-        function hasBarType () {
-            return hasType('bar')
+        function hasBarType (targets) {
+            return hasType(targets, 'bar')
         }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
@@ -567,7 +599,7 @@
               .enter().append('circle')
                 .attr("class", function(d){ return "selected-circle selected-circle-" + i })
                 .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
+                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
                 .attr("stroke", function(){ return color(d.id) })
                 .attr("r", __point_select_r * 1.4)
               .transition().duration(100)
@@ -594,7 +626,7 @@
 
         //-- Shape --//
 
-        function lineWithRegions (d, regions) {
+        function lineWithRegions (d, x, y, regions) {
             var prev = -1, i, j
             var s = "M"
             var xp, yp, dx, dy, dd, diff, diff2
@@ -637,7 +669,7 @@
 
         /*-- Define brush --*/
 
-        var brush = d3.svg.brush().x(x2).on("brush", redraw)
+        var brush = d3.svg.brush().x(subX).on("brush", redraw)
 
         /*-- Draw Chart --*/
 
@@ -653,9 +685,12 @@
             // TODO: set names if names not specified
 
             x.domain(d3.extent(data.map(function(d){ return d.x })))
-            y.domain(getYDomain(targets))
-            x2.domain(x.domain())
-            y2.domain(y.domain())
+            y.domain(getYDomain(targets, 'y'))
+            y2.domain(getYDomain(targets, 'y2'))
+
+            subX.domain(x.domain())
+            subY.domain(y.domain())
+            subY2.domain(y2.domain())
 
             /*-- Main Region --*/
 
@@ -751,7 +786,7 @@
                 .on('mouseover', function(d,i) {
                     if (dragging) return // do nothing if dragging
 
-                    var selectedData = c3.data.targets.map(function(d){ return d.values[i] });
+                    var selectedData = targets.map(function(d){ return d.values[i] });
                     var j, newData
 
                     // Add id,name to selectedData
@@ -952,6 +987,11 @@
                 .style("text-anchor", "end")
                 .text(__axis_y_text)
 
+            main.append("g")
+                .attr("class", "y2 axis")
+                .attr("transform", "translate(" + width + ",0)")
+                .call(yAxis2)
+
             /*-- Context Region --*/
 
             if (__subchart_show) {
@@ -986,7 +1026,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate(0," + height2 + ")")
-                    .call(xAxis2)
+                    .call(subXAxis)
             }
 
             /*-- Legend Region --*/
@@ -1010,14 +1050,19 @@
             withY = (typeof withY === 'undefined') ? false : withY
             withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
-            // TODO: for stacked bars
-            y.domain(getYDomain(c3.data.targets))
-            y2.domain(y.domain())
+            // Update main domains
+            y.domain(getYDomain(c3.data.targets, 'y'))
+            y2.domain(getYDomain(c3.data.targets, 'y2'))
             main.selectAll(".y.axis").transition().call(yAxis)
+            main.selectAll(".y2.axis").transition().call(yAxis2)
+
+            // Update sub domain
+            subY.domain(y.domain())
+            subY2.domain(y2.domain())
 
             // ticks for x-axis
             // ATTENTION: call here to update tickOffset
-            x.domain(brush.empty() ? x2.domain() : brush.extent())
+            x.domain(brush.empty() ? subX.domain() : brush.extent())
             main.selectAll(".x.axis").call(xAxis)
 
             // grid
@@ -1074,9 +1119,9 @@
 
             // bars
             barW = getBarW(xAxis, barTargetsNum)
-            barH = getBarH(y, height)
-            barX = getBarX(x, barW, barTargetsNum, barIndices)
-            barY = getBarY(y, barH, barIndices)
+            barH = getBarH(height)
+            barX = getBarX(barW, barTargetsNum, barIndices)
+            barY = getBarY(barH, barIndices)
             mainBar = main.selectAll('.__bars').selectAll('.__bar')
                 .data(barData)
             mainBar.transition().duration(withTransition ? 250 : 0)
@@ -1099,21 +1144,21 @@
                 .data(lineData)
             mainCircle.transition().duration(withTransition ? 250 : 0)
                 .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
+                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
                 .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return y(d.value) })
+                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
                 .attr("r", __point_r)
             mainCircle.exit().remove()
 
             // subchart
             if (withSubchart && __subchart_show) {
                 // bars
-                barW = getBarW(xAxis2, barTargetsNum)
-                barH = getBarH(y2, height2)
-                barX = getBarX(x2, barW, barTargetsNum, barIndices)
-                barY = getBarY(y2, barH, barIndices)
+                barW = getBarW(subXAxis, barTargetsNum)
+                barH = getBarH(height2, true)
+                barX = getBarX(barW, barTargetsNum, barIndices, true)
+                barY = getBarY(barH, barIndices, true)
                 contextBar = context.selectAll('.__bars').selectAll('.__bar')
                     .data(barData)
                 contextBar.transition().duration(withTransition ? 250 : 0)
@@ -1141,7 +1186,7 @@
                 .remove()
             main.selectAll('.selected-circle')
                 .attr("cx", function(d) { return x(d.x) })
-                .attr("cy", function(d) { return y(d.value) })
+                .attr("cy", function(d) { return getYScale(d.id)(d.value) })
 
             // rect for mouseover
             rectWidth = ((width*getXDomainRatio())/(maxDataCount()-1))
@@ -1490,7 +1535,7 @@
         }
         function axisY (selection, y) {
             selection.attr("transform", function(d){
-                return "translate(" + y(d) + ",0)"
+                return "translate(" + y(d) + ",0)" // TODO: Fix scale
             })
         }
         function scaleExtent (domain) {

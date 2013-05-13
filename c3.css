@@ -9,6 +9,11 @@ path, line {
   stroke: #000;
   stroke-width: 1px;
 }
+text {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
 
 /*-- Grid --*/
 
