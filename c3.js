@@ -1478,6 +1478,11 @@
             redraw(true, true, true)
         }
 
+        c3.groups = function (groups) {
+            if (typeof groups !== 'undefined')  __data_groups = groups
+            redraw(true, true, true)
+        }
+
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
