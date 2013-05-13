@@ -38,6 +38,7 @@
             __data_x_format = getConfig(['data','x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data','id_converter'], function(id){ return id; }),
             __data_names = getConfig(['data','names'], {}),
+            __data_groups = getConfig(['data','groups'], []),
             __data_types = getConfig(['data','types'], {}),
             __data_regions = getConfig(['data','regions'], {}),
             __data_colors = getConfig(['data','colors'], {}),
@@ -284,7 +285,25 @@
             return (__axis_y_min !== null) ? __axis_y_min : d3.min(targets, function(t) { return d3.min(t.values, function(v) { return v.value }) })
         }
         function getYDomainMax (targets) {
-            return (__axis_y_max !== null) ? __axis_y_max : d3.max(targets, function(t) { return d3.max(t.values, function(v) { return v.value }) })
+            var ys = {}, j, k
+
+            if (__axis_y_max !== null) return __axis_y_max
+
+            targets.forEach(function(t){
+                ys[t.id] = []
+                t.values.forEach(function(v){
+                    ys[t.id].push(v.value)
+                })
+            })
+            for (j = 0; j < __data_groups.length; j++) {
+                for (k = 1; k < __data_groups[j].length; k++) {
+                    ys[__data_groups[j][k]].forEach(function(v,i){
+                        ys[__data_groups[j][0]][i] += v*1
+                    })
+                }
+            }
+
+            return d3.max(Object.keys(ys).map(function(key){ return d3.max(ys[key]) }))
         }
         function getYDomain (targets) {
             var yDomainMin = getYDomainMin(targets),
@@ -295,7 +314,7 @@
                 yDomainMax = yDomainAbs - __axis_y_center
                 yDomainMin = __axis_y_center - yDomainAbs
             }
-            return [yDomainMin-padding, yDomainMax+padding]
+            return [yDomainMin-(hasBarType() ? 0 : padding), yDomainMax+padding]
         }
         function getXDomainRatio () {
             if (brush.empty()) return 1
@@ -399,9 +418,8 @@
             }
             return false
         }
-        function getTargetsNum (filter) {
-            if (typeof c3.data.targets === 'undefined') return 0
-            return typeof filter !== 'undefined' ? c3.data.targets.filter(filter).length : c3.data.targets.length;
+        function getTargets (filter) {
+            return typeof filter !== 'undefined' ? c3.data.targets.filter(filter) : c3.data.targets
         }
         function category (i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i
@@ -416,23 +434,40 @@
 
         //-- Bar --//
 
-        function getBarTargetIndices () {
-            var indices = {}, i = 0
-            c3.data.targets.forEach(function(d) {
-                if (isBarType(d)) {
-                    indices[d.id] = i++
+        function getBarIndices () {
+            var indices = {}, i = 0, j, k
+            getTargets(isBarType).forEach(function(d) {
+                for (j = 0; j < __data_groups.length; j++) {
+                    if (__data_groups[j].indexOf(d.id) < 0) continue
+                    for (k = 0; k < __data_groups[j].length; k++) {
+                        if (__data_groups[j][k] in indices) {
+                            indices[d.id] = indices[__data_groups[j][k]]
+                            break
+                        }
+                    }
                 }
+                if (typeof indices[d.id] === 'undefined') indices[d.id] = i++
             })
+            indices.__max__ = i-1
             return indices
         }
-        function getBarX (scale, barWidth, barTargetsNum, barIndices) {
+        function getBarX (scale, barW, barTargetsNum, barIndices) {
             return function (d) {
                 var barIndex = d.id in barIndices ? barIndices[d.id] : 0
-                return scale(d.x) - barWidth * (barTargetsNum/2 - barIndex)
+                return scale(d.x) - barW * (barTargetsNum/2 - barIndex)
             }
         }
-        function getBarY (scale) {
-            return function (d) { return scale(d.value) }
+        function getBarY (scale, barH, indices) {
+            return function (d,i) {
+                var indicesIds = Object.keys(indices), offset = 0
+                getTargets(isBarType).forEach(function(t){
+                    if (t.id === d.id || indices[t.id] !== indices[d.id]) return
+                    if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id)) {
+                        offset += barH(t.values[i])
+                    }
+                })
+                return scale(d.value) - offset
+            }
         }
         function getBarW (axis, barTargetsNum) {
             return (axis.tickOffset()*2*0.6) / barTargetsNum
@@ -452,6 +487,19 @@
             for (var i = 0; i < targetIds.length; i++) {
                 __data_types[targetIds[i]] = type
             }
+        }
+        function hasType (type) {
+            var has = false
+            Object.keys(__data_types).forEach(function(key){
+                if (__data_types[key] === type) has = true
+            })
+            return has
+        }
+        function hasLineType () {
+            return hasType('line')
+        }
+        function hasBarType () {
+            return hasType('bar')
         }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
@@ -945,7 +993,7 @@
         function redraw (withTransition, withY, withSubchart) {
             var xgrid, xgridData, xgridLine
             var mainPath, mainCircle, mainBar, contextPath
-            var barTargetsNum = getTargetsNum(isBarType), barIndices = getBarTargetIndices()
+            var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1
             var barX, barY, barW, barH
             var rectWidth
 
@@ -953,6 +1001,11 @@
             withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
             x.domain(brush.empty() ? x2.domain() : brush.extent())
+
+            // TODO: for stacked bars
+            y.domain(getYDomain(c3.data.targets))
+            y2.domain(y.domain())
+            main.selectAll(".y.axis").call(yAxis)
 
             // ticks for x-axis
             // ATTENTION: call here to update tickOffset
@@ -1030,7 +1083,7 @@
             barW = getBarW(xAxis, barTargetsNum)
             barH = getBarH(y, height)
             barX = getBarX(x, barW, barTargetsNum, barIndices)
-            barY = getBarY(y)
+            barY = getBarY(y, barH, barIndices)
             mainBar = main.selectAll('.__bars').selectAll('.__bar')
                 .data(barData)
             mainBar.transition().duration(withTransition ? 250 : 0)
@@ -1055,7 +1108,7 @@
                 barW = getBarW(xAxis2, barTargetsNum)
                 barH = getBarH(y2, height2)
                 barX = getBarX(x2, barW, barTargetsNum, barIndices)
-                barY = getBarY(y2)
+                barY = getBarY(y2, barH, barIndices)
                 contextBar = context.selectAll('.__bars').selectAll('.__bar')
                     .data(barData)
                 contextBar.transition().duration(withTransition ? 250 : 0)
