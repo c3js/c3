@@ -28,6 +28,10 @@ path, line {
 }
 /*-- Point --*/
 
+.__circle._e_ {
+  stroke-width: 1px;
+  stroke: white;
+}
 .selected-circle {
   fill: white;
   stroke-width: 2px;
