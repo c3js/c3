@@ -297,6 +297,7 @@
             })
             for (j = 0; j < __data_groups.length; j++) {
                 for (k = 1; k < __data_groups[j].length; k++) {
+                    if ( ! isBarType(__data_groups[j][k])) continue
                     ys[__data_groups[j][k]].forEach(function(v,i){
                         ys[__data_groups[j][0]][i] += v*1
                     })
