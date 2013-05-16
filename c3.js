@@ -786,7 +786,7 @@
                 .on('mouseover', function(d,i) {
                     if (dragging) return // do nothing if dragging
 
-                    var selectedData = targets.map(function(d){ return d.values[i] });
+                    var selectedData = c3.data.targets.map(function(d){ return d.values[i] });
                     var j, newData
 
                     // Add id,name to selectedData
