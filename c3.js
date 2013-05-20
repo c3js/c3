@@ -74,7 +74,8 @@
             __axis_y2_min = getConfig(['axis','y2','min'], null),
             __axis_y2_center = getConfig(['axis','y2','center'], null),
             __axis_y2_text = getConfig(['axis','y2','text'], null),
-            __axis_y2_rescale = getConfig(['axis','y2','rescale'], true)
+            __axis_y2_rescale = getConfig(['axis','y2','rescale'], true),
+            __axis_rotated = getConfig(['axis','rotated'], false)
 
         // grid
         var __grid_x_show = getConfig(['grid','x','show'], false),
@@ -142,10 +143,11 @@
         /*-- Set Chart Params --*/
 
         var bottom = 20 + __subchart_size_height + legendHeight,
+            right = __axis_y2_show && !__axis_rotated ? 50 : 1,
             top2 = __size_height - __subchart_size_height - legendHeight,
             bottom2 = 20 + legendHeight,
             top3 = __size_height - legendHeight,
-            margin = {top: 10, right: (__axis_y2_show ? 50 : -1), bottom: bottom, left: 40},
+            margin = {top: 10, right: right, bottom: bottom, left: 40},
             margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
             margin3 = {top: top3, right: 20, bottom: 0, left: 40},
             width = __size_width - margin.left - margin.right,
@@ -155,9 +157,14 @@
 
         var parseDate = d3.time.format(__data_x_format).parse
 
-        var x = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
-            y = d3.scale.linear().range([height, 10]),
-            y2 = d3.scale.linear().range([height, 10]),
+        var xMin = __axis_rotated ? 10 : 0,
+            xMax = __axis_rotated ? height : width,
+            yMin = __axis_rotated ? 0 : height,
+            yMax = __axis_rotated ? width : 10
+
+        var x = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([xMin, xMax]),
+            y = d3.scale.linear().range([yMin, yMax]),
+            y2 = d3.scale.linear().range([yMin, yMax]),
             subX = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
             subY = d3.scale.linear().range([height2, 10]),
             subY2 = d3.scale.linear().range([height2, 10])
@@ -168,9 +175,9 @@
             yAxis2 = d3.svg.axis(),
             subXAxis = isCategorized ? categoryAxis() : d3.svg.axis()
 
-        xAxis.scale(x).orient("bottom")
-        yAxis.scale(y).orient("left")
-        yAxis2.scale(y2).orient("right")
+        xAxis.scale(x).orient(__axis_rotated ? "left" : "bottom")
+        yAxis.scale(y).orient(__axis_rotated ? "bottom" : "left")
+        yAxis2.scale(y2).orient(__axis_rotated ? "top" : "right")
         subXAxis.scale(subX).orient("bottom")
 
         if (isTimeSeries) {
@@ -215,9 +222,16 @@
             })()
         }
 
-        // For main region
+        // For main region // TODO: use nornal line when no region
         var lineOnMain = function (d) {
-            return isLineType(d) ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : "M " + x(d.values[0].x)+ " " + getYScale(d.id)(d.values[0].value)
+            var x0, y0
+            if (isLineType(d)) {
+                return lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id])
+            } else {
+                x0 = x(d.values[0].x)
+                y0 = getYScale(d.id)(d.values[0].value)
+                return __axis_rotated ? "M "+y0+" "+x0 : "M "+x0+" "+y0
+            }
         }
 
         // For brush region
@@ -254,8 +268,9 @@
         svg.select("defs").append("clipPath")
             .attr("id", clipId)
           .append("rect")
+            .attr("y", 10)
             .attr("width", width)
-            .attr("height", height)
+            .attr("height", height-10)
 
         svg.select("defs").append("clipPath")
             .attr("id", "xaxis-clip")
@@ -264,6 +279,14 @@
             .attr("y", -1)
             .attr("width", width + 2)
             .attr("height", 40)
+
+        svg.select("defs").append("clipPath")
+            .attr("id", "yaxis-clip")
+          .append("rect")
+            .attr("x", -40 + 1)
+            .attr("y", 10 - 1)
+            .attr("width", 40)
+            .attr("height", height)
 
         // Define regions
         var main = svg.append("g")
@@ -461,6 +484,15 @@
         function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
         function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
 
+        //-- Circle --/
+
+        function circleX (d) {
+            return x(d.x)
+        }
+        function circleY (d) {
+            return getYScale(d.id)(d.value)
+        }
+
         //-- Bar --//
 
         function getBarIndices () {
@@ -481,33 +513,34 @@
             return indices
         }
         function getBarX (barW, barTargetsNum, barIndices, isSub) {
+            var scale = isSub ? subX : x
             return function (d) {
-                var scale = isSub ? subX : x
                 var barIndex = d.id in barIndices ? barIndices[d.id] : 0
                 return scale(d.x) - barW * (barTargetsNum/2 - barIndex)
             }
         }
-        function getBarY (barH, indices, isSub) {
+        function getBarY (barH, barIndices, zeroBased, isSub) {
+            var indicesIds = Object.keys(barIndices)
             return function (d,i) {
-                var indicesIds = Object.keys(indices), offset = 0
+                var offset = 0
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id)
                 getTargets(isBarType).forEach(function(t){
-                    if (t.id === d.id || indices[t.id] !== indices[d.id]) return
+                    if (t.id === d.id || barIndices[t.id] !== barIndices[d.id]) return
                     if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id)) {
                         offset += barH(t.values[i])
                     }
                 })
-                return scale(d.value) - offset
+                return zeroBased ? offset : scale(d.value) - offset
             }
         }
         function getBarW (axis, barTargetsNum) {
             return (axis.tickOffset()*2*0.6) / barTargetsNum
         }
         function getBarH (height, isSub) {
+            var h = height === null ? function(v){ return v } : function(v){ return height-v }
             return function (d) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id)
-                var h = height-scale(d.value)
-                return h < 0 ? 0 : h
+                return h(scale(d.value))
             }
         }
 
@@ -598,8 +631,8 @@
                 .data([d])
               .enter().append('circle')
                 .attr("class", function(d){ return "selected-circle selected-circle-" + i })
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
+                .attr("cx", __axis_rotated ? circleY : circleX)
+                .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("stroke", function(){ return color(d.id) })
                 .attr("r", __point_select_r * 1.4)
               .transition().duration(100)
@@ -630,6 +663,7 @@
             var prev = -1, i, j
             var s = "M"
             var xp, yp, dx, dy, dd, diff, diff2
+            var xValue, yValue
 
             // Check start/end of regions
             if (typeof regions !== 'undefined') {
@@ -643,13 +677,17 @@
                 }
             }
 
+            // Set scales
+            xValue = __axis_rotated ? function(d){ return y(d.value) } : function(d){ return x(d.x) }
+            yValue = __axis_rotated ? function(d){ return x(d.x) } : function(d){ return y(d.value) }
+
             // Generate
             for (i = 0; i < d.length; i++) {
                 // Draw as normal
                 if (typeof regions === 'undefined' || ! isWithinRegions(d[i].x, regions)) {
-                    s += " "+x(d[i].x)+" "+y(d[i].value)
+                    s += " "+xValue(d[i])+" "+yValue(d[i])
                 }
-                // Draw with region
+                // Draw with region // TODO: Fix for horizotal charts
                 else {
                     xp = d3.scale.linear().range([d[i-1].x, d[i].x])
                     yp = d3.scale.linear().range([d[i-1].value, d[i].value])
@@ -679,7 +717,7 @@
 
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data)
-            var rectWidth
+            var rectX, rectW
             var grid, xgridLine
 
             // TODO: set names if names not specified
@@ -770,7 +808,8 @@
                 .attr('class', 'chart')
 
             // Cover whole with rects for events
-            rectWidth = ((width*getXDomainRatio())/(maxDataCount()-1))
+            rectW = (((__axis_rotated ? height : width)*getXDomainRatio())/(maxDataCount()-1))
+            rectX = function(d){ return x(d.x)-(rectW/2) }
             main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
@@ -779,10 +818,10 @@
               .enter().append("rect")
                 .attr("class", function(d,i){ return "event-rect event-rect-"+i })
                 .style("cursor", function(d){ return __data_selection_enabled && __data_selection_grouped ? "pointer" : null })
-                .attr("x", function(d){ return x(d.x) - (rectWidth/2) })
-                .attr("y", function(d){ return 0 })
-                .attr("width", rectWidth)
-                .attr("height", height)
+                .attr("x", __axis_rotated ? 0 : rectX)
+                .attr("y", __axis_rotated ? rectX : 0)
+                .attr("width", __axis_rotated ? width : rectW)
+                .attr("height", __axis_rotated ? rectW : height)
                 .on('mouseover', function(d,i) {
                     if (dragging) return // do nothing if dragging
 
@@ -828,7 +867,7 @@
 
                     // Set tooltip
                     tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
-                           .style("left", (x(selectedData[0].x) + 60) + "px")
+                           .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px")
                     tooltip.html(__tooltip_contents(selectedData))
                     tooltip.style("visibility", "visible")
                 })
@@ -974,12 +1013,13 @@
             // Add Axis
             main.append("g")
                 .attr("class", "x axis")
-                .attr("clip-path", "url(#xaxis-clip)")
+                .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
+                .call(__axis_rotated ? yAxis : xAxis)
             main.append("g")
                 .attr("class", "y axis")
-                .call(yAxis)
+                .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
+                .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("dy", "1.4em")
@@ -987,10 +1027,12 @@
                 .style("text-anchor", "end")
                 .text(__axis_y_text)
 
-            main.append("g")
-                .attr("class", "y2 axis")
-                .attr("transform", "translate(" + width + ",0)")
-                .call(yAxis2)
+            if (__axis_y2_show) {
+                main.append("g")
+                    .attr("class", "y2 axis")
+                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
+                    .call(yAxis2)
+            }
 
             /*-- Context Region --*/
 
@@ -1045,25 +1087,25 @@
             var mainPath, mainCircle, mainBar, contextPath
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1
             var barX, barY, barW, barH
-            var rectWidth
+            var rectX, rectW
 
             withY = (typeof withY === 'undefined') ? false : withY
             withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
+            // ticks for x-axis
+            // ATTENTION: call here to update tickOffset
+            x.domain(brush.empty() ? subX.domain() : brush.extent())
+            main.selectAll(".x.axis").call(__axis_rotated ? yAxis : xAxis)
+
             // Update main domains
             y.domain(getYDomain(c3.data.targets, 'y'))
             y2.domain(getYDomain(c3.data.targets, 'y2'))
-            main.selectAll(".y.axis").transition().call(yAxis)
+            main.selectAll(".y.axis").transition().duration(__axis_rotated ? 0 : 250).call(__axis_rotated ? xAxis : yAxis)
             main.selectAll(".y2.axis").transition().call(yAxis2)
 
             // Update sub domain
             subY.domain(y.domain())
             subY2.domain(y2.domain())
-
-            // ticks for x-axis
-            // ATTENTION: call here to update tickOffset
-            x.domain(brush.empty() ? subX.domain() : brush.extent())
-            main.selectAll(".x.axis").call(xAxis)
 
             // grid
             if (__grid_x_show) {
@@ -1119,16 +1161,22 @@
 
             // bars
             barW = getBarW(xAxis, barTargetsNum)
-            barH = getBarH(height)
+            barH = getBarH(__axis_rotated ? null : height)
             barX = getBarX(barW, barTargetsNum, barIndices)
-            barY = getBarY(barH, barIndices)
+            barY = getBarY(barH, barIndices, __axis_rotated)
             mainBar = main.selectAll('.__bars').selectAll('.__bar')
                 .data(barData)
             mainBar.transition().duration(withTransition ? 250 : 0)
-                .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                .attr("x", __axis_rotated ? barY : barX)
+                .attr("y", __axis_rotated ? barX : barY)
+                .attr("width", __axis_rotated ? barH : barW)
+                .attr("height", __axis_rotated ? barW : barH)
             mainBar.enter().append('rect')
                 .attr("class", classBar)
-                .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                .attr("x", __axis_rotated ? barY : barX)
+                .attr("y", __axis_rotated ? barX : barY)
+                .attr("width", __axis_rotated ? barH : barW)
+                .attr("height", __axis_rotated ? barW : barH)
                 .style("opacity", 0)
               .transition().duration(withTransition ? 250 : 0)
                 .style('opacity', 1)
@@ -1143,12 +1191,12 @@
             mainCircle = main.selectAll('.__circles').selectAll('.__circle')
                 .data(lineData)
             mainCircle.transition().duration(withTransition ? 250 : 0)
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
+                .attr("cx", __axis_rotated ? circleY : circleX)
+                .attr("cy", __axis_rotated ? circleX : circleY)
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
-                .attr("cx", function(d){ return x(d.x) })
-                .attr("cy", function(d){ return getYScale(d.id)(d.value) })
+                .attr("cx", __axis_rotated ? circleY : circleX)
+                .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("r", __point_r)
             mainCircle.exit().remove()
 
@@ -1158,7 +1206,7 @@
                 barW = getBarW(subXAxis, barTargetsNum)
                 barH = getBarH(height2, true)
                 barX = getBarX(barW, barTargetsNum, barIndices, true)
-                barY = getBarY(barH, barIndices, true)
+                barY = getBarY(barH, barIndices, false, true)
                 contextBar = context.selectAll('.__bars').selectAll('.__bar')
                     .data(barData)
                 contextBar.transition().duration(withTransition ? 250 : 0)
@@ -1185,14 +1233,17 @@
                 .selectAll('circle')
                 .remove()
             main.selectAll('.selected-circle')
-                .attr("cx", function(d) { return x(d.x) })
-                .attr("cy", function(d) { return getYScale(d.id)(d.value) })
+                .attr("cx", __axis_rotated ? circleY : circleX)
+                .attr("cy", __axis_rotated ? circleX : circleY)
 
             // rect for mouseover
-            rectWidth = ((width*getXDomainRatio())/(maxDataCount()-1))
-            main.selectAll('rect.event-rect')
-                .attr("width", rectWidth)
-                .attr("x", function(d) { return x(d.x) - (rectWidth/2) })
+            rectW = (((__axis_rotated ? height : width)*getXDomainRatio())/(maxDataCount()-1))
+            rectX = function(d){ return x(d.x)-(rectW/2) }
+            main.selectAll('.event-rect')
+                .attr("x", __axis_rotated ? 0 : rectX)
+                .attr("y", __axis_rotated ? rectX : 0)
+                .attr("width", __axis_rotated ? width : rectW)
+                .attr("height", __axis_rotated ? rectW : height)
             main.selectAll('rect.region')
                 .attr("x", regionStart)
                 .attr("width", regionWidth)
@@ -1535,7 +1586,7 @@
         }
         function axisY (selection, y) {
             selection.attr("transform", function(d){
-                return "translate(" + y(d) + ",0)" // TODO: Fix scale
+                return "translate(0," + y(d) + ")"
             })
         }
         function scaleExtent (domain) {
@@ -1598,17 +1649,20 @@
                         pathUpdate.attr("d", "M" + range[0] + "," + -tickEndSize + "V0H" + range[1] + "V" + -tickEndSize)
                         break
                     }
+*/
                 case "left":
                     {
                         tickTransform = axisY
                         lineEnter.attr("x2", -tickMajorSize)
                         textEnter.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding))
                         lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0)
-                        textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", 0)
+                        textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset)
                         text.attr("dy", ".32em").style("text-anchor", "end")
+                        text.text(function(i){ return shouldShowTickText(ticks, i) ? category(i) : "" })
                         pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize)
                         break
                     }
+/*
                 case "right":
                     {
                         tickTransform = axisY
