@@ -222,17 +222,22 @@
             })()
         }
 
-        // For main region // TODO: use nornal line when no region
-        var lineOnMain = function (d) {
-            var x0, y0
-            if (isLineType(d)) {
-                return lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id])
-            } else {
-                x0 = x(d.values[0].x)
-                y0 = getYScale(d.id)(d.values[0].value)
-                return __axis_rotated ? "M "+y0+" "+x0 : "M "+x0+" "+y0
+        // For main region
+        var lineOnMain = (function () {
+            var line = d3.svg.line()
+                .x(__axis_rotated ? function(d){ return getYScale(d.id)(d.value) } : xx)
+                .y(__axis_rotated ? xx : function(d){ return getYScale(d.id)(d.value) })
+            return function (d) {
+                var x0, y0
+                if (isLineType(d)) {
+                    return __data_regions.length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values)
+                } else {
+                    x0 = x(d.values[0].x)
+                    y0 = getYScale(d.id)(d.values[0].value)
+                    return __axis_rotated ? "M "+y0+" "+x0 : "M "+x0+" "+y0
+                }
             }
-        }
+        })()
 
         // For brush region
         var lineOnSub = (function () {
