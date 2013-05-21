@@ -765,10 +765,10 @@
                     .attr("class", "xgrid-focus")
                   .append('line')
                     .attr('class', 'xgrid-focus')
-                    .attr("x1", -10)
-                    .attr("x2", -10)
-                    .attr("y1", margin.top)
-                    .attr("y2", height)
+                    .attr("x1", __axis_rotated ? 0 : -10)
+                    .attr("x2", __axis_rotated ? width : -10)
+                    .attr("y1", __axis_rotated ? -10 : margin.top)
+                    .attr("y2", __axis_rotated ? -10 : height)
             }
 
             // Y-Grid
@@ -862,8 +862,8 @@
                     main.selectAll('line.xgrid-focus')
                         .style("visibility","visible")
                         .data([selectedData[0]])
-                        .attr('x1', function(d){ return x(d.x) })
-                        .attr('x2', function(d){ return x(d.x) })
+                        .attr(__axis_rotated ? 'y1' : 'x1', function(d){ return x(d.x) })
+                        .attr(__axis_rotated ? 'y2' : 'x2', function(d){ return x(d.x) })
 
                     // Set tooltip
                     tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
