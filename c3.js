@@ -807,8 +807,6 @@
                 .attr('class', 'chart')
 
             // Cover whole with rects for events
-            rectW = (((__axis_rotated ? height : width)*getXDomainRatio())/(maxDataCount()-1))
-            rectX = function(d){ return x(d.x)-(rectW/2) }
             main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
@@ -817,10 +815,6 @@
               .enter().append("rect")
                 .attr("class", function(d,i){ return "event-rect event-rect-"+i })
                 .style("cursor", function(d){ return __data_selection_enabled && __data_selection_grouped ? "pointer" : null })
-                .attr("x", __axis_rotated ? 0 : rectX)
-                .attr("y", __axis_rotated ? rectX : 0)
-                .attr("width", __axis_rotated ? width : rectW)
-                .attr("height", __axis_rotated ? rectW : height)
                 .on('mouseover', function(d,i) {
                     if (dragging) return // do nothing if dragging
 
@@ -1244,6 +1238,8 @@
                 .attr("y", __axis_rotated ? rectX : 0)
                 .attr("width", __axis_rotated ? width : rectW)
                 .attr("height", __axis_rotated ? rectW : height)
+
+            // rect for regions
             main.selectAll('rect.region')
                 .attr("x", __axis_rotated ? 0 : regionStart)
                 .attr("y", __axis_rotated ? regionStart : margin.top)
