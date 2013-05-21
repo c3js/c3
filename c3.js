@@ -484,6 +484,13 @@
         function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
         function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
 
+        function xx (d) {
+            return x(d.x)
+        }
+        function yv (d) {
+            return y(d.value)
+        }
+
         //-- Circle --/
 
         function circleX (d) {
@@ -784,8 +791,8 @@
                     .attr("class", function(d){ return "ygrid-line " + d['class'] })
                     .attr("x1", 0)
                     .attr("x2", width)
-                    .attr("y1", function(d){ return y(d.value) })
-                    .attr("y2", function(d){ return y(d.value) })
+                    .attr("y1", yv)
+                    .attr("y2", yv)
             }
 
             // Area
@@ -862,8 +869,8 @@
                     main.selectAll('line.xgrid-focus')
                         .style("visibility","visible")
                         .data([selectedData[0]])
-                        .attr(__axis_rotated ? 'y1' : 'x1', function(d){ return x(d.x) })
-                        .attr(__axis_rotated ? 'y2' : 'x2', function(d){ return x(d.x) })
+                        .attr(__axis_rotated ? 'y1' : 'x1', xx)
+                        .attr(__axis_rotated ? 'y2' : 'x2', xx)
 
                     // Set tooltip
                     tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
@@ -1153,8 +1160,8 @@
             }
             if (withY && __grid_y_lines) {
                 main.select('.ygrid-lines').selectAll('.ygrid-line')
-                    .attr("y1", function(d){ return y(d.value) })
-                    .attr("y2", function(d){ return y(d.value) })
+                    .attr("y1", yv)
+                    .attr("y2", yv)
             }
 
             // bars
