@@ -1092,14 +1092,12 @@
             withY = (typeof withY === 'undefined') ? false : withY
             withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
 
-            // ticks for x-axis
             // ATTENTION: call here to update tickOffset
             x.domain(brush.empty() ? subX.domain() : brush.extent())
-            main.selectAll(".x.axis").call(__axis_rotated ? yAxis : xAxis)
-
-            // Update main domains
             y.domain(getYDomain(c3.data.targets, 'y'))
             y2.domain(getYDomain(c3.data.targets, 'y2'))
+
+            main.selectAll(".x.axis").transition().duration(__axis_rotated ? 250 : 0).call(__axis_rotated ? yAxis : xAxis)
             main.selectAll(".y.axis").transition().duration(__axis_rotated ? 0 : 250).call(__axis_rotated ? xAxis : yAxis)
             main.selectAll(".y2.axis").transition().call(yAxis2)
 
