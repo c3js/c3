@@ -230,6 +230,7 @@
             return function (d) {
                 var x0, y0
                 if (isLineType(d)) {
+                    isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear")
                     return __data_regions.length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values)
                 } else {
                     x0 = x(d.values[0].x)
@@ -584,7 +585,11 @@
         }
         function isLineType (d) {
             var id = (typeof d === 'string') ? d : d.id
-            return !(id in __data_types) || __data_types[id] === 'line'
+            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline'
+        }
+        function isSplineType (d) {
+            var id = (typeof d === 'string') ? d : d.id
+            return __data_types[id] === 'spline'
         }
         function isBarType (d) {
             var id = (typeof d === 'string') ? d : d.id
@@ -1549,6 +1554,11 @@
 
         c3.toLine = function (targets) {
             setTargetType(targets, 'line')
+            redraw(true, true, true)
+        }
+
+        c3.toSpline = function (targets) {
+            setTargetType(targets, 'spline')
             redraw(true, true, true)
         }
 
