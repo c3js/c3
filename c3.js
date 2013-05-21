@@ -803,10 +803,6 @@
                     .data(__regions)
                   .enter().append('rect')
                     .attr('class', function(d,i){ return 'region region-' + i })
-                    .attr("x", regionStart)
-                    .attr("y", margin.top)
-                    .attr("width", regionWidth)
-                    .attr("height", height)
             }
 
             // Define g for chart area
@@ -1253,8 +1249,10 @@
                 .attr("width", __axis_rotated ? width : rectW)
                 .attr("height", __axis_rotated ? rectW : height)
             main.selectAll('rect.region')
-                .attr("x", regionStart)
-                .attr("width", regionWidth)
+                .attr("x", __axis_rotated ? 0 : regionStart)
+                .attr("y", __axis_rotated ? regionStart : margin.top)
+                .attr("width", __axis_rotated ? width : regionWidth)
+                .attr("height", __axis_rotated ? regionWidth : height)
             // TODO: enter/exti section for data add/remove
         }
 
