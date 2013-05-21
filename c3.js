@@ -487,6 +487,9 @@
         function xx (d) {
             return x(d.x)
         }
+        function xv (d) {
+            return x(d.value)
+        }
         function yv (d) {
             return y(d.value)
         }
@@ -756,15 +759,16 @@
                     .attr("class", "xgrid-line")
                 xgridLine.append('line')
                     .attr("class", function(d){ return "" + d['class'] })
-                    .attr("x1", function(d){ return x(d.value) })
-                    .attr("x2", function(d){ return x(d.value) })
-                    .attr("y1", margin.top)
-                    .attr("y2", height)
+                    .attr("x1", __axis_rotated ? 0 : xv)
+                    .attr("x2", __axis_rotated ? width : xv)
+                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y2", __axis_rotated ? xv : height)
                 xgridLine.append('text')
                     .attr("class", function(d){ return "" + d['class'] })
-                    .attr('x', function(d){ return x(d.value) })
-                    .attr('y', height-8)
-                    .attr('dx', 6)
+                    .attr("text-anchor", "end")
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .attr('dx', __axis_rotated ? 0 : -margin.top)
+                    .attr('dy', -6)
                     .text(function(d){ return d.text })
             }
             if (__point_focus_line_enabled) {
@@ -1138,10 +1142,13 @@
             if (__grid_x_lines) {
                 xgridLine = main.selectAll(".xgrid-lines")
                 xgridLine.selectAll('line')
-                    .attr("x1", function(d){ return x(d.value) })
-                    .attr("x2", function(d){ return x(d.value) })
+                    .attr("x1", __axis_rotated ? 0 : xv)
+                    .attr("x2", __axis_rotated ? width : xv)
+                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y2", __axis_rotated ? xv : height)
                 xgridLine.selectAll('text')
-                    .attr("x", function(d){ return x(d.value) })
+                    .attr("x", __axis_rotated ? width : 0)
+                    .attr("y", xv)
             }
             // Y-Grid
             if (withY && __grid_y_show) {
