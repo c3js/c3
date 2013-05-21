@@ -793,10 +793,6 @@
                     .data(__grid_y_lines)
                   .enter().append('line')
                     .attr("class", function(d){ return "ygrid-line " + d['class'] })
-                    .attr("x1", 0)
-                    .attr("x2", width)
-                    .attr("y1", yv)
-                    .attr("y2", yv)
             }
 
             // Area
@@ -1156,10 +1152,10 @@
                     .data(y.ticks(10))
                 ygrid.enter().append('line')
                     .attr('class', 'ygrid')
-                ygrid.attr("x1", 0)
-                     .attr("x2", width)
-                     .attr("y1", y)
-                     .attr("y2", y)
+                ygrid.attr("x1", __axis_rotated ? y : 0)
+                     .attr("x2", __axis_rotated ? y : width)
+                     .attr("y1", __axis_rotated ? 0 : y)
+                     .attr("y2", __axis_rotated ? height : y)
                      .attr("opacity", 0)
                    .transition()
                      .attr("opacity", 1)
