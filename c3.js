@@ -268,9 +268,9 @@
         svg.select("defs").append("clipPath")
             .attr("id", clipId)
           .append("rect")
-            .attr("y", 10)
+            .attr("y", margin.top)
             .attr("width", width)
-            .attr("height", height-10)
+            .attr("height", height-margin.top)
 
         svg.select("defs").append("clipPath")
             .attr("id", "xaxis-clip")
@@ -284,9 +284,9 @@
             .attr("id", "yaxis-clip")
           .append("rect")
             .attr("x", -40 + 1)
-            .attr("y", 10 - 1)
+            .attr("y", margin.top - 1)
             .attr("width", 40)
-            .attr("height", height)
+            .attr("height", height - margin.top + 2)
 
         // Define regions
         var main = svg.append("g")
