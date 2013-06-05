@@ -489,6 +489,7 @@
         function classShape (d,i) { return "__shape __shape-" + i }
         function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
         function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
+        function classRegion (d,i) { return 'region region-' + i + ("id" in d ? ' region-' + d.id : '')}
 
         function xx (d) {
             return x(d.x)
@@ -1247,14 +1248,25 @@
             // rect for regions
             mainRegion = main.select('.regions').selectAll('rect.region')
                 .data(__regions)
-            mainRegion.enter().append('rect')
-                .attr('class', function(d,i){ return 'region region-' + i })// TODO: fix class
             mainRegion
+                .attr('class', classRegion)
+              .transition().duration(withTransition ? 250 : 0)
                 .attr("x", __axis_rotated ? 0 : regionStart)
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
-            mainRegion.exit().remove()
+            mainRegion.enter().append('rect')
+                .attr('class', classRegion)
+                .attr("x", __axis_rotated ? 0 : regionStart)
+                .attr("y", __axis_rotated ? regionStart : margin.top)
+                .attr("width", __axis_rotated ? width : regionWidth)
+                .attr("height", __axis_rotated ? regionWidth : height)
+                .attr("opacity", 0)
+              .transition().duration(withTransition ? 250 : 0)
+                .attr("opacity", 1)
+            mainRegion.exit().transition().duration(withTransition ? 250 : 0)
+                .attr("opacity", 0)
+                .remove()
         }
 
         function updateTargets (targets) {
@@ -1568,6 +1580,12 @@
 
         c3.groups = function (groups) {
             if (typeof groups !== 'undefined')  __data_groups = groups
+            redraw(true, true, true)
+        }
+
+        c3.regions = function (regions) {
+            if (typeof regions === 'undefined') return __regions
+            __regions = regions
             redraw(true, true, true)
         }
 
