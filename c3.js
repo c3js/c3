@@ -97,7 +97,7 @@
             __point_onunselected = getConfig(['point','onunselected'], function(){})
 
         // region - region to change style
-        var __regions = getConfig(['regions'], null)
+        var __regions = getConfig(['regions'], [])
 
         // tooltip - show when mouseover on each data
         var __tooltip_contents = getConfig(['tooltip','contents'], function(d) {
@@ -802,14 +802,9 @@
             }
 
             // Area
-            if (__regions !== null) {
-                grid.append('g')
-                    .attr("class", "regions")
-                  .selectAll('rect.region')
-                    .data(__regions)
-                  .enter().append('rect')
-                    .attr('class', function(d,i){ return 'region region-' + i })
-            }
+            main.append('g')
+                .attr("clip-path", clipPath)
+                .attr("class", "regions")
 
             // Define g for chart area
             main.append('g')
@@ -1250,12 +1245,16 @@
                 .attr("height", __axis_rotated ? rectW : height)
 
             // rect for regions
-            main.selectAll('rect.region')
+            mainRegion = main.select('.regions').selectAll('rect.region')
+                .data(__regions)
+            mainRegion.enter().append('rect')
+                .attr('class', function(d,i){ return 'region region-' + i })// TODO: fix class
+            mainRegion
                 .attr("x", __axis_rotated ? 0 : regionStart)
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
-            // TODO: enter/exti section for data add/remove
+            mainRegion.exit().remove()
         }
 
         function updateTargets (targets) {
