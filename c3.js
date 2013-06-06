@@ -1233,6 +1233,7 @@
                 .selectAll('circle')
                 .remove()
             main.selectAll('.selected-circle')
+              .transition().duration(withTransition ? 250 : 0)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
 
@@ -1301,6 +1302,12 @@
                 .attr("class", classCircles)
                 .style("fill", function(d){ return color(d.id) })
                 .style("cursor", function(d){ return __data_selection_isselectable(d) ? "pointer" : null })
+            // Update date for selected circles
+            targets.forEach(function(t){
+                main.selectAll('.selected-circles-'+t.id).selectAll('.selected-circle').each(function(d){
+                    d.value = t.values[d.x].value
+                })
+            })
 
             /*-- Context --*/
 
