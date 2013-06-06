@@ -62,7 +62,7 @@
 
         // axis
         var __axis_x_type = getConfig(['axis','x','type'], 'indexed'),
-            __axis_x_categories = getConfig(['axis','x','categories'], ['hoge']),
+            __axis_x_categories = getConfig(['axis','x','categories'], []),
             __axis_x_tick_centered = getConfig(['axis','x','tick','centered'], false),
             __axis_y_max = getConfig(['axis','y','max'], null),
             __axis_y_min = getConfig(['axis','y','min'], null),
