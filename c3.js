@@ -147,7 +147,7 @@
             top2 = __size_height - __subchart_size_height - legendHeight,
             bottom2 = 20 + legendHeight,
             top3 = __size_height - legendHeight,
-            margin = {top: 10, right: right, bottom: bottom, left: 40},
+            margin = {top: 0, right: right, bottom: bottom, left: 40},
             margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
             margin3 = {top: top3, right: 20, bottom: 0, left: 40},
             width = __size_width - margin.left - margin.right,
@@ -160,7 +160,7 @@
         var xMin = __axis_rotated ? 10 : 0,
             xMax = __axis_rotated ? height : width,
             yMin = __axis_rotated ? 0 : height,
-            yMax = __axis_rotated ? width : 10
+            yMax = __axis_rotated ? width : 1
 
         var x = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([xMin, xMax]),
             y = d3.scale.linear().range([yMin, yMax]),
