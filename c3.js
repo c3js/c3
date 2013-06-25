@@ -1606,7 +1606,7 @@
     }
 
     function categoryAxis () {
-        var scale = d3.scale.linear(), orient = "bottom", tickMajorSize = 6, tickMinorSize = 6, tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 30, tickOffset = 0, categories = []
+        var scale = d3.scale.linear(), orient = "bottom", tickMajorSize = 6, tickMinorSize = 6, tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, categories = []
         function axisX (selection, x) {
             selection.attr("transform", function(d){
                 return "translate(" + (x(d) + tickOffset) + ",0)"
@@ -1735,6 +1735,11 @@
         axis.tickCentered = function(x) {
             if (!arguments.length) return tickCentered
             tickCentered = x
+            return axis
+        }
+        axis.tickTextNum = function(x) {
+            if (!arguments.length) return tickTextNum
+            tickTextNum = x
             return axis
         }
         axis.tickOffset = function() {
