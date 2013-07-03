@@ -1586,6 +1586,12 @@
             __regions = regions
             redraw(true, true, true)
         }
+        c3.regions.add = function (regions) {
+            if (typeof regions === 'undefined') return __regions
+            __regions = __regions.concat(regions)
+            redraw(true, true, true)
+            return __regions
+        }
 
         /*-- Load data and init chart with defined functions --*/
 
