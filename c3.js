@@ -1256,6 +1256,7 @@
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
+                .style("opacity", function(d){ return typeof d.opacity !== 'undefined' ? d.opacity : .1 })
             mainRegion.exit().transition().duration(withTransition ? 250 : 0)
                 .attr("opacity", 0)
                 .remove()
