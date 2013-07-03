@@ -1595,6 +1595,21 @@
             redraw(true, true, true)
             return __regions
         }
+        c3.regions.remove = function (regionIds, options) {
+            var targets = [].concat(regionIds),
+                options = typeof options !== 'undefined' ? options : {}
+            targets.forEach(function(id){
+                var regions = d3.selectAll('.region-' + id)
+                if (typeof options.duration !== 'undefined') {
+                    regions = regions.transition().duration(options.duration).style('opacity', 0)
+                }
+                regions.remove()
+                __regions = __regions.filter(function(region){
+                    return region.id !== id
+                })
+            })
+            return __regions
+        }
 
         /*-- Load data and init chart with defined functions --*/
 
