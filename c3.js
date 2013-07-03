@@ -1534,13 +1534,13 @@
             )
         }
 
-        c3.select = function (indices, resetOther) {
+        c3.select = function (ids, indices, resetOther) {
             if ( ! __data_selection_enabled) return
             main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
                 var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
                     unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
                 if (indices.indexOf(i) >= 0) {
-                    if (__data_selection_grouped || __data_selection_isselectable(d)) {
+                    if (__data_selection_isselectable(d) && (__data_selection_grouped || typeof ids === 'undefined' || ids.indexOf(d.id) >= 0)) {
                         selectShape(d3.select(this).classed('_s_',true), d, i)
                     }
                 } else if (typeof resetOther !== 'undefined' && resetOther) {
@@ -1549,12 +1549,12 @@
             })
         }
 
-        c3.unselect = function (indices) {
+        c3.unselect = function (ids, indices) {
             if ( ! __data_selection_enabled) return
             main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
                 var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
                 if (typeof indices === 'undefined' || indices.indexOf(i) >= 0) {
-                    if (__data_selection_grouped || __data_selection_isselectable(d)) {
+                    if (__data_selection_isselectable(d) && (__data_selection_grouped || typeof ids === 'undefined' || ids.indexOf(d.id) >= 0)) {
                         unselectShape(d3.select(this).classed('_s_',false), d, i)
                     }
                 }
