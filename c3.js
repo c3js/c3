@@ -489,7 +489,7 @@
         function classShape (d,i) { return "__shape __shape-" + i }
         function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
         function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
-        function classRegion (d,i) { return 'region region-' + i + ("id" in d ? ' region-' + d.id : '')}
+        function classRegion (d,i) { return 'region region-' + i + ' ' + ("id" in d ? 'region-' + d.id : '') + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : '')}
 
         function xx (d) {
             return x(d.x)
