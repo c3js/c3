@@ -1612,6 +1612,15 @@
             return __regions
         }
 
+        c3.data.get = function (id) {
+            var target = c3.data.getAsTarget(id)
+            return typeof target !== 'undefined' ? target.values.map(function(d){ return d.value }) : undefined
+        }
+        c3.data.getAsTarget = function (id) {
+            var targets = getTargets(function(d){ return d.id == id })
+            return targets.length > 0 ? targets[0] : undefined
+        }
+
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
