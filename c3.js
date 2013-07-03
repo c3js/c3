@@ -1577,14 +1577,17 @@
         }
 
         c3.groups = function (groups) {
-            if (typeof groups !== 'undefined')  __data_groups = groups
+            if (typeof groups === 'undefined') return __data_groups
+            __data_groups = groups
             redraw(true, true, true)
+            return __data_groups
         }
 
         c3.regions = function (regions) {
             if (typeof regions === 'undefined') return __regions
             __regions = regions
             redraw(true, true, true)
+            return __regions
         }
         c3.regions.add = function (regions) {
             if (typeof regions === 'undefined') return __regions
