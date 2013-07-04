@@ -489,7 +489,7 @@
         function classShape (d,i) { return "__shape __shape-" + i }
         function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i }
         function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i }
-        function classRegion (d,i) { return 'region region-' + i + ' ' + ("id" in d ? 'region-' + d.id : '') + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : '')}
+        function classRegion (d,i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : '')}
 
         function xx (d) {
             return x(d.x)
@@ -1596,17 +1596,17 @@
             redraw(true, true, true)
             return __regions
         }
-        c3.regions.remove = function (regionIds, options) {
-            var targets = [].concat(regionIds),
+        c3.regions.remove = function (classes, options) {
+            var regionClasses = [].concat(classes),
                 options = typeof options !== 'undefined' ? options : {}
-            targets.forEach(function(id){
-                var regions = d3.selectAll('.region-' + id)
+            regionClasses.forEach(function(cls){
+                var regions = d3.selectAll('.'+cls)
                 if (typeof options.duration !== 'undefined') {
                     regions = regions.transition().duration(options.duration).style('opacity', 0)
                 }
                 regions.remove()
                 __regions = __regions.filter(function(region){
-                    return region.id !== id
+                    return region.classes.indexOf(cls) < 0
                 })
             })
             return __regions
