@@ -1256,9 +1256,9 @@
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
-                .style("opacity", function(d){ return typeof d.opacity !== 'undefined' ? d.opacity : .1 })
+                .style("fill-opacity", function(d){ return typeof d.opacity !== 'undefined' ? d.opacity : .1 })
             mainRegion.exit().transition().duration(withTransition ? 250 : 0)
-                .style("opacity", 0)
+                .style("fill-opacity", 0)
                 .remove()
         }
 
@@ -1602,7 +1602,7 @@
             regionClasses.forEach(function(cls){
                 var regions = d3.selectAll('.'+cls)
                 if (typeof options.duration !== 'undefined') {
-                    regions = regions.transition().duration(options.duration).style('opacity', 0)
+                    regions = regions.transition().duration(options.duration).style('fill-opacity', 0)
                 }
                 regions.remove()
                 __regions = __regions.filter(function(region){
