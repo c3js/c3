@@ -68,7 +68,7 @@ text {
 
 .region {
   fill: steelblue;
-  opacity: .1;
+  fill-opacity: .1;
 }
 
 /*-- Brush --*/
