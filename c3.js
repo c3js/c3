@@ -231,7 +231,7 @@
                 var x0, y0
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear")
-                    return __data_regions.length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values)
+                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values)
                 } else {
                     x0 = x(d.values[0].x)
                     y0 = getYScale(d.id)(d.values[0].value)
