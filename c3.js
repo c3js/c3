@@ -48,7 +48,7 @@
             __data_selection_isselectable = getConfig(['data','selection','isselectable'], function(d){return true})
 
         // subchart
-        var __subchart_show = getConfig(['subchart','show'], true),
+        var __subchart_show = getConfig(['subchart','show'], false),
             __subchart_size_height = __subchart_show ? getConfig(['subchart','size','height'], 60) : 0,
             __subchart_default = getConfig(['subchart','default'], null)
 
