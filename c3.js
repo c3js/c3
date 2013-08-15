@@ -104,8 +104,8 @@
             var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth()+1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
                 text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++){
-                if (typeof d[i] !== 'undefined') {
-                    value = typeof d[i].value !== 'undefined' ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
+                if (isDefined(d[i])) {
+                    value = isDefined(d[i].value) ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
                     name = d[i].name;
                 } else {
                     value = '-';
@@ -343,7 +343,7 @@
             for (j = 0; j < __data_groups.length; j++) {
                 for (k = 1; k < __data_groups[j].length; k++) {
                     if ( ! isBarType(__data_groups[j][k])) continue
-                    if (typeof ys[__data_groups[j][k]] === 'undefined') continue
+                    if (isUndefined(ys[__data_groups[j][k]])) continue
                     ys[__data_groups[j][k]].forEach(function(v,i){
                         if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0])){
                             ys[__data_groups[j][0]][i] += v*1
@@ -424,7 +424,7 @@
             for (i = 0; i < columns.length; i++) {
                 key = columns[i][0]
                 for (j = 1; j < columns[i].length; j++) {
-                    if (typeof new_rows[j-1] === 'undefined') {
+                    if (isUndefined(new_rows[j-1])) {
                         new_rows[j-1] = {}
                     }
                     new_rows[j-1][key] = columns[i][j]
@@ -480,7 +480,7 @@
             return d3.max(c3.data.targets, function(t){ return t.values.length })
         }
         function getTargetIds (targets) {
-            targets = (typeof targets === 'undefined') ? c3.data.targets : targets
+            targets = isUndefined(targets) ? c3.data.targets : targets
             return targets.map(function(d){ return d.id; })
         }
         function hasTarget (id) {
@@ -491,7 +491,7 @@
             return false
         }
         function getTargets (filter) {
-            return typeof filter !== 'undefined' ? c3.data.targets.filter(filter) : c3.data.targets
+            return isDefined(filter) ? c3.data.targets.filter(filter) : c3.data.targets
         }
         function category (i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i
@@ -538,7 +538,7 @@
                         }
                     }
                 }
-                if (typeof indices[d.id] === 'undefined') indices[d.id] = i++
+                if (isUndefined(indices[d.id])) indices[d.id] = i++
             })
             indices.__max__ = i-1
             return indices
@@ -578,7 +578,7 @@
         //-- Type --//
 
         function setTargetType (targets, type) {
-            var targetIds = typeof targets === 'undefined' ? getTargetIds() : targets
+            var targetIds = isUndefined(targets) ? getTargetIds() : targets
             if (typeof targetIds === 'string') targetIds = [targetIds]
             for (var i = 0; i < targetIds.length; i++) {
                 __data_types[targetIds[i]] = type
@@ -701,12 +701,12 @@
             var xValue, yValue
 
             // Check start/end of regions
-            if (typeof regions !== 'undefined') {
+            if (isDefined(regions)) {
                 for (i = 0; i < regions.length; i++){
-                    if (typeof regions[i].start === 'undefined') {
+                    if (isUndefined(regions[i].start)) {
                         regions[i].start = d[0].x
                     }
-                    if (typeof regions[i].end === 'undefined') {
+                    if (isUndefined(regions[i].end)) {
                         regions[i].end = d[d.length-1].x
                     }
                 }
@@ -719,7 +719,7 @@
             // Generate
             for (i = 0; i < d.length; i++) {
                 // Draw as normal
-                if (typeof regions === 'undefined' || ! isWithinRegions(d[i].x, regions)) {
+                if (isUndefined(regions) || ! isWithinRegions(d[i].x, regions)) {
                     s += " "+xValue(d[i])+" "+yValue(d[i])
                 }
                 // Draw with region // TODO: Fix for horizotal charts
@@ -845,9 +845,9 @@
 
                     // Add id,name to selectedData
                     for (j = 0; j < selectedData.length; j++) {
-                        if (typeof selectedData[j] === 'undefined') continue;
+                        if (isUndefined(selectedData[j])) continue;
                         name = __data_names[selectedData[j].id];
-                        selectedData[j].name = typeof name !== 'undefined' ? name : selectedData[j].id;
+                        selectedData[j].name = isDefined(name) ? name : selectedData[j].id;
                     }
                     // Sort selectedData as names order
                     if (Object.keys(__data_names).length > 0) {
@@ -1106,8 +1106,8 @@
             var barX, barY, barW, barH
             var rectX, rectW
 
-            withY = (typeof withY === 'undefined') ? false : withY
-            withSubchart = (typeof withSubchart === 'undefined') ? false : withSubchart
+            withY = isDefined(withY) ? withY : false
+            withSubchart = isDefined(withSubchart) ? withSubchart : false
 
             // ATTENTION: call here to update tickOffset
             x.domain(brush.empty() ? subX.domain() : brush.extent())
@@ -1274,7 +1274,7 @@
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
-                .style("fill-opacity", function(d){ return typeof d.opacity !== 'undefined' ? d.opacity : .1 })
+                .style("fill-opacity", function(d){ return isDefined(d.opacity) ? d.opacity : .1 })
             mainRegion.exit().transition().duration(withTransition ? 250 : 0)
                 .style("fill-opacity", 0)
                 .remove()
@@ -1434,7 +1434,7 @@
                 .attr('width', 10)
                 .attr('height', 10)
             l.append('text')
-                .text(function(d){ return typeof __data_names[d] !== 'undefined' ? __data_names[d] : d; })
+                .text(function(d){ return isDefined(__data_names[d]) ? __data_names[d] : d; })
                 .attr('x', -200)
                 .attr('y', function(d,i){ return legendHeight/2 })
 
@@ -1457,7 +1457,7 @@
         /*-- Event Handling --*/
 
         function getTargetSelector (target) {
-            return (typeof target === 'undefined') ? '.target' : '.target-' + target
+            return isDefined(target) ? '.target-' + target : '.target'
         }
 
         c3.focus = function (target) {
@@ -1499,7 +1499,7 @@
 
         c3.load = function (args) {
             // check args
-            if (typeof args.done === 'undefined') {
+            if (isUndefined(args.done)) {
                 args.done = function() {}
             }
             // use cache if exists
@@ -1545,7 +1545,7 @@
         }
 
         c3.selected = function (target) {
-            var suffix = (typeof target !== 'undefined') ? '-' + target : ''
+            var suffix = isDefined(target) ? '-' + target : ''
             return d3.merge(
                 main.selectAll('.__shapes' + suffix).selectAll('.__shape')
                     .filter(function(){ return d3.select(this).classed('_s_') })
@@ -1559,10 +1559,10 @@
                 var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
                     unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
                 if (indices.indexOf(i) >= 0) {
-                    if (__data_selection_isselectable(d) && (__data_selection_grouped || typeof ids === 'undefined' || ids.indexOf(d.id) >= 0)) {
+                    if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
                         selectShape(d3.select(this).classed('_s_',true), d, i)
                     }
-                } else if (typeof resetOther !== 'undefined' && resetOther) {
+                } else if (isDefined(resetOther) && resetOther) {
                     unselectShape(d3.select(this).classed('_s_',false), d, i)
                 }
             })
@@ -1572,8 +1572,8 @@
             if ( ! __data_selection_enabled) return
             main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
                 var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar
-                if (typeof indices === 'undefined' || indices.indexOf(i) >= 0) {
-                    if (__data_selection_isselectable(d) && (__data_selection_grouped || typeof ids === 'undefined' || ids.indexOf(d.id) >= 0)) {
+                if (isUndefined(indices) || indices.indexOf(i) >= 0) {
+                    if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
                         unselectShape(d3.select(this).classed('_s_',false), d, i)
                     }
                 }
@@ -1596,30 +1596,30 @@
         }
 
         c3.groups = function (groups) {
-            if (typeof groups === 'undefined') return __data_groups
+            if (isUndefined(groups)) return __data_groups
             __data_groups = groups
             redraw(true, true, true)
             return __data_groups
         }
 
         c3.regions = function (regions) {
-            if (typeof regions === 'undefined') return __regions
+            if (isUndefined(regions)) return __regions
             __regions = regions
             redraw(true, true, true)
             return __regions
         }
         c3.regions.add = function (regions) {
-            if (typeof regions === 'undefined') return __regions
+            if (isUndefined(regions)) return __regions
             __regions = __regions.concat(regions)
             redraw(true, true, true)
             return __regions
         }
         c3.regions.remove = function (classes, options) {
             var regionClasses = [].concat(classes),
-                options = typeof options !== 'undefined' ? options : {}
+                options = isDefined(options) ? options : {}
             regionClasses.forEach(function(cls){
                 var regions = d3.selectAll('.'+cls)
-                if (typeof options.duration !== 'undefined') {
+                if (isDefined(options.duration)) {
                     regions = regions.transition().duration(options.duration).style('fill-opacity', 0)
                 }
                 regions.remove()
@@ -1632,7 +1632,7 @@
 
         c3.data.get = function (id) {
             var target = c3.data.getAsTarget(id)
-            return typeof target !== 'undefined' ? target.values.map(function(d){ return d.value }) : undefined
+            return isDefined(target) ? target.values.map(function(d){ return d.value }) : undefined
         }
         c3.data.getAsTarget = function (id) {
             var targets = getTargets(function(d){ return d.id == id })
@@ -1798,6 +1798,13 @@
             return tickOffset
         }
         return axis
+    }
+
+    function isUndefined(v) {
+        return typeof v === 'undefined'
+    }
+    function isDefined(v) {
+        return typeof v !== 'undefined'
     }
 
 })(window)
