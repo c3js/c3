@@ -428,12 +428,14 @@
         }
         function convertDataToTargets (data) {
             var ids = d3.keys(data[0]).filter(function(key){ return key !== __data_x })
-            var targets, i = 0
+            var targets, i = 0, parsedDate;
 
             data.forEach(function(d) {
                 if (isTimeSeries) {
                     if (!(__data_x in d)) throw Error("'" + __data_x + "' must be included in data");
-                    d.x = parseDate(d[__data_x]);
+                    parsedDate = parseDate(d[__data_x]);
+                    if (parsedDate === null) throw Error("Failed to parse timeseries date in data");
+                    d.x = parsedDate;
                 } else {
                     d.x = i++;
                 }
