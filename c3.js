@@ -182,6 +182,11 @@
 
         if (isTimeSeries) {
             xAxis.tickFormat(customTimeFormat)
+        }
+        if (isCategorized) {
+            xAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
+            subXAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
+        } else {
             // TODO: fix
             xAxis.tickOffset = function () {
                 return 0
@@ -190,10 +195,6 @@
             subXAxis.tickOffset = function () {
                 return 0
             }
-        }
-        if (isCategorized) {
-            xAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
-            subXAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered)
         }
 
         // Use custom scale if needed
