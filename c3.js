@@ -88,8 +88,8 @@
         // point - point of each data
         var __point_show = getConfig(['point','show'], false),
             __point_r = __point_show ? getConfig(['point','r'], 2.5) : 0,
-            __point_focus_line_enabled = getConfig(['point','focus','line','enabled'], false),
-            __point_focus_expand_enabled = getConfig(['point','focus','expand','enabled'], __point_show),
+            __point_focus_line_enabled = getConfig(['point','focus','line','enabled'], true),
+            __point_focus_expand_enabled = getConfig(['point','focus','expand','enabled'], true),
             __point_focus_expand_r = getConfig(['point','focus','expand','r'], __point_focus_expand_enabled ? 4 : __point_r),
             __point_select_r = getConfig(['point','focus','select','r'], 8),
             __point_onclick = getConfig(['point','onclick'], function(){}),
