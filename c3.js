@@ -752,6 +752,8 @@
             subY.domain(y.domain())
             subY2.domain(y2.domain())
 
+            xAxis.ticks(data.length < 10 ? data.length : 10);
+
             /*-- Main Region --*/
 
             grid = main.append('g')
