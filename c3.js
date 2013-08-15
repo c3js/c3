@@ -29,7 +29,7 @@
         checkConfig('bindto', 'bindto is required in config')
 
         var __size_width = getConfig(['size','width'], 640),
-            __size_height = getConfig(['size','height'], 480)
+            __size_height = getConfig(['size','height'], 280)
 
         // data - data configuration
         checkConfig('data', 'data is required in config')
