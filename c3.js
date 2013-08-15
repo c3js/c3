@@ -102,10 +102,16 @@
         // tooltip - show when mouseover on each data
         var __tooltip_contents = getConfig(['tooltip','contents'], function(d) {
             var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth()+1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
-                text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i
+                text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++){
-                var value = typeof d[i].value !== 'undefined' ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
-                text += "<tr><td>" + d[i].name + "</td><td class='value'>" + value + "</td></tr>"
+                if (typeof d[i] !== 'undefined') {
+                    value = typeof d[i].value !== 'undefined' ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
+                    name = d[i].name;
+                } else {
+                    value = '-';
+                    name = '-';
+                }
+                text += "<tr><td>" + name + "</td><td class='value'>" + value + "</td></tr>"
             }
             return text + "</table>"
         })
@@ -839,6 +845,7 @@
 
                     // Add id,name to selectedData
                     for (j = 0; j < selectedData.length; j++) {
+                        if (typeof selectedData[j] === 'undefined') continue;
                         name = __data_names[selectedData[j].id];
                         selectedData[j].name = typeof name !== 'undefined' ? name : selectedData[j].id;
                     }
