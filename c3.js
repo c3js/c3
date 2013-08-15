@@ -102,9 +102,9 @@
         // tooltip - show when mouseover on each data
         var __tooltip_contents = getConfig(['tooltip','contents'], function(d) {
             var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth()+1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
-                text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>"
-            for (var i = 0; i < d.length; i++){
-                var value = (typeof d[i].value !== 'undefined') ? (Math.round(d[i].value*100)/100).toFixed(2) : '-'
+                text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i
+            for (i = 0; i < d.length; i++){
+                var value = typeof d[i].value !== 'undefined' ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
                 text += "<tr><td>" + d[i].name + "</td><td class='value'>" + value + "</td></tr>"
             }
             return text + "</table>"
@@ -826,11 +826,12 @@
                     if (dragging) return // do nothing if dragging
 
                     var selectedData = c3.data.targets.map(function(d){ return d.values[i] });
-                    var j, newData
+                    var j, newData, name;
 
                     // Add id,name to selectedData
                     for (j = 0; j < selectedData.length; j++) {
-                        selectedData[j].name = __data_names[selectedData[j].id]
+                        name = __data_names[selectedData[j].id];
+                        selectedData[j].name = typeof name !== 'undefined' ? name : selectedData[j].id;
                     }
                     // Sort selectedData as names order
                     if (Object.keys(__data_names).length > 0) {
@@ -1417,7 +1418,7 @@
                 .attr('width', 10)
                 .attr('height', 10)
             l.append('text')
-                .text(function(d){ return __data_names[d] })
+                .text(function(d){ return typeof __data_names[d] !== 'undefined' ? __data_names[d] : d; })
                 .attr('x', -200)
                 .attr('y', function(d,i){ return legendHeight/2 })
 
