@@ -431,7 +431,12 @@
             var targets, i = 0
 
             data.forEach(function(d) {
-                d.x = (isTimeSeries) ? parseDate(d[__data_x]) : i++
+                if (isTimeSeries) {
+                    if (!(__data_x in d)) throw Error("'" + __data_x + "' must be included in data");
+                    d.x = parseDate(d[__data_x]);
+                } else {
+                    d.x = i++;
+                }
                 if (firstDate === null) firstDate = new Date(d.x)
                 lastDate = new Date(d.x)
             })
