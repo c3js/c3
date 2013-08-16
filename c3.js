@@ -10,6 +10,8 @@
         var c3 = { data : {} },
             cache = {};
 
+        var EXPANDED = '_expanded_', SELECTED = '_selected_', INCLUDED = '_included_';
+
         /*-- Handle Config --*/
 
         function checkConfig (key, message) {
@@ -867,13 +869,13 @@
                     // Expand circles if needed
                     if (__point_focus_expand_enabled) {
                         main.selectAll('.-circle-'+i)
-                            .classed("_e_", true)
+                            .classed(EXPANDED, true)
                             .attr('r', __point_focus_expand_r);
                     }
 
                     // Expand bars
                     main.selectAll(".-bar-"+i)
-                        .classed("_e_", true);
+                        .classed(EXPANDED, true);
 
                     // Show xgrid focus line
                     main.selectAll('line.xgrid-focus')
@@ -893,12 +895,12 @@
                     tooltip.style("visibility", "hidden");
                     // Undo expanded circles
                     main.selectAll('.-circle-'+i)
-                        .filter(function(){ return d3.select(this).classed('_e_'); })
-                        .classed("_e_", false)
+                        .filter(function(){ return d3.select(this).classed(EXPANDED); })
+                        .classed(EXPANDED, false)
                         .attr('r', __point_r);
                     // Undo expanded bar
                     main.selectAll(".-bar-"+i)
-                        .classed("_e_", false);
+                        .classed(EXPANDED, false);
                 })
                 .on('mousemove', function(d,i){
                     if ( ! __data_selection_enabled || dragging) return;
@@ -907,7 +909,7 @@
                     main.selectAll('.-shape-'+i)
                         .filter(function(d){ return __data_selection_isselectable(d); })
                         .each(function(d){
-                            var _this = d3.select(this).classed('_e_', true);
+                            var _this = d3.select(this).classed(EXPANDED, true);
                             if (this.nodeName === 'circle') _this.attr('r', __point_focus_expand_r);
                             d3.select('.event-rect-'+i).style('cursor', null);
                         })
@@ -922,8 +924,8 @@
                         })
                         .each(function(d){
                             var _this = d3.select(this);
-                            if ( ! _this.classed('_e_')) {
-                                _this.classed('_e_', true);
+                            if ( ! _this.classed(EXPANDED)) {
+                                _this.classed(EXPANDED, true);
                                 if (this.nodeName === 'circle') _this.attr('r', __point_select_r);
                             }
                             d3.select('.event-rect-'+i).style('cursor', 'pointer');
@@ -932,7 +934,7 @@
                 .on('click', function(d,i) {
                     main.selectAll('.-shape-'+i).each(function(d){
                         var _this = d3.select(this),
-                            isSelected = _this.classed('_s_');
+                            isSelected = _this.classed(SELECTED);
                         var isWithin = false, toggle;
                         if (this.nodeName === 'circle') {
                             isWithin = isWithinCircle(this, __point_select_r*1.5);
@@ -944,7 +946,7 @@
                         }
                         if (__data_selection_grouped || isWithin) {
                             if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                                _this.classed('_s_', !isSelected);
+                                _this.classed(SELECTED, !isSelected);
                                 toggle(!isSelected, _this, d, i);
                             }
                             __point_onclick(d, _this); // TODO: should be __data_onclick
@@ -972,8 +974,8 @@
                             .filter(function(d){ return __data_selection_isselectable(d); })
                             .each(function(d,i){
                                 var _this = d3.select(this),
-                                    isSelected = _this.classed('_s_'),
-                                    isIncluded = _this.classed('_i_'),
+                                    isSelected = _this.classed(SELECTED),
+                                    isIncluded = _this.classed(INCLUDED),
                                     _x, _y, _w, toggle, isWithin = false;
                                 if (this.nodeName === 'circle') {
                                     _x = _this.attr("cx")*1;
@@ -989,9 +991,9 @@
                                     isWithin = minX < _x+_w && _x < maxX && _y < maxY;
                                 }
                                 if (isWithin ^ isIncluded) {
-                                    _this.classed('_i_', !isIncluded);
+                                    _this.classed(INCLUDED, !isIncluded);
                                     // TODO: included/unincluded callback here
-                                    _this.classed('_s_', !isSelected);
+                                    _this.classed(SELECTED, !isSelected);
                                     toggle(!isSelected, _this, d, i);
                                 }
                             });
@@ -1012,7 +1014,7 @@
                             .style('opacity', 0)
                           .remove();
                         main.selectAll('.-shape')
-                            .classed('_i_', false);
+                            .classed(INCLUDED, false);
                         dragging = false;
                         // TODO: add callback here
                     })
@@ -1557,7 +1559,7 @@
             var suffix = isDefined(target) ? '-' + target : '';
             return d3.merge(
                 main.selectAll('.-shapes' + suffix).selectAll('.-shape')
-                    .filter(function(){ return d3.select(this).classed('_s_'); })
+                    .filter(function(){ return d3.select(this).classed(SELECTED); })
                     .map(function(d){ return d.map(function(_d){ return _d.__data__; }); })
             );
         };
@@ -1569,10 +1571,10 @@
                     unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
                 if (indices.indexOf(i) >= 0) {
                     if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
-                        selectShape(d3.select(this).classed('_s_',true), d, i);
+                        selectShape(d3.select(this).classed(SELECTED,true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
-                    unselectShape(d3.select(this).classed('_s_',false), d, i);
+                    unselectShape(d3.select(this).classed(SELECTED,false), d, i);
                 }
             });
         };
@@ -1583,7 +1585,7 @@
                 var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
                 if (isUndefined(indices) || indices.indexOf(i) >= 0) {
                     if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
-                        unselectShape(d3.select(this).classed('_s_',false), d, i);
+                        unselectShape(d3.select(this).classed(SELECTED,false), d, i);
                     }
                 }
             });

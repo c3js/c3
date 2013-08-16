@@ -33,7 +33,7 @@ text {
 }
 /*-- Point --*/
 
-.-circle._e_ {
+.-circle._expanded_ {
   stroke-width: 1px;
   stroke: white;
 }
@@ -44,12 +44,12 @@ text {
 
 /*-- Bar --*/
 
-.-bar._e_ {
+.-bar._expanded_ {
   stroke-width: 1px;
   fill-opacity: 0.6;
 }
 /* TODO: use this*/
-.-bar._s_ {
+.-bar._selected_ {
   stroke-width: 1px;
   fill-opacity: 0.3;
 }
