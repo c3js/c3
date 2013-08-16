@@ -742,7 +742,7 @@
 
         /*-- Define brush --*/
 
-        var brush = d3.svg.brush().x(subX).on("brush", redraw);
+        var brush = d3.svg.brush().x(subX).on("brush", redrawForBrush);
 
         /*-- Draw Chart --*/
 
@@ -1096,18 +1096,20 @@
             updateTargets(targets);
 
             // Draw with targets
-            redraw(false, true, true);
+            redraw({withTransition:false});
         }
 
-        function redraw (withTransition, withY, withSubchart) {
+        function redraw (options) {
             var xgrid, xgridData, xgridLine;
             var mainPath, mainCircle, mainBar, contextPath;
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1;
             var barX, barY, barW, barH;
             var rectX, rectW;
 
-            withY = isDefined(withY) ? withY : false;
-            withSubchart = isDefined(withSubchart) ? withSubchart : false;
+            options = isDefined(options) ? options : {};
+            withY = isDefined(options.withY) ? options.withY : true;
+            withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
+            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
 
             // ATTENTION: call here to update tickOffset
             x.domain(brush.empty() ? subX.domain() : brush.extent());
@@ -1279,6 +1281,13 @@
                 .style("fill-opacity", 0)
                 .remove();
         }
+        function redrawForBrush() {
+            redraw({
+                withTransition: false,
+                withY: false,
+                withSubchart: false
+            });
+        }
 
         function updateTargets (targets) {
             var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
@@ -1387,7 +1396,7 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw(true, true, true);
+            redraw();
 
             done();
         }
@@ -1541,7 +1550,7 @@
                 updateLegend(c3.data.targets);
             }
 
-            if (c3.data.targets.length > 0) redraw(true, true, true);
+            if (c3.data.targets.length > 0) redraw();
         };
 
         c3.selected = function (target) {
@@ -1582,36 +1591,36 @@
 
         c3.toLine = function (targets) {
             setTargetType(targets, 'line');
-            redraw(true, true, true);
+            redraw();
         };
 
         c3.toSpline = function (targets) {
             setTargetType(targets, 'spline');
-            redraw(true, true, true);
+            redraw();
         };
 
         c3.toBar = function (targets) {
             setTargetType(targets, 'bar');
-            redraw(true, true, true);
+            redraw();
         };
 
         c3.groups = function (groups) {
             if (isUndefined(groups)) return __data_groups;
             __data_groups = groups;
-            redraw(true, true, true);
+            redraw();
             return __data_groups;
         };
 
         c3.regions = function (regions) {
             if (isUndefined(regions)) return __regions;
             __regions = regions;
-            redraw(true, true, true);
+            redraw();
             return __regions;
         };
         c3.regions.add = function (regions) {
             if (isUndefined(regions)) return __regions;
             __regions = __regions.concat(regions);
-            redraw(true, true, true);
+            redraw();
             return __regions;
         };
         c3.regions.remove = function (classes, options) {
