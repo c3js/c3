@@ -1806,6 +1806,9 @@
         axis.tickOffset = function() {
             return tickOffset;
         }
+        axis.ticks = function() {
+            return; // TODO: implement
+        }
         return axis;
     }
 
