@@ -496,13 +496,13 @@
         function category (i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
-        function classShapes (d) { return "__shapes __shapes-" + d.id; }
-        function classLine (d) { return classShapes(d) + " __line __line-" + d.id; }
-        function classCircles (d) { return classShapes(d) + " __circles __circles-" + d.id; }
-        function classBars (d) { return classShapes(d) + " __bars __bars-" + d.id; }
-        function classShape (d,i) { return "__shape __shape-" + i; }
-        function classCircle (d,i) { return classShape(d,i) + " __circle __circle-" + i; }
-        function classBar (d,i) { return classShape(d,i) + " __bar __bar-" + i; }
+        function classShapes (d) { return "-shapes -shapes-" + d.id; }
+        function classLine (d) { return classShapes(d) + " -line -line-" + d.id; }
+        function classCircles (d) { return classShapes(d) + " -circles -circles-" + d.id; }
+        function classBars (d) { return classShapes(d) + " -bars -bars-" + d.id; }
+        function classShape (d,i) { return "-shape -shape-" + i; }
+        function classCircle (d,i) { return classShape(d,i) + " -circle -circle-" + i; }
+        function classBar (d,i) { return classShape(d,i) + " -bar -bar-" + i; }
         function classRegion (d,i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
 
         function xx (d) {
@@ -866,13 +866,13 @@
 
                     // Expand circles if needed
                     if (__point_focus_expand_enabled) {
-                        main.selectAll('.__circle-'+i)
+                        main.selectAll('.-circle-'+i)
                             .classed("_e_", true)
                             .attr('r', __point_focus_expand_r);
                     }
 
                     // Expand bars
-                    main.selectAll(".__bar-"+i)
+                    main.selectAll(".-bar-"+i)
                         .classed("_e_", true);
 
                     // Show xgrid focus line
@@ -892,19 +892,19 @@
                     main.select('line.xgrid-focus').style("visibility", "hidden");
                     tooltip.style("visibility", "hidden");
                     // Undo expanded circles
-                    main.selectAll('.__circle-'+i)
+                    main.selectAll('.-circle-'+i)
                         .filter(function(){ return d3.select(this).classed('_e_'); })
                         .classed("_e_", false)
                         .attr('r', __point_r);
                     // Undo expanded bar
-                    main.selectAll(".__bar-"+i)
+                    main.selectAll(".-bar-"+i)
                         .classed("_e_", false);
                 })
                 .on('mousemove', function(d,i){
                     if ( ! __data_selection_enabled || dragging) return;
                     if ( __data_selection_grouped) return; // nothing to do when grouped
 
-                    main.selectAll('.__shape-'+i)
+                    main.selectAll('.-shape-'+i)
                         .filter(function(d){ return __data_selection_isselectable(d); })
                         .each(function(d){
                             var _this = d3.select(this).classed('_e_', true);
@@ -930,7 +930,7 @@
                         });
                 })
                 .on('click', function(d,i) {
-                    main.selectAll('.__shape-'+i).each(function(d){
+                    main.selectAll('.-shape-'+i).each(function(d){
                         var _this = d3.select(this),
                             isSelected = _this.classed('_s_');
                         var isWithin = false, toggle;
@@ -968,7 +968,7 @@
                             .attr('y', minY)
                             .attr('width', maxX-minX)
                             .attr('height', maxY-minY);
-                        main.selectAll('.__shapes').selectAll('.__shape')
+                        main.selectAll('.-shapes').selectAll('.-shape')
                             .filter(function(d){ return __data_selection_isselectable(d); })
                             .each(function(d,i){
                                 var _this = d3.select(this),
@@ -1011,7 +1011,7 @@
                           .transition().duration(100)
                             .style('opacity', 0)
                           .remove();
-                        main.selectAll('.__shape')
+                        main.selectAll('.-shape')
                             .classed('_i_', false);
                         dragging = false;
                         // TODO: add callback here
@@ -1184,7 +1184,7 @@
             barH = getBarH(__axis_rotated ? null : height);
             barX = getBarX(barW, barTargetsNum, barIndices);
             barY = getBarY(barH, barIndices, __axis_rotated);
-            mainBar = main.selectAll('.__bars').selectAll('.__bar')
+            mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
             mainBar.transition().duration(withTransition ? 250 : 0)
                 .attr("x", __axis_rotated ? barY : barX)
@@ -1205,10 +1205,10 @@
                 .remove();
 
             // lines and cricles
-            main.selectAll('.__line')
+            main.selectAll('.-line')
               .transition().duration(withTransition ? 250 : 0)
                 .attr("d", lineOnMain);
-            mainCircle = main.selectAll('.__circles').selectAll('.__circle')
+            mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineData);
             mainCircle.transition().duration(withTransition ? 250 : 0)
                 .attr("cx", __axis_rotated ? circleY : circleX)
@@ -1227,7 +1227,7 @@
                 barH = getBarH(height2, true);
                 barX = getBarX(barW, barTargetsNum, barIndices, true);
                 barY = getBarY(barH, barIndices, false, true);
-                contextBar = context.selectAll('.__bars').selectAll('.__bar')
+                contextBar = context.selectAll('.-bars').selectAll('.-bar')
                     .data(barData);
                 contextBar.transition().duration(withTransition ? 250 : 0)
                     .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
@@ -1242,7 +1242,7 @@
                     .remove();
 
                 // lines
-                context.selectAll('.__line')
+                context.selectAll('.-line')
                   .transition().duration(withTransition ? 250 : 0)
                     .attr("d", lineOnSub);
             }
@@ -1556,7 +1556,7 @@
         c3.selected = function (target) {
             var suffix = isDefined(target) ? '-' + target : '';
             return d3.merge(
-                main.selectAll('.__shapes' + suffix).selectAll('.__shape')
+                main.selectAll('.-shapes' + suffix).selectAll('.-shape')
                     .filter(function(){ return d3.select(this).classed('_s_'); })
                     .map(function(d){ return d.map(function(_d){ return _d.__data__; }); })
             );
@@ -1564,7 +1564,7 @@
 
         c3.select = function (ids, indices, resetOther) {
             if ( ! __data_selection_enabled) return;
-            main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
+            main.selectAll('.-shapes').selectAll('.-shape').each(function(d,i){
                 var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
                     unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
                 if (indices.indexOf(i) >= 0) {
@@ -1579,7 +1579,7 @@
 
         c3.unselect = function (ids, indices) {
             if ( ! __data_selection_enabled) return;
-            main.selectAll('.__shapes').selectAll('.__shape').each(function(d,i){
+            main.selectAll('.-shapes').selectAll('.-shape').each(function(d,i){
                 var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
                 if (isUndefined(indices) || indices.indexOf(i) >= 0) {
                     if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
