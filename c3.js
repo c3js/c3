@@ -113,7 +113,7 @@
                     value = '-';
                     name = '-';
                 }
-                text += "<tr><td>" + name + "</td><td class='value'>" + value + "</td></tr>";
+                text += "<tr><td><span style='background-color:"+color(d[i].id)+"'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
             return text + "</table>";
         });

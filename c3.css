@@ -98,6 +98,7 @@ text {
   -webkit-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
      -moz-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
           box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
+  opacity: 0.9;
 }
 .tooltip tr {
   border:1px solid #CCC;
@@ -111,10 +112,15 @@ text {
 }
 .tooltip td {
   font-size:13px;
-  padding:2px 6px;
-  text-align:center;
+  padding: 3px 6px;
   background-color:#fff;
   border-left:1px dotted #999;
+}
+.tooltip td > span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
 }
 .tooltip td.value{
   text-align: right;
