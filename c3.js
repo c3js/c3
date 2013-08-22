@@ -88,7 +88,7 @@
             __grid_y_lines = getConfig(['grid','y','lines'], null);
 
         // point - point of each data
-        var __point_show = getConfig(['point','show'], false),
+        var __point_show = getConfig(['point','show'], true),
             __point_r = __point_show ? getConfig(['point','r'], 2.5) : 0,
             __point_focus_line_enabled = getConfig(['point','focus','line','enabled'], true),
             __point_focus_expand_enabled = getConfig(['point','focus','expand','enabled'], true),
