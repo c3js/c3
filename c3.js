@@ -104,7 +104,7 @@
         // tooltip - show when mouseover on each data
         var __tooltip_contents = getConfig(['tooltip','contents'], function(d) {
             var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth()+1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
-                text = "<table class='tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i, value, name;
+                text = "<table class='-tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++){
                 if (isDefined(d[i])) {
                     value = isDefined(d[i].value) ? (Math.round(d[i].value*100)/100).toFixed(2) : '-';
