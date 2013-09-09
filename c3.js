@@ -170,12 +170,12 @@
             yMin = __axis_rotated ? 0 : height,
             yMax = __axis_rotated ? width : 1;
 
-        var x = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([xMin, xMax]),
-            y = d3.scale.linear().range([yMin, yMax]),
-            y2 = d3.scale.linear().range([yMin, yMax]),
-            subX = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([0, width]),
-            subY = d3.scale.linear().range([height2, 10]),
-            subY2 = d3.scale.linear().range([height2, 10]);
+        var x = getX(xMin, xMax),
+            y = getY(yMin, yMax),
+            y2 = getY(yMin, yMax),
+            subX = getX(0, width),
+            subY = getY(height2, 10),
+            subY2 = getY(height2, 10);
 
         // TODO: Enable set position
         var xAxis = isCategorized ? categoryAxis() : d3.svg.axis(),
@@ -327,6 +327,15 @@
               .style("visibility", "hidden");
 
         /*-- Define Functions --*/
+
+        //-- Scale --//
+
+        function getX (min, max) {
+            return ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
+        }
+        function getY (min, max) {
+            return d3.scale.linear().range([min, max]);
+        }
 
         //-- Domain --//
 
@@ -698,7 +707,7 @@
 
         function lineWithRegions (d, x, y, regions) {
             var prev = -1, i, j;
-            var s = "M";
+            var s = "M", sWithRegion;
             var xp, yp, dx, dy, dd, diff, diff2;
             var xValue, yValue;
 
@@ -707,9 +716,13 @@
                 for (i = 0; i < regions.length; i++){
                     if (isUndefined(regions[i].start)) {
                         regions[i].start = d[0].x;
+                    } else if (isTimeSeries) {
+                        regions[i].start = parseDate(regions[i].start);
                     }
                     if (isUndefined(regions[i].end)) {
                         regions[i].end = d[d.length-1].x;
+                    } else if (isTimeSeries) {
+                        regions[i].end = parseDate(regions[i].end);
                     }
                 }
             }
@@ -717,6 +730,20 @@
             // Set scales
             xValue = __axis_rotated ? function(d){ return y(d.value); } : function(d){ return x(d.x); };
             yValue = __axis_rotated ? function(d){ return x(d.x); } : function(d){ return y(d.value); };
+
+            // Define svg generator function for region
+            if (isTimeSeries) {
+                sWithRegion = function (d0, d1, j, diff) {
+                    var x0 = d0.x.getTime(), x_diff = d1.x-d0.x,
+                        xv0 = new Date(x0 + x_diff * j),
+                        xv1 = new Date(x0 + x_diff * (j+diff));
+                    return "M"+x(xv0)+" "+y(yp(j))+" "+x(xv1)+" "+y(yp(j+diff));
+                }
+            } else {
+                sWithRegion = function (d0, d1, j, diff) {
+                    return "M"+x(xp(j))+" "+y(yp(j))+" "+x(xp(j+diff))+" "+y(yp(j+diff));
+                }
+            }
 
             // Generate
             for (i = 0; i < d.length; i++) {
@@ -726,19 +753,22 @@
                 }
                 // Draw with region // TODO: Fix for horizotal charts
                 else {
-                    xp = d3.scale.linear().range([d[i-1].x, d[i].x]);
-                    yp = d3.scale.linear().range([d[i-1].value, d[i].value]);
+                    xp = getX(d[i-1].x, d[i].x);
+                    yp = getY(d[i-1].value, d[i].value);
+
                     dx = x(d[i].x) - x(d[i-1].x);
                     dy = y(d[i].value) - y(d[i-1].value);
                     dd = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
                     diff = 2/dd;
                     diffx2 = diff*2;
+
                     for (j = diff; j <= 1; j += diffx2) {
-                        s += "M"+x(xp(j))+" "+y(yp(j))+" "+x(xp(j+diff))+" "+y(yp(j+diff));
+                        s += sWithRegion(d[i-1], d[i], j, diff);
                     }
                 }
                 prev = d[i].x;
             }
+
             return s;
         }
 
