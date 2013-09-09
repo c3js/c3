@@ -261,11 +261,11 @@
 
         // For region
         var regionStart = function (d) {
-            return ('start' in d) ? x(d.start) : 0;
+            return ('start' in d) ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0;
         };
         var regionWidth = function (d) {
-            var start = ('start' in d) ? x(d.start) : 0,
-                end = ('end' in d) ? x(d.end) : width,
+            var start = regionStart(d),
+                end = ('end' in d) ? x(isTimeSeries ? parseDate(d.end) : d.end) : width,
                 w = end - start;
             return (w < 0) ? 0 : w;
         };
