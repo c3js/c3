@@ -520,7 +520,7 @@
             return x(d.x);
         }
         function xv (d) {
-            return x(d.value);
+            return x(isTimeSeries ? parseDate(d.value) : d.value);
         }
         function yv (d) {
             return y(d.value);
