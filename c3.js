@@ -116,7 +116,10 @@
                 text += "<tr><td><span style='background-color:"+color(d[i].id)+"'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
             return text + "</table>";
-        });
+        }),
+            __tooltip_init_show = getConfig(['tooltip','init','show'], false),
+            __tooltip_init_x = getConfig(['tooltip','init','x'], 0),
+            __tooltip_init_position = getConfig(['tooltip','init','position'], {top:'0px',left:'50px'});
 
         /*-- Set Variables --*/
 
@@ -419,6 +422,11 @@
 
         //-- Data --//
 
+        function addName (data) {
+            var name = __data_names[data.id];
+            data.name = isDefined(name) ? name : data.id;
+            return data;
+        }
         function convertRowsToData (rows) {
             var keys = rows[0], new_row = {}, new_rows = [], i, j;
             for (i = 1; i < rows.length; i++) {
@@ -786,6 +794,7 @@
             var targets = c3.data.targets = convertDataToTargets(data);
             var rectX, rectW;
             var grid, xgridLine;
+            var i;
 
             // TODO: set names if names not specified
 
@@ -872,15 +881,9 @@
                 .on('mouseover', function(d,i) {
                     if (dragging) return; // do nothing if dragging
 
-                    var selectedData = c3.data.targets.map(function(d){ return d.values[i]; });
-                    var j, newData, name;
+                    var selectedData = c3.data.targets.map(function(d){ return addName(d.values[i]); });
+                    var j, newData;
 
-                    // Add id,name to selectedData
-                    for (j = 0; j < selectedData.length; j++) {
-                        if (isUndefined(selectedData[j])) continue;
-                        name = __data_names[selectedData[j].id];
-                        selectedData[j].name = isDefined(name) ? name : selectedData[j].id;
-                    }
                     // Sort selectedData as names order
                     if (Object.keys(__data_names).length > 0) {
                         newData = [];
@@ -1129,6 +1132,23 @@
 
             // Draw with targets
             redraw({withTransition:false});
+
+            // Show tooltip if needed
+            if (__tooltip_init_show) {
+                if (isTimeSeries && typeof __tooltip_init_x == 'string') {
+                    __tooltip_init_x = parseDate(__tooltip_init_x);
+                    for (i = 0; i < targets[0].values.length; i++) {
+                        if ((targets[0].values[i].x - __tooltip_init_x) == 0) break;
+                    }
+                    __tooltip_init_x = i;
+                }
+                tooltip.html(__tooltip_contents(targets.map(function(d){
+                    return addName(d.values[__tooltip_init_x]);
+                })));
+                tooltip.style("top", __tooltip_init_position.top)
+                       .style("left", __tooltip_init_position.left)
+                       .style("visibility", "visible");
+            }
         }
 
         function redraw (options) {
