@@ -734,24 +734,26 @@
 
         //-- Shape --//
 
-        function lineWithRegions (d, x, y, regions) {
+        function lineWithRegions (d, x, y, _regions) {
             var prev = -1, i, j;
             var s = "M", sWithRegion;
             var xp, yp, dx, dy, dd, diff, diff2;
             var xValue, yValue;
+            var regions = [];
 
             // Check start/end of regions
-            if (isDefined(regions)) {
-                for (i = 0; i < regions.length; i++){
-                    if (isUndefined(regions[i].start)) {
+            if (isDefined(_regions)) {
+                for (i = 0; i < _regions.length; i++){
+                    regions[i] = {};
+                    if (isUndefined(_regions[i].start)) {
                         regions[i].start = d[0].x;
                     } else if (isTimeSeries) {
-                        regions[i].start = parseDate(regions[i].start);
+                        regions[i].start = parseDate(_regions[i].start);
                     }
-                    if (isUndefined(regions[i].end)) {
+                    if (isUndefined(_regions[i].end)) {
                         regions[i].end = d[d.length-1].x;
                     } else if (isTimeSeries) {
-                        regions[i].end = parseDate(regions[i].end);
+                        regions[i].end = parseDate(_regions[i].end);
                     }
                 }
             }
