@@ -30,7 +30,7 @@
         // bindto - id to bind the chart
         checkConfig('bindto', 'bindto is required in config');
 
-        var __size_width = getConfig(['size','width'], 640),
+        var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], 280);
 
         // data - data configuration
@@ -151,34 +151,12 @@
             };
         }
 
-        /*-- Set Chart Params --*/
-
-        var bottom = 20 + __subchart_size_height + legendHeight,
-            right = __axis_y2_show && !__axis_rotated ? 50 : 1,
-            top2 = __size_height - __subchart_size_height - legendHeight,
-            bottom2 = 20 + legendHeight,
-            top3 = __size_height - legendHeight,
-            margin = {top: 0, right: right, bottom: bottom, left: 40},
-            margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
-            margin3 = {top: top3, right: 20, bottom: 0, left: 40},
-            width = __size_width - margin.left - margin.right,
-            height = __size_height - margin.top - margin.bottom,
-            height2 = __size_height - margin2.top - margin2.bottom,
-            height3 = __size_height - margin3.top - margin3.bottom;
-
         var parseDate = d3.time.format(__data_x_format).parse;
 
-        var xMin = __axis_rotated ? 10 : 0,
-            xMax = __axis_rotated ? height : width,
-            yMin = __axis_rotated ? 0 : height,
-            yMax = __axis_rotated ? width : 1;
+        /*-- Set Chart Params --*/
 
-        var x = getX(xMin, xMax),
-            y = getY(yMin, yMax),
-            y2 = getY(yMin, yMax),
-            subX = getX(0, width),
-            subY = getY(height2, 10),
-            subY2 = getY(height2, 10);
+        var bottom, bottom2, right, top2, top3, margin, margin2, margin3, width, height, height2, height3;
+        var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2;
 
         // TODO: Enable set position
         var xAxis = isCategorized ? categoryAxis() : d3.svg.axis(),
@@ -186,10 +164,47 @@
             yAxis2 = d3.svg.axis(),
             subXAxis = isCategorized ? categoryAxis() : d3.svg.axis();
 
-        xAxis.scale(x).orient(__axis_rotated ? "left" : "bottom");
-        yAxis.scale(y).orient(__axis_rotated ? "bottom" : "left");
-        yAxis2.scale(y2).orient(__axis_rotated ? "top" : "right");
-        subXAxis.scale(subX).orient("bottom");
+        function updateSizes () {
+            bottom = 20 + __subchart_size_height + legendHeight,
+            right = __axis_y2_show && !__axis_rotated ? 50 : 1,
+            top2 = __size_height - __subchart_size_height - legendHeight,
+            bottom2 = 20 + legendHeight,
+            top3 = __size_height - legendHeight,
+            margin = {top: 0, right: right, bottom: bottom, left: 40},
+            margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
+            margin3 = {top: top3, right: 20, bottom: 0, left: 40},
+            width = (__size_width == null ? getParentWidth() : __size_width) - margin.left - margin.right,
+            height = __size_height - margin.top - margin.bottom,
+            height2 = __size_height - margin2.top - margin2.bottom,
+            height3 = __size_height - margin3.top - margin3.bottom;
+        }
+        updateSizes();
+
+        function updateScales () {
+            var _x, _y, _y2, _subX;
+            // update edges
+            xMin = __axis_rotated ? 10 : 0;
+            xMax = __axis_rotated ? height : width; // AAA
+            yMin = __axis_rotated ? 0 : height;
+            yMax = __axis_rotated ? width : 1; // AAA
+            // update scales
+            _x = getX(xMin, xMax);
+            _y = getY(yMin, yMax);
+            _y2 = getY(yMin, yMax);
+            _subX = getX(0, width);
+            x = isDefined(x) ? _x.domain(x.domain()) : _x;
+            y = isDefined(y) ? _y.domain(y.domain()) : _y;
+            y2 = isDefined(y2) ? _y2.domain(y2.domain()) : _y2;
+            subX = isDefined(subX) ? _subX.domain(subX.domain()) : _subX;
+            subY = getY(height2, 10);
+            subY2 = getY(height2, 10);
+            // update axies
+            xAxis.scale(x).orient(__axis_rotated ? "left" : "bottom");
+            yAxis.scale(y).orient(__axis_rotated ? "bottom" : "left");
+            yAxis2.scale(y2).orient(__axis_rotated ? "top" : "right");
+            subXAxis.scale(subX).orient("bottom");
+        };
+        updateScales();
 
         if (isTimeSeries) {
             xAxis.tickFormat(customTimeFormat);
@@ -278,27 +293,28 @@
 
         // Define svgs
         var svg = d3.select(config.bindto).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom);
+                    .attr("width", width + margin.left + margin.right) // AAA
+                    .attr("height", height + margin.top + margin.bottom);
 
-        svg.append("defs");
+        // Define defs
+        var defs = svg.append("defs");
 
-        svg.select("defs").append("clipPath")
+        defs.append("clipPath")
             .attr("id", clipId)
           .append("rect")
             .attr("y", margin.top)
-            .attr("width", width)
+            .attr("width", width) // AAA
             .attr("height", height-margin.top);
 
-        svg.select("defs").append("clipPath")
+        defs.append("clipPath")
             .attr("id", "xaxis-clip")
           .append("rect")
             .attr("x", -1)
             .attr("y", -1)
-            .attr("width", width + 2)
+            .attr("width", width + 2) // AAA
             .attr("height", 40);
 
-        svg.select("defs").append("clipPath")
+        defs.append("clipPath")
             .attr("id", "yaxis-clip")
           .append("rect")
             .attr("x", -40 + 1)
@@ -330,6 +346,11 @@
               .style("visibility", "hidden");
 
         /*-- Define Functions --*/
+
+        function getParentWidth () {
+            // TODO: if rotated, use height
+            return +d3.select(config.bindto).style("width").replace('px','');
+        }
 
         //-- Scale --//
 
@@ -841,7 +862,7 @@
                   .append('line')
                     .attr('class', 'xgrid-focus')
                     .attr("x1", __axis_rotated ? 0 : -10)
-                    .attr("x2", __axis_rotated ? width : -10)
+                    .attr("x2", __axis_rotated ? width : -10) // AAA update on update
                     .attr("y1", __axis_rotated ? -10 : margin.top)
                     .attr("y2", __axis_rotated ? -10 : height);
             }
@@ -1082,7 +1103,7 @@
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
+                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")") // AAA
                     .call(yAxis2);
             }
 
@@ -1339,6 +1360,18 @@
                 withY: false,
                 withSubchart: false
             });
+        }
+
+        function resize () {
+            // Update sizes and scales
+            updateSizes();
+            updateScales();
+            // Resize svg
+            d3.select('svg').attr('width', width + margin.left + margin.right);
+            d3.select('#'+clipId).select('rect').attr('width', width);
+            d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
+            // Draw with new sizes & scales
+            redraw();
         }
 
         function updateTargets (targets) {
@@ -1714,6 +1747,9 @@
         else {
             throw Error('url or rows or columns is required.');
         }
+
+        // Bind resize event
+        window.onresize = resize;
 
         return c3;
     }
