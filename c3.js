@@ -1372,6 +1372,8 @@
             d3.select('svg').attr('width', width + margin.left + margin.right);
             d3.select('#'+clipId).select('rect').attr('width', width);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
+            // Update legend
+            if (__legend_show) updateLegend(c3.data.targets, {withTransition:false});
             // Draw with new sizes & scales
             redraw({withTransition:false});
         }
@@ -1490,9 +1492,14 @@
 
         /*-- Draw Legend --*/
 
-        function updateLegend (targets) {
+        function updateLegend (targets, options) {
             var ids = getTargetIds(targets), l;
             var padding = width/2 - __legend_item_width*Object.keys(targets).length/2;
+            var withTransition;
+
+            options = isUndefined(options) ? {} : options;
+
+            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
 
             // Define g for legend area
             l = legend.selectAll('.legend-item')
@@ -1536,17 +1543,17 @@
 
             legend.selectAll('rect.legend-item-event')
                 .data(ids)
-              .transition()
+              .transition().duration(withTransition ? 250 : 0)
                 .attr('x', function(d,i){ return padding + __legend_item_width*i; });
 
             legend.selectAll('rect.legend-item-tile')
                 .data(ids)
-              .transition()
+              .transition().duration(withTransition ? 250 : 0)
                 .attr('x', function(d,i){ return padding + __legend_item_width*i; });
 
             legend.selectAll('text')
                 .data(ids)
-              .transition()
+              .transition().duration(withTransition ? 250 : 0)
                 .attr('x', function(d,i){ return padding + __legend_item_width*i + 14; });
         }
 
