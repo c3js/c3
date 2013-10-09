@@ -1373,7 +1373,7 @@
             d3.select('#'+clipId).select('rect').attr('width', width);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
             // Draw with new sizes & scales
-            redraw();
+            redraw({withTransition:false});
         }
 
         function updateTargets (targets) {
