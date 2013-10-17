@@ -184,9 +184,9 @@
             var _x, _y, _y2, _subX;
             // update edges
             xMin = __axis_rotated ? 10 : 0;
-            xMax = __axis_rotated ? height : width; // AAA
+            xMax = __axis_rotated ? height : width;
             yMin = __axis_rotated ? 0 : height;
-            yMax = __axis_rotated ? width : 1; // AAA
+            yMax = __axis_rotated ? width : 1;
             // update scales
             _x = getX(xMin, xMax);
             _y = getY(yMin, yMax);
@@ -293,7 +293,7 @@
 
         // Define svgs
         var svg = d3.select(config.bindto).append("svg")
-                    .attr("width", width + margin.left + margin.right) // AAA
+                    .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom);
 
         // Define defs
@@ -303,7 +303,7 @@
             .attr("id", clipId)
           .append("rect")
             .attr("y", margin.top)
-            .attr("width", width) // AAA
+            .attr("width", width)
             .attr("height", height-margin.top);
 
         defs.append("clipPath")
@@ -311,7 +311,7 @@
           .append("rect")
             .attr("x", -1)
             .attr("y", -1)
-            .attr("width", width + 2) // AAA
+            .attr("width", width + 2)
             .attr("height", 40);
 
         defs.append("clipPath")
@@ -864,7 +864,7 @@
                   .append('line')
                     .attr('class', 'xgrid-focus')
                     .attr("x1", __axis_rotated ? 0 : -10)
-                    .attr("x2", __axis_rotated ? width : -10) // AAA update on update
+                    .attr("x2", __axis_rotated ? width : -10)
                     .attr("y1", __axis_rotated ? -10 : margin.top)
                     .attr("y2", __axis_rotated ? -10 : height);
             }
@@ -1105,7 +1105,7 @@
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")") // AAA
+                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
                     .call(yAxis2);
             }
 
