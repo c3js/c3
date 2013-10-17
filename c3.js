@@ -833,6 +833,31 @@
 
             /*-- Main Region --*/
 
+            // Add Axis
+            main.append("g")
+                .attr("class", "x axis")
+                .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
+                .attr("transform", "translate(0," + height + ")")
+                .call(__axis_rotated ? yAxis : xAxis);
+            main.append("g")
+                .attr("class", "y axis")
+                .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
+                .call(__axis_rotated ? xAxis : yAxis)
+              .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("dy", "1.4em")
+                .attr("dx", "-.8em")
+                .style("text-anchor", "end")
+                .text(__axis_y_text);
+
+            if (__axis_y2_show) {
+                main.append("g")
+                    .attr("class", "y2 axis")
+                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
+                    .call(yAxis2);
+            }
+
+            // Grids
             grid = main.append('g')
                 .attr("clip-path", clipPath)
                 .attr('class', 'grid');
@@ -1083,31 +1108,6 @@
             // Define g for line chart area
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
-
-            // ATTENTION: This must be called AFTER chart added
-            // Add Axis
-            main.append("g")
-                .attr("class", "x axis")
-                .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
-                .attr("transform", "translate(0," + height + ")")
-                .call(__axis_rotated ? yAxis : xAxis);
-            main.append("g")
-                .attr("class", "y axis")
-                .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
-                .call(__axis_rotated ? xAxis : yAxis)
-              .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("dy", "1.4em")
-                .attr("dx", "-.8em")
-                .style("text-anchor", "end")
-                .text(__axis_y_text);
-
-            if (__axis_y2_show) {
-                main.append("g")
-                    .attr("class", "y2 axis")
-                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
-                    .call(yAxis2);
-            }
 
             /*-- Context Region --*/
 
