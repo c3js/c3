@@ -403,15 +403,22 @@
                 yDomainMin = (yMin !== null) ? yMin : getYDomainMin(yTargets),
                 yDomainMax = (yMax !== null) ? yMax : getYDomainMax(yTargets),
                 padding = Math.abs(yDomainMax - yDomainMin) * 0.1,
+                padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
             if (center !== null) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
                 yDomainMin = center - yDomainAbs;
             }
-            if (axisId === 'y' && __axis_y_padding !== null) padding = __axis_y_padding;
-            if (axisId === 'y2' && __axis_y2_padding !== null) padding = __axis_y2_padding;
-            return [hasBarType(yTargets) ? 0 : yDomainMin-padding, yDomainMax+padding];
+            if (axisId === 'y' && __axis_y_padding !== null) {
+                padding_top = isDefined(__axis_y_padding.top) ? __axis_y_padding.top : padding;
+                padding_bottom = isDefined(__axis_y_padding.bottom) ? __axis_y_padding.bottom : padding;
+            }
+            if (axisId === 'y2' && __axis_y2_padding !== null) {
+                padding_top = isDefined(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
+                padding_bottom = isDefined(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
+            }
+            return [hasBarType(yTargets) ? 0 : yDomainMin-padding_bottom, yDomainMax+padding_top];
         }
         function getXDomainRatio () {
             if (brush.empty()) return 1;
