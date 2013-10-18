@@ -71,12 +71,14 @@
             __axis_y_center = getConfig(['axis','y','center'], null),
             __axis_y_text = getConfig(['axis','y','text'], null),
             __axis_y_rescale = getConfig(['axis','y','rescale'], true),
+            __axis_y_inner = getConfig(['axis','y','inner'], false),
             __axis_y2_show = getConfig(['axis','y2','show'], false),
             __axis_y2_max = getConfig(['axis','y2','max'], null),
             __axis_y2_min = getConfig(['axis','y2','min'], null),
             __axis_y2_center = getConfig(['axis','y2','center'], null),
             __axis_y2_text = getConfig(['axis','y2','text'], null),
             __axis_y2_rescale = getConfig(['axis','y2','rescale'], true),
+            __axis_y2_inner = getConfig(['axis','y2','inner'], false),
             __axis_rotated = getConfig(['axis','rotated'], false);
 
         // grid
@@ -166,13 +168,14 @@
 
         function updateSizes () {
             bottom = 20 + __subchart_size_height + legendHeight,
-            right = __axis_y2_show && !__axis_rotated ? 50 : 1,
+            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 1,
+            left = __axis_y_inner ? 0 : 40,
             top2 = __size_height - __subchart_size_height - legendHeight,
             bottom2 = 20 + legendHeight,
             top3 = __size_height - legendHeight,
-            margin = {top: 0, right: right, bottom: bottom, left: 40},
-            margin2 = {top: top2, right: 20, bottom: bottom2, left: 40},
-            margin3 = {top: top3, right: 20, bottom: 0, left: 40},
+            margin = {top: 0, right: right, bottom: bottom, left: left},
+            margin2 = {top: top2, right: 20, bottom: bottom2, left: left},
+            margin3 = {top: top3, right: 20, bottom: 0, left: left},
             width = (__size_width == null ? getParentWidth() : __size_width) - margin.left - margin.right,
             height = __size_height - margin.top - margin.bottom,
             height2 = __size_height - margin2.top - margin2.bottom,
@@ -200,8 +203,8 @@
             subY2 = getY(height2, 10);
             // update axies
             xAxis.scale(x).orient(__axis_rotated ? "left" : "bottom");
-            yAxis.scale(y).orient(__axis_rotated ? "bottom" : "left");
-            yAxis2.scale(y2).orient(__axis_rotated ? "top" : "right");
+            yAxis.scale(y).orient(__axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"));
+            yAxis2.scale(y2).orient(__axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"));
             subXAxis.scale(subX).orient("bottom");
         };
         updateScales();
@@ -317,9 +320,9 @@
         defs.append("clipPath")
             .attr("id", "yaxis-clip")
           .append("rect")
-            .attr("x", -40 + 1)
+            .attr("x", -margin.left + 1)
             .attr("y", margin.top - 1)
-            .attr("width", 40)
+            .attr("width", margin.left)
             .attr("height", height - margin.top + 2);
 
         // Define regions
