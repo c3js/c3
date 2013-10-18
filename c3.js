@@ -621,7 +621,13 @@
             };
         }
         function getBarW (axis, barTargetsNum) {
-            return (axis.tickOffset()*2*0.6) / barTargetsNum;
+            var barW;
+            if (isCategorized) {
+                barW = (axis.tickOffset()*2*0.6) / barTargetsNum;
+            } else {
+                barW = (((__axis_rotated ? height : width)*getXDomainRatio())/(maxDataCount()-1))*0.6;
+            }
+            return barW;
         }
         function getBarH (height, isSub) {
             var h = height === null ? function(v){ return v; } : function(v){ return height-v; };
