@@ -421,8 +421,15 @@
             return [hasBarType(yTargets) ? 0 : yDomainMin-padding_bottom, yDomainMax+padding_top];
         }
         function getXDomainRatio () {
-            if (brush.empty()) return 1;
-            var domain = subX.domain(), extent = brush.extent();
+            var domain, extent;
+            if (__subchart_show) {
+                if (brush.empty()) return 1;
+                domain = subX.domain();
+                extent = brush.extent();
+            } else {
+                domain = orgXDomain;
+                extent = x.domain();
+            }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
 
@@ -828,12 +835,15 @@
         /*-- Define brush --*/
 
         var brush = d3.svg.brush().x(subX).on("brush", redrawForBrush);
+        var zoom = d3.behavior.zoom().on("zoom", redrawForZoom);
 
         /*-- Draw Chart --*/
 
         // for brush area culculation
         var firstDate = null,
             lastDate = null;
+
+        var orgXDomain;
 
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data);
@@ -854,6 +864,12 @@
             xAxis.ticks(data.length < 10 ? data.length : 10);
             yAxis.ticks(3).outerTickSize(0).tickFormat(__axis_y_format);
             yAxis2.ticks(3).outerTickSize(0).tickFormat(__axis_y2_format);
+
+            // Save original x domain for zoom update
+            orgXDomain = x.domain();
+
+            // MEMO: must set x here for timeseries data
+            zoom.x(x);
 
             /*-- Main Region --*/
 
@@ -1123,7 +1139,8 @@
                         dragging = false;
                         // TODO: add callback here
                     })
-                );
+                )
+                .call(zoom);
 
             // Define g for bar chart area
             main.select(".chart").append("g")
@@ -1204,14 +1221,20 @@
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1;
             var barX, barY, barW, barH;
             var rectX, rectW;
+            var withY, withSubchart, withTransition, withUpdateXDomain;
+
+            // Hide tooltip and grid
+            main.select('line.xgrid-focus').style("visibility", "hidden");
+            tooltip.style("visibility", "hidden");
 
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
+            withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : true;
 
             // ATTENTION: call here to update tickOffset
-            x.domain(brush.empty() ? subX.domain() : brush.extent());
+            if (withUpdateXDomain) x.domain(brush.empty() ? subX.domain() : brush.extent());
             y.domain(getYDomain(c3.data.targets, 'y'));
             y2.domain(getYDomain(c3.data.targets, 'y2'));
 
@@ -1385,6 +1408,14 @@
                 withTransition: false,
                 withY: false,
                 withSubchart: false
+            });
+        }
+        function redrawForZoom() {
+            redraw({
+                withTransition: false,
+                withY: false,
+                withSubchart: false,
+                withUpdateXDomain: false
             });
         }
 
