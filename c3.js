@@ -73,6 +73,7 @@
             __axis_y_rescale = getConfig(['axis','y','rescale'], true),
             __axis_y_inner = getConfig(['axis','y','inner'], false),
             __axis_y_format = getConfig(['axis','y','format'], function(d){ return d; }),
+            __axis_y_padding = getConfig(['axis','y','padding'], null),
             __axis_y2_show = getConfig(['axis','y2','show'], false),
             __axis_y2_max = getConfig(['axis','y2','max'], null),
             __axis_y2_min = getConfig(['axis','y2','min'], null),
@@ -81,6 +82,7 @@
             __axis_y2_rescale = getConfig(['axis','y2','rescale'], true),
             __axis_y2_inner = getConfig(['axis','y2','inner'], false),
             __axis_y2_format = getConfig(['axis','y2','format'], function(d){ return d; }),
+            __axis_y2_padding = getConfig(['axis','y2','padding'], null),
             __axis_rotated = getConfig(['axis','rotated'], false);
 
         // grid
@@ -407,6 +409,8 @@
                 yDomainMax = yDomainAbs - center;
                 yDomainMin = center - yDomainAbs;
             }
+            if (axisId === 'y' && __axis_y_padding !== null) padding = __axis_y_padding;
+            if (axisId === 'y2' && __axis_y2_padding !== null) padding = __axis_y2_padding;
             return [hasBarType(yTargets) ? 0 : yDomainMin-padding, yDomainMax+padding];
         }
         function getXDomainRatio () {
