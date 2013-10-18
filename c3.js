@@ -74,6 +74,7 @@
             __axis_y_inner = getConfig(['axis','y','inner'], false),
             __axis_y_format = getConfig(['axis','y','format'], function(d){ return d; }),
             __axis_y_padding = getConfig(['axis','y','padding'], null),
+            __axis_y_ticks = getConfig(['axis','y','ticks'], 10),
             __axis_y2_show = getConfig(['axis','y2','show'], false),
             __axis_y2_max = getConfig(['axis','y2','max'], null),
             __axis_y2_min = getConfig(['axis','y2','min'], null),
@@ -83,6 +84,7 @@
             __axis_y2_inner = getConfig(['axis','y2','inner'], false),
             __axis_y2_format = getConfig(['axis','y2','format'], function(d){ return d; }),
             __axis_y2_padding = getConfig(['axis','y2','padding'], null),
+            __axis_y2_ticks = getConfig(['axis','y2','ticks'], 10),
             __axis_rotated = getConfig(['axis','rotated'], false);
 
         // grid
@@ -862,8 +864,8 @@
             subY2.domain(y2.domain());
 
             xAxis.ticks(data.length < 10 ? data.length : 10);
-            yAxis.ticks(3).outerTickSize(0).tickFormat(__axis_y_format);
-            yAxis2.ticks(3).outerTickSize(0).tickFormat(__axis_y2_format);
+            yAxis.ticks(__axis_y_ticks).outerTickSize(0).tickFormat(__axis_y_format);
+            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0).tickFormat(__axis_y2_format);
 
             // Save original x domain for zoom update
             orgXDomain = x.domain();
