@@ -847,6 +847,10 @@
 
         var orgXDomain;
 
+        function translateForY2 () {
+            return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")";
+        }
+
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data);
             var rectX, rectW;
@@ -895,7 +899,7 @@
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")")
+                    .attr("transform", translateForY2)
                     .call(yAxis2);
             }
 
@@ -1429,6 +1433,8 @@
             d3.select('svg').attr('width', width + margin.left + margin.right);
             d3.select('#'+clipId).select('rect').attr('width', width);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
+            // Update Axis translate
+            d3.select('g.y2.axis').attr("transform", translateForY2)
             // Update legend
             if (__legend_show) updateLegend(c3.data.targets, {withTransition:false});
             // Draw with new sizes & scales
