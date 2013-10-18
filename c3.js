@@ -1429,6 +1429,8 @@
             // Update sizes and scales
             updateSizes();
             updateScales();
+            // Set x for zoom again because of scale update
+            zoom.x(x);
             // Resize svg
             d3.select('svg').attr('width', width + margin.left + margin.right);
             d3.select('#'+clipId).select('rect').attr('width', width);
