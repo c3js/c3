@@ -836,7 +836,7 @@
 
         /*-- Define brush --*/
 
-        var brush = d3.svg.brush().x(subX).on("brush", redrawForBrush);
+        var brush = d3.svg.brush().on("brush", redrawForBrush);
         var zoom = d3.behavior.zoom().on("zoom", redrawForZoom);
 
         /*-- Draw Chart --*/
@@ -875,6 +875,7 @@
             orgXDomain = x.domain();
 
             // MEMO: must set x here for timeseries data
+            brush.x(subX);
             zoom.x(x);
 
             /*-- Main Region --*/
