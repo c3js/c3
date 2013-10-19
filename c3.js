@@ -424,14 +424,9 @@
         }
         function getXDomainRatio () {
             var domain, extent;
-            if (__subchart_show) {
-                if (brush.empty()) return 1;
-                domain = subX.domain();
-                extent = brush.extent();
-            } else {
-                domain = orgXDomain;
-                extent = x.domain();
-            }
+            if (brush.empty()) return 1;
+            domain = orgXDomain;
+            extent = x.domain();
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
 
@@ -1260,6 +1255,12 @@
             // Update sub domain
             subY.domain(y.domain());
             subY2.domain(y2.domain());
+
+            // Update brush extent if zoom
+            if (d3.event !== null && d3.event.type === 'zoom') {
+                brush.extent(x.domain());
+                if ( ! brush.empty()) context.select('.x.brush').call(brush);
+            }
 
             // grid
             if (__grid_x_show) {
