@@ -422,11 +422,16 @@
             }
             return [hasBarType(yTargets) ? 0 : yDomainMin-padding_bottom, yDomainMax+padding_top];
         }
-        function getXDomainRatio () {
+        function getXDomainRatio (isSub) {
             var domain, extent;
             if (brush.empty()) return 1;
-            domain = orgXDomain;
-            extent = x.domain();
+            if (isSub) {
+                domain = x.domain();
+                extent = brush.extent();
+            } else {
+                domain = orgXDomain;
+                extent = x.domain();
+            }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
 
@@ -624,12 +629,12 @@
                 return zeroBased ? offset : scale(d.value) - offset;
             };
         }
-        function getBarW (axis, barTargetsNum) {
+        function getBarW (axis, barTargetsNum, isSub) {
             var barW;
             if (isCategorized) {
                 barW = (axis.tickOffset()*2*0.6) / barTargetsNum;
             } else {
-                barW = (((__axis_rotated ? height : width)*getXDomainRatio())/(maxDataCount()-1))*0.6;
+                barW = (((__axis_rotated ? height : width)*getXDomainRatio(isSub))/(maxDataCount()-1))*0.6;
             }
             return barW;
         }
@@ -1318,7 +1323,7 @@
             }
 
             // bars
-            barW = getBarW(xAxis, barTargetsNum);
+            barW = getBarW(xAxis, barTargetsNum, false);
             barH = getBarH(__axis_rotated ? null : height);
             barX = getBarX(barW, barTargetsNum, barIndices);
             barY = getBarY(barH, barIndices, __axis_rotated);
@@ -1361,7 +1366,7 @@
             // subchart
             if (withSubchart && __subchart_show) {
                 // bars
-                barW = getBarW(subXAxis, barTargetsNum);
+                barW = getBarW(subXAxis, barTargetsNum, true);
                 barH = getBarH(height2, true);
                 barX = getBarX(barW, barTargetsNum, barIndices, true);
                 barY = getBarY(barH, barIndices, false, true);
