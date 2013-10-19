@@ -903,6 +903,13 @@
                     .call(yAxis2);
             }
 
+            main.append('rect')
+                .attr('class', 'zoom-rect')
+                .attr('width', width)
+                .attr('height', height)
+                .style('opacity', 0)
+                .call(zoom);
+
             // Grids
             grid = main.append('g')
                 .attr("clip-path", clipPath)
@@ -1239,7 +1246,10 @@
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : true;
 
             // ATTENTION: call here to update tickOffset
-            if (withUpdateXDomain) x.domain(brush.empty() ? subX.domain() : brush.extent());
+            if (withUpdateXDomain) {
+                x.domain(brush.empty() ? subX.domain() : brush.extent());
+                zoom.x(x);
+            }
             y.domain(getYDomain(c3.data.targets, 'y'));
             y2.domain(getYDomain(c3.data.targets, 'y2'));
 
@@ -1434,6 +1444,7 @@
             d3.select('svg').attr('width', width + margin.left + margin.right);
             d3.select('#'+clipId).select('rect').attr('width', width);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
+            d3.select('.zoom-rect').attr('width', width);
             // Update Axis translate
             d3.select('g.y2.axis').attr("transform", translateForY2)
             // Update legend
