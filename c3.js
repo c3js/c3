@@ -1257,7 +1257,7 @@
             subY2.domain(y2.domain());
 
             // Update brush extent if zoom
-            if (d3.event !== null && d3.event.type === 'zoom') {
+            if (__subchart_show && d3.event !== null && d3.event.type === 'zoom') {
                 brush.extent(x.domain());
                 if ( ! brush.empty()) context.select('.x.brush').call(brush);
             }
