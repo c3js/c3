@@ -51,8 +51,7 @@
 
         // subchart
         var __subchart_show = getConfig(['subchart','show'], false),
-            __subchart_size_height = __subchart_show ? getConfig(['subchart','size','height'], 60) : 0,
-            __subchart_default = getConfig(['subchart','default'], null);
+            __subchart_size_height = __subchart_show ? getConfig(['subchart','size','height'], 60) : 0;
 
         // color
         var __color_pattern = getConfig(['color','pattern'], null);
@@ -66,6 +65,7 @@
         var __axis_x_type = getConfig(['axis','x','type'], 'indexed'),
             __axis_x_categories = getConfig(['axis','x','categories'], []),
             __axis_x_tick_centered = getConfig(['axis','x','tick','centered'], false),
+            __axis_x_default = getConfig(['axis','x','default'], null),
             __axis_y_max = getConfig(['axis','y','max'], null),
             __axis_y_min = getConfig(['axis','y','min'], null),
             __axis_y_center = getConfig(['axis','y','center'], null),
@@ -1156,6 +1156,11 @@
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
 
+            // Set default extent if defined
+            if (__axis_x_default !== null) {
+                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : (isTimeSeries ? __axis_x_default(firstDate,lastDate) : __axis_x_default(0,maxDataCount()-1)));
+            }
+
             /*-- Context Region --*/
 
             if (__subchart_show) {
@@ -1171,12 +1176,6 @@
                 // Define g for line chart area
                 context.select(".chart").append("g")
                     .attr("class", "chart-lines");
-
-                // ATTENTION: This must be called AFTER chart rendered and BEFORE brush called.
-                // Update extetn for Brush
-                if (__subchart_default !== null) {
-                    brush.extent((isTimeSeries) ? __subchart_default(firstDate,lastDate) : __subchart_default(0,maxDataCount()-1));
-                }
 
                 // Add extent rect for Brush
                 context.append("g")
