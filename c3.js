@@ -838,7 +838,7 @@
         /*-- Define brush --*/
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoom", redrawForZoom);
+        var zoom = d3.behavior.zoom().on("zoom", __zoom_enabled ? redrawForZoom : null);
 
         /*-- Draw Chart --*/
 
@@ -877,7 +877,7 @@
 
             // MEMO: must set x here for timeseries data
             brush.x(subX);
-            zoom.x(x);
+            if (__zoom_enabled) zoom.x(x);
 
             /*-- Main Region --*/
 
@@ -905,12 +905,14 @@
                     .call(yAxis2);
             }
 
-            main.append('rect')
-                .attr('class', 'zoom-rect')
-                .attr('width', width)
-                .attr('height', height)
-                .style('opacity', 0)
-                .call(zoom).on("dblclick.zoom", null);
+            if (__zoom_enabled) {
+                main.append('rect')
+                    .attr('class', 'zoom-rect')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .style('opacity', 0)
+                    .call(zoom).on("dblclick.zoom", null);
+            }
 
             // Grids
             grid = main.append('g')
@@ -1255,7 +1257,7 @@
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? subX.domain() : brush.extent());
-                zoom.x(x);
+                if (__zoom_enabled) zoom.x(x);
             }
             y.domain(getYDomain(c3.data.targets, 'y'));
             y2.domain(getYDomain(c3.data.targets, 'y2'));
@@ -1455,7 +1457,7 @@
             updateSizes();
             updateScales();
             // Set x for zoom again because of scale update
-            zoom.x(x);
+            if (__zoom_enabled) zoom.x(x);
             // Resize svg
             d3.select('svg').attr('width', width + margin.left + margin.right);
             d3.select('#'+clipId).select('rect').attr('width', width);
