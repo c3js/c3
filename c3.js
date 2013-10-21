@@ -424,7 +424,6 @@
         }
         function getXDomainRatio (isSub) {
             var domain, extent;
-            if (brush.empty()) return 1;
             if (isSub) {
                 domain = x.domain();
                 extent = brush.extent();
