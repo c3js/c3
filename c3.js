@@ -33,6 +33,8 @@
         var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], 280);
 
+        var __zoom_enabled = getConfig(['zoom','enabled'], false);
+
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
@@ -137,7 +139,7 @@
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized');
 
-        var dragStart = null, dragging = false;
+        var dragStart = null, dragging = false, cancelClick = false;
 
         var legendHeight = __legend_show ? 40 : 0;
 
@@ -908,7 +910,7 @@
                 .attr('width', width)
                 .attr('height', height)
                 .style('opacity', 0)
-                .call(zoom);
+                .call(zoom).on("dblclick.zoom", null);
 
             // Grids
             grid = main.append('g')
@@ -1066,6 +1068,10 @@
                         });
                 })
                 .on('click', function(d,i) {
+                    if (cancelClick) {
+                        cancelClick = false;
+                        return;
+                    }
                     main.selectAll('.-shape-'+i).each(function(d){
                         var _this = d3.select(this),
                             isSelected = _this.classed(SELECTED);
@@ -1090,6 +1096,7 @@
                 .call(
                     d3.behavior.drag().origin(Object).on('drag', function(d){
                         if ( ! __data_selection_enabled) return; // do nothing if not selectable
+                        if (__zoom_enabled) return; // skip if zoomable because of conflict drag dehavior
 
                         var sx = dragStart[0], sy = dragStart[1],
                             mouse = d3.mouse(this),
@@ -1153,7 +1160,7 @@
                         // TODO: add callback here
                     })
                 )
-                .call(zoom);
+                .call(zoom).on("dblclick.zoom", null);
 
             // Define g for bar chart area
             main.select(".chart").append("g")
@@ -1438,6 +1445,9 @@
                 withSubchart: false,
                 withUpdateXDomain: false
             });
+            if (d3.event.sourceEvent.type === 'mousemove') {
+                cancelClick = true;
+            }
         }
 
         function resize () {
