@@ -28,7 +28,7 @@
         }
 
         // bindto - id to bind the chart
-        checkConfig('bindto', 'bindto is required in config');
+        var __bindto = getConfig(['size','width'], '#chart');
 
         var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], 280);
@@ -133,7 +133,7 @@
 
         /*-- Set Variables --*/
 
-        var clipId = config.bindto.replace('#','') + '-clip',
+        var clipId = __bindto.replace('#','') + '-clip',
             clipPath = "url(#" + clipId + ")";
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
@@ -303,7 +303,7 @@
         var color = generateColor(__data_colors, __color_pattern);
 
         // Define svgs
-        var svg = d3.select(config.bindto).append("svg")
+        var svg = d3.select(__bindto).append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom);
 
@@ -348,7 +348,7 @@
         }
 
         // Define tooltip
-        var tooltip = d3.select(config.bindto)
+        var tooltip = d3.select(__bindto)
               .style("position", "relative")
             .append("div")
               .style("position", "absolute")
@@ -360,7 +360,7 @@
 
         function getParentWidth () {
             // TODO: if rotated, use height
-            return +d3.select(config.bindto).style("width").replace('px','');
+            return +d3.select(__bindto).style("width").replace('px','');
         }
 
         //-- Scale --//
