@@ -214,9 +214,35 @@
             yAxis.scale(y).orient(__axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"));
             yAxis2.scale(y2).orient(__axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"));
             subXAxis.scale(subX).orient("bottom");
+            // Use custom scale if needed
+            if (isCategorized) {
+                // TODO: fix this
+                // TODO: fix x_grid
+                (function () {
+                    var _x = x, _subX = subX;
+                    var keys = Object.keys(x), key, i;
+                    x = function(d){ return _x(d) + xAxis.tickOffset(); };
+                    subX = function(d){ return _subX(d) + subXAxis.tickOffset(); };
+                    for (i = 0; i < keys.length; i++) {
+                        key = keys[i];
+                        x[key] = _x[key];
+                        subX[key] = _subX[key];
+                    }
+                    x.domain = function (domain) {
+                        if (!arguments.length) {
+                            var domain = _x.domain();
+                            domain[1]++;
+                            return domain;
+                        }
+                        _x.domain(domain);
+                        return x;
+                    };
+                })();
+            }
         };
         updateScales();
 
+        // Set up axies
         if (isTimeSeries) {
             xAxis.tickFormat(customTimeFormat);
         }
@@ -232,32 +258,6 @@
             subXAxis.tickOffset = function () {
                 return 0;
             };
-        }
-
-        // Use custom scale if needed
-        if (isCategorized) {
-            // TODO: fix this
-            // TODO: fix x_grid
-            (function () {
-                var _x = x, _subX = subX;
-                var keys = Object.keys(x), key, i;
-                x = function(d){ return _x(d) + xAxis.tickOffset(); };
-                subX = function(d){ return _subX(d) + subXAxis.tickOffset(); };
-                for (i = 0; i < keys.length; i++) {
-                    key = keys[i];
-                    x[key] = _x[key];
-                    subX[key] = _subX[key];
-                }
-                x.domain = function (domain) {
-                    if (!arguments.length) {
-                        var domain = _x.domain();
-                        domain[1]++;
-                        return domain;
-                    }
-                    _x.domain(domain);
-                    return x;
-                };
-            })();
         }
 
         // For main region
