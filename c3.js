@@ -31,7 +31,7 @@
         var __bindto = getConfig(['size','width'], '#chart');
 
         var __size_width = getConfig(['size','width'], null),
-            __size_height = getConfig(['size','height'], 280);
+            __size_height = getConfig(['size','height'], null);
 
         var __zoom_enabled = getConfig(['zoom','enabled'], false);
 
@@ -165,7 +165,8 @@
 
         /*-- Set Chart Params --*/
 
-        var bottom, bottom2, right, top2, top3, margin, margin2, margin3, width, height, height2, height3;
+        var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3;
+        var currentWidth, currentHeight;
         var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2;
 
         // TODO: Enable set position
@@ -175,19 +176,21 @@
             subXAxis = isCategorized ? categoryAxis() : d3.svg.axis();
 
         function updateSizes () {
-            bottom = 20 + __subchart_size_height + legendHeight,
-            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 1,
-            left = __axis_y_inner ? 0 : 40,
-            top2 = __size_height - __subchart_size_height - legendHeight,
-            bottom2 = 20 + legendHeight,
-            top3 = __size_height - legendHeight,
-            margin = {top: 0, right: right, bottom: bottom, left: left},
-            margin2 = {top: top2, right: 20, bottom: bottom2, left: left},
-            margin3 = {top: top3, right: 20, bottom: 0, left: left},
-            width = (__size_width == null ? getParentWidth() : __size_width) - margin.left - margin.right,
-            height = __size_height - margin.top - margin.bottom,
-            height2 = __size_height - margin2.top - margin2.bottom,
-            height3 = __size_height - margin3.top - margin3.bottom;
+            currentWidth = getCurrentWidth();
+            currentHeight = getCurrentHeight();
+            bottom = 20 + __subchart_size_height + legendHeight;
+            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 1;
+            left = __axis_y_inner ? 0 : 40;
+            top2 = currentHeight - __subchart_size_height - legendHeight;
+            bottom2 = 20 + legendHeight;
+            top3 = currentHeight - legendHeight;
+            margin = {top: 0, right: right, bottom: bottom, left: left};
+            margin2 = {top: top2, right: 20, bottom: bottom2, left: left};
+            margin3 = {top: top3, right: 20, bottom: 0, left: left};
+            width = currentWidth - margin.left - margin.right;
+            height = currentHeight - margin.top - margin.bottom;
+            height2 = currentHeight - margin2.top - margin2.bottom;
+            height3 = currentHeight - margin3.top - margin3.bottom;
         }
         updateSizes();
 
@@ -241,6 +244,15 @@
             }
         };
         updateScales();
+
+        var translate = {
+            main : function () { return "translate(" + margin.left + "," + margin.top + ")" },
+            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")" },
+            legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")" },
+            y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")" },
+            x : function () { return "translate(0," + height + ")" },
+            subx : function () { return "translate(0," + height2 + ")" }
+        }
 
         // Set up axies
         if (isTimeSeries) {
@@ -335,16 +347,16 @@
 
         // Define regions
         var main = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", translate.main);
         var context = null;
         if (__subchart_show) {
             context = svg.append("g")
-                .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+                .attr("transform", translate.context);
         }
         var legend = null;
         if (__legend_show) {
             legend = svg.append("g")
-                .attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
+                .attr("transform", translate.legend);
         }
 
         // Define tooltip
@@ -358,9 +370,17 @@
 
         /*-- Define Functions --*/
 
+        function getCurrentWidth () {
+            return __size_width === null ? getParentWidth() : __size_width;
+        }
+        function getCurrentHeight () {
+            return __size_height === null ? getParentHeight() : __size_height;
+        }
         function getParentWidth () {
-            // TODO: if rotated, use height
-            return +d3.select(__bindto).style("width").replace('px','');
+            return +d3.select(__bindto).style("width").replace('px',''); // TODO: if rotated, use height
+        }
+        function getParentHeight () {
+            return +d3.select(__bindto).style('height').replace('px',''); // TODO: if rotated, use width
         }
 
         //-- Scale --//
@@ -848,10 +868,6 @@
 
         var orgXDomain;
 
-        function translateForY2 () {
-            return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")";
-        }
-
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data);
             var rectX, rectW;
@@ -885,7 +901,7 @@
             main.append("g")
                 .attr("class", "x axis")
                 .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
-                .attr("transform", "translate(0," + height + ")")
+                .attr("transform", translate.x)
                 .call(__axis_rotated ? yAxis : xAxis);
             main.append("g")
                 .attr("class", "y axis")
@@ -901,7 +917,7 @@
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", translateForY2)
+                    .attr("transform", translate.y2)
                     .call(yAxis2);
             }
 
@@ -1204,7 +1220,7 @@
                 // Add Axis
                 context.append("g")
                     .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height2 + ")")
+                    .attr("transform", translate.subx)
                     .call(subXAxis);
             }
 
@@ -1243,6 +1259,7 @@
             var barX, barY, barW, barH;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withUpdateXDomain;
+            var duration;
 
             // Hide tooltip and grid
             main.select('line.xgrid-focus').style("visibility", "hidden");
@@ -1254,6 +1271,8 @@
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : true;
 
+            duration = withTransition ? 250 : 0;
+
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? subX.domain() : brush.extent());
@@ -1262,9 +1281,9 @@
             y.domain(getYDomain(c3.data.targets, 'y'));
             y2.domain(getYDomain(c3.data.targets, 'y2'));
 
-            main.selectAll(".x.axis").transition().duration(__axis_rotated ? 250 : 0).call(__axis_rotated ? yAxis : xAxis);
-            main.selectAll(".y.axis").transition().duration(__axis_rotated ? 0 : 250).call(__axis_rotated ? xAxis : yAxis);
-            main.selectAll(".y2.axis").transition().call(yAxis2);
+            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
+            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
+            main.select(".y2.axis").transition().call(yAxis2);
 
             // Update sub domain
             subY.domain(y.domain());
@@ -1338,7 +1357,7 @@
             barY = getBarY(barH, barIndices, __axis_rotated);
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
-            mainBar.transition().duration(withTransition ? 250 : 0)
+            mainBar.transition().duration(duration)
                 .attr("x", __axis_rotated ? barY : barX)
                 .attr("y", __axis_rotated ? barX : barY)
                 .attr("width", __axis_rotated ? barH : barW)
@@ -1350,19 +1369,19 @@
                 .attr("width", __axis_rotated ? barH : barW)
                 .attr("height", __axis_rotated ? barW : barH)
                 .style("opacity", 0)
-              .transition().duration(withTransition ? 250 : 0)
+              .transition().duration(duration)
                 .style('opacity', 1);
-            mainBar.exit().transition().duration(withTransition ? 250 : 0)
+            mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
                 .remove();
 
             // lines and cricles
             main.selectAll('.-line')
-              .transition().duration(withTransition ? 250 : 0)
+              .transition().duration(duration)
                 .attr("d", lineOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineData);
-            mainCircle.transition().duration(withTransition ? 250 : 0)
+            mainCircle.transition().duration(duration)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.enter().append("circle")
@@ -1374,6 +1393,9 @@
 
             // subchart
             if (withSubchart && __subchart_show) {
+                // Update axis
+                // TODO: fix when rotated
+                context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
                 // bars
                 barW = getBarW(subXAxis, barTargetsNum, true);
                 barH = getBarH(height2, true);
@@ -1381,7 +1403,7 @@
                 barY = getBarY(barH, barIndices, false, true);
                 contextBar = context.selectAll('.-bars').selectAll('.-bar')
                     .data(barData);
-                contextBar.transition().duration(withTransition ? 250 : 0)
+                contextBar.transition().duration(duration)
                     .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
                 contextBar.enter().append('rect')
                     .attr("class", classBar)
@@ -1395,7 +1417,7 @@
 
                 // lines
                 context.selectAll('.-line')
-                  .transition().duration(withTransition ? 250 : 0)
+                  .transition().duration(duration)
                     .attr("d", lineOnSub);
             }
 
@@ -1405,7 +1427,7 @@
                 .selectAll('circle')
                 .remove();
             main.selectAll('.selected-circle')
-              .transition().duration(withTransition ? 250 : 0)
+              .transition().duration(duration)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
@@ -1429,7 +1451,7 @@
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
                 .style("fill-opacity", function(d){ return isDefined(d.opacity) ? d.opacity : .1; });
-            mainRegion.exit().transition().duration(withTransition ? 250 : 0)
+            mainRegion.exit().transition().duration(duration)
                 .style("fill-opacity", 0)
                 .remove();
         }
@@ -1456,15 +1478,24 @@
             // Update sizes and scales
             updateSizes();
             updateScales();
+            // Set x for brush again because of scale update
+            brush.x(subX).extent(x.domain());
             // Set x for zoom again because of scale update
             if (__zoom_enabled) zoom.x(x);
-            // Resize svg
-            d3.select('svg').attr('width', width + margin.left + margin.right);
-            d3.select('#'+clipId).select('rect').attr('width', width);
+            // Update sizes
+            d3.select('svg').attr('width', currentWidth).attr('height', currentHeight);
+            d3.select('#'+clipId).select('rect').attr('width', width).attr('height', height);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
             d3.select('.zoom-rect').attr('width', width);
-            // Update Axis translate
-            d3.select('g.y2.axis').attr("transform", translateForY2)
+            context.select('.x.brush').selectAll('rect').attr('height', height2);
+            context.select('.x.brush').call(brush);
+            // Update g positions
+            context.attr("transform", translate.context);
+            legend.attr("transform", translate.legend);
+            // Update axis positions
+            main.select('.x.axis').attr("transform", translate.x);
+            main.select('.y2.axis').attr("transform", translate.y2);
+            context.select('.x.axis').attr("transform", translate.subx);
             // Update legend
             if (__legend_show) updateLegend(c3.data.targets, {withTransition:false});
             // Draw with new sizes & scales
