@@ -1211,6 +1211,7 @@
 
                 // Add extent rect for Brush
                 context.append("g")
+                    .attr("clip-path", clipPath)
                     .attr("class", "x brush")
                     .call(brush)
                   .selectAll("rect")
