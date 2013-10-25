@@ -1481,7 +1481,9 @@
             updateSizes();
             updateScales();
             // Set x for brush again because of scale update
-            brush.x(subX).extent(x.domain());
+            brush.x(subX);
+            // Update extent width if extent specified
+            if ( ! brush.empty()) brush.extent(x.domain());
             // Set x for zoom again because of scale update
             if (__zoom_enabled) zoom.x(x);
             // Update sizes
