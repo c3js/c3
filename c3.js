@@ -374,7 +374,8 @@
             return __size_width === null ? getParentWidth() : __size_width;
         }
         function getCurrentHeight () {
-            return __size_height === null ? getParentHeight() : __size_height;
+            var h = __size_height === null ? getParentHeight() : __size_height;
+            return h > 0 ? h : 320;
         }
         function getParentWidth () {
             return +d3.select(__bindto).style("width").replace('px',''); // TODO: if rotated, use height
