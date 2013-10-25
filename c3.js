@@ -1507,7 +1507,7 @@
                 updateLegend(c3.data.targets, {withTransition:false});
             }
             // Draw with new sizes & scales
-            redraw({withTransition:false, withUpdateXDomain:false});
+            redraw({withTransition:false});
         }
 
         function updateTargets (targets) {
