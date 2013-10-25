@@ -1491,19 +1491,23 @@
             d3.select('#'+clipId).select('rect').attr('width', width).attr('height', height);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
             d3.select('.zoom-rect').attr('width', width);
-            context.select('.x.brush').selectAll('rect').attr('height', height2);
-            context.select('.x.brush').call(brush);
-            // Update g positions
-            context.attr("transform", translate.context);
-            legend.attr("transform", translate.legend);
-            // Update axis positions
+            // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
             main.select('.y2.axis').attr("transform", translate.y2);
-            context.select('.x.axis').attr("transform", translate.subx);
-            // Update legend
-            if (__legend_show) updateLegend(c3.data.targets, {withTransition:false});
+            // Update context sizes and positions
+            if (__subchart_show) {
+                context.select('.x.brush').selectAll('rect').attr('height', height2);
+                context.select('.x.brush').call(brush);
+                context.attr("transform", translate.context);
+                context.select('.x.axis').attr("transform", translate.subx);
+            }
+            // Update legend positions
+            if (__legend_show) {
+                legend.attr("transform", translate.legend);
+                updateLegend(c3.data.targets, {withTransition:false});
+            }
             // Draw with new sizes & scales
-            redraw({withTransition:false});
+            redraw({withTransition:false, withUpdateXDomain:false});
         }
 
         function updateTargets (targets) {
