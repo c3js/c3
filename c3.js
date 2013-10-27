@@ -1246,10 +1246,6 @@
             var withY, withSubchart, withTransition, withUpdateXDomain;
             var duration;
 
-            // Hide tooltip and grid
-            main.select('line.xgrid-focus').style("visibility", "hidden");
-            tooltip.style("visibility", "hidden");
-
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
@@ -1274,7 +1270,13 @@
             subY.domain(y.domain());
             subY2.domain(y2.domain());
 
+            // tooltip
+            tooltip.style("visibility", "hidden");
+
             // grid
+            main.select('line.xgrid-focus')
+                .style("visibility", "hidden")
+                .attr('y2', height);
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
@@ -1477,7 +1479,7 @@
             d3.select('svg').attr('width', currentWidth).attr('height', currentHeight);
             d3.select('#'+clipId).select('rect').attr('width', width).attr('height', height);
             d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
-            d3.select('.zoom-rect').attr('width', width);
+            d3.select('.zoom-rect').attr('width', width).attr('height', height);
             // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
             main.select('.y2.axis').attr("transform", translate.y2);
