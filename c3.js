@@ -143,25 +143,27 @@
 
         var legendHeight = __legend_show ? 40 : 0;
 
-        var customTimeFormat = timeFormat([
-            [d3.time.format("%Y/%-m/%-d"), function() { return true }],
-            [d3.time.format("%-m/%-d"), function(d) { return d.getMonth() }],
-            [d3.time.format("%-m/%-d"), function(d) { return d.getDate() != 1 }],
-            [d3.time.format("%-m/%-d"), function(d) { return d.getDay() && d.getDate() != 1 }],
-            [d3.time.format("%I %p"), function(d) { return d.getHours() }],
-            [d3.time.format("%I:%M"), function(d) { return d.getMinutes() }],
-            [d3.time.format(":%S"), function(d) { return d.getSeconds() }],
-            [d3.time.format(".%L"), function(d) { return d.getMilliseconds() }]
-        ]);
-        function timeFormat(formats) {
+        var parseDate = d3.time.format(__data_x_format).parse;
+
+        var color = generateColor(__data_colors, __color_pattern);
+
+        var customTimeFormat = (function () {
+            var formats = [
+                [d3.time.format("%Y/%-m/%-d"), function() { return true }],
+                [d3.time.format("%-m/%-d"), function(d) { return d.getMonth() }],
+                [d3.time.format("%-m/%-d"), function(d) { return d.getDate() != 1 }],
+                [d3.time.format("%-m/%-d"), function(d) { return d.getDay() && d.getDate() != 1 }],
+                [d3.time.format("%I %p"), function(d) { return d.getHours() }],
+                [d3.time.format("%I:%M"), function(d) { return d.getMinutes() }],
+                [d3.time.format(":%S"), function(d) { return d.getSeconds() }],
+                [d3.time.format(".%L"), function(d) { return d.getMilliseconds() }]
+            ];
             return function(date) {
                 var i = formats.length - 1, f = formats[i];
                 while (!f[1](date)) f = formats[--i];
                 return f[0](date);
             };
-        }
-
-        var parseDate = d3.time.format(__data_x_format).parse;
+        })();
 
         /*-- Set Chart Params --*/
 
@@ -172,6 +174,19 @@
             yOrient = __axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"),
             y2Orient = __axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"),
             subXOrient = "bottom";
+
+        var translate = {
+            main : function () { return "translate(" + margin.left + "," + margin.top + ")" },
+            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")" },
+            legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")" },
+            y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")" },
+            x : function () { return "translate(0," + height + ")" },
+            subx : function () { return "translate(0," + height2 + ")" }
+        }
+
+        /*-- Define Functions --*/
+
+        //-- Sizes --//
 
         function updateSizes () {
             currentWidth = getCurrentWidth();
@@ -190,125 +205,6 @@
             height2 = currentHeight - margin2.top - margin2.bottom;
             height3 = currentHeight - margin3.top - margin3.bottom;
         }
-        updateSizes();
-
-        function updateScales () {
-            // update edges
-            xMin = __axis_rotated ? 10 : 0;
-            xMax = __axis_rotated ? height : width;
-            yMin = __axis_rotated ? 0 : height;
-            yMax = __axis_rotated ? width : 1;
-            // update scales
-            x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function(d){ return xAxis.tickOffset() });
-            y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
-            y2 = getY(yMin, yMax, isDefined(y2) ? y2.domain() : undefined);
-            subX = getX(0, width, isDefined(orgXDomain) ? orgXDomain : undefined, function(d){ return d % 1 === 0 ? subXAxis.tickOffset() : 0 });
-            subY = getY(height2, 10);
-            subY2 = getY(height2, 10);
-            // update axies
-            xAxis = getXAxis(x, xOrient);
-            yAxis = getYAxis(y, yOrient);
-            yAxis2 = getYAxis(y2, y2Orient);
-            subXAxis = getXAxis(subX, subXOrient);
-        };
-        updateScales();
-
-        var translate = {
-            main : function () { return "translate(" + margin.left + "," + margin.top + ")" },
-            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")" },
-            legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")" },
-            y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")" },
-            x : function () { return "translate(0," + height + ")" },
-            subx : function () { return "translate(0," + height2 + ")" }
-        }
-
-        // For main region
-        var lineOnMain = (function () {
-            var line = d3.svg.line()
-                .x(__axis_rotated ? function(d){ return getYScale(d.id)(d.value); } : xx)
-                .y(__axis_rotated ? xx : function(d){ return getYScale(d.id)(d.value); });
-            return function (d) {
-                var x0, y0;
-                if (isLineType(d)) {
-                    isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values);
-                } else {
-                    x0 = x(d.values[0].x);
-                    y0 = getYScale(d.id)(d.values[0].value);
-                    return __axis_rotated ? "M "+y0+" "+x0 : "M "+x0+" "+y0;
-                }
-            };
-        })();
-
-        // For brush region
-        var lineOnSub = (function () {
-            var line = d3.svg.line()
-                .x(function(d){ return subX(d.x) })
-                .y(function(d){ return getSubYScale(d.id)(d.value) });
-            return function (d) {
-                return isLineType(d) ? line(d.values) : "M " + subX(d.values[0].x)+ " " + getSubYScale(d.id)(d.values[0].value);
-            };
-        })();
-
-        // Define color
-        var color = generateColor(__data_colors, __color_pattern);
-
-        // Define svgs
-        var svg = d3.select(__bindto).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom);
-
-        // Define defs
-        var defs = svg.append("defs");
-
-        defs.append("clipPath")
-            .attr("id", clipId)
-          .append("rect")
-            .attr("y", margin.top)
-            .attr("width", width)
-            .attr("height", height-margin.top);
-
-        defs.append("clipPath")
-            .attr("id", "xaxis-clip")
-          .append("rect")
-            .attr("x", -1)
-            .attr("y", -1)
-            .attr("width", width + 2)
-            .attr("height", 40);
-
-        defs.append("clipPath")
-            .attr("id", "yaxis-clip")
-          .append("rect")
-            .attr("x", -margin.left + 1)
-            .attr("y", margin.top - 1)
-            .attr("width", margin.left)
-            .attr("height", height - margin.top + 2);
-
-        // Define regions
-        var main = svg.append("g")
-            .attr("transform", translate.main);
-        var context = null;
-        if (__subchart_show) {
-            context = svg.append("g")
-                .attr("transform", translate.context);
-        }
-        var legend = null;
-        if (__legend_show) {
-            legend = svg.append("g")
-                .attr("transform", translate.legend);
-        }
-
-        // Define tooltip
-        var tooltip = d3.select(__bindto)
-              .style("position", "relative")
-            .append("div")
-              .style("position", "absolute")
-              .style("width", "30%") // TODO: cul actual width when show
-              .style("z-index", "10")
-              .style("visibility", "hidden");
-
-        /*-- Define Functions --*/
-
         function getCurrentWidth () {
             return __size_width === null ? getParentWidth() : __size_width;
         }
@@ -323,8 +219,27 @@
             return +d3.select(__bindto).style('height').replace('px',''); // TODO: if rotated, use width
         }
 
-        //-- Scale --//
+        //-- Scales --//
 
+        function updateScales () {
+            // update edges
+            xMin = __axis_rotated ? 10 : 0;
+            xMax = __axis_rotated ? height : width;
+            yMin = __axis_rotated ? 0 : height;
+            yMax = __axis_rotated ? width : 1;
+            // update scales
+            x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function(d){ return xAxis.tickOffset() });
+            y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
+            y2 = getY(yMin, yMax, isDefined(y2) ? y2.domain() : undefined);
+            subX = getX(0, width, isDefined(orgXDomain) ? orgXDomain : undefined, function(d){ return d % 1 === 0 ? subXAxis.tickOffset() : 0 });
+            subY = getY(height2, 10);
+            subY2 = getY(height2, 10);
+            // update axes
+            xAxis = getXAxis(x, xOrient);
+            yAxis = getYAxis(y, yOrient);
+            yAxis2 = getYAxis(y2, y2Orient);
+            subXAxis = getXAxis(subX, subXOrient);
+        };
         function getX (min, max, domain, offset) {
             var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
             // Set function and values for c3
@@ -362,7 +277,7 @@
             return getAxisId(id) === 'y2' ? subY2 : subY;
         }
 
-        //-- Axis --//
+        //-- Axes --//
 
         function getXAxis (scale, orient) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
@@ -778,6 +693,34 @@
 
         //-- Shape --//
 
+        // For main region
+        var lineOnMain = (function () {
+            var line = d3.svg.line()
+                .x(__axis_rotated ? function(d){ return getYScale(d.id)(d.value); } : xx)
+                .y(__axis_rotated ? xx : function(d){ return getYScale(d.id)(d.value); });
+            return function (d) {
+                var x0, y0;
+                if (isLineType(d)) {
+                    isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
+                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values);
+                } else {
+                    x0 = x(d.values[0].x);
+                    y0 = getYScale(d.id)(d.values[0].value);
+                    return __axis_rotated ? "M "+y0+" "+x0 : "M "+x0+" "+y0;
+                }
+            };
+        })();
+
+        // For brush region
+        var lineOnSub = (function () {
+            var line = d3.svg.line()
+                .x(function(d){ return subX(d.x) })
+                .y(function(d){ return getSubYScale(d.id)(d.value) });
+            return function (d) {
+                return isLineType(d) ? line(d.values) : "M " + subX(d.values[0].x)+ " " + getSubYScale(d.id)(d.values[0].value);
+            };
+        })();
+
         function lineWithRegions (d, x, y, _regions) {
             var prev = -1, i, j;
             var s = "M", sWithRegion;
@@ -847,18 +790,18 @@
             return s;
         }
 
-        /*-- Define brush --*/
+        //-- Define brush/zoom -//
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
         var zoom = d3.behavior.zoom().on("zoom", __zoom_enabled ? redrawForZoom : null);
 
         /*-- Draw Chart --*/
 
-        // for brush area culculation
-        var firstDate = null,
-            lastDate = null;
+        // for svg elements
+        var svg, defs, main, context, legend, tooltip;
 
-        var orgXDomain;
+        // for brush area culculation
+        var firstDate = null, lastDate = null, orgXDomain;
 
         function init (data) {
             var targets = c3.data.targets = convertDataToTargets(data);
@@ -868,14 +811,19 @@
 
             // TODO: set names if names not specified
 
+            // Init sizes and scales
+            updateSizes();
+            updateScales();
+
+            // Set domains for each scale
             x.domain(d3.extent(data.map(function(d){ return d.x; })));
             y.domain(getYDomain(targets, 'y'));
             y2.domain(getYDomain(targets, 'y2'));
-
             subX.domain(x.domain());
             subY.domain(y.domain());
             subY2.domain(y2.domain());
 
+            // Set axes attrs
             xAxis.ticks(data.length < 10 ? data.length : 10);
             yAxis.ticks(__axis_y_ticks).outerTickSize(0).tickFormat(__axis_y_format);
             yAxis2.ticks(__axis_y2_ticks).outerTickSize(0).tickFormat(__axis_y2_format);
@@ -883,9 +831,53 @@
             // Save original x domain for zoom update
             orgXDomain = x.domain();
 
-            // MEMO: must set x here for timeseries data
+            // Set initialized scales to brush and zoom
             brush.x(subX);
             if (__zoom_enabled) zoom.x(x);
+
+            /*-- Basic Elements --*/
+
+            // Define svgs
+            svg = d3.select(__bindto).append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+
+            // Define defs
+            defs = svg.append("defs");
+            defs.append("clipPath")
+                .attr("id", clipId)
+              .append("rect")
+                .attr("y", margin.top)
+                .attr("width", width)
+                .attr("height", height-margin.top);
+            defs.append("clipPath")
+                .attr("id", "xaxis-clip")
+              .append("rect")
+                .attr("x", -1)
+                .attr("y", -1)
+                .attr("width", width + 2)
+                .attr("height", 40);
+            defs.append("clipPath")
+                .attr("id", "yaxis-clip")
+              .append("rect")
+                .attr("x", -margin.left + 1)
+                .attr("y", margin.top - 1)
+                .attr("width", margin.left)
+                .attr("height", height - margin.top + 2);
+
+            // Define regions
+            main = svg.append("g").attr("transform", translate.main);
+            context = __subchart_show ? svg.append("g").attr("transform", translate.context) : null;
+            legend = __legend_show ? svg.append("g").attr("transform", translate.legend) : null;
+
+            // Define tooltip
+            tooltip = d3.select(__bindto)
+                .style("position", "relative")
+              .append("div")
+                .style("position", "absolute")
+                .style("width", "30%") // TODO: cul actual width when show
+                .style("z-index", "10")
+                .style("visibility", "hidden");
 
             /*-- Main Region --*/
 
@@ -1387,7 +1379,7 @@
                 }
                 // update subchart elements if needed
                 if (withSubchart) {
-                    // axies
+                    // axes
                     // TODO: fix when rotated
                     context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
                     // extent rect
