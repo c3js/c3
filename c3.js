@@ -250,17 +250,6 @@
             };
         })();
 
-        // For region
-        var regionStart = function (d) {
-            return ('start' in d) ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0;
-        };
-        var regionWidth = function (d) {
-            var start = regionStart(d),
-                end = ('end' in d) ? x(isTimeSeries ? parseDate(d.end) : d.end) : width,
-                w = end - start;
-            return (w < 0) ? 0 : w;
-        };
-
         // Define color
         var color = generateColor(__data_colors, __color_pattern);
 
@@ -366,6 +355,12 @@
         function getY (min, max) {
             return d3.scale.linear().range([min, max]);
         }
+        function getYScale (id) {
+            return getAxisId(id) === 'y2' ? y2 : y;
+        }
+        function getSubYScale (id) {
+            return getAxisId(id) === 'y2' ? subY2 : subY;
+        }
 
         //-- Axis --//
 
@@ -384,6 +379,9 @@
         }
         function getYAxis (scale, orient) {
             return d3.svg.axis().scale(scale).orient(orient);
+        }
+        function getAxisId (id) {
+            return id in __data_axes ? __data_axes[id] : 'y';
         }
 
         //-- Domain --//
@@ -469,17 +467,17 @@
             return targets;
         }
 
-        //-- Axis --//
+        //-- Regions --//
 
-        function getAxisId (id) {
-            return id in __data_axes ? __data_axes[id] : 'y';
-        }
-        function getYScale (id) {
-            return getAxisId(id) === 'y2' ? y2 : y;
-        }
-        function getSubYScale (id) {
-            return getAxisId(id) === 'y2' ? subY2 : subY;
-        }
+        function regionStart (d) {
+            return ('start' in d) ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0;
+        };
+        function regionWidth (d) {
+            var start = regionStart(d),
+                end = ('end' in d) ? x(isTimeSeries ? parseDate(d.end) : d.end) : width,
+                w = end - start;
+            return (w < 0) ? 0 : w;
+        };
 
         //-- Data --//
 
