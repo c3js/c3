@@ -165,15 +165,13 @@
 
         /*-- Set Chart Params --*/
 
-        var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3;
-        var currentWidth, currentHeight;
-        var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2;
+        var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3, currentWidth, currentHeight;
+        var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
 
-        // TODO: Enable set position
-        var xAxis = isCategorized ? categoryAxis() : d3.svg.axis(),
-            yAxis = d3.svg.axis(),
-            yAxis2 = d3.svg.axis(),
-            subXAxis = isCategorized ? categoryAxis() : d3.svg.axis();
+        var xOrient = __axis_rotated ? "left" : "bottom",
+            yOrient = __axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"),
+            y2Orient = __axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"),
+            subXOrient = "bottom";
 
         function updateSizes () {
             currentWidth = getCurrentWidth();
@@ -195,53 +193,23 @@
         updateSizes();
 
         function updateScales () {
-            var _x, _y, _y2, _subX;
             // update edges
             xMin = __axis_rotated ? 10 : 0;
             xMax = __axis_rotated ? height : width;
             yMin = __axis_rotated ? 0 : height;
             yMax = __axis_rotated ? width : 1;
             // update scales
-            _x = getX(xMin, xMax);
-            _y = getY(yMin, yMax);
-            _y2 = getY(yMin, yMax);
-            _subX = getX(0, width);
-            x = isDefined(x) ? _x.domain(x.domain()) : _x;
-            y = isDefined(y) ? _y.domain(y.domain()) : _y;
-            y2 = isDefined(y2) ? _y2.domain(y2.domain()) : _y2;
-            subX = isDefined(subX) ? _subX.domain(subX.domain()) : _subX;
+            x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function(d){ return xAxis.tickOffset() });
+            y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
+            y2 = getY(yMin, yMax, isDefined(y2) ? y2.domain() : undefined);
+            subX = getX(0, width, isDefined(orgXDomain) ? orgXDomain : undefined, function(d){ return d % 1 === 0 ? subXAxis.tickOffset() : 0 });
             subY = getY(height2, 10);
             subY2 = getY(height2, 10);
             // update axies
-            xAxis.scale(x).orient(__axis_rotated ? "left" : "bottom");
-            yAxis.scale(y).orient(__axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"));
-            yAxis2.scale(y2).orient(__axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"));
-            subXAxis.scale(subX).orient("bottom");
-            // Use custom scale if needed
-            if (isCategorized) {
-                // TODO: fix this
-                // TODO: fix x_grid
-                (function () {
-                    var _x = x, _subX = subX;
-                    var keys = Object.keys(x), key, i;
-                    x = function(d){ return _x(d) + xAxis.tickOffset(); };
-                    subX = function(d){ return _subX(d) + subXAxis.tickOffset(); };
-                    for (i = 0; i < keys.length; i++) {
-                        key = keys[i];
-                        x[key] = _x[key];
-                        subX[key] = _subX[key];
-                    }
-                    x.domain = function (domain) {
-                        if (!arguments.length) {
-                            var domain = _x.domain();
-                            domain[1]++;
-                            return domain;
-                        }
-                        _x.domain(domain);
-                        return x;
-                    };
-                })();
-            }
+            xAxis = getXAxis(x, xOrient);
+            yAxis = getYAxis(y, yOrient);
+            yAxis2 = getYAxis(y2, y2Orient);
+            subXAxis = getXAxis(subX, subXOrient);
         };
         updateScales();
 
@@ -252,24 +220,6 @@
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")" },
             x : function () { return "translate(0," + height + ")" },
             subx : function () { return "translate(0," + height2 + ")" }
-        }
-
-        // Set up axies
-        if (isTimeSeries) {
-            xAxis.tickFormat(customTimeFormat);
-        }
-        if (isCategorized) {
-            xAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
-            subXAxis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
-        } else {
-            // TODO: fix
-            xAxis.tickOffset = function () {
-                return 0;
-            };
-            // TODO: fix
-            subXAxis.tickOffset = function () {
-                return 0;
-            };
         }
 
         // For main region
@@ -386,11 +336,54 @@
 
         //-- Scale --//
 
-        function getX (min, max) {
-            return ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
+        function getX (min, max, domain, offset) {
+            var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
+            // Set function and values for c3
+            scale.orgDomain = function () { return scale.domain(); }
+            if (isDefined(domain)) scale.domain(domain);
+            if (isUndefined(offset)) offset = function(d){ return 0; };
+            // Define customized scale if categorized axis
+            if (isCategorized) {
+                var _scale = scale, key;
+                scale = function(d){ return _scale(d) + offset(d); };
+                for (key in _scale) {
+                    scale[key] = _scale[key];
+                }
+                scale.orgDomain = function () {
+                    return _scale.domain();
+                };
+                scale.domain = function (domain) {
+                    if (!arguments.length) {
+                        var domain = _scale.domain();
+                        return [domain[0], domain[1]+1];
+                    }
+                    _scale.domain(domain);
+                    return scale;
+                };
+            }
+            return scale;
         }
         function getY (min, max) {
             return d3.scale.linear().range([min, max]);
+        }
+
+        //-- Axis --//
+
+        function getXAxis (scale, orient) {
+            var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
+            if (isTimeSeries) {
+                axis.tickFormat(customTimeFormat);
+            }
+            if (isCategorized) {
+                axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
+            } else {
+                // TODO: fix
+                axis.tickOffset = function () { return 0; }
+            }
+            return axis;
+        }
+        function getYAxis (scale, orient) {
+            return d3.svg.axis().scale(scale).orient(orient);
         }
 
         //-- Domain --//
@@ -1277,7 +1270,7 @@
 
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
-                x.domain(brush.empty() ? subX.domain() : brush.extent());
+                x.domain(brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) zoom.x(x);
             }
             y.domain(getYDomain(c3.data.targets, 'y'));
@@ -1290,12 +1283,6 @@
             // Update sub domain
             subY.domain(y.domain());
             subY2.domain(y2.domain());
-
-            // Update brush extent if zoom
-            if (__subchart_show && d3.event !== null && d3.event.type === 'zoom') {
-                brush.extent(x.domain());
-                if ( ! brush.empty()) context.select('.x.brush').call(brush);
-            }
 
             // grid
             if (__grid_x_show) {
@@ -1394,33 +1381,45 @@
             mainCircle.exit().remove();
 
             // subchart
-            if (withSubchart && __subchart_show) {
-                // Update axis
-                // TODO: fix when rotated
-                context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
-                // bars
-                barW = getBarW(subXAxis, barTargetsNum, true);
-                barH = getBarH(height2, true);
-                barX = getBarX(barW, barTargetsNum, barIndices, true);
-                barY = getBarY(barH, barIndices, false, true);
-                contextBar = context.selectAll('.-bars').selectAll('.-bar')
-                    .data(barData);
-                contextBar.transition().duration(duration)
-                    .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
-                contextBar.enter().append('rect')
-                    .attr("class", classBar)
-                    .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
-                    .style("opacity", 0)
-                  .transition()
-                    .style('opacity', 1);
-                contextBar.exit().transition()
-                    .style('opacity', 0)
-                    .remove();
-
-                // lines
-                context.selectAll('.-line')
-                  .transition().duration(duration)
-                    .attr("d", lineOnSub);
+            if (__subchart_show) {
+                // reflect main chart to extent on subchart if zoomed
+                if (d3.event !== null && d3.event.type === 'zoom') {
+                    brush.extent(x.orgDomain());
+                    context.select('.x.brush').call(brush);
+                }
+                // update subchart elements if needed
+                if (withSubchart) {
+                    // axies
+                    // TODO: fix when rotated
+                    context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
+                    // extent rect
+                    if ( ! brush.empty()) {
+                        brush.extent(x.orgDomain());
+                        context.select('.x.brush').call(brush);
+                    }
+                    // bars
+                    barW = getBarW(subXAxis, barTargetsNum, true);
+                    barH = getBarH(height2, true);
+                    barX = getBarX(barW, barTargetsNum, barIndices, true);
+                    barY = getBarY(barH, barIndices, false, true);
+                    contextBar = context.selectAll('.-bars').selectAll('.-bar')
+                        .data(barData);
+                    contextBar.transition().duration(duration)
+                        .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
+                    contextBar.enter().append('rect')
+                        .attr("class", classBar)
+                        .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                        .style("opacity", 0)
+                      .transition()
+                        .style('opacity', 1);
+                    contextBar.exit().transition()
+                        .style('opacity', 0)
+                        .remove();
+                    // lines
+                    context.selectAll('.-line')
+                      .transition().duration(duration)
+                        .attr("d", lineOnSub);
+                }
             }
 
             // circles for select
@@ -1482,8 +1481,6 @@
             updateScales();
             // Set x for brush again because of scale update
             brush.x(subX);
-            // Update extent width if extent specified
-            if ( ! brush.empty()) brush.extent(x.domain());
             // Set x for zoom again because of scale update
             if (__zoom_enabled) zoom.x(x);
             // Update sizes
@@ -1497,7 +1494,6 @@
             // Update context sizes and positions
             if (__subchart_show) {
                 context.select('.x.brush').selectAll('rect').attr('height', height2);
-                context.select('.x.brush').call(brush);
                 context.attr("transform", translate.context);
                 context.select('.x.axis').attr("transform", translate.subx);
             }
