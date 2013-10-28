@@ -793,7 +793,7 @@
         //-- Define brush/zoom -//
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoom", __zoom_enabled ? redrawForZoom : null);
+        var zoom = d3.behavior.zoom().on("zoomstart", function(){ zoom.startDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null);
 
         // define functions for c3
         brush.update = function () {
@@ -1104,7 +1104,7 @@
                 .call(
                     d3.behavior.drag().origin(Object).on('drag', function(d){
                         if ( ! __data_selection_enabled) return; // do nothing if not selectable
-                        if (__zoom_enabled) return; // skip if zoomable because of conflict drag dehavior
+                        if (__zoom_enabled && ! zoom.startDomain) return; // skip if zoomable because of conflict drag dehavior
 
                         var sx = dragStart[0], sy = dragStart[1],
                             mouse = d3.mouse(this),
@@ -1461,6 +1461,11 @@
             });
         }
         function redrawForZoom() {
+            if (d3.event.sourceEvent.type === 'mousemove' && zoom.startDomain) {
+                x.domain(zoom.startDomain);
+                zoom.x(x);
+                return;
+            }
             redraw({
                 withTransition: false,
                 withY: false,
