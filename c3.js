@@ -1217,7 +1217,7 @@
             updateTargets(targets);
 
             // Draw with targets
-            redraw({withTransition:false});
+            redraw({withTransition:false, withUpdateXDomain:true});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -1250,7 +1250,7 @@
             withY = isDefined(options.withY) ? options.withY : true;
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
-            withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : true;
+            withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
 
             duration = withTransition ? 250 : 0;
 
@@ -1452,15 +1452,15 @@
             redraw({
                 withTransition: false,
                 withY: false,
-                withSubchart: false
+                withSubchart: false,
+                withUpdateXDomain: true
             });
         }
         function redrawForZoom() {
             redraw({
                 withTransition: false,
                 withY: false,
-                withSubchart: false,
-                withUpdateXDomain: false
+                withSubchart: false
             });
             if (d3.event.sourceEvent.type === 'mousemove') {
                 cancelClick = true;
@@ -1495,7 +1495,7 @@
                 updateLegend(c3.data.targets, {withTransition:false});
             }
             // Draw with new sizes & scales
-            redraw({withTransition:false});
+            redraw({withTransition:false, withUpdateXDomain:true});
         }
 
         function updateTargets (targets) {
