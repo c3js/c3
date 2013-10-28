@@ -795,6 +795,12 @@
         var brush = d3.svg.brush().on("brush", redrawForBrush);
         var zoom = d3.behavior.zoom().on("zoom", __zoom_enabled ? redrawForZoom : null);
 
+        // define functions for c3
+        brush.update = function () {
+            if (context) context.select('.x.brush').call(this);
+            return this;
+        }
+
         /*-- Draw Chart --*/
 
         // for svg elements
@@ -1376,8 +1382,7 @@
             if (__subchart_show) {
                 // reflect main chart to extent on subchart if zoomed
                 if (d3.event !== null && d3.event.type === 'zoom') {
-                    brush.extent(x.orgDomain());
-                    context.select('.x.brush').call(brush);
+                    brush.extent(x.orgDomain()).update();
                 }
                 // update subchart elements if needed
                 if (withSubchart) {
@@ -1386,8 +1391,7 @@
                     context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
                     // extent rect
                     if ( ! brush.empty()) {
-                        brush.extent(x.orgDomain());
-                        context.select('.x.brush').call(brush);
+                        brush.extent(x.orgDomain()).update();
                     }
                     // bars
                     barW = getBarW(subXAxis, barTargetsNum, true);
@@ -1719,6 +1723,11 @@
                 .transition()
                 .style('opacity', 0);
         };
+
+        c3.unzoom = function () {
+            brush.clear().update();
+            redraw({withUpdateXDomain:true});
+        }
 
         c3.load = function (args) {
             // check args
