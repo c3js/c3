@@ -927,6 +927,7 @@
                     .attr('width', width)
                     .attr('height', height)
                     .style('opacity', 0)
+                    .style('cursor', 'ew-resize')
                     .call(zoom).on("dblclick.zoom", null);
             }
 
@@ -994,6 +995,7 @@
             main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
+                .style('cursor', __zoom_enabled ? 'ew-resize' : null)
               .selectAll(".event-rects")
                 .data(data)
               .enter().append("rect")
