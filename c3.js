@@ -33,7 +33,8 @@
         var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], null);
 
-        var __zoom_enabled = getConfig(['zoom','enabled'], false);
+        var __zoom_enabled = getConfig(['zoom','enabled'], false),
+            __zoom_extent = getConfig(['zoom','extent'], [1, 10]);
 
         // data - data configuration
         checkConfig('data', 'data is required in config');
@@ -361,6 +362,9 @@
                 extent = x.domain();
             }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
+        }
+        function diffDomain (d) {
+            return d[1]-d[0];
         }
 
         //-- Cache --//
@@ -793,11 +797,17 @@
         //-- Define brush/zoom -//
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoomstart", function(){ zoom.startDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null);
+        var zoom = d3.behavior.zoom().on("zoomstart", function(){ zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null).scaleExtent(__zoom_extent);
 
         // define functions for c3
         brush.update = function () {
             if (context) context.select('.x.brush').call(this);
+            return this;
+        }
+        zoom.orgScaleExtent = zoom.scaleExtent();
+        zoom.updateScaleExtent = function () {
+            var ratio = diffDomain(x.orgDomain())/diffDomain(orgXDomain);
+            this.scaleExtent([this.orgScaleExtent[0]*ratio, this.orgScaleExtent[1]*ratio]);
             return this;
         }
 
@@ -1104,7 +1114,7 @@
                 .call(
                     d3.behavior.drag().origin(Object).on('drag', function(d){
                         if ( ! __data_selection_enabled) return; // do nothing if not selectable
-                        if (__zoom_enabled && ! zoom.startDomain) return; // skip if zoomable because of conflict drag dehavior
+                        if (__zoom_enabled && ! zoom.altDomain) return; // skip if zoomable because of conflict drag dehavior
 
                         var sx = dragStart[0], sy = dragStart[1],
                             mouse = d3.mouse(this),
@@ -1263,7 +1273,7 @@
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
-                if (__zoom_enabled) zoom.x(x);
+                if (__zoom_enabled) zoom.x(x).updateScaleExtent();
             }
             y.domain(getYDomain(c3.data.targets, 'y'));
             y2.domain(getYDomain(c3.data.targets, 'y2'));
@@ -1461,10 +1471,13 @@
             });
         }
         function redrawForZoom() {
-            if (d3.event.sourceEvent.type === 'mousemove' && zoom.startDomain) {
-                x.domain(zoom.startDomain);
-                zoom.x(x);
+            if (d3.event.sourceEvent.type === 'mousemove' && zoom.altDomain) {
+                x.domain(zoom.altDomain);
+                zoom.x(x).updateScaleExtent();
                 return;
+            }
+            if (isCategorized && x.orgDomain()[0] === orgXDomain[0]) {
+                x.domain([orgXDomain[0]-1e-10, x.orgDomain()[1]]);
             }
             redraw({
                 withTransition: false,
