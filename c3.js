@@ -1000,7 +1000,7 @@
                 .data(data)
               .enter().append("rect")
                 .attr("class", function(d,i){ return "event-rect event-rect-" + i; })
-                .style("cursor", function(d){ return __data_selection_enabled && __data_selection_grouped ? "pointer" : null; })
+                .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
                 .on('mouseover', function(d,i) {
                     if (dragging) return; // do nothing if dragging
 
