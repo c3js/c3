@@ -33,8 +33,7 @@
         var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], null);
 
-        var __zoom_enabled = getConfig(['zoom','enabled'], false),
-            __zoom_extent = getConfig(['zoom','extent'], [1, 10]);
+        var __zoom_enabled = getConfig(['zoom','enabled'], false);
 
         // data - data configuration
         checkConfig('data', 'data is required in config');
@@ -797,19 +796,21 @@
         //-- Define brush/zoom -//
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoomstart", function(){ zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null).scaleExtent(__zoom_extent);
+        var zoom = d3.behavior.zoom().on("zoomstart", function(){ zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null);
 
         // define functions for c3
         brush.update = function () {
             if (context) context.select('.x.brush').call(this);
             return this;
-        }
-        zoom.orgScaleExtent = zoom.scaleExtent();
+        };
+        zoom.orgScaleExtent = function () {
+            return [1, Math.max(maxDataCount()/10, 10)];
+        };
         zoom.updateScaleExtent = function () {
-            var ratio = diffDomain(x.orgDomain())/diffDomain(orgXDomain);
-            this.scaleExtent([this.orgScaleExtent[0]*ratio, this.orgScaleExtent[1]*ratio]);
+            var ratio = diffDomain(x.orgDomain())/diffDomain(orgXDomain), extent = this.orgScaleExtent();
+            this.scaleExtent([extent[0]*ratio, extent[1]*ratio]);
             return this;
-        }
+        };
 
         /*-- Draw Chart --*/
 
