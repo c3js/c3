@@ -34,7 +34,8 @@
             __size_height = getConfig(['size','height'], null);
 
         var __zoom_enabled = getConfig(['zoom','enabled'], false),
-            __zoom_extent = getConfig(['zoom','extent'], null);
+            __zoom_extent = getConfig(['zoom','extent'], null),
+            __zoom_privileged = getConfig(['zoom','privileged'], false);
 
         // data - data configuration
         checkConfig('data', 'data is required in config');
@@ -924,16 +925,6 @@
                     .call(yAxis2);
             }
 
-            if (__zoom_enabled) {
-                main.append('rect')
-                    .attr('class', 'zoom-rect')
-                    .attr('width', width)
-                    .attr('height', height)
-                    .style('opacity', 0)
-                    .style('cursor', 'ew-resize')
-                    .call(zoom).on("dblclick.zoom", null);
-            }
-
             // Grids
             grid = main.append('g')
                 .attr("clip-path", clipPath)
@@ -1192,6 +1183,17 @@
             // Define g for line chart area
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
+
+            if (__zoom_enabled) {
+                // if zoom privileged, insert rect to forefront
+                main.insert('rect', __zoom_privileged ? null : 'g.grid')
+                    .attr('class', 'zoom-rect')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .style('opacity', 0)
+                    .style('cursor', 'ew-resize')
+                    .call(zoom).on("dblclick.zoom", null);
+            }
 
             // Set default extent if defined
             if (__axis_x_default !== null) {
