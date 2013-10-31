@@ -33,7 +33,8 @@
         var __size_width = getConfig(['size','width'], null),
             __size_height = getConfig(['size','height'], null);
 
-        var __zoom_enabled = getConfig(['zoom','enabled'], false);
+        var __zoom_enabled = getConfig(['zoom','enabled'], false),
+            __zoom_extent = getConfig(['zoom','extent'], null);
 
         // data - data configuration
         checkConfig('data', 'data is required in config');
@@ -804,7 +805,8 @@
             return this;
         };
         zoom.orgScaleExtent = function () {
-            return [1, Math.max(maxDataCount()/10, 10)];
+            var extent = __zoom_extent ? __zoom_extent : [1,10];
+            return [extent[0], Math.max(maxDataCount()/extent[1], extent[1])];
         };
         zoom.updateScaleExtent = function () {
             var ratio = diffDomain(x.orgDomain())/diffDomain(orgXDomain), extent = this.orgScaleExtent();
