@@ -125,7 +125,7 @@
                     value = '-';
                     name = '-';
                 }
-                text += "<tr><td><span style='background-color:"+color(d[i].id)+"'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
+                text += "<tr class='-tooltip-name-"+d[i].id+"'><td class='name'><span style='background-color:"+color(d[i].id)+"'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
             return text + "</table>";
         }),
