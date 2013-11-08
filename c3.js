@@ -37,6 +37,9 @@
             __zoom_extent = getConfig(['zoom','extent'], null),
             __zoom_privileged = getConfig(['zoom','privileged'], false);
 
+        var __onenter = getConfig(['onenter'], function(){}),
+            __onleave = getConfig(['onleave'], function(){});
+
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
@@ -983,7 +986,9 @@
             // Define g for chart area
             main.append('g')
                 .attr("clip-path", clipPath)
-                .attr('class', 'chart');
+                .attr('class', 'chart')
+                .on('mouseenter', __onenter)
+                .on('mouseleave', __onleave);
 
             // Cover whole with rects for events
             main.select('.chart').append("g")
