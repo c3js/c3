@@ -863,7 +863,9 @@
             // Define svgs
             svg = d3.select(__bindto).append("svg")
                 .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom);
+                .attr("height", height + margin.top + margin.bottom)
+                .on('mouseenter', __onenter)
+                .on('mouseleave', __onleave);
 
             // Define defs
             defs = svg.append("defs");
@@ -986,9 +988,7 @@
             // Define g for chart area
             main.append('g')
                 .attr("clip-path", clipPath)
-                .attr('class', 'chart')
-                .on('mouseenter', __onenter)
-                .on('mouseleave', __onleave);
+                .attr('class', 'chart');
 
             // Cover whole with rects for events
             main.select('.chart').append("g")
