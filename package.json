@@ -1,0 +1,27 @@
+{
+  "name": "c3",
+  "version": "0.1.0",
+  "description": "D3-based reusable chart library",
+  "main": "c3.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/masayuki0812/c3.git"
+  },
+  "keywords": [
+    "d3",
+    "chart",
+    "graph"
+  ],
+  "author": "Masayuki Tanaka",
+  "license": "MIT",
+  "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.7.1",
+    "grunt-contrib-jasmine": "~0.5.2"
+  }
+}
