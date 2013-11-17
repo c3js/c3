@@ -834,7 +834,7 @@
         /*-- Draw Chart --*/
 
         // for svg elements
-        var svg, defs, main, context, legend, tooltip;
+        var svg, defs, main, context, legend, tooltip, selectChart;
 
         // for brush area culculation
         var firstDate = null, lastDate = null, orgXDomain;
@@ -843,6 +843,12 @@
             var targets = c3.data.targets = convertDataToTargets(data);
             var grid, xgridLine;
             var i;
+
+            selectChart = d3.select(__bindto);
+            if (selectChart.empty()) {
+                window.alert('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
+                return;
+            }
 
             // TODO: set names if names not specified
 
