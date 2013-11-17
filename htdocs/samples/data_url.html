@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <link href="/css/c3.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.min.js"></script>
+    <script>
+      var chart = c3.generate({
+        data: {
+          url: '/data/c3_test.csv'
+        }
+      });
+    </script>
+  </body>
+</html>
