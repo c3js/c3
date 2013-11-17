@@ -465,7 +465,7 @@
                     id: convertedId,
                     id_org: id,
                     values: data.map(function (d) {
-                        return {x: d.x, value: +d[id], id: convertedId};
+                        return {x: d.x, value: d[id] !== null ? +d[id] : null, id: convertedId};
                     })
                 };
             });
@@ -712,6 +712,10 @@
             (selected) ? selectBar(target, d, i) : unselectBar(target, d, i);
         }
 
+        function filterRemoveNull(data) {
+            return data.filter(function (d) { return d.value !== null; });
+        }
+
         //-- Shape --//
 
         // For main region
@@ -720,13 +724,13 @@
                 .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
                 .y(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
             return function (d) {
-                var x0, y0;
+                var data = filterRemoveNull(d.values), x0, y0;
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(d.values, x, getYScale(d.id), __data_regions[d.id]) : line(d.values);
+                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
                 } else {
-                    x0 = x(d.values[0].x);
-                    y0 = getYScale(d.id)(d.values[0].value);
+                    x0 = x(data[0].x);
+                    y0 = getYScale(d.id)(data[0].value);
                     return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
             };
@@ -738,7 +742,8 @@
                 .x(function (d) { return subX(d.x); })
                 .y(function (d) { return getSubYScale(d.id)(d.value); });
             return function (d) {
-                return isLineType(d) ? line(d.values) : "M " + subX(d.values[0].x) + " " + getSubYScale(d.id)(d.values[0].value);
+                var data = filterRemoveNull(d.values);
+                return isLineType(d) ? line(data) : "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
             };
         })();
 
@@ -1409,9 +1414,11 @@
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineData);
             mainCircle.transition().duration(duration)
+                .style('opacity', function (d) { return d.value === null ? 0 : 1; })
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.enter().append("circle")
+                .style('opacity', function (d) { return d.value === null ? 0 : 1; })
                 .attr("class", classCircle)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
