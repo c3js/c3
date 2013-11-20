@@ -202,7 +202,7 @@
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
             bottom = 20 + __subchart_size_height + legendHeight;
-            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 1;
+            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 0;
             left = __axis_y_inner ? 0 : 40;
             top2 = currentHeight - __subchart_size_height - legendHeight;
             bottom2 = 20 + legendHeight;
