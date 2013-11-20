@@ -22,6 +22,7 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.7.1",
-    "grunt-contrib-jasmine": "~0.5.2"
+    "grunt-contrib-jasmine": "~0.5.2",
+    "load-grunt-tasks": "~0.2.0"
   }
 }

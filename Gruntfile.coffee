@@ -1,6 +1,8 @@
 
 module.exports = (grunt) ->
 
+    require('load-grunt-tasks') grunt, pattern: 'grunt-contrib-*'
+
     grunt.initConfig
 
         jshint:
@@ -16,8 +18,5 @@ module.exports = (grunt) ->
                 src: 'c3.js'
                 options:
                     specs: 'spec/*.js'
-
-    grunt.loadNpmTasks 'grunt-contrib-jshint'
-    grunt.loadNpmTasks 'grunt-contrib-jasmine'
 
     grunt.registerTask 'default', ['jshint', 'jasmine']
