@@ -1789,6 +1789,11 @@
             if (isUndefined(args.done)) {
                 args.done = function () {};
             }
+            // update categories if exists
+            if ('categories' in args && isCategorized) {
+                __axis_x_categories = args.categories;
+                xAxis.categories(__axis_x_categories);
+            }
             // use cache if exists
             if ('cacheIds' in args && hasCaches(args.cacheIds)) {
                 load(getCaches(args.cacheIds), args.done);
