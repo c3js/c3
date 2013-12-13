@@ -1,0 +1,22 @@
+{
+  "name": "c3",
+  "main": "c3.min.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/masayuki0812/c3",
+  "authors": [
+    "Masayuki Tanaka <masayuki0812@mac.com>"
+  ],
+  "description": "D3-based reusable chart library",
+  "keywords": [
+    "chart",
+    "d3"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
