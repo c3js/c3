@@ -74,6 +74,7 @@
         var __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
+            __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format'], null),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
             __axis_y_max = getConfig(['axis', 'y', 'max'], null),
             __axis_y_min = getConfig(['axis', 'y', 'min'], null),
@@ -157,7 +158,7 @@
 
         var color = generateColor(__data_colors, __color_pattern);
 
-        var customTimeFormat = (function () {
+        var defaultTimeFormat = (function () {
             var formats = [
                 [d3.time.format("%Y/%-m/%-d"), function () { return true; }],
                 [d3.time.format("%-m/%-d"), function (d) { return d.getMonth(); }],
@@ -293,7 +294,7 @@
         function getXAxis(scale, orient) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
             if (isTimeSeries) {
-                axis.tickFormat(customTimeFormat);
+                axis.tickFormat(__axis_x_tick_format ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : defaultTimeFormat);
             }
             if (isCategorized) {
                 axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);

@@ -21,7 +21,10 @@
         },
         axis : {
           x : {
-            type : 'timeseries'
+            type : 'timeseries',
+            tick : {
+              format : "%m/%d" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+            }
           }
         }
       });
