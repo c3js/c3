@@ -450,7 +450,7 @@
 
             // check __data_x is defined if timeseries
             if (isTimeSeries && ! __data_x) {
-                alert('data.x must be specified when axis.x.type == "timeseries"');
+                window.alert('data.x must be specified when axis.x.type == "timeseries"');
                 return [];
             }
 
@@ -499,10 +499,10 @@
             };
         }
         function getPrevX(i) {
-            return i > 0 ? c3.data.targets[0].values[i-1].x : undefined;
+            return i > 0 ? c3.data.targets[0].values[i - 1].x : undefined;
         }
         function getNextX(i) {
-            return i < maxDataCount() - 1 ? c3.data.targets[0].values[i+1].x : undefined;
+            return i < maxDataCount() - 1 ? c3.data.targets[0].values[i + 1].x : undefined;
         }
         function maxDataCount() {
             return d3.max(c3.data.targets, function (t) { return t.values.length; });
@@ -1495,17 +1495,17 @@
 
             // rect for mouseover
             if (isCustomX) {
-                rectW = function (d,i) {
+                rectW = function (d, i) {
                     var prevX = getPrevX(i), nextX = getNextX(i);
-                    return (x(nextX ? nextX : d.x+50)-x(prevX ? prevX : d.x-50))/2;
+                    return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
                 };
-                rectX = function (d,i) {
+                rectX = function (d, i) {
                     var prevX = getPrevX(i);
-                    return (x(d.x)+x(prevX ? prevX : d.x-50))/2;
+                    return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
                 };
             } else {
                 rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
-                rectX = function (d,i) { return x(d.x) - (rectW / 2); };
+                rectX = function (d) { return x(d.x) - (rectW / 2); };
             }
             main.selectAll('.event-rect')
                 .attr("x", __axis_rotated ? 0 : rectX)
