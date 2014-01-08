@@ -45,7 +45,7 @@
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
-        var __data_x = getConfig(['data', 'x'], 'x'),
+        var __data_x = getConfig(['data', 'x'], undefined),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
@@ -148,7 +148,8 @@
             clipPath = "url(#" + clipId + ")";
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
-            isCategorized = (__axis_x_type === 'categorized');
+            isCategorized = (__axis_x_type === 'categorized'),
+            isCustomX = !isTimeSeries && __data_x;
 
         var dragStart = null, dragging = false, cancelClick = false;
 
@@ -447,13 +448,23 @@
             var ids = d3.keys(data[0]).filter(function (key) { return key !== __data_x; });
             var targets, i = 0, parsedDate;
 
+            // check __data_x is defined if timeseries
+            if (isTimeSeries && ! __data_x) {
+                alert('data.x must be specified when axis.x.type == "timeseries"');
+                return [];
+            }
+
             data.forEach(function (d) {
                 if (isTimeSeries) {
                     if (!(__data_x in d)) { throw Error("'" + __data_x + "' must be included in data"); }
                     parsedDate = parseDate(d[__data_x]);
                     if (parsedDate === null) { throw Error("Failed to parse timeseries date in data"); }
                     d.x = parsedDate;
-                } else {
+                }
+                else if (isCustomX) {
+                    d.x = d[__data_x];
+                }
+                else {
                     d.x = i++;
                 }
                 if (firstDate === null) { firstDate = new Date(d.x); }
@@ -486,6 +497,12 @@
                     return {x: d.x, value: d.value, id: d.id};
                 })
             };
+        }
+        function getPrevX(i) {
+            return i > 0 ? c3.data.targets[0].values[i-1].x : undefined;
+        }
+        function getNextX(i) {
+            return i < maxDataCount() - 1 ? c3.data.targets[0].values[i+1].x : undefined;
         }
         function maxDataCount() {
             return d3.max(c3.data.targets, function (t) { return t.values.length; });
@@ -1477,8 +1494,19 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
-            rectX = function (d) { return x(d.x) - (rectW / 2); };
+            if (isCustomX) {
+                rectW = function (d,i) {
+                    var prevX = getPrevX(i), nextX = getNextX(i);
+                    return (x(nextX ? nextX : d.x+50)-x(prevX ? prevX : d.x-50))/2;
+                };
+                rectX = function (d,i) {
+                    var prevX = getPrevX(i);
+                    return (x(d.x)+x(prevX ? prevX : d.x-50))/2;
+                };
+            } else {
+                rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
+                rectX = function (d,i) { return x(d.x) - (rectW / 2); };
+            }
             main.selectAll('.event-rect')
                 .attr("x", __axis_rotated ? 0 : rectX)
                 .attr("y", __axis_rotated ? rectX : 0)
