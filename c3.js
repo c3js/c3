@@ -477,7 +477,7 @@
                     id: convertedId,
                     id_org: id,
                     values: data.map(function (d) {
-                        return {x: d.x, value: d[id] !== null ? +d[id] : null, id: convertedId};
+                        return {x: d.x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
                     })
                 };
             });
