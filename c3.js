@@ -35,6 +35,9 @@
         var __size_width = getConfig(['size', 'width'], null),
             __size_height = getConfig(['size', 'height'], null);
 
+        var __padding_left = getConfig(['padding', 'left'], null),
+            __padding_right = getConfig(['padding', 'right'], null);
+
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent'], null),
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
@@ -204,14 +207,14 @@
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
             bottom = 20 + __subchart_size_height + legendHeight;
-            right = __axis_y2_show && !__axis_rotated && !__axis_y2_inner ? 50 : 0;
-            left = __axis_y_inner ? 0 : 40;
+            right = getCurrentPaddingRight();
+            left = getCurrentPaddingLeft();
             top2 = currentHeight - __subchart_size_height - legendHeight;
             bottom2 = 20 + legendHeight;
             top3 = currentHeight - legendHeight;
             margin = {top: 0, right: right, bottom: bottom, left: left};
-            margin2 = {top: top2, right: 20, bottom: bottom2, left: left};
-            margin3 = {top: top3, right: 20, bottom: 0, left: left};
+            margin2 = {top: top2, right: NaN, bottom: bottom2, left: left};
+            margin3 = {top: top3, right: NaN, bottom: 0, left: left};
             width = currentWidth - margin.left - margin.right;
             height = currentHeight - margin.top - margin.bottom;
             height2 = currentHeight - margin2.top - margin2.bottom;
@@ -224,11 +227,42 @@
             var h = __size_height === null ? getParentHeight() : __size_height;
             return h > 0 ? h : 320;
         }
+        function getCurrentPaddingLeft() {
+            if (__padding_left) {
+                return __padding_left;
+            } else {
+                return __axis_y_inner ? 1 : getDefaultPaddingWithAxisId('y');
+            }
+        }
+        function getCurrentPaddingRight() {
+            if (__padding_right) {
+                return __padding_right;
+            } else if (__axis_y2_show) {
+                return __axis_y2_inner || __axis_rotated ? 1 : getDefaultPaddingWithAxisId('y2');
+            } else {
+                return 20;
+            }
+        }
+        function getDefaultPaddingWithAxisId() {
+            return 40; // TODO: calc automatically
+        }
         function getParentWidth() {
             return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
         }
         function getParentHeight() {
             return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
+        }
+        function getXAxisClipWidth() {
+            return width + 2 + margin.left + margin.right;
+        }
+        function getXAxisClipHeight() {
+            return 40;
+        }
+        function getYAxisClipWidth() {
+            return margin.left;
+        }
+        function getYAxisClipHeight() {
+            return height - margin.top + 2 + getXAxisClipHeight();
         }
 
         //-- Scales --//
@@ -340,7 +374,7 @@
 
             return d3.max(Object.keys(ys).map(function (key) { return d3.max(ys[key]); }));
         }
-        function getYDomain(targets, axisId) {
+        function getYDomain(axisId) {
             var yTargets = getTargets(function (d) { return getAxisId(d.id) === axisId; }),
                 yMin = axisId === 'y2' ? __axis_y2_min : __axis_y_min,
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
@@ -881,8 +915,8 @@
 
             // Set domains for each scale
             x.domain(d3.extent(data.map(function (d) { return d.x; })));
-            y.domain(getYDomain(targets, 'y'));
-            y2.domain(getYDomain(targets, 'y2'));
+            y.domain(getYDomain('y'));
+            y2.domain(getYDomain('y2'));
             subX.domain(x.domain());
             subY.domain(y.domain());
             subY2.domain(y2.domain());
@@ -919,17 +953,17 @@
             defs.append("clipPath")
                 .attr("id", "xaxis-clip")
               .append("rect")
-                .attr("x", -1)
+                .attr("x", -1 - margin.left)
                 .attr("y", -1)
-                .attr("width", width + 2)
-                .attr("height", 40);
+                .attr("width", getXAxisClipWidth)
+                .attr("height", getXAxisClipHeight);
             defs.append("clipPath")
                 .attr("id", "yaxis-clip")
               .append("rect")
                 .attr("x", -margin.left + 1)
                 .attr("y", margin.top - 1)
-                .attr("width", margin.left)
-                .attr("height", height - margin.top + 2);
+                .attr("width", getYAxisClipWidth)
+                .attr("height", getYAxisClipHeight);
 
             // Define regions
             main = svg.append("g").attr("transform", translate.main);
@@ -1328,8 +1362,8 @@
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.x(x).updateScaleExtent(); }
             }
-            y.domain(getYDomain(c3.data.targets, 'y'));
-            y2.domain(getYDomain(c3.data.targets, 'y2'));
+            y.domain(getYDomain('y'));
+            y2.domain(getYDomain('y2'));
 
             main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
             main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
@@ -1566,7 +1600,7 @@
             // Update sizes
             d3.select('svg').attr('width', currentWidth).attr('height', currentHeight);
             d3.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
-            d3.select('#xaxis-clip').select('rect').attr('width', width + 2);
+            d3.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
             d3.select('.zoom-rect').attr('width', width).attr('height', height);
             // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
