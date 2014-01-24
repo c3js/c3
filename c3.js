@@ -260,7 +260,7 @@
             return 40;
         }
         function getYAxisClipWidth() {
-            return margin.left;
+            return margin.left + 20;
         }
         function getYAxisClipHeight() {
             return height - margin.top + 2 + getXAxisClipHeight();
@@ -989,6 +989,7 @@
                 .attr("transform", translate.x)
                 .call(__axis_rotated ? yAxis : xAxis)
               .append("text")
+                .attr("class", "label")
                 .attr("x", width)
                 .attr("dy", "-.5em")
                 .style("text-anchor", "end")
@@ -1374,6 +1375,9 @@
             main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
             main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
             main.select(".y2.axis").transition().call(yAxis2);
+
+            // Update label position
+            main.select(".x.axis text.label").attr("x", width);
 
             // Update sub domain
             subY.domain(y.domain());
