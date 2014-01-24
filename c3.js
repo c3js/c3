@@ -79,10 +79,11 @@
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format'], null),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
+            __axis_x_label = getConfig(['axis', 'x', 'label'], null),
             __axis_y_max = getConfig(['axis', 'y', 'max'], null),
             __axis_y_min = getConfig(['axis', 'y', 'min'], null),
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
-            __axis_y_text = getConfig(['axis', 'y', 'text'], null),
+            __axis_y_label = getConfig(['axis', 'y', 'label'], null),
             // not used
             //__axis_y_rescale = getConfig(['axis', 'y', 'rescale'], true),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
@@ -94,7 +95,7 @@
             __axis_y2_min = getConfig(['axis', 'y2', 'min'], null),
             __axis_y2_center = getConfig(['axis', 'y2', 'center'], null),
             // not used
-            // __axis_y2_text = getConfig(['axis', 'y2', 'text'], null),
+            // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
             // __axis_y2_rescale = getConfig(['axis', 'y2', 'rescale'], true),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_format = getConfig(['axis', 'y2', 'format'], function (d) { return d; }),
@@ -954,7 +955,7 @@
                 .attr("id", "xaxis-clip")
               .append("rect")
                 .attr("x", -1 - margin.left)
-                .attr("y", -1)
+                .attr("y", -20)
                 .attr("width", getXAxisClipWidth)
                 .attr("height", getXAxisClipHeight);
             defs.append("clipPath")
@@ -986,17 +987,22 @@
                 .attr("class", "x axis")
                 .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
                 .attr("transform", translate.x)
-                .call(__axis_rotated ? yAxis : xAxis);
+                .call(__axis_rotated ? yAxis : xAxis)
+              .append("text")
+                .attr("x", width)
+                .attr("dy", "-.5em")
+                .style("text-anchor", "end")
+                .text(__axis_x_label);
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
                 .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("dy", "1.4em")
-                .attr("dx", "-.8em")
+                .attr("dy", "1.2em")
+                .attr("dx", "-.5em")
                 .style("text-anchor", "end")
-                .text(__axis_y_text);
+                .text(__axis_y_label);
 
             if (__axis_y2_show) {
                 main.append("g")
