@@ -989,7 +989,7 @@
                 .attr("transform", translate.x)
                 .call(__axis_rotated ? yAxis : xAxis)
               .append("text")
-                .attr("class", "label")
+                .attr("class", "-axis-x-label")
                 .attr("x", width)
                 .attr("dy", "-.5em")
                 .style("text-anchor", "end")
@@ -1377,7 +1377,7 @@
             main.select(".y2.axis").transition().call(yAxis2);
 
             // Update label position
-            main.select(".x.axis text.label").attr("x", width);
+            main.select(".x.axis .-axis-x-label").attr("x", width);
 
             // Update sub domain
             subY.domain(y.domain());
