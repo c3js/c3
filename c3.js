@@ -976,7 +976,6 @@
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
-                .style("width", "30%") // TODO: cul actual width when show
                 .style("z-index", "10")
                 .style("display", "none");
 
@@ -1138,11 +1137,23 @@
                         return addName(d.values[i]);
                     });
 
+                    // Construct tooltip
+                    tooltip.html(__tooltip_contents(selectedData))
+                        .style("visibility", "hidden")
+                        .style("display", "block");
+                    // Get tooltip dimensions
+                    var tWidth = tooltip.property('offsetWidth'),
+                        tHeight = tooltip.property('offsetHeight');
                     // Set tooltip
-                    tooltip.style("top", (d3.mouse(this)[1] + 15) + "px")
-                        .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
-                    tooltip.html(__tooltip_contents(selectedData));
-                    tooltip.style("display", "block");
+                    // todo get rid of magic numbers
+                    tooltip
+                        .style("top", (d3.mouse(this)[1] + 15 + tHeight < getCurrentHeight() ? d3.mouse(this)[1] + 15 : d3.mouse(this)[1] - tHeight ) + "px")
+                        .style("left", ((__axis_rotated ?
+                            d3.mouse(this)[0] :
+                            (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
+                                (x(selectedData[0].x) + 60) +"px" : (x(selectedData[0].x) - tWidth + 30)  + "px"
+                        )))
+                        .style("visibility", "visible");
 
                     if (! __data_selection_enabled || dragging) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
