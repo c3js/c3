@@ -1120,12 +1120,6 @@
                         .data([selectedData[0]])
                         .attr(__axis_rotated ? 'y1' : 'x1', xx)
                         .attr(__axis_rotated ? 'y2' : 'x2', xx);
-
-                    // Set tooltip
-                    tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
-                           .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
-                    tooltip.html(__tooltip_contents(selectedData));
-                    tooltip.style("visibility", "visible");
                 })
                 .on('mouseout', function (d, i) {
                     main.select('line.xgrid-focus').style("visibility", "hidden");
@@ -1140,6 +1134,16 @@
                         .classed(EXPANDED, false);
                 })
                 .on('mousemove', function (d, i) {
+                    var selectedData = c3.data.targets.map(function (d) {
+                        return addName(d.values[i]);
+                    });
+
+                    // Set tooltip
+                    tooltip.style("top", (d3.mouse(this)[1] + 15) + "px")
+                        .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
+                    tooltip.html(__tooltip_contents(selectedData));
+                    tooltip.style("visibility", "visible");
+
                     if (! __data_selection_enabled || dragging) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
 
