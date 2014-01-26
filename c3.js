@@ -565,6 +565,7 @@
         function classLine(d) { return classShapes(d) + " -line -line-" + d.id; }
         function classCircles(d) { return classShapes(d) + " -circles -circles-" + d.id; }
         function classBars(d) { return classShapes(d) + " -bars -bars-" + d.id; }
+        function classArea(d) { return classShapes(d) + " -area -area-" + d.id; }
         function classShape(d, i) { return "-shape -shape-" + i; }
         function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
@@ -673,11 +674,11 @@
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline';
+            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline';
         }
         function isSplineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'spline';
+            return __data_types[id] === 'spline' || __data_types[id] === 'area-spline';
         }
         function isBarType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -781,6 +782,25 @@
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
                     return Object.keys(__data_regions).length > 0 ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
+                } else {
+                    x0 = x(data[0].x);
+                    y0 = getYScale(d.id)(data[0].value);
+                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+                }
+            };
+        })();
+
+        var areaOnMain = (function () {
+            var area = d3.svg.area()
+                .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
+                .y0(__axis_rotated ? getCurrentWidth() : getCurrentHeight())
+                .y1(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
+            return function (d) {
+                var data = filterRemoveNull(d.values), x0, y0;
+
+                if (hasType([d], 'area') || hasType([d], 'area-spline')) {
+                    isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
+                    return area(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
@@ -1473,6 +1493,9 @@
             main.selectAll('.-line')
               .transition().duration(duration)
                 .attr("d", lineOnMain);
+            main.selectAll('.-area')
+                .transition().duration(duration)
+                .attr("d", areaOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineData);
             mainCircle.transition().duration(duration)
@@ -1664,6 +1687,10 @@
             mainLineEnter.append("path")
                 .attr("class", classLine)
                 .style("stroke", function (d) { return color(d.id); });
+            // Areas
+            mainLineEnter.append("path")
+                .attr("class", classArea)
+                .style("fill", function (d) { return color(d.id); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
                 .attr("class", function (d) { return "selected-circles selected-circles-" + d.id; });
