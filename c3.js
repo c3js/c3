@@ -978,7 +978,7 @@
                 .style("position", "absolute")
                 .style("width", "30%") // TODO: cul actual width when show
                 .style("z-index", "10")
-                .style("visibility", "hidden");
+                .style("display", "none");
 
             /*-- Main Region --*/
 
@@ -1123,7 +1123,7 @@
                 })
                 .on('mouseout', function (d, i) {
                     main.select('line.xgrid-focus').style("visibility", "hidden");
-                    tooltip.style("visibility", "hidden");
+                    tooltip.style("display", "none");
                     // Undo expanded circles
                     main.selectAll('.-circle-' + i)
                         .filter(function () { return d3.select(this).classed(EXPANDED); })
@@ -1142,7 +1142,7 @@
                     tooltip.style("top", (d3.mouse(this)[1] + 15) + "px")
                         .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
                     tooltip.html(__tooltip_contents(selectedData));
-                    tooltip.style("visibility", "visible");
+                    tooltip.style("display", "block");
 
                     if (! __data_selection_enabled || dragging) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
@@ -1347,7 +1347,7 @@
                 })));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
-                       .style("visibility", "visible");
+                       .style("display", "block");
             }
         }
 
@@ -1388,7 +1388,7 @@
             subY2.domain(y2.domain());
 
             // tooltip
-            tooltip.style("visibility", "hidden");
+            tooltip.style("display", "none");
 
             // grid
             main.select('line.xgrid-focus')
