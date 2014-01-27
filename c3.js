@@ -985,9 +985,8 @@
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
-                .style("width", "30%") // TODO: cul actual width when show
                 .style("z-index", "10")
-                .style("visibility", "hidden");
+                .style("display", "none");
 
             /*-- Main Region --*/
 
@@ -1129,16 +1128,10 @@
                         .data([selectedData[0]])
                         .attr(__axis_rotated ? 'y1' : 'x1', xx)
                         .attr(__axis_rotated ? 'y2' : 'x2', xx);
-
-                    // Set tooltip
-                    tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
-                           .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
-                    tooltip.html(__tooltip_contents(selectedData));
-                    tooltip.style("visibility", "visible");
                 })
                 .on('mouseout', function (d, i) {
                     main.select('line.xgrid-focus').style("visibility", "hidden");
-                    tooltip.style("visibility", "hidden");
+                    tooltip.style("display", "none");
                     // Undo expanded circles
                     main.selectAll('.-circle-' + i)
                         .filter(function () { return d3.select(this).classed(EXPANDED); })
@@ -1149,6 +1142,28 @@
                         .classed(EXPANDED, false);
                 })
                 .on('mousemove', function (d, i) {
+                    var selectedData = c3.data.targets.map(function (d) {
+                        return addName(d.values[i]);
+                    });
+
+                    // Construct tooltip
+                    tooltip.html(__tooltip_contents(selectedData))
+                        .style("visibility", "hidden")
+                        .style("display", "block");
+                    // Get tooltip dimensions
+                    var tWidth = tooltip.property('offsetWidth'),
+                        tHeight = tooltip.property('offsetHeight');
+                    // Set tooltip
+                    // todo get rid of magic numbers
+                    tooltip
+                        .style("top", (d3.mouse(this)[1] + 15 + tHeight < getCurrentHeight() ? d3.mouse(this)[1] + 15 : d3.mouse(this)[1] - tHeight ) + "px")
+                        .style("left", ((__axis_rotated ?
+                            d3.mouse(this)[0] :
+                            (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
+                                (x(selectedData[0].x) + 60) +"px" : (x(selectedData[0].x) - tWidth + 30)  + "px"
+                        )))
+                        .style("visibility", "visible");
+
                     if (! __data_selection_enabled || dragging) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
 
@@ -1352,7 +1367,7 @@
                 })));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
-                       .style("visibility", "visible");
+                       .style("display", "block");
             }
 
             // Bind resize event
@@ -1398,7 +1413,7 @@
             subY2.domain(y2.domain());
 
             // tooltip
-            tooltip.style("visibility", "hidden");
+            tooltip.style("display", "none");
 
             // grid
             main.select('line.xgrid-focus')
