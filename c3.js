@@ -903,7 +903,6 @@
         var firstDate = null, lastDate = null, orgXDomain;
 
         function init(data) {
-            var targets = c3.data.targets = convertDataToTargets(data);
             var grid, xgridLine;
             var i;
 
@@ -911,7 +910,12 @@
             if (selectChart.empty()) {
                 window.alert('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
                 return;
+            } else {
+                selectChart.html("");
             }
+
+            c3.data.x = undefined;
+            c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
 
@@ -1326,10 +1330,10 @@
 
             /*-- Legend Region --*/
 
-            if (__legend_show) { updateLegend(targets); }
+            if (__legend_show) { updateLegend(c3.data.targets); }
 
             // Set targets
-            updateTargets(targets);
+            updateTargets(c3.data.targets);
 
             // Draw with targets
             redraw({withTransition: false, withUpdateXDomain: true});
@@ -1338,17 +1342,22 @@
             if (__tooltip_init_show) {
                 if (isTimeSeries && typeof __tooltip_init_x === 'string') {
                     __tooltip_init_x = parseDate(__tooltip_init_x);
-                    for (i = 0; i < targets[0].values.length; i++) {
-                        if ((targets[0].values[i].x - __tooltip_init_x) === 0) { break; }
+                    for (i = 0; i < c3.data.targets[0].values.length; i++) {
+                        if ((c3.data.targets[0].values[i].x - __tooltip_init_x) === 0) { break; }
                     }
                     __tooltip_init_x = i;
                 }
-                tooltip.html(__tooltip_contents(targets.map(function (d) {
+                tooltip.html(__tooltip_contents(c3.data.targets.map(function (d) {
                     return addName(d.values[__tooltip_init_x]);
                 })));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
                        .style("visibility", "visible");
+            }
+
+            // Bind resize event
+            if (window.onresize == null) {
+                window.onresize = resize;
             }
         }
 
@@ -2009,6 +2018,13 @@
             return targets.length > 0 ? targets[0] : undefined;
         };
 
+        c3.destroy = function () {
+            c3.data.targets = undefined;
+            c3.data.x = undefined;
+            selectChart.html("");
+            window.onresize = null;
+        };
+
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
@@ -2023,9 +2039,6 @@
         else {
             throw Error('url or rows or columns is required.');
         }
-
-        // Bind resize event
-        window.onresize = resize;
 
         return c3;
     };
