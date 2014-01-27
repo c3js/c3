@@ -465,7 +465,6 @@
             }
             return new_rows;
         }
-
         function convertColumnsToData(columns) {
             var new_rows = [], i, j, key;
             for (i = 0; i < columns.length; i++) {
@@ -481,7 +480,7 @@
         }
         function convertDataToTargets(data) {
             var ids = d3.keys(data[0]).filter(function (key) { return key !== __data_x; });
-            var targets, i = 0, parsedDate;
+            var targets, index, parsedDate;
 
             // check __data_x is defined if timeseries
             if (isTimeSeries && ! __data_x) {
@@ -489,6 +488,11 @@
                 return [];
             }
 
+            if (isCustomX && isUndefined(c3.data.x)) {
+                c3.data.x = data.map(function (d) { return d[__data_x]; });
+            }
+
+            index = 0;
             data.forEach(function (d) {
                 if (isTimeSeries) {
                     if (!(__data_x in d)) { throw Error("'" + __data_x + "' must be included in data"); }
@@ -497,13 +501,14 @@
                     d.x = parsedDate;
                 }
                 else if (isCustomX) {
-                    d.x = d[__data_x];
+                    d.x = isDefined(d[__data_x]) ? d[__data_x] : c3.data.x[index];
                 }
                 else {
-                    d.x = i++;
+                    d.x = index;
                 }
                 if (firstDate === null) { firstDate = new Date(d.x); }
                 lastDate = new Date(d.x);
+                index++;
             });
 
             targets = ids.map(function (id) {
