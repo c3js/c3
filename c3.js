@@ -791,10 +791,20 @@
         })();
 
         var areaOnMain = (function () {
-            var area = d3.svg.area()
-                .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
-                .y0(__axis_rotated ? getCurrentWidth() : getCurrentHeight())
-                .y1(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
+            var area;
+
+            if (__axis_rotated) {
+                area = d3.svg.area()
+                    .x0(function (d) {  return getYScale(d.id)(0); })
+                    .x1(function (d) { return getYScale(d.id)(d.value); })
+                    .y(xx);
+            } else {
+                area = d3.svg.area()
+                    .x(xx)
+                    .y0(function (d) {  return getYScale(d.id)(0); })
+                    .y1(function (d) { return getYScale(d.id)(d.value); });
+            }
+
             return function (d) {
                 var data = filterRemoveNull(d.values), x0, y0;
 
