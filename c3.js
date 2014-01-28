@@ -1156,11 +1156,11 @@
                     // Set tooltip
                     // todo get rid of magic numbers
                     tooltip
-                        .style("top", (d3.mouse(this)[1] + 15 + tHeight < getCurrentHeight() ? d3.mouse(this)[1] + 15 : d3.mouse(this)[1] - tHeight ) + "px")
+                        .style("top", (d3.mouse(this)[1] + 15 + tHeight < getCurrentHeight() ? d3.mouse(this)[1] + 15 : d3.mouse(this)[1] - tHeight) + "px")
                         .style("left", ((__axis_rotated ?
                             d3.mouse(this)[0] :
                             (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
-                                (x(selectedData[0].x) + 60) +"px" : (x(selectedData[0].x) - tWidth + 30)  + "px"
+                                (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
                         )))
                         .style("visibility", "visible");
 
