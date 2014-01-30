@@ -795,7 +795,7 @@
                 var data = filterRemoveNull(d.values), x0, y0;
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
+                    return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
