@@ -329,15 +329,22 @@
 
         function getXAxis(scale, orient) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
-            if (isTimeSeries) {
-                axis.tickFormat(__axis_x_tick_format ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : defaultTimeFormat);
+            var tickFormat = isTimeSeries ? defaultTimeFormat : null;
+
+            // Set tick format
+            if (__axis_x_tick_format) {
+                tickFormat = typeof __axis_x_tick_format === 'function' ? __axis_x_tick_format : isTimeSeries ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : null;
             }
+            axis.tickFormat(tickFormat);
+
+            // Set categories
             if (isCategorized) {
                 axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
             } else {
                 // TODO: fix
                 axis.tickOffset = function () { return 0; };
             }
+
             return axis;
         }
         function getYAxis(scale, orient) {
