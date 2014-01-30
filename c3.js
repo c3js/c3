@@ -350,7 +350,7 @@
             return id in __data_axes ? __data_axes[id] : 'y';
         }
         function getXAxisTickFormat() {
-            var tickFormat = isTimeSeries ? defaultTimeFormat : isCategorized ? category : null;
+            var tickFormat = isTimeSeries ? defaultTimeFormat : isCategorized ? category : function (x) { return x; };
             if (__axis_x_tick_format) {
                 tickFormat = typeof __axis_x_tick_format === 'function' ? __axis_x_tick_format : isTimeSeries ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : tickFormat;
             }
