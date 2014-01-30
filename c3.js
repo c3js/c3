@@ -2069,7 +2069,9 @@
     };
 
     function categoryAxis() {
-        var scale = d3.scale.linear(), orient = "bottom", tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, categories = [];
+        var scale = d3.scale.linear(), orient = "bottom";
+        var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null;
+        var categories = [];
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
                 return "translate(" + (x(d) + tickOffset) + ", 0)";
@@ -2099,6 +2101,10 @@
         }
         function category(i) {
             return i < categories.length ? categories[i] : i;
+        }
+        function formattedCategory(i) {
+            var c = category(i);
+            return tickFormat ? tickFormat(c) : c;
         }
         function axis(g) {
             g.each(function () {
@@ -2135,7 +2141,7 @@
                         lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                         textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                         text.attr("dy", ".71em").style("text-anchor", "middle");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? category(i) : ""; });
+                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                         pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
                     }
 
@@ -2161,7 +2167,7 @@
                         lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
                         textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
                         text.attr("dy", ".32em").style("text-anchor", "end");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? category(i) : ""; });
+                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                         pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
                         break;
                     }
@@ -2215,6 +2221,11 @@
         axis.tickTextNum = function (x) {
             if (!arguments.length) { return tickTextNum; }
             tickTextNum = x;
+            return axis;
+        };
+        axis.tickFormat = function (format) {
+            if (!arguments.length) { return tickFormat; }
+            tickFormat = format;
             return axis;
         };
         axis.tickOffset = function () {
