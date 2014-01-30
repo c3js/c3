@@ -828,13 +828,13 @@
                     regions[i] = {};
                     if (isUndefined(_regions[i].start)) {
                         regions[i].start = d[0].x;
-                    } else if (isTimeSeries) {
-                        regions[i].start = parseDate(_regions[i].start);
+                    } else {
+                        regions[i].start = isTimeSeries ? parseDate(_regions[i].start) : _regions[i].start;
                     }
                     if (isUndefined(_regions[i].end)) {
                         regions[i].end = d[d.length - 1].x;
-                    } else if (isTimeSeries) {
-                        regions[i].end = parseDate(_regions[i].end);
+                    } else {
+                        regions[i].end = isTimeSeries ? parseDate(_regions[i].end) : _regions[i].end;
                     }
                 }
             }
