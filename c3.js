@@ -1444,13 +1444,12 @@
                 xgrid = main.select('.xgrids').selectAll(".xgrid")
                     .data(xgridData);
                 xgrid.enter().append('line').attr("class", "xgrid");
+                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return x(d) - xAxis.tickOffset(); })
+                    .attr("x2", __axis_rotated ? width : function (d) { return x(d) - xAxis.tickOffset(); })
+                    .attr("y1", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : margin.top)
+                    .attr("y2", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : height)
+                    .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
-                main.selectAll(".xgrid")
-                    .attr("x1", function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("x2", function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("y1", margin.top)
-                    .attr("y2", height)
-                    .style("opacity", function () { return d3.select(this).attr('x1') === 0 ? 0 : 1; });
             }
             if (__grid_x_lines) {
                 xgridLine = main.selectAll(".xgrid-lines");
