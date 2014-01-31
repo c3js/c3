@@ -1471,10 +1471,7 @@
                 ygrid.attr("x1", __axis_rotated ? y : 0)
                      .attr("x2", __axis_rotated ? y : width)
                      .attr("y1", __axis_rotated ? 0 : y)
-                     .attr("y2", __axis_rotated ? height : y)
-                     .attr("opacity", 0)
-                   .transition()
-                     .attr("opacity", 1);
+                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
             }
             if (withY && __grid_y_lines) {
