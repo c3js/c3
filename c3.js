@@ -1449,7 +1449,8 @@
                     .attr("x1", function (d) { return x(d) - xAxis.tickOffset(); })
                     .attr("x2", function (d) { return x(d) - xAxis.tickOffset(); })
                     .attr("y1", margin.top)
-                    .attr("y2", height);
+                    .attr("y2", height)
+                    .style("opacity", function () { return d3.select(this).attr('x1') === 0 ? 0 : 1; });
             }
             if (__grid_x_lines) {
                 xgridLine = main.selectAll(".xgrid-lines");
