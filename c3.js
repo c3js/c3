@@ -673,6 +673,9 @@
                 )))
                 .style("visibility", "visible");
         }
+        function hideTooltip() {
+            tooltip.style("display", "none");
+        }
 
         function showXGridFocus(data) {
             main.selectAll('line.xgrid-focus')
@@ -680,6 +683,9 @@
                 .data([data])
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
+        }
+        function hideXGridFocus() {
+            main.select('line.xgrid-focus').style("visibility", "hidden");
         }
 
         //-- Circle --//
@@ -734,14 +740,14 @@
         function getBarW(axis, barTargetsNum, isSub) {
             var barW;
             if (isCategorized) {
-                barW = (axis.tickOffset() * 2 * 0.6) / barTargetsNum;
+                barW = barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
             } else {
                 barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (maxDataCount() - 1)) * 0.6;
             }
             return barW;
         }
         function getBarH(height, isSub) {
-            var h = height === null ? function (v) { return v; } : function (v) { return height - v; };
+            var h = height === null ? function (v) { return v; } : function (v) { return height > v ? height - v : 0; };
             return function (d) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
                 return h(scale(d.value));
@@ -894,6 +900,30 @@
         }
 
         //-- Shape --//
+
+        function getCircles(i, id) {
+            return (id ? main.selectAll('.-circles-' + id) : main).selectAll('.-circle' + (i || i === 0 ? '-' + i : ''));
+        }
+        function expandCircles(i, id) {
+            getCircles(i, id)
+                .classed(EXPANDED, true)
+                .attr('r', __point_focus_expand_r);
+        }
+        function unexpandCircles(i) {
+            getCircles(i)
+                .filter(function () { return d3.select(this).classed(EXPANDED); })
+                .classed(EXPANDED, false)
+                .attr('r', __point_r);
+        }
+        function getBars(i) {
+            return main.selectAll(".-bar" + (i || i === 0 ? '-' + i : ''));
+        }
+        function expandBars(i) {
+            getBars(i).classed(EXPANDED, false);
+        }
+        function unexpandBars(i) {
+            getBars(i).classed(EXPANDED, false);
+        }
 
         // For main region
         var lineOnMain = (function () {
@@ -1325,31 +1355,19 @@
                         selectedData = newData.concat(selectedData); // Add remained
                     }
 
-                    // Expand circles if needed
-                    if (__point_focus_expand_enabled) {
-                        main.selectAll('.-circle-' + i)
-                            .classed(EXPANDED, true)
-                            .attr('r', __point_focus_expand_r);
-                    }
-
-                    // Expand bars
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, true);
+                    // Expand shapes if needed
+                    if (__point_focus_expand_enabled) { expandCircles(i); }
+                    expandBars(i);
 
                     // Show xgrid focus line
                     showXGridFocus(selectedData[0]);
                 })
                 .on('mouseout', function (d, i) {
-                    main.select('line.xgrid-focus').style("visibility", "hidden");
-                    tooltip.style("display", "none");
-                    // Undo expanded circles
-                    main.selectAll('.-circle-' + i)
-                        .filter(function () { return d3.select(this).classed(EXPANDED); })
-                        .classed(EXPANDED, false)
-                        .attr('r', __point_r);
-                    // Undo expanded bar
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, false);
+                    hideXGridFocus();
+                    hideTooltip();
+                    // Undo expanded shapes
+                    unexpandCircles(i);
+                    unexpandBars();
                 })
                 .on('mousemove', function (d, i) {
                     var selectedData;
@@ -1413,23 +1431,27 @@
                 .attr('width', width)
                 .attr('height', height)
                 .attr('class', "event-rect")
+                .on('mouseout', function () {
+                    hideXGridFocus();
+                    hideTooltip();
+                    unexpandCircles();
+                })
                 .on('mousemove', function () {
-                    var mouse = d3.mouse(this),
-                        closest = findClosest(c3.data.targets, mouse);
+                    var mouse, closest, selectedData;
+
+                    if (dragging) { return; } // do nothing when dragging
+
+                    mouse = d3.mouse(this);
+                    closest = findClosest(c3.data.targets, mouse);
 
                     // show tooltip when cursor is close to some point
-                    var selectedData = [addName(closest)];
+                    selectedData = [addName(closest)];
                     showTooltip(selectedData, mouse);
 
                     // expand points
                     if (__point_focus_expand_enabled) {
-                        main.selectAll('.-circle')
-                            .filter(function () { return d3.select(this).classed(EXPANDED); })
-                            .classed(EXPANDED, false)
-                            .attr('r', __point_r);
-                        main.select('.-circles-' + closest.id).select('.-circle-' + closest.index)
-                            .classed(EXPANDED, true)
-                            .attr('r', __point_focus_expand_r);
+                        unexpandCircles();
+                        expandCircles(closest.index, closest.id);
                     }
 
                     // Show xgrid focus line
@@ -1499,6 +1521,7 @@
                 .attr('y', minY)
                 .attr('width', maxX - minX)
                 .attr('height', maxY - minY);
+            // TODO: binary search when multiple xs
             main.selectAll('.-shapes').selectAll('.-shape')
                 .filter(function (d) { return __data_selection_isselectable(d); })
                 .each(function (d, i) {
