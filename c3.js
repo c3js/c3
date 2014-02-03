@@ -48,7 +48,8 @@
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
-        var __data_x = getConfig(['data', 'x'], undefined),
+        var __data_x = getConfig(['data', 'x'], null),
+            __data_xs = getConfig(['data', 'xs'], null),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
@@ -153,13 +154,11 @@
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
-            isCustomX = !isTimeSeries && __data_x;
+            isCustomX = !isTimeSeries && (__data_x || __data_xs);
 
         var dragStart = null, dragging = false, cancelClick = false;
 
         var legendHeight = __legend_show ? 40 : 0;
-
-        var parseDate = d3.time.format(__data_x_format).parse;
 
         var color = generateColor(__data_colors, __color_pattern);
 
@@ -458,6 +457,16 @@
 
         //-- Data --//
 
+        function isX(key) {
+            return (__data_x && key === __data_x) || (__data_xs && hasValue(__data_xs, key));
+        }
+        function isNotX(key) {
+            return !isX(key);
+        }
+        function getXKey(id) {
+            return __data_x ? __data_x : __data_xs ? __data_xs[id] : null;
+        }
+
         function addName(data) {
             var name = __data_names[data.id];
             data.name = isDefined(name) ? name : data.id;
@@ -489,45 +498,49 @@
             return new_rows;
         }
         function convertDataToTargets(data) {
-            var ids = d3.keys(data[0]).filter(function (key) { return key !== __data_x; });
-            var targets, index, parsedDate;
+            var ids = d3.keys(data[0]).filter(isNotX), xs = d3.keys(data[0]).filter(isX), targets;
 
-            // check __data_x is defined if timeseries
-            if (isTimeSeries && ! __data_x) {
-                window.alert('data.x must be specified when axis.x.type == "timeseries"');
+            // check "x" is defined if timeseries
+            if (isTimeSeries && xs.length === 0) {
+                window.alert('data.x or data.xs must be specified when axis.x.type == "timeseries"');
                 return [];
             }
 
-            if (isCustomX && isUndefined(c3.data.x)) {
-                c3.data.x = data.map(function (d) { return d[__data_x]; });
+            // save x for update data by load
+            if (isCustomX) {
+                ids.forEach(function (id) {
+                    var xKey = getXKey(id);
+                    if (xs.indexOf(xKey) >= 0) {
+                        c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                    }
+                });
             }
 
-            index = 0;
-            data.forEach(function (d) {
-                if (isTimeSeries) {
-                    if (!(__data_x in d)) { throw Error("'" + __data_x + "' must be included in data"); }
-                    parsedDate = parseDate(d[__data_x]);
-                    if (parsedDate === null) { throw Error("Failed to parse timeseries date in data"); }
-                    d.x = parsedDate;
-                }
-                else if (isCustomX) {
-                    d.x = isDefined(d[__data_x]) ? d[__data_x] : c3.data.x[index];
-                }
-                else {
-                    d.x = index;
-                }
-                if (firstDate === null) { firstDate = new Date(d.x); }
-                lastDate = new Date(d.x);
-                index++;
-            });
-
+            // convert to target
             targets = ids.map(function (id) {
                 var convertedId = __data_id_converter(id);
                 return {
                     id: convertedId,
                     id_org: id,
-                    values: data.map(function (d) {
-                        return {x: d.x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
+                    values: data.map(function (d, i) {
+                        var x, xKey = getXKey(id);
+
+                        if (isTimeSeries) {
+                            x = parseDate(d[xKey]);
+                        }
+                        else if (isCustomX) {
+                            x = d[xKey] ? d[xKey] : c3.data.x[id][i];
+                        }
+                        else {
+                            x = i;
+                        }
+
+                        if (x < firstX || firstX === null) { firstX = x; }
+                        if (lastX < x) { lastX = x; }
+
+                        d.x = x; // used by event-rect
+
+                        return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId, index: i};
                     })
                 };
             });
@@ -595,10 +608,84 @@
             return y(d.value);
         }
 
-        //-- Circle --/
+        function findClosestOfValues(values, pos, _min, _max) { // MEMO: values must be sorted by x
+            var min = _min ? _min : 0,
+                max = _max ? _max : values.length - 1,
+                med = Math.floor((max - min) / 2) + min,
+                value = values[med],
+                diff = x(value.x) - pos[0],
+                minDist, maxDist;
+
+            // Update rage for search
+            diff > 0 ? max = med : min = med;
+
+            // if candidates are two closest min and max, stop recursive call
+            if ((max - min) === 1) {
+                if (! values[min].x) { return values[max]; }
+                if (! values[max].x) { return values[min]; }
+                minDist = Math.pow(pos[0] - x(values[min].x), 2) + Math.pow(pos[1] - y(values[min].value), 2);
+                maxDist = Math.pow(pos[0] - x(values[max].x), 2) + Math.pow(pos[1] - y(values[max].value), 2);
+                return minDist < maxDist ? values[min] : values[max];
+            }
+
+            return findClosestOfValues(values, pos, min, max);
+        }
+        function findClosest(targets, mouse) {
+            var closest, closests, minDist;
+
+            // map to array of closest points of each target
+            closests = targets.map(function (target) {
+                return findClosestOfValues(target.values, mouse);
+            });
+
+            // decide closest point
+            closests.forEach(function (c) {
+                var dist = Math.pow(x(c.x) - mouse[0], 2) + Math.pow(y(c.value) - mouse[1], 2);
+                if (dist < minDist || ! minDist) {
+                    minDist = dist;
+                    closest = c;
+                }
+            });
+
+            // TODO: multiple closests when each is very close
+
+            return closest;
+        }
+
+        //-- Tooltip --//
+
+        function showTooltip(selectedData, mouse) {
+            // Construct tooltip
+            tooltip.html(__tooltip_contents(selectedData))
+                .style("visibility", "hidden")
+                .style("display", "block");
+            // Get tooltip dimensions
+            var tWidth = tooltip.property('offsetWidth'),
+                tHeight = tooltip.property('offsetHeight');
+            // Set tooltip
+            // todo get rid of magic numbers
+            tooltip
+                .style("top", (mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight) + "px")
+                .style("left", ((__axis_rotated ?
+                  mouse[0] :
+                  (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
+                      (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
+                )))
+                .style("visibility", "visible");
+        }
+
+        function showXGridFocus(data) {
+            main.selectAll('line.xgrid-focus')
+                .style("visibility", "visible")
+                .data([data])
+                .attr(__axis_rotated ? 'y1' : 'x1', xx)
+                .attr(__axis_rotated ? 'y2' : 'x2', xx);
+        }
+
+        //-- Circle --//
 
         function circleX(d) {
-            return x(d.x);
+            return d.x || d.x === 0 ? x(d.x) : null;
         }
         function circleY(d) {
             return getYScale(d.id)(d.value);
@@ -724,6 +811,16 @@
             };
         }
 
+        //-- Date --//
+
+        function parseDate(date) {
+            var parsedDate;
+            if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
+            parsedDate = d3.time.format(__data_x_format).parse(date);
+            if (!parsedDate) { throw Error("Failed to parse '" + date + "' with format " + __data_x_format); }
+            return parsedDate;
+        }
+
         //-- Util --//
 
         function isWithinCircle(_this, _r) {
@@ -743,6 +840,18 @@
                 if (regions[i].start < x && x <= regions[i].end) { return true; }
             }
             return false;
+        }
+
+        function hasValue(dict, value) {
+            var found = false;
+            Object.keys(dict).forEach(function (key) {
+                if (dict[key] === value) { found = true; }
+            });
+            return found;
+        }
+
+        function dist(data, mouse) {
+            return Math.pow(x(data.x) - mouse[0], 2) + Math.pow(y(data.value) - mouse[1], 2);
         }
 
         //-- Selection --//
@@ -910,10 +1019,10 @@
         var svg, defs, main, context, legend, tooltip, selectChart;
 
         // for brush area culculation
-        var firstDate = null, lastDate = null, orgXDomain;
+        var firstX = null, lastX = null, orgXDomain;
 
         function init(data) {
-            var grid, xgridLine;
+            var eventRect, grid, xgridLine;
             var i;
 
             selectChart = d3.select(__bindto);
@@ -924,7 +1033,7 @@
                 selectChart.html("");
             }
 
-            c3.data.x = undefined;
+            c3.data.x = {};
             c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
@@ -934,7 +1043,7 @@
             updateScales();
 
             // Set domains for each scale
-            x.domain(d3.extent(data.map(function (d) { return d.x; })));
+            x.domain(d3.extent([firstX, lastX]));
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
             subX.domain(x.domain());
@@ -1091,211 +1200,13 @@
                 .attr('class', 'chart');
 
             // Cover whole with rects for events
-            main.select('.chart').append("g")
+            eventRect = main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
-                .style('cursor', __zoom_enabled ? 'ew-resize' : null)
-              .selectAll(".event-rects")
-                .data(data)
-              .enter().append("rect")
-                .attr("class", function (d, i) { return "event-rect event-rect-" + i; })
-                .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
-                .on('mouseover', function (d, i) {
-                    if (dragging) { return; } // do nothing if dragging
+                .style('cursor', __zoom_enabled ? 'ew-resize' : null);
 
-                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
-                    var j, newData;
-
-                    // Sort selectedData as names order
-                    if (Object.keys(__data_names).length > 0) {
-                        newData = [];
-                        for (var id in __data_names) {
-                            for (j = 0; j < selectedData.length; j++) {
-                                if (selectedData[j].id === id) {
-                                    newData.push(selectedData[j]);
-                                    selectedData.shift(j);
-                                    break;
-                                }
-                            }
-                        }
-                        selectedData = newData.concat(selectedData); // Add remained
-                    }
-
-                    // Expand circles if needed
-                    if (__point_focus_expand_enabled) {
-                        main.selectAll('.-circle-' + i)
-                            .classed(EXPANDED, true)
-                            .attr('r', __point_focus_expand_r);
-                    }
-
-                    // Expand bars
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, true);
-
-                    // Show xgrid focus line
-                    main.selectAll('line.xgrid-focus')
-                        .style("visibility", "visible")
-                        .data([selectedData[0]])
-                        .attr(__axis_rotated ? 'y1' : 'x1', xx)
-                        .attr(__axis_rotated ? 'y2' : 'x2', xx);
-                })
-                .on('mouseout', function (d, i) {
-                    main.select('line.xgrid-focus').style("visibility", "hidden");
-                    tooltip.style("display", "none");
-                    // Undo expanded circles
-                    main.selectAll('.-circle-' + i)
-                        .filter(function () { return d3.select(this).classed(EXPANDED); })
-                        .classed(EXPANDED, false)
-                        .attr('r', __point_r);
-                    // Undo expanded bar
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, false);
-                })
-                .on('mousemove', function (d, i) {
-                    var selectedData = c3.data.targets.map(function (d) {
-                        return addName(d.values[i]);
-                    });
-
-                    // Construct tooltip
-                    tooltip.html(__tooltip_contents(selectedData))
-                        .style("visibility", "hidden")
-                        .style("display", "block");
-                    // Get tooltip dimensions
-                    var tWidth = tooltip.property('offsetWidth'),
-                        tHeight = tooltip.property('offsetHeight');
-                    // Set tooltip
-                    // todo get rid of magic numbers
-                    tooltip
-                        .style("top", (d3.mouse(this)[1] + 15 + tHeight < getCurrentHeight() ? d3.mouse(this)[1] + 15 : d3.mouse(this)[1] - tHeight) + "px")
-                        .style("left", ((__axis_rotated ?
-                            d3.mouse(this)[0] :
-                            (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
-                                (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
-                        )))
-                        .style("visibility", "visible");
-
-                    if (! __data_selection_enabled || dragging) { return; }
-                    if (__data_selection_grouped) { return; } // nothing to do when grouped
-
-                    main.selectAll('.-shape-' + i)
-                        .filter(function (d) { return __data_selection_isselectable(d); })
-                        .each(function () {
-                            var _this = d3.select(this).classed(EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
-                            d3.select('.event-rect-' + i).style('cursor', null);
-                        })
-                        .filter(function () {
-                            var _this = d3.select(this);
-                            if (this.nodeName === 'circle') {
-                                return isWithinCircle(this, __point_select_r);
-                            }
-                            else if (this.nodeName === 'rect') {
-                                return isWithinBar(this, _this.attr('x'), _this.attr('y'));
-                            }
-                        })
-                        .each(function () {
-                            var _this = d3.select(this);
-                            if (! _this.classed(EXPANDED)) {
-                                _this.classed(EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
-                            }
-                            d3.select('.event-rect-' + i).style('cursor', 'pointer');
-                        });
-                })
-                .on('click', function (d, i) {
-                    if (cancelClick) {
-                        cancelClick = false;
-                        return;
-                    }
-                    main.selectAll('.-shape-' + i).each(function (d) {
-                        var _this = d3.select(this),
-                            isSelected = _this.classed(SELECTED);
-                        var isWithin = false, toggle;
-                        if (this.nodeName === 'circle') {
-                            isWithin = isWithinCircle(this, __point_select_r * 1.5);
-                            toggle = togglePoint;
-                        }
-                        else if (this.nodeName === 'rect') {
-                            isWithin = isWithinBar(this);
-                            toggle = toggleBar;
-                        }
-                        if (__data_selection_grouped || isWithin) {
-                            if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                                _this.classed(SELECTED, !isSelected);
-                                toggle(!isSelected, _this, d, i);
-                            }
-                            __point_onclick(d, _this); // TODO: should be __data_onclick
-                        }
-                    });
-                })
-                .call(
-                    d3.behavior.drag().origin(Object).on('drag', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
-
-                        var sx = dragStart[0], sy = dragStart[1],
-                            mouse = d3.mouse(this),
-                            mx = mouse[0],
-                            my = mouse[1],
-                            minX = Math.min(sx, mx),
-                            maxX = Math.max(sx, mx),
-                            minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my),
-                            maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
-                        main.select('.dragarea')
-                            .attr('x', minX)
-                            .attr('y', minY)
-                            .attr('width', maxX - minX)
-                            .attr('height', maxY - minY);
-                        main.selectAll('.-shapes').selectAll('.-shape')
-                            .filter(function (d) { return __data_selection_isselectable(d); })
-                            .each(function (d, i) {
-                                var _this = d3.select(this),
-                                    isSelected = _this.classed(SELECTED),
-                                    isIncluded = _this.classed(INCLUDED),
-                                    _x, _y, _w, toggle, isWithin = false;
-                                if (this.nodeName === 'circle') {
-                                    _x = _this.attr("cx") * 1;
-                                    _y = _this.attr("cy") * 1;
-                                    toggle = togglePoint;
-                                    isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
-                                }
-                                else if (this.nodeName === 'rect') {
-                                    _x = _this.attr("x") * 1;
-                                    _y = _this.attr("y") * 1;
-                                    _w = _this.attr('width') * 1;
-                                    toggle = toggleBar;
-                                    isWithin = minX < _x + _w && _x < maxX && _y < maxY;
-                                }
-                                if (isWithin ^ isIncluded) {
-                                    _this.classed(INCLUDED, !isIncluded);
-                                    // TODO: included/unincluded callback here
-                                    _this.classed(SELECTED, !isSelected);
-                                    toggle(!isSelected, _this, d, i);
-                                }
-                            });
-                    })
-                    .on('dragstart', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        dragStart = d3.mouse(this);
-                        main.select('.chart').append('rect')
-                            .attr('class', 'dragarea')
-                            .style('opacity', 0.1);
-                        dragging = true;
-                        // TODO: add callback here
-                    })
-                    .on('dragend', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        main.select('.dragarea')
-                          .transition().duration(100)
-                            .style('opacity', 0)
-                          .remove();
-                        main.selectAll('.-shape')
-                            .classed(INCLUDED, false);
-                        dragging = false;
-                        // TODO: add callback here
-                    })
-                )
-                .call(zoom).on("dblclick.zoom", null);
+            // Generate rect for event handling
+            __data_xs ? generateEventRectsForMultipleXs(eventRect) : generateEventRectsForSingleX(eventRect, data);
 
             // Define g for bar chart area
             main.select(".chart").append("g")
@@ -1305,7 +1216,7 @@
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
 
-            if (__zoom_enabled) {
+            if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
                 main.insert('rect', __zoom_privileged ? null : 'g.grid')
                     .attr('class', 'zoom-rect')
@@ -1318,7 +1229,7 @@
 
             // Set default extent if defined
             if (__axis_x_default !== null) {
-                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : (isTimeSeries ? __axis_x_default(firstDate, lastDate) : __axis_x_default(0, maxDataCount() - 1)));
+                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(firstX, lastX));
             }
 
             /*-- Context Region --*/
@@ -1386,6 +1297,260 @@
             }
         }
 
+        function generateEventRectsForSingleX(eventRect, data) {
+            eventRect
+              .selectAll(".event-rects")
+                .data(data)
+              .enter().append("rect")
+                .attr("class", function (d, i) { return "event-rect event-rect-" + i; })
+                .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
+                .on('mouseover', function (d, i) {
+                    if (dragging) { return; } // do nothing if dragging
+
+                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
+                    var j, newData;
+
+                    // Sort selectedData as names order
+                    if (Object.keys(__data_names).length > 0) {
+                        newData = [];
+                        for (var id in __data_names) {
+                            for (j = 0; j < selectedData.length; j++) {
+                                if (selectedData[j].id === id) {
+                                    newData.push(selectedData[j]);
+                                    selectedData.shift(j);
+                                    break;
+                                }
+                            }
+                        }
+                        selectedData = newData.concat(selectedData); // Add remained
+                    }
+
+                    // Expand circles if needed
+                    if (__point_focus_expand_enabled) {
+                        main.selectAll('.-circle-' + i)
+                            .classed(EXPANDED, true)
+                            .attr('r', __point_focus_expand_r);
+                    }
+
+                    // Expand bars
+                    main.selectAll(".-bar-" + i)
+                        .classed(EXPANDED, true);
+
+                    // Show xgrid focus line
+                    showXGridFocus(selectedData[0]);
+                })
+                .on('mouseout', function (d, i) {
+                    main.select('line.xgrid-focus').style("visibility", "hidden");
+                    tooltip.style("display", "none");
+                    // Undo expanded circles
+                    main.selectAll('.-circle-' + i)
+                        .filter(function () { return d3.select(this).classed(EXPANDED); })
+                        .classed(EXPANDED, false)
+                        .attr('r', __point_r);
+                    // Undo expanded bar
+                    main.selectAll(".-bar-" + i)
+                        .classed(EXPANDED, false);
+                })
+                .on('mousemove', function (d, i) {
+                    var selectedData;
+
+                    if (dragging) { return; } // do nothing when dragging
+
+                    // Show tooltip
+                    selectedData = c3.data.targets.map(function (d) {
+                        return addName(d.values[i]);
+                    });
+                    showTooltip(selectedData, d3.mouse(this));
+
+                    if (! __data_selection_enabled) { return; }
+                    if (__data_selection_grouped) { return; } // nothing to do when grouped
+
+                    main.selectAll('.-shape-' + i)
+                        .filter(function (d) { return __data_selection_isselectable(d); })
+                        .each(function () {
+                            var _this = d3.select(this).classed(EXPANDED, true);
+                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
+                            d3.select('.event-rect-' + i).style('cursor', null);
+                        })
+                        .filter(function () {
+                            var _this = d3.select(this);
+                            if (this.nodeName === 'circle') {
+                                return isWithinCircle(this, __point_select_r);
+                            }
+                            else if (this.nodeName === 'rect') {
+                                return isWithinBar(this, _this.attr('x'), _this.attr('y'));
+                            }
+                        })
+                        .each(function () {
+                            var _this = d3.select(this);
+                            if (! _this.classed(EXPANDED)) {
+                                _this.classed(EXPANDED, true);
+                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
+                            }
+                            d3.select('.event-rect-' + i).style('cursor', 'pointer');
+                        });
+                })
+                .on('click', function (d, i) {
+                    if (cancelClick) {
+                        cancelClick = false;
+                        return;
+                    }
+                    main.selectAll('.-shape-' + i).each(function (d) { selectShape(this, d, i); });
+                })
+                .call(
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { drag(d3.mouse(this)); })
+                        .on('dragstart', function () { dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { dragend(); })
+                )
+                .call(zoom).on("dblclick.zoom", null);
+        }
+
+        function generateEventRectsForMultipleXs(eventRect) {
+            eventRect.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', width)
+                .attr('height', height)
+                .attr('class', "event-rect")
+                .on('mousemove', function () {
+                    var mouse = d3.mouse(this),
+                        closest = findClosest(c3.data.targets, mouse);
+
+                    // show tooltip when cursor is close to some point
+                    var selectedData = [addName(closest)];
+                    showTooltip(selectedData, mouse);
+
+                    // expand points
+                    if (__point_focus_expand_enabled) {
+                        main.selectAll('.-circle')
+                            .filter(function () { return d3.select(this).classed(EXPANDED); })
+                            .classed(EXPANDED, false)
+                            .attr('r', __point_r);
+                        main.select('.-circles-' + closest.id).select('.-circle-' + closest.index)
+                            .classed(EXPANDED, true)
+                            .attr('r', __point_focus_expand_r);
+                    }
+
+                    // Show xgrid focus line
+                    showXGridFocus(selectedData[0]);
+
+                    // Show cursor as pointer if point is close to mouse position
+                    if (dist(closest, mouse) < 100) {
+                        d3.select('.event-rect').style('cursor', 'pointer');
+                    } else {
+                        d3.select('.event-rect').style('cursor', null);
+                    }
+                })
+                .on('click', function () {
+                    var mouse = d3.mouse(this),
+                        closest = findClosest(c3.data.targets, mouse);
+
+                    // select if selection enabled
+                    if (dist(closest, mouse) < 100) {
+                        main.select('.-circles-' + closest.id).select('.-circle-' + closest.index).each(function () {
+                            selectShape(this, closest, closest.index);
+                        });
+                    }
+                })
+                .call(
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { drag(d3.mouse(this)); })
+                        .on('dragstart', function () { dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { dragend(); })
+                )
+                .call(zoom).on("dblclick.zoom", null);
+        }
+
+        function selectShape(target, d, i) {
+            var _this = d3.select(target),
+                isSelected = _this.classed(SELECTED);
+            var isWithin = false, toggle;
+            if (target.nodeName === 'circle') {
+                isWithin = isWithinCircle(target, __point_select_r * 1.5);
+                toggle = togglePoint;
+            }
+            else if (target.nodeName === 'rect') {
+                isWithin = isWithinBar(target);
+                toggle = toggleBar;
+            }
+            if (__data_selection_grouped || isWithin) {
+                if (__data_selection_enabled && __data_selection_isselectable(d)) {
+                    _this.classed(SELECTED, !isSelected);
+                    toggle(!isSelected, _this, d, i);
+                }
+                __point_onclick(d, _this); // TODO: should be __data_onclick
+            }
+        }
+
+        function drag(mouse) {
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
+
+            var sx = dragStart[0], sy = dragStart[1],
+                mx = mouse[0],
+                my = mouse[1],
+                minX = Math.min(sx, mx),
+                maxX = Math.max(sx, mx),
+                minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my),
+                maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
+            main.select('.dragarea')
+                .attr('x', minX)
+                .attr('y', minY)
+                .attr('width', maxX - minX)
+                .attr('height', maxY - minY);
+            main.selectAll('.-shapes').selectAll('.-shape')
+                .filter(function (d) { return __data_selection_isselectable(d); })
+                .each(function (d, i) {
+                    var _this = d3.select(this),
+                        isSelected = _this.classed(SELECTED),
+                        isIncluded = _this.classed(INCLUDED),
+                        _x, _y, _w, toggle, isWithin = false;
+                    if (this.nodeName === 'circle') {
+                        _x = _this.attr("cx") * 1;
+                        _y = _this.attr("cy") * 1;
+                        toggle = togglePoint;
+                        isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
+                    }
+                    else if (this.nodeName === 'rect') {
+                        _x = _this.attr("x") * 1;
+                        _y = _this.attr("y") * 1;
+                        _w = _this.attr('width') * 1;
+                        toggle = toggleBar;
+                        isWithin = minX < _x + _w && _x < maxX && _y < maxY;
+                    }
+                    if (isWithin ^ isIncluded) {
+                        _this.classed(INCLUDED, !isIncluded);
+                        // TODO: included/unincluded callback here
+                        _this.classed(SELECTED, !isSelected);
+                        toggle(!isSelected, _this, d, i);
+                    }
+                });
+        }
+
+        function dragstart(mouse) {
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            dragStart = mouse;
+            main.select('.chart').append('rect')
+                .attr('class', 'dragarea')
+                .style('opacity', 0.1);
+            dragging = true;
+            // TODO: add callback here
+        }
+
+        function dragend() {
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            main.select('.dragarea')
+                .transition().duration(100)
+                .style('opacity', 0)
+                .remove();
+            main.selectAll('.-shape')
+                .classed(INCLUDED, false);
+            dragging = false;
+            // TODO: add callback here
+            
+        }
+
         function redraw(options) {
             var xgrid, xgridData, xgridLine;
             var mainCircle, mainBar;
@@ -1432,8 +1597,8 @@
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
-                    var firstYear = firstDate.getFullYear();
-                    var lastYear = lastDate.getFullYear();
+                    var firstYear = firstX.getFullYear();
+                    var lastYear = lastX.getFullYear();
                     for (var year = firstYear; year <= lastYear; year++) {
                         xgridData.push(new Date(year + '-01-01 00:00:00'));
                     }
@@ -1574,24 +1739,26 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (isCustomX) {
-                rectW = function (d, i) {
-                    var prevX = getPrevX(i), nextX = getNextX(i);
-                    return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
-                };
-                rectX = function (d, i) {
-                    var prevX = getPrevX(i);
-                    return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
-                };
-            } else {
-                rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
-                rectX = function (d) { return x(d.x) - (rectW / 2); };
+            if (! __data_xs) {
+                if (isCustomX) {
+                    rectW = function (d, i) {
+                        var prevX = getPrevX(i), nextX = getNextX(i);
+                        return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
+                    };
+                    rectX = function (d, i) {
+                        var prevX = getPrevX(i);
+                        return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
+                    };
+                } else {
+                    rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
+                    rectX = function (d) { return x(d.x) - (rectW / 2); };
+                }
+                main.selectAll('.event-rect')
+                  .attr("x", __axis_rotated ? 0 : rectX)
+                  .attr("y", __axis_rotated ? rectX : 0)
+                  .attr("width", __axis_rotated ? width : rectW)
+                  .attr("height", __axis_rotated ? rectW : height);
             }
-            main.selectAll('.event-rect')
-                .attr("x", __axis_rotated ? 0 : rectX)
-                .attr("y", __axis_rotated ? rectX : 0)
-                .attr("width", __axis_rotated ? width : rectW)
-                .attr("height", __axis_rotated ? rectW : height);
 
             // rect for regions
             var mainRegion = main.select('.regions').selectAll('rect.region')
@@ -2042,7 +2209,7 @@
 
         c3.destroy = function () {
             c3.data.targets = undefined;
-            c3.data.x = undefined;
+            c3.data.x = {};
             selectChart.html("");
             window.onresize = null;
         };
