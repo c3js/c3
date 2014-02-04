@@ -419,6 +419,10 @@
             }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
+        function getDefaultXDomain() {
+            var padding = isCategorized ? 0 : Math.abs(lastX - firstX) * 0.01;
+            return [firstX - padding, lastX + padding];
+        }
         function diffDomain(d) {
             return d[1] - d[0];
         }
@@ -540,9 +544,25 @@
 
                         d.x = x; // used by event-rect
 
-                        return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId, index: i};
+                        return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
                     })
                 };
+            });
+
+            // finish targets
+            targets.forEach(function (t) {
+                var i;
+                // sort values by its x
+                t.values = t.values.sort(function (v1, v2) {
+                    var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+                        x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
+                    return x1 - x2;
+                });
+                // indexing each value
+                i = 0;
+                t.values.forEach(function (v) {
+                    v.index = i++;
+                });
             });
 
             // cache as original id keyed
@@ -678,6 +698,8 @@
         }
 
         function showXGridFocus(data) {
+            // Show when line chart exists
+            if (! hasLineType(c3.data.targets)) { return; }
             main.selectAll('line.xgrid-focus')
                 .style("visibility", "visible")
                 .data([data])
@@ -771,14 +793,17 @@
             });
             return has;
         }
-        /* not used
         function hasLineType(targets) {
             return hasType(targets, 'line');
         }
-        */
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
+        /* not used
+        function hasScatterType(targets) {
+            return hasType(targets, 'scatter');
+        }
+        */
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline';
@@ -791,11 +816,23 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'bar';
         }
+        function isScatterType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'scatter';
+        }
+        /* not used
         function lineData(d) {
             return isLineType(d) ? d.values : [];
         }
+        function scatterData(d) {
+            return isScatterType(d) ? d.values : [];
+        }
+        */
         function barData(d) {
             return isBarType(d) ? d.values : [];
+        }
+        function lineOrScatterData(d) {
+            return isLineType(d) || isScatterType(d) ? d.values : [];
         }
 
         //-- Color --//
@@ -1073,7 +1110,7 @@
             updateScales();
 
             // Set domains for each scale
-            x.domain(d3.extent([firstX, lastX]));
+            x.domain(d3.extent(getDefaultXDomain()));
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
             subX.domain(x.domain());
@@ -1698,7 +1735,7 @@
               .transition().duration(duration)
                 .attr("d", lineOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
-                .data(lineData);
+                .data(lineOrScatterData);
             mainCircle.transition().duration(duration)
                 .style('opacity', function (d) { return d.value === null ? 0 : 1; })
                 .attr("cx", __axis_rotated ? circleY : circleX)
@@ -2183,6 +2220,11 @@
 
         c3.toBar = function (targets) {
             setTargetType(targets, 'bar');
+            redraw();
+        };
+
+        c3.toScatter = function (targets) {
+            setTargetType(targets, 'scatter');
             redraw();
         };
 
