@@ -740,9 +740,10 @@
         }
         function getBarX(barW, barTargetsNum, barIndices, isSub) {
             var scale = isSub ? subX : x;
+            if (! barTargetsNum) { return function () { return 0; }; }
             return function (d) {
                 var barIndex = d.id in barIndices ? barIndices[d.id] : 0;
-                return scale(d.x) - barW * (barTargetsNum / 2 - barIndex);
+                return d.x || d.x === 0 ? scale(d.x) - barW * (barTargetsNum / 2 - barIndex) : 0;
             };
         }
         function getBarY(barH, barIndices, zeroBased, isSub) {
