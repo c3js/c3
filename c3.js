@@ -628,49 +628,71 @@
             return y(d.value);
         }
 
+        function findSameXOfValues(values, index) {
+            var i, targetX = values[index].x, sames = [];
+            for (i = index - 1; i >= 0; i--) {
+                if (targetX !== values[i].x) { break; }
+                sames.push(values[i]);
+            }
+            for (i = index; i < values.length; i++) {
+                if (targetX !== values[i].x) { break; }
+                sames.push(values[i]);
+            }
+            return sames;
+        }
+
         function findClosestOfValues(values, pos, _min, _max) { // MEMO: values must be sorted by x
             var min = _min ? _min : 0,
                 max = _max ? _max : values.length - 1,
                 med = Math.floor((max - min) / 2) + min,
                 value = values[med],
                 diff = x(value.x) - pos[0],
-                minDist, maxDist;
+                candidates;
 
-            // Update rage for search
+            // Update range for search
             diff > 0 ? max = med : min = med;
 
             // if candidates are two closest min and max, stop recursive call
             if ((max - min) === 1) {
-                if (! values[min].x) { return values[max]; }
-                if (! values[max].x) { return values[min]; }
-                minDist = Math.pow(pos[0] - x(values[min].x), 2) + Math.pow(pos[1] - y(values[min].value), 2);
-                maxDist = Math.pow(pos[0] - x(values[max].x), 2) + Math.pow(pos[1] - y(values[max].value), 2);
-                return minDist < maxDist ? values[min] : values[max];
+
+                // Get candidates that has same min and max index
+                candidates = [];
+                if (values[min].x) {
+                    candidates = candidates.concat(findSameXOfValues(values, min));
+                }
+                if (values[max].x) {
+                    candidates = candidates.concat(findSameXOfValues(values, max));
+                }
+
+                // Determine the closest and return
+                return findClosest(candidates, pos);
             }
 
             return findClosestOfValues(values, pos, min, max);
         }
-        function findClosest(targets, mouse) {
-            var closest, closests, minDist;
+        function findClosestFromTargets(targets, pos) {
+            var candidates;
 
             // map to array of closest points of each target
-            closests = targets.map(function (target) {
-                return findClosestOfValues(target.values, mouse);
+            candidates = targets.map(function (target) {
+                return findClosestOfValues(target.values, pos);
             });
 
-            // decide closest point
-            closests.forEach(function (c) {
-                var dist = Math.pow(x(c.x) - mouse[0], 2) + Math.pow(y(c.value) - mouse[1], 2);
-                if (dist < minDist || ! minDist) {
-                    minDist = dist;
-                    closest = c;
+            // decide closest point and return
+            return findClosest(candidates, pos);
+        }
+        function findClosest(values, pos) {
+            var minDist, closest;
+            values.forEach(function (v) {
+                var d = dist(v, pos);
+                if (d < minDist || ! minDist) {
+                    minDist = d;
+                    closest = v;
                 }
             });
-
-            // TODO: multiple closests when each is very close
-
             return closest;
         }
+
 
         //-- Tooltip --//
 
@@ -894,8 +916,8 @@
             return found;
         }
 
-        function dist(data, mouse) {
-            return Math.pow(x(data.x) - mouse[0], 2) + Math.pow(y(data.value) - mouse[1], 2);
+        function dist(data, pos) {
+            return Math.pow(x(data.x) - pos[0], 2) + Math.pow(y(data.value) - pos[1], 2);
         }
 
         //-- Selection --//
@@ -1480,7 +1502,7 @@
                     if (dragging) { return; } // do nothing when dragging
 
                     mouse = d3.mouse(this);
-                    closest = findClosest(c3.data.targets, mouse);
+                    closest = findClosestFromTargets(c3.data.targets, mouse);
 
                     // show tooltip when cursor is close to some point
                     selectedData = [addName(closest)];
@@ -1504,7 +1526,7 @@
                 })
                 .on('click', function () {
                     var mouse = d3.mouse(this),
-                        closest = findClosest(c3.data.targets, mouse);
+                        closest = findClosestFromTargets(c3.data.targets, mouse);
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
