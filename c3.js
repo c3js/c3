@@ -55,6 +55,7 @@
             __data_names = getConfig(['data', 'names'], {}),
             __data_groups = getConfig(['data', 'groups'], []),
             __data_axes = getConfig(['data', 'axes'], {}),
+            __data_type = getConfig(['data', 'type'], null),
             __data_types = getConfig(['data', 'types'], {}),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_colors = getConfig(['data', 'colors'], {}),
@@ -1123,10 +1124,16 @@
                 selectChart.html("");
             }
 
+            // Init data as targets
             c3.data.x = {};
             c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
+
+            // Set data type if data.type is specified
+            if (__data_type) {
+                setTargetType(getTargetIds().filter(function (id) { return ! (id in __data_types); }), __data_type);
+            }
 
             // Init sizes and scales
             updateSizes();
