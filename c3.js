@@ -721,8 +721,8 @@
         }
 
         function showXGridFocus(data) {
-            // Show when line chart exists
-            if (! hasLineType(c3.data.targets)) { return; }
+            // Hide when scatter plot exists
+            if (hasScatterType(c3.data.targets)) { return; }
             main.selectAll('line.xgrid-focus')
                 .style("visibility", "visible")
                 .data([data])
@@ -817,17 +817,17 @@
             });
             return has;
         }
+        /* not used
         function hasLineType(targets) {
             return hasType(targets, 'line');
         }
+        */
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
-        /* not used
         function hasScatterType(targets) {
             return hasType(targets, 'scatter');
         }
-        */
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline';
