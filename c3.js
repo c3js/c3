@@ -421,8 +421,10 @@
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
         function getDefaultXDomain() {
-            var padding = isCategorized ? 0 : Math.abs(lastX - firstX) * 0.01;
-            return [firstX - padding, lastX + padding];
+            var padding = isCategorized ? 0 : Math.abs(firstX - lastX) * 0.01,
+                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
+                max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+            return [min, max];
         }
         function diffDomain(d) {
             return d[1] - d[0];
