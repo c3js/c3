@@ -184,6 +184,7 @@
         /*-- Set Chart Params --*/
 
         var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3, currentWidth, currentHeight;
+        var radius, radiusExpanded, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
 
         var xOrient = __axis_rotated ? "left" : "bottom",
@@ -197,7 +198,8 @@
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")"; },
             x : function () { return "translate(0," + height + ")"; },
-            subx : function () { return "translate(0," + height2 + ")"; }
+            subx : function () { return "translate(0," + height2 + ")"; },
+            arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
         /*-- Define Functions --*/
@@ -220,6 +222,8 @@
             height = currentHeight - margin.top - margin.bottom;
             height2 = currentHeight - margin2.top - margin2.bottom;
             height3 = currentHeight - margin3.top - margin3.bottom;
+            radiusExpanded = height / 2;
+            radius = radiusExpanded * 0.95;
         }
         function getCurrentWidth() {
             return __size_width === null ? getParentWidth() : __size_width;
@@ -286,6 +290,10 @@
             yAxis = getYAxis(y, yOrient);
             yAxis2 = getYAxis(y2, y2Orient);
             subXAxis = getXAxis(subX, subXOrient);
+            // update for arc
+            svgArc = getSvgArc();
+            svgArcExpanded = getSvgArcExpanded();
+            svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
 
         function getX(min, max, domain, offset) {
@@ -355,6 +363,80 @@
                 tickFormat = typeof __axis_x_tick_format === 'function' ? __axis_x_tick_format : isTimeSeries ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : tickFormat;
             }
             return tickFormat;
+        }
+
+        //-- Arc --//
+
+        pie = d3.layout.pie().value(function (d) {
+            return d.values.reduce(function (a, b) { return a + b.value; }, 0);
+        });
+
+        function updateAngle(d) {
+            var found = false;
+            pie(c3.data.targets).forEach(function (t) {
+                if (! found && t.data.id === d.data.id) {
+                    found = true;
+                    d = t;
+                    return;
+                }
+            });
+            return found ? d : null;
+        }
+
+        function getSvgArc() {
+            var arc = d3.svg.arc().outerRadius(radius).innerRadius(0),
+                newArc = function (d, withoutUpdate) {
+                    var updated;
+                    if (withoutUpdate) { return arc(d); } // for interpolate
+                    updated = updateAngle(d);
+                    return updated ? arc(updated) : "M 0 0";
+                };
+            // TODO: extends all function
+            newArc.centroid = arc.centroid;
+            return newArc;
+        }
+        function getSvgArcExpanded(rate) {
+            var arc = d3.svg.arc().outerRadius(radiusExpanded * (rate ? rate : 1)).innerRadius(0);
+            return function (d) {
+                var updated = updateAngle(d);
+                return updated ? arc(updated) : "M 0 0";
+            };
+        }
+        function getArc(d, withoutUpdate) {
+            return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
+        }
+        function transformForArcLable(d) {
+            var updated = updateAngle(d), c, x, y, h, translate = "";
+            if (updated) {
+                c = svgArc.centroid(updated);
+                x = c[0], y = c[1], h = Math.sqrt(x * x + y * y);
+                translate = "translate(" + ((x / h) * radius * 0.8) +  ',' + ((y / h) * radius * 0.8) +  ")";
+            }
+            return translate;
+        }
+        function textForArcLable(d) {
+            var ratio = 100 * (d.endAngle - d.startAngle) / (Math.PI * 2);
+            return ratio.toFixed(1) + "%";
+        }
+        function expandArc(targetId, withoutFadeOut) {
+            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
+                noneTargets = d3.selectAll('.-arc').filter(function (data) { return data.data.id !== targetId; });
+            target.selectAll('path')
+              .transition().duration(50)
+                .attr("d", svgArcExpanded)
+              .transition().duration(100)
+                .attr("d", svgArcExpandedSub);
+            if (!withoutFadeOut) {
+                noneTargets.style("opacity", 0.3);
+            }
+        }
+        function unexpandArc(targetId) {
+            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : ''));
+            target.selectAll('path')
+              .transition().duration(50)
+                .attr("d", svgArc);
+            d3.selectAll('.-arc')
+                .style("opacity", 1);
         }
 
         //-- Domain --//
@@ -473,6 +555,9 @@
         function getXKey(id) {
             return __data_x ? __data_x : __data_xs ? __data_xs[id] : null;
         }
+        function getXValue(id, i) {
+            return id in c3.data.x && c3.data.x[i] ? c3.data.x[i] : i;
+        }
 
         function addName(data) {
             var name = __data_names[data.id];
@@ -536,7 +621,7 @@
                             x = parseDate(d[xKey]);
                         }
                         else if (isCustomX) {
-                            x = d[xKey] ? d[xKey] : c3.data.x[id][i];
+                            x = d[xKey] ? d[xKey] : getXValue(id, i);
                         }
                         else {
                             x = i;
@@ -616,6 +701,7 @@
         function classLine(d) { return classShapes(d) + " -line -line-" + d.id; }
         function classCircles(d) { return classShapes(d) + " -circles -circles-" + d.id; }
         function classBars(d) { return classShapes(d) + " -bars -bars-" + d.id; }
+        function classArc(d) { return classShapes(d.data) + " -arc -arc-" + d.data.id; }
         function classShape(d, i) { return "-shape -shape-" + i; }
         function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
@@ -724,7 +810,7 @@
 
         function showXGridFocus(data) {
             // Hide when scatter plot exists
-            if (hasScatterType(c3.data.targets)) { return; }
+            if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
             main.selectAll('line.xgrid-focus')
                 .style("visibility", "visible")
                 .data([data])
@@ -830,6 +916,9 @@
         function hasScatterType(targets) {
             return hasType(targets, 'scatter');
         }
+        function hasArcType(targets) {
+            return hasType(targets, 'pie');
+        }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline';
@@ -845,6 +934,10 @@
         function isScatterType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'scatter';
+        }
+        function isArcType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'pie';
         }
         /* not used
         function lineData(d) {
@@ -1132,11 +1225,6 @@
 
             // TODO: set names if names not specified
 
-            // Set data type if data.type is specified
-            if (__data_type) {
-                setTargetType(getTargetIds().filter(function (id) { return ! (id in __data_types); }), __data_type);
-            }
-
             // Init sizes and scales
             updateSizes();
             updateScales();
@@ -1315,6 +1403,11 @@
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
 
+            // Define g for arc chart area
+            main.select(".chart").append("g")
+                .attr("class", "chart-arcs")
+                .attr("transform", translate.arc);
+
             if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
                 main.insert('rect', __zoom_privileged ? null : 'g.grid')
@@ -1405,6 +1498,7 @@
                 .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
                 .on('mouseover', function (d, i) {
                     if (dragging) { return; } // do nothing if dragging
+                    if (hasArcType(c3.data.targets)) { return; }
 
                     var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
                     var j, newData;
@@ -1432,6 +1526,7 @@
                     showXGridFocus(selectedData[0]);
                 })
                 .on('mouseout', function (d, i) {
+                    if (hasArcType(c3.data.targets)) { return; }
                     hideXGridFocus();
                     hideTooltip();
                     // Undo expanded shapes
@@ -1442,6 +1537,7 @@
                     var selectedData;
 
                     if (dragging) { return; } // do nothing when dragging
+                    if (hasArcType(c3.data.targets)) { return; }
 
                     // Show tooltip
                     selectedData = c3.data.targets.map(function (d) {
@@ -1478,6 +1574,7 @@
                         });
                 })
                 .on('click', function (d, i) {
+                    if (hasArcType(c3.data.targets)) { return; }
                     if (cancelClick) {
                         cancelClick = false;
                         return;
@@ -1501,6 +1598,7 @@
                 .attr('height', height)
                 .attr('class', "event-rect")
                 .on('mouseout', function () {
+                    if (hasArcType(c3.data.targets)) { return; }
                     hideXGridFocus();
                     hideTooltip();
                     unexpandCircles();
@@ -1509,6 +1607,7 @@
                     var mouse, closest, selectedData;
 
                     if (dragging) { return; } // do nothing when dragging
+                    if (hasArcType(c3.data.targets)) { return; }
 
                     mouse = d3.mouse(this);
                     closest = findClosestFromTargets(c3.data.targets, mouse);
@@ -1534,8 +1633,12 @@
                     }
                 })
                 .on('click', function () {
-                    var mouse = d3.mouse(this),
-                        closest = findClosestFromTargets(c3.data.targets, mouse);
+                    var mouse, closest;
+
+                    if (hasArcType(c3.data.targets)) { return; }
+
+                    mouse = d3.mouse(this);
+                    closest = findClosestFromTargets(c3.data.targets, mouse);
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
@@ -1575,16 +1678,21 @@
         }
 
         function drag(mouse) {
+            var sx, sy, mx, my, minX, maxX, minY, maxY;
+
+            if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
 
-            var sx = dragStart[0], sy = dragStart[1],
-                mx = mouse[0],
-                my = mouse[1],
-                minX = Math.min(sx, mx),
-                maxX = Math.max(sx, mx),
-                minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my),
-                maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
+            sx = dragStart[0];
+            sy = dragStart[1];
+            mx = mouse[0];
+            my = mouse[1];
+            minX = Math.min(sx, mx);
+            maxX = Math.max(sx, mx);
+            minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my);
+            maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
+
             main.select('.dragarea')
                 .attr('x', minX)
                 .attr('y', minY)
@@ -1621,6 +1729,7 @@
         }
 
         function dragstart(mouse) {
+            if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             dragStart = mouse;
             main.select('.chart').append('rect')
@@ -1631,6 +1740,7 @@
         }
 
         function dragend() {
+            if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             main.select('.dragarea')
                 .transition().duration(100)
@@ -1650,6 +1760,7 @@
             var barX, barY, barW, barH;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withUpdateXDomain;
+            var isPieChart;
             var duration;
 
             options = isDefined(options) ? options : {};
@@ -1657,6 +1768,7 @@
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
+            isPieChart = hasArcType(c3.data.targets);
 
             duration = withTransition ? 250 : 0;
 
@@ -1668,9 +1780,10 @@
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
 
-            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
-            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
-            main.select(".y2.axis").transition().call(yAxis2);
+            // axis
+            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis).style("opacity", isPieChart ? 0 : 1);
+            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis).style("opacity", isPieChart ? 0 : 1);
+            main.select(".y2.axis").transition().call(yAxis2).style("opacity", isPieChart ? 0 : 1);
 
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", width);
@@ -1763,7 +1876,7 @@
                 .remove();
 
             // lines and cricles
-            main.selectAll('.-line')
+            main.selectAll('.chart-line').select('.-line')
               .transition().duration(duration)
                 .attr("d", lineOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
@@ -1779,6 +1892,35 @@
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("r", __point_r);
             mainCircle.exit().remove();
+
+            // arc
+            main.selectAll('.chart-arc').select('.-arc')
+                .style("opacity", function (d) { return d === this._current ? 0 : 1; })
+              .transition().duration(duration)
+                .attrTween("d", function (d) {
+                    var updated = updateAngle(d);
+                    if (! updated) {
+                        return function () { return "M 0 0"; };
+                    }
+/*
+                    if (this._current === d) {
+                        this._current = {
+                            startAngle: Math.PI*2,
+                            endAngle: Math.PI*2,
+                        };
+                    }
+*/
+                    var i = d3.interpolate(this._current, updated);
+                    this._current = i(0);
+                    return function (t) { return getArc(i(t), true); };
+                })
+                .style("opacity", 1);
+            main.selectAll('.chart-arc').select('text')
+                .attr("transform", transformForArcLable)
+                .attr("opacity", 0)
+              .transition().duration(duration)
+                .text(textForArcLable)
+                .attr("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
 
             // subchart
             if (__subchart_show) {
@@ -1910,6 +2052,7 @@
             // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
             main.select('.y2.axis').attr("transform", translate.y2);
+            main.select('.chart-arcs').attr("transform", translate.arc);
             // Update context sizes and positions
             if (__subchart_show) {
                 context.select('.x.brush').selectAll('rect').attr('height', height2);
@@ -1926,10 +2069,15 @@
         }
 
         function updateTargets(targets) {
-            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
+            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate, mainPieEnter, mainPieUpdate;
             var contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate;
 
             /*-- Main --*/
+
+            // Set data type if data.type is specified
+            if (__data_type) {
+                setTargetType(getTargetIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
+            }
 
             //-- Bar --//
             mainBarUpdate = main.select('.chart-bars')
@@ -1972,6 +2120,36 @@
                     d.value = t.values[d.x].value;
                 });
             });
+            // MEMO: can not keep same color...
+            //mainLineUpdate.exit().remove();
+
+            //-- Pie --//
+
+            mainPieUpdate = main.select('.chart-arcs')
+              .selectAll(".chart-arc")
+                .data(pie(targets));
+            mainPieEnter = mainPieUpdate.enter().append("g")
+                .attr("class", function (d) { return 'chart-arc target target-' + d.data.id; })
+                .style('opacity', 0);
+            mainPieEnter.append("path")
+                .attr("class", classArc)
+                .style("fill", function (d) { return color(d.data.id); })
+                .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
+                .each(function (d) { this._current = d; })
+                .on('mouseover', function (d) {
+                    expandArc(d.data.id);
+                    focusLegend(d.data.id);
+                })
+                .on('mouseout', function (d) {
+                    unexpandArc(d.data.id);
+                    revertLegend();
+                });
+            mainPieEnter.append("text")
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle")
+                .style("pointer-events", "none");
+            // MEMO: can not keep same color..., but not bad to update color in redraw
+            //mainPieUpdate.exit().remove();
 
             /*-- Context --*/
 
@@ -2039,6 +2217,17 @@
 
         /*-- Draw Legend --*/
 
+        function focusLegend(id) {
+            d3.selectAll('.legend-item').filter(function (d) { return d !== id; })
+              .transition().duration(100)
+                .style('opacity', 0.3);
+        }
+        function revertLegend() {
+            d3.selectAll('.legend-item')
+              .transition().duration(100)
+                .style('opacity', 1);
+        }
+        
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
             var padding = width / 2 - __legend_item_width * Object.keys(targets).length / 2;
@@ -2058,15 +2247,11 @@
                     __legend_item_onclick(d);
                 })
                 .on('mouseover', function (d) {
-                    d3.selectAll('.legend-item').filter(function (_d) { return _d !== d; })
-                      .transition().duration(100)
-                        .style('opacity', 0.3);
+                    focusLegend(d);
                     c3.focus(d);
                 })
                 .on('mouseout', function () {
-                    d3.selectAll('.legend-item')
-                      .transition().duration(100)
-                        .style('opacity', 1);
+                    revertLegend();
                     c3.revert();
                 });
             l.append('rect')
@@ -2078,6 +2263,7 @@
                 .attr('height', 24);
             l.append('rect')
                 .attr("class", "legend-item-tile")
+                .style("pointer-events", "none")
                 .style('fill', function (d) { return color(d); })
                 .attr('x', -200)
                 .attr('y', function () { return legendHeight / 2 - 9; })
@@ -2085,6 +2271,7 @@
                 .attr('height', 10);
             l.append('text')
                 .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
+                .style("pointer-events", "none")
                 .attr('x', -200)
                 .attr('y', function () { return legendHeight / 2; });
 
@@ -2109,30 +2296,54 @@
         function getTargetSelector(target) {
             return isDefined(target) ? '.target-' + target : '.target';
         }
+        function isNoneArc(d) {
+            return hasTarget(d.id);
+        }
+        function isArc(d) {
+            return 'data' in d && hasTarget(d.data.id);
+        }
 
         c3.focus = function (target) {
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function focus(targets) {
+                targets.transition().duration(100).style('opacity', 1);
+            }
             c3.defocus();
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', true)
-                .transition().duration(100)
-                .style('opacity', 1);
+            focus(candidatesForNoneArc.classed('focused', true));
+            focus(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                expandArc(target, true);
+            }
         };
 
         c3.defocus = function (target) {
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', false)
-                .transition().duration(100)
-                .style('opacity', 0.3);
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function defocus(targets) {
+                targets.transition().duration(100).style('opacity', 0.3);
+            }
+            defocus(candidatesForNoneArc.classed('focused', false));
+            defocus(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                unexpandArc(target);
+            }
         };
 
         c3.revert = function (target) {
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', false)
-                .transition().duration(100)
-                .style('opacity', 1);
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function revert(targets) {
+                targets.transition().duration(100).style('opacity', 1);
+            }
+            revert(candidatesForNoneArc.classed('focused', false));
+            revert(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                unexpandArc(target);
+            }
         };
 
         c3.show = function (target) {
