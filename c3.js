@@ -502,8 +502,16 @@
             }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
-        function getDefaultXDomain() {
-            var padding = isCategorized ? 0 : Math.abs(firstX - lastX) * 0.01,
+        function getXDomainMin(targets) {
+            return d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
+        }
+        function getXDomainMax(targets) {
+            return d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
+        }
+        function getXDomain(targets) {
+            var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
+                firstX = xDomain[0], lastX = xDomain[1],
+                padding = isCategorized ? 0 : Math.abs(firstX - lastX) * 0.01,
                 min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
                 max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
             return [min, max];
@@ -626,10 +634,6 @@
                         else {
                             x = i;
                         }
-
-                        if (x < firstX || firstX === null) { firstX = x; }
-                        if (lastX < x) { lastX = x; }
-
                         d.x = x; // used by event-rect
 
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
@@ -1205,7 +1209,7 @@
         var svg, defs, main, context, legend, tooltip, selectChart;
 
         // for brush area culculation
-        var firstX = null, lastX = null, orgXDomain;
+        var orgXDomain;
 
         function init(data) {
             var eventRect, grid, xgridLine;
@@ -1230,7 +1234,7 @@
             updateScales();
 
             // Set domains for each scale
-            x.domain(d3.extent(getDefaultXDomain()));
+            x.domain(d3.extent(getXDomain(c3.data.targets)));
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
             subX.domain(x.domain());
@@ -1421,7 +1425,7 @@
 
             // Set default extent if defined
             if (__axis_x_default !== null) {
-                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(firstX, lastX));
+                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain()));
             }
 
             /*-- Context Region --*/
@@ -1759,7 +1763,7 @@
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1;
             var barX, barY, barW, barH;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withUpdateXDomain;
+            var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
             var isPieChart;
             var duration;
 
@@ -1768,9 +1772,18 @@
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
+            withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
             isPieChart = hasArcType(c3.data.targets);
 
             duration = withTransition ? 250 : 0;
+
+            if (withUpdateOrgXDomain) {
+                x.domain(d3.extent(getXDomain(c3.data.targets)));
+                orgXDomain = x.domain();
+                zoom.x(x).updateScaleExtent();
+                subX.domain(x.domain());
+                brush.x(subX);
+            }
 
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
@@ -1802,8 +1815,9 @@
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
-                    var firstYear = firstX.getFullYear();
-                    var lastYear = lastX.getFullYear();
+                    var xDomain = getXDomain();
+                    var firstYear = xDomain[0].getFullYear();
+                    var lastYear = xDomain[1].getFullYear();
                     for (var year = firstYear; year <= lastYear; year++) {
                         xgridData.push(new Date(year + '-01-01 00:00:00'));
                     }
@@ -2210,7 +2224,7 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw();
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
 
             done();
         }
@@ -2412,7 +2426,9 @@
                 updateLegend(c3.data.targets);
             }
 
-            if (c3.data.targets.length > 0) { redraw(); }
+            if (c3.data.targets.length > 0) {
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            }
         };
 
         c3.selected = function (target) {
