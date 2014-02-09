@@ -48,12 +48,14 @@
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
-        var __data_x = getConfig(['data', 'x'], undefined),
+        var __data_x = getConfig(['data', 'x'], null),
+            __data_xs = getConfig(['data', 'xs'], null),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
             __data_groups = getConfig(['data', 'groups'], []),
             __data_axes = getConfig(['data', 'axes'], {}),
+            __data_type = getConfig(['data', 'type'], null),
             __data_types = getConfig(['data', 'types'], {}),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_colors = getConfig(['data', 'colors'], {}),
@@ -87,7 +89,7 @@
             // not used
             //__axis_y_rescale = getConfig(['axis', 'y', 'rescale'], true),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
-            __axis_y_format = getConfig(['axis', 'y', 'format'], function (d) { return d; }),
+            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], function (d) { return d; }),
             __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
@@ -98,7 +100,7 @@
             // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
             // __axis_y2_rescale = getConfig(['axis', 'y2', 'rescale'], true),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
-            __axis_y2_format = getConfig(['axis', 'y2', 'format'], function (d) { return d; }),
+            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], function (d) { return d; }),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10),
             __axis_rotated = getConfig(['axis', 'rotated'], false);
@@ -128,8 +130,8 @@
 
         // tooltip - show when mouseover on each data
         var __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
-            var date = isTimeSeries ? d[0].x.getFullYear() + '.' + (d[0].x.getMonth() + 1) + '.' + d[0].x.getDate() : isCategorized ? category(d[0].x) : d[0].x,
-                text = "<table class='-tooltip'><tr><th colspan='2'>" + date + "</th></tr>", i, value, name;
+            var title = getXAxisTickFormat()(d[0].x),
+                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++) {
                 if (isDefined(d[i])) {
                     value = isDefined(d[i].value) ? (Math.round(d[i].value * 100) / 100).toFixed(2) : '-';
@@ -153,13 +155,11 @@
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
-            isCustomX = !isTimeSeries && __data_x;
+            isCustomX = !isTimeSeries && (__data_x || __data_xs);
 
         var dragStart = null, dragging = false, cancelClick = false;
 
         var legendHeight = __legend_show ? 40 : 0;
-
-        var parseDate = d3.time.format(__data_x_format).parse;
 
         var color = generateColor(__data_colors, __color_pattern);
 
@@ -184,6 +184,7 @@
         /*-- Set Chart Params --*/
 
         var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3, currentWidth, currentHeight;
+        var radius, radiusExpanded, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
 
         var xOrient = __axis_rotated ? "left" : "bottom",
@@ -197,7 +198,8 @@
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")"; },
             x : function () { return "translate(0," + height + ")"; },
-            subx : function () { return "translate(0," + height2 + ")"; }
+            subx : function () { return "translate(0," + height2 + ")"; },
+            arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
         /*-- Define Functions --*/
@@ -220,6 +222,8 @@
             height = currentHeight - margin.top - margin.bottom;
             height2 = currentHeight - margin2.top - margin2.bottom;
             height3 = currentHeight - margin3.top - margin3.bottom;
+            radiusExpanded = height / 2;
+            radius = radiusExpanded * 0.95;
         }
         function getCurrentWidth() {
             return __size_width === null ? getParentWidth() : __size_width;
@@ -286,6 +290,10 @@
             yAxis = getYAxis(y, yOrient);
             yAxis2 = getYAxis(y2, y2Orient);
             subXAxis = getXAxis(subX, subXOrient);
+            // update for arc
+            svgArc = getSvgArc();
+            svgArcExpanded = getSvgArcExpanded();
+            svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
 
         function getX(min, max, domain, offset) {
@@ -329,15 +337,18 @@
 
         function getXAxis(scale, orient) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
-            if (isTimeSeries) {
-                axis.tickFormat(__axis_x_tick_format ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : defaultTimeFormat);
-            }
+
+            // Set tick format
+            axis.tickFormat(getXAxisTickFormat());
+
+            // Set categories
             if (isCategorized) {
                 axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
             } else {
                 // TODO: fix
                 axis.tickOffset = function () { return 0; };
             }
+
             return axis;
         }
         function getYAxis(scale, orient) {
@@ -345,6 +356,87 @@
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
+        }
+        function getXAxisTickFormat() {
+            var tickFormat = isTimeSeries ? defaultTimeFormat : isCategorized ? category : function (x) { return x; };
+            if (__axis_x_tick_format) {
+                tickFormat = typeof __axis_x_tick_format === 'function' ? __axis_x_tick_format : isTimeSeries ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : tickFormat;
+            }
+            return tickFormat;
+        }
+
+        //-- Arc --//
+
+        pie = d3.layout.pie().value(function (d) {
+            return d.values.reduce(function (a, b) { return a + b.value; }, 0);
+        });
+
+        function updateAngle(d) {
+            var found = false;
+            pie(c3.data.targets).forEach(function (t) {
+                if (! found && t.data.id === d.data.id) {
+                    found = true;
+                    d = t;
+                    return;
+                }
+            });
+            return found ? d : null;
+        }
+
+        function getSvgArc() {
+            var arc = d3.svg.arc().outerRadius(radius).innerRadius(0),
+                newArc = function (d, withoutUpdate) {
+                    var updated;
+                    if (withoutUpdate) { return arc(d); } // for interpolate
+                    updated = updateAngle(d);
+                    return updated ? arc(updated) : "M 0 0";
+                };
+            // TODO: extends all function
+            newArc.centroid = arc.centroid;
+            return newArc;
+        }
+        function getSvgArcExpanded(rate) {
+            var arc = d3.svg.arc().outerRadius(radiusExpanded * (rate ? rate : 1)).innerRadius(0);
+            return function (d) {
+                var updated = updateAngle(d);
+                return updated ? arc(updated) : "M 0 0";
+            };
+        }
+        function getArc(d, withoutUpdate) {
+            return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
+        }
+        function transformForArcLable(d) {
+            var updated = updateAngle(d), c, x, y, h, translate = "";
+            if (updated) {
+                c = svgArc.centroid(updated);
+                x = c[0], y = c[1], h = Math.sqrt(x * x + y * y);
+                translate = "translate(" + ((x / h) * radius * 0.8) +  ',' + ((y / h) * radius * 0.8) +  ")";
+            }
+            return translate;
+        }
+        function textForArcLable(d) {
+            var ratio = 100 * (d.endAngle - d.startAngle) / (Math.PI * 2);
+            return ratio.toFixed(1) + "%";
+        }
+        function expandArc(targetId, withoutFadeOut) {
+            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
+                noneTargets = d3.selectAll('.-arc').filter(function (data) { return data.data.id !== targetId; });
+            target.selectAll('path')
+              .transition().duration(50)
+                .attr("d", svgArcExpanded)
+              .transition().duration(100)
+                .attr("d", svgArcExpandedSub);
+            if (!withoutFadeOut) {
+                noneTargets.style("opacity", 0.3);
+            }
+        }
+        function unexpandArc(targetId) {
+            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : ''));
+            target.selectAll('path')
+              .transition().duration(50)
+                .attr("d", svgArc);
+            d3.selectAll('.-arc')
+                .style("opacity", 1);
         }
 
         //-- Domain --//
@@ -410,6 +502,20 @@
             }
             return (domain[1] - domain[0]) / (extent[1] - extent[0]);
         }
+        function getXDomainMin(targets) {
+            return d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
+        }
+        function getXDomainMax(targets) {
+            return d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
+        }
+        function getXDomain(targets) {
+            var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
+                firstX = xDomain[0], lastX = xDomain[1],
+                padding = isCategorized ? 0 : Math.abs(firstX - lastX) * 0.01,
+                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
+                max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+            return [min, max];
+        }
         function diffDomain(d) {
             return d[1] - d[0];
         }
@@ -448,6 +554,19 @@
 
         //-- Data --//
 
+        function isX(key) {
+            return (__data_x && key === __data_x) || (__data_xs && hasValue(__data_xs, key));
+        }
+        function isNotX(key) {
+            return !isX(key);
+        }
+        function getXKey(id) {
+            return __data_x ? __data_x : __data_xs ? __data_xs[id] : null;
+        }
+        function getXValue(id, i) {
+            return id in c3.data.x && c3.data.x[i] ? c3.data.x[i] : i;
+        }
+
         function addName(data) {
             var name = __data_names[data.id];
             data.name = isDefined(name) ? name : data.id;
@@ -465,7 +584,6 @@
             }
             return new_rows;
         }
-
         function convertColumnsToData(columns) {
             var new_rows = [], i, j, key;
             for (i = 0; i < columns.length; i++) {
@@ -480,41 +598,63 @@
             return new_rows;
         }
         function convertDataToTargets(data) {
-            var ids = d3.keys(data[0]).filter(function (key) { return key !== __data_x; });
-            var targets, i = 0, parsedDate;
+            var ids = d3.keys(data[0]).filter(isNotX), xs = d3.keys(data[0]).filter(isX), targets;
 
-            // check __data_x is defined if timeseries
-            if (isTimeSeries && ! __data_x) {
-                window.alert('data.x must be specified when axis.x.type == "timeseries"');
+            // check "x" is defined if timeseries
+            if (isTimeSeries && xs.length === 0) {
+                window.alert('data.x or data.xs must be specified when axis.x.type == "timeseries"');
                 return [];
             }
 
-            data.forEach(function (d) {
-                if (isTimeSeries) {
-                    if (!(__data_x in d)) { throw Error("'" + __data_x + "' must be included in data"); }
-                    parsedDate = parseDate(d[__data_x]);
-                    if (parsedDate === null) { throw Error("Failed to parse timeseries date in data"); }
-                    d.x = parsedDate;
-                }
-                else if (isCustomX) {
-                    d.x = d[__data_x];
-                }
-                else {
-                    d.x = i++;
-                }
-                if (firstDate === null) { firstDate = new Date(d.x); }
-                lastDate = new Date(d.x);
-            });
+            // save x for update data by load
+            if (isCustomX) {
+                ids.forEach(function (id) {
+                    var xKey = getXKey(id);
+                    if (xs.indexOf(xKey) >= 0) {
+                        c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                    }
+                });
+            }
 
+            // convert to target
             targets = ids.map(function (id) {
                 var convertedId = __data_id_converter(id);
                 return {
                     id: convertedId,
                     id_org: id,
-                    values: data.map(function (d) {
-                        return {x: d.x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
+                    values: data.map(function (d, i) {
+                        var x, xKey = getXKey(id);
+
+                        if (isTimeSeries) {
+                            x = parseDate(d[xKey]);
+                        }
+                        else if (isCustomX) {
+                            x = d[xKey] ? d[xKey] : getXValue(id, i);
+                        }
+                        else {
+                            x = i;
+                        }
+                        d.x = x; // used by event-rect
+
+                        return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
                     })
                 };
+            });
+
+            // finish targets
+            targets.forEach(function (t) {
+                var i;
+                // sort values by its x
+                t.values = t.values.sort(function (v1, v2) {
+                    var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+                        x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
+                    return x1 - x2;
+                });
+                // indexing each value
+                i = 0;
+                t.values.forEach(function (v) {
+                    v.index = i++;
+                });
             });
 
             // cache as original id keyed
@@ -565,6 +705,7 @@
         function classLine(d) { return classShapes(d) + " -line -line-" + d.id; }
         function classCircles(d) { return classShapes(d) + " -circles -circles-" + d.id; }
         function classBars(d) { return classShapes(d) + " -bars -bars-" + d.id; }
+        function classArc(d) { return classShapes(d.data) + " -arc -arc-" + d.data.id; }
         function classArea(d) { return classShapes(d) + " -area -area-" + d.id; }
         function classShape(d, i) { return "-shape -shape-" + i; }
         function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
@@ -581,10 +722,114 @@
             return y(d.value);
         }
 
-        //-- Circle --/
+        function findSameXOfValues(values, index) {
+            var i, targetX = values[index].x, sames = [];
+            for (i = index - 1; i >= 0; i--) {
+                if (targetX !== values[i].x) { break; }
+                sames.push(values[i]);
+            }
+            for (i = index; i < values.length; i++) {
+                if (targetX !== values[i].x) { break; }
+                sames.push(values[i]);
+            }
+            return sames;
+        }
+
+        function findClosestOfValues(values, pos, _min, _max) { // MEMO: values must be sorted by x
+            var min = _min ? _min : 0,
+                max = _max ? _max : values.length - 1,
+                med = Math.floor((max - min) / 2) + min,
+                value = values[med],
+                diff = x(value.x) - pos[0],
+                candidates;
+
+            // Update range for search
+            diff > 0 ? max = med : min = med;
+
+            // if candidates are two closest min and max, stop recursive call
+            if ((max - min) === 1) {
+
+                // Get candidates that has same min and max index
+                candidates = [];
+                if (values[min].x) {
+                    candidates = candidates.concat(findSameXOfValues(values, min));
+                }
+                if (values[max].x) {
+                    candidates = candidates.concat(findSameXOfValues(values, max));
+                }
+
+                // Determine the closest and return
+                return findClosest(candidates, pos);
+            }
+
+            return findClosestOfValues(values, pos, min, max);
+        }
+        function findClosestFromTargets(targets, pos) {
+            var candidates;
+
+            // map to array of closest points of each target
+            candidates = targets.map(function (target) {
+                return findClosestOfValues(target.values, pos);
+            });
+
+            // decide closest point and return
+            return findClosest(candidates, pos);
+        }
+        function findClosest(values, pos) {
+            var minDist, closest;
+            values.forEach(function (v) {
+                var d = dist(v, pos);
+                if (d < minDist || ! minDist) {
+                    minDist = d;
+                    closest = v;
+                }
+            });
+            return closest;
+        }
+
+
+        //-- Tooltip --//
+
+        function showTooltip(selectedData, mouse) {
+            // Construct tooltip
+            tooltip.html(__tooltip_contents(selectedData))
+                .style("visibility", "hidden")
+                .style("display", "block");
+            // Get tooltip dimensions
+            var tWidth = tooltip.property('offsetWidth'),
+                tHeight = tooltip.property('offsetHeight');
+            // Set tooltip
+            // todo get rid of magic numbers
+            tooltip
+                .style("top", (mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight) + "px")
+                .style("left", ((__axis_rotated ?
+                  mouse[0] :
+                  (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
+                      (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
+                )))
+                .style("visibility", "visible");
+        }
+        function hideTooltip() {
+            tooltip.style("display", "none");
+        }
+
+        function showXGridFocus(data) {
+            // Hide when scatter plot exists
+            if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
+            main.selectAll('line.xgrid-focus')
+                .style("visibility", "visible")
+                .data([data])
+                .attr(__axis_rotated ? 'y1' : 'x1', xx)
+                .attr(__axis_rotated ? 'y2' : 'x2', xx);
+        }
+        function hideXGridFocus() {
+            main.select('line.xgrid-focus').style("visibility", "hidden");
+        }
+
+        //-- Circle --//
 
         function circleX(d) {
-            return x(d.x);
+            return d.x || d.x === 0 ? x(d.x) : null;
         }
         function circleY(d) {
             return getYScale(d.id)(d.value);
@@ -611,9 +856,10 @@
         }
         function getBarX(barW, barTargetsNum, barIndices, isSub) {
             var scale = isSub ? subX : x;
+            if (! barTargetsNum) { return function () { return 0; }; }
             return function (d) {
                 var barIndex = d.id in barIndices ? barIndices[d.id] : 0;
-                return scale(d.x) - barW * (barTargetsNum / 2 - barIndex);
+                return d.x || d.x === 0 ? scale(d.x) - barW * (barTargetsNum / 2 - barIndex) : 0;
             };
         }
         function getBarY(barH, barIndices, zeroBased, isSub) {
@@ -633,14 +879,14 @@
         function getBarW(axis, barTargetsNum, isSub) {
             var barW;
             if (isCategorized) {
-                barW = (axis.tickOffset() * 2 * 0.6) / barTargetsNum;
+                barW = barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
             } else {
                 barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (maxDataCount() - 1)) * 0.6;
             }
             return barW;
         }
         function getBarH(height, isSub) {
-            var h = height === null ? function (v) { return v; } : function (v) { return height - v; };
+            var h = height === null ? function (v) { return v; } : function (v) { return height > v ? height - v : 0; };
             return function (d) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
                 return h(scale(d.value));
@@ -672,6 +918,12 @@
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
+        function hasScatterType(targets) {
+            return hasType(targets, 'scatter');
+        }
+        function hasArcType(targets) {
+            return hasType(targets, 'pie');
+        }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline';
@@ -684,11 +936,27 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'bar';
         }
+        function isScatterType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'scatter';
+        }
+        function isArcType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'pie';
+        }
+        /* not used
         function lineData(d) {
             return isLineType(d) ? d.values : [];
         }
+        function scatterData(d) {
+            return isScatterType(d) ? d.values : [];
+        }
+        */
         function barData(d) {
             return isBarType(d) ? d.values : [];
+        }
+        function lineOrScatterData(d) {
+            return isLineType(d) || isScatterType(d) ? d.values : [];
         }
 
         //-- Color --//
@@ -710,6 +978,16 @@
             };
         }
 
+        //-- Date --//
+
+        function parseDate(date) {
+            var parsedDate;
+            if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
+            parsedDate = d3.time.format(__data_x_format).parse(date);
+            if (!parsedDate) { throw Error("Failed to parse '" + date + "' with format " + __data_x_format); }
+            return parsedDate;
+        }
+
         //-- Util --//
 
         function isWithinCircle(_this, _r) {
@@ -729,6 +1007,18 @@
                 if (regions[i].start < x && x <= regions[i].end) { return true; }
             }
             return false;
+        }
+
+        function hasValue(dict, value) {
+            var found = false;
+            Object.keys(dict).forEach(function (key) {
+                if (dict[key] === value) { found = true; }
+            });
+            return found;
+        }
+
+        function dist(data, pos) {
+            return Math.pow(x(data.x) - pos[0], 2) + Math.pow(y(data.value) - pos[1], 2);
         }
 
         //-- Selection --//
@@ -772,6 +1062,30 @@
 
         //-- Shape --//
 
+        function getCircles(i, id) {
+            return (id ? main.selectAll('.-circles-' + id) : main).selectAll('.-circle' + (i || i === 0 ? '-' + i : ''));
+        }
+        function expandCircles(i, id) {
+            getCircles(i, id)
+                .classed(EXPANDED, true)
+                .attr('r', __point_focus_expand_r);
+        }
+        function unexpandCircles(i) {
+            getCircles(i)
+                .filter(function () { return d3.select(this).classed(EXPANDED); })
+                .classed(EXPANDED, false)
+                .attr('r', __point_r);
+        }
+        function getBars(i) {
+            return main.selectAll(".-bar" + (i || i === 0 ? '-' + i : ''));
+        }
+        function expandBars(i) {
+            getBars(i).classed(EXPANDED, false);
+        }
+        function unexpandBars(i) {
+            getBars(i).classed(EXPANDED, false);
+        }
+
         // For main region
         var lineOnMain = (function () {
             var line = d3.svg.line()
@@ -781,7 +1095,7 @@
                 var data = filterRemoveNull(d.values), x0, y0;
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return Object.keys(__data_regions).length > 0 ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
+                    return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
@@ -843,13 +1157,13 @@
                     regions[i] = {};
                     if (isUndefined(_regions[i].start)) {
                         regions[i].start = d[0].x;
-                    } else if (isTimeSeries) {
-                        regions[i].start = parseDate(_regions[i].start);
+                    } else {
+                        regions[i].start = isTimeSeries ? parseDate(_regions[i].start) : _regions[i].start;
                     }
                     if (isUndefined(_regions[i].end)) {
                         regions[i].end = d[d.length - 1].x;
-                    } else if (isTimeSeries) {
-                        regions[i].end = parseDate(_regions[i].end);
+                    } else {
+                        regions[i].end = isTimeSeries ? parseDate(_regions[i].end) : _regions[i].end;
                     }
                 }
             }
@@ -925,18 +1239,23 @@
         var svg, defs, main, context, legend, tooltip, selectChart;
 
         // for brush area culculation
-        var firstDate = null, lastDate = null, orgXDomain;
+        var orgXDomain;
 
         function init(data) {
-            var targets = c3.data.targets = convertDataToTargets(data);
-            var grid, xgridLine;
+            var eventRect, grid, xgridLine;
             var i;
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
                 window.alert('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
                 return;
+            } else {
+                selectChart.html("");
             }
+
+            // Init data as targets
+            c3.data.x = {};
+            c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
 
@@ -945,7 +1264,7 @@
             updateScales();
 
             // Set domains for each scale
-            x.domain(d3.extent(data.map(function (d) { return d.x; })));
+            x.domain(d3.extent(getXDomain(c3.data.targets)));
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
             subX.domain(x.domain());
@@ -954,8 +1273,8 @@
 
             // Set axes attrs
             xAxis.ticks(data.length < 10 ? data.length : 10);
-            yAxis.ticks(__axis_y_ticks).outerTickSize(0).tickFormat(__axis_y_format);
-            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0).tickFormat(__axis_y2_format);
+            yAxis.ticks(__axis_y_ticks).outerTickSize(0).tickFormat(__axis_y_tick_format);
+            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0).tickFormat(__axis_y2_tick_format);
 
             // Save original x domain for zoom update
             orgXDomain = x.domain();
@@ -1006,9 +1325,8 @@
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
-                .style("width", "30%") // TODO: cul actual width when show
                 .style("z-index", "10")
-                .style("visibility", "hidden");
+                .style("display", "none");
 
             /*-- Main Region --*/
 
@@ -1103,195 +1421,13 @@
                 .attr('class', 'chart');
 
             // Cover whole with rects for events
-            main.select('.chart').append("g")
+            eventRect = main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
-                .style('cursor', __zoom_enabled ? 'ew-resize' : null)
-              .selectAll(".event-rects")
-                .data(data)
-              .enter().append("rect")
-                .attr("class", function (d, i) { return "event-rect event-rect-" + i; })
-                .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
-                .on('mouseover', function (d, i) {
-                    if (dragging) { return; } // do nothing if dragging
+                .style('cursor', __zoom_enabled ? 'ew-resize' : null);
 
-                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
-                    var j, newData;
-
-                    // Sort selectedData as names order
-                    if (Object.keys(__data_names).length > 0) {
-                        newData = [];
-                        for (var id in __data_names) {
-                            for (j = 0; j < selectedData.length; j++) {
-                                if (selectedData[j].id === id) {
-                                    newData.push(selectedData[j]);
-                                    selectedData.shift(j);
-                                    break;
-                                }
-                            }
-                        }
-                        selectedData = newData.concat(selectedData); // Add remained
-                    }
-
-                    // Expand circles if needed
-                    if (__point_focus_expand_enabled) {
-                        main.selectAll('.-circle-' + i)
-                            .classed(EXPANDED, true)
-                            .attr('r', __point_focus_expand_r);
-                    }
-
-                    // Expand bars
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, true);
-
-                    // Show xgrid focus line
-                    main.selectAll('line.xgrid-focus')
-                        .style("visibility", "visible")
-                        .data([selectedData[0]])
-                        .attr(__axis_rotated ? 'y1' : 'x1', xx)
-                        .attr(__axis_rotated ? 'y2' : 'x2', xx);
-
-                    // Set tooltip
-                    tooltip.style("top", (d3.mouse(this)[1] + 30) + "px")
-                           .style("left", ((__axis_rotated ? d3.mouse(this)[0] : x(selectedData[0].x)) + 60) + "px");
-                    tooltip.html(__tooltip_contents(selectedData));
-                    tooltip.style("visibility", "visible");
-                })
-                .on('mouseout', function (d, i) {
-                    main.select('line.xgrid-focus').style("visibility", "hidden");
-                    tooltip.style("visibility", "hidden");
-                    // Undo expanded circles
-                    main.selectAll('.-circle-' + i)
-                        .filter(function () { return d3.select(this).classed(EXPANDED); })
-                        .classed(EXPANDED, false)
-                        .attr('r', __point_r);
-                    // Undo expanded bar
-                    main.selectAll(".-bar-" + i)
-                        .classed(EXPANDED, false);
-                })
-                .on('mousemove', function (d, i) {
-                    if (! __data_selection_enabled || dragging) { return; }
-                    if (__data_selection_grouped) { return; } // nothing to do when grouped
-
-                    main.selectAll('.-shape-' + i)
-                        .filter(function (d) { return __data_selection_isselectable(d); })
-                        .each(function () {
-                            var _this = d3.select(this).classed(EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
-                            d3.select('.event-rect-' + i).style('cursor', null);
-                        })
-                        .filter(function () {
-                            var _this = d3.select(this);
-                            if (this.nodeName === 'circle') {
-                                return isWithinCircle(this, __point_select_r);
-                            }
-                            else if (this.nodeName === 'rect') {
-                                return isWithinBar(this, _this.attr('x'), _this.attr('y'));
-                            }
-                        })
-                        .each(function () {
-                            var _this = d3.select(this);
-                            if (! _this.classed(EXPANDED)) {
-                                _this.classed(EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
-                            }
-                            d3.select('.event-rect-' + i).style('cursor', 'pointer');
-                        });
-                })
-                .on('click', function (d, i) {
-                    if (cancelClick) {
-                        cancelClick = false;
-                        return;
-                    }
-                    main.selectAll('.-shape-' + i).each(function (d) {
-                        var _this = d3.select(this),
-                            isSelected = _this.classed(SELECTED);
-                        var isWithin = false, toggle;
-                        if (this.nodeName === 'circle') {
-                            isWithin = isWithinCircle(this, __point_select_r * 1.5);
-                            toggle = togglePoint;
-                        }
-                        else if (this.nodeName === 'rect') {
-                            isWithin = isWithinBar(this);
-                            toggle = toggleBar;
-                        }
-                        if (__data_selection_grouped || isWithin) {
-                            if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                                _this.classed(SELECTED, !isSelected);
-                                toggle(!isSelected, _this, d, i);
-                            }
-                            __point_onclick(d, _this); // TODO: should be __data_onclick
-                        }
-                    });
-                })
-                .call(
-                    d3.behavior.drag().origin(Object).on('drag', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
-
-                        var sx = dragStart[0], sy = dragStart[1],
-                            mouse = d3.mouse(this),
-                            mx = mouse[0],
-                            my = mouse[1],
-                            minX = Math.min(sx, mx),
-                            maxX = Math.max(sx, mx),
-                            minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my),
-                            maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
-                        main.select('.dragarea')
-                            .attr('x', minX)
-                            .attr('y', minY)
-                            .attr('width', maxX - minX)
-                            .attr('height', maxY - minY);
-                        main.selectAll('.-shapes').selectAll('.-shape')
-                            .filter(function (d) { return __data_selection_isselectable(d); })
-                            .each(function (d, i) {
-                                var _this = d3.select(this),
-                                    isSelected = _this.classed(SELECTED),
-                                    isIncluded = _this.classed(INCLUDED),
-                                    _x, _y, _w, toggle, isWithin = false;
-                                if (this.nodeName === 'circle') {
-                                    _x = _this.attr("cx") * 1;
-                                    _y = _this.attr("cy") * 1;
-                                    toggle = togglePoint;
-                                    isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
-                                }
-                                else if (this.nodeName === 'rect') {
-                                    _x = _this.attr("x") * 1;
-                                    _y = _this.attr("y") * 1;
-                                    _w = _this.attr('width') * 1;
-                                    toggle = toggleBar;
-                                    isWithin = minX < _x + _w && _x < maxX && _y < maxY;
-                                }
-                                if (isWithin ^ isIncluded) {
-                                    _this.classed(INCLUDED, !isIncluded);
-                                    // TODO: included/unincluded callback here
-                                    _this.classed(SELECTED, !isSelected);
-                                    toggle(!isSelected, _this, d, i);
-                                }
-                            });
-                    })
-                    .on('dragstart', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        dragStart = d3.mouse(this);
-                        main.select('.chart').append('rect')
-                            .attr('class', 'dragarea')
-                            .style('opacity', 0.1);
-                        dragging = true;
-                        // TODO: add callback here
-                    })
-                    .on('dragend', function () {
-                        if (! __data_selection_enabled) { return; } // do nothing if not selectable
-                        main.select('.dragarea')
-                          .transition().duration(100)
-                            .style('opacity', 0)
-                          .remove();
-                        main.selectAll('.-shape')
-                            .classed(INCLUDED, false);
-                        dragging = false;
-                        // TODO: add callback here
-                    })
-                )
-                .call(zoom).on("dblclick.zoom", null);
+            // Generate rect for event handling
+            __data_xs ? generateEventRectsForMultipleXs(eventRect) : generateEventRectsForSingleX(eventRect, data);
 
             // Define g for bar chart area
             main.select(".chart").append("g")
@@ -1301,7 +1437,12 @@
             main.select(".chart").append("g")
                 .attr("class", "chart-lines");
 
-            if (__zoom_enabled) {
+            // Define g for arc chart area
+            main.select(".chart").append("g")
+                .attr("class", "chart-arcs")
+                .attr("transform", translate.arc);
+
+            if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
                 main.insert('rect', __zoom_privileged ? null : 'g.grid')
                     .attr('class', 'zoom-rect')
@@ -1314,7 +1455,7 @@
 
             // Set default extent if defined
             if (__axis_x_default !== null) {
-                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : (isTimeSeries ? __axis_x_default(firstDate, lastDate) : __axis_x_default(0, maxDataCount() - 1)));
+                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain()));
             }
 
             /*-- Context Region --*/
@@ -1351,10 +1492,10 @@
 
             /*-- Legend Region --*/
 
-            if (__legend_show) { updateLegend(targets); }
+            if (__legend_show) { updateLegend(c3.data.targets); }
 
             // Set targets
-            updateTargets(targets);
+            updateTargets(c3.data.targets);
 
             // Draw with targets
             redraw({withTransition: false, withUpdateXDomain: true});
@@ -1363,18 +1504,287 @@
             if (__tooltip_init_show) {
                 if (isTimeSeries && typeof __tooltip_init_x === 'string') {
                     __tooltip_init_x = parseDate(__tooltip_init_x);
-                    for (i = 0; i < targets[0].values.length; i++) {
-                        if ((targets[0].values[i].x - __tooltip_init_x) === 0) { break; }
+                    for (i = 0; i < c3.data.targets[0].values.length; i++) {
+                        if ((c3.data.targets[0].values[i].x - __tooltip_init_x) === 0) { break; }
                     }
                     __tooltip_init_x = i;
                 }
-                tooltip.html(__tooltip_contents(targets.map(function (d) {
+                tooltip.html(__tooltip_contents(c3.data.targets.map(function (d) {
                     return addName(d.values[__tooltip_init_x]);
                 })));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
-                       .style("visibility", "visible");
+                       .style("display", "block");
             }
+
+            // Bind resize event
+            if (window.onresize == null) {
+                window.onresize = resize;
+            }
+        }
+
+        function generateEventRectsForSingleX(eventRect, data) {
+            eventRect
+              .selectAll(".event-rects")
+                .data(data)
+              .enter().append("rect")
+                .attr("class", function (d, i) { return "event-rect event-rect-" + i; })
+                .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
+                .on('mouseover', function (d, i) {
+                    if (dragging) { return; } // do nothing if dragging
+                    if (hasArcType(c3.data.targets)) { return; }
+
+                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
+                    var j, newData;
+
+                    // Sort selectedData as names order
+                    if (Object.keys(__data_names).length > 0) {
+                        newData = [];
+                        for (var id in __data_names) {
+                            for (j = 0; j < selectedData.length; j++) {
+                                if (selectedData[j].id === id) {
+                                    newData.push(selectedData[j]);
+                                    selectedData.shift(j);
+                                    break;
+                                }
+                            }
+                        }
+                        selectedData = newData.concat(selectedData); // Add remained
+                    }
+
+                    // Expand shapes if needed
+                    if (__point_focus_expand_enabled) { expandCircles(i); }
+                    expandBars(i);
+
+                    // Show xgrid focus line
+                    showXGridFocus(selectedData[0]);
+                })
+                .on('mouseout', function (d, i) {
+                    if (hasArcType(c3.data.targets)) { return; }
+                    hideXGridFocus();
+                    hideTooltip();
+                    // Undo expanded shapes
+                    unexpandCircles(i);
+                    unexpandBars();
+                })
+                .on('mousemove', function (d, i) {
+                    var selectedData;
+
+                    if (dragging) { return; } // do nothing when dragging
+                    if (hasArcType(c3.data.targets)) { return; }
+
+                    // Show tooltip
+                    selectedData = c3.data.targets.map(function (d) {
+                        return addName(d.values[i]);
+                    });
+                    showTooltip(selectedData, d3.mouse(this));
+
+                    if (! __data_selection_enabled) { return; }
+                    if (__data_selection_grouped) { return; } // nothing to do when grouped
+
+                    main.selectAll('.-shape-' + i)
+                        .filter(function (d) { return __data_selection_isselectable(d); })
+                        .each(function () {
+                            var _this = d3.select(this).classed(EXPANDED, true);
+                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
+                            d3.select('.event-rect-' + i).style('cursor', null);
+                        })
+                        .filter(function () {
+                            var _this = d3.select(this);
+                            if (this.nodeName === 'circle') {
+                                return isWithinCircle(this, __point_select_r);
+                            }
+                            else if (this.nodeName === 'rect') {
+                                return isWithinBar(this, _this.attr('x'), _this.attr('y'));
+                            }
+                        })
+                        .each(function () {
+                            var _this = d3.select(this);
+                            if (! _this.classed(EXPANDED)) {
+                                _this.classed(EXPANDED, true);
+                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
+                            }
+                            d3.select('.event-rect-' + i).style('cursor', 'pointer');
+                        });
+                })
+                .on('click', function (d, i) {
+                    if (hasArcType(c3.data.targets)) { return; }
+                    if (cancelClick) {
+                        cancelClick = false;
+                        return;
+                    }
+                    main.selectAll('.-shape-' + i).each(function (d) { selectShape(this, d, i); });
+                })
+                .call(
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { drag(d3.mouse(this)); })
+                        .on('dragstart', function () { dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { dragend(); })
+                )
+                .call(zoom).on("dblclick.zoom", null);
+        }
+
+        function generateEventRectsForMultipleXs(eventRect) {
+            eventRect.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', width)
+                .attr('height', height)
+                .attr('class', "event-rect")
+                .on('mouseout', function () {
+                    if (hasArcType(c3.data.targets)) { return; }
+                    hideXGridFocus();
+                    hideTooltip();
+                    unexpandCircles();
+                })
+                .on('mousemove', function () {
+                    var mouse, closest, selectedData;
+
+                    if (dragging) { return; } // do nothing when dragging
+                    if (hasArcType(c3.data.targets)) { return; }
+
+                    mouse = d3.mouse(this);
+                    closest = findClosestFromTargets(c3.data.targets, mouse);
+
+                    // show tooltip when cursor is close to some point
+                    selectedData = [addName(closest)];
+                    showTooltip(selectedData, mouse);
+
+                    // expand points
+                    if (__point_focus_expand_enabled) {
+                        unexpandCircles();
+                        expandCircles(closest.index, closest.id);
+                    }
+
+                    // Show xgrid focus line
+                    showXGridFocus(selectedData[0]);
+
+                    // Show cursor as pointer if point is close to mouse position
+                    if (dist(closest, mouse) < 100) {
+                        d3.select('.event-rect').style('cursor', 'pointer');
+                    } else {
+                        d3.select('.event-rect').style('cursor', null);
+                    }
+                })
+                .on('click', function () {
+                    var mouse, closest;
+
+                    if (hasArcType(c3.data.targets)) { return; }
+
+                    mouse = d3.mouse(this);
+                    closest = findClosestFromTargets(c3.data.targets, mouse);
+
+                    // select if selection enabled
+                    if (dist(closest, mouse) < 100) {
+                        main.select('.-circles-' + closest.id).select('.-circle-' + closest.index).each(function () {
+                            selectShape(this, closest, closest.index);
+                        });
+                    }
+                })
+                .call(
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { drag(d3.mouse(this)); })
+                        .on('dragstart', function () { dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { dragend(); })
+                )
+                .call(zoom).on("dblclick.zoom", null);
+        }
+
+        function selectShape(target, d, i) {
+            var _this = d3.select(target),
+                isSelected = _this.classed(SELECTED);
+            var isWithin = false, toggle;
+            if (target.nodeName === 'circle') {
+                isWithin = isWithinCircle(target, __point_select_r * 1.5);
+                toggle = togglePoint;
+            }
+            else if (target.nodeName === 'rect') {
+                isWithin = isWithinBar(target);
+                toggle = toggleBar;
+            }
+            if (__data_selection_grouped || isWithin) {
+                if (__data_selection_enabled && __data_selection_isselectable(d)) {
+                    _this.classed(SELECTED, !isSelected);
+                    toggle(!isSelected, _this, d, i);
+                }
+                __point_onclick(d, _this); // TODO: should be __data_onclick
+            }
+        }
+
+        function drag(mouse) {
+            var sx, sy, mx, my, minX, maxX, minY, maxY;
+
+            if (hasArcType(c3.data.targets)) { return; }
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
+
+            sx = dragStart[0];
+            sy = dragStart[1];
+            mx = mouse[0];
+            my = mouse[1];
+            minX = Math.min(sx, mx);
+            maxX = Math.max(sx, mx);
+            minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my);
+            maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
+
+            main.select('.dragarea')
+                .attr('x', minX)
+                .attr('y', minY)
+                .attr('width', maxX - minX)
+                .attr('height', maxY - minY);
+            // TODO: binary search when multiple xs
+            main.selectAll('.-shapes').selectAll('.-shape')
+                .filter(function (d) { return __data_selection_isselectable(d); })
+                .each(function (d, i) {
+                    var _this = d3.select(this),
+                        isSelected = _this.classed(SELECTED),
+                        isIncluded = _this.classed(INCLUDED),
+                        _x, _y, _w, toggle, isWithin = false;
+                    if (this.nodeName === 'circle') {
+                        _x = _this.attr("cx") * 1;
+                        _y = _this.attr("cy") * 1;
+                        toggle = togglePoint;
+                        isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
+                    }
+                    else if (this.nodeName === 'rect') {
+                        _x = _this.attr("x") * 1;
+                        _y = _this.attr("y") * 1;
+                        _w = _this.attr('width') * 1;
+                        toggle = toggleBar;
+                        isWithin = minX < _x + _w && _x < maxX && _y < maxY;
+                    }
+                    if (isWithin ^ isIncluded) {
+                        _this.classed(INCLUDED, !isIncluded);
+                        // TODO: included/unincluded callback here
+                        _this.classed(SELECTED, !isSelected);
+                        toggle(!isSelected, _this, d, i);
+                    }
+                });
+        }
+
+        function dragstart(mouse) {
+            if (hasArcType(c3.data.targets)) { return; }
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            dragStart = mouse;
+            main.select('.chart').append('rect')
+                .attr('class', 'dragarea')
+                .style('opacity', 0.1);
+            dragging = true;
+            // TODO: add callback here
+        }
+
+        function dragend() {
+            if (hasArcType(c3.data.targets)) { return; }
+            if (! __data_selection_enabled) { return; } // do nothing if not selectable
+            main.select('.dragarea')
+                .transition().duration(100)
+                .style('opacity', 0)
+                .remove();
+            main.selectAll('.-shape')
+                .classed(INCLUDED, false);
+            dragging = false;
+            // TODO: add callback here
+            
         }
 
         function redraw(options) {
@@ -1383,7 +1793,8 @@
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1;
             var barX, barY, barW, barH;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withUpdateXDomain;
+            var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
+            var isPieChart;
             var duration;
 
             options = isDefined(options) ? options : {};
@@ -1391,8 +1802,18 @@
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
+            withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
+            isPieChart = hasArcType(c3.data.targets);
 
             duration = withTransition ? 250 : 0;
+
+            if (withUpdateOrgXDomain) {
+                x.domain(d3.extent(getXDomain(c3.data.targets)));
+                orgXDomain = x.domain();
+                zoom.x(x).updateScaleExtent();
+                subX.domain(x.domain());
+                brush.x(subX);
+            }
 
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
@@ -1402,9 +1823,10 @@
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
 
-            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
-            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
-            main.select(".y2.axis").transition().call(yAxis2);
+            // axis
+            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis).style("opacity", isPieChart ? 0 : 1);
+            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis).style("opacity", isPieChart ? 0 : 1);
+            main.select(".y2.axis").transition().call(yAxis2).style("opacity", isPieChart ? 0 : 1);
 
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", width);
@@ -1414,7 +1836,7 @@
             subY2.domain(y2.domain());
 
             // tooltip
-            tooltip.style("visibility", "hidden");
+            tooltip.style("display", "none");
 
             // grid
             main.select('line.xgrid-focus')
@@ -1423,8 +1845,9 @@
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
-                    var firstYear = firstDate.getFullYear();
-                    var lastYear = lastDate.getFullYear();
+                    var xDomain = getXDomain();
+                    var firstYear = xDomain[0].getFullYear();
+                    var lastYear = xDomain[1].getFullYear();
                     for (var year = firstYear; year <= lastYear; year++) {
                         xgridData.push(new Date(year + '-01-01 00:00:00'));
                     }
@@ -1435,12 +1858,12 @@
                 xgrid = main.select('.xgrids').selectAll(".xgrid")
                     .data(xgridData);
                 xgrid.enter().append('line').attr("class", "xgrid");
+                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return x(d) - xAxis.tickOffset(); })
+                    .attr("x2", __axis_rotated ? width : function (d) { return x(d) - xAxis.tickOffset(); })
+                    .attr("y1", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : margin.top)
+                    .attr("y2", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : height)
+                    .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
-                main.selectAll(".xgrid")
-                    .attr("x1", function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("x2", function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("y1", margin.top)
-                    .attr("y2", height);
             }
             if (__grid_x_lines) {
                 xgridLine = main.selectAll(".xgrid-lines");
@@ -1462,10 +1885,7 @@
                 ygrid.attr("x1", __axis_rotated ? y : 0)
                      .attr("x2", __axis_rotated ? y : width)
                      .attr("y1", __axis_rotated ? 0 : y)
-                     .attr("y2", __axis_rotated ? height : y)
-                     .attr("opacity", 0)
-                   .transition()
-                     .attr("opacity", 1);
+                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
             }
             if (withY && __grid_y_lines) {
@@ -1500,14 +1920,14 @@
                 .remove();
 
             // lines and cricles
-            main.selectAll('.-line')
+            main.selectAll('.chart-line').select('.-line')
               .transition().duration(duration)
                 .attr("d", lineOnMain);
             main.selectAll('.-area')
                 .transition().duration(duration)
                 .attr("d", areaOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
-                .data(lineData);
+                .data(lineOrScatterData);
             mainCircle.transition().duration(duration)
                 .style('opacity', function (d) { return d.value === null ? 0 : 1; })
                 .attr("cx", __axis_rotated ? circleY : circleX)
@@ -1519,6 +1939,35 @@
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("r", __point_r);
             mainCircle.exit().remove();
+
+            // arc
+            main.selectAll('.chart-arc').select('.-arc')
+                .style("opacity", function (d) { return d === this._current ? 0 : 1; })
+              .transition().duration(duration)
+                .attrTween("d", function (d) {
+                    var updated = updateAngle(d);
+                    if (! updated) {
+                        return function () { return "M 0 0"; };
+                    }
+/*
+                    if (this._current === d) {
+                        this._current = {
+                            startAngle: Math.PI*2,
+                            endAngle: Math.PI*2,
+                        };
+                    }
+*/
+                    var i = d3.interpolate(this._current, updated);
+                    this._current = i(0);
+                    return function (t) { return getArc(i(t), true); };
+                })
+                .style("opacity", 1);
+            main.selectAll('.chart-arc').select('text')
+                .attr("transform", transformForArcLable)
+                .attr("opacity", 0)
+              .transition().duration(duration)
+                .text(textForArcLable)
+                .attr("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
 
             // subchart
             if (__subchart_show) {
@@ -1571,24 +2020,26 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (isCustomX) {
-                rectW = function (d, i) {
-                    var prevX = getPrevX(i), nextX = getNextX(i);
-                    return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
-                };
-                rectX = function (d, i) {
-                    var prevX = getPrevX(i);
-                    return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
-                };
-            } else {
-                rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
-                rectX = function (d) { return x(d.x) - (rectW / 2); };
+            if (! __data_xs) {
+                if (isCustomX) {
+                    rectW = function (d, i) {
+                        var prevX = getPrevX(i), nextX = getNextX(i);
+                        return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
+                    };
+                    rectX = function (d, i) {
+                        var prevX = getPrevX(i);
+                        return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
+                    };
+                } else {
+                    rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
+                    rectX = function (d) { return x(d.x) - (rectW / 2); };
+                }
+                main.selectAll('.event-rect')
+                  .attr("x", __axis_rotated ? 0 : rectX)
+                  .attr("y", __axis_rotated ? rectX : 0)
+                  .attr("width", __axis_rotated ? width : rectW)
+                  .attr("height", __axis_rotated ? rectW : height);
             }
-            main.selectAll('.event-rect')
-                .attr("x", __axis_rotated ? 0 : rectX)
-                .attr("y", __axis_rotated ? rectX : 0)
-                .attr("width", __axis_rotated ? width : rectW)
-                .attr("height", __axis_rotated ? rectW : height);
 
             // rect for regions
             var mainRegion = main.select('.regions').selectAll('rect.region')
@@ -1648,6 +2099,7 @@
             // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
             main.select('.y2.axis').attr("transform", translate.y2);
+            main.select('.chart-arcs').attr("transform", translate.arc);
             // Update context sizes and positions
             if (__subchart_show) {
                 context.select('.x.brush').selectAll('rect').attr('height', height2);
@@ -1664,10 +2116,15 @@
         }
 
         function updateTargets(targets) {
-            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
+            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate, mainPieEnter, mainPieUpdate;
             var contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate;
 
             /*-- Main --*/
+
+            // Set data type if data.type is specified
+            if (__data_type) {
+                setTargetType(getTargetIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
+            }
 
             //-- Bar --//
             mainBarUpdate = main.select('.chart-bars')
@@ -1714,6 +2171,36 @@
                     d.value = t.values[d.x].value;
                 });
             });
+            // MEMO: can not keep same color...
+            //mainLineUpdate.exit().remove();
+
+            //-- Pie --//
+
+            mainPieUpdate = main.select('.chart-arcs')
+              .selectAll(".chart-arc")
+                .data(pie(targets));
+            mainPieEnter = mainPieUpdate.enter().append("g")
+                .attr("class", function (d) { return 'chart-arc target target-' + d.data.id; })
+                .style('opacity', 0);
+            mainPieEnter.append("path")
+                .attr("class", classArc)
+                .style("fill", function (d) { return color(d.data.id); })
+                .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
+                .each(function (d) { this._current = d; })
+                .on('mouseover', function (d) {
+                    expandArc(d.data.id);
+                    focusLegend(d.data.id);
+                })
+                .on('mouseout', function (d) {
+                    unexpandArc(d.data.id);
+                    revertLegend();
+                });
+            mainPieEnter.append("text")
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle")
+                .style("pointer-events", "none");
+            // MEMO: can not keep same color..., but not bad to update color in redraw
+            //mainPieUpdate.exit().remove();
 
             /*-- Context --*/
 
@@ -1774,13 +2261,24 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw();
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
 
             done();
         }
 
         /*-- Draw Legend --*/
 
+        function focusLegend(id) {
+            d3.selectAll('.legend-item').filter(function (d) { return d !== id; })
+              .transition().duration(100)
+                .style('opacity', 0.3);
+        }
+        function revertLegend() {
+            d3.selectAll('.legend-item')
+              .transition().duration(100)
+                .style('opacity', 1);
+        }
+        
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
             var padding = width / 2 - __legend_item_width * Object.keys(targets).length / 2;
@@ -1800,15 +2298,11 @@
                     __legend_item_onclick(d);
                 })
                 .on('mouseover', function (d) {
-                    d3.selectAll('.legend-item').filter(function (_d) { return _d !== d; })
-                      .transition().duration(100)
-                        .style('opacity', 0.3);
+                    focusLegend(d);
                     c3.focus(d);
                 })
                 .on('mouseout', function () {
-                    d3.selectAll('.legend-item')
-                      .transition().duration(100)
-                        .style('opacity', 1);
+                    revertLegend();
                     c3.revert();
                 });
             l.append('rect')
@@ -1820,6 +2314,7 @@
                 .attr('height', 24);
             l.append('rect')
                 .attr("class", "legend-item-tile")
+                .style("pointer-events", "none")
                 .style('fill', function (d) { return color(d); })
                 .attr('x', -200)
                 .attr('y', function () { return legendHeight / 2 - 9; })
@@ -1827,6 +2322,7 @@
                 .attr('height', 10);
             l.append('text')
                 .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
+                .style("pointer-events", "none")
                 .attr('x', -200)
                 .attr('y', function () { return legendHeight / 2; });
 
@@ -1851,30 +2347,54 @@
         function getTargetSelector(target) {
             return isDefined(target) ? '.target-' + target : '.target';
         }
+        function isNoneArc(d) {
+            return hasTarget(d.id);
+        }
+        function isArc(d) {
+            return 'data' in d && hasTarget(d.data.id);
+        }
 
         c3.focus = function (target) {
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function focus(targets) {
+                targets.transition().duration(100).style('opacity', 1);
+            }
             c3.defocus();
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', true)
-                .transition().duration(100)
-                .style('opacity', 1);
+            focus(candidatesForNoneArc.classed('focused', true));
+            focus(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                expandArc(target, true);
+            }
         };
 
         c3.defocus = function (target) {
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', false)
-                .transition().duration(100)
-                .style('opacity', 0.3);
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function defocus(targets) {
+                targets.transition().duration(100).style('opacity', 0.3);
+            }
+            defocus(candidatesForNoneArc.classed('focused', false));
+            defocus(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                unexpandArc(target);
+            }
         };
 
         c3.revert = function (target) {
-            d3.selectAll(getTargetSelector(target))
-                .filter(function (d) { return hasTarget(d.id); })
-                .classed('focused', false)
-                .transition().duration(100)
-                .style('opacity', 1);
+            var candidates = d3.selectAll(getTargetSelector(target)),
+                candidatesForNoneArc = candidates.filter(isNoneArc),
+                candidatesForArc = candidates.filter(isArc);
+            function revert(targets) {
+                targets.transition().duration(100).style('opacity', 1);
+            }
+            revert(candidatesForNoneArc.classed('focused', false));
+            revert(candidatesForArc);
+            if (hasArcType(c3.data.targets)) {
+                unexpandArc(target);
+            }
         };
 
         c3.show = function (target) {
@@ -1943,7 +2463,9 @@
                 updateLegend(c3.data.targets);
             }
 
-            if (c3.data.targets.length > 0) { redraw(); }
+            if (c3.data.targets.length > 0) {
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            }
         };
 
         c3.selected = function (target) {
@@ -1997,6 +2519,11 @@
             redraw();
         };
 
+        c3.toScatter = function (targets) {
+            setTargetType(targets, 'scatter');
+            redraw();
+        };
+
         c3.groups = function (groups) {
             if (isUndefined(groups)) { return __data_groups; }
             __data_groups = groups;
@@ -2041,6 +2568,13 @@
             return targets.length > 0 ? targets[0] : undefined;
         };
 
+        c3.destroy = function () {
+            c3.data.targets = undefined;
+            c3.data.x = {};
+            selectChart.html("");
+            window.onresize = null;
+        };
+
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
@@ -2056,14 +2590,13 @@
             throw Error('url or rows or columns is required.');
         }
 
-        // Bind resize event
-        window.onresize = resize;
-
         return c3;
     };
 
     function categoryAxis() {
-        var scale = d3.scale.linear(), orient = "bottom", tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, categories = [];
+        var scale = d3.scale.linear(), orient = "bottom";
+        var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null;
+        var categories = [];
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
                 return "translate(" + (x(d) + tickOffset) + ", 0)";
@@ -2093,6 +2626,10 @@
         }
         function category(i) {
             return i < categories.length ? categories[i] : i;
+        }
+        function formattedCategory(i) {
+            var c = category(i);
+            return tickFormat ? tickFormat(c) : c;
         }
         function axis(g) {
             g.each(function () {
@@ -2129,7 +2666,7 @@
                         lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                         textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                         text.attr("dy", ".71em").style("text-anchor", "middle");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? category(i) : ""; });
+                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                         pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
                     }
 
@@ -2155,7 +2692,7 @@
                         lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
                         textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
                         text.attr("dy", ".32em").style("text-anchor", "end");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? category(i) : ""; });
+                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                         pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
                         break;
                     }
@@ -2209,6 +2746,11 @@
         axis.tickTextNum = function (x) {
             if (!arguments.length) { return tickTextNum; }
             tickTextNum = x;
+            return axis;
+        };
+        axis.tickFormat = function (format) {
+            if (!arguments.length) { return tickFormat; }
+            tickFormat = format;
             return axis;
         };
         axis.tickOffset = function () {

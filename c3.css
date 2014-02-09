@@ -15,6 +15,15 @@ text {
           user-select: none;
 }
 
+.chart-arc path {
+  stroke: #fff;
+
+}
+.chart-arc text {
+  fill: #fff;
+  font-size: 13px;
+}
+
 /*-- Grid --*/
 
 .grid line {
@@ -60,7 +69,7 @@ text {
 
 /*-- Focus --*/
 
-.target.focused path {
+.target.focused path.-line {
   stroke-width: 2px;
 }
 
