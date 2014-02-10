@@ -564,7 +564,7 @@
             return __data_x ? __data_x : __data_xs ? __data_xs[id] : null;
         }
         function getXValue(id, i) {
-            return id in c3.data.x && c3.data.x[i] ? c3.data.x[i] : i;
+            return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
         }
 
         function addName(data) {
@@ -674,7 +674,7 @@
             };
         }
         function getPrevX(i) {
-            return i > 0 ? c3.data.targets[0].values[i - 1].x : undefined;
+            return i > 0 && c3.data.targets[0].values[i - 1] ? c3.data.targets[0].values[i - 1].x : undefined;
         }
         function getNextX(i) {
             return i < maxDataCount() - 1 ? c3.data.targets[0].values[i + 1].x : undefined;
