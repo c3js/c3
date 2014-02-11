@@ -489,7 +489,8 @@
                 padding_top = isDefined(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
                 padding_bottom = isDefined(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
             }
-            return [hasBarType(yTargets) ? 0 : yDomainMin - padding_bottom, yDomainMax + padding_top];
+
+            return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainRatio(isSub) {
             var domain, extent;
@@ -862,18 +863,24 @@
                 return d.x || d.x === 0 ? scale(d.x) - barW * (barTargetsNum / 2 - barIndex) : 0;
             };
         }
-        function getBarY(barH, barIndices, zeroBased, isSub) {
+        function getBarY(isSub) {
+            return function (d, i) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
+                return scale(d.value);
+            };
+        }
+        function getBarOffset(barIndices, isSub) {
             var indicesIds = Object.keys(barIndices);
             return function (d, i) {
                 var offset = 0;
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
                 getTargets(isBarType).forEach(function (t) {
                     if (t.id === d.id || barIndices[t.id] !== barIndices[d.id]) { return; }
-                    if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id)) {
-                        offset += barH(t.values[i]);
+                    if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
+                        offset += scale(t.values[i].value);
                     }
                 });
-                return zeroBased ? offset : scale(d.value) - offset;
+                return offset;
             };
         }
         function getBarW(axis, barTargetsNum, isSub) {
@@ -1784,7 +1791,7 @@
                 .classed(INCLUDED, false);
             dragging = false;
             // TODO: add callback here
-            
+
         }
 
         function redraw(options) {
@@ -1895,26 +1902,57 @@
             }
 
             // bars
-            barW = getBarW(xAxis, barTargetsNum, false);
-            barH = getBarH(__axis_rotated ? null : height);
-            barX = getBarX(barW, barTargetsNum, barIndices);
-            barY = getBarY(barH, barIndices, __axis_rotated);
+
+            var barOnMain = function (isSub) {
+                var barW = getBarW(xAxis, barTargetsNum, !!isSub),
+                    barX = getBarX(barW, barTargetsNum, barIndices),
+                    barY = getBarY(!!isSub),
+                    barOffset = getBarOffset(barIndices);
+
+                return function (d, i) {
+                    var y = barY;
+                    var x = barX;
+
+                    var y0 = getYScale(d.id)(0),
+                        offset = barOffset(d, i) || y0; // offset is for stacked bar chart, by default
+
+                    // 4 points that make a bar
+                    var points = [
+                        [x(d), offset],
+                        [x(d), y(d) - (y0 - offset)],
+                        [x(d) + barW, y(d) - (y0 - offset)],
+                        [x(d) + barW, offset]
+                    ];
+
+                    // switch points if axis is rotated, not applicable for sub chart
+                    var indexX = isSub || !__axis_rotated ? 0 : 1;
+                    var indexY = isSub || !__axis_rotated ? 1 : 0;
+
+                    var path = 'M ' + points[0][ indexX] + ',' + points[0][indexY] + ' ' +
+                        'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
+                        'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
+                        'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
+                        'z';
+
+                    return  path;
+                }
+            };
+
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
-            mainBar.transition().duration(duration)
-                .attr("x", __axis_rotated ? barY : barX)
-                .attr("y", __axis_rotated ? barX : barY)
-                .attr("width", __axis_rotated ? barH : barW)
-                .attr("height", __axis_rotated ? barW : barH);
-            mainBar.enter().append('rect')
-                .attr("class", classBar)
-                .attr("x", __axis_rotated ? barY : barX)
-                .attr("y", __axis_rotated ? barX : barY)
-                .attr("width", __axis_rotated ? barH : barW)
-                .attr("height", __axis_rotated ? barW : barH)
+
+            mainBar.enter().append('path')
+                .attr('d', barOnMain(false))
+                .style("stroke", 'none')
+                .style("fill", function (d) { return color(d.id); })
+                .attr("class", classBar);
+
+            mainBar
                 .style("opacity", 0)
-              .transition().duration(duration)
+                .transition().duration(duration)
+                .attr('d', barOnMain(false))
                 .style('opacity', 1);
+
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
                 .remove();
@@ -1981,7 +2019,7 @@
                     // TODO: fix when rotated
                     context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
                     // extent rect
-                    if (! brush.empty()) {
+                    if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
                     }
                     // bars
@@ -2004,7 +2042,7 @@
                         .remove();
                     // lines
                     context.selectAll('.-line')
-                      .transition().duration(duration)
+                        .transition().duration(duration)
                         .attr("d", lineOnSub);
                 }
             }
