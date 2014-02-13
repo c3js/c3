@@ -458,8 +458,8 @@
                     if (! isBarType(__data_groups[j][k])) { continue; }
                     if (isUndefined(ys[__data_groups[j][k]])) { continue; }
                     ys[__data_groups[j][k]].forEach(function (v, i) {
-                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0])) {
-                            ys[__data_groups[j][0]][i] += v * 1;
+                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0]) && ys[__data_groups[j][0]]) {
+                            ys[__data_groups[j][0]][i] += +v;
                         }
                     });
                 }
