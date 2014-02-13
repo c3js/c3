@@ -1519,7 +1519,10 @@
 
             // Bind resize event
             if (window.onresize == null) {
-                window.onresize = resize;
+                window.onresize = generateResize();
+            }
+            if (window.onresize.add) {
+                window.onresize.add(resize);
             }
         }
 
@@ -2083,6 +2086,18 @@
             }
         }
 
+        function generateResize() {
+            var resizeFunctions = [];
+            function callResizeFunctions() {
+                resizeFunctions.forEach(function (f) {
+                    f();
+                });
+            }
+            callResizeFunctions.add = function (f) {
+                resizeFunctions.push(f);
+            };
+            return callResizeFunctions;
+        }
         function resize() {
             // Update sizes and scales
             updateSizes();
