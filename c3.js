@@ -419,8 +419,8 @@
             return ratio.toFixed(1) + "%";
         }
         function expandArc(targetId, withoutFadeOut) {
-            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
-                noneTargets = d3.selectAll('.-arc').filter(function (data) { return data.data.id !== targetId; });
+            var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
+                noneTargets = svg.selectAll('.-arc').filter(function (data) { return data.data.id !== targetId; });
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArcExpanded)
@@ -431,11 +431,11 @@
             }
         }
         function unexpandArc(targetId) {
-            var target = d3.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : ''));
+            var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : ''));
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArc);
-            d3.selectAll('.-arc')
+            svg.selectAll('.-arc')
                 .style("opacity", 1);
         }
 
@@ -458,8 +458,8 @@
                     if (! isBarType(__data_groups[j][k])) { continue; }
                     if (isUndefined(ys[__data_groups[j][k]])) { continue; }
                     ys[__data_groups[j][k]].forEach(function (v, i) {
-                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0])) {
-                            ys[__data_groups[j][0]][i] += v * 1;
+                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0]) && ys[__data_groups[j][0]]) {
+                            ys[__data_groups[j][0]][i] += +v;
                         }
                     });
                 }
@@ -1526,7 +1526,10 @@
 
             // Bind resize event
             if (window.onresize == null) {
-                window.onresize = resize;
+                window.onresize = generateResize();
+            }
+            if (window.onresize.add) {
+                window.onresize.add(resize);
             }
         }
 
@@ -1594,7 +1597,7 @@
                         .each(function () {
                             var _this = d3.select(this).classed(EXPANDED, true);
                             if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
-                            d3.select('.event-rect-' + i).style('cursor', null);
+                            svg.select('.event-rect-' + i).style('cursor', null);
                         })
                         .filter(function () {
                             var _this = d3.select(this);
@@ -1611,7 +1614,7 @@
                                 _this.classed(EXPANDED, true);
                                 if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
                             }
-                            d3.select('.event-rect-' + i).style('cursor', 'pointer');
+                            svg.select('.event-rect-' + i).style('cursor', 'pointer');
                         });
                 })
                 .on('click', function (d, i) {
@@ -1668,9 +1671,9 @@
 
                     // Show cursor as pointer if point is close to mouse position
                     if (dist(closest, mouse) < 100) {
-                        d3.select('.event-rect').style('cursor', 'pointer');
+                        svg.select('.event-rect').style('cursor', 'pointer');
                     } else {
-                        d3.select('.event-rect').style('cursor', null);
+                        svg.select('.event-rect').style('cursor', null);
                     }
                 })
                 .on('click', function () {
@@ -2121,6 +2124,18 @@
             }
         }
 
+        function generateResize() {
+            var resizeFunctions = [];
+            function callResizeFunctions() {
+                resizeFunctions.forEach(function (f) {
+                    f();
+                });
+            }
+            callResizeFunctions.add = function (f) {
+                resizeFunctions.push(f);
+            };
+            return callResizeFunctions;
+        }
         function resize() {
             // Update sizes and scales
             updateSizes();
@@ -2130,10 +2145,10 @@
             // Set x for zoom again because of scale update
             if (__zoom_enabled) { zoom.x(x); }
             // Update sizes
-            d3.select('svg').attr('width', currentWidth).attr('height', currentHeight);
-            d3.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
-            d3.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
-            d3.select('.zoom-rect').attr('width', width).attr('height', height);
+            svg.attr('width', currentWidth).attr('height', currentHeight);
+            svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
+            svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
+            svg.select('.zoom-rect').attr('width', width).attr('height', height);
             // Update main positions
             main.select('.x.axis').attr("transform", translate.x);
             main.select('.y2.axis').attr("transform", translate.y2);
@@ -2277,7 +2292,7 @@
             /*-- Show --*/
 
             // Fade-in each chart
-            d3.selectAll('.target')
+            svg.selectAll('.target')
                 .transition()
                 .style("opacity", 1);
         }
@@ -2307,12 +2322,12 @@
         /*-- Draw Legend --*/
 
         function focusLegend(id) {
-            d3.selectAll('.legend-item').filter(function (d) { return d !== id; })
+            svg.selectAll('.legend-item').filter(function (d) { return d !== id; })
               .transition().duration(100)
                 .style('opacity', 0.3);
         }
         function revertLegend() {
-            d3.selectAll('.legend-item')
+            svg.selectAll('.legend-item')
               .transition().duration(100)
                 .style('opacity', 1);
         }
@@ -2393,7 +2408,7 @@
         }
 
         c3.focus = function (target) {
-            var candidates = d3.selectAll(getTargetSelector(target)),
+            var candidates = svg.selectAll(getTargetSelector(target)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function focus(targets) {
@@ -2408,7 +2423,7 @@
         };
 
         c3.defocus = function (target) {
-            var candidates = d3.selectAll(getTargetSelector(target)),
+            var candidates = svg.selectAll(getTargetSelector(target)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function defocus(targets) {
@@ -2422,7 +2437,7 @@
         };
 
         c3.revert = function (target) {
-            var candidates = d3.selectAll(getTargetSelector(target)),
+            var candidates = svg.selectAll(getTargetSelector(target)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function revert(targets) {
@@ -2436,13 +2451,13 @@
         };
 
         c3.show = function (target) {
-            d3.selectAll(getTargetSelector(target))
+            svg.selectAll(getTargetSelector(target))
                 .transition()
                 .style('opacity', 1);
         };
 
         c3.hide = function (target) {
-            d3.selectAll(getTargetSelector(target))
+            svg.selectAll(getTargetSelector(target))
                 .transition()
                 .style('opacity', 0);
         };
@@ -2491,13 +2506,13 @@
             c3.data.targets = c3.data.targets.filter(function (d) {
                 return d.id !== target;
             });
-            d3.selectAll('.target-' + target)
+            svg.selectAll('.target-' + target)
               .transition()
                 .style('opacity', 0)
                 .remove();
 
             if (__legend_show) {
-                d3.selectAll('.legend-item-' + target).remove();
+                svg.selectAll('.legend-item-' + target).remove();
                 updateLegend(c3.data.targets);
             }
 
@@ -2585,7 +2600,7 @@
             var regionClasses = [].concat(classes);
             options = isDefined(options) ? options : {};
             regionClasses.forEach(function (cls) {
-                var regions = d3.selectAll('.' + cls);
+                var regions = svg.selectAll('.' + cls);
                 if (isDefined(options.duration)) {
                     regions = regions.transition().duration(options.duration).style('fill-opacity', 0);
                 }
