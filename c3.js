@@ -818,22 +818,33 @@
         //-- Tooltip --//
 
         function showTooltip(selectedData, mouse) {
+            var tWidth, tHeight;
+            var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
                 .style("display", "block");
             // Get tooltip dimensions
-            var tWidth = tooltip.property('offsetWidth'),
-                tHeight = tooltip.property('offsetHeight');
+            tWidth = tooltip.property('offsetWidth');
+            tHeight = tooltip.property('offsetHeight');
+            // Determin tooltip position
+            if (__axis_rotated) {
+                tooltipLeft = mouse[0];
+            } else {
+                svgLeft = svg.property('offsetLeft');
+                tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(selectedData[0].x) + 20;
+                tooltipRight = tooltipLeft + tWidth;
+                chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
+                if (tooltipRight > chartRight) {
+                    tooltipLeft -= tWidth + 30;
+                }
+            }
+            tooltipTop = mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight;
             // Set tooltip
             // todo get rid of magic numbers
             tooltip
-                .style("top", (mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight) + "px")
-                .style("left", ((__axis_rotated ?
-                  mouse[0] :
-                  (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
-                      (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
-                )))
+                .style("top", tooltipTop + "px")
+                .style("left", tooltipLeft + 'px')
                 .style("visibility", "visible");
         }
         function hideTooltip() {
