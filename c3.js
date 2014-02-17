@@ -568,6 +568,11 @@
         function getXValue(id, i) {
             return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
         }
+        function addXs(xs) {
+            Object.keys(xs).forEach(function (id) {
+                __data_xs[id] = xs[id];
+            });
+        }
 
         function addName(data) {
             var name;
@@ -617,6 +622,8 @@
                     var xKey = getXKey(id);
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                    } else { // if no x included, use same x of current will be used
+                        c3.data.x[id] = c3.data.x[Object.keys(c3.data.x)[0]];
                     }
                 });
             }
@@ -2470,8 +2477,12 @@
 
         c3.load = function (args) {
             // check args
-            if (isUndefined(args.done)) {
+            if (typeof args.done !== 'function') {
                 args.done = function () {};
+            }
+            // update xs if exists
+            if (args.xs) {
+                addXs(args.xs);
             }
             // update categories if exists
             if ('categories' in args && isCategorized) {
