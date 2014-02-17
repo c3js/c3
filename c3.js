@@ -1938,18 +1938,16 @@
 
             // bars
 
-            var barOnMain = function (isSub) {
+            var drawBar = function (isSub) {
                 var barW = getBarW(xAxis, barTargetsNum, !!isSub),
-                    barX = getBarX(barW, barTargetsNum, barIndices),
-                    barY = getBarY(!!isSub),
-                    barOffset = getBarOffset(barIndices);
+                    x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
+                    y = getBarY(!!isSub),
+                    barOffset = getBarOffset(barIndices, !!isSub),
+                    yScale = isSub ? getSubYScale : getYScale;
 
                 return function (d, i) {
-                    var y = barY;
-                    var x = barX;
-
-                    var y0 = getYScale(d.id)(0),
-                        offset = barOffset(d, i) || y0; // offset is for stacked bar chart, by default
+                    var y0 = yScale(d.id)(0),
+                        offset = barOffset(d, i) || y0; // offset is for stacked bar chart
 
                     // 4 points that make a bar
                     var points = [
@@ -1977,16 +1975,14 @@
                 .data(barData);
 
             mainBar.enter().append('path')
-                .attr('d', barOnMain(false))
+                .attr('d', drawBar(false))
                 .style("stroke", 'none')
                 .style("fill", function (d) { return color(d.id); })
                 .attr("class", classBar);
 
             mainBar
-                .style("opacity", 0)
                 .transition().duration(duration)
-                .attr('d', barOnMain(false))
-                .style('opacity', 1);
+                .attr('d', drawBar(false));
 
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
@@ -2058,21 +2054,19 @@
                         brush.extent(x.orgDomain()).update();
                     }
                     // bars
-                    barW = getBarW(subXAxis, barTargetsNum, true);
-                    barH = getBarH(height2, true);
-                    barX = getBarX(barW, barTargetsNum, barIndices, true);
-                    barY = getBarY(barH, barIndices, false, true);
                     contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
-                    contextBar.transition().duration(duration)
-                        .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
-                    contextBar.enter().append('rect')
-                        .attr("class", classBar)
-                        .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH)
+                    contextBar.enter().append('path')
+                        .attr('d', drawBar(true))
+                        .style("stroke", 'none')
+                        .style("fill", function (d) { return color(d.id); })
+                        .attr("class", classBar);
+                    contextBar
                         .style("opacity", 0)
-                      .transition()
+                        .transition().duration(duration)
+                        .attr('d', drawBar(true))
                         .style('opacity', 1);
-                    contextBar.exit().transition()
+                    contextBar.exit().transition().duration(duration)
                         .style('opacity', 0)
                         .remove();
                     // lines
