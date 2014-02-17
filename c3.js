@@ -133,13 +133,9 @@
             var title = getXAxisTickFormat()(d[0].x),
                 text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++) {
-                if (isDefined(d[i])) {
-                    value = isDefined(d[i].value) ? (Math.round(d[i].value * 100) / 100).toFixed(2) : '-';
-                    name = d[i].name;
-                } else {
-                    value = '-';
-                    name = '-';
-                }
+                if (! d[i] || !(d[i].value || d[i].value === 0)) { continue; }
+                value = isDefined(d[i].value) ? (Math.round(d[i].value * 100) / 100).toFixed(2) : '-';
+                name = d[i].name;
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
             return text + "</table>";
@@ -268,6 +264,12 @@
         }
         function getYAxisClipHeight() {
             return height - margin.top + 2 + getXAxisClipHeight();
+        }
+        function getEventRectWidth() {
+            var base = __axis_rotated ? height : width,
+                ratio = getXDomainRatio(),
+                maxDataCount = getMaxDataCount();
+            return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
 
         //-- Scales --//
@@ -567,10 +569,18 @@
         function getXValue(id, i) {
             return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
         }
+        function addXs(xs) {
+            Object.keys(xs).forEach(function (id) {
+                __data_xs[id] = xs[id];
+            });
+        }
 
         function addName(data) {
-            var name = __data_names[data.id];
-            data.name = isDefined(name) ? name : data.id;
+            var name;
+            if (data) {
+                name = __data_names[data.id];
+                data.name = name ? name : data.id;
+            }
             return data;
         }
 
@@ -613,6 +623,8 @@
                     var xKey = getXKey(id);
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                    } else { // if no x included, use same x of current will be used
+                        c3.data.x[id] = c3.data.x[Object.keys(c3.data.x)[0]];
                     }
                 });
             }
@@ -678,10 +690,24 @@
             return i > 0 && c3.data.targets[0].values[i - 1] ? c3.data.targets[0].values[i - 1].x : undefined;
         }
         function getNextX(i) {
-            return i < maxDataCount() - 1 ? c3.data.targets[0].values[i + 1].x : undefined;
+            return i < getMaxDataCount() - 1 ? c3.data.targets[0].values[i + 1].x : undefined;
         }
-        function maxDataCount() {
+        function getMaxDataCount() {
             return d3.max(c3.data.targets, function (t) { return t.values.length; });
+        }
+        function getMaxDataCountTarget() {
+            var length = c3.data.targets.length, max = 0, maxTarget;
+            if (length > 1) {
+                c3.data.targets.forEach(function (t) {
+                    if (t.values.length > max) {
+                        maxTarget = t;
+                        max = t.values.length;
+                    }
+                });
+            } else {
+                maxTarget = length ? c3.data.targets[0] : null;
+            }
+            return maxTarget;
         }
         function getTargetIds(targets) {
             targets = isUndefined(targets) ? c3.data.targets : targets;
@@ -712,6 +738,7 @@
         function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
         function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
+        function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
         function xx(d) {
             return x(d.x);
@@ -792,22 +819,33 @@
         //-- Tooltip --//
 
         function showTooltip(selectedData, mouse) {
+            var tWidth, tHeight;
+            var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
                 .style("display", "block");
             // Get tooltip dimensions
-            var tWidth = tooltip.property('offsetWidth'),
-                tHeight = tooltip.property('offsetHeight');
+            tWidth = tooltip.property('offsetWidth');
+            tHeight = tooltip.property('offsetHeight');
+            // Determin tooltip position
+            if (__axis_rotated) {
+                tooltipLeft = mouse[0];
+            } else {
+                svgLeft = svg.property('offsetLeft');
+                tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(selectedData[0].x) + 20;
+                tooltipRight = tooltipLeft + tWidth;
+                chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
+                if (tooltipRight > chartRight) {
+                    tooltipLeft -= tWidth + 30;
+                }
+            }
+            tooltipTop = mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight;
             // Set tooltip
             // todo get rid of magic numbers
             tooltip
-                .style("top", (mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight) + "px")
-                .style("left", ((__axis_rotated ?
-                  mouse[0] :
-                  (x(selectedData[0].x) + 60 + tWidth < getCurrentWidth()) ?
-                      (x(selectedData[0].x) + 60) + "px" : (x(selectedData[0].x) - tWidth + 30) + "px"
-                )))
+                .style("top", tooltipTop + "px")
+                .style("left", tooltipLeft + 'px')
                 .style("visibility", "visible");
         }
         function hideTooltip() {
@@ -888,7 +926,7 @@
             if (isCategorized) {
                 barW = barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
             } else {
-                barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (maxDataCount() - 1)) * 0.6;
+                barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (getMaxDataCount() - 1)) * 0.6;
             }
             return barW;
         }
@@ -1232,7 +1270,7 @@
         };
         zoom.orgScaleExtent = function () {
             var extent = __zoom_extent ? __zoom_extent : [1, 10];
-            return [extent[0], Math.max(maxDataCount() / extent[1], extent[1])];
+            return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
         };
         zoom.updateScaleExtent = function () {
             var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
@@ -1433,9 +1471,6 @@
                 .style('fill-opacity', 0)
                 .style('cursor', __zoom_enabled ? 'ew-resize' : null);
 
-            // Generate rect for event handling
-            __data_xs ? generateEventRectsForMultipleXs(eventRect) : generateEventRectsForSingleX(eventRect, data);
-
             // Define g for bar chart area
             main.select(".chart").append("g")
                 .attr("class", "chart-bars");
@@ -1533,14 +1568,11 @@
             }
         }
 
-        function generateEventRectsForSingleX(eventRect, data) {
-            eventRect
-              .selectAll(".event-rects")
-                .data(data)
-              .enter().append("rect")
-                .attr("class", function (d, i) { return "event-rect event-rect-" + i; })
+        function generateEventRectsForSingleX(eventRectEnter) {
+            eventRectEnter.append("rect")
+                .attr("class", classEvent)
                 .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
-                .on('mouseover', function (d, i) {
+                .on('mouseover', function (_, i) {
                     if (dragging) { return; } // do nothing if dragging
                     if (hasArcType(c3.data.targets)) { return; }
 
@@ -1569,7 +1601,7 @@
                     // Show xgrid focus line
                     showXGridFocus(selectedData[0]);
                 })
-                .on('mouseout', function (d, i) {
+                .on('mouseout', function (_, i) {
                     if (hasArcType(c3.data.targets)) { return; }
                     hideXGridFocus();
                     hideTooltip();
@@ -1577,7 +1609,7 @@
                     unexpandCircles(i);
                     unexpandBars();
                 })
-                .on('mousemove', function (d, i) {
+                .on('mousemove', function (_, i) {
                     var selectedData;
 
                     if (dragging) { return; } // do nothing when dragging
@@ -1617,7 +1649,7 @@
                             svg.select('.event-rect-' + i).style('cursor', 'pointer');
                         });
                 })
-                .on('click', function (d, i) {
+                .on('click', function (_, i) {
                     if (hasArcType(c3.data.targets)) { return; }
                     if (cancelClick) {
                         cancelClick = false;
@@ -1634,8 +1666,8 @@
                 .call(zoom).on("dblclick.zoom", null);
         }
 
-        function generateEventRectsForMultipleXs(eventRect) {
-            eventRect.append('rect')
+        function generateEventRectsForMultipleXs(eventRectEnter) {
+            eventRectEnter.append('rect')
                 .attr('x', 0)
                 .attr('y', 0)
                 .attr('width', width)
@@ -1798,9 +1830,9 @@
         }
 
         function redraw(options) {
-            var xgrid, xgridData, xgridLine;
-            var mainCircle, mainBar;
-            var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1;
+            var xgrid, xgridData, xgridLine, ygrid;
+            var mainCircle, mainBar, mainRegion, contextBar, eventRectUpdate;
+            var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1, maxDataCountTarget;
             var barX, barY, barW, barH;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
@@ -1888,7 +1920,7 @@
             }
             // Y-Grid
             if (withY && __grid_y_show) {
-                var ygrid = main.select('.ygrids').selectAll(".ygrid")
+                ygrid = main.select('.ygrids').selectAll(".ygrid")
                     .data(y.ticks(10));
                 ygrid.enter().append('line')
                     .attr('class', 'ygrid');
@@ -2030,7 +2062,7 @@
                     barH = getBarH(height2, true);
                     barX = getBarX(barW, barTargetsNum, barIndices, true);
                     barY = getBarY(barH, barIndices, false, true);
-                    var contextBar = context.selectAll('.-bars').selectAll('.-bar')
+                    contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
                     contextBar.transition().duration(duration)
                         .attr("x", barX).attr("y", barY).attr("width", barW).attr("height", barH);
@@ -2061,7 +2093,19 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (! __data_xs) {
+            if (__data_xs) {
+                eventRectUpdate = main.select('.event-rects').selectAll('.event-rect')
+                    .data([0]);
+                // enter : only one rect will be added
+                generateEventRectsForMultipleXs(eventRectUpdate.enter());
+                // update
+                eventRectUpdate
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', width)
+                    .attr('height', height);
+                // exit : not needed becuase always only one rect exists
+            } else {
                 if (isCustomX) {
                     rectW = function (d, i) {
                         var prevX = getPrevX(i), nextX = getNextX(i);
@@ -2072,18 +2116,31 @@
                         return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
                     };
                 } else {
-                    rectW = (((__axis_rotated ? height : width) * getXDomainRatio()) / (maxDataCount() - 1));
+                    rectW = getEventRectWidth();
                     rectX = function (d) { return x(d.x) - (rectW / 2); };
                 }
-                main.selectAll('.event-rect')
-                  .attr("x", __axis_rotated ? 0 : rectX)
-                  .attr("y", __axis_rotated ? rectX : 0)
-                  .attr("width", __axis_rotated ? width : rectW)
-                  .attr("height", __axis_rotated ? rectW : height);
+                // Set data
+                maxDataCountTarget = getMaxDataCountTarget();
+                main.select(".event-rects")
+                    .datum(maxDataCountTarget ? maxDataCountTarget.values : []);
+                // Update rects
+                eventRectUpdate = main.select('.event-rects').selectAll('.event-rect')
+                    .data(function (d) { return d; });
+                // enter
+                generateEventRectsForSingleX(eventRectUpdate.enter());
+                // update
+                eventRectUpdate
+                    .attr('class', classEvent)
+                    .attr("x", __axis_rotated ? 0 : rectX)
+                    .attr("y", __axis_rotated ? rectX : 0)
+                    .attr("width", __axis_rotated ? width : rectW)
+                    .attr("height", __axis_rotated ? rectW : height);
+                // exit
+                eventRectUpdate.exit().remove();
             }
 
             // rect for regions
-            var mainRegion = main.select('.regions').selectAll('rect.region')
+            mainRegion = main.select('.regions').selectAll('rect.region')
                 .data(__regions);
             mainRegion.enter().append('rect');
             mainRegion
@@ -2469,8 +2526,12 @@
 
         c3.load = function (args) {
             // check args
-            if (isUndefined(args.done)) {
+            if (typeof args.done !== 'function') {
                 args.done = function () {};
+            }
+            // update xs if exists
+            if (args.xs) {
+                addXs(args.xs);
             }
             // update categories if exists
             if ('categories' in args && isCategorized) {
