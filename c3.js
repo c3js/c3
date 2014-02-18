@@ -86,8 +86,6 @@
             __axis_y_min = getConfig(['axis', 'y', 'min'], null),
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
             __axis_y_label = getConfig(['axis', 'y', 'label'], null),
-            // not used
-            //__axis_y_rescale = getConfig(['axis', 'y', 'rescale'], true),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], function (d) { return d; }),
             __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
@@ -98,7 +96,6 @@
             __axis_y2_center = getConfig(['axis', 'y2', 'center'], null),
             // not used
             // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
-            // __axis_y2_rescale = getConfig(['axis', 'y2', 'rescale'], true),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], function (d) { return d; }),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
