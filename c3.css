@@ -107,9 +107,9 @@ text {
   border-spacing:0;
   background-color:#fff;
   empty-cells:show;
-  -webkit-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
-     -moz-box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
-          box-shadow: 7px 7px 12px -9px rgba(119,119,119,10);
+  -webkit-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
+     -moz-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
+          box-shadow: 7px 7px 12px -9px rgb(119,119,119);
   opacity: 0.9;
 }
 .-tooltip tr {
