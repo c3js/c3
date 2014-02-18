@@ -444,29 +444,51 @@
         //-- Domain --//
 
         function getYDomainMin(targets) {
-            return d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.value; }); });
-        }
-        function getYDomainMax(targets) {
-            var ys = {}, j, k;
-
-            targets.forEach(function (t) {
-                ys[t.id] = [];
-                t.values.forEach(function (v) {
-                    ys[t.id].push(v.value);
-                });
-            });
-            for (j = 0; j < __data_groups.length; j++) {
-                for (k = 1; k < __data_groups[j].length; k++) {
-                    if (! isBarType(__data_groups[j][k])) { continue; }
-                    if (isUndefined(ys[__data_groups[j][k]])) { continue; }
-                    ys[__data_groups[j][k]].forEach(function (v, i) {
-                        if (getAxisId(__data_groups[j][k]) === getAxisId(__data_groups[j][0]) && ys[__data_groups[j][0]]) {
-                            ys[__data_groups[j][0]][i] += +v;
-                        }
-                    });
+            var ys = getValuesAsIdKeyed(targets), j, k, baseId, id, hasNegativeValue;
+            if (__data_groups.length > 0) {
+                hasNegativeValue = hasNegativeValueInTargets(targets);
+                for (j = 0; j < __data_groups.length; j++) {
+                    if (hasNegativeValue) {
+                        ys[__data_groups[j][0]].forEach(function (v, i) {
+                            ys[__data_groups[j][0]][i] = v < 0 ? v : 0;
+                        });
+                    }
+                    baseId = __data_groups[j][0];
+                    for (k = 1; k < __data_groups[j].length; k++) {
+                        id = __data_groups[j][k];
+                        if (! ys[id]) { continue; }
+                        ys[id].forEach(function (v, i) {
+                            if (getAxisId(id) === getAxisId(baseId) && ys[baseId] && !(hasNegativeValue && +v > 0)) {
+                                ys[baseId][i] += +v;
+                            }
+                        });
+                    }
                 }
             }
-
+            return d3.min(Object.keys(ys).map(function (key) { return d3.min(ys[key]); }));
+        }
+        function getYDomainMax(targets) {
+            var ys = getValuesAsIdKeyed(targets), j, k, baseId, id, hasPositiveValue;
+            if (__data_groups.length > 0) {
+                hasPositiveValue = hasPositiveValueInTargets(targets);
+                for (j = 0; j < __data_groups.length; j++) {
+                    if (hasPositiveValue) {
+                        ys[__data_groups[j][0]].forEach(function (v, i) {
+                            ys[__data_groups[j][0]][i] = v > 0 ? v : 0;
+                        });
+                    }
+                    baseId = __data_groups[j][0];
+                    for (k = 1; k < __data_groups[j].length; k++) {
+                        id = __data_groups[j][k];
+                        if (! ys[id]) { continue; }
+                        ys[id].forEach(function (v, i) {
+                            if (getAxisId(id) === getAxisId(baseId) && ys[baseId] && !(hasPositiveValue && +v < 0)) {
+                                ys[baseId][i] += +v;
+                            }
+                        });
+                    }
+                }
+            }
             return d3.max(Object.keys(ys).map(function (key) { return d3.max(ys[key]); }));
         }
         function getYDomain(axisId) {
@@ -491,7 +513,6 @@
                 padding_top = isDefined(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
                 padding_bottom = isDefined(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
             }
-
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainRatio(isSub) {
@@ -725,6 +746,34 @@
         function getTargets(filter) {
             return isDefined(filter) ? c3.data.targets.filter(filter) : c3.data.targets;
         }
+        function getValuesAsIdKeyed(targets) {
+            var ys = {};
+            targets.forEach(function (t) {
+                ys[t.id] = [];
+                t.values.forEach(function (v) {
+                    ys[t.id].push(v.value);
+                });
+            });
+            return ys;
+        }
+        function checkValueInTargets(targets, checker) {
+            var ids = Object.keys(targets), i, j, values;
+            for (i = 0; i < ids.length; i++) {
+                values = targets[ids[i]].values;
+                for (j = 0; j < values.length; j++) {
+                    if (checker(values[j].value)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        function hasNegativeValueInTargets(targets) {
+            return checkValueInTargets(targets, function (v) { return v < 0; });
+        }
+        function hasPositiveValueInTargets(targets) {
+            return checkValueInTargets(targets, function (v) { return v > 0; });
+        }
         function category(i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
@@ -902,7 +951,7 @@
             };
         }
         function getBarY(isSub) {
-            return function (d, i) {
+            return function (d) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
                 return scale(d.value);
             };
@@ -910,12 +959,12 @@
         function getBarOffset(barIndices, isSub) {
             var indicesIds = Object.keys(barIndices);
             return function (d, i) {
-                var offset = 0;
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
+                    y0 = scale(0), offset = y0;
                 getTargets(isBarType).forEach(function (t) {
                     if (t.id === d.id || barIndices[t.id] !== barIndices[d.id]) { return; }
                     if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
-                        offset += scale(t.values[i].value);
+                        offset += scale(t.values[i].value) - y0;
                     }
                 });
                 return offset;
@@ -929,13 +978,6 @@
                 barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (getMaxDataCount() - 1)) * 0.6;
             }
             return barW;
-        }
-        function getBarH(height, isSub) {
-            var h = height === null ? function (v) { return v; } : function (v) { return height > v ? height - v : 0; };
-            return function (d) {
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
-                return h(scale(d.value));
-            };
         }
 
         //-- Type --//
@@ -959,10 +1001,10 @@
         function hasLineType(targets) {
             return hasType(targets, 'line');
         }
-        */
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
+        */
         function hasScatterType(targets) {
             return hasType(targets, 'scatter');
         }
@@ -1833,7 +1875,6 @@
             var xgrid, xgridData, xgridLine, ygrid;
             var mainCircle, mainBar, mainRegion, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1, maxDataCountTarget;
-            var barX, barY, barW, barH;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
             var isPieChart;
@@ -1961,14 +2002,14 @@
                     var indexX = isSub || !__axis_rotated ? 0 : 1;
                     var indexY = isSub || !__axis_rotated ? 1 : 0;
 
-                    var path = 'M ' + points[0][ indexX] + ',' + points[0][indexY] + ' ' +
+                    var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
                         'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
                         'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
                         'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
                         'z';
 
-                    return  path;
-                }
+                    return path;
+                };
             };
 
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
@@ -1977,12 +2018,14 @@
             mainBar.enter().append('path')
                 .attr('d', drawBar(false))
                 .style("stroke", 'none')
+                .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
                 .attr("class", classBar);
 
             mainBar
                 .transition().duration(duration)
-                .attr('d', drawBar(false));
+                .attr('d', drawBar(false))
+                .style("opacity", 1);
 
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
