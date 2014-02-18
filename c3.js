@@ -1873,7 +1873,7 @@
         }
 
         function redraw(options) {
-            var xgrid, xgridData, xgridLine, ygrid;
+            var xgrid, xgridData, xgridLines, ygrid, ygridLines;
             var mainCircle, mainBar, mainRegion, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1, maxDataCountTarget;
             var rectX, rectW;
@@ -1950,13 +1950,14 @@
                 xgrid.exit().remove();
             }
             if (__grid_x_lines) {
-                xgridLine = main.selectAll(".xgrid-lines");
-                xgridLine.selectAll('line')
+                xgridLines = main.selectAll(".xgrid-lines");
+                xgridLines.selectAll('line')
+                  .transition().duration(duration)
                     .attr("x1", __axis_rotated ? 0 : xv)
                     .attr("x2", __axis_rotated ? width : xv)
                     .attr("y1", __axis_rotated ? xv : margin.top)
                     .attr("y2", __axis_rotated ? xv : height);
-                xgridLine.selectAll('text')
+                xgridLines.selectAll('text')
                     .attr("x", __axis_rotated ? width : 0)
                     .attr("y", xv);
             }
@@ -1973,9 +1974,13 @@
                 ygrid.exit().remove();
             }
             if (withY && __grid_y_lines) {
-                main.select('.ygrid-lines').selectAll('.ygrid-line')
-                    .attr("y1", yv)
-                    .attr("y2", yv);
+                ygridLines = main.select('.ygrid-lines');
+                ygridLines.selectAll('line')
+                  .transition().duration(duration)
+                    .attr("x1", __axis_rotated ? yv : 0)
+                    .attr("x2", __axis_rotated ? yv : width)
+                    .attr("y1", __axis_rotated ? 0 : yv)
+                    .attr("y2", __axis_rotated ? height : yv);
             }
 
             // bars
