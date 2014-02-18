@@ -445,12 +445,12 @@
             if (__data_groups.length > 0) {
                 hasNegativeValue = hasNegativeValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
-                    if (hasNegativeValue) {
-                        ys[__data_groups[j][0]].forEach(function (v, i) {
-                            ys[__data_groups[j][0]][i] = v < 0 ? v : 0;
+                    baseId = __data_groups[j][0];
+                    if (hasNegativeValue && ys[baseId]) {
+                        ys[baseId].forEach(function (v, i) {
+                            ys[baseId][i] = v < 0 ? v : 0;
                         });
                     }
-                    baseId = __data_groups[j][0];
                     for (k = 1; k < __data_groups[j].length; k++) {
                         id = __data_groups[j][k];
                         if (! ys[id]) { continue; }
@@ -469,12 +469,12 @@
             if (__data_groups.length > 0) {
                 hasPositiveValue = hasPositiveValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
-                    if (hasPositiveValue) {
-                        ys[__data_groups[j][0]].forEach(function (v, i) {
-                            ys[__data_groups[j][0]][i] = v > 0 ? v : 0;
+                    baseId = __data_groups[j][0];
+                    if (hasPositiveValue && ys[baseId]) {
+                        ys[baseId].forEach(function (v, i) {
+                            ys[baseId][i] = v > 0 ? v : 0;
                         });
                     }
-                    baseId = __data_groups[j][0];
                     for (k = 1; k < __data_groups[j].length; k++) {
                         id = __data_groups[j][k];
                         if (! ys[id]) { continue; }
