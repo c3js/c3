@@ -27,7 +27,10 @@ text {
 /*-- Grid --*/
 
 .grid line {
-  stroke: #ccc;
+  stroke: #aaa;
+}
+.grid text {
+  fill: #aaa;
 }
 .xgrid, .ygrid {
   stroke-dasharray: 3 3;

@@ -1330,7 +1330,7 @@
         var orgXDomain;
 
         function init(data) {
-            var eventRect, grid, xgridLine;
+            var eventRect, grid, xgridLines, ygridLines;
             var i;
 
             selectChart = d3.select(__bindto);
@@ -1458,20 +1458,20 @@
                 grid.append("g").attr("class", "xgrids");
             }
             if (__grid_x_lines) {
-                xgridLine = grid.append('g')
+                xgridLines = grid.append('g')
                     .attr("class", "xgrid-lines")
                   .selectAll('.xgrid-line')
                     .data(__grid_x_lines)
                   .enter().append('g')
                     .attr("class", "xgrid-line");
-                xgridLine.append('line')
+                xgridLines.append('line')
                     .attr("class", function (d) { return "" + d['class']; });
-                xgridLine.append('text')
+                xgridLines.append('text')
                     .attr("class", function (d) { return "" + d['class']; })
                     .attr("text-anchor", "end")
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .attr('dx', __axis_rotated ? 0 : -margin.top)
-                    .attr('dy', -6)
+                    .attr('dy', -5)
                     .text(function (d) { return d.text; });
             }
             if (__point_focus_line_enabled) {
@@ -1490,12 +1490,21 @@
                 grid.append('g').attr('class', 'ygrids');
             }
             if (__grid_y_lines) {
-                grid.append('g')
+                ygridLines = grid.append('g')
                     .attr('class', 'ygrid-lines')
                   .selectAll('ygrid-line')
                     .data(__grid_y_lines)
-                  .enter().append('line')
-                    .attr("class", function (d) { return "ygrid-line " + d['class']; });
+                  .enter().append('g')
+                    .attr("class", "ygrid-line");
+                ygridLines.append('line')
+                    .attr("class", function (d) { return "" + d['class']; });
+                ygridLines.append('text')
+                    .attr("class", function (d) { return "" + d['class']; })
+                    .attr("text-anchor", "end")
+                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
+                    .attr('dx', __axis_rotated ? 0 : -margin.top)
+                    .attr('dy', -5)
+                    .text(function (d) { return d.text; });
             }
 
             // Area
@@ -1981,6 +1990,9 @@
                     .attr("x2", __axis_rotated ? yv : width)
                     .attr("y1", __axis_rotated ? 0 : yv)
                     .attr("y2", __axis_rotated ? height : yv);
+                ygridLines.selectAll('text')
+                    .attr("x", __axis_rotated ? 0 : width)
+                    .attr("y", yv);
             }
 
             // bars
