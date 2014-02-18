@@ -495,23 +495,27 @@
             var yTargets = getTargets(function (d) { return getAxisId(d.id) === axisId; }),
                 yMin = axisId === 'y2' ? __axis_y2_min : __axis_y_min,
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
-                yDomainMin = (yMin !== null) ? yMin : getYDomainMin(yTargets),
-                yDomainMax = (yMax !== null) ? yMax : getYDomainMax(yTargets),
+                yDomainMin = (yMin) ? yMin : getYDomainMin(yTargets),
+                yDomainMax = (yMax) ? yMax : getYDomainMax(yTargets),
                 padding = Math.abs(yDomainMax - yDomainMin) * 0.1,
                 padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
-            if (center !== null) {
+            if (center) {
                 var yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
                 yDomainMin = center - yDomainAbs;
             }
-            if (axisId === 'y' && __axis_y_padding !== null) {
-                padding_top = isDefined(__axis_y_padding.top) ? __axis_y_padding.top : padding;
-                padding_bottom = isDefined(__axis_y_padding.bottom) ? __axis_y_padding.bottom : padding;
+            if (axisId === 'y' && __axis_y_padding) {
+                padding_top = __axis_y_padding.top ? __axis_y_padding.top : padding;
+                padding_bottom = __axis_y_padding.bottom ? __axis_y_padding.bottom : padding;
             }
-            if (axisId === 'y2' && __axis_y2_padding !== null) {
-                padding_top = isDefined(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
-                padding_bottom = isDefined(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
+            if (axisId === 'y2' && __axis_y2_padding) {
+                padding_top = __axis_y2_padding.top ? __axis_y2_padding.top : padding;
+                padding_bottom = __axis_y2_padding.bottom ? __axis_y2_padding.bottom : padding;
+            }
+            // Bar chart with only positive values should be 0-based
+            if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
+                padding_bottom = yDomainMin;
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
@@ -1001,10 +1005,10 @@
         function hasLineType(targets) {
             return hasType(targets, 'line');
         }
+        */
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
-        */
         function hasScatterType(targets) {
             return hasType(targets, 'scatter');
         }
