@@ -176,14 +176,15 @@
 
         /*-- Set Chart Params --*/
 
-        var bottom, bottom2, right, left, top2, top3, margin, margin2, margin3, width, height, height2, height3, currentWidth, currentHeight;
+        var margin, margin2, margin3, width, width2, height, height2, height3, currentWidth, currentHeight;
         var radius, radiusExpanded, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
-        var xMin, xMax, yMin, yMax, x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
+        var xMin, xMax, yMin, yMax, subXMin, subXMax, subYMin, subYMax;
+        var x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
 
         var xOrient = __axis_rotated ? "left" : "bottom",
             yOrient = __axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"),
             y2Orient = __axis_rotated ? (__axis_y2_inner ? "bottom" : "top") : (__axis_y2_inner ? "left" : "right"),
-            subXOrient = "bottom";
+            subXOrient = __axis_rotated ? "left" : "bottom";
 
         var translate = {
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
@@ -191,7 +192,7 @@
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")"; },
             x : function () { return "translate(0," + height + ")"; },
-            subx : function () { return "translate(0," + height2 + ")"; },
+            subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
@@ -199,22 +200,42 @@
 
         //-- Sizes --//
 
+        // TODO: configurabale
+        var rotated_padding_left = 40, rotated_padding_right = 20;
+
         function updateSizes() {
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
-            bottom = 20 + __subchart_size_height + legendHeight;
-            right = getCurrentPaddingRight();
-            left = getCurrentPaddingLeft();
-            top2 = currentHeight - __subchart_size_height - legendHeight;
-            bottom2 = 20 + legendHeight;
-            top3 = currentHeight - legendHeight;
-            margin = {top: 0, right: right, bottom: bottom, left: left};
-            margin2 = {top: top2, right: NaN, bottom: bottom2, left: left};
-            margin3 = {top: top3, right: NaN, bottom: 0, left: left};
+
+            // for main
+            margin = {
+                top: 0,
+                left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft(),
+                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + legendHeight,
+                right: getCurrentPaddingRight()
+            };
             width = currentWidth - margin.left - margin.right;
             height = currentHeight - margin.top - margin.bottom;
-            height2 = currentHeight - margin2.top - margin2.bottom;
+
+            // for context
+            margin2 = {
+                top: __axis_rotated ? 0 : (currentHeight - __subchart_size_height - legendHeight),
+                left: __axis_rotated ? rotated_padding_left : margin.left,
+                bottom: 20 + legendHeight,
+                right: NaN
+            };
+            width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
+            height2 = __axis_rotated ? height : currentHeight - margin2.top - margin2.bottom;
+
+            // for legend
+            margin3 = {
+                top: currentHeight - legendHeight,
+                right: NaN,
+                bottom: 0,
+                left: margin.left
+            };
             height3 = currentHeight - margin3.top - margin3.bottom;
+
             radiusExpanded = height / 2;
             radius = radiusExpanded * 0.95;
         }
@@ -277,13 +298,17 @@
             xMax = __axis_rotated ? height : width;
             yMin = __axis_rotated ? 0 : height;
             yMax = __axis_rotated ? width : 1;
+            subXMin = xMin;
+            subXMax = xMax;
+            subYMin = __axis_rotated ? 0 : height2;
+            subYMax = __axis_rotated ? width2 : 10;
             // update scales
             x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
             y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
             y2 = getY(yMin, yMax, isDefined(y2) ? y2.domain() : undefined);
-            subX = getX(0, width, isDefined(orgXDomain) ? orgXDomain : undefined, function (d) { return d % 1 === 0 ? subXAxis.tickOffset() : 0; });
-            subY = getY(height2, 10);
-            subY2 = getY(height2, 10);
+            subX = getX(xMin, xMax, isDefined(orgXDomain) ? orgXDomain : undefined, function (d) { return d % 1 === 0 ? subXAxis.tickOffset() : 0; });
+            subY = getY(subYMin, subYMax);
+            subY2 = getY(subYMin, subYMax);
             // update axes
             xAxis = getXAxis(x, xOrient);
             yAxis = getYAxis(y, yOrient);
@@ -803,6 +828,9 @@
         function yv(d) {
             return y(d.value);
         }
+        function subxx(d) {
+            return subX(d.x);
+        }
 
         function findSameXOfValues(values, index) {
             var i, targetX = values[index].x, sames = [];
@@ -1230,8 +1258,8 @@
         // For brush region
         var lineOnSub = (function () {
             var line = d3.svg.line()
-                .x(function (d) { return subX(d.x); })
-                .y(function (d) { return getSubYScale(d.id)(d.value); });
+                .x(__axis_rotated ? function (d) { return getSubYScale(d.id)(d.value); } : subxx)
+                .y(__axis_rotated ? subxx : function (d) { return getSubYScale(d.id)(d.value); });
             return function (d) {
                 var data = filterRemoveNull(d.values);
                 return isLineType(d) ? line(data) : "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
@@ -1317,6 +1345,12 @@
             if (context) { context.select('.x.brush').call(this); }
             return this;
         };
+        brush.scale = function (scale) {
+            return __axis_rotated ? this.y(scale) : this.x(scale);
+        };
+        zoom.scale = function (scale) {
+            return __axis_rotated ? this.y(scale) : this.x(scale);
+        };
         zoom.orgScaleExtent = function () {
             var extent = __zoom_extent ? __zoom_extent : [1, 10];
             return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
@@ -1374,8 +1408,8 @@
             orgXDomain = x.domain();
 
             // Set initialized scales to brush and zoom
-            brush.x(subX);
-            if (__zoom_enabled) { zoom.x(x); }
+            brush.scale(subX);
+            if (__zoom_enabled) { zoom.scale(x); }
 
             /*-- Basic Elements --*/
 
@@ -1580,7 +1614,7 @@
                     .attr("class", "x brush")
                     .call(brush)
                   .selectAll("rect")
-                    .attr("height", height2);
+                    .attr(__axis_rotated ? "width" : "height", __axis_rotated ? width2 : height2);
 
                 // ATTENTION: This must be called AFTER chart added
                 // Add Axis
@@ -1909,15 +1943,15 @@
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
                 orgXDomain = x.domain();
-                zoom.x(x).updateScaleExtent();
+                zoom.scale(x).updateScaleExtent();
                 subX.domain(x.domain());
-                brush.x(subX);
+                brush.scale(subX);
             }
 
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
-                if (__zoom_enabled) { zoom.x(x).updateScaleExtent(); }
+                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
@@ -2111,8 +2145,7 @@
                 // update subchart elements if needed
                 if (withSubchart) {
                     // axes
-                    // TODO: fix when rotated
-                    context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : subXAxis);
+                    context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(subXAxis);
                     // extent rect
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
@@ -2223,7 +2256,7 @@
         function redrawForZoom() {
             if (d3.event.sourceEvent.type === 'mousemove' && zoom.altDomain) {
                 x.domain(zoom.altDomain);
-                zoom.x(x).updateScaleExtent();
+                zoom.scale(x).updateScaleExtent();
                 return;
             }
             if (isCategorized && x.orgDomain()[0] === orgXDomain[0]) {
@@ -2256,9 +2289,9 @@
             updateSizes();
             updateScales();
             // Set x for brush again because of scale update
-            brush.x(subX);
+            brush.scale(subX);
             // Set x for zoom again because of scale update
-            if (__zoom_enabled) { zoom.x(x); }
+            if (__zoom_enabled) { zoom.scale(x); }
             // Update sizes
             svg.attr('width', currentWidth).attr('height', currentHeight);
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
@@ -2270,7 +2303,6 @@
             main.select('.chart-arcs').attr("transform", translate.arc);
             // Update context sizes and positions
             if (__subchart_show) {
-                context.select('.x.brush').selectAll('rect').attr('height', height2);
                 context.attr("transform", translate.context);
                 context.select('.x.axis').attr("transform", translate.subx);
             }
