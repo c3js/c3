@@ -2058,16 +2058,13 @@
                 .attr("d", areaOnMain);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineOrScatterData);
+            mainCircle.enter().append("circle")
+                .attr("class", classCircle)
+                .attr("r", __point_r);
             mainCircle.transition().duration(duration)
                 .style('opacity', function (d) { return d.value === null ? 0 : 1; })
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
-            mainCircle.enter().append("circle")
-                .style('opacity', function (d) { return d.value === null ? 0 : 1; })
-                .attr("class", classCircle)
-                .attr("cx", __axis_rotated ? circleY : circleX)
-                .attr("cy", __axis_rotated ? circleX : circleY)
-                .attr("r", __point_r);
             mainCircle.exit().remove();
 
             // arc
