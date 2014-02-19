@@ -790,6 +790,10 @@
         function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
+        function opacityCircle(d) {
+            return d.value ? isScatterType(d) ? 0.5 : 1 : 0;
+        }
+
         function xx(d) {
             return x(d.x);
         }
@@ -2062,7 +2066,7 @@
                 .attr("class", classCircle)
                 .attr("r", __point_r);
             mainCircle.transition().duration(duration)
-                .style('opacity', function (d) { return d.value === null ? 0 : 1; })
+                .style('opacity', opacityCircle)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.exit().remove();
