@@ -542,15 +542,7 @@
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainRatio(isSub) {
-            var domain, extent;
-            if (isSub) {
-                domain = x.domain();
-                extent = brush.extent();
-            } else {
-                domain = orgXDomain;
-                extent = x.domain();
-            }
-            return (domain[1] - domain[0]) / (extent[1] - extent[0]);
+            return isSub ? 1 : diffDomain(orgXDomain) / diffDomain(x.domain());
         }
         function getXDomainMin(targets) {
             return d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
