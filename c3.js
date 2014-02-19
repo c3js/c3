@@ -219,7 +219,7 @@
 
             // for context
             margin2 = {
-                top: __axis_rotated ? 0 : (currentHeight - __subchart_size_height - legendHeight),
+                top: __axis_rotated ? margin.top : (currentHeight - __subchart_size_height - legendHeight),
                 left: __axis_rotated ? rotated_padding_left : margin.left,
                 bottom: 20 + legendHeight,
                 right: NaN
@@ -281,7 +281,7 @@
             return margin.left + 20;
         }
         function getYAxisClipHeight() {
-            return height - margin.top + 2 + getXAxisClipHeight();
+            return height - margin.top + 2;
         }
         function getEventRectWidth() {
             var base = __axis_rotated ? height : width,
@@ -294,14 +294,14 @@
 
         function updateScales() {
             // update edges
-            xMin = __axis_rotated ? 10 : 0;
+            xMin = __axis_rotated ? 1 : 0;
             xMax = __axis_rotated ? height : width;
             yMin = __axis_rotated ? 0 : height;
             yMax = __axis_rotated ? width : 1;
             subXMin = xMin;
             subXMax = xMax;
             subYMin = __axis_rotated ? 0 : height2;
-            subYMax = __axis_rotated ? width2 : 10;
+            subYMax = __axis_rotated ? width2 : 1;
             // update scales
             x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
             y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
@@ -1613,6 +1613,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", translate.subx)
+                    .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
                     .call(subXAxis);
             }
 
