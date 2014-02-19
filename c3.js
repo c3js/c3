@@ -2049,8 +2049,8 @@
                     ];
 
                     // switch points if axis is rotated, not applicable for sub chart
-                    var indexX = isSub || !__axis_rotated ? 0 : 1;
-                    var indexY = isSub || !__axis_rotated ? 1 : 0;
+                    var indexX = __axis_rotated ? 1 : 0;
+                    var indexY = __axis_rotated ? 0 : 1;
 
                     var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
                         'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
