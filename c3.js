@@ -902,7 +902,7 @@
             var tWidth, tHeight;
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             // don't show tooltip when no data
-            if (selectedData.filter(function (d) { return d.value; }).length === 0) { return; }
+            if (selectedData.filter(function (d) { return d && d.value; }).length === 0) { return; }
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
