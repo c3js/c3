@@ -177,7 +177,7 @@
         /*-- Set Chart Params --*/
 
         var margin, margin2, margin3, width, width2, height, height2, height3, currentWidth, currentHeight;
-        var radius, radiusExpanded, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
+        var radius, radiusExpanded, innerRadius, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, subXMin, subXMax, subYMin, subYMax;
         var x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
 
@@ -238,6 +238,7 @@
 
             radiusExpanded = height / 2;
             radius = radiusExpanded * 0.95;
+            innerRadius = hasDountType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getCurrentWidth() {
             return __size_width === null ? getParentWidth() : __size_width;
@@ -408,7 +409,7 @@
         }
 
         function getSvgArc() {
-            var arc = d3.svg.arc().outerRadius(radius).innerRadius(0),
+            var arc = d3.svg.arc().outerRadius(radius).innerRadius(innerRadius),
                 newArc = function (d, withoutUpdate) {
                     var updated;
                     if (withoutUpdate) { return arc(d); } // for interpolate
@@ -420,7 +421,7 @@
             return newArc;
         }
         function getSvgArcExpanded(rate) {
-            var arc = d3.svg.arc().outerRadius(radiusExpanded * (rate ? rate : 1)).innerRadius(0);
+            var arc = d3.svg.arc().outerRadius(radiusExpanded * (rate ? rate : 1)).innerRadius(innerRadius);
             return function (d) {
                 var updated = updateAngle(d);
                 return updated ? arc(updated) : "M 0 0";
@@ -708,6 +709,11 @@
                     v.index = i++;
                 });
             });
+
+            // set target types
+            if (__data_type) {
+                setTargetType(getTargetIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
+            }
 
             // cache as original id keyed
             targets.forEach(function (d) {
@@ -1035,8 +1041,14 @@
         function hasScatterType(targets) {
             return hasType(targets, 'scatter');
         }
-        function hasArcType(targets) {
+        function hasPieType(targets) {
             return hasType(targets, 'pie');
+        }
+        function hasDountType(targets) {
+            return hasType(targets, 'dount');
+        }
+        function hasArcType(targets) {
+            return hasPieType(targets) || hasDountType(targets);
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -1056,7 +1068,7 @@
         }
         function isArcType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'pie';
+            return __data_types[id] === 'pie' || __data_types[id] === 'dount';
         }
         /* not used
         function lineData(d) {
@@ -1920,7 +1932,7 @@
             var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1, maxDataCountTarget;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
-            var isPieChart;
+            var hideAxis = hasArcType(c3.data.targets);
             var duration;
 
             options = isDefined(options) ? options : {};
@@ -1929,7 +1941,6 @@
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
-            isPieChart = hasArcType(c3.data.targets);
 
             duration = withTransition ? 250 : 0;
 
@@ -1950,9 +1961,9 @@
             y2.domain(getYDomain('y2'));
 
             // axis
-            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis).style("opacity", isPieChart ? 0 : 1);
-            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis).style("opacity", isPieChart ? 0 : 1);
-            main.select(".y2.axis").transition().call(yAxis2).style("opacity", isPieChart ? 0 : 1);
+            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis).style("opacity", hideAxis ? 0 : 1);
+            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis).style("opacity", hideAxis ? 0 : 1);
+            main.select(".y2.axis").transition().call(yAxis2).style("opacity", hideAxis ? 0 : 1);
 
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", width);
@@ -2313,11 +2324,6 @@
             var contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate;
 
             /*-- Main --*/
-
-            // Set data type if data.type is specified
-            if (__data_type) {
-                setTargetType(getTargetIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
-            }
 
             //-- Bar --//
             mainBarUpdate = main.select('.chart-bars')
