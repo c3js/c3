@@ -123,7 +123,8 @@
             __point_onunselected = getConfig(['point', 'onunselected'], function () {});
 
         // arc
-        var __arc_label_fomat = getConfig(['arc', 'label', 'format'], function (d, ratio) { return ratio.toFixed(1) + "%"; });
+        var __arc_label_fomat = getConfig(['arc', 'label', 'format'], function (d, ratio) { return (100 * ratio).toFixed(1) + "%"; }),
+            __arc_title = getConfig(['arc', 'title'], "");
 
         // region - region to change style
         var __regions = getConfig(['regions'], []);
@@ -442,9 +443,11 @@
             }
             return translate;
         }
+        function getArcRatio(d) {
+            return (d.endAngle - d.startAngle) / (Math.PI * 2);
+        }
         function textForArcLable(d) {
-            var ratio = 100 * (d.endAngle - d.startAngle) / (Math.PI * 2);
-            return __arc_label_fomat(d, ratio);
+            return __arc_label_fomat(d, getArcRatio(d));
         }
         function expandArc(targetId, withoutFadeOut) {
             var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
@@ -453,7 +456,12 @@
               .transition().duration(50)
                 .attr("d", svgArcExpanded)
               .transition().duration(100)
-                .attr("d", svgArcExpandedSub);
+                .attr("d", svgArcExpandedSub)
+                .each(function (d) {
+                    if (isDountType(d.data)) {
+                        // callback here
+                    }
+                });
             if (!withoutFadeOut) {
                 noneTargets.style("opacity", 0.3);
             }
@@ -1069,9 +1077,16 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'scatter';
         }
-        function isArcType(d) {
+        function isPieType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'pie' || __data_types[id] === 'dount';
+            return __data_types[id] === 'pie';
+        }
+        function isDountType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'dount';
+        }
+        function isArcType(d) {
+            return isPieType(d) || isDountType(d);
         }
         /* not used
         function lineData(d) {
@@ -1581,7 +1596,11 @@
             // Define g for arc chart area
             main.select(".chart").append("g")
                 .attr("class", "chart-arcs")
-                .attr("transform", translate.arc);
+                .attr("transform", translate.arc)
+              .append('text')
+                .attr('class', 'chart-arcs-title')
+                .style("text-anchor", "middle")
+                .text(__arc_title);
 
             if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront

@@ -70,6 +70,12 @@ text {
   stroke-width: 2px;
 }
 
+/*-- Arc --*/
+
+.chart-arcs-title {
+  font-size: 1.3em;
+}
+
 /*-- Focus --*/
 
 .target.focused path.-line {
