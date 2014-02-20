@@ -26,6 +26,7 @@
 //            ["versicolor", 40],
 //            ["virginica", 50],
           ],
+//          type : 'pie',
           type : 'dount',
         },
         axis: {
@@ -35,7 +36,12 @@
           y: {
             label: 'Petal.Width'
           }
-        }
+        },
+        arc: {
+          label: {
+            format: function (d, ratio) { return ""; }
+          }
+        } 
       });
 
       setTimeout(function () {

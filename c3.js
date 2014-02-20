@@ -122,6 +122,9 @@
             __point_onselected = getConfig(['point', 'onselected'], function () {}),
             __point_onunselected = getConfig(['point', 'onunselected'], function () {});
 
+        // arc
+        var __arc_label_fomat = getConfig(['arc', 'label', 'format'], function (d, ratio) { return ratio.toFixed(1) + "%"; });
+
         // region - region to change style
         var __regions = getConfig(['regions'], []);
 
@@ -441,7 +444,7 @@
         }
         function textForArcLable(d) {
             var ratio = 100 * (d.endAngle - d.startAngle) / (Math.PI * 2);
-            return ratio.toFixed(1) + "%";
+            return __arc_label_fomat(d, ratio);
         }
         function expandArc(targetId, withoutFadeOut) {
             var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
