@@ -2566,6 +2566,7 @@
             if (hasArcType(c3.data.targets)) {
                 expandArc(target, true);
             }
+            focusLegend(target);
         };
 
         c3.defocus = function (target) {
@@ -2594,6 +2595,7 @@
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(target);
             }
+            revertLegend();
         };
 
         c3.show = function (target) {
