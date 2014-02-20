@@ -2468,9 +2468,18 @@
         /*-- Draw Legend --*/
 
         function focusLegend(id) {
-            svg.selectAll('.legend-item').filter(function (d) { return d !== id; })
-              .transition().duration(100)
-                .style('opacity', 0.3);
+            var legendItem = svg.selectAll('.legend-item'),
+                isTarget = function (d) { return !id || d === id; },
+                notTarget = function (d) { return !isTarget(d); };
+            legendItem.filter(notTarget).transition().duration(100).style('opacity', 0.3);
+            legendItem.filter(isTarget).transition().duration(100).style('opacity', 1);
+        }
+        function defocusLegend(id) {
+            var legendItem = svg.selectAll('.legend-item'),
+                isTarget = function (d) { return !id || d === id; },
+                notTarget = function (d) { return !isTarget(d); };
+            legendItem.filter(notTarget).transition().duration(100).style('opacity', 1);
+            legendItem.filter(isTarget).transition().duration(100).style('opacity', 0.3);
         }
         function revertLegend() {
             svg.selectAll('.legend-item')
@@ -2560,6 +2569,7 @@
             function focus(targets) {
                 targets.transition().duration(100).style('opacity', 1);
             }
+            c3.revert();
             c3.defocus();
             focus(candidatesForNoneArc.classed('focused', true));
             focus(candidatesForArc);
@@ -2576,11 +2586,13 @@
             function defocus(targets) {
                 targets.transition().duration(100).style('opacity', 0.3);
             }
+            c3.revert();
             defocus(candidatesForNoneArc.classed('focused', false));
             defocus(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(target);
             }
+            defocusLegend(target);
         };
 
         c3.revert = function (target) {
