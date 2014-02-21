@@ -271,7 +271,7 @@
             } else if (__axis_y2_show) {
                 return __axis_y2_inner || __axis_rotated ? 1 : getDefaultPaddingWithAxisId('y2');
             } else {
-                return 20;
+                return 1;
             }
         }
         function getDefaultPaddingWithAxisId() {
