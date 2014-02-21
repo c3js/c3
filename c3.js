@@ -138,7 +138,12 @@
                 text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || !(d[i].value || d[i].value === 0)) { continue; }
-                value = isDefined(d[i].value) ? (Math.round(d[i].value * 100) / 100).toFixed(2) : '-';
+
+                var value = '-';
+                if (isDefined(d[i].value)) {
+                    value = __axis_y_tick_format((Math.round(d[i].value * 100) / 100).toFixed(2));
+                }
+
                 name = d[i].name;
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
