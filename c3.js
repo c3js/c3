@@ -241,9 +241,13 @@
             };
             height3 = currentHeight - margin3.top - margin3.bottom;
 
+            // for arc
+            updateRadius();
+        }
+        function updateRadius() {
             radiusExpanded = height / 2;
             radius = radiusExpanded * 0.95;
-            innerRadius = hasDountType(c3.data.targets) ? radius * 0.6 : 0;
+            innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getCurrentWidth() {
             return __size_width === null ? getParentWidth() : __size_width;
@@ -321,11 +325,13 @@
             yAxis2 = getYAxis(y2, y2Orient);
             subXAxis = getXAxis(subX, subXOrient);
             // update for arc
+            updateArc();
+        }
+        function updateArc() {
             svgArc = getSvgArc();
             svgArcExpanded = getSvgArcExpanded();
             svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
-
         function getX(min, max, domain, offset) {
             var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
             // Set function and values for c3
@@ -459,7 +465,7 @@
               .transition().duration(100)
                 .attr("d", svgArcExpandedSub)
                 .each(function (d) {
-                    if (isDountType(d.data)) {
+                    if (isDonutType(d.data)) {
                         // callback here
                     }
                 });
@@ -1033,6 +1039,7 @@
             var targetIds = isUndefined(targets) ? getTargetIds() : targets;
             if (typeof targetIds === 'string') { targetIds = [targetIds]; }
             for (var i = 0; i < targetIds.length; i++) {
+                withoutFadeIn[targetIds[i]] = (type === __data_types[targetIds[i]]);
                 __data_types[targetIds[i]] = type;
             }
         }
@@ -1044,6 +1051,10 @@
             });
             return has;
         }
+        function initialOpacity(d) {
+            return withoutFadeIn[d.id] ? 1 : 0;
+        }
+
         /* not used
         function hasLineType(targets) {
             return hasType(targets, 'line');
@@ -1058,11 +1069,11 @@
         function hasPieType(targets) {
             return hasType(targets, 'pie');
         }
-        function hasDountType(targets) {
-            return hasType(targets, 'dount');
+        function hasDonutType(targets) {
+            return hasType(targets, 'donut');
         }
         function hasArcType(targets) {
-            return hasPieType(targets) || hasDountType(targets);
+            return hasPieType(targets) || hasDonutType(targets);
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -1084,12 +1095,12 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'pie';
         }
-        function isDountType(d) {
+        function isDonutType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'dount';
+            return __data_types[id] === 'donut';
         }
         function isArcType(d) {
-            return isPieType(d) || isDountType(d);
+            return isPieType(d) || isDonutType(d);
         }
         /* not used
         function lineData(d) {
@@ -1280,6 +1291,41 @@
             };
         })();
 
+        var drawBar = function (barIndices, isSub_) {
+            var barTargetsNum = barIndices.__max__ + 1,
+                isSub = arguments.length > 1 ? isSub_ : true,
+                barW = getBarW(xAxis, barTargetsNum, !!isSub),
+                x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
+                y = getBarY(!!isSub),
+                barOffset = getBarOffset(barIndices, !!isSub),
+                yScale = isSub ? getSubYScale : getYScale;
+
+            return function (d, i) {
+                var y0 = yScale(d.id)(0),
+                    offset = barOffset(d, i) || y0; // offset is for stacked bar chart
+
+                // 4 points that make a bar
+                var points = [
+                    [x(d), offset],
+                    [x(d), y(d) - (y0 - offset)],
+                    [x(d) + barW, y(d) - (y0 - offset)],
+                    [x(d) + barW, offset]
+                ];
+
+                // switch points if axis is rotated, not applicable for sub chart
+                var indexX = __axis_rotated ? 1 : 0;
+                var indexY = __axis_rotated ? 0 : 1;
+
+                var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+                        'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
+                        'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
+                        'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
+                        'z';
+
+                return path;
+            };
+        };
+
         // For brush region
         var lineOnSub = (function () {
             var line = d3.svg.line()
@@ -1393,6 +1439,9 @@
 
         // for brush area culculation
         var orgXDomain;
+
+        // for save value
+        var orgAreaOpacity, withoutFadeIn = {};
 
         function init(data) {
             var eventRect, grid, xgridLines, ygridLines;
@@ -1662,7 +1711,7 @@
             updateTargets(c3.data.targets);
 
             // Draw with targets
-            redraw({withTransition: false, withUpdateXDomain: true});
+            redraw({withTransform: true, withUpdateXDomain: true});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -1954,9 +2003,9 @@
         function redraw(options) {
             var xgrid, xgridData, xgridLines, ygrid, ygridLines;
             var mainCircle, mainBar, mainRegion, contextBar, eventRectUpdate;
-            var barIndices = getBarIndices(), barTargetsNum = barIndices.__max__ + 1, maxDataCountTarget;
+            var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withUpdateXDomain, withUpdateOrgXDomain;
+            var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
             var hideAxis = hasArcType(c3.data.targets);
             var duration;
 
@@ -1964,10 +2013,11 @@
             withY = isDefined(options.withY) ? options.withY : true;
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
+            withTransform = isDefined(options.withTransform) ? options.withTransform : false;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
 
-            duration = withTransition ? 250 : 0;
+            duration = withTransition ? 350 : 0;
 
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
@@ -1986,9 +2036,9 @@
             y2.domain(getYDomain('y2'));
 
             // axis
-            main.select(".x.axis").transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis).style("opacity", hideAxis ? 0 : 1);
-            main.select(".y.axis").transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis).style("opacity", hideAxis ? 0 : 1);
-            main.select(".y2.axis").transition().call(yAxis2).style("opacity", hideAxis ? 0 : 1);
+            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
+            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
+            main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().call(yAxis2);
 
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", width);
@@ -2065,72 +2115,43 @@
             }
 
             // bars
-
-            var drawBar = function (isSub) {
-                var barW = getBarW(xAxis, barTargetsNum, !!isSub),
-                    x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
-                    y = getBarY(!!isSub),
-                    barOffset = getBarOffset(barIndices, !!isSub),
-                    yScale = isSub ? getSubYScale : getYScale;
-
-                return function (d, i) {
-                    var y0 = yScale(d.id)(0),
-                        offset = barOffset(d, i) || y0; // offset is for stacked bar chart
-
-                    // 4 points that make a bar
-                    var points = [
-                        [x(d), offset],
-                        [x(d), y(d) - (y0 - offset)],
-                        [x(d) + barW, y(d) - (y0 - offset)],
-                        [x(d) + barW, offset]
-                    ];
-
-                    // switch points if axis is rotated, not applicable for sub chart
-                    var indexX = __axis_rotated ? 1 : 0;
-                    var indexY = __axis_rotated ? 0 : 1;
-
-                    var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
-                        'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
-                        'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
-                        'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
-                        'z';
-
-                    return path;
-                };
-            };
-
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
-
             mainBar.enter().append('path')
-                .attr('d', drawBar(false))
+                .attr('d', drawBar(barIndices, false))
                 .style("stroke", 'none')
                 .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
                 .attr("class", classBar);
-
             mainBar
-                .transition().duration(duration)
-                .attr('d', drawBar(false))
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
+                .attr('d', drawBar(barIndices, false))
                 .style("opacity", 1);
-
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
                 .remove();
 
             // lines and cricles
-            main.selectAll('.chart-line').select('.-line')
+            main.selectAll('.-line')
+                .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr("d", lineOnMain);
+                .attr("d", lineOnMain)
+                .style("opacity", 1);
             main.selectAll('.-area')
-                .transition().duration(duration)
-                .attr("d", areaOnMain);
+                .style("opacity", 0)
+              .transition().duration(duration)
+                .attr("d", areaOnMain)
+                .style("opacity", orgAreaOpacity);
             mainCircle = main.selectAll('.-circles').selectAll('.-circle')
                 .data(lineOrScatterData);
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
+                .style('opacity', 0)
                 .attr("r", __point_r);
-            mainCircle.transition().duration(duration)
+            mainCircle
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
                 .style('opacity', opacityCircle)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
@@ -2138,6 +2159,7 @@
 
             // arc
             main.selectAll('.chart-arc').select('.-arc')
+                .attr("transform", withTransform ? "scale(0)" : "")
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
               .transition().duration(duration)
                 .attrTween("d", function (d) {
@@ -2157,13 +2179,16 @@
                     this._current = i(0);
                     return function (t) { return getArc(i(t), true); };
                 })
+                .attr("transform", withTransform ? "scale(1)" : "")
                 .style("opacity", 1);
             main.selectAll('.chart-arc').select('text')
                 .attr("transform", transformForArcLable)
-                .attr("opacity", 0)
+                .style("opacity", 0)
               .transition().duration(duration)
                 .text(textForArcLable)
-                .attr("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
+                .style("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
+            main.select('.chart-arcs-title')
+                .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
 
             // subchart
             if (__subchart_show) {
@@ -2174,7 +2199,7 @@
                 // update subchart elements if needed
                 if (withSubchart) {
                     // axes
-                    context.select('.x.axis').transition().duration(__axis_rotated ? duration : 0).call(subXAxis);
+                    context.select('.x.axis').style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? duration : 0).call(subXAxis);
                     // extent rect
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
@@ -2183,22 +2208,24 @@
                     contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
                     contextBar.enter().append('path')
-                        .attr('d', drawBar(true))
+                        .attr('d', drawBar(barIndices))
                         .style("stroke", 'none')
                         .style("fill", function (d) { return color(d.id); })
                         .attr("class", classBar);
                     contextBar
-                        .style("opacity", 0)
-                        .transition().duration(duration)
-                        .attr('d', drawBar(true))
+                        .style("opacity", initialOpacity)
+                      .transition().duration(duration)
+                        .attr('d', drawBar(barIndices))
                         .style('opacity', 1);
                     contextBar.exit().transition().duration(duration)
                         .style('opacity', 0)
                         .remove();
                     // lines
                     context.selectAll('.-line')
-                        .transition().duration(duration)
-                        .attr("d", lineOnSub);
+                        .style("opacity", initialOpacity)
+                      .transition().duration(duration)
+                        .attr("d", lineOnSub)
+                        .style('opacity', 1);
                 }
             }
 
@@ -2273,6 +2300,11 @@
             mainRegion.exit().transition().duration(duration)
                 .style("fill-opacity", 0)
                 .remove();
+
+            // update fadein condition
+            getTargetIds().forEach(function (id) {
+                withoutFadeIn[id] = true;
+            });
         }
         function redrawForBrush() {
             redraw({
@@ -2356,14 +2388,12 @@
                 .data(targets);
             mainBarEnter = mainBarUpdate.enter().append('g')
                 .attr('class', function (d) { return 'chart-bar target target-' + d.id; })
-                .style("pointer-events", "none")
-                .style('opacity', 0);
+                .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
                 .attr("class", classBars)
                 .style("fill", function (d) { return color(d.id); })
-                .style("stroke", function (d) { return color(d.id); })
-                .style("stroke-width", 0)
+                .style("stroke", "none")
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
 
             //-- Line --//
@@ -2372,15 +2402,16 @@
                 .data(targets);
             mainLineEnter = mainLineUpdate.enter().append('g')
                 .attr('class', function (d) { return 'chart-line target target-' + d.id; })
-                .style("pointer-events", "none")
-                .style('opacity', 0);
+                .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
                 .attr("class", classLine)
+                .style("opacity", 0)
                 .style("stroke", function (d) { return color(d.id); });
             // Areas
             mainLineEnter.append("path")
                 .attr("class", classArea)
+                .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; })
                 .style("fill", function (d) { return color(d.id); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
@@ -2399,15 +2430,14 @@
             //mainLineUpdate.exit().remove();
 
             //-- Pie --//
-
             mainPieUpdate = main.select('.chart-arcs')
               .selectAll(".chart-arc")
                 .data(pie(targets));
             mainPieEnter = mainPieUpdate.enter().append("g")
-                .attr("class", function (d) { return 'chart-arc target target-' + d.data.id; })
-                .style('opacity', 0);
+                .attr("class", function (d) { return 'chart-arc target target-' + d.data.id; });
             mainPieEnter.append("path")
                 .attr("class", classArc)
+                .style("opacity", 0)
                 .style("fill", function (d) { return color(d.data.id); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
@@ -2421,6 +2451,7 @@
                 });
             mainPieEnter.append("text")
                 .attr("dy", ".35em")
+                .style("opacity", 0)
                 .style("text-anchor", "middle")
                 .style("pointer-events", "none");
             // MEMO: can not keep same color..., but not bad to update color in redraw
@@ -2434,8 +2465,7 @@
                   .selectAll('.chart-bar')
                     .data(targets);
                 contextBarEnter = contextBarUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-bar target target-' + d.id; })
-                    .style('opacity', 0);
+                    .attr('class', function (d) { return 'chart-bar target target-' + d.id; });
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
@@ -2446,11 +2476,11 @@
                   .selectAll('.chart-line')
                     .data(targets);
                 contextLineEnter = contextLineUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-line target target-' + d.id; })
-                    .style('opacity', 0);
+                    .attr('class', function (d) { return 'chart-line target target-' + d.id; });
                 // Lines for each data
                 contextLineEnter.append("path")
                     .attr("class", classLine)
+                    .style("opacity", 0)
                     .style("stroke", function (d) { return color(d.id); });
             }
 
@@ -2764,6 +2794,30 @@
         c3.toScatter = function (targets) {
             setTargetType(targets, 'scatter');
             redraw();
+        };
+
+        c3.toArea = function (targets) {
+            setTargetType(targets, 'area');
+            redraw();
+        };
+
+        c3.toAreaSpline = function (targets) {
+            setTargetType(targets, 'area-spline');
+            redraw();
+        };
+
+        c3.toPie = function (targets) {
+            setTargetType(targets, 'pie');
+            updateRadius();
+            updateArc();
+            redraw({withTransform: true});
+        };
+
+        c3.toDonut = function (targets) {
+            setTargetType(targets, 'donut');
+            updateRadius();
+            updateArc();
+            redraw({withTransform: true});
         };
 
         c3.groups = function (groups) {
