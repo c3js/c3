@@ -45,6 +45,8 @@
         var __onenter = getConfig(['onenter'], function () {}),
             __onleave = getConfig(['onleave'], function () {});
 
+        var __transition_duration = getConfig(['transition', 'duration'], 350);
+
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
@@ -2017,7 +2019,7 @@
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
 
-            duration = withTransition ? 350 : 0;
+            duration = withTransition ? __transition_duration : 0;
 
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
