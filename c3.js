@@ -139,7 +139,7 @@
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || !(d[i].value || d[i].value === 0)) { continue; }
 
-                var value = '-';
+                value = '-';
                 if (isDefined(d[i].value)) {
                     value = __axis_y_tick_format((Math.round(d[i].value * 100) / 100).toFixed(2));
                 }
