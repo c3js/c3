@@ -89,7 +89,7 @@
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
             __axis_y_label = getConfig(['axis', 'y', 'label'], null),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
-            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], function (d) { return d; }),
+            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], null),
             __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
@@ -99,7 +99,7 @@
             // not used
             // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
-            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], function (d) { return d; }),
+            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], null),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10),
             __axis_rotated = getConfig(['axis', 'rotated'], false);
