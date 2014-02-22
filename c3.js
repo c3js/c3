@@ -137,10 +137,10 @@
             var title = getXAxisTickFormat()(d[0].x),
                 text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++) {
-                if (! d[i] || !(d[i].value || d[i].value === 0)) { continue; }
+                if (! d[i] || ! isValue(d[i].value)) { continue; }
 
                 value = '-';
-                if (isDefined(d[i].value)) {
+                if (isValue(d[i].value)) {
                     value = __axis_y_tick_format((Math.round(d[i].value * 100) / 100).toFixed(2));
                 }
 
@@ -839,7 +839,7 @@
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
         function opacityCircle(d) {
-            return d.value ? isScatterType(d) ? 0.5 : 1 : 0;
+            return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
 
         function xx(d) {
@@ -928,7 +928,7 @@
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             if (! __tooltip_enabled) { return; }
             // don't show tooltip when no data
-            if (selectedData.filter(function (d) { return d && d.value; }).length === 0) { return; }
+            if (selectedData.filter(function (d) { return d && isValue(d.value); }).length === 0) { return; }
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
@@ -1222,7 +1222,7 @@
         }
 
         function filterRemoveNull(data) {
-            return data.filter(function (d) { return d.value !== null; });
+            return data.filter(function (d) { return isValue(d.value); });
         }
 
         //-- Shape --//
@@ -3065,6 +3065,9 @@
         return axis;
     }
 
+    function isValue(v) {
+        return v || v === 0;
+    }
     function isUndefined(v) {
         return typeof v === 'undefined';
     }
