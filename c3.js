@@ -157,7 +157,7 @@
         /*-- Set Variables --*/
 
         var clipId = __bindto.replace('#', '') + '-clip',
-            clipPath = "url("+document.URL+"#" + clipId + ")";
+            clipPath = "url(" + document.URL + "#" + clipId + ")";
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
