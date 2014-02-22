@@ -257,10 +257,10 @@
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getCurrentWidth() {
-            return __size_width === null ? getParentWidth() : __size_width;
+            return __size_width ? __size_width : getParentWidth();
         }
         function getCurrentHeight() {
-            var h = __size_height === null ? getParentHeight() : __size_height;
+            var h = __size_height ? __size_height : getParentHeight();
             return h > 0 ? h : 320;
         }
         function getCurrentPaddingLeft() {
@@ -2869,6 +2869,12 @@
         c3.data.getAsTarget = function (id) {
             var targets = getTargets(function (d) { return d.id === id; });
             return targets.length > 0 ? targets[0] : undefined;
+        };
+
+        c3.resize = function (size) {
+            __size_width = size ? size.width : null;
+            __size_height = size ? size.height : null;
+            resize();
         };
 
         c3.destroy = function () {
