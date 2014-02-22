@@ -135,13 +135,14 @@
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
             var title = getXAxisTickFormat()(d[0].x),
-                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
+                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name,
+                format = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || ! isValue(d[i].value)) { continue; }
 
                 value = '-';
                 if (isValue(d[i].value)) {
-                    value = __axis_y_tick_format((Math.round(d[i].value * 100) / 100).toFixed(2));
+                    value = format(d[i].value);
                 }
 
                 name = d[i].name;
