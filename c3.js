@@ -1543,7 +1543,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", "x axis")
-                .attr("clip-path", __axis_rotated ? "" : "url("+document.URL+"#xaxis-clip)")
+                .attr("clip-path", __axis_rotated ? "" : "url(" + document.URL + "#xaxis-clip)")
                 .attr("transform", translate.x)
                 .call(__axis_rotated ? yAxis : xAxis)
               .append("text")
@@ -1554,7 +1554,7 @@
                 .text(__axis_x_label);
             main.append("g")
                 .attr("class", "y axis")
-                .attr("clip-path", __axis_rotated ? "url("+document.URL+"#yaxis-clip)" : "")
+                .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
                 .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
@@ -1707,7 +1707,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "url("+document.URL+"#yaxis-clip)" : "")
+                    .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
                     .call(subXAxis);
             }
 
