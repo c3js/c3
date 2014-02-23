@@ -134,15 +134,16 @@
         // tooltip - show when mouseover on each data
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
-            var title = getXAxisTickFormat()(d[0].x),
-                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name,
-                format = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
+            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; },
+                xFormat = getXAxisTickFormat(),
+                title = xFormat ? xFormat(d[0].x) : d[0].x,
+                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || ! isValue(d[i].value)) { continue; }
 
                 value = '-';
                 if (isValue(d[i].value)) {
-                    value = format(d[i].value);
+                    value = yFormat(d[i].value);
                 }
 
                 name = d[i].name;
@@ -402,11 +403,15 @@
             return id in __data_axes ? __data_axes[id] : 'y';
         }
         function getXAxisTickFormat() {
-            var tickFormat = isTimeSeries ? defaultTimeFormat : isCategorized ? category : function (x) { return x; };
+            var format = isTimeSeries ? defaultTimeFormat : isCategorized ? category : null;
             if (__axis_x_tick_format) {
-                tickFormat = typeof __axis_x_tick_format === 'function' ? __axis_x_tick_format : isTimeSeries ? function (date) { return d3.time.format(__axis_x_tick_format)(date); } : tickFormat;
+                if (typeof __axis_x_tick_format === 'function') {
+                    format = __axis_x_tick_format;
+                } else if (isTimeSeries) {
+                    format = function (date) { return d3.time.format(__axis_x_tick_format)(date); };
+                }
             }
-            return tickFormat;
+            return format;
         }
 
         //-- Arc --//
