@@ -2617,7 +2617,6 @@
         /*-- Event Handling --*/
 
         function getTargetSelectorSuffix(targetId) {
-            // TODO: sanitize target
             return targetId ? '-' + targetId.replace(/\./g, '\\.') : '';
         }
         function getTargetSelector(targetId) {
