@@ -464,9 +464,9 @@
         function textForArcLable(d) {
             return __arc_label_fomat(d, getArcRatio(d));
         }
-        function expandArc(targetId, withoutFadeOut) {
-            var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : '')),
-                noneTargets = svg.selectAll('.-arc').filter(function (data) { return data.data.id !== targetId; });
+        function expandArc(id, withoutFadeOut) {
+            var target = svg.selectAll('.chart-arc' + getTargetSelector(id)),
+                noneTargets = svg.selectAll('.-arc').filter(function (data) { return data.data.id !== id; });
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArcExpanded)
@@ -481,8 +481,8 @@
                 noneTargets.style("opacity", 0.3);
             }
         }
-        function unexpandArc(targetId) {
-            var target = svg.selectAll('.chart-arc.target' + (targetId ? '-' + targetId : ''));
+        function unexpandArc(id) {
+            var target = svg.selectAll('.chart-arc' + getTargetSelector(id));
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArc);
@@ -1229,7 +1229,7 @@
         //-- Shape --//
 
         function getCircles(i, id) {
-            return (id ? main.selectAll('.-circles-' + id) : main).selectAll('.-circle' + (i || i === 0 ? '-' + i : ''));
+            return (id ? main.selectAll('.-circles-' + id) : main).selectAll('.-circle' + (isValue(i) ? '-' + i : ''));
         }
         function expandCircles(i, id) {
             getCircles(i, id)
@@ -1243,7 +1243,7 @@
                 .attr('r', __point_r);
         }
         function getBars(i) {
-            return main.selectAll(".-bar" + (i || i === 0 ? '-' + i : ''));
+            return main.selectAll(".-bar" + (isValue(i) ? '-' + i : ''));
         }
         function expandBars(i) {
             getBars(i).classed(EXPANDED, false);
@@ -2430,7 +2430,8 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
-                main.selectAll('.selected-circles-' + t.id).selectAll('.selected-circle').each(function (d) {
+                var suffix = getTargetSelectorSuffix(t.id);
+                main.selectAll('.selected-circles' + suffix).selectAll('.selected-circle').each(function (d) {
                     d.value = t.values[d.x].value;
                 });
             });
@@ -2615,8 +2616,12 @@
 
         /*-- Event Handling --*/
 
-        function getTargetSelector(target) {
-            return isDefined(target) ? '.target-' + target : '.target';
+        function getTargetSelectorSuffix(targetId) {
+            // TODO: sanitize target
+            return targetId ? '-' + targetId.replace(/\./g, '\\.') : '';
+        }
+        function getTargetSelector(targetId) {
+            return '.target' + getTargetSelectorSuffix(targetId);
         }
         function isNoneArc(d) {
             return hasTarget(d.id);
@@ -2625,8 +2630,8 @@
             return 'data' in d && hasTarget(d.data.id);
         }
 
-        c3.focus = function (target) {
-            var candidates = svg.selectAll(getTargetSelector(target)),
+        c3.focus = function (targetId) {
+            var candidates = svg.selectAll(getTargetSelector(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function focus(targets) {
@@ -2637,13 +2642,13 @@
             focus(candidatesForNoneArc.classed('focused', true));
             focus(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
-                expandArc(target, true);
+                expandArc(targetId, true);
             }
-            focusLegend(target);
+            focusLegend(targetId);
         };
 
-        c3.defocus = function (target) {
-            var candidates = svg.selectAll(getTargetSelector(target)),
+        c3.defocus = function (targetId) {
+            var candidates = svg.selectAll(getTargetSelector(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function defocus(targets) {
@@ -2653,13 +2658,13 @@
             defocus(candidatesForNoneArc.classed('focused', false));
             defocus(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
-                unexpandArc(target);
+                unexpandArc(targetId);
             }
-            defocusLegend(target);
+            defocusLegend(targetId);
         };
 
-        c3.revert = function (target) {
-            var candidates = svg.selectAll(getTargetSelector(target)),
+        c3.revert = function (targetId) {
+            var candidates = svg.selectAll(getTargetSelector(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function revert(targets) {
@@ -2668,19 +2673,19 @@
             revert(candidatesForNoneArc.classed('focused', false));
             revert(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
-                unexpandArc(target);
+                unexpandArc(targetId);
             }
             revertLegend();
         };
 
-        c3.show = function (target) {
-            svg.selectAll(getTargetSelector(target))
+        c3.show = function (targetId) {
+            svg.selectAll(getTargetSelector(targetId))
                 .transition()
                 .style('opacity', 1);
         };
 
-        c3.hide = function (target) {
-            svg.selectAll(getTargetSelector(target))
+        c3.hide = function (targetId) {
+            svg.selectAll(getTargetSelector(targetId))
                 .transition()
                 .style('opacity', 0);
         };
@@ -2729,17 +2734,20 @@
             }
         };
 
-        c3.unload = function (target) {
-            c3.data.targets = c3.data.targets.filter(function (d) {
-                return d.id !== target;
+        c3.unload = function (targetId) {
+            c3.data.targets = c3.data.targets.filter(function (t) {
+                return t.id !== targetId;
             });
-            svg.selectAll('.target-' + target)
+            svg.selectAll(getTargetSelector(targetId))
               .transition()
                 .style('opacity', 0)
                 .remove();
 
             if (__legend_show) {
-                svg.selectAll('.legend-item-' + target).remove();
+                svg.selectAll('.legend-item' + getTargetSelectorSuffix(targetId))
+                  .transition()
+                    .style("opacity", 0)
+                    .remove();
                 updateLegend(c3.data.targets);
             }
 
@@ -2748,8 +2756,8 @@
             }
         };
 
-        c3.selected = function (target) {
-            var suffix = isDefined(target) ? '-' + target : '';
+        c3.selected = function (targetId) {
+            var suffix = getTargetSelectorSuffix(targetId);
             return d3.merge(
                 main.selectAll('.-shapes' + suffix).selectAll('.-shape')
                     .filter(function () { return d3.select(this).classed(SELECTED); })
@@ -2863,12 +2871,12 @@
             return __regions;
         };
 
-        c3.data.get = function (id) {
-            var target = c3.data.getAsTarget(id);
+        c3.data.get = function (targetId) {
+            var target = c3.data.getAsTarget(targetId);
             return isDefined(target) ? target.values.map(function (d) { return d.value; }) : undefined;
         };
-        c3.data.getAsTarget = function (id) {
-            var targets = getTargets(function (d) { return d.id === id; });
+        c3.data.getAsTarget = function (targetId) {
+            var targets = getTargets(function (t) { return t.id === targetId; });
             return targets.length > 0 ? targets[0] : undefined;
         };
 
