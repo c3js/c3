@@ -136,17 +136,18 @@
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
             var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; },
                 xFormat = getXAxisTickFormat(),
-                title = xFormat ? xFormat(d[0].x) : d[0].x,
-                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
+                text, i, title, value, name;
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || ! isValue(d[i].value)) { continue; }
 
-                value = '-';
-                if (isValue(d[i].value)) {
-                    value = yFormat(d[i].value);
+                if (! text) {
+                    title = xFormat ? xFormat(d[i].x) : d[i].x;
+                    text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>";
                 }
 
                 name = d[i].name;
+                value = yFormat(d[i].value);
+
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
             return text + "</table>";
@@ -849,7 +850,7 @@
         }
 
         function xx(d) {
-            return x(d.x);
+            return d ? x(d.x) : null;
         }
         function xv(d) {
             return x(isTimeSeries ? parseDate(d.value) : d.value);
@@ -932,9 +933,10 @@
         function showTooltip(selectedData, mouse) {
             var tWidth, tHeight;
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
+            var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
             if (! __tooltip_enabled) { return; }
             // don't show tooltip when no data
-            if (selectedData.filter(function (d) { return d && isValue(d.value); }).length === 0) { return; }
+            if (dataToShow.length === 0) { return; }
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
@@ -947,7 +949,7 @@
                 tooltipLeft = mouse[0];
             } else {
                 svgLeft = svg.property('offsetLeft');
-                tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(selectedData[0].x) + 20;
+                tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(dataToShow[0].x) + 20;
                 tooltipRight = tooltipLeft + tWidth;
                 chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
                 if (tooltipRight > chartRight) {
@@ -966,13 +968,14 @@
             tooltip.style("display", "none");
         }
 
-        function showXGridFocus(data) {
+        function showXGridFocus(selectedData) {
+            var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
             if (! __tooltip_enabled) { return; }
             // Hide when scatter plot exists
             if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
             main.selectAll('line.xgrid-focus')
                 .style("visibility", "visible")
-                .data([data])
+                .data([dataToShow[0]])
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
         }
@@ -1783,7 +1786,7 @@
                     expandBars(i);
 
                     // Show xgrid focus line
-                    showXGridFocus(selectedData[0]);
+                    showXGridFocus(selectedData);
                 })
                 .on('mouseout', function (_, i) {
                     if (hasArcType(c3.data.targets)) { return; }
@@ -1883,7 +1886,7 @@
                     }
 
                     // Show xgrid focus line
-                    showXGridFocus(selectedData[0]);
+                    showXGridFocus(selectedData);
 
                     // Show cursor as pointer if point is close to mouse position
                     if (dist(closest, mouse) < 100) {
