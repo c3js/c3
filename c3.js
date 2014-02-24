@@ -561,12 +561,12 @@
                 yDomainMin = center - yDomainAbs;
             }
             if (axisId === 'y' && __axis_y_padding) {
-                padding_top = __axis_y_padding.top ? __axis_y_padding.top : padding;
-                padding_bottom = __axis_y_padding.bottom ? __axis_y_padding.bottom : padding;
+                padding_top = isValue(__axis_y_padding.top) ? __axis_y_padding.top : padding;
+                padding_bottom = isValue(__axis_y_padding.bottom) ? __axis_y_padding.bottom : padding;
             }
             if (axisId === 'y2' && __axis_y2_padding) {
-                padding_top = __axis_y2_padding.top ? __axis_y2_padding.top : padding;
-                padding_bottom = __axis_y2_padding.bottom ? __axis_y2_padding.bottom : padding;
+                padding_top = isValue(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
+                padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
             }
             // Bar chart with only positive values should be 0-based
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
