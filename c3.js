@@ -2305,14 +2305,16 @@
             // rect for regions
             mainRegion = main.select('.regions').selectAll('rect.region')
                 .data(__regions);
-            mainRegion.enter().append('rect');
+            mainRegion.enter().append('rect')
+                .style("fill-opacity", 0);
             mainRegion
                 .attr('class', classRegion)
                 .attr("x", __axis_rotated ? 0 : regionStart)
                 .attr("y", __axis_rotated ? regionStart : margin.top)
                 .attr("width", __axis_rotated ? width : regionWidth)
                 .attr("height", __axis_rotated ? regionWidth : height)
-                .style("fill-opacity", function (d) { return isDefined(d.opacity) ? d.opacity : 0.1; });
+              .transition().duration(duration)
+                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
             mainRegion.exit().transition().duration(duration)
                 .style("fill-opacity", 0)
                 .remove();
@@ -2866,11 +2868,11 @@
             var regionClasses = [].concat(classes);
             options = isDefined(options) ? options : {};
             regionClasses.forEach(function (cls) {
-                var regions = svg.selectAll('.' + cls);
-                if (isDefined(options.duration)) {
-                    regions = regions.transition().duration(options.duration).style('fill-opacity', 0);
-                }
-                regions.remove();
+                var duration = isValue(options.duration) ? options.duration : 0;
+                svg.selectAll('.' + cls)
+                  .transition().duration(duration)
+                    .style('fill-opacity', 0)
+                    .remove();
                 __regions = __regions.filter(function (region) {
                     return region.classes.indexOf(cls) < 0;
                 });
