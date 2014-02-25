@@ -323,10 +323,10 @@
             subYMin = __axis_rotated ? 0 : height2;
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
-            x = getX(xMin, xMax, isDefined(x) ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
-            y = getY(yMin, yMax, isDefined(y) ? y.domain() : undefined);
-            y2 = getY(yMin, yMax, isDefined(y2) ? y2.domain() : undefined);
-            subX = getX(xMin, xMax, isDefined(orgXDomain) ? orgXDomain : undefined, function (d) { return d % 1 === 0 ? subXAxis.tickOffset() : 0; });
+            x = getX(xMin, xMax, x ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
+            y = getY(yMin, yMax, y ? y.domain() : undefined);
+            y2 = getY(yMin, yMax, y2 ? y2.domain() : undefined);
+            subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
             subY = getY(subYMin, subYMax);
             subY2 = getY(subYMin, subYMax);
             // update axes
@@ -1491,6 +1491,7 @@
 
             // Set axes attrs
             xAxis.ticks(data.length < 10 ? data.length : 10);
+            subXAxis.ticks(data.length < 10 ? data.length : 10);
             yAxis.ticks(__axis_y_ticks).outerTickSize(0);
             yAxis2.ticks(__axis_y2_ticks).outerTickSize(0);
 
