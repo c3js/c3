@@ -714,7 +714,7 @@
                             x = parseDate(d[xKey]);
                         }
                         else if (isCustomX) {
-                            x = d[xKey] ? d[xKey] : getXValue(id, i);
+                            x = d[xKey] ? +d[xKey] : getXValue(id, i);
                         }
                         else {
                             x = i;
