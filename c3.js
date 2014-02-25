@@ -259,6 +259,10 @@
             radius = radiusExpanded * 0.95;
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
+        function getSvgLeft() {
+            var svgLeft = svg.property('offsetLeft');
+            return svgLeft ? svgLeft : 0;
+        }
         function getCurrentWidth() {
             return __size_width ? __size_width : getParentWidth();
         }
@@ -955,7 +959,7 @@
             if (__axis_rotated) {
                 tooltipLeft = mouse[0];
             } else {
-                svgLeft = svg.property('offsetLeft');
+                svgLeft = getSvgLeft();
                 tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(dataToShow[0].x) + 20;
                 tooltipRight = tooltipLeft + tWidth;
                 chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
