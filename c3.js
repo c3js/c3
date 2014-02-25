@@ -330,10 +330,10 @@
             subY = getY(subYMin, subYMax);
             subY2 = getY(subYMin, subYMax);
             // update axes
-            xAxis = getXAxis(x, xOrient);
-            yAxis = getYAxis(y, yOrient);
-            yAxis2 = getYAxis(y2, y2Orient);
-            subXAxis = getXAxis(subX, subXOrient);
+            xAxis = getXAxis(x, xOrient, getXAxisTickFormat());
+            yAxis = getYAxis(y, yOrient, __axis_y_tick_format);
+            yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format);
+            subXAxis = getXAxis(subX, subXOrient, getXAxisTickFormat());
             // update for arc
             updateArc();
         }
@@ -381,11 +381,11 @@
 
         //-- Axes --//
 
-        function getXAxis(scale, orient) {
+        function getXAxis(scale, orient, tickFormat) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
 
             // Set tick format
-            axis.tickFormat(getXAxisTickFormat());
+            axis.tickFormat(tickFormat);
 
             // Set categories
             if (isCategorized) {
@@ -397,8 +397,8 @@
 
             return axis;
         }
-        function getYAxis(scale, orient) {
-            return d3.svg.axis().scale(scale).orient(orient);
+        function getYAxis(scale, orient, tickFormat) {
+            return d3.svg.axis().scale(scale).orient(orient).tickFormat(tickFormat);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -1491,8 +1491,8 @@
 
             // Set axes attrs
             xAxis.ticks(data.length < 10 ? data.length : 10);
-            yAxis.ticks(__axis_y_ticks).outerTickSize(0).tickFormat(__axis_y_tick_format);
-            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0).tickFormat(__axis_y2_tick_format);
+            yAxis.ticks(__axis_y_ticks).outerTickSize(0);
+            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0);
 
             // Save original x domain for zoom update
             orgXDomain = x.domain();
