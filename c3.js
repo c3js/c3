@@ -313,6 +313,7 @@
         //-- Scales --//
 
         function updateScales() {
+            var xAxisTickFormat, xAxisTicks;
             // update edges
             xMin = __axis_rotated ? 1 : 0;
             xMax = __axis_rotated ? height : width;
@@ -330,10 +331,12 @@
             subY = getY(subYMin, subYMax);
             subY2 = getY(subYMin, subYMax);
             // update axes
-            xAxis = getXAxis(x, xOrient, getXAxisTickFormat());
-            yAxis = getYAxis(y, yOrient, __axis_y_tick_format);
-            yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format);
-            subXAxis = getXAxis(subX, subXOrient, getXAxisTickFormat());
+            xAxisTickFormat = getXAxisTickFormat();
+            xAxisTicks = getXAxisTicks();
+            xAxis = getXAxis(x, xOrient, xAxisTickFormat, xAxisTicks);
+            subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTicks);
+            yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
+            yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
             // update for arc
             updateArc();
         }
@@ -381,11 +384,11 @@
 
         //-- Axes --//
 
-        function getXAxis(scale, orient, tickFormat) {
+        function getXAxis(scale, orient, tickFormat, ticks) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
 
-            // Set tick format
-            axis.tickFormat(tickFormat);
+            // Set tick
+            axis.tickFormat(tickFormat).ticks(ticks);
 
             // Set categories
             if (isCategorized) {
@@ -397,8 +400,8 @@
 
             return axis;
         }
-        function getYAxis(scale, orient, tickFormat) {
-            return d3.svg.axis().scale(scale).orient(orient).tickFormat(tickFormat);
+        function getYAxis(scale, orient, tickFormat, ticks) {
+            return d3.svg.axis().scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks).outerTickSize(0);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -413,6 +416,10 @@
                 }
             }
             return format;
+        }
+        function getXAxisTicks() {
+            var maxDataCount = getMaxDataCount();
+            return maxDataCount < 10 ? maxDataCount : 10;
         }
 
         //-- Arc --//
@@ -1488,12 +1495,6 @@
             subX.domain(x.domain());
             subY.domain(y.domain());
             subY2.domain(y2.domain());
-
-            // Set axes attrs
-            xAxis.ticks(data.length < 10 ? data.length : 10);
-            subXAxis.ticks(data.length < 10 ? data.length : 10);
-            yAxis.ticks(__axis_y_ticks).outerTickSize(0);
-            yAxis2.ticks(__axis_y2_ticks).outerTickSize(0);
 
             // Save original x domain for zoom update
             orgXDomain = x.domain();
