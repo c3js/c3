@@ -2767,10 +2767,7 @@
                 .remove();
 
             if (__legend_show) {
-                svg.selectAll('.legend-item' + getTargetSelectorSuffix(targetId))
-                  .transition()
-                    .style("opacity", 0)
-                    .remove();
+                svg.selectAll('.legend-item' + getTargetSelectorSuffix(targetId)).remove();
                 updateLegend(c3.data.targets);
             }
 
