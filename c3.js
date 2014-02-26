@@ -38,6 +38,8 @@
         var __padding_left = getConfig(['padding', 'left'], null),
             __padding_right = getConfig(['padding', 'right'], null);
 
+        var __scroll_enabled = getConfig(['scroll', 'enabled'], false);
+
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent'], null),
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
@@ -1436,7 +1438,7 @@
         //-- Define brush/zoom -//
 
         var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null);
+        var zoom = d3.behavior.zoom().on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled || __scroll_enabled ? redrawForZoom : null);
 
         // define functions for c3
         brush.update = function () {
@@ -1454,9 +1456,15 @@
             return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
         };
         zoom.updateScaleExtent = function () {
-            var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
-            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
-            return this;
+            var ratio, orgExtent, extent;
+            if (__zoom_enabled) {
+                ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain);
+                orgExtent = this.orgScaleExtent();
+                extent = [orgExtent[0] * ratio, orgExtent[1] * ratio];
+            } else if (__scroll_enabled) {
+                extent = [1, 1];
+            }
+            return this.scaleExtent(extent);
         };
 
         /*-- Draw Chart --*/
@@ -1505,7 +1513,7 @@
 
             // Set initialized scales to brush and zoom
             brush.scale(subX);
-            if (__zoom_enabled) { zoom.scale(x); }
+            if (__zoom_enabled || __scroll_enabled) { zoom.scale(x); }
 
             /*-- Basic Elements --*/
 
@@ -1657,7 +1665,7 @@
             eventRect = main.select('.chart').append("g")
                 .attr("class", "event-rects")
                 .style('fill-opacity', 0)
-                .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
+                .style('cursor', __zoom_enabled || __scroll_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
 
             // Define g for bar chart area
             main.select(".chart").append("g")
@@ -1676,7 +1684,7 @@
                 .style("text-anchor", "middle")
                 .text(__arc_title);
 
-            if (__zoom_enabled) { // TODO: __zoom_privileged here?
+            if (__zoom_enabled || __scroll_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
                 main.insert('rect', __zoom_privileged ? null : 'g.grid')
                     .attr('class', 'zoom-rect')
@@ -1951,7 +1959,7 @@
 
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
-            if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
+            if ((__zoom_enabled || __scroll_enabled) && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
 
             sx = dragStart[0];
             sy = dragStart[1];
@@ -2052,7 +2060,7 @@
             // ATTENTION: call here to update tickOffset
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
-                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+                if (__zoom_enabled || __scroll_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
             y.domain(getYDomain('y'));
             y2.domain(getYDomain('y2'));
@@ -2376,7 +2384,7 @@
             // Set x for brush again because of scale update
             brush.scale(subX);
             // Set x for zoom again because of scale update
-            if (__zoom_enabled) { zoom.scale(x); }
+            if (__zoom_enabled || __scroll_enabled) { zoom.scale(x); }
             // Update sizes
             svg.attr('width', currentWidth).attr('height', currentHeight);
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
