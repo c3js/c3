@@ -1435,10 +1435,9 @@
 
         //-- Define brush/zoom -//
 
-        var brush = d3.svg.brush().on("brush", redrawForBrush);
-        var zoom = d3.behavior.zoom().on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; }).on("zoom", __zoom_enabled ? redrawForZoom : null);
+        var brush, zoom = function () {};
 
-        // define functions for c3
+        brush = d3.svg.brush().on("brush", redrawForBrush);
         brush.update = function () {
             if (context) { context.select('.x.brush').call(this); }
             return this;
@@ -1446,18 +1445,24 @@
         brush.scale = function (scale) {
             return __axis_rotated ? this.y(scale) : this.x(scale);
         };
-        zoom.scale = function (scale) {
-            return __axis_rotated ? this.y(scale) : this.x(scale);
-        };
-        zoom.orgScaleExtent = function () {
-            var extent = __zoom_extent ? __zoom_extent : [1, 10];
-            return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
-        };
-        zoom.updateScaleExtent = function () {
-            var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
-            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
-            return this;
-        };
+
+        if (__zoom_enabled) {
+            zoom = d3.behavior.zoom()
+                .on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; })
+                .on("zoom", __zoom_enabled ? redrawForZoom : null);
+            zoom.scale = function (scale) {
+                return __axis_rotated ? this.y(scale) : this.x(scale);
+            };
+            zoom.orgScaleExtent = function () {
+                var extent = __zoom_extent ? __zoom_extent : [1, 10];
+                return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
+            };
+            zoom.updateScaleExtent = function () {
+                var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
+                this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
+                return this;
+            };
+        }
 
         /*-- Draw Chart --*/
 
@@ -2044,7 +2049,7 @@
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
                 orgXDomain = x.domain();
-                zoom.scale(x).updateScaleExtent();
+                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 subX.domain(x.domain());
                 brush.scale(subX);
             }
