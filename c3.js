@@ -398,8 +398,10 @@
             if (isCategorized) {
                 axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
             } else {
-                // TODO: fix
-                axis.tickOffset = function () { return 0; };
+                axis.tickOffset = function () {
+                    var base = __axis_rotated ? height : width;
+                    return ((base * getXDomainRatio()) / getMaxDataCount()) / 2;
+                };
             }
 
             return axis;
@@ -594,10 +596,21 @@
         function getXDomainMax(targets) {
             return d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
         }
+        function getXDomainPadding(targets, domain) {
+            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), padding;
+            if (isCategorized) {
+                padding = 0;
+            } else if (hasBarType(targets)) {
+                padding = (diff / (getMaxDataCount() - 1)) / 2;
+            } else {
+                padding = diff * 0.01;
+            }
+            return padding;
+        }
         function getXDomain(targets) {
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
-                padding = isCategorized ? 0 : Math.abs(firstX - lastX) * 0.01,
+                padding = getXDomainPadding(targets, xDomain),
                 min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
                 max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
             return [min, max];
@@ -1050,14 +1063,8 @@
                 return offset;
             };
         }
-        function getBarW(axis, barTargetsNum, isSub) {
-            var barW;
-            if (isCategorized) {
-                barW = barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
-            } else {
-                barW = (((__axis_rotated ? height : width) * getXDomainRatio(isSub)) / (getMaxDataCount() - 1)) * 0.6;
-            }
-            return barW;
+        function getBarW(axis, barTargetsNum) {
+            return barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
         }
 
         //-- Type --//
@@ -1321,7 +1328,7 @@
         var drawBar = function (barIndices, isSub_) {
             var barTargetsNum = barIndices.__max__ + 1,
                 isSub = arguments.length > 1 ? isSub_ : true,
-                barW = getBarW(xAxis, barTargetsNum, !!isSub),
+                barW = getBarW(xAxis, barTargetsNum),
                 x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
                 y = getBarY(!!isSub),
                 barOffset = getBarOffset(barIndices, !!isSub),
