@@ -59,6 +59,7 @@
             __data_axes = getConfig(['data', 'axes'], {}),
             __data_type = getConfig(['data', 'type'], null),
             __data_types = getConfig(['data', 'types'], {}),
+            __data_order = getConfig(['data', 'order'], null),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_colors = getConfig(['data', 'colors'], {}),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
@@ -951,6 +952,26 @@
             return closest;
         }
 
+        function isOrderDesc() {
+            return __data_order && __data_order.toLowerCase() === 'desc';
+        }
+        function isOrderAsc() {
+            return __data_order && __data_order.toLowerCase() === 'asc';
+        }
+        function orderTargets(targets) {
+            var orderAsc = isOrderAsc(), orderDesc = isOrderDesc();
+            if (orderAsc || orderDesc) {
+                targets.sort(function (t1, t2) {
+                    var reducer = function (p, c) { return p + Math.abs(c.value); };
+                    var t1Sum = t1.values.reduce(reducer, 0),
+                        t2Sum = t2.values.reduce(reducer, 0);
+                    return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
+                });
+            } else if (typeof __data_order === 'function') {
+                targets.sort(__data_order);
+            } // TODO: accept name array for order
+            return targets;
+        }
 
         //-- Tooltip --//
 
@@ -1050,13 +1071,14 @@
             };
         }
         function getBarOffset(barIndices, isSub) {
-            var indicesIds = Object.keys(barIndices);
+            var targets = orderTargets(getTargets(isBarType)),
+                targetIds = targets.map(function (t) { return t.id; });
             return function (d, i) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
                     y0 = scale(0), offset = y0;
-                getTargets(isBarType).forEach(function (t) {
+                targets.forEach(function (t) {
                     if (t.id === d.id || barIndices[t.id] !== barIndices[d.id]) { return; }
-                    if (indicesIds.indexOf(t.id) < indicesIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
+                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
                         offset += scale(t.values[i].value) - y0;
                     }
                 });
@@ -2161,6 +2183,8 @@
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr('d', drawBar(barIndices, false))
+//                .style("fill", function (d) { return color(d.id); })
+//                .attr("class", classBar)
                 .style("opacity", 1);
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
