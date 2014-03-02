@@ -81,10 +81,13 @@
             __legend_item_onclick = getConfig(['legend', 'item', 'onclick'], function () {});
 
         // axis
-        var __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
+        var __axis_rotated = getConfig(['axis', 'rotated'], false),
+            __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format'], null),
+            __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_rotated || __axis_x_type === 'categorized' ? false : true),
+            __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
             __axis_x_label = getConfig(['axis', 'x', 'label'], null),
             __axis_y_max = getConfig(['axis', 'y', 'max'], null),
@@ -104,8 +107,7 @@
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], null),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
-            __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10),
-            __axis_rotated = getConfig(['axis', 'rotated'], false);
+            __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
@@ -396,15 +398,18 @@
 
             // Set tick
             axis.tickFormat(tickFormat).ticks(ticks);
-
-            // Set categories
             if (isCategorized) {
-                axis.categories(__axis_x_categories).tickCentered(__axis_x_tick_centered);
+                axis.tickCentered(__axis_x_tick_centered);
             } else {
                 axis.tickOffset = function () {
                     var base = __axis_rotated ? height : width;
                     return ((base * getXDomainRatio()) / getMaxDataCount()) / 2;
                 };
+            }
+
+            // Set categories
+            if (isCategorized) {
+                axis.categories(__axis_x_categories);
             }
 
             return axis;
@@ -428,7 +433,7 @@
         }
         function getXAxisTicks() {
             var maxDataCount = getMaxDataCount();
-            return maxDataCount < 10 ? maxDataCount : 10;
+            return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
         }
 
         //-- Arc --//
@@ -1386,7 +1391,7 @@
         };
         
         //showValues on Bar - added 23.2.2014 - fiery-
-         var textVal = function (barIndices, isSub_, inIsXY) {
+        var textVal = function (barIndices, isSub_, inIsXY) {
             var barTargetsNum = barIndices.__max__ + 1,
                 isSub = arguments.length > 1 ? isSub_ : true,
                 barW = getBarW(xAxis, barTargetsNum, !!isSub),
@@ -1410,9 +1415,9 @@
                 // switch points if axis is rotated, not applicable for sub chart
                 var indexX = __axis_rotated ? 1 : 0;
                 var indexY = __axis_rotated ? 0 : 1;
-		
-		        if(inIsXY == 'X') return d.value < 0 ? points[2][indexX] - 4 : points[2][indexX] + 4;
-		        return (points[0][indexY] + points[2][indexY])/2;
+
+                if (inIsXY === 'X') { return d.value < 0 ? points[2][indexX] - 4 : points[2][indexX] + 4; }
+                return (points[0][indexY] + points[2][indexY]) / 2;
             };
         };
 
@@ -2217,8 +2222,6 @@
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr('d', drawBar(barIndices, false))
-//                .style("fill", function (d) { return color(d.id); })
-//                .attr("class", classBar)
                 .style("opacity", 1);
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
@@ -2226,28 +2229,28 @@
             
             //showValues on Bar - added 23.2.2014 - fiery-
             if (showValues) {
-        		mainBarTxt = main.selectAll('.-bars').selectAll('.-bartxt')
-        			.data(barData);
-        		mainBarTxt.enter().append('text')
-        		    .attr('text-anchor', function(d,i) { return d.value < 0 ? 'end' : 'start' ; })
-        		    .attr('y', textVal(barIndices, false, 'Y'))
-        		    .attr('x', textVal(barIndices, false, 'X'))
-        		    .attr('dy', '.32em')
-        		    .style("stroke", 'none')
-        		    .style("opacity", 0)
-        		    .text(function(d,i) { return d3.format(',.2f')(d.value); })
-        		    .attr("class", classTextBar);		
-        		mainBarTxt
-        		    .style("opacity", initialOpacity)
-        		    .transition().duration(duration)
-        		    .attr('y', textVal(barIndices, false, 'Y'))
-        		    .attr('x', textVal(barIndices, false, 'X'))
-        		    .style("opacity", 1);    
-        		mainBarTxt.exit()
-        		    .transition().duration(duration)
-        		    .style('opacity', 0)
-        		    .remove();
-        	}
+                mainBarTxt = main.selectAll('.-bars').selectAll('.-bartxt')
+                    .data(barData);
+                mainBarTxt.enter().append('text')
+                    .attr('text-anchor', function (d) { return d.value < 0 ? 'end' : 'start'; })
+                    .attr('y', textVal(barIndices, false, 'Y'))
+                    .attr('x', textVal(barIndices, false, 'X'))
+                    .attr('dy', '.32em')
+                    .style("stroke", 'none')
+                    .style("opacity", 0)
+                    .text(function (d) { return d3.format(',.2f')(d.value); })
+                    .attr("class", classTextBar);
+                mainBarTxt
+                    .style("opacity", initialOpacity)
+                  .transition().duration(duration)
+                    .attr('y', textVal(barIndices, false, 'Y'))
+                    .attr('x', textVal(barIndices, false, 'X'))
+                    .style("opacity", 1);
+                mainBarTxt.exit()
+                  .transition().duration(duration)
+                    .style('opacity', 0)
+                    .remove();
+            }
 
             // lines and cricles
             main.selectAll('.-line')
@@ -3020,7 +3023,7 @@
 
     function categoryAxis() {
         var scale = d3.scale.linear(), orient = "bottom";
-        var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null;
+        var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null, tickCulling = true;
         var categories = [];
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
@@ -3047,7 +3050,8 @@
             return ticks;
         }
         function shouldShowTickText(ticks, i) {
-            return true || ticks.length < tickTextNum || i % Math.ceil(ticks.length / tickTextNum) === 0;
+            var length = ticks.length - 1;
+            return length <= tickTextNum || i % Math.ceil(length / tickTextNum) === 0;
         }
         function category(i) {
             return i < categories.length ? categories[i] : i;
@@ -3168,11 +3172,6 @@
             tickCentered = x;
             return axis;
         };
-        axis.tickTextNum = function (x) {
-            if (!arguments.length) { return tickTextNum; }
-            tickTextNum = x;
-            return axis;
-        };
         axis.tickFormat = function (format) {
             if (!arguments.length) { return tickFormat; }
             tickFormat = format;
@@ -3181,8 +3180,15 @@
         axis.tickOffset = function () {
             return tickOffset;
         };
-        axis.ticks = function () {
-            return; // TODO: implement
+        axis.ticks = function (n) {
+            if (!arguments.length) { return tickTextNum; }
+            tickTextNum = n;
+            return axis;
+        };
+        axis.tickCulling = function (culling) {
+            if (!arguments.length) { return tickCulling; }
+            tickCulling = culling;
+            return axis;
         };
         return axis;
     }
