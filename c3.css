@@ -1,4 +1,3 @@
-
 /*-- Chart --*/
 
 svg {
@@ -69,7 +68,11 @@ text {
   fill: white;
   stroke-width: 2px;
 }
-
+.-bartxt {
+  font-weight: bold;
+  fill: rgba(0,0,0,1);
+  stroke: rgba(0,0,0,0);
+}
 /*-- Arc --*/
 
 .chart-arcs-title {
