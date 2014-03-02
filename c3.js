@@ -4,6 +4,8 @@
     var c3 = window.c3 = {};
     var d3 = window.d3;
 
+    var showValues = true;	//added 23.2.2014 - fiery-
+    var mainBarTxt = null;	//
     /*
      * Generate chart according to config
      */
@@ -566,7 +568,7 @@
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
                 yDomainMin = (yMin) ? yMin : getYDomainMin(yTargets),
                 yDomainMax = (yMax) ? yMax : getYDomainMax(yTargets),
-                padding = Math.abs(yDomainMax - yDomainMin) * 0.1,
+                padding = Math.abs(yDomainMax - yDomainMin) * 0.22, //0.1 -> 0.22 - 23.2.2014 - fiery-
                 padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
             if (center) {
@@ -869,6 +871,7 @@
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
         function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
+        function classTextBar(d, i) { return classShape(d, i) + " -bartxt -bartxt-" + i; }	//added 24.2.2014 - fiery-
 
         function opacityCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
@@ -1379,6 +1382,37 @@
                         'z';
 
                 return path;
+            };
+        };
+        
+        //showValues on Bar - added 23.2.2014 - fiery-
+         var textVal = function (barIndices, isSub_, inIsXY) {
+            var barTargetsNum = barIndices.__max__ + 1,
+                isSub = arguments.length > 1 ? isSub_ : true,
+                barW = getBarW(xAxis, barTargetsNum, !!isSub),
+                x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
+                y = getBarY(!!isSub),
+                barOffset = getBarOffset(barIndices, !!isSub),
+                yScale = isSub ? getSubYScale : getYScale;
+
+            return function (d, i) {
+                var y0 = yScale(d.id)(0),
+                    offset = barOffset(d, i) || y0; // offset is for stacked bar chart
+
+                // 4 points that make a bar
+                var points = [
+                    [x(d), offset],
+                    [x(d), y(d) - (y0 - offset)],
+                    [x(d) + barW, y(d) - (y0 - offset)],
+                    [x(d) + barW, offset]
+                ];
+
+                // switch points if axis is rotated, not applicable for sub chart
+                var indexX = __axis_rotated ? 1 : 0;
+                var indexY = __axis_rotated ? 0 : 1;
+		
+		        if(inIsXY == 'X') return d.value < 0 ? points[2][indexX] - 4 : points[2][indexX] + 4;
+		        return (points[0][indexY] + points[2][indexY])/2;
             };
         };
 
@@ -2189,6 +2223,31 @@
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
                 .remove();
+            
+            //showValues on Bar - added 23.2.2014 - fiery-
+            if (showValues) {
+        		mainBarTxt = main.selectAll('.-bars').selectAll('.-bartxt')
+        			.data(barData);
+        		mainBarTxt.enter().append('text')
+        		    .attr('text-anchor', function(d,i) { return d.value < 0 ? 'end' : 'start' ; })
+        		    .attr('y', textVal(barIndices, false, 'Y'))
+        		    .attr('x', textVal(barIndices, false, 'X'))
+        		    .attr('dy', '.32em')
+        		    .style("stroke", 'none')
+        		    .style("opacity", 0)
+        		    .text(function(d,i) { return d3.format(',.2f')(d.value); })
+        		    .attr("class", classTextBar);		
+        		mainBarTxt
+        		    .style("opacity", initialOpacity)
+        		    .transition().duration(duration)
+        		    .attr('y', textVal(barIndices, false, 'Y'))
+        		    .attr('x', textVal(barIndices, false, 'X'))
+        		    .style("opacity", 1);    
+        		mainBarTxt.exit()
+        		    .transition().duration(duration)
+        		    .style('opacity', 0)
+        		    .remove();
+        	}
 
             // lines and cricles
             main.selectAll('.-line')
@@ -2988,7 +3047,7 @@
             return ticks;
         }
         function shouldShowTickText(ticks, i) {
-            return ticks.length < tickTextNum || i % Math.ceil(ticks.length / tickTextNum) === 0;
+            return true || ticks.length < tickTextNum || i % Math.ceil(ticks.length / tickTextNum) === 0;
         }
         function category(i) {
             return i < categories.length ? categories[i] : i;
