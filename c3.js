@@ -139,8 +139,7 @@
         // tooltip - show when mouseover on each data
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
-            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; },
-                xFormat = getXAxisTickFormat(),
+            var xFormat = getXAxisTickFormat(),
                 text, i, title, value, name;
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || ! isValue(d[i].value)) { continue; }
@@ -151,7 +150,7 @@
                 }
 
                 name = d[i].name;
-                value = yFormat(d[i].value);
+                value = formattedValue(d[i].value);
 
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
@@ -893,6 +892,10 @@
         }
         function subxx(d) {
             return subX(d.x);
+        }
+        function formattedValue(v) {
+            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
+            return yFormat(v);
         }
 
         function findSameXOfValues(values, index) {
@@ -2238,7 +2241,7 @@
                     .attr('dy', '.32em')
                     .style("stroke", 'none')
                     .style("opacity", 0)
-                    .text(function (d) { return d3.format(',.2f')(d.value); })
+                    .text(function (d) { return formattedValue(d.value); })
                     .attr("class", classTextBar);
                 mainBarTxt
                     .style("opacity", initialOpacity)
