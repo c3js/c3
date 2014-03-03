@@ -37,6 +37,11 @@ text {
 .xgrid-focus {
 }
 
+/*-- Text on Chart --*/
+
+.-text {
+}
+
 /*-- Line --*/
 
 .-line {
@@ -68,11 +73,7 @@ text {
   fill: white;
   stroke-width: 2px;
 }
-.-bartxt {
-  font-weight: bold;
-  fill: rgba(0,0,0,1);
-  stroke: rgba(0,0,0,0);
-}
+
 /*-- Arc --*/
 
 .chart-arcs-title {
