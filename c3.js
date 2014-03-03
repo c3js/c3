@@ -877,10 +877,17 @@
         function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
-        function opacityCircle(d) {
+        function initialOpacity(d) {
+            return withoutFadeIn[d.id] ? 1 : 0;
+        }
+        function initialOpacityForText(d) {
+            var targetOpacity = opacityForText(d);
+            return initialOpacity(d) * targetOpacity;
+        }
+        function opacityForCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
-        function opacityText(d) {
+        function opacityForText(d) {
             if (typeof __data_labels === 'boolean' && __data_labels) {
                 return 1;
             } else if (__data_labels[d.id] === 'boolean' && __data_labels[d.id]) {
@@ -1127,9 +1134,6 @@
             });
             return has;
         }
-        function initialOpacity(d) {
-            return withoutFadeIn[d.id] ? 1 : 0;
-        }
 
         /* not used
         function hasLineType(targets) {
@@ -1346,13 +1350,13 @@
 
             if (__axis_rotated) {
                 area = d3.svg.area()
-                    .x0(function (d) {  return getYScale(d.id)(0); })
+                    .x0(function (d) { return getYScale(d.id)(0); })
                     .x1(function (d) { return getYScale(d.id)(d.value); })
                     .y(xx);
             } else {
                 area = d3.svg.area()
                     .x(xx)
-                    .y0(function (d) {  return getYScale(d.id)(0); })
+                    .y0(function (d) { return getYScale(d.id)(0); })
                     .y1(function (d) { return getYScale(d.id)(d.value); });
             }
 
@@ -1369,6 +1373,49 @@
                 }
             };
         })();
+
+        function generateDrawBar(barIndices, isSub) {
+            var getPoints = generateGetBarPoints(barIndices, isSub);
+            return function (d, i) {
+                // 4 points that make a bar
+                var points = getPoints(d, i);
+
+                // switch points if axis is rotated, not applicable for sub chart
+                var indexX = __axis_rotated ? 1 : 0;
+                var indexY = __axis_rotated ? 0 : 1;
+
+                var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+                        'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
+                        'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
+                        'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
+                        'z';
+
+                return path;
+            };
+        }
+        function generateXYForText(barIndices, forX) {
+            var getPoints = generateGetBarPoints(barIndices, false),
+                getter = forX ? getXForText : getYForText;
+            return function (d, i) {
+                return getter(getPoints(d, i), d, this);
+            };
+        }
+        function getXForText(points, d) {
+            var padding;
+            if (__axis_rotated) {
+                padding = isBarType(d) ? 4 : 6;
+                return points[2][1] + padding * (d.value < 0 ? -1 : 1);
+            } else {
+                return points[0][0] + (points[2][0] - points[0][0]) / 2;
+            }
+        }
+        function getYForText(points, d, that) {
+            if (__axis_rotated) {
+                return (points[0][0] + points[2][0] + that.offsetHeight * 0.6) / 2;
+            } else {
+                return points[2][1] + (d.value < 0 ? that.offsetHeight : isBarType(d) ? -3 : -6);
+            }
+        }
 
         function generateGetBarPoints(barIndices, isSub) {
             var barTargetsNum = barIndices.__max__ + 1,
@@ -1388,44 +1435,6 @@
                     [x(d) + barW, offset]
                 ];
             };
-        }
-
-        var drawBar = function (barIndices, isSub) {
-            var getPoints = generateGetBarPoints(barIndices, isSub);
-            return function (d, i) {
-                // 4 points that make a bar
-                var points = getPoints(d, i);
-
-                // switch points if axis is rotated, not applicable for sub chart
-                var indexX = __axis_rotated ? 1 : 0;
-                var indexY = __axis_rotated ? 0 : 1;
-
-                var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
-                        'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
-                        'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
-                        'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
-                        'z';
-
-                return path;
-            };
-        };
-
-        var getXYForText = function (barIndices, isSub, forX) {
-            var getPoints = generateGetBarPoints(barIndices, isSub);
-            return function (d, i) {
-                var points = getPoints(d, i);
-                if (forX) {
-                    return __axis_rotated ? points[2][1] + (d.value < 0 ? -4 : 4) : points[0][0] + (points[2][0] - points[0][0]) / 2;
-                } else {
-                    return __axis_rotated ? (points[0][0] + points[2][0] + this.offsetHeight * 0.6) / 2 : points[2][1] + (d.value < 0 ? this.offsetHeight : -3);
-                }
-            };
-        };
-        function getXForText(barIndices, isSub) {
-            return getXYForText(barIndices, isSub, true);
-        }
-        function getYForText(barIndices, isSub) {
-            return getXYForText(barIndices, isSub, false);
         }
 
         // For brush region
@@ -2108,6 +2117,8 @@
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
             var hideAxis = hasArcType(c3.data.targets);
+            var drawBar = generateDrawBar(barIndices), drawBarOnSub = generateDrawBar(barIndices, true);
+            var xForText = generateXYForText(barIndices, true), yForText = generateXYForText(barIndices, false);
             var duration;
 
             options = isDefined(options) ? options : {};
@@ -2219,7 +2230,7 @@
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
             mainBar.enter().append('path')
-                .attr('d', drawBar(barIndices))
+                .attr('d', drawBar)
                 .style("stroke", 'none')
                 .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
@@ -2227,7 +2238,7 @@
             mainBar
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr('d', drawBar(barIndices))
+                .attr('d', drawBar)
                 .style("opacity", 1);
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
@@ -2239,17 +2250,17 @@
                 .attr("class", classText)
                 .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
                 .style("stroke", 'none')
-                .style("opacity", 0)
+                .style("fill-opacity", 0)
                 .text(function (d) { return formattedValue(d.value); });
             mainText
-                .style("opacity", initialOpacity)
+                .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
-                .attr('x', getXForText(barIndices))
-                .attr('y', getYForText(barIndices))
-                .style("opacity", opacityText);
+                .attr('x', xForText)
+                .attr('y', yForText)
+                .style("fill-opacity", opacityForText);
             mainText.exit()
               .transition().duration(duration)
-                .style('opacity', 0)
+                .style('fill-opacity', 0)
                 .remove();
 
             // lines and cricles
@@ -2272,7 +2283,7 @@
             mainCircle
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .style('opacity', opacityCircle)
+                .style('opacity', opacityForCircle)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.exit().remove();
@@ -2328,14 +2339,14 @@
                     contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
                     contextBar.enter().append('path')
-                        .attr('d', drawBar(barIndices, true))
+                        .attr('d', drawBarOnSub)
                         .style("stroke", 'none')
                         .style("fill", function (d) { return color(d.id); })
                         .attr("class", classBar);
                     contextBar
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
-                        .attr('d', drawBar(barIndices, true))
+                        .attr('d', drawBarOnSub)
                         .style('opacity', 1);
                     contextBar.exit().transition().duration(duration)
                         .style('opacity', 0)
