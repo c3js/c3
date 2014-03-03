@@ -2117,8 +2117,7 @@
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
             var hideAxis = hasArcType(c3.data.targets);
-            var drawBar = generateDrawBar(barIndices), drawBarOnSub = generateDrawBar(barIndices, true);
-            var xForText = generateXYForText(barIndices, true), yForText = generateXYForText(barIndices, false);
+            var drawBar, drawBarOnSub, xForText, yForText;
             var duration;
 
             options = isDefined(options) ? options : {};
@@ -2151,6 +2150,11 @@
             main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
             main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
             main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().call(yAxis2);
+
+            // setup drawer - MEMO: these must be called after axis updated
+            drawBar = generateDrawBar(barIndices);
+            xForText = generateXYForText(barIndices, true);
+            yForText = generateXYForText(barIndices, false);
 
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", width);
@@ -2335,6 +2339,8 @@
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
                     }
+                    // setup drawer - MEMO: this must be called after axis updated
+                    drawBarOnSub = generateDrawBar(barIndices, true);
                     // bars
                     contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
