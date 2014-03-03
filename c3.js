@@ -4,8 +4,6 @@
     var c3 = window.c3 = {};
     var d3 = window.d3;
 
-    var showValues = true;	//added 23.2.2014 - fiery-
-    var mainBarTxt = null;	//
     /*
      * Generate chart according to config
      */
@@ -61,6 +59,7 @@
             __data_axes = getConfig(['data', 'axes'], {}),
             __data_type = getConfig(['data', 'type'], null),
             __data_types = getConfig(['data', 'types'], {}),
+            __data_labels = getConfig(['data', 'labels'], {}),
             __data_order = getConfig(['data', 'order'], null),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_colors = getConfig(['data', 'colors'], {}),
@@ -864,6 +863,8 @@
         function category(i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
+        function classText(d) { return "-text -text-" + d.id; }
+        function classTexts(d) { return "-texts -texts-" + d.id; }
         function classShapes(d) { return "-shapes -shapes-" + d.id; }
         function classLine(d) { return classShapes(d) + " -line -line-" + d.id; }
         function classCircles(d) { return classShapes(d) + " -circles -circles-" + d.id; }
@@ -875,10 +876,19 @@
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
         function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
-        function classTextBar(d, i) { return classShape(d, i) + " -bartxt -bartxt-" + i; }	//added 24.2.2014 - fiery-
 
         function opacityCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
+        }
+        function opacityText(d) {
+            if (typeof __data_labels === 'boolean' && __data_labels) {
+                return 1;
+            } else if (__data_labels[d.id] === 'boolean' && __data_labels[d.id]) {
+                return 1;
+            } else if (__data_labels[d.id] && __data_labels[d.id].show) {
+                return 1;
+            }
+            return 0;
         }
 
         function xx(d) {
@@ -1183,6 +1193,9 @@
         function lineOrScatterData(d) {
             return isLineType(d) || isScatterType(d) ? d.values : [];
         }
+        function barOrLineData(d) {
+            return isBarType(d) || isLineType(d) ? d.values : [];
+        }
 
         //-- Color --//
 
@@ -1358,26 +1371,31 @@
             };
         })();
 
-        var drawBar = function (barIndices, isSub_) {
+        function generateGetBarPoints(barIndices, isSub) {
             var barTargetsNum = barIndices.__max__ + 1,
-                isSub = arguments.length > 1 ? isSub_ : true,
                 barW = getBarW(xAxis, barTargetsNum),
                 x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
                 y = getBarY(!!isSub),
                 barOffset = getBarOffset(barIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
-
             return function (d, i) {
                 var y0 = yScale(d.id)(0),
                     offset = barOffset(d, i) || y0; // offset is for stacked bar chart
-
                 // 4 points that make a bar
-                var points = [
+                return [
                     [x(d), offset],
                     [x(d), y(d) - (y0 - offset)],
                     [x(d) + barW, y(d) - (y0 - offset)],
                     [x(d) + barW, offset]
                 ];
+            };
+        }
+
+        var drawBar = function (barIndices, isSub) {
+            var getPoints = generateGetBarPoints(barIndices, isSub);
+            return function (d, i) {
+                // 4 points that make a bar
+                var points = getPoints(d, i);
 
                 // switch points if axis is rotated, not applicable for sub chart
                 var indexX = __axis_rotated ? 1 : 0;
@@ -1392,37 +1410,24 @@
                 return path;
             };
         };
-        
-        //showValues on Bar - added 23.2.2014 - fiery-
-        var textVal = function (barIndices, isSub_, inIsXY) {
-            var barTargetsNum = barIndices.__max__ + 1,
-                isSub = arguments.length > 1 ? isSub_ : true,
-                barW = getBarW(xAxis, barTargetsNum, !!isSub),
-                x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
-                y = getBarY(!!isSub),
-                barOffset = getBarOffset(barIndices, !!isSub),
-                yScale = isSub ? getSubYScale : getYScale;
 
+        var getXYForText = function (barIndices, isSub, forX) {
+            var getPoints = generateGetBarPoints(barIndices, isSub);
             return function (d, i) {
-                var y0 = yScale(d.id)(0),
-                    offset = barOffset(d, i) || y0; // offset is for stacked bar chart
-
-                // 4 points that make a bar
-                var points = [
-                    [x(d), offset],
-                    [x(d), y(d) - (y0 - offset)],
-                    [x(d) + barW, y(d) - (y0 - offset)],
-                    [x(d) + barW, offset]
-                ];
-
-                // switch points if axis is rotated, not applicable for sub chart
-                var indexX = __axis_rotated ? 1 : 0;
-                var indexY = __axis_rotated ? 0 : 1;
-
-                if (inIsXY === 'X') { return d.value < 0 ? points[2][indexX] - 4 : points[2][indexX] + 4; }
-                return (points[0][indexY] + points[2][indexY]) / 2;
+                var points = getPoints(d, i);
+                if (forX) {
+                    return __axis_rotated ? points[2][1] + (d.value < 0 ? -4 : 4) : points[0][0] + (points[2][0] - points[0][0]) / 2;
+                } else {
+                    return __axis_rotated ? (points[0][0] + points[2][0] + this.offsetHeight * 0.6) / 2 : points[2][1] + (d.value < 0 ? this.offsetHeight : -3);
+                }
             };
         };
+        function getXForText(barIndices, isSub) {
+            return getXYForText(barIndices, isSub, true);
+        }
+        function getYForText(barIndices, isSub) {
+            return getXYForText(barIndices, isSub, false);
+        }
 
         // For brush region
         var lineOnSub = (function () {
@@ -1719,7 +1724,7 @@
                     .text(function (d) { return d.text; });
             }
 
-            // Area
+            // Regions
             main.append('g')
                 .attr("clip-path", clipPath)
                 .attr("class", "regions");
@@ -1751,6 +1756,9 @@
                 .attr('class', 'chart-arcs-title')
                 .style("text-anchor", "middle")
                 .text(__arc_title);
+
+            main.select(".chart").append("g")
+                .attr("class", "chart-texts");
 
             if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
@@ -2100,7 +2108,7 @@
 
         function redraw(options) {
             var xgrid, xgridData, xgridLines, ygrid, ygridLines;
-            var mainCircle, mainBar, mainRegion, contextBar, eventRectUpdate;
+            var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
@@ -2216,7 +2224,7 @@
             mainBar = main.selectAll('.-bars').selectAll('.-bar')
                 .data(barData);
             mainBar.enter().append('path')
-                .attr('d', drawBar(barIndices, false))
+                .attr('d', drawBar(barIndices))
                 .style("stroke", 'none')
                 .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
@@ -2224,36 +2232,30 @@
             mainBar
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr('d', drawBar(barIndices, false))
+                .attr('d', drawBar(barIndices))
                 .style("opacity", 1);
             mainBar.exit().transition().duration(duration)
                 .style('opacity', 0)
                 .remove();
             
-            //showValues on Bar - added 23.2.2014 - fiery-
-            if (showValues) {
-                mainBarTxt = main.selectAll('.-bars').selectAll('.-bartxt')
-                    .data(barData);
-                mainBarTxt.enter().append('text')
-                    .attr('text-anchor', function (d) { return d.value < 0 ? 'end' : 'start'; })
-                    .attr('y', textVal(barIndices, false, 'Y'))
-                    .attr('x', textVal(barIndices, false, 'X'))
-                    .attr('dy', '.32em')
-                    .style("stroke", 'none')
-                    .style("opacity", 0)
-                    .text(function (d) { return formattedValue(d.value); })
-                    .attr("class", classTextBar);
-                mainBarTxt
-                    .style("opacity", initialOpacity)
-                  .transition().duration(duration)
-                    .attr('y', textVal(barIndices, false, 'Y'))
-                    .attr('x', textVal(barIndices, false, 'X'))
-                    .style("opacity", 1);
-                mainBarTxt.exit()
-                  .transition().duration(duration)
-                    .style('opacity', 0)
-                    .remove();
-            }
+            mainText = main.selectAll('.-texts').selectAll('.-text')
+                .data(barOrLineData);
+            mainText.enter().append('text')
+                .attr("class", classText)
+                .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
+                .style("stroke", 'none')
+                .style("opacity", 0)
+                .text(function (d) { return formattedValue(d.value); });
+            mainText
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
+                .attr('x', getXForText(barIndices))
+                .attr('y', getYForText(barIndices))
+                .style("opacity", opacityText);
+            mainText.exit()
+              .transition().duration(duration)
+                .style('opacity', 0)
+                .remove();
 
             // lines and cricles
             main.selectAll('.-line')
@@ -2331,14 +2333,14 @@
                     contextBar = context.selectAll('.-bars').selectAll('.-bar')
                         .data(barData);
                     contextBar.enter().append('path')
-                        .attr('d', drawBar(barIndices))
+                        .attr('d', drawBar(barIndices, true))
                         .style("stroke", 'none')
                         .style("fill", function (d) { return color(d.id); })
                         .attr("class", classBar);
                     contextBar
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
-                        .attr('d', drawBar(barIndices))
+                        .attr('d', drawBar(barIndices, true))
                         .style('opacity', 1);
                     contextBar.exit().transition().duration(duration)
                         .style('opacity', 0)
@@ -2502,10 +2504,21 @@
         }
 
         function updateTargets(targets) {
-            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate, mainPieEnter, mainPieUpdate;
+            var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate, mainPieEnter, mainPieUpdate, mainTextUpdate, mainTextEnter;
             var contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate;
 
             /*-- Main --*/
+
+            //-- Text --//
+            mainTextUpdate = main.select('.chart-texts')
+                  .selectAll('.chart-text')
+                    .data(targets);
+            mainTextEnter = mainTextUpdate.enter().append('g')
+                .attr('class', function (d) { return 'chart-text target target-' + d.id; })
+                .style("pointer-events", "none");
+            mainTextEnter.append('g')
+                .attr('class', classTexts)
+                .style("fill", function (d) { return color(d.id); });
 
             //-- Bar --//
             mainBarUpdate = main.select('.chart-bars')
