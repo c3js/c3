@@ -1639,7 +1639,6 @@
                 .attr("class", "x axis")
                 .attr("clip-path", __axis_rotated ? "" : "url(" + document.URL + "#xaxis-clip)")
                 .attr("transform", translate.x)
-                .call(__axis_rotated ? yAxis : xAxis)
               .append("text")
                 .attr("class", "-axis-x-label")
                 .attr("x", width)
@@ -1649,7 +1648,6 @@
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
-                .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("dy", "1.2em")
@@ -1660,8 +1658,7 @@
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", translate.y2)
-                    .call(yAxis2);
+                    .attr("transform", translate.y2);
             }
 
             // Grids
@@ -1804,8 +1801,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
-                    .call(subXAxis);
+                    .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "");
             }
 
             /*-- Legend Region --*/
