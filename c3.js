@@ -2486,7 +2486,9 @@
                 .remove();
 
             // update legend
-            updateLegend(c3.data.targets, {withTransition: withTransition});
+            if (__legend_show) {
+                updateLegend(c3.data.targets, {withTransition: withTransition});
+            }
 
             // update fadein condition
             getTargetIds().forEach(function (id) {
