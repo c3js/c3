@@ -76,7 +76,7 @@
 
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
-            __legend_item_width = getConfig(['legend', 'item', 'width'], 80), // TODO: auto
+            __legend_position = getConfig(['legend', 'position'], 'bottom'),
             __legend_item_onclick = getConfig(['legend', 'item', 'onclick'], function () {});
 
         // axis
@@ -173,8 +173,6 @@
 
         var dragStart = null, dragging = false, cancelClick = false;
 
-        var legendHeight = __legend_show ? 40 : 0;
-
         var color = generateColor(__data_colors, __color_pattern);
 
         var defaultTimeFormat = (function () {
@@ -197,7 +195,7 @@
 
         /*-- Set Chart Params --*/
 
-        var margin, margin2, margin3, width, width2, height, height2, height3, currentWidth, currentHeight;
+        var margin, margin2, margin3, width, width2, height, height2, currentWidth, currentHeight, legendHeight, legendWidth;
         var radius, radiusExpanded, innerRadius, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, subXMin, subXMax, subYMin, subYMax;
         var x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
@@ -211,13 +209,39 @@
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
-            y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")"; },
+            y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
             x : function () { return "translate(0," + height + ")"; },
             subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
+        var isLegendRight = __legend_position === 'right';
+
         /*-- Define Functions --*/
+
+        function transformMain() {
+            main.attr("transform", translate.main);
+            main.select('.x.axis').attr("transform", translate.x);
+            main.select('.y2.axis').attr("transform", translate.y2);
+            main.select('.chart-arcs').attr("transform", translate.arc);
+        }
+        function transformContext() {
+            if (__subchart_show) {
+                context.attr("transform", translate.context);
+                context.select('.x.axis').attr("transform", translate.subx);
+            }
+        }
+        function transformLegend(withTransition) {
+            var duration = withTransition !== false ? 250 : 0;
+            if (__legend_show) {
+                legend.transition().duration(duration).attr("transform", translate.legend);
+            }
+        }
+        function transformAll(withTransition) {
+            transformMain(withTransition);
+            transformContext(withTransition);
+            transformLegend(withTransition);
+        }
 
         //-- Sizes --//
 
@@ -227,38 +251,43 @@
         function updateSizes() {
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
+            legendHeight = getLegendHeight();
+            legendWidth = getLegendWidth();
 
             // for main
             margin = {
-                top: 0,
-                left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft(),
-                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + legendHeight,
-                right: getCurrentPaddingRight()
+                top: __axis_rotated && __axis_y2_show ? 20 : 0,
+                right: getCurrentPaddingRight(),
+                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
+                left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
             height = currentHeight - margin.top - margin.bottom;
 
             // for context
             margin2 = {
-                top: __axis_rotated ? margin.top : (currentHeight - __subchart_size_height - legendHeight),
-                left: __axis_rotated ? rotated_padding_left : margin.left,
-                bottom: 20 + legendHeight,
-                right: NaN
+                top: __axis_rotated ? margin.top : (currentHeight - __subchart_size_height - (isLegendRight ? 0 : legendHeight)),
+                right: NaN,
+                bottom: 20 + (isLegendRight ? 0 : legendHeight),
+                left: __axis_rotated ? rotated_padding_left : margin.left
             };
             width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
             height2 = __axis_rotated ? height : currentHeight - margin2.top - margin2.bottom;
 
             // for legend
             margin3 = {
-                top: currentHeight - legendHeight,
+                top: isLegendRight ? margin.top : currentHeight - legendHeight,
                 right: NaN,
                 bottom: 0,
-                left: margin.left
+                left: isLegendRight ? currentWidth - legendWidth : 0
             };
-            height3 = currentHeight - margin3.top - margin3.bottom;
 
             // for arc
             updateRadius();
+
+            if (isLegendRight && hasArcType(c3.data.targets)) {
+                margin3.left = width / 2 + radiusExpanded;
+            }
         }
         function updateRadius() {
             radiusExpanded = height / 2;
@@ -277,15 +306,21 @@
             return h > 0 ? h : 320;
         }
         function getCurrentPaddingLeft() {
-            if (__padding_left) {
+            if (hasArcType(c3.data.targets)) {
+                return 0;
+            } else if (__padding_left) {
                 return __padding_left;
             } else {
                 return __axis_y_inner ? 1 : getDefaultPaddingWithAxisId('y');
             }
         }
         function getCurrentPaddingRight() {
-            if (__padding_right) {
+            if (hasArcType(c3.data.targets)) {
+                return 0;
+            } else if (__padding_right) {
                 return __padding_right;
+            } else if (isLegendRight) {
+                return legendWidth * (__axis_y2_show && !__axis_rotated ? 1.25 : 1);
             } else if (__axis_y2_show) {
                 return __axis_y2_inner || __axis_rotated ? 1 : getDefaultPaddingWithAxisId('y2');
             } else {
@@ -302,7 +337,7 @@
             return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
         }
         function getXAxisClipWidth() {
-            return width + 2 + margin.left + margin.right;
+            return width + 2;
         }
         function getXAxisClipHeight() {
             return 40;
@@ -311,13 +346,19 @@
             return margin.left + 20;
         }
         function getYAxisClipHeight() {
-            return height - margin.top + 2;
+            return height + 2;
         }
         function getEventRectWidth() {
             var base = __axis_rotated ? height : width,
                 ratio = getXDomainRatio(),
                 maxDataCount = getMaxDataCount();
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
+        }
+        function getLegendWidth() {
+            return __legend_show ? isLegendRight ? 150 : currentWidth : 0;
+        }
+        function getLegendHeight() {
+            return __legend_show ? isLegendRight ? currentHeight : 40 : 0;
         }
 
         //-- Scales --//
@@ -1613,13 +1654,12 @@
             defs.append("clipPath")
                 .attr("id", clipId)
               .append("rect")
-                .attr("y", margin.top)
                 .attr("width", width)
-                .attr("height", height - margin.top);
+                .attr("height", height);
             defs.append("clipPath")
                 .attr("id", "xaxis-clip")
               .append("rect")
-                .attr("x", -1 - margin.left)
+                .attr("x", -1)
                 .attr("y", -20)
                 .attr("width", getXAxisClipWidth)
                 .attr("height", getXAxisClipHeight);
@@ -1627,7 +1667,6 @@
                 .attr("id", "yaxis-clip")
               .append("rect")
                 .attr("x", -margin.left + 1)
-                .attr("y", margin.top - 1)
                 .attr("width", getYAxisClipWidth)
                 .attr("height", getYAxisClipHeight);
 
@@ -1818,7 +1857,9 @@
 
             /*-- Legend Region --*/
 
-            if (__legend_show) { updateLegend(c3.data.targets); }
+            if (__legend_show) {
+                updateLegend(c3.data.targets);
+            }
 
             // Set targets
             updateTargets(c3.data.targets);
@@ -1848,7 +1889,7 @@
                 window.onresize = generateResize();
             }
             if (window.onresize.add) {
-                window.onresize.add(resize);
+                window.onresize.add(updateAndRedraw);
             }
         }
 
@@ -2121,7 +2162,7 @@
             var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
-            var duration;
+            var duration, durationForExit;
 
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
@@ -2132,6 +2173,7 @@
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
 
             duration = withTransition ? __transition_duration : 0;
+            durationForExit = isDefined(options.durationForExit) ? options.durationForExit : duration;
 
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
@@ -2247,7 +2289,7 @@
               .transition().duration(duration)
                 .attr('d', drawBar)
                 .style("opacity", 1);
-            mainBar.exit().transition().duration(duration)
+            mainBar.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
             
@@ -2266,7 +2308,7 @@
                 .attr('y', yForText)
                 .style("fill-opacity", opacityForText);
             mainText.exit()
-              .transition().duration(duration)
+              .transition().duration(durationForExit)
                 .style('fill-opacity', 0)
                 .remove();
 
@@ -2443,6 +2485,9 @@
                 .style("fill-opacity", 0)
                 .remove();
 
+            // update legend
+            updateLegend(c3.data.targets, {withTransition: withTransition});
+
             // update fadein condition
             getTargetIds().forEach(function (id) {
                 withoutFadeIn[id] = true;
@@ -2487,7 +2532,11 @@
             };
             return callResizeFunctions;
         }
-        function resize() {
+        function updateAndRedraw(options) {
+            var withTransition, withTransform;
+            options = isDefined(options) ? options : {};
+            withTransition = isDefined(options.withTransition) ? options.withTransition : false;
+            withTransform = isDefined(options.withTransform) ? options.withTransform : false;
             // Update sizes and scales
             updateSizes();
             updateScales();
@@ -2500,22 +2549,15 @@
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
             svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
             svg.select('.zoom-rect').attr('width', width).attr('height', height);
-            // Update main positions
-            main.select('.x.axis').attr("transform", translate.x);
-            main.select('.y2.axis').attr("transform", translate.y2);
-            main.select('.chart-arcs').attr("transform", translate.arc);
-            // Update context sizes and positions
-            if (__subchart_show) {
-                context.attr("transform", translate.context);
-                context.select('.x.axis').attr("transform", translate.subx);
-            }
-            // Update legend positions
-            if (__legend_show) {
-                legend.attr("transform", translate.legend);
-                updateLegend(c3.data.targets, {withTransition: false});
-            }
+            // Update g positions
+            transformAll(withTransition);
             // Draw with new sizes & scales
-            redraw({withTransition: false, withUpdateXDomain: true});
+            redraw({
+                withTransition: withTransition,
+                withUpdateXDomain: true,
+                withTransform: withTransform,
+                durationForExit: 0
+            });
         }
 
         function updateTargets(targets) {
@@ -2698,12 +2740,40 @@
         
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
-            var padding = width / 2 - __legend_item_width * Object.keys(targets).length / 2;
+            var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
+            var item_height = 0, item_width = 0, paddingTop = 4, paddingRight = 30, margin, updateSizes;
             var withTransition;
 
             options = isUndefined(options) ? {} : options;
-
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
+
+            if (isLegendRight) {
+                xForLegend = function () { return legendWidth * 0.2; };
+                yForLegend = function (d, i) { return margin + item_height * i; };
+            } else {
+                xForLegend = function (d, i) { return margin + item_width * i; };
+                yForLegend = function () { return legendHeight * 0.2; };
+            }
+            xForLegendText = function (d, i) { return xForLegend(d, i) + 14; };
+            yForLegendText = function (d, i) { return yForLegend(d, i) + 9; };
+            xForLegendRect = function (d, i) { return xForLegend(d, i) - 4; };
+            yForLegendRect = function (d, i) { return yForLegend(d, i) - 7; };
+            updateSizes = function (offsetWidth, offsetHeight) {
+                var width = Math.ceil((offsetWidth + paddingRight) / 10) * 10,
+                    height = Math.ceil((offsetHeight + paddingTop) / 10) * 10;
+                if (width > item_width) {
+                    item_width = width;
+                    if (! isLegendRight) {
+                        margin = (legendWidth - item_width * Object.keys(targets).length) / 2;
+                    }
+                }
+                if (height > item_height) {
+                    item_height = height;
+                    if (isLegendRight) {
+                        margin = (legendHeight - item_height * Object.keys(targets).length) / 2;
+                    }
+                }
+            };
 
             // Define g for legend area
             l = legend.selectAll('.legend-item')
@@ -2722,41 +2792,47 @@
                     revertLegend();
                     c3.revert();
                 });
+            l.append('text')
+                .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
+                .each(function () { updateSizes(this.offsetWidth, this.offsetHeight); })
+                .style("pointer-events", "none")
+                .attr('x', isLegendRight ? xForLegendText : -200)
+                .attr('y', isLegendRight ? -200 : yForLegend);
             l.append('rect')
                 .attr("class", "legend-item-event")
                 .style('fill-opacity', 0)
-                .attr('x', -200)
-                .attr('y', function () { return legendHeight / 2 - 16; })
-                .attr('width', __legend_item_width)
+                .attr('x', isLegendRight ? xForLegendRect : -200)
+                .attr('y', isLegendRight ? -200 : yForLegendRect)
+                .attr('width', item_width + 14)
                 .attr('height', 24);
             l.append('rect')
                 .attr("class", "legend-item-tile")
                 .style("pointer-events", "none")
                 .style('fill', function (d) { return color(d); })
-                .attr('x', -200)
-                .attr('y', function () { return legendHeight / 2 - 9; })
+                .attr('x', isLegendRight ? xForLegendText : -200)
+                .attr('y', isLegendRight ? -200 : yForLegendText)
                 .attr('width', 10)
                 .attr('height', 10);
-            l.append('text')
-                .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
-                .style("pointer-events", "none")
-                .attr('x', -200)
-                .attr('y', function () { return legendHeight / 2; });
+
+            legend.selectAll('text')
+                .data(ids)
+                .each(function () { updateSizes(this.offsetWidth, this.offsetHeight); })
+              .transition().duration(withTransition ? 250 : 0)
+                .attr('x', xForLegendText)
+                .attr('y', yForLegendText);
 
             legend.selectAll('rect.legend-item-event')
                 .data(ids)
               .transition().duration(withTransition ? 250 : 0)
-                .attr('x', function (d, i) { return padding + __legend_item_width * i; });
+                .attr('x', xForLegendRect)
+                .attr('y', yForLegendRect);
 
             legend.selectAll('rect.legend-item-tile')
                 .data(ids)
               .transition().duration(withTransition ? 250 : 0)
-                .attr('x', function (d, i) { return padding + __legend_item_width * i; });
+                .attr('x', xForLegend)
+                .attr('y', yForLegend);
 
-            legend.selectAll('text')
-                .data(ids)
-              .transition().duration(withTransition ? 250 : 0)
-                .attr('x', function (d, i) { return padding + __legend_item_width * i + 14; });
         }
 
         /*-- Event Handling --*/
@@ -2935,46 +3011,42 @@
 
         c3.toLine = function (targets) {
             setTargetType(targets, 'line');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toSpline = function (targets) {
             setTargetType(targets, 'spline');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toBar = function (targets) {
             setTargetType(targets, 'bar');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toScatter = function (targets) {
             setTargetType(targets, 'scatter');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toArea = function (targets) {
             setTargetType(targets, 'area');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toAreaSpline = function (targets) {
             setTargetType(targets, 'area-spline');
-            redraw();
+            updateAndRedraw({withTransition: true});
         };
 
         c3.toPie = function (targets) {
             setTargetType(targets, 'pie');
-            updateRadius();
-            updateArc();
-            redraw({withTransform: true});
+            updateAndRedraw({withTransition: true, withTransform: true});
         };
 
         c3.toDonut = function (targets) {
             setTargetType(targets, 'donut');
-            updateRadius();
-            updateArc();
-            redraw({withTransform: true});
+            updateAndRedraw({withTransition: true, withTransform: true});
         };
 
         c3.groups = function (groups) {
@@ -3024,7 +3096,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            resize();
+            updateAndRedraw();
         };
 
         c3.destroy = function () {
