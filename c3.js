@@ -137,19 +137,22 @@
 
         // tooltip - show when mouseover on each data
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
+            __tooltip_format_title = getConfig(['tooltip', 'format', 'title'], null),
+            __tooltip_format_value = getConfig(['tooltip', 'format', 'value'], null),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
-            var xFormat = getXAxisTickFormat(),
+            var titleFormat = __tooltip_format_title ? __tooltip_format_title : getXAxisTickFormat(),
+                valueFormat = __tooltip_format_value ? __tooltip_format_value : defaultValueFormat,
                 text, i, title, value, name;
             for (i = 0; i < d.length; i++) {
                 if (! d[i] || ! isValue(d[i].value)) { continue; }
 
                 if (! text) {
-                    title = xFormat ? xFormat(d[i].x) : d[i].x;
+                    title = titleFormat ? titleFormat(d[i].x) : d[i].x;
                     text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>";
                 }
 
                 name = d[i].name;
-                value = formattedValue(d[i].value);
+                value = valueFormat(d[i].value);
 
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
@@ -910,7 +913,7 @@
         function subxx(d) {
             return subX(d.x);
         }
-        function formattedValue(v) {
+        function defaultValueFormat(v) {
             var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
             return yFormat(v);
         }
@@ -2255,7 +2258,7 @@
                 .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
                 .style("stroke", 'none')
                 .style("fill-opacity", 0)
-                .text(function (d) { return formattedValue(d.value); });
+                .text(function (d) { return defaultValueFormat(d.value); });
             mainText
                 .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
