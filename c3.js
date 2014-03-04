@@ -139,12 +139,12 @@
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title'], null),
             __tooltip_format_value = getConfig(['tooltip', 'format', 'value'], null),
-            __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
-            var titleFormat = __tooltip_format_title ? __tooltip_format_title : getXAxisTickFormat(),
+            __tooltip_contents = getConfig(['tooltip', 'contents'], function (d, defaultTitleFormat, defaultValueFormat, color) {
+            var titleFormat = __tooltip_format_title ? __tooltip_format_title : defaultTitleFormat,
                 valueFormat = __tooltip_format_value ? __tooltip_format_value : defaultValueFormat,
                 text, i, title, value, name;
             for (i = 0; i < d.length; i++) {
-                if (! d[i] || ! isValue(d[i].value)) { continue; }
+                if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
                 if (! text) {
                     title = titleFormat ? titleFormat(d[i].x) : d[i].x;
@@ -1014,7 +1014,7 @@
             // don't show tooltip when no data
             if (dataToShow.length === 0) { return; }
             // Construct tooltip
-            tooltip.html(__tooltip_contents(selectedData))
+            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), defaultValueFormat, color))
                 .style("visibility", "hidden")
                 .style("display", "block");
             // Get tooltip dimensions
@@ -1837,7 +1837,7 @@
                 }
                 tooltip.html(__tooltip_contents(c3.data.targets.map(function (d) {
                     return addName(d.values[__tooltip_init_x]);
-                })));
+                }), getXAxisTickFormat(), defaultValueFormat, color));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
                        .style("display", "block");
