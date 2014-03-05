@@ -1453,11 +1453,12 @@
                 return points[0][0] + (points[2][0] - points[0][0]) / 2;
             }
         }
-        function getYForText(points, d, that) {
+        function getYForText(points, d, textElement) {
+            var box = textElement.getBBox();
             if (__axis_rotated) {
-                return (points[0][0] + points[2][0] + that.offsetHeight * 0.6) / 2;
+                return (points[0][0] + points[2][0] + box.height * 0.6) / 2;
             } else {
-                return points[2][1] + (d.value < 0 ? that.offsetHeight : isBarType(d) ? -3 : -6);
+                return points[2][1] + (d.value < 0 ? box.height : isBarType(d) ? -3 : -6);
             }
         }
 
