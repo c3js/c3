@@ -1063,17 +1063,23 @@
             tHeight = tooltip.property('offsetHeight');
             // Determin tooltip position
             if (__axis_rotated) {
-                tooltipLeft = mouse[0];
+                tooltipLeft = mouse[0] + 100;
+                tooltipRight = tooltipLeft + tWidth;
+                chartRight = getCurrentWidth() - getCurrentPaddingRight();
+                tooltipTop = x(dataToShow[0].x) + 20;
             } else {
                 svgLeft = getSvgLeft();
                 tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(dataToShow[0].x) + 20;
                 tooltipRight = tooltipLeft + tWidth;
                 chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
-                if (tooltipRight > chartRight) {
-                    tooltipLeft -= tWidth + 30;
-                }
+                tooltipTop = mouse[1] + 15;
             }
-            tooltipTop = mouse[1] + 15 + tHeight < getCurrentHeight() ? mouse[1] + 15 : mouse[1] - tHeight;
+            if (tooltipRight > chartRight) {
+                tooltipLeft -= tWidth + 60;
+            }
+            if (tooltipTop + tHeight > getCurrentHeight()) {
+                tooltipTop -= tHeight + 30;
+            }
             // Set tooltip
             // todo get rid of magic numbers
             tooltip
