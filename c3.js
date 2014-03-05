@@ -2199,8 +2199,8 @@
             y2.domain(getYDomain('y2'));
 
             // axis
-            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? duration : 0).call(__axis_rotated ? yAxis : xAxis);
-            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? 0 : duration).call(__axis_rotated ? xAxis : yAxis);
+            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(__axis_rotated ? yAxis : xAxis);
+            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(__axis_rotated ? xAxis : yAxis);
             main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().call(yAxis2);
 
             // setup drawer - MEMO: these must be called after axis updated
@@ -2386,7 +2386,7 @@
                 // update subchart elements if needed
                 if (withSubchart) {
                     // axes
-                    context.select('.x.axis').style("opacity", hideAxis ? 0 : 1).transition().duration(__axis_rotated ? duration : 0).call(subXAxis);
+                    context.select('.x.axis').style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(subXAxis);
                     // extent rect
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
