@@ -2760,9 +2760,10 @@
             yForLegendText = function (d, i) { return yForLegend(d, i) + 9; };
             xForLegendRect = function (d, i) { return xForLegend(d, i) - 4; };
             yForLegendRect = function (d, i) { return yForLegend(d, i) - 7; };
-            updateSizes = function (offsetWidth, offsetHeight) {
-                var width = Math.ceil((offsetWidth + paddingRight) / 10) * 10,
-                    height = Math.ceil((offsetHeight + paddingTop) / 10) * 10;
+            updateSizes = function (textElement) {
+                var box = textElement.getBBox(),
+                    width = Math.ceil((box.width + paddingRight) / 10) * 10,
+                    height = Math.ceil((box.height + paddingTop) / 10) * 10;
                 if (width > item_width) {
                     item_width = width;
                     if (! isLegendRight) {
@@ -2796,7 +2797,7 @@
                 });
             l.append('text')
                 .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
-                .each(function () { updateSizes(this.offsetWidth, this.offsetHeight); })
+                .each(function () { updateSizes(this); })
                 .style("pointer-events", "none")
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegend);
@@ -2818,7 +2819,7 @@
 
             legend.selectAll('text')
                 .data(ids)
-                .each(function () { updateSizes(this.offsetWidth, this.offsetHeight); })
+                .each(function () { updateSizes(this); })
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
