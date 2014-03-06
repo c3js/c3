@@ -296,8 +296,9 @@
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getSvgLeft() {
-            var svgLeft = svg.property('offsetLeft');
-            return svgLeft ? svgLeft : 0;
+            var svgRect = d3.select('.y.axis').node().getBoundingClientRect(),
+                chartRect = d3.select(__bindto).node().getBoundingClientRect();
+            return svgRect.right - chartRect.left - getCurrentPaddingLeft();
         }
         function getCurrentWidth() {
             return __size_width ? __size_width : getParentWidth();
@@ -1064,7 +1065,8 @@
             tHeight = tooltip.property('offsetHeight');
             // Determin tooltip position
             if (__axis_rotated) {
-                tooltipLeft = mouse[0] + 100;
+                svgLeft = getSvgLeft();
+                tooltipLeft = svgLeft + mouse[0] + 100;
                 tooltipRight = tooltipLeft + tWidth;
                 chartRight = getCurrentWidth() - getCurrentPaddingRight();
                 tooltipTop = x(dataToShow[0].x) + 20;
