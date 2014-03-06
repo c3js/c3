@@ -115,7 +115,8 @@
             __grid_y_show = getConfig(['grid', 'y', 'show'], false),
             // not used
             // __grid_y_type = getConfig(['grid', 'y', 'type'], 'tick'),
-            __grid_y_lines = getConfig(['grid', 'y', 'lines'], null);
+            __grid_y_lines = getConfig(['grid', 'y', 'lines'], null),
+            __grid_y_ticks = getConfig(['grid', 'y', 'ticks'], 10);
 
         // point - point of each data
         var __point_show = getConfig(['point', 'show'], true),
@@ -2260,7 +2261,7 @@
             // Y-Grid
             if (withY && __grid_y_show) {
                 ygrid = main.select('.ygrids').selectAll(".ygrid")
-                    .data(y.ticks(10));
+                    .data(y.ticks(__grid_y_ticks));
                 ygrid.enter().append('line')
                     .attr('class', 'ygrid');
                 ygrid.attr("x1", __axis_rotated ? y : 0)
@@ -2299,7 +2300,7 @@
             mainBar.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
-            
+
             mainText = main.selectAll('.-texts').selectAll('.-text')
                 .data(barOrLineData);
             mainText.enter().append('text')
@@ -2746,7 +2747,7 @@
               .transition().duration(100)
                 .style('opacity', 1);
         }
-        
+
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
