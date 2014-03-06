@@ -89,10 +89,13 @@
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
             __axis_x_label = getConfig(['axis', 'x', 'label'], null),
+            __axis_x_label_position_dy = getConfig(['axis', 'x', 'label_position', 'dy'], "-.5em"),
             __axis_y_max = getConfig(['axis', 'y', 'max'], null),
             __axis_y_min = getConfig(['axis', 'y', 'min'], null),
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
             __axis_y_label = getConfig(['axis', 'y', 'label'], null),
+            __axis_y_label_position_dx = getConfig(['axis', 'y', 'label_position', 'dx'], "-.5em"),
+            __axis_y_label_position_dy = getConfig(['axis', 'y', 'label_position', 'dy'], "1.2em"),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], null),
             __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
@@ -1700,7 +1703,7 @@
               .append("text")
                 .attr("class", "-axis-x-label")
                 .attr("x", width)
-                .attr("dy", "-.5em")
+                .attr("dy", __axis_x_label_position_dy)
                 .style("text-anchor", "end")
                 .text(__axis_x_label);
             main.append("g")
@@ -1708,8 +1711,8 @@
                 .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
               .append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("dy", "1.2em")
-                .attr("dx", "-.5em")
+                .attr("dy",  __axis_y_label_position_dy)
+                .attr("dx",  __axis_y_label_position_dx)
                 .style("text-anchor", "end")
                 .text(__axis_y_label);
 
