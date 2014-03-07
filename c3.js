@@ -479,6 +479,12 @@
             var maxDataCount = getMaxDataCount();
             return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
         }
+        function getXAxisLabel() {
+            return typeof __axis_x_label === 'string' ? __axis_x_label : __axis_x_label ? __axis_x_label.text : null;
+        }
+        function getYAxisLabel() {
+            return typeof __axis_y_label === 'string' ? __axis_y_label : __axis_y_label ? __axis_y_label.text : null;
+        }
 
         //-- Arc --//
 
@@ -1705,7 +1711,7 @@
                 .attr("x", width)
                 .attr("dy", "-.5em")
                 .style("text-anchor", "end")
-                .text(__axis_x_label);
+                .text(getXAxisLabel);
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
@@ -1714,7 +1720,7 @@
                 .attr("dy", "1.2em")
                 .attr("dx", "-.5em")
                 .style("text-anchor", "end")
-                .text(__axis_y_label);
+                .text(getYAxisLabel);
 
             if (__axis_y2_show) {
                 main.append("g")
