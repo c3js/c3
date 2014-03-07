@@ -259,7 +259,7 @@
             margin = {
                 top: __axis_rotated && __axis_y2_show ? 20 : 0,
                 right: getCurrentPaddingRight(),
-                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
+                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? getLegendPaddingTop() : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
@@ -277,7 +277,7 @@
 
             // for legend
             margin3 = {
-                top: isLegendRight ? margin.top : currentHeight - legendHeight,
+                top: isLegendRight ? margin.top : currentHeight + getLegendPaddingTop() - legendHeight,
                 right: NaN,
                 bottom: 0,
                 left: isLegendRight ? currentWidth - legendWidth : 0
@@ -330,7 +330,8 @@
             }
         }
         function getDefaultPaddingWithAxisId() {
-            return 40; // TODO: calc automatically
+            var yAxisLabelPosition = getYAxisLabelPosition();
+            return yAxisLabelPosition.isInner ? 40 : 60; // TODO: calc automatically
         }
         function getParentWidth() {
             return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
@@ -342,7 +343,7 @@
             return width + 2;
         }
         function getXAxisClipHeight() {
-            return 40;
+            return 80;
         }
         function getYAxisClipWidth() {
             return margin.left + 20;
@@ -361,6 +362,10 @@
         }
         function getLegendHeight() {
             return __legend_show ? isLegendRight ? currentHeight : 40 : 0;
+        }
+        function getLegendPaddingTop() {
+            var xAxisLabelPositon = getXAxisLabelPosition();
+            return xAxisLabelPositon.isInner ? 5 : 20;
         }
 
         //-- Scales --//
@@ -479,11 +484,70 @@
             var maxDataCount = getMaxDataCount();
             return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
         }
-        function getXAxisLabel() {
-            return typeof __axis_x_label === 'string' ? __axis_x_label : __axis_x_label ? __axis_x_label.text : null;
+
+        function getAxisLableText(option) {
+            return typeof option === 'string' ? option : option ? option.text : null;
         }
-        function getYAxisLabel() {
-            return typeof __axis_y_label === 'string' ? __axis_y_label : __axis_y_label ? __axis_y_label.text : null;
+        function getAxisLabelPosition(option, defaultPosition) {
+            var position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
+            return {
+                isInner: position.indexOf('inner') >= 0,
+                isOuter: position.indexOf('outer') >= 0,
+                isLeft: position.indexOf('left') >= 0,
+                isCenter: position.indexOf('center') >= 0,
+                isRight: position.indexOf('right') >= 0,
+                isTop: position.indexOf('top') >= 0,
+                isMiddle: position.indexOf('middle') >= 0,
+                isBottom: position.indexOf('bottom') >= 0
+            };
+        }
+        function getXAxisLabelPosition() {
+            return getAxisLabelPosition(__axis_x_label, 'inner-right');
+        }
+        function getYAxisLabelPosition() {
+            return getAxisLabelPosition(__axis_y_label, 'inner-top');
+        }
+        function textForXAxisLabel() {
+            return getAxisLableText(__axis_x_label);
+        }
+        function textForYAxisLabel() {
+            return getAxisLableText(__axis_y_label);
+        }
+        function xForXAxisLabel() {
+            var position = getXAxisLabelPosition();
+            return position.isLeft ? 0 : position.isCenter ? width / 2 : width;
+        }
+        function xForYAxisLabel() {
+            var position = getYAxisLabelPosition();
+            return position.isBottom ? -height : position.isMiddle ? -height / 2 : 0;
+        }
+        function dxForYAxisLabel() {
+            var position = getYAxisLabelPosition();
+            return position.isTop ? "-0.5em" : "0";
+        }
+        function dyForXAxisLabel() {
+            var position = getXAxisLabelPosition();
+            return position.isInner ? "-0.5em" : "3.5em";
+        }
+        function dyForYAxisLabel() {
+            var position = getYAxisLabelPosition();
+
+            // TODO: define as function and use to calc padding left
+            var maxWidth = 0;
+            d3.selectAll('.y.axis .tick text').each(function () {
+                var box = this.getBBox();
+                if (maxWidth < box.width) { maxWidth = box.width; }
+            });
+
+            return position.isInner ? "1.2em" : -20 - maxWidth;
+        }
+        function textAnchorForXAxisLabel() {
+            var position = getXAxisLabelPosition();
+            return position.isLeft ? 'start' : position.isCenter ? 'middle' : 'end';
+        }
+        function textAnchorForYAxisLabel() {
+            var position = getYAxisLabelPosition();
+            return position.isBottom ? 'start' : position.isMiddle ? 'middle' : 'end';
         }
 
         //-- Arc --//
@@ -1708,19 +1772,18 @@
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", "-axis-x-label")
-                .attr("x", width)
-                .attr("dy", "-.5em")
-                .style("text-anchor", "end")
-                .text(getXAxisLabel);
+                .attr("dy", dyForXAxisLabel)
+                .style("text-anchor", textAnchorForXAxisLabel)
+                .text(textForXAxisLabel);
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
               .append("text")
+                .attr("class", "-axis-y-label")
                 .attr("transform", "rotate(-90)")
-                .attr("dy", "1.2em")
-                .attr("dx", "-.5em")
-                .style("text-anchor", "end")
-                .text(getYAxisLabel);
+                .attr("dx", dxForYAxisLabel)
+                .style("text-anchor", textAnchorForYAxisLabel)
+                .text(textForYAxisLabel);
 
             if (__axis_y2_show) {
                 main.append("g")
@@ -2218,7 +2281,8 @@
             yForText = generateXYForText(barIndices, false);
 
             // Update label position
-            main.select(".x.axis .-axis-x-label").attr("x", width);
+            main.select(".x.axis .-axis-x-label").attr("x", xForXAxisLabel);
+            main.select(".y.axis .-axis-y-label").attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel);
 
             // Update sub domain
             subY.domain(y.domain());
