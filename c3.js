@@ -137,7 +137,7 @@
         var __regions = getConfig(['regions'], []);
 
         // tooltip - show when mouseover on each data
-        var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
+        var __tooltip_show = getConfig(['tooltip', 'show'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title'], null),
             __tooltip_format_value = getConfig(['tooltip', 'format', 'value'], null),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d, defaultTitleFormat, defaultValueFormat, color) {
@@ -1123,7 +1123,7 @@
             var tWidth, tHeight;
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-            if (! __tooltip_enabled) { return; }
+            if (! __tooltip_show) { return; }
             // don't show tooltip when no data
             if (dataToShow.length === 0) { return; }
             // Construct tooltip
@@ -1166,7 +1166,7 @@
 
         function showXGridFocus(selectedData) {
             var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-            if (! __tooltip_enabled) { return; }
+            if (! __tooltip_show) { return; }
             // Hide when scatter plot exists
             if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
             main.selectAll('line.xgrid-focus')
