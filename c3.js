@@ -1774,7 +1774,7 @@
                 .attr("class", "-axis-x-label")
                 .attr("dy", dyForXAxisLabel)
                 .style("text-anchor", textAnchorForXAxisLabel)
-                .text(textForXAxisLabel);
+                .text(__axis_rotated ? textForYAxisLabel : textForXAxisLabel);
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
@@ -1783,7 +1783,7 @@
                 .attr("transform", "rotate(-90)")
                 .attr("dx", dxForYAxisLabel)
                 .style("text-anchor", textAnchorForYAxisLabel)
-                .text(textForYAxisLabel);
+                .text(__axis_rotated ? textForXAxisLabel : textForYAxisLabel);
 
             if (__axis_y2_show) {
                 main.append("g")
