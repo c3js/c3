@@ -85,7 +85,7 @@
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format'], null),
-            __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_rotated || __axis_x_type === 'categorized' ? false : true),
+            __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_x_type === 'categorized' ? false : true),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
             __axis_x_label = getConfig(['axis', 'x', 'label'], null),
