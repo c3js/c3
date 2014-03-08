@@ -685,8 +685,8 @@
             var yTargets = getTargets(function (d) { return getAxisId(d.id) === axisId; }),
                 yMin = axisId === 'y2' ? __axis_y2_min : __axis_y_min,
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
-                yDomainMin = (yMin) ? yMin : getYDomainMin(yTargets),
-                yDomainMax = (yMax) ? yMax : getYDomainMax(yTargets),
+                yDomainMin = isValue(yMin) ? yMin : getYDomainMin(yTargets),
+                yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
                 padding = Math.abs(yDomainMax - yDomainMin) * 0.22, //0.1 -> 0.22 - 23.2.2014 - fiery-
                 padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
