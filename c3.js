@@ -687,7 +687,7 @@
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
                 yDomainMin = isValue(yMin) ? yMin : getYDomainMin(yTargets),
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
-                padding = Math.abs(yDomainMax - yDomainMin) * 0.22, //0.1 -> 0.22 - 23.2.2014 - fiery-
+                padding = Math.abs(yDomainMax - yDomainMin) * (hasDataLabel() && __axis_rotated ? 0.125 : 0.1),
                 padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
             if (center) {
@@ -1004,14 +1004,18 @@
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
         function opacityForText(d) {
+            return hasDataLabel(d) ? 1 : 0;
+        }
+        function hasDataLabel(d) {
+            var id = d ? d.id : null;
             if (typeof __data_labels === 'boolean' && __data_labels) {
-                return 1;
-            } else if (__data_labels[d.id] === 'boolean' && __data_labels[d.id]) {
-                return 1;
-            } else if (__data_labels[d.id] && __data_labels[d.id].show) {
-                return 1;
+                return true;
+            } else if (__data_labels[id] === 'boolean' && __data_labels[id]) {
+                return true;
+            } else if (__data_labels[id] && __data_labels[id].show) {
+                return true;
             }
-            return 0;
+            return false;
         }
 
         function xx(d) {
