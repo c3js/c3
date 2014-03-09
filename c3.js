@@ -77,7 +77,8 @@
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
             __legend_position = getConfig(['legend', 'position'], 'bottom'),
-            __legend_item_onclick = getConfig(['legend', 'item', 'onclick'], function () {});
+            __legend_item_onclick = getConfig(['legend', 'item', 'onclick'], function () {}),
+            __legend_equally = getConfig(['legend', 'equally'], false);
 
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
@@ -358,6 +359,7 @@
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
         function getLegendWidth() {
+            // TODO: legend width should be an option
             return __legend_show ? isLegendRight ? 150 : currentWidth : 0;
         }
         function getLegendHeight() {
@@ -2827,61 +2829,84 @@
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
-            var item_height = 0, item_width = 0, paddingTop = 4, paddingRight = 30, margin, updateSizes;
+            var paddingTop = 4, paddingRight = 30, margin;
+            var totalLength = 0, offsets = {}, widths = {}, heights = {};
             var withTransition;
 
             options = isUndefined(options) ? {} : options;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
 
-            if (isLegendRight) {
-                xForLegend = function () { return legendWidth * 0.2; };
-                yForLegend = function (d, i) { return margin + item_height * i; };
-            } else {
-                xForLegend = function (d, i) { return margin + item_width * i; };
-                yForLegend = function () { return legendHeight * 0.2; };
+            function getXOffset(id, i) {
+                return __legend_equally ? widths[id] * i : offsets[id];
             }
-            xForLegendText = function (d, i) { return xForLegend(d, i) + 14; };
-            yForLegendText = function (d, i) { return yForLegend(d, i) + 9; };
-            xForLegendRect = function (d, i) { return xForLegend(d, i) - 4; };
-            yForLegendRect = function (d, i) { return yForLegend(d, i) - 7; };
-            updateSizes = function (textElement) {
+            function getYOffset(id, i) {
+                return __legend_equally ? heights[id] * i : offsets[id];
+            }
+            function updatePositions(textElement, id) {
                 var box = textElement.getBBox(),
                     width = Math.ceil((box.width + paddingRight) / 10) * 10,
-                    height = Math.ceil((box.height + paddingTop) / 10) * 10;
-                if (width > item_width) {
-                    item_width = width;
-                    if (! isLegendRight) {
-                        margin = (legendWidth - item_width * Object.keys(targets).length) / 2;
+                    height = Math.ceil((box.height + paddingTop) / 10) * 10,
+                    length = isLegendRight ? height : width,
+                    areaLength = isLegendRight ? legendHeight : legendWidth,
+                    maxWidth, maxHeight;
+
+                widths[id] = width;
+                heights[id] = height;
+
+                if (__legend_equally) {
+                    maxWidth = d3.max(Object.keys(widths).map(function (key) { return widths[key]; }));
+                    maxHeight = d3.max(Object.keys(heights).map(function (key) { return heights[key]; }));
+                    if (width >= maxWidth) {
+                        Object.keys(widths).forEach(function (key) { widths[key] = width; });
+                        if (! isLegendRight) {
+                            margin = (legendWidth - width * Object.keys(targets).length) / 2;
+                        }
                     }
-                }
-                if (height > item_height) {
-                    item_height = height;
-                    if (isLegendRight) {
-                        margin = (legendHeight - item_height * Object.keys(targets).length) / 2;
+                    if (height >= maxHeight) {
+                        Object.keys(heights).forEach(function (key) { heights[key] = height; });
+                        if (isLegendRight) {
+                            margin = (legendHeight - height * Object.keys(targets).length) / 2;
+                        }
                     }
+                } else {
+                    offsets[id] = totalLength;
+                    totalLength += length;
+                    margin = (areaLength - totalLength) / 2;
                 }
-            };
+            }
+
+            if (isLegendRight) {
+                xForLegend = function () { return legendWidth * 0.2; };
+                yForLegend = function (id, i) { return margin + getYOffset(id, i); };
+            } else {
+                xForLegend = function (id, i) { return margin + getXOffset(id, i); };
+                yForLegend = function () { return legendHeight * 0.2; };
+            }
+            xForLegendText = function (id, i) { return xForLegend(id, i) + 14; };
+            yForLegendText = function (id, i) { return yForLegend(id, i) + 9; };
+            xForLegendRect = function (id, i) { return xForLegend(id, i) - 4; };
+            yForLegendRect = function (id, i) { return yForLegend(id, i) - 7; };
 
             // Define g for legend area
             l = legend.selectAll('.legend-item')
                 .data(ids)
               .enter().append('g')
-                .attr('class', function (d) { return 'legend-item legend-item-' + d; })
+                .attr('class', function (id) { return 'legend-item legend-item-' + id; })
                 .style('cursor', 'pointer')
-                .on('click', function (d) {
-                    __legend_item_onclick(d);
+                .on('click', function (id) {
+                    __legend_item_onclick(id);
                 })
-                .on('mouseover', function (d) {
-                    focusLegend(d);
-                    c3.focus(d);
+                .on('mouseover', function (id) {
+                    focusLegend(id);
+                    c3.focus(id);
                 })
                 .on('mouseout', function () {
                     revertLegend();
                     c3.revert();
                 });
             l.append('text')
-                .text(function (d) { return isDefined(__data_names[d]) ? __data_names[d] : d; })
-                .each(function () { updateSizes(this); })
+                .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
+                .each(function (id) { updatePositions(this, id); })
                 .style("pointer-events", "none")
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegend);
@@ -2890,12 +2915,12 @@
                 .style('fill-opacity', 0)
                 .attr('x', isLegendRight ? xForLegendRect : -200)
                 .attr('y', isLegendRight ? -200 : yForLegendRect)
-                .attr('width', item_width + 14)
-                .attr('height', 24);
+                .attr('width', function (id) { return widths[id]; })
+                .attr('height', function (id) { return heights[id]; });
             l.append('rect')
                 .attr("class", "legend-item-tile")
                 .style("pointer-events", "none")
-                .style('fill', function (d) { return color(d); })
+                .style('fill', function (id) { return color(id); })
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegendText)
                 .attr('width', 10)
@@ -2903,7 +2928,7 @@
 
             legend.selectAll('text')
                 .data(ids)
-                .each(function () { updateSizes(this); })
+                .each(function (id) { updatePositions(this, id); })
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
