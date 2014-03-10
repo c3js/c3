@@ -692,9 +692,10 @@
                 domainLength = Math.abs(yDomainMax - yDomainMin),
                 padding = domainLength * 0.1, // TODO: should be an option
                 padding_top = padding, padding_bottom = padding,
-                center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
+                center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
+                yDomainAbs, widths, diff, ratio;
             if (center) {
-                var yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
+                yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
                 yDomainMin = center - yDomainAbs;
             }
@@ -708,8 +709,9 @@
             }
             // add padding for data label
             if (hasDataLabel() && __axis_rotated) {
-                var widths = getDataLabelWidth(yDomainMin, yDomainMax), diff = diffDomain(y.range());
-                var ratio = [widths[0] / diff, widths[1] / diff];
+                widths = getDataLabelWidth(yDomainMin, yDomainMax);
+                diff = diffDomain(y.range());
+                ratio = [widths[0] / diff, widths[1] / diff];
                 padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
                 padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
             }
