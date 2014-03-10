@@ -385,8 +385,8 @@
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
             x = getX(xMin, xMax, x ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
-            y = getY(yMin, yMax, y ? y.domain() : undefined);
-            y2 = getY(yMin, yMax, y2 ? y2.domain() : undefined);
+            y = getY(yMin, yMax);
+            y2 = getY(yMin, yMax);
             subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
             subY = getY(subYMin, subYMax);
             subY2 = getY(subYMin, subYMax);
@@ -689,7 +689,8 @@
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
                 yDomainMin = isValue(yMin) ? yMin : getYDomainMin(yTargets),
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
-                padding = Math.abs(yDomainMax - yDomainMin) * (hasDataLabel() && __axis_rotated ? 0.125 : 0.1),
+                domainLength = Math.abs(yDomainMax - yDomainMin),
+                padding = domainLength * 0.1, // TODO: should be an option
                 padding_top = padding, padding_bottom = padding,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center;
             if (center) {
@@ -704,6 +705,13 @@
             if (axisId === 'y2' && __axis_y2_padding) {
                 padding_top = isValue(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
                 padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
+            }
+            // add padding for data label
+            if (hasDataLabel() && __axis_rotated) {
+                var widths = getDataLabelWidth(yDomainMin, yDomainMax), diff = diffDomain(y.range());
+                var ratio = [widths[0] / diff, widths[1] / diff];
+                padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
+                padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
             }
             // Bar chart with only positive values should be 0-based
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
@@ -1018,6 +1026,16 @@
                 return true;
             }
             return false;
+        }
+        function getDataLabelWidth(min, max) {
+            var widths = [], paddingCoef = 1.3;
+            d3.select('svg').selectAll('.dummy')
+                .data([min, max])
+              .enter().append('text')
+                .text(function (d) { return d; })
+                .each(function (d, i) { var box = this.getBBox(); widths[i] = box.width * paddingCoef; })
+              .remove();
+            return widths;
         }
 
         function xx(d) {
