@@ -1710,7 +1710,7 @@
         var orgAreaOpacity, withoutFadeIn = {};
 
         function init(data) {
-            var eventRect, grid, xgridLines, ygridLines;
+            var eventRect, grid;
             var i;
 
             selectChart = d3.select(__bindto);
@@ -1827,21 +1827,7 @@
                 grid.append("g").attr("class", "xgrids");
             }
             if (__grid_x_lines) {
-                xgridLines = grid.append('g')
-                    .attr("class", "xgrid-lines")
-                  .selectAll('.xgrid-line')
-                    .data(__grid_x_lines)
-                  .enter().append('g')
-                    .attr("class", "xgrid-line");
-                xgridLines.append('line')
-                    .attr("class", function (d) { return "" + d['class']; });
-                xgridLines.append('text')
-                    .attr("class", function (d) { return "" + d['class']; })
-                    .attr("text-anchor", "end")
-                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .attr('dx', __axis_rotated ? 0 : -margin.top)
-                    .attr('dy', -5)
-                    .text(function (d) { return d.text; });
+                grid.append('g').attr("class", "xgrid-lines");
             }
             if (__point_focus_line_enabled) {
                 grid.append('g')
@@ -1859,21 +1845,7 @@
                 grid.append('g').attr('class', 'ygrids');
             }
             if (__grid_y_lines) {
-                ygridLines = grid.append('g')
-                    .attr('class', 'ygrid-lines')
-                  .selectAll('ygrid-line')
-                    .data(__grid_y_lines)
-                  .enter().append('g')
-                    .attr("class", "ygrid-line");
-                ygridLines.append('line')
-                    .attr("class", function (d) { return "" + d['class']; });
-                ygridLines.append('text')
-                    .attr("class", function (d) { return "" + d['class']; })
-                    .attr("text-anchor", "end")
-                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
-                    .attr('dx', __axis_rotated ? 0 : -margin.top)
-                    .attr('dy', -5)
-                    .text(function (d) { return d.text; });
+                grid.append('g').attr('class', 'ygrid-lines');
             }
 
             // Regions
@@ -2260,7 +2232,7 @@
         }
 
         function redraw(options) {
-            var xgrid, xgridData, xgridLines, ygrid, ygridLines;
+            var xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
@@ -2345,7 +2317,21 @@
                 xgrid.exit().remove();
             }
             if (__grid_x_lines) {
-                xgridLines = main.selectAll(".xgrid-lines");
+                xgridLines = main.select('.xgrid-lines').selectAll('.xgrid-line')
+                    .data(__grid_x_lines);
+                // enter
+                xgridLine = xgridLines.enter().append('g')
+                    .attr("class", "xgrid-line");
+                xgridLine.append('line')
+                    .attr("class", function (d) { return d.class ? d.class : ''; });
+                xgridLine.append('text')
+                    .attr("class", function (d) { return d.class ? d.class : ''; })
+                    .attr("text-anchor", "end")
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .attr('dx', __axis_rotated ? 0 : -margin.top)
+                    .attr('dy', -5)
+                    .text(function (d) { return d.text; });
+                // udpate
                 xgridLines.selectAll('line')
                   .transition().duration(duration)
                     .attr("x1", __axis_rotated ? 0 : xv)
@@ -2355,6 +2341,8 @@
                 xgridLines.selectAll('text')
                     .attr("x", __axis_rotated ? width : 0)
                     .attr("y", xv);
+                // exit
+                xgridLines.exit().remove();
             }
             // Y-Grid
             if (withY && __grid_y_show) {
@@ -2363,13 +2351,27 @@
                 ygrid.enter().append('line')
                     .attr('class', 'ygrid');
                 ygrid.attr("x1", __axis_rotated ? y : 0)
-                     .attr("x2", __axis_rotated ? y : width)
-                     .attr("y1", __axis_rotated ? 0 : y)
-                     .attr("y2", __axis_rotated ? height : y);
+                    .attr("x2", __axis_rotated ? y : width)
+                    .attr("y1", __axis_rotated ? 0 : y)
+                    .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
             }
             if (withY && __grid_y_lines) {
-                ygridLines = main.select('.ygrid-lines');
+                ygridLines = main.select('.ygrid-lines').selectAll('.ygrid-line')
+                    .data(__grid_y_lines);
+                // enter
+                ygridLine = ygridLines.enter().append('g')
+                    .attr("class", "ygrid-line");
+                ygridLine.append('line')
+                    .attr("class", function (d) { return d.class ? d.class : ''; });
+                ygridLine.append('text')
+                    .attr("class", function (d) { return d.class ? d.class : ''; })
+                    .attr("text-anchor", "end")
+                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
+                    .attr('dx', __axis_rotated ? 0 : -margin.top)
+                    .attr('dy', -5)
+                    .text(function (d) { return d.text; });
+                // update
                 ygridLines.selectAll('line')
                   .transition().duration(duration)
                     .attr("x1", __axis_rotated ? yv : 0)
@@ -2379,6 +2381,8 @@
                 ygridLines.selectAll('text')
                     .attr("x", __axis_rotated ? 0 : width)
                     .attr("y", yv);
+                // exit
+                ygridLines.exit().remove();
             }
 
             // bars
