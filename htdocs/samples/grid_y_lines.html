@@ -24,6 +24,27 @@
           }
         }
       });
+
+      setTimeout(function () {
+        chart.ygrids([{value: 130, text:'Lable 130'}, {value: 50, text: 'Lable 50'}]);
+      }, 1000);
+
+      setTimeout(function () {
+        chart.ygrids([{value: 130, text:'Lable 130', class: 'hoge'}]);
+      }, 2000);
+
+      setTimeout(function () {
+        chart.ygrids.add([{value: 230, text:'Lable 230'}]);
+      }, 3000);
+
+      setTimeout(function () {
+        chart.ygrids.remove({value: 230});
+      }, 4000);
+
+      setTimeout(function () {
+        chart.ygrids.remove({class: 'hoge'});
+      }, 5000);
+
     </script>
   </body>
 </html>
