@@ -722,7 +722,8 @@
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainRatio(isSub) {
-            return isSub ? 1 : diffDomain(orgXDomain) / diffDomain(x.domain());
+            var orgDiff = diffDomain(orgXDomain), currentDiff = diffDomain(x.domain());
+            return isSub || currentDiff === 0 ? 1 : orgDiff / currentDiff;
         }
         function getXDomainMin(targets) {
             return d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
@@ -731,11 +732,12 @@
             return d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
         }
         function getXDomainPadding(targets, domain) {
-            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), padding;
+            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), maxDataCount, padding;
             if (isCategorized) {
                 padding = 0;
             } else if (hasBarType(targets)) {
-                padding = (diff / (getMaxDataCount() - 1)) / 2;
+                maxDataCount = getMaxDataCount();
+                padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
             } else {
                 padding = diff * 0.01;
             }
