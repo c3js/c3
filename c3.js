@@ -1578,13 +1578,16 @@
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
                 var y0 = yScale(d.id)(0),
-                    offset = barOffset(d, i) || y0; // offset is for stacked bar chart
+                    offset = barOffset(d, i) || y0, // offset is for stacked bar chart
+                    posX = x(d), posY = y(d);
+                // fix posY not to overflow opposite quadrant
+                if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
                 // 4 points that make a bar
                 return [
-                    [x(d), offset],
-                    [x(d), y(d) - (y0 - offset)],
-                    [x(d) + barW, y(d) - (y0 - offset)],
-                    [x(d) + barW, offset]
+                    [posX, offset],
+                    [posX, posY - (y0 - offset)],
+                    [posX + barW, posY - (y0 - offset)],
+                    [posX + barW, offset]
                 ];
             };
         }
