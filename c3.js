@@ -167,7 +167,7 @@
         /*-- Set Variables --*/
 
         var clipId = __bindto.replace('#', '') + '-clip',
-            clipPath = "url(" + document.URL + "#" + clipId + ")";
+            clipPath = getClipPath(clipId);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
@@ -220,6 +220,10 @@
         var isLegendRight = __legend_position === 'right';
 
         /*-- Define Functions --*/
+
+        function getClipPath(id) {
+            return "url(" + document.URL.split('#')[0] + "#" + id;
+        }
 
         function transformMain() {
             main.attr("transform", translate.main);
@@ -1805,7 +1809,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", "x axis")
-                .attr("clip-path", __axis_rotated ? "" : "url(" + document.URL + "#xaxis-clip)")
+                .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"))
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", "-axis-x-label")
@@ -1814,7 +1818,7 @@
                 .text(__axis_rotated ? textForYAxisLabel : textForXAxisLabel);
             main.append("g")
                 .attr("class", "y axis")
-                .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "")
+                .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
               .append("text")
                 .attr("class", "-axis-y-label")
                 .attr("transform", "rotate(-90)")
@@ -1940,7 +1944,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "url(" + document.URL + "#yaxis-clip)" : "");
+                    .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "");
             }
 
             /*-- Legend Region --*/
