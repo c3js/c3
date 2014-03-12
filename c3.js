@@ -689,11 +689,15 @@
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
                 yDomainMin = isValue(yMin) ? yMin : getYDomainMin(yTargets),
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
-                domainLength = Math.abs(yDomainMax - yDomainMin),
-                padding = domainLength * 0.1, // TODO: should be an option
-                padding_top = padding, padding_bottom = padding,
+                domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
-                yDomainAbs, widths, diff, ratio;
+                yDomainAbs, widths, diff, ratio,
+                showDataLable = hasDataLabel() && __axis_rotated;
+            if (yDomainMin === yDomainMax) {
+                yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
+            }
+            domainLength = Math.abs(yDomainMax - yDomainMin);
+            padding = padding_top = padding_bottom = showDataLable ? 0 : domainLength * 0.1;
             if (center) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
@@ -708,7 +712,7 @@
                 padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
             }
             // add padding for data label
-            if (hasDataLabel() && __axis_rotated) {
+            if (showDataLable) {
                 widths = getDataLabelWidth(yDomainMin, yDomainMax);
                 diff = diffDomain(y.range());
                 ratio = [widths[0] / diff, widths[1] / diff];
