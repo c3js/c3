@@ -1581,7 +1581,9 @@
                     offset = barOffset(d, i) || y0, // offset is for stacked bar chart
                     posX = x(d), posY = y(d);
                 // fix posY not to overflow opposite quadrant
-                if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                if (__axis_rotated) {
+                    if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                }
                 // 4 points that make a bar
                 return [
                     [posX, offset],
