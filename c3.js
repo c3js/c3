@@ -131,7 +131,8 @@
             __point_onunselected = getConfig(['point', 'onunselected'], function () {});
 
         // arc
-        var __arc_label_format = getConfig(['arc', 'label', 'format'], null),
+        var __arc_label_show = getConfig(['arc', 'label', 'show'], true),
+            __arc_label_format = getConfig(['arc', 'label', 'format'], null),
             __arc_title = getConfig(['arc', 'title'], "");
 
         // region - region to change style
@@ -609,7 +610,9 @@
             return (d.endAngle - d.startAngle) / (Math.PI * 2);
         }
         function textForArcLable(d) {
-            var ratio = getArcRatio(d);
+            var ratio;
+            if (! __arc_label_show) { return ""; }
+            ratio = getArcRatio(d);
             return __arc_label_format ? __arc_label_format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
         }
         function expandArc(id, withoutFadeOut) {
