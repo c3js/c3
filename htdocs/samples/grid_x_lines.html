@@ -1,12 +1,12 @@
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+    <link rel="stylesheet" type="text/css" href="../css/c3.css">
   </head>
   <body>
     <div id="chart"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="/js/c3.js"></script>
+    <script src="../js/c3.js"></script>
     <script>
       var chart = c3.generate({
         bindto: '#chart',
@@ -24,6 +24,26 @@
           }
         }
       });
+
+      setTimeout(function () {
+        chart.xgrids([{value: 1, text:'Lable 1'}, {value: 4, text: 'Lable 4'}]);
+      }, 1000);
+
+      setTimeout(function () {
+        chart.xgrids([{value: 2, text:'Lable 2'}]);
+      }, 2000);
+
+      setTimeout(function () {
+        chart.xgrids.add([{value: 3, text:'Lable 3', class:'hoge'}]);
+      }, 3000);
+
+      setTimeout(function () {
+        chart.xgrids.remove({value:2});
+      }, 4000);
+
+      setTimeout(function () {
+        chart.xgrids.remove({class:'hoge'});
+      }, 5000);
     </script>
   </body>
 </html>
