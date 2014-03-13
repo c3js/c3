@@ -492,7 +492,7 @@
             return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
         }
 
-        function getAxisLableText(option) {
+        function getAxisLabelText(option) {
             return typeof option === 'string' ? option : option ? option.text : null;
         }
         function getAxisLabelPosition(option, defaultPosition) {
@@ -515,10 +515,10 @@
             return getAxisLabelPosition(__axis_y_label, 'inner-top');
         }
         function textForXAxisLabel() {
-            return getAxisLableText(__axis_x_label);
+            return getAxisLabelText(__axis_x_label);
         }
         function textForYAxisLabel() {
-            return getAxisLableText(__axis_y_label);
+            return getAxisLabelText(__axis_y_label);
         }
         function xForXAxisLabel() {
             var position = getXAxisLabelPosition();
@@ -597,7 +597,7 @@
         function getArc(d, withoutUpdate) {
             return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
         }
-        function transformForArcLable(d) {
+        function transformForArcLabel(d) {
             var updated = updateAngle(d), c, x, y, h, translate = "";
             if (updated) {
                 c = svgArc.centroid(updated);
@@ -609,7 +609,7 @@
         function getArcRatio(d) {
             return (d.endAngle - d.startAngle) / (Math.PI * 2);
         }
-        function textForArcLable(d) {
+        function textForArcLabel(d) {
             var ratio;
             if (! __arc_label_show) { return ""; }
             ratio = getArcRatio(d);
@@ -700,12 +700,12 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, widths, diff, ratio,
-                showDataLable = hasDataLabel() && __axis_rotated;
+                showDataLabel = hasDataLabel() && __axis_rotated;
             if (yDomainMin === yDomainMax) {
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
             domainLength = Math.abs(yDomainMax - yDomainMin);
-            padding = padding_top = padding_bottom = showDataLable ? 0 : domainLength * 0.1;
+            padding = padding_top = padding_bottom = showDataLabel ? 0 : domainLength * 0.1;
             if (center) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
@@ -720,7 +720,7 @@
                 padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
             }
             // add padding for data label
-            if (showDataLable) {
+            if (showDataLabel) {
                 widths = getDataLabelWidth(yDomainMin, yDomainMax);
                 diff = diffDomain(y.range());
                 ratio = [widths[0] / diff, widths[1] / diff];
@@ -2511,10 +2511,10 @@
                 .attr("transform", withTransform ? "scale(1)" : "")
                 .style("opacity", 1);
             main.selectAll('.chart-arc').select('text')
-                .attr("transform", transformForArcLable)
+                .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
               .transition().duration(duration)
-                .text(textForArcLable)
+                .text(textForArcLabel)
                 .style("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
             main.select('.chart-arcs-title')
                 .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
