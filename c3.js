@@ -65,7 +65,9 @@
             __data_colors = getConfig(['data', 'colors'], {}),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
-            __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; });
+            __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
+            __data_selection_multiselected = getConfig(['data', 'selection', 'multiselected'], true);
+
 
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
@@ -2177,6 +2179,11 @@
             }
             if (__data_selection_grouped || isWithin) {
                 if (__data_selection_enabled && __data_selection_isselectable(d)) {
+                    if (!__data_selection_multiselected) {
+                        main.selectAll(target.nodeName).each(function (d, i) {
+                            toggle(false, this, d, i);
+                        });
+                    }
                     _this.classed(SELECTED, !isSelected);
                     toggle(!isSelected, _this, d, i);
                 }
