@@ -131,7 +131,7 @@
             __point_onunselected = getConfig(['point', 'onunselected'], function () {});
 
         // arc
-        var __arc_label_fomat = getConfig(['arc', 'label', 'format'], function (d, ratio) { return (100 * ratio).toFixed(1) + "%"; }),
+        var __arc_label_format = getConfig(['arc', 'label', 'format'], null),
             __arc_title = getConfig(['arc', 'title'], "");
 
         // region - region to change style
@@ -150,11 +150,11 @@
 
                 if (! text) {
                     title = titleFormat ? titleFormat(d[i].x) : d[i].x;
-                    text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>";
+                    text = "<table class='-tooltip'>" + (title  ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
                 }
 
                 name = d[i].name;
-                value = valueFormat(d[i].value);
+                value = valueFormat(d[i].value, d[i].ratio);
 
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
@@ -609,7 +609,8 @@
             return (d.endAngle - d.startAngle) / (Math.PI * 2);
         }
         function textForArcLable(d) {
-            return __arc_label_fomat(d, getArcRatio(d));
+            var ratio = getArcRatio(d);
+            return __arc_label_format ? __arc_label_format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
         }
         function expandArc(id, withoutFadeOut) {
             var target = svg.selectAll('.chart-arc' + getTargetSelector(id)),
@@ -1066,6 +1067,9 @@
             var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
             return yFormat(v);
         }
+        function defaultArcValueFormat(v, ratio) {
+            return (ratio * 100).toFixed(1) + '%';
+        }
 
         function findSameXOfValues(values, index) {
             var i, targetX = values[index].x, sames = [];
@@ -1158,36 +1162,43 @@
         function showTooltip(selectedData, mouse) {
             var tWidth, tHeight;
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
+            var forArc = hasArcType(c3.data.targets);
+            var valueFormat = forArc ? defaultArcValueFormat : defaultValueFormat;
             var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
             if (! __tooltip_show) { return; }
             // don't show tooltip when no data
             if (dataToShow.length === 0) { return; }
             // Construct tooltip
-            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), defaultValueFormat, color))
+            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color))
                 .style("visibility", "hidden")
                 .style("display", "block");
             // Get tooltip dimensions
             tWidth = tooltip.property('offsetWidth');
             tHeight = tooltip.property('offsetHeight');
             // Determin tooltip position
-            if (__axis_rotated) {
-                svgLeft = getSvgLeft();
-                tooltipLeft = svgLeft + mouse[0] + 100;
-                tooltipRight = tooltipLeft + tWidth;
-                chartRight = getCurrentWidth() - getCurrentPaddingRight();
-                tooltipTop = x(dataToShow[0].x) + 20;
+            if (forArc) {
+                tooltipLeft = (width / 2) + mouse[0];
+                tooltipTop = (height / 2) + mouse[1] + 20;
             } else {
-                svgLeft = getSvgLeft();
-                tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(dataToShow[0].x) + 20;
-                tooltipRight = tooltipLeft + tWidth;
-                chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
-                tooltipTop = mouse[1] + 15;
-            }
-            if (tooltipRight > chartRight) {
-                tooltipLeft -= tWidth + 60;
-            }
-            if (tooltipTop + tHeight > getCurrentHeight()) {
-                tooltipTop -= tHeight + 30;
+                if (__axis_rotated) {
+                    svgLeft = getSvgLeft();
+                    tooltipLeft = svgLeft + mouse[0] + 100;
+                    tooltipRight = tooltipLeft + tWidth;
+                    chartRight = getCurrentWidth() - getCurrentPaddingRight();
+                    tooltipTop = x(dataToShow[0].x) + 20;
+                } else {
+                    svgLeft = getSvgLeft();
+                    tooltipLeft = svgLeft + getCurrentPaddingLeft() + x(dataToShow[0].x) + 20;
+                    tooltipRight = tooltipLeft + tWidth;
+                    chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
+                    tooltipTop = mouse[1] + 15;
+                }
+                if (tooltipRight > chartRight) {
+                    tooltipLeft -= tWidth + 60;
+                }
+                if (tooltipTop + tHeight > getCurrentHeight()) {
+                    tooltipTop -= tHeight + 30;
+                }
             }
             // Set tooltip
             // todo get rid of magic numbers
@@ -2778,9 +2789,18 @@
                     expandArc(d.data.id);
                     focusLegend(d.data.id);
                 })
+                .on('mousemove', function (d) {
+                    var selectedData = [addName({
+                        id: d.data.id,
+                        value: d.value,
+                        ratio: getArcRatio(d)
+                    })];
+                    showTooltip(selectedData, d3.mouse(this));
+                })
                 .on('mouseout', function (d) {
                     unexpandArc(d.data.id);
                     revertLegend();
+                    hideTooltip();
                 });
             mainPieEnter.append("text")
                 .attr("dy", ".35em")
