@@ -477,12 +477,24 @@
             return id in __data_axes ? __data_axes[id] : 'y';
         }
         function getXAxisTickFormat() {
+            var monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
             var format = isTimeSeries ? defaultTimeFormat : isCategorized ? category : null;
             if (__axis_x_tick_format) {
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
+                    if (__axis_x_tick_format === 'dateMonthYear'){
+                        format = function (date) {
+                            if (date !== undefined){
+                                var shortYear = date.getFullYear().toString().substring(2,4);
+                                return ''+ date.getDate()+' '+ monthNames[date.getMonth()] +' '+ shortYear;
+                            }
+                        }
+                    } else {
                     format = function (date) { return d3.time.format(__axis_x_tick_format)(date); };
+                  }
+
                 }
             }
             return format;
