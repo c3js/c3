@@ -225,7 +225,7 @@
         /*-- Define Functions --*/
 
         function getClipPath(id) {
-            return "url(" + document.URL.split('#')[0] + "#" + id;
+            return "url(" + document.URL.split('#')[0] + "#" + id + ")";
         }
 
         function transformMain() {
