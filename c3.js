@@ -66,7 +66,7 @@
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
-            __data_selection_multiselected = getConfig(['data', 'selection', 'multiselected'], true);
+            __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true);
 
 
         // subchart
@@ -1461,7 +1461,7 @@
                 .remove();
         }
         function togglePoint(selected, target, d, i) {
-            (selected) ? selectPoint(target, d, i) : unselectPoint(target, d, i);
+            selected ? selectPoint(target, d, i) : unselectPoint(target, d, i);
         }
 
         function selectBar() {
@@ -1469,7 +1469,7 @@
         function unselectBar() {
         }
         function toggleBar(selected, target, d, i) {
-            (selected) ? selectBar(target, d, i) : unselectBar(target, d, i);
+            selected ? selectBar(target, d, i) : unselectBar(target, d, i);
         }
 
         function filterRemoveNull(data) {
@@ -2179,13 +2179,12 @@
             }
             if (__data_selection_grouped || isWithin) {
                 if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                    if (!__data_selection_multiselected) {
-                        main.selectAll(target.nodeName).each(function (d, i) {
-                            toggle(false, this, d, i);
-                        });
+                    if (__data_selection_multiple) {
+                        _this.classed(SELECTED, !isSelected);
+                        toggle(!isSelected, _this, d, i);
+                    } else {
+                        c3.select([d.id], [i], true);
                     }
-                    _this.classed(SELECTED, !isSelected);
-                    toggle(!isSelected, _this, d, i);
                 }
                 __point_onclick(d, _this); // TODO: should be __data_onclick
             }
@@ -3182,9 +3181,11 @@
             if (! __data_selection_enabled) { return; }
             main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
                 var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
-                    unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
-                if (indices.indexOf(i) >= 0) {
-                    if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
+                    unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                    isTargetIndex = !indices || indices.indexOf(i) >= 0;
+                if (isTargetId && isTargetIndex) {
+                    if (__data_selection_isselectable(d)) {
                         selectShape(d3.select(this).classed(SELECTED, true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
@@ -3196,9 +3197,11 @@
         c3.unselect = function (ids, indices) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
-                var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar;
-                if (isUndefined(indices) || indices.indexOf(i) >= 0) {
-                    if (__data_selection_isselectable(d) && (__data_selection_grouped || isUndefined(ids) || ids.indexOf(d.id) >= 0)) {
+                var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                    isTargetIndex = !indices || indices.indexOf(i) >= 0;
+                if (isTargetId && isTargetIndex) {
+                    if (__data_selection_isselectable(d)) {
                         unselectShape(d3.select(this).classed(SELECTED, false), d, i);
                     }
                 }
