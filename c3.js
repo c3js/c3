@@ -68,7 +68,6 @@
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
             __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true);
 
-
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
@@ -221,6 +220,7 @@
         };
 
         var isLegendRight = __legend_position === 'right';
+        var legendStep = 0, legendItemWidth = 0, legendItemHeight = 0;
 
         /*-- Define Functions --*/
 
@@ -365,12 +365,20 @@
                 maxDataCount = getMaxDataCount();
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
+        function updateLegndStep(step) {
+            legendStep = step;
+        }
+        function updateLegendItemWidth(w) {
+            legendItemWidth = w;
+        }
+        function updateLegendItemHeight(h) {
+            legendItemHeight = h;
+        }
         function getLegendWidth() {
-            // TODO: legend width should be an option
-            return __legend_show ? isLegendRight ? 150 : currentWidth : 0;
+            return __legend_show ? isLegendRight ? legendItemWidth * (legendStep + 1) : currentWidth : 0;
         }
         function getLegendHeight() {
-            return __legend_show ? isLegendRight ? currentHeight : 40 : 0;
+            return __legend_show ? isLegendRight ? currentHeight : legendItemHeight * (legendStep + 1) : 0;
         }
         function getLegendPaddingTop() {
             var xAxisLabelPositon = getXAxisLabelPosition();
@@ -1963,17 +1971,11 @@
                     .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "");
             }
 
-            /*-- Legend Region --*/
-
-            if (__legend_show) {
-                updateLegend(c3.data.targets);
-            }
-
             // Set targets
             updateTargets(c3.data.targets);
 
             // Draw with targets
-            redraw({withTransform: true, withUpdateXDomain: true});
+            redraw({withTransform: true, withUpdateXDomain: true, withLegend: true});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -1997,7 +1999,9 @@
                 window.onresize = generateResize();
             }
             if (window.onresize.add) {
-                window.onresize.add(updateAndRedraw);
+                window.onresize.add(function () {
+                    updateAndRedraw({withTransition: false, withLegend: true});
+                });
             }
         }
 
@@ -2271,7 +2275,7 @@
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain;
+            var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit;
@@ -2283,9 +2287,16 @@
             withTransform = isDefined(options.withTransform) ? options.withTransform : false;
             withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
+            withLegend = isDefined(options.withLegend) ? options.withLegend : false;
 
             duration = withTransition ? __transition_duration : 0;
             durationForExit = isDefined(options.durationForExit) ? options.durationForExit : duration;
+
+            // update legend
+            if (withLegend && __legend_show) {
+                updateLegend(c3.data.targets, options);
+                return; // call in updateLegend again with same options
+            }
 
             if (withUpdateOrgXDomain) {
                 x.domain(d3.extent(getXDomain(c3.data.targets)));
@@ -2640,11 +2651,6 @@
                 .style("fill-opacity", 0)
                 .remove();
 
-            // update legend
-            if (__legend_show) {
-                updateLegend(c3.data.targets, {withTransition: withTransition});
-            }
-
             // update fadein condition
             getTargetIds().forEach(function (id) {
                 withoutFadeIn[id] = true;
@@ -2690,10 +2696,11 @@
             return callResizeFunctions;
         }
         function updateAndRedraw(options) {
-            var withTransition, withTransform;
+            var withTransition, withTransform, withLegend;
             options = isDefined(options) ? options : {};
-            withTransition = isDefined(options.withTransition) ? options.withTransition : false;
+            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withTransform = isDefined(options.withTransform) ? options.withTransform : false;
+            withLegend = isDefined(options.withLegend) ? options.withLegend : false;
             // Update sizes and scales
             updateSizes();
             updateScales();
@@ -2713,7 +2720,8 @@
                 withTransition: withTransition,
                 withUpdateXDomain: true,
                 withTransform: withTransform,
-                durationForExit: 0
+                durationForExit: 0,
+                withLegend: withLegend
             });
         }
 
@@ -2846,12 +2854,6 @@
                     .style("stroke", function (d) { return color(d.id); });
             }
 
-            /*-- Legend --*/
-
-            if (__legend_show) {
-                updateLegend(targets);
-            }
-
             /*-- Show --*/
 
             // Fade-in each chart
@@ -2877,7 +2879,7 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 
             done();
         }
@@ -2907,58 +2909,74 @@
         function updateLegend(targets, options) {
             var ids = getTargetIds(targets), l;
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
-            var paddingTop = 4, paddingRight = 30, margin;
-            var totalLength = 0, offsets = {}, widths = {}, heights = {};
+            var paddingTop = 4, paddingRight = 26, maxWidth, maxHeight, posMin = 10;
+            var totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = {}, steps = {}, step = 0;
             var withTransition;
 
             options = isUndefined(options) ? {} : options;
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
 
-            function getXOffset(id, i) {
-                return __legend_equally ? widths[id] * i : offsets[id];
-            }
-            function getYOffset(id, i) {
-                return __legend_equally ? heights[id] * i : offsets[id];
-            }
-            function updatePositions(textElement, id) {
+            function updatePositions(textElement, id, reset) {
                 var box = textElement.getBBox(),
-                    width = Math.ceil((box.width + paddingRight) / 10) * 10,
-                    height = Math.ceil((box.height + paddingTop) / 10) * 10,
-                    length = isLegendRight ? height : width,
+                    itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
+                    itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
+                    itemLength = isLegendRight ? itemHeight : itemWidth,
                     areaLength = isLegendRight ? legendHeight : legendWidth,
-                    maxWidth, maxHeight;
+                    margin, maxLength;
 
-                widths[id] = width;
-                heights[id] = height;
+                // MEMO: care about condifion of step, totalLength
+                function updateValues(id, withoutStep) {
+                    if (!withoutStep) {
+                        margin = (areaLength - totalLength - itemLength) / 2;
+                        if (margin < posMin) {
+                            margin = (areaLength - itemLength) / 2;
+                            totalLength = 0;
+                            step++;
+                        }
+                    }
+                    steps[id] = step;
+                    margins[step] = margin;
+                    offsets[id] = totalLength;
+                    totalLength += itemLength;
+                }
+
+                if (reset) {
+                    totalLength = 0;
+                    step = 0;
+                    maxWidth = 0;
+                    maxHeight = 0;
+                }
+
+                widths[id] = itemWidth;
+                heights[id] = itemHeight;
+
+                if (!maxWidth || itemWidth >= maxWidth) { maxWidth = itemWidth; }
+                if (!maxHeight || itemHeight >= maxHeight) { maxHeight = itemHeight; }
+                maxLength = isLegendRight ? maxHeight : maxWidth;
 
                 if (__legend_equally) {
-                    maxWidth = d3.max(Object.keys(widths).map(function (key) { return widths[key]; }));
-                    maxHeight = d3.max(Object.keys(heights).map(function (key) { return heights[key]; }));
-                    if (width >= maxWidth) {
-                        Object.keys(widths).forEach(function (key) { widths[key] = width; });
-                        if (! isLegendRight) {
-                            margin = (legendWidth - width * Object.keys(targets).length) / 2;
-                        }
+                    Object.keys(widths).forEach(function (id) { widths[id] = maxWidth; });
+                    Object.keys(heights).forEach(function (id) { heights[id] = maxHeight; });
+                    margin = (areaLength - maxLength * ids.length) / 2;
+                    if (margin < posMin) {
+                        totalLength = 0;
+                        step = 0;
+                        ids.forEach(function (id) { updateValues(id); });
                     }
-                    if (height >= maxHeight) {
-                        Object.keys(heights).forEach(function (key) { heights[key] = height; });
-                        if (isLegendRight) {
-                            margin = (legendHeight - height * Object.keys(targets).length) / 2;
-                        }
+                    else {
+                        updateValues(id, true);
                     }
                 } else {
-                    offsets[id] = totalLength;
-                    totalLength += length;
-                    margin = (areaLength - totalLength) / 2;
+                    updateValues(id);
                 }
             }
 
             if (isLegendRight) {
-                xForLegend = function () { return legendWidth * 0.2; };
-                yForLegend = function (id, i) { return margin + getYOffset(id, i); };
+                xForLegend = function (id) { return maxWidth * (0.2 + steps[id]); };
+                yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
             } else {
-                xForLegend = function (id, i) { return margin + getXOffset(id, i); };
-                yForLegend = function () { return legendHeight * 0.2; };
+                xForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
+                yForLegend = function (id) { return maxHeight * (0.2 + steps[id]); };
             }
             xForLegendText = function (id, i) { return xForLegend(id, i) + 14; };
             yForLegendText = function (id, i) { return yForLegend(id, i) + 9; };
@@ -2984,10 +3002,10 @@
                 });
             l.append('text')
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
-                .each(function (id) { updatePositions(this, id); })
+                .each(function (id, i) { updatePositions(this, id, i === 0); })
                 .style("pointer-events", "none")
                 .attr('x', isLegendRight ? xForLegendText : -200)
-                .attr('y', isLegendRight ? -200 : yForLegend);
+                .attr('y', isLegendRight ? -200 : yForLegendText);
             l.append('rect')
                 .attr("class", "legend-item-event")
                 .style('fill-opacity', 0)
@@ -3000,13 +3018,13 @@
                 .style("pointer-events", "none")
                 .style('fill', function (id) { return color(id); })
                 .attr('x', isLegendRight ? xForLegendText : -200)
-                .attr('y', isLegendRight ? -200 : yForLegendText)
+                .attr('y', isLegendRight ? -200 : yForLegend)
                 .attr('width', 10)
                 .attr('height', 10);
 
             legend.selectAll('text')
                 .data(ids)
-                .each(function (id) { updatePositions(this, id); })
+                .each(function (id, i) { updatePositions(this, id, i === 0); })
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
@@ -3023,6 +3041,15 @@
                 .attr('x', xForLegend)
                 .attr('y', yForLegend);
 
+            // Update all to reflect change of legend
+            updateLegendItemWidth(maxWidth);
+            updateLegendItemHeight(maxHeight);
+            updateLegndStep(step);
+            updateSizes();
+            updateScales();
+            transformAll(false);
+            options.withLegend = false;
+            redraw(options);
         }
 
         /*-- Event Handling --*/
@@ -3160,11 +3187,10 @@
 
             if (__legend_show) {
                 svg.selectAll('.legend-item' + getTargetSelectorSuffix(targetId)).remove();
-                updateLegend(c3.data.targets);
             }
 
             if (c3.data.targets.length > 0) {
-                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
             }
         };
 
@@ -3210,42 +3236,42 @@
 
         c3.toLine = function (targets) {
             setTargetType(targets, 'line');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toSpline = function (targets) {
             setTargetType(targets, 'spline');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toBar = function (targets) {
             setTargetType(targets, 'bar');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toScatter = function (targets) {
             setTargetType(targets, 'scatter');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toArea = function (targets) {
             setTargetType(targets, 'area');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toAreaSpline = function (targets) {
             setTargetType(targets, 'area-spline');
-            updateAndRedraw({withTransition: true});
+            updateAndRedraw();
         };
 
         c3.toPie = function (targets) {
             setTargetType(targets, 'pie');
-            updateAndRedraw({withTransition: true, withTransform: true});
+            updateAndRedraw({withTransform: true});
         };
 
         c3.toDonut = function (targets) {
             setTargetType(targets, 'donut');
-            updateAndRedraw({withTransition: true, withTransform: true});
+            updateAndRedraw({withTransform: true});
         };
 
         c3.groups = function (groups) {
@@ -3325,7 +3351,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            updateAndRedraw();
+            updateAndRedraw({withLegend: true, withTransition: false});
         };
 
         c3.destroy = function () {
