@@ -388,7 +388,7 @@
         //-- Scales --//
 
         function updateScales() {
-            var xAxisTickFormat, xAxisTicks;
+            var xAxisTickFormat, xAxisTicks, forInit = !x;
             // update edges
             xMin = __axis_rotated ? 1 : 0;
             xMax = __axis_rotated ? height : width;
@@ -399,7 +399,7 @@
             subYMin = __axis_rotated ? 0 : height2;
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
-            x = getX(xMin, xMax, x ? x.domain() : undefined, function () { return xAxis.tickOffset(); });
+            x = getX(xMin, xMax, forInit ? undefined : x.domain(), function () { return xAxis.tickOffset(); });
             y = getY(yMin, yMax);
             y2 = getY(yMin, yMax);
             subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
@@ -412,6 +412,11 @@
             subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTicks);
             yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
             yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+            // Set initialized scales to brush and zoom
+            if (!forInit) {
+                brush.scale(subX);
+                if (__zoom_enabled) { zoom.scale(x); }
+            }
             // update for arc
             updateArc();
         }
@@ -2292,10 +2297,9 @@
             duration = withTransition ? __transition_duration : 0;
             durationForExit = isDefined(options.durationForExit) ? options.durationForExit : duration;
 
-            // update legend
+            // update legend and transform each g
             if (withLegend && __legend_show) {
                 updateLegend(c3.data.targets, options);
-                return; // updateAndRedraw() will be called again in updateLegend()
             }
 
             if (withUpdateOrgXDomain) {
@@ -2695,6 +2699,14 @@
             };
             return callResizeFunctions;
         }
+
+        function updateSvgSize() {
+            svg.attr('width', currentWidth).attr('height', currentHeight);
+            svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
+            svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
+            svg.select('.zoom-rect').attr('width', width).attr('height', height);
+        }
+
         function updateAndRedraw(options) {
             var withTransition, withTransform, withLegend;
             options = isDefined(options) ? options : {};
@@ -2704,15 +2716,7 @@
             // Update sizes and scales
             updateSizes();
             updateScales();
-            // Set x for brush again because of scale update
-            brush.scale(subX);
-            // Set x for zoom again because of scale update
-            if (__zoom_enabled) { zoom.scale(x); }
-            // Update sizes
-            svg.attr('width', currentWidth).attr('height', currentHeight);
-            svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
-            svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
-            svg.select('.zoom-rect').attr('width', width).attr('height', height);
+            updateSvgSize();
             // Update g positions
             transformAll(withTransition);
             // Draw with new sizes & scales
@@ -3045,8 +3049,12 @@
             updateLegendItemWidth(maxWidth);
             updateLegendItemHeight(maxHeight);
             updateLegndStep(step);
-            options.withLegend = false;
-            updateAndRedraw(options);
+            // Update size and scale
+            updateSizes();
+            updateScales();
+            updateSvgSize();
+            // Update g positions
+            transformAll(false);
         }
 
         /*-- Event Handling --*/
