@@ -2295,7 +2295,7 @@
             // update legend
             if (withLegend && __legend_show) {
                 updateLegend(c3.data.targets, options);
-                return; // call in updateLegend again with same options
+                return; // updateAndRedraw() will be called again in updateLegend()
             }
 
             if (withUpdateOrgXDomain) {
@@ -3045,11 +3045,8 @@
             updateLegendItemWidth(maxWidth);
             updateLegendItemHeight(maxHeight);
             updateLegndStep(step);
-            updateSizes();
-            updateScales();
-            transformAll(false);
             options.withLegend = false;
-            redraw(options);
+            updateAndRedraw(options);
         }
 
         /*-- Event Handling --*/
