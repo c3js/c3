@@ -2891,21 +2891,21 @@
         /*-- Draw Legend --*/
 
         function focusLegend(id) {
-            var legendItem = svg.selectAll('.legend-item'),
+            var legendItem = legend.selectAll('.legend-item'),
                 isTarget = function (d) { return !id || d === id; },
                 notTarget = function (d) { return !isTarget(d); };
             legendItem.filter(notTarget).transition().duration(100).style('opacity', 0.3);
             legendItem.filter(isTarget).transition().duration(100).style('opacity', 1);
         }
         function defocusLegend(id) {
-            var legendItem = svg.selectAll('.legend-item'),
+            var legendItem = legend.selectAll('.legend-item'),
                 isTarget = function (d) { return !id || d === id; },
                 notTarget = function (d) { return !isTarget(d); };
             legendItem.filter(notTarget).transition().duration(100).style('opacity', 1);
             legendItem.filter(isTarget).transition().duration(100).style('opacity', 0.3);
         }
         function revertLegend() {
-            svg.selectAll('.legend-item')
+            legend.selectAll('.legend-item')
               .transition().duration(100)
                 .style('opacity', 1);
         }
@@ -2997,11 +2997,9 @@
                     __legend_item_onclick(id);
                 })
                 .on('mouseover', function (id) {
-                    focusLegend(id);
                     c3.focus(id);
                 })
                 .on('mouseout', function () {
-                    revertLegend();
                     c3.revert();
                 });
             l.append('text')
@@ -3191,7 +3189,7 @@
                 .remove();
 
             if (__legend_show) {
-                svg.selectAll('.legend-item' + getTargetSelectorSuffix(targetId)).remove();
+                legend.selectAll('.legend-item' + getTargetSelectorSuffix(targetId)).remove();
             }
 
             if (c3.data.targets.length > 0) {
