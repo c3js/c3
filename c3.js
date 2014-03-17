@@ -267,7 +267,7 @@
             margin = {
                 top: __axis_rotated && __axis_y2_show ? 20 : 0,
                 right: getCurrentPaddingRight(),
-                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? getLegendPaddingTop() : legendHeight),
+                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + getLegendPaddingTop() + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
@@ -285,7 +285,7 @@
 
             // for legend
             margin3 = {
-                top: isLegendRight ? margin.top : currentHeight + getLegendPaddingTop() - legendHeight,
+                top: isLegendRight ? margin.top : currentHeight - legendHeight,
                 right: NaN,
                 bottom: 0,
                 left: isLegendRight ? currentWidth - legendWidth : 0
