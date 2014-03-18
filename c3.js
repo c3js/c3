@@ -268,7 +268,7 @@
             margin = {
                 top: __axis_rotated && __axis_y2_show ? getAxisHeightByAxisId('y2') : 0,
                 right: getCurrentPaddingRight(),
-                bottom: getAxisHeightByAxisId(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + getLegendPaddingTop() + (isLegendRight ? 0 : legendHeight),
+                bottom: getAxisHeightByAxisId(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
@@ -343,10 +343,8 @@
             return position.isInner ? 20 + getMaxTickWidth(id) : 40 + getMaxTickWidth(id);
         }
         function getAxisHeightByAxisId(id) {
-            var position;
-            if (! getAxisLabel(id)) { return 20; }
-            position = getAxisLabelPositionById(id);
-            return (position.isInner ? 0 : 20) + (id === 'y2' ? 20 : 0);
+            var position = getAxisLabelPositionById(id);
+            return (position.isInner ? 30 : 40) + (id === 'y2' ? -10 : 0);
         }
         function getParentWidth() {
             return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
@@ -410,10 +408,6 @@
         }
         function getLegendHeight() {
             return __legend_show ? isLegendRight ? currentHeight : legendItemHeight * (legendStep + 1) : 0;
-        }
-        function getLegendPaddingTop() {
-            var xAxisLabelPositon = getXAxisLabelPosition();
-            return xAxisLabelPositon.isInner ? 5 : 20;
         }
 
         //-- Scales --//
@@ -541,9 +535,6 @@
         function getAxisLabelText(option) {
             return typeof option === 'string' ? option : option ? option.text : null;
         }
-        function getAxisLabel(id) {
-            return id === 'x' ? __axis_x_label : id === 'y' ? __axis_y_label : __axis_y2_label;
-        }
         function getAxisLabelPosition(option, defaultPosition) {
             var position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
             return {
@@ -633,7 +624,7 @@
         function dyForY2AxisLabel() {
             var position = getY2AxisLabelPosition();
             if (__axis_rotated) {
-                return position.isInner ? "1.2em" : "-2.5em";
+                return position.isInner ? "1.2em" : "-2.2em";
             } else {
                 return position.isInner ? "-0.5em" : 30 + getMaxTickWidth('y2');
             }
