@@ -103,8 +103,7 @@
             __axis_y2_max = getConfig(['axis', 'y2', 'max'], null),
             __axis_y2_min = getConfig(['axis', 'y2', 'min'], null),
             __axis_y2_center = getConfig(['axis', 'y2', 'center'], null),
-            // not used
-            // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
+            __axis_y2_label = getConfig(['axis', 'y2', 'label'], null),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], null),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
@@ -213,8 +212,9 @@
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
+            x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
+            y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
-            x : function () { return "translate(0," + height + ")"; },
             subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
@@ -231,6 +231,7 @@
         function transformMain() {
             main.attr("transform", translate.main);
             main.select('.x.axis').attr("transform", translate.x);
+            main.select('.y.axis').attr("transform", translate.y);
             main.select('.y2.axis').attr("transform", translate.y2);
             main.select('.chart-arcs').attr("transform", translate.arc);
         }
@@ -265,9 +266,9 @@
 
             // for main
             margin = {
-                top: __axis_rotated && __axis_y2_show ? 20 : 0,
+                top: __axis_rotated && __axis_y2_show ? getAxisHeightByAxisId('y2') : 0,
                 right: getCurrentPaddingRight(),
-                bottom: 20 + (__axis_rotated ? 0 : __subchart_size_height) + getLegendPaddingTop() + (isLegendRight ? 0 : legendHeight),
+                bottom: getAxisHeightByAxisId(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + getLegendPaddingTop() + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
@@ -285,7 +286,7 @@
 
             // for legend
             margin3 = {
-                top: isLegendRight ? margin.top : currentHeight - legendHeight,
+                top: isLegendRight ? 0 : currentHeight - legendHeight,
                 right: NaN,
                 bottom: 0,
                 left: isLegendRight ? currentWidth - legendWidth : 0
@@ -321,7 +322,7 @@
             } else if (__padding_left) {
                 return __padding_left;
             } else {
-                return __axis_y_inner ? 1 : getDefaultPaddingWithAxisId('y');
+                return __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
             }
         }
         function getCurrentPaddingRight() {
@@ -330,16 +331,20 @@
             } else if (__padding_right) {
                 return __padding_right;
             } else if (isLegendRight) {
-                return legendWidth * (__axis_y2_show && !__axis_rotated ? 1.25 : 1);
+                return legendWidth + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : 1);
             } else if (__axis_y2_show) {
-                return __axis_y2_inner || __axis_rotated ? 1 : getDefaultPaddingWithAxisId('y2');
+                return __axis_y2_inner || __axis_rotated ? 1 : getAxisWidthByAxisId('y2');
             } else {
                 return 1;
             }
         }
-        function getDefaultPaddingWithAxisId() {
-            var yAxisLabelPosition = getYAxisLabelPosition();
-            return yAxisLabelPosition.isInner ? 40 : 60; // TODO: calc automatically
+        function getAxisWidthByAxisId(id) {
+            var position = getAxisLabelPositionById(id);
+            return position.isInner ? 20 + getMaxTickWidth(id) : 40 + getMaxTickWidth(id);
+        }
+        function getAxisHeightByAxisId(id) {
+            var position = getAxisLabelPositionById(id);
+            return (position.isInner ? 0 : 20) + (id === 'y2' ? 20 : 0);
         }
         function getParentWidth() {
             return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
@@ -347,17 +352,41 @@
         function getParentHeight() {
             return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
         }
+        function getAxisClipX(forHorizontal) {
+            return forHorizontal ? -1 : -(margin.left - 1);
+        }
+        function getAxisClipY(forHorizontal) {
+            return forHorizontal ? -20 : -1;
+        }
+        function getXAxisClipX() {
+            return getAxisClipX(!__axis_rotated);
+        }
+        function getXAxisClipY() {
+            return getAxisClipY(!__axis_rotated);
+        }
+        function getYAxisClipX() {
+            return getAxisClipX(__axis_rotated);
+        }
+        function getYAxisClipY() {
+            return getAxisClipY(__axis_rotated);
+        }
+        function getAxisClipWidth(forHorizontal) {
+            return forHorizontal ? width + 2 : margin.left + 20;
+        }
+        function getAxisClipHeight(forHorizontal) {
+            return forHorizontal ? 80 : height + 2;
+        }
         function getXAxisClipWidth() {
-            return width + 2;
+            return getAxisClipWidth(!__axis_rotated);
         }
         function getXAxisClipHeight() {
-            return 80;
+            return getAxisClipHeight(!__axis_rotated);
         }
         function getYAxisClipWidth() {
-            return margin.left + 20;
+            return getAxisClipWidth(__axis_rotated);
         }
         function getYAxisClipHeight() {
-            return height + 2;
+            return getAxisClipHeight(__axis_rotated);
         }
         function getEventRectWidth() {
             var base = __axis_rotated ? height : width,
@@ -529,47 +558,97 @@
         function getYAxisLabelPosition() {
             return getAxisLabelPosition(__axis_y_label, 'inner-top');
         }
+        function getY2AxisLabelPosition() {
+            return getAxisLabelPosition(__axis_y2_label, 'inner-top');
+        }
+        function getAxisLabelPositionById(id) {
+            return id === 'y2' ? getY2AxisLabelPosition() : id === 'y' ? getYAxisLabelPosition() : getXAxisLabelPosition();
+        }
         function textForXAxisLabel() {
             return getAxisLabelText(__axis_x_label);
         }
         function textForYAxisLabel() {
             return getAxisLabelText(__axis_y_label);
         }
+        function textForY2AxisLabel() {
+            return getAxisLabelText(__axis_y2_label);
+        }
+        function xForAxisLabel(forHorizontal, position) {
+            if (forHorizontal) {
+                return position.isLeft ? 0 : position.isCenter ? width / 2 : width;
+            } else {
+                return position.isBottom ? -height : position.isMiddle ? -height / 2 : 0;
+            }
+        }
+        function dxForAxisLabel(forHorizontal, position) {
+            if (forHorizontal) {
+                return position.isLeft ? "0.5em" : position.isRight ? "-0.5em" : "0";
+            } else {
+                return position.isTop ? "-0.5em" : position.isBottom ? "0.5em" : "0";
+            }
+        }
+        function textAnchorForAxisLabel(forHorizontal, position) {
+            if (forHorizontal) {
+                return position.isLeft ? 'start' : position.isCenter ? 'middle' : 'end';
+            } else {
+                return position.isBottom ? 'start' : position.isMiddle ? 'middle' : 'end';
+            }
+        }
         function xForXAxisLabel() {
-            var position = getXAxisLabelPosition();
-            return position.isLeft ? 0 : position.isCenter ? width / 2 : width;
+            return xForAxisLabel(!__axis_rotated, getXAxisLabelPosition());
         }
         function xForYAxisLabel() {
-            var position = getYAxisLabelPosition();
-            return position.isBottom ? -height : position.isMiddle ? -height / 2 : 0;
+            return xForAxisLabel(__axis_rotated, getYAxisLabelPosition());
+        }
+        function xForY2AxisLabel() {
+            return xForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
         }
         function dxForYAxisLabel() {
-            var position = getYAxisLabelPosition();
-            return position.isTop ? "-0.5em" : "0";
+            return dxForAxisLabel(__axis_rotated, getYAxisLabelPosition());
+        }
+        function dxForY2AxisLabel() {
+            return dxForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
         }
         function dyForXAxisLabel() {
             var position = getXAxisLabelPosition();
-            return position.isInner ? "-0.5em" : "3.5em";
+            if (__axis_rotated) {
+                return position.isInner ? "1.2em" : -30 - getMaxTickWidth('x');
+            } else {
+                return position.isInner ? "-0.5em" : "3em";
+            }
         }
         function dyForYAxisLabel() {
             var position = getYAxisLabelPosition();
-
-            // TODO: define as function and use to calc padding left
+            if (__axis_rotated) {
+                return position.isInner ? "-0.5em" : "3em";
+            } else {
+                return position.isInner ? "1.2em" : -20 - getMaxTickWidth('y');
+            }
+        }
+        function dyForY2AxisLabel() {
+            var position = getY2AxisLabelPosition();
+            if (__axis_rotated) {
+                return position.isInner ? "1.2em" : "-2.5em";
+            } else {
+                return position.isInner ? "-0.5em" : 30 + getMaxTickWidth('y2');
+            }
+        }
+        function textAnchorForXAxisLabel() {
+            return textAnchorForAxisLabel(!__axis_rotated, getXAxisLabelPosition());
+        }
+        function textAnchorForYAxisLabel() {
+            return textAnchorForAxisLabel(__axis_rotated, getYAxisLabelPosition());
+        }
+        function textAnchorForY2AxisLabel() {
+            return textAnchorForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
+        }
+        function getMaxTickWidth(id) {
             var maxWidth = 0;
-            d3.selectAll('.y.axis .tick text').each(function () {
+            d3.selectAll('.' + id + '.axis .tick text').each(function () {
                 var box = this.getBBox();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
-
-            return position.isInner ? "1.2em" : -20 - maxWidth;
-        }
-        function textAnchorForXAxisLabel() {
-            var position = getXAxisLabelPosition();
-            return position.isLeft ? 'start' : position.isCenter ? 'middle' : 'end';
-        }
-        function textAnchorForYAxisLabel() {
-            var position = getYAxisLabelPosition();
-            return position.isBottom ? 'start' : position.isMiddle ? 'middle' : 'end';
+            return maxWidth;
         }
 
         //-- Arc --//
@@ -1809,14 +1888,15 @@
             defs.append("clipPath")
                 .attr("id", "xaxis-clip")
               .append("rect")
-                .attr("x", -1)
-                .attr("y", -20)
+                .attr("x", getXAxisClipX)
+                .attr("y", getXAxisClipY)
                 .attr("width", getXAxisClipWidth)
                 .attr("height", getXAxisClipHeight);
             defs.append("clipPath")
                 .attr("id", "yaxis-clip")
               .append("rect")
-                .attr("x", -margin.left + 1)
+                .attr("x", getYAxisClipX)
+                .attr("y", getYAxisClipY)
                 .attr("width", getYAxisClipWidth)
                 .attr("height", getYAxisClipHeight);
 
@@ -1842,23 +1922,31 @@
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", "-axis-x-label")
+                .attr("transform", __axis_rotated ? "rotate(-90)" : "")
                 .attr("dy", dyForXAxisLabel)
                 .style("text-anchor", textAnchorForXAxisLabel)
-                .text(__axis_rotated ? textForYAxisLabel : textForXAxisLabel);
+                .text(textForXAxisLabel);
             main.append("g")
                 .attr("class", "y axis")
                 .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
               .append("text")
                 .attr("class", "-axis-y-label")
-                .attr("transform", "rotate(-90)")
+                .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                 .attr("dx", dxForYAxisLabel)
                 .style("text-anchor", textAnchorForYAxisLabel)
-                .text(__axis_rotated ? textForXAxisLabel : textForYAxisLabel);
+                .text(textForYAxisLabel);
 
             if (__axis_y2_show) {
                 main.append("g")
                     .attr("class", "y2 axis")
-                    .attr("transform", translate.y2);
+                    // clip-path?
+                    .attr("transform", translate.y2)
+                  .append("text")
+                    .attr("class", "-axis-y2-label")
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .attr("dx", dxForY2AxisLabel)
+                    .style("text-anchor", textAnchorForY2AxisLabel)
+                    .text(textForY2AxisLabel);
             }
 
             // Grids
@@ -1979,8 +2067,16 @@
             // Set targets
             updateTargets(c3.data.targets);
 
+            // Update ticks for width calculation
+            if (__axis_rotated) {
+                main.select(".x.axis").style("opacity", 0).call(xAxis);
+            } else {
+                main.select(".y.axis").style("opacity", 0).call(yAxis);
+                main.select(".y2.axis").style("opacity", 0).call(yAxis2);
+            }
+
             // Draw with targets
-            redraw({withTransform: true, withUpdateXDomain: true, withLegend: true});
+            updateAndRedraw({withTransform: true, withUpdateXDomain: true, withLegend: true, durationForAxis: 0});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -2283,7 +2379,7 @@
             var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
-            var duration, durationForExit;
+            var duration, durationForExit, durationForAxis;
 
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
@@ -2296,6 +2392,7 @@
 
             duration = withTransition ? __transition_duration : 0;
             durationForExit = isDefined(options.durationForExit) ? options.durationForExit : duration;
+            durationForAxis = isDefined(options.durationForAxis) ? options.durationForAxis : duration;
 
             // update legend and transform each g
             if (withLegend && __legend_show) {
@@ -2319,9 +2416,9 @@
             y2.domain(getYDomain('y2'));
 
             // axis
-            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(__axis_rotated ? yAxis : xAxis);
-            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(__axis_rotated ? xAxis : yAxis);
-            main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().call(yAxis2);
+            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
+            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis);
+            main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // setup drawer - MEMO: these must be called after axis updated
             drawBar = generateDrawBar(barIndices);
@@ -2331,6 +2428,7 @@
             // Update label position
             main.select(".x.axis .-axis-x-label").attr("x", xForXAxisLabel);
             main.select(".y.axis .-axis-y-label").attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel);
+            main.select(".y2.axis .-axis-y2-label").attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel);
 
             // Update sub domain
             subY.domain(y.domain());
@@ -2708,25 +2806,20 @@
         }
 
         function updateAndRedraw(options) {
-            var withTransition, withTransform, withLegend;
             options = isDefined(options) ? options : {};
-            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
-            withTransform = isDefined(options.withTransform) ? options.withTransform : false;
-            withLegend = isDefined(options.withLegend) ? options.withLegend : false;
+            options.withTransition = isDefined(options.withTransition) ? options.withTransition : true;
+            options.withTransform = isDefined(options.withTransform) ? options.withTransform : false;
+            options.withLegend = isDefined(options.withLegend) ? options.withLegend : false;
+            options.withUpdateXDomain = true;
+            options.durationForExit = 0;
             // Update sizes and scales
             updateSizes();
             updateScales();
             updateSvgSize();
             // Update g positions
-            transformAll(withTransition);
+            transformAll(options.withTransition);
             // Draw with new sizes & scales
-            redraw({
-                withTransition: withTransition,
-                withUpdateXDomain: true,
-                withTransform: withTransform,
-                durationForExit: 0,
-                withLegend: withLegend
-            });
+            redraw(options);
         }
 
         function updateTargets(targets) {
