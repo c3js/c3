@@ -343,7 +343,9 @@
             return position.isInner ? 20 + getMaxTickWidth(id) : 40 + getMaxTickWidth(id);
         }
         function getAxisHeightByAxisId(id) {
-            var position = getAxisLabelPositionById(id);
+            var position;
+            if (! getAxisLabel(id)) { return 20; }
+            position = getAxisLabelPositionById(id);
             return (position.isInner ? 0 : 20) + (id === 'y2' ? 20 : 0);
         }
         function getParentWidth() {
@@ -538,6 +540,9 @@
 
         function getAxisLabelText(option) {
             return typeof option === 'string' ? option : option ? option.text : null;
+        }
+        function getAxisLabel(id) {
+            return id === 'x' ? __axis_x_label : id === 'y' ? __axis_y_label : __axis_y2_label;
         }
         function getAxisLabelPosition(option, defaultPosition) {
             var position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
