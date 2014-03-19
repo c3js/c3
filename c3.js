@@ -305,7 +305,8 @@
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getSvgLeft() {
-            var svgRect = d3.select('.y.axis').node().getBoundingClientRect(),
+            var leftAxisClass = __axis_rotated ? ".x.axis" : ".y.axis",
+                svgRect = d3.select(leftAxisClass).node().getBoundingClientRect(),
                 chartRect = d3.select(__bindto).node().getBoundingClientRect();
             return svgRect.right - chartRect.left - getCurrentPaddingLeft();
         }
