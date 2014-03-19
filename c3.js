@@ -266,7 +266,7 @@
 
             // for main
             margin = {
-                top: __axis_rotated && __axis_y2_show ? getAxisHeightByAxisId('y2') : 0,
+                top: __axis_rotated && __axis_y2_show ? getAxisHeightByAxisId('y2') : 5,
                 right: getCurrentPaddingRight(),
                 bottom: getAxisHeightByAxisId(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
@@ -326,16 +326,17 @@
             }
         }
         function getCurrentPaddingRight() {
+            var defaultPadding = 1;
             if (hasArcType(c3.data.targets)) {
                 return 0;
             } else if (__padding_right) {
                 return __padding_right;
             } else if (isLegendRight) {
-                return legendWidth + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : 1);
+                return legendWidth + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
             } else if (__axis_y2_show) {
-                return __axis_y2_inner || __axis_rotated ? 1 : getAxisWidthByAxisId('y2');
+                return __axis_y2_inner || __axis_rotated ? defaultPadding : getAxisWidthByAxisId('y2');
             } else {
-                return 1;
+                return defaultPadding;
             }
         }
         function getAxisWidthByAxisId(id) {
