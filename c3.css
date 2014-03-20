@@ -61,17 +61,7 @@ text {
 /*-- Bar --*/
 
 .-bar._expanded_ {
-  stroke-width: 1px;
-  fill-opacity: 0.6;
-}
-/* TODO: use this*/
-.-bar._selected_ {
-  stroke-width: 1px;
-  fill-opacity: 0.3;
-}
-.selected-bar {
-  fill: white;
-  stroke-width: 2px;
+  fill-opacity: 0.75;
 }
 
 /*-- Arc --*/

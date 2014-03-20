@@ -1502,8 +1502,8 @@
             return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
         }
         function isWithinBar(_this) {
-            var mouse = d3.mouse(_this), d3_this = d3.select(_this);
-            var x = d3_this.attr("x") * 1, y = d3_this.attr("y") * 1, w = d3_this.attr("width") * 1;
+            var mouse = d3.mouse(_this), box = _this.getBBox();
+            var x = box.x, y = box.y, w = box.width;
             var sx = x - 10, ex = x + w + 10, ey = y - 10;
             return sx < mouse[0] && mouse[0] < ex && ey < mouse[1];
         }
@@ -1554,9 +1554,11 @@
             selected ? selectPoint(target, d, i) : unselectPoint(target, d, i);
         }
 
-        function selectBar() {
+        function selectBar(target, d) {
+            target.transition().duration(100).style("fill", function () { return d3.rgb(color(d.id)).darker(1); });
         }
-        function unselectBar() {
+        function unselectBar(target, d) {
+            target.transition().duration(100).style("fill", function () { return color(d.id); });
         }
         function toggleBar(selected, target, d, i) {
             selected ? selectBar(target, d, i) : unselectBar(target, d, i);
@@ -1586,7 +1588,7 @@
             return main.selectAll(".-bar" + (isValue(i) ? '-' + i : ''));
         }
         function expandBars(i) {
-            getBars(i).classed(EXPANDED, false);
+            getBars(i).classed(EXPANDED, true);
         }
         function unexpandBars(i) {
             getBars(i).classed(EXPANDED, false);
@@ -2168,12 +2170,11 @@
                             svg.select('.event-rect-' + i).style('cursor', null);
                         })
                         .filter(function () {
-                            var _this = d3.select(this);
                             if (this.nodeName === 'circle') {
                                 return isWithinCircle(this, __point_select_r);
                             }
-                            else if (this.nodeName === 'rect') {
-                                return isWithinBar(this, _this.attr('x'), _this.attr('y'));
+                            else if (this.nodeName === 'path') {
+                                return isWithinBar(this);
                             }
                         })
                         .each(function () {
@@ -2276,7 +2277,7 @@
                 isWithin = isWithinCircle(target, __point_select_r * 1.5);
                 toggle = togglePoint;
             }
-            else if (target.nodeName === 'rect') {
+            else if (target.nodeName === 'path') {
                 isWithin = isWithinBar(target);
                 toggle = toggleBar;
             }
