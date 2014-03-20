@@ -1503,9 +1503,9 @@
         }
         function isWithinBar(_this) {
             var mouse = d3.mouse(_this), box = _this.getBBox();
-            var x = box.x, y = box.y, w = box.width;
-            var sx = x - 10, ex = x + w + 10, ey = y - 10;
-            return sx < mouse[0] && mouse[0] < ex && ey < mouse[1];
+            var x = box.x, y = box.y, w = box.width, h = box.height, offset = 10;
+            var sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
+            return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
         }
         function isWithinRegions(x, regions) {
             var i;
