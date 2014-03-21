@@ -333,7 +333,7 @@
             } else if (__padding_left) {
                 return __padding_left;
             } else {
-                return __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
+                return __axis_rotated || __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
             }
         }
         function getCurrentPaddingRight() {
@@ -561,13 +561,13 @@
             };
         }
         function getXAxisLabelPosition() {
-            return getAxisLabelPosition(__axis_x_label, 'inner-right');
+            return getAxisLabelPosition(__axis_x_label, __axis_rotated ? 'inner-top' : 'inner-right');
         }
         function getYAxisLabelPosition() {
-            return getAxisLabelPosition(__axis_y_label, 'inner-top');
+            return getAxisLabelPosition(__axis_y_label, __axis_rotated ? 'inner-right' : 'inner-top');
         }
         function getY2AxisLabelPosition() {
-            return getAxisLabelPosition(__axis_y2_label, 'inner-top');
+            return getAxisLabelPosition(__axis_y2_label, __axis_rotated ? 'inner-right' : 'inner-top');
         }
         function getAxisLabelPositionById(id) {
             return id === 'y2' ? getY2AxisLabelPosition() : id === 'y' ? getYAxisLabelPosition() : getXAxisLabelPosition();
@@ -610,6 +610,9 @@
         }
         function xForY2AxisLabel() {
             return xForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
+        }
+        function dxForXAxisLabel() {
+            return dxForAxisLabel(!__axis_rotated, getXAxisLabelPosition());
         }
         function dxForYAxisLabel() {
             return dxForAxisLabel(__axis_rotated, getYAxisLabelPosition());
@@ -1962,6 +1965,7 @@
               .append("text")
                 .attr("class", "-axis-x-label")
                 .attr("transform", __axis_rotated ? "rotate(-90)" : "")
+                .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
                 .style("text-anchor", textAnchorForXAxisLabel)
                 .text(textForXAxisLabel);
@@ -1972,6 +1976,7 @@
                 .attr("class", "-axis-y-label")
                 .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                 .attr("dx", dxForYAxisLabel)
+                .attr("dy", dyForYAxisLabel)
                 .style("text-anchor", textAnchorForYAxisLabel)
                 .text(textForYAxisLabel);
 
