@@ -1017,7 +1017,7 @@
                         var x, xKey = getXKey(id);
 
                         if (isTimeSeries) {
-                            x = parseDate(d[xKey]);
+                            x = d[xKey] instanceof Date ? d[xKey] : parseDate(d[xKey]);
                         }
                         else if (isCustomX) {
                             x = d[xKey] ? +d[xKey] : getXValue(id, i);
