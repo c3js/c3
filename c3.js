@@ -150,8 +150,8 @@
                 if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
                 if (! text) {
-                    title = titleFormat ? titleFormat(d[i].x) : d[i].x + "";
-                    text = "<table class='-tooltip'>" + (title ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+                    title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+                    text = "<table class='-tooltip'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
                 }
 
                 name = d[i].name;
