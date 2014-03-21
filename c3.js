@@ -365,7 +365,7 @@
             return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
         }
         function getAxisClipX(forHorizontal) {
-            return forHorizontal ? -5 : -(margin.left - 1);
+            return forHorizontal ? -(1 + 4) : -(margin.left - 1);
         }
         function getAxisClipY(forHorizontal) {
             return forHorizontal ? -20 : -1;
@@ -383,7 +383,7 @@
             return getAxisClipY(__axis_rotated);
         }
         function getAxisClipWidth(forHorizontal) {
-            return forHorizontal ? width + 2 : margin.left + 20;
+            return forHorizontal ? width + 2 + 4 : margin.left + 20;
         }
         function getAxisClipHeight(forHorizontal) {
             return forHorizontal ? 80 : height + 2;
