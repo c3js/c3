@@ -130,10 +130,20 @@
             __point_onselected = getConfig(['point', 'onselected'], function () {}),
             __point_onunselected = getConfig(['point', 'onunselected'], function () {});
 
-        // arc
-        var __arc_label_show = getConfig(['arc', 'label', 'show'], true),
-            __arc_label_format = getConfig(['arc', 'label', 'format'], null),
-            __arc_title = getConfig(['arc', 'title'], "");
+        // pie
+        var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
+            __pie_label_format = getConfig(['pie', 'label', 'format'], null),
+            __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
+            __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
+            __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
+
+        // donut
+        var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
+            __donut_label_format = getConfig(['donut', 'label', 'format'], null),
+            __donut_title = getConfig(['donut', 'title'], ""),
+            __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
+            __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
+            __donut_onmouseout = getConfig(['donut', 'onmouseout'], function () {});
 
         // region - region to change style
         var __regions = getConfig(['regions'], []);
@@ -701,11 +711,19 @@
         function getArcRatio(d) {
             return (d.endAngle - d.startAngle) / (Math.PI * 2);
         }
+        function convertToArcData(d) {
+            return addName({
+                id: d.data.id,
+                value: d.value,
+                ratio: getArcRatio(d)
+            });
+        }
         function textForArcLabel(d) {
-            var ratio;
-            if (! __arc_label_show) { return ""; }
+            var ratio, format;
+            if (! shouldShowArcLable()) { return ""; }
             ratio = getArcRatio(d);
-            return __arc_label_format ? __arc_label_format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
+            format = getArcLabelFormat();
+            return format ? format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
         }
         function expandArc(id, withoutFadeOut) {
             var target = svg.selectAll('.chart-arc' + getTargetSelector(id)),
@@ -731,6 +749,27 @@
                 .attr("d", svgArc);
             svg.selectAll('.-arc')
                 .style("opacity", 1);
+        }
+        function shouldShowArcLable() {
+            return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
+        }
+        function getArcLabelFormat() {
+            return hasDonutType(c3.data.targets) ? __donut_label_format : __pie_label_format;
+        }
+        function getArcTitle() {
+            return hasDonutType(c3.data.targets) ? __donut_title : "";
+        }
+        function getArcOnClick() {
+            var callback = hasDonutType(c3.data.targets) ? __donut_onclick : __pie_onclick;
+            return typeof callback === 'function' ? callback : function () {};
+        }
+        function getArcOnMouseOver() {
+            var callback = hasDonutType(c3.data.targets) ? __donut_onmouseover : __pie_onmouseover;
+            return typeof callback === 'function' ? callback : function () {};
+        }
+        function getArcOnMouseOut() {
+            var callback = hasDonutType(c3.data.targets) ? __donut_onmouseout : __pie_onmouseout;
+            return typeof callback === 'function' ? callback : function () {};
         }
 
         //-- Domain --//
@@ -2011,7 +2050,7 @@
               .append('text')
                 .attr('class', 'chart-arcs-title')
                 .style("text-anchor", "middle")
-                .text(__arc_title);
+                .text(getArcTitle());
 
             main.select(".chart").append("g")
                 .attr("class", "chart-texts");
@@ -2898,22 +2937,26 @@
                 .style("fill", function (d) { return color(d.data.id); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
-                .on('mouseover', function (d) {
+                .on('mouseover', function (d, i) {
+                    var arcData = convertToArcData(d), callback = getArcOnMouseOver();
                     expandArc(d.data.id);
                     focusLegend(d.data.id);
+                    callback(arcData, i);
                 })
                 .on('mousemove', function (d) {
-                    var selectedData = [addName({
-                        id: d.data.id,
-                        value: d.value,
-                        ratio: getArcRatio(d)
-                    })];
+                    var selectedData = [convertToArcData(d)];
                     showTooltip(selectedData, d3.mouse(this));
                 })
-                .on('mouseout', function (d) {
+                .on('mouseout', function (d, i) {
+                    var arcData = convertToArcData(d), callback = getArcOnMouseOut();
                     unexpandArc(d.data.id);
                     revertLegend();
                     hideTooltip();
+                    callback(arcData, i);
+                })
+                .on('click', function (d, i) {
+                    var arcData = convertToArcData(d), callback = getArcOnClick();
+                    callback(arcData, i);
                 });
             mainPieEnter.append("text")
                 .attr("dy", ".35em")

@@ -37,12 +37,15 @@
             label: 'Petal.Width'
           }
         },
-        arc: {
+        donut: {
           label: {
 //            format: function (d, ratio) { return ""; }
           },
-          title: "Iris Petal Width"
-        } 
+          title: "Iris Petal Width",
+          onmouseover: function (d, i) { console.log(d, i); },
+          onmouseout: function (d, i) { console.log(d, i); },
+          onclick: function (d, i) { console.log(d, i); },
+        }
       });
 
       setTimeout(function () {
