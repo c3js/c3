@@ -365,7 +365,7 @@
             return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
         }
         function getAxisClipX(forHorizontal) {
-            return forHorizontal ? -1 : -(margin.left - 1);
+            return forHorizontal ? -5 : -(margin.left - 1);
         }
         function getAxisClipY(forHorizontal) {
             return forHorizontal ? -20 : -1;
@@ -2845,6 +2845,7 @@
             svg.attr('width', currentWidth).attr('height', currentHeight);
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
             svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
+            svg.select('#yaxis-clip').select('rect').attr('width', getYAxisClipWidth);
             svg.select('.zoom-rect').attr('width', width).attr('height', height);
         }
 
