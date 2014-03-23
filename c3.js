@@ -2120,7 +2120,7 @@
             }
 
             // Draw with targets
-            updateAndRedraw({withTransform: true, withUpdateXDomain: true, withLegend: true, durationForAxis: 0});
+            updateAndRedraw({withTransform: true, withLegend: true, durationForAxis: 0});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -2855,6 +2855,7 @@
             options.withTransform = isDefined(options.withTransform) ? options.withTransform : false;
             options.withLegend = isDefined(options.withLegend) ? options.withLegend : false;
             options.withUpdateXDomain = true;
+            options.withUpdateOrgXDomain = true;
             options.durationForExit = 0;
             // Update sizes and scales
             updateSizes();
