@@ -177,7 +177,7 @@
 
         /*-- Set Variables --*/
 
-        var clipId = __bindto.replace('#', '') + '-clip',
+        var clipId = (typeof __bindto === "string" ? __bindto.replace('#', '') : __bindto.id)  + '-clip',
             clipPath = getClipPath(clipId);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
