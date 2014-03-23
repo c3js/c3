@@ -991,8 +991,7 @@
 
             // check "x" is defined if timeseries
             if (isTimeSeries && xs.length === 0) {
-                window.alert('data.x or data.xs must be specified when axis.x.type == "timeseries"');
-                return [];
+                throw new Error('data.x or data.xs must be specified when axis.x.type == "timeseries"');
             }
 
             // save x for update data by load
@@ -1880,8 +1879,7 @@
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                window.alert('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
-                return;
+                throw new Error('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
             } else {
                 selectChart.html("");
             }
