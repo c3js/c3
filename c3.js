@@ -3198,7 +3198,7 @@
         /*-- Event Handling --*/
 
         function getTargetSelectorSuffix(targetId) {
-            return targetId ? '-' + targetId.replace(/\./g, '\\.') : '';
+            return targetId ? '-' + targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : '';
         }
         function getTargetSelector(targetId) {
             return '.target' + getTargetSelectorSuffix(targetId);
