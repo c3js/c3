@@ -179,7 +179,7 @@
 
         /*-- Set Variables --*/
 
-        var clipId = __bindto.replace('#', '') + '-clip',
+        var clipId = (typeof __bindto === "string" ? __bindto.replace('#', '') : __bindto.id)  + '-clip',
             clipPath = getClipPath(clipId);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
@@ -993,8 +993,7 @@
 
             // check "x" is defined if timeseries
             if (isTimeSeries && xs.length === 0) {
-                window.alert('data.x or data.xs must be specified when axis.x.type == "timeseries"');
-                return [];
+                throw new Error('data.x or data.xs must be specified when axis.x.type == "timeseries"');
             }
 
             // save x for update data by load
@@ -1882,8 +1881,7 @@
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                window.alert('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
-                return;
+                throw new Error('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
             } else {
                 selectChart.html("");
             }
@@ -3202,7 +3200,7 @@
         /*-- Event Handling --*/
 
         function getTargetSelectorSuffix(targetId) {
-            return targetId ? '-' + targetId.replace(/\./g, '\\.') : '';
+            return targetId ? '-' + targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : '';
         }
         function getTargetSelector(targetId) {
             return '.target' + getTargetSelectorSuffix(targetId);
