@@ -1150,7 +1150,7 @@
         function classShape(d, i) { return "-shape -shape-" + i; }
         function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
         function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
-        function classRegion(d, i) { return 'region region-' + i + ' ' + ('classes' in d ? [].concat(d.classes).join(' ') : ''); }
+        function classRegion(d, i) { return 'region region-' + i + ' ' + ('class' in d ? d.class : ''); }
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
         function initialOpacity(d) {
