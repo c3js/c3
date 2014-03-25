@@ -1140,19 +1140,22 @@
         function category(i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
-        function classText(d) { return "-text -text-" + d.id; }
-        function classTexts(d) { return "-texts -texts-" + d.id; }
-        function classShapes(d) { return "-shapes -shapes-" + d.id; }
-        function classLine(d) { return classShapes(d) + " -line -line-" + d.id; }
-        function classCircles(d) { return classShapes(d) + " -circles -circles-" + d.id; }
-        function classBars(d) { return classShapes(d) + " -bars -bars-" + d.id; }
-        function classArc(d) { return classShapes(d.data) + " -arc -arc-" + d.data.id; }
-        function classArea(d) { return classShapes(d) + " -area -area-" + d.id; }
-        function classShape(d, i) { return "-shape -shape-" + i; }
-        function classCircle(d, i) { return classShape(d, i) + " -circle -circle-" + i; }
-        function classBar(d, i) { return classShape(d, i) + " -bar -bar-" + i; }
-        function classRegion(d, i) { return 'region region-' + i + ' ' + ('class' in d ? d.class : ''); }
-        function classEvent(d, i) { return "event-rect event-rect-" + i; }
+        function generateClass(prefix, targetId) {
+            return " " + prefix + " " + prefix + getTargetSelectorSuffix(targetId);
+        }
+        function classText(d) { return generateClass("-text", d.id); }
+        function classTexts(d) { return generateClass("-texts", d.id); }
+        function classShapes(d) { return generateClass("-shapes", d.id); }
+        function classLine(d) { return classShapes(d) + generateClass("-line", d.id); }
+        function classCircles(d) { return classShapes(d) + generateClass("-circles", d.id); }
+        function classBars(d) { return classShapes(d) + generateClass("-bars", d.id); }
+        function classArc(d) { return classShapes(d.data) + generateClass("-arc", d.data.id); }
+        function classArea(d) { return classShapes(d) + generateClass("-area", d.id); }
+        function classShape(d, i) { return generateClass("-shape", i); }
+        function classCircle(d, i) { return classShape(d, i) + generateClass("-circle", i); }
+        function classBar(d, i) { return classShape(d, i) + generateClass("-bar", i); }
+        function classRegion(d, i) { return generateClass("region", i) + ' ' + ('class' in d ? d.class : ''); }
+        function classEvent(d, i) { return generateClass("event-rect", i); }
 
         function initialOpacity(d) {
             return withoutFadeIn[d.id] ? 1 : 0;
@@ -1575,10 +1578,10 @@
         function selectPoint(target, d, i) {
             __point_onselected(target, d);
             // add selected-circle on low layer g
-            main.select(".selected-circles-" + d.id).selectAll('.selected-circle-' + i)
+            main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll('.selected-circle-' + i)
                 .data([d])
               .enter().append('circle')
-                .attr("class", function () { return "selected-circle selected-circle-" + i; })
+                .attr("class", function () { return generateClass("selected-circle", i); })
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("stroke", function () { return color(d.id); })
@@ -1589,7 +1592,7 @@
         function unselectPoint(target, d, i) {
             __point_onunselected(target, d);
             // remove selected-circle from low layer g
-            main.select(".selected-circles-" + d.id).selectAll(".selected-circle-" + i)
+            main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll(".selected-circle-" + i)
               .transition().duration(100).attr('r', 0)
                 .remove();
         }
@@ -1614,7 +1617,7 @@
         //-- Shape --//
 
         function getCircles(i, id) {
-            return (id ? main.selectAll('.-circles-' + id) : main).selectAll('.-circle' + (isValue(i) ? '-' + i : ''));
+            return (id ? main.selectAll('.-circles' + getTargetSelectorSuffix(id)) : main).selectAll('.-circle' + (isValue(i) ? '-' + i : ''));
         }
         function expandCircles(i, id) {
             getCircles(i, id)
@@ -2299,7 +2302,7 @@
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
-                        main.select('.-circles-' + closest.id).select('.-circle-' + closest.index).each(function () {
+                        main.select('.-circles-' + getTargetSelectorSuffix(closest.id)).select('.-circle-' + closest.index).each(function () {
                             selectShape(this, closest, closest.index);
                         });
                     }
@@ -2878,7 +2881,7 @@
                   .selectAll('.chart-text')
                     .data(targets);
             mainTextEnter = mainTextUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-text target target-' + d.id; })
+                .attr('class', function (d) { return 'chart-text' + generateClass('target', d.id); })
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
@@ -2889,7 +2892,7 @@
               .selectAll('.chart-bar')
                 .data(targets);
             mainBarEnter = mainBarUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-bar target target-' + d.id; })
+                .attr('class', function (d) { return 'chart-bar' + generateClass('target', d.id); })
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -2903,7 +2906,7 @@
               .selectAll('.chart-line')
                 .data(targets);
             mainLineEnter = mainLineUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-line target target-' + d.id; })
+                .attr('class', function (d) { return 'chart-line' + generateClass('target', d.id); })
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -2917,7 +2920,7 @@
                 .style("fill", function (d) { return color(d.id); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
-                .attr("class", function (d) { return "selected-circles selected-circles-" + d.id; });
+                .attr("class", function (d) { return generateClass("selected-circles", d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
                 .style("fill", function (d) { return color(d.id); })
@@ -2981,7 +2984,7 @@
                   .selectAll('.chart-bar')
                     .data(targets);
                 contextBarEnter = contextBarUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-bar target target-' + d.id; });
+                    .attr('class', function (d) { return 'chart-bar' + generateClass('target', d.id); });
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
@@ -2992,7 +2995,7 @@
                   .selectAll('.chart-line')
                     .data(targets);
                 contextLineEnter = contextLineUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-line target target-' + d.id; });
+                    .attr('class', function (d) { return 'chart-line' + generateClass('target', d.id); });
                 // Lines for each data
                 contextLineEnter.append("path")
                     .attr("class", classLine)
@@ -3133,7 +3136,7 @@
             l = legend.selectAll('.legend-item')
                 .data(ids)
               .enter().append('g')
-                .attr('class', function (id) { return 'legend-item legend-item-' + id; })
+                .attr('class', function (id) { return generateClass('legend-item', id); })
                 .style('cursor', 'pointer')
                 .on('click', function (id) {
                     __legend_item_onclick(id);
@@ -3200,7 +3203,7 @@
         /*-- Event Handling --*/
 
         function getTargetSelectorSuffix(targetId) {
-            return targetId ? '-' + targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : '';
+            return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
         function getTargetSelector(targetId) {
             return '.target' + getTargetSelectorSuffix(targetId);
