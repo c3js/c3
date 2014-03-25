@@ -3045,6 +3045,7 @@
         /*-- Draw Legend --*/
 
         function focusLegend(id) {
+            if(!__legend_show) { return; }
             var legendItem = legend.selectAll('.legend-item'),
                 isTarget = function (d) { return !id || d === id; },
                 notTarget = function (d) { return !isTarget(d); };
@@ -3052,6 +3053,7 @@
             legendItem.filter(isTarget).transition().duration(100).style('opacity', 1);
         }
         function defocusLegend(id) {
+            if(!__legend_show) { return; }
             var legendItem = legend.selectAll('.legend-item'),
                 isTarget = function (d) { return !id || d === id; },
                 notTarget = function (d) { return !isTarget(d); };
@@ -3059,6 +3061,7 @@
             legendItem.filter(isTarget).transition().duration(100).style('opacity', 0.3);
         }
         function revertLegend() {
+            if(!__legend_show) { return; }
             legend.selectAll('.legend-item')
               .transition().duration(100)
                 .style('opacity', 1);
