@@ -321,8 +321,9 @@
             var leftAxisClass = __axis_rotated ? ".x.axis" : ".y.axis",
                 leftAxis = d3.select(leftAxisClass).node(),
                 svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
-                chartRect = d3.select(__bindto).node().getBoundingClientRect();
-            return svgRect.right - chartRect.left - getCurrentPaddingLeft();
+                chartRect = d3.select(__bindto).node().getBoundingClientRect(),
+                svgLeft = svgRect.right - chartRect.left - getCurrentPaddingLeft();
+            return svgLeft > 0 ? svgLeft : 0;
         }
         function getCurrentWidth() {
             return __size_width ? __size_width : getParentWidth();
@@ -1313,9 +1314,7 @@
             // don't show tooltip when no data
             if (dataToShow.length === 0) { return; }
             // Construct tooltip
-            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color))
-                .style("visibility", "hidden")
-                .style("display", "block");
+            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color));
             // Get tooltip dimensions
             tWidth = tooltip.property('offsetWidth');
             tHeight = tooltip.property('offsetHeight');
@@ -1337,6 +1336,7 @@
                     chartRight = svgLeft + getCurrentWidth() - getCurrentPaddingRight();
                     tooltipTop = mouse[1] + 15;
                 }
+
                 if (tooltipRight > chartRight) {
                     tooltipLeft -= tWidth + 60;
                 }
@@ -1345,11 +1345,10 @@
                 }
             }
             // Set tooltip
-            // todo get rid of magic numbers
             tooltip
                 .style("top", tooltipTop + "px")
                 .style("left", tooltipLeft + 'px')
-                .style("visibility", "visible");
+                .style("display", "block");
         }
         function hideTooltip() {
             tooltip.style("display", "none");
