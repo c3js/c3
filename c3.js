@@ -3044,24 +3044,23 @@
 
         /*-- Draw Legend --*/
 
+        function toggleFocusLegend(id, focus) {
+            var legendItem, isTarget, notTarget;
+            if (!__legend_show) { return; }
+            legendItem = legend.selectAll('.legend-item');
+            isTarget = function (d) { return !id || d === id; };
+            notTarget = function (d) { return !isTarget(d); };
+            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : 1);
+            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? 1 : 0.3);
+        }
         function focusLegend(id) {
-            if(!__legend_show) { return; }
-            var legendItem = legend.selectAll('.legend-item'),
-                isTarget = function (d) { return !id || d === id; },
-                notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', 0.3);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', 1);
+            toggleFocusLegend(id, true);
         }
         function defocusLegend(id) {
-            if(!__legend_show) { return; }
-            var legendItem = legend.selectAll('.legend-item'),
-                isTarget = function (d) { return !id || d === id; },
-                notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', 1);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', 0.3);
+            toggleFocusLegend(id, false);
         }
         function revertLegend() {
-            if(!__legend_show) { return; }
+            if (!__legend_show) { return; }
             legend.selectAll('.legend-item')
               .transition().duration(100)
                 .style('opacity', 1);
