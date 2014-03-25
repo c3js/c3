@@ -93,6 +93,7 @@
             __axis_x_min = getConfig(['axis', 'x', 'min'], null),
             __axis_x_default = getConfig(['axis', 'x', 'default'], null),
             __axis_x_label = getConfig(['axis', 'x', 'label'], null),
+            __axis_y_show = getConfig(['axis', 'y', 'show'], true),
             __axis_y_max = getConfig(['axis', 'y', 'max'], null),
             __axis_y_min = getConfig(['axis', 'y', 'min'], null),
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
@@ -268,7 +269,7 @@
         //-- Sizes --//
 
         // TODO: configurabale
-        var rotated_padding_left = 40, rotated_padding_right = 20;
+        var rotated_padding_left = 40, rotated_padding_right = 20, rotated_padding_top = 5;
 
         function updateSizes() {
             currentWidth = getCurrentWidth();
@@ -278,9 +279,9 @@
 
             // for main
             margin = {
-                top: __axis_rotated && __axis_y2_show ? getAxisHeightByAxisId('y2') : 5,
+                top: __axis_rotated ? getHorizontalAxisHeight('y2') : rotated_padding_top,
                 right: getCurrentPaddingRight(),
-                bottom: getAxisHeightByAxisId(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
+                bottom: getHorizontalAxisHeight(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
@@ -318,7 +319,8 @@
         }
         function getSvgLeft() {
             var leftAxisClass = __axis_rotated ? ".x.axis" : ".y.axis",
-                svgRect = d3.select(leftAxisClass).node().getBoundingClientRect(),
+                leftAxis = d3.select(leftAxisClass).node(),
+                svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
                 chartRect = d3.select(__bindto).node().getBoundingClientRect();
             return svgRect.right - chartRect.left - getCurrentPaddingLeft();
         }
@@ -335,7 +337,7 @@
             } else if (__padding_left) {
                 return __padding_left;
             } else {
-                return __axis_rotated || __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
+                return __axis_rotated || !__axis_y_show || __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
             }
         }
         function getCurrentPaddingRight() {
@@ -356,9 +358,10 @@
             var position = getAxisLabelPositionById(id);
             return position.isInner ? 20 + getMaxTickWidth(id) : 40 + getMaxTickWidth(id);
         }
-        function getAxisHeightByAxisId(id) {
-            var position = getAxisLabelPositionById(id);
-            return (position.isInner ? 30 : 40) + (id === 'y2' ? -10 : 0);
+        function getHorizontalAxisHeight(axisId) {
+            if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight ? 10 : 1; }
+            if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
+            return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
         function getParentWidth() {
             return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
@@ -1972,16 +1975,19 @@
                 .attr("dy", dyForXAxisLabel)
                 .style("text-anchor", textAnchorForXAxisLabel)
                 .text(textForXAxisLabel);
-            main.append("g")
-                .attr("class", "y axis")
-                .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
-              .append("text")
-                .attr("class", "-axis-y-label")
-                .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                .attr("dx", dxForYAxisLabel)
-                .attr("dy", dyForYAxisLabel)
-                .style("text-anchor", textAnchorForYAxisLabel)
-                .text(textForYAxisLabel);
+
+            if (__axis_y_show) {
+                main.append("g")
+                    .attr("class", "y axis")
+                    .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
+                  .append("text")
+                    .attr("class", "-axis-y-label")
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .attr("dx", dxForYAxisLabel)
+                    .attr("dy", dyForYAxisLabel)
+                    .style("text-anchor", textAnchorForYAxisLabel)
+                    .text(textForYAxisLabel);
+            }
 
             if (__axis_y2_show) {
                 main.append("g")
