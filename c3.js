@@ -1537,7 +1537,7 @@
         function parseDate(date) {
             var parsedDate;
             if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
-            parsedDate = d3.time.format(__data_x_format).parse(date);
+            parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
             if (!parsedDate) { throw Error("Failed to parse '" + date + "' with format " + __data_x_format); }
             return parsedDate;
         }
