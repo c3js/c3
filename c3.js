@@ -2334,7 +2334,7 @@
                         _this.classed(SELECTED, !isSelected);
                         toggle(!isSelected, _this, d, i);
                     } else {
-                        c3.select([d.id], [i], true);
+                        isSelected ? c3.unselect() : c3.select([d.id], [i], true);
                     }
                 }
                 __point_onclick(d, _this); // TODO: should be __data_onclick
@@ -2386,8 +2386,12 @@
                     if (isWithin ^ isIncluded) {
                         _this.classed(INCLUDED, !isIncluded);
                         // TODO: included/unincluded callback here
-                        _this.classed(SELECTED, !isSelected);
-                        toggle(!isSelected, _this, d, i);
+                        if (__data_selection_multiple) {
+                            _this.classed(SELECTED, !isSelected);
+                            toggle(!isSelected, _this, d, i);
+                        } else {
+                            isSelected ? c3.unselect() : c3.select([d.id], [i], true);
+                        }
                     }
                 });
         }
