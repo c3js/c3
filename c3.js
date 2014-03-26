@@ -1,13 +1,14 @@
 (function (window) {
     'use strict';
 
-    var c3 = window.c3 = {};
-    var d3 = window.d3;
+    var c3 = {};
 
     /*
      * Generate chart according to config
      */
     c3.generate = function (config) {
+
+        var d3 = window.d3 ? window.d3 : window.require ? window.require("d3") : undefined;
 
         var c3 = { data : {} },
             cache = {};
@@ -666,6 +667,177 @@
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
             return maxWidth;
+        }
+
+        function categoryAxis() {
+            var scale = d3.scale.linear(), orient = "bottom";
+            var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null, tickCulling = true;
+            var categories = [];
+            function axisX(selection, x) {
+                selection.attr("transform", function (d) {
+                    return "translate(" + (x(d) + tickOffset) + ", 0)";
+                });
+            }
+            function axisY(selection, y) {
+                selection.attr("transform", function (d) {
+                    return "translate(0," + y(d) + ")";
+                });
+            }
+            function scaleExtent(domain) {
+                var start = domain[0], stop = domain[domain.length - 1];
+                return start < stop ? [ start, stop ] : [ stop, start ];
+            }
+            function generateTicks(domain) {
+                var ticks = [];
+                for (var i = Math.ceil(domain[0]); i < domain[1]; i++) {
+                    ticks.push(i);
+                }
+                if (ticks.length > 0 && ticks[0] > 0) {
+                    ticks.unshift(ticks[0] - (ticks[1] - ticks[0]));
+                }
+                return ticks;
+            }
+            function shouldShowTickText(ticks, i) {
+                var length = ticks.length - 1;
+                return length <= tickTextNum || i % Math.ceil(length / tickTextNum) === 0;
+            }
+            function category(i) {
+                return i < categories.length ? categories[i] : i;
+            }
+            function formattedCategory(i) {
+                var c = category(i);
+                return tickFormat ? tickFormat(c) : c;
+            }
+            function axis(g) {
+                g.each(function () {
+                    var g = d3.select(this);
+                    var ticks = generateTicks(scale.domain());
+                    var tick = g.selectAll(".tick.major").data(ticks, String),
+                        tickEnter = tick.enter().insert("g", "path").attr("class", "tick major").style("opacity", 1e-6),
+                        tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
+                        tickUpdate = d3.transition(tick).style("opacity", 1),
+                        tickTransform,
+                        tickX;
+                    var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
+                        path = g.selectAll(".domain").data([ 0 ]);
+
+                    path.enter().append("path").attr("class", "domain");
+
+                    var pathUpdate = d3.transition(path);
+
+                    var scale1 = scale.copy(), scale0 = this.__chart__ || scale1;
+                    this.__chart__ = scale1;
+                    tickEnter.append("line");
+                    tickEnter.append("text");
+                    var lineEnter = tickEnter.select("line"), lineUpdate = tickUpdate.select("line"), text = tick.select("text"), textEnter = tickEnter.select("text"), textUpdate = tickUpdate.select("text");
+
+                    tickOffset = (scale1(1) - scale1(0)) / 2;
+                    tickX = tickCentered ? 0 : tickOffset;
+
+                    switch (orient) {
+                    case "bottom":
+                        {
+                            tickTransform = axisX;
+                            lineEnter.attr("y2", tickMajorSize);
+                            textEnter.attr("y", Math.max(tickMajorSize, 0) + tickPadding);
+                            lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
+                            textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
+                            text.attr("dy", ".71em").style("text-anchor", "middle");
+                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
+                            break;
+                        }
+/* TODO: implement
+                    case "top":
+                        {
+                        tickTransform = axisX
+                        lineEnter.attr("y2", -tickMajorSize)
+                        textEnter.attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
+                        lineUpdate.attr("x2", 0).attr("y2", -tickMajorSize)
+                        textUpdate.attr("x", 0).attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
+                        text.attr("dy", "0em").style("text-anchor", "middle")
+                        pathUpdate.attr("d", "M" + range[0] + "," + -tickEndSize + "V0H" + range[1] + "V" + -tickEndSize)
+                        break
+                        }
+*/
+                    case "left":
+                        {
+                            tickTransform = axisY;
+                            lineEnter.attr("x2", -tickMajorSize);
+                            textEnter.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding));
+                            lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
+                            textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
+                            text.attr("dy", ".32em").style("text-anchor", "end");
+                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
+                            break;
+                        }
+/*
+                case "right":
+                    {
+                        tickTransform = axisY
+                        lineEnter.attr("x2", tickMajorSize)
+                        textEnter.attr("x", Math.max(tickMajorSize, 0) + tickPadding)
+                        lineUpdate.attr("x2", tickMajorSize).attr("y2", 0)
+                        textUpdate.attr("x", Math.max(tickMajorSize, 0) + tickPadding).attr("y", 0)
+                        text.attr("dy", ".32em").style("text-anchor", "start")
+                        pathUpdate.attr("d", "M" + tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + tickEndSize)
+                        break
+                    }
+*/
+                    }
+                    if (scale.ticks) {
+                        tickEnter.call(tickTransform, scale0);
+                        tickUpdate.call(tickTransform, scale1);
+                        tickExit.call(tickTransform, scale1);
+                    } else {
+                        var dx = scale1.rangeBand() / 2, x = function (d) {
+                            return scale1(d) + dx;
+                        };
+                        tickEnter.call(tickTransform, x);
+                        tickUpdate.call(tickTransform, x);
+                    }
+                });
+            }
+            axis.scale = function (x) {
+                if (!arguments.length) { return scale; }
+                scale = x;
+                return axis;
+            };
+            axis.orient = function (x) {
+                if (!arguments.length) { return orient; }
+                orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
+                return axis;
+            };
+            axis.categories = function (x) {
+                if (!arguments.length) { return categories; }
+                categories = x;
+                return axis;
+            };
+            axis.tickCentered = function (x) {
+                if (!arguments.length) { return tickCentered; }
+                tickCentered = x;
+                return axis;
+            };
+            axis.tickFormat = function (format) {
+                if (!arguments.length) { return tickFormat; }
+                tickFormat = format;
+                return axis;
+            };
+            axis.tickOffset = function () {
+                return tickOffset;
+            };
+            axis.ticks = function (n) {
+                if (!arguments.length) { return tickTextNum; }
+                tickTextNum = n;
+                return axis;
+            };
+            axis.tickCulling = function (culling) {
+                if (!arguments.length) { return tickCulling; }
+                tickCulling = culling;
+                return axis;
+            };
+            return axis;
         }
 
         //-- Arc --//
@@ -3538,178 +3710,6 @@
         return c3;
     };
 
-    function categoryAxis() {
-        var scale = d3.scale.linear(), orient = "bottom";
-        var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null, tickCulling = true;
-        var categories = [];
-        function axisX(selection, x) {
-            selection.attr("transform", function (d) {
-                return "translate(" + (x(d) + tickOffset) + ", 0)";
-            });
-        }
-        function axisY(selection, y) {
-            selection.attr("transform", function (d) {
-                return "translate(0," + y(d) + ")";
-            });
-        }
-        function scaleExtent(domain) {
-            var start = domain[0], stop = domain[domain.length - 1];
-            return start < stop ? [ start, stop ] : [ stop, start ];
-        }
-        function generateTicks(domain) {
-            var ticks = [];
-            for (var i = Math.ceil(domain[0]); i < domain[1]; i++) {
-                ticks.push(i);
-            }
-            if (ticks.length > 0 && ticks[0] > 0) {
-                ticks.unshift(ticks[0] - (ticks[1] - ticks[0]));
-            }
-            return ticks;
-        }
-        function shouldShowTickText(ticks, i) {
-            var length = ticks.length - 1;
-            return length <= tickTextNum || i % Math.ceil(length / tickTextNum) === 0;
-        }
-        function category(i) {
-            return i < categories.length ? categories[i] : i;
-        }
-        function formattedCategory(i) {
-            var c = category(i);
-            return tickFormat ? tickFormat(c) : c;
-        }
-        function axis(g) {
-            g.each(function () {
-                var g = d3.select(this);
-                var ticks = generateTicks(scale.domain());
-                var tick = g.selectAll(".tick.major").data(ticks, String),
-                    tickEnter = tick.enter().insert("g", "path").attr("class", "tick major").style("opacity", 1e-6),
-                    tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
-                    tickUpdate = d3.transition(tick).style("opacity", 1),
-                    tickTransform,
-                    tickX;
-                var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
-                    path = g.selectAll(".domain").data([ 0 ]);
-
-                path.enter().append("path").attr("class", "domain");
-
-                var pathUpdate = d3.transition(path);
-
-                var scale1 = scale.copy(), scale0 = this.__chart__ || scale1;
-                this.__chart__ = scale1;
-                tickEnter.append("line");
-                tickEnter.append("text");
-                var lineEnter = tickEnter.select("line"), lineUpdate = tickUpdate.select("line"), text = tick.select("text"), textEnter = tickEnter.select("text"), textUpdate = tickUpdate.select("text");
-
-                tickOffset = (scale1(1) - scale1(0)) / 2;
-                tickX = tickCentered ? 0 : tickOffset;
-
-                switch (orient) {
-                case "bottom":
-                    {
-                        tickTransform = axisX;
-                        lineEnter.attr("y2", tickMajorSize);
-                        textEnter.attr("y", Math.max(tickMajorSize, 0) + tickPadding);
-                        lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
-                        textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
-                        text.attr("dy", ".71em").style("text-anchor", "middle");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
-                        pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
-                    }
-
-                    break;
-/* TODO: implement
-                case "top":
-                    {
-                        tickTransform = axisX
-                        lineEnter.attr("y2", -tickMajorSize)
-                        textEnter.attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
-                        lineUpdate.attr("x2", 0).attr("y2", -tickMajorSize)
-                        textUpdate.attr("x", 0).attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
-                        text.attr("dy", "0em").style("text-anchor", "middle")
-                        pathUpdate.attr("d", "M" + range[0] + "," + -tickEndSize + "V0H" + range[1] + "V" + -tickEndSize)
-                        break
-                    }
-*/
-                case "left":
-                    {
-                        tickTransform = axisY;
-                        lineEnter.attr("x2", -tickMajorSize);
-                        textEnter.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding));
-                        lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
-                        textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
-                        text.attr("dy", ".32em").style("text-anchor", "end");
-                        text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
-                        pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
-                        break;
-                    }
-/*
-                case "right":
-                    {
-                        tickTransform = axisY
-                        lineEnter.attr("x2", tickMajorSize)
-                        textEnter.attr("x", Math.max(tickMajorSize, 0) + tickPadding)
-                        lineUpdate.attr("x2", tickMajorSize).attr("y2", 0)
-                        textUpdate.attr("x", Math.max(tickMajorSize, 0) + tickPadding).attr("y", 0)
-                        text.attr("dy", ".32em").style("text-anchor", "start")
-                        pathUpdate.attr("d", "M" + tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + tickEndSize)
-                        break
-                    }
-*/
-                }
-                if (scale.ticks) {
-                    tickEnter.call(tickTransform, scale0);
-                    tickUpdate.call(tickTransform, scale1);
-                    tickExit.call(tickTransform, scale1);
-                } else {
-                    var dx = scale1.rangeBand() / 2, x = function (d) {
-                        return scale1(d) + dx;
-                    };
-                    tickEnter.call(tickTransform, x);
-                    tickUpdate.call(tickTransform, x);
-                }
-            });
-        }
-        axis.scale = function (x) {
-            if (!arguments.length) { return scale; }
-            scale = x;
-            return axis;
-        };
-        axis.orient = function (x) {
-            if (!arguments.length) { return orient; }
-            orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
-            return axis;
-        };
-        axis.categories = function (x) {
-            if (!arguments.length) { return categories; }
-            categories = x;
-            return axis;
-        };
-        axis.tickCentered = function (x) {
-            if (!arguments.length) { return tickCentered; }
-            tickCentered = x;
-            return axis;
-        };
-        axis.tickFormat = function (format) {
-            if (!arguments.length) { return tickFormat; }
-            tickFormat = format;
-            return axis;
-        };
-        axis.tickOffset = function () {
-            return tickOffset;
-        };
-        axis.ticks = function (n) {
-            if (!arguments.length) { return tickTextNum; }
-            tickTextNum = n;
-            return axis;
-        };
-        axis.tickCulling = function (culling) {
-            if (!arguments.length) { return tickCulling; }
-            tickCulling = culling;
-            return axis;
-        };
-        return axis;
-    }
-
     function isValue(v) {
         return v || v === 0;
     }
@@ -3719,5 +3719,12 @@
     function isDefined(v) {
         return typeof v !== 'undefined';
     }
+
+    if (typeof window.define === "function" && window.define.amd) {
+        window.define(c3);
+    } else {
+        window.c3 = c3;
+    }
+    // TODO: module.exports
 
 })(window);
