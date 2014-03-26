@@ -287,6 +287,8 @@
             };
             width = currentWidth - margin.left - margin.right;
             height = currentHeight - margin.top - margin.bottom;
+            if (width < 0) { width = 0; }
+            if (height < 0) { height = 0; }
 
             // for context
             margin2 = {
@@ -297,6 +299,8 @@
             };
             width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
             height2 = __axis_rotated ? height : currentHeight - margin2.top - margin2.bottom;
+            if (width2 < 0) { width2 = 0; }
+            if (height2 < 0) { height2 = 0; }
 
             // for legend
             margin3 = {
