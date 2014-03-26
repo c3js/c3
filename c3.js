@@ -2528,6 +2528,7 @@
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
+            if (!__data_selection_multiple) { return; } // skip when single selection becuase drag is used for multiple selection
 
             sx = dragStart[0];
             sy = dragStart[1];
@@ -2567,12 +2568,8 @@
                     if (isWithin ^ isIncluded) {
                         _this.classed(INCLUDED, !isIncluded);
                         // TODO: included/unincluded callback here
-                        if (__data_selection_multiple) {
-                            _this.classed(SELECTED, !isSelected);
-                            toggle(!isSelected, _this, d, i);
-                        } else {
-                            isSelected ? c3.unselect() : c3.select([d.id], [i], true);
-                        }
+                        _this.classed(SELECTED, !isSelected);
+                        toggle(!isSelected, _this, d, i);
                     }
                 });
         }
