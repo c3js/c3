@@ -1,7 +1,7 @@
 {
   "name": "c3",
   "main": "c3.min.js",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "homepage": "https://github.com/masayuki0812/c3",
   "authors": [
     "Masayuki Tanaka <masayuki0812@mac.com>"
@@ -20,6 +20,6 @@
     "tests"
   ],
   "dependencies": {
-    "d3": "~3.4.3"
+    "d3": "~3.4.4"
   }
 }
