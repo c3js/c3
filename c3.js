@@ -67,7 +67,10 @@
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
-            __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true);
+            __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true),
+            __data_onclick = getConfig(['data', 'onclick'], function () {}),
+            __data_onselected = getConfig(['data', 'onselected'], function () {}),
+            __data_onunselected = getConfig(['data', 'onunselected'], function () {});
 
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
@@ -129,10 +132,7 @@
             __point_focus_line_enabled = getConfig(['point', 'focus', 'line', 'enabled'], true),
             __point_focus_expand_enabled = getConfig(['point', 'focus', 'expand', 'enabled'], true),
             __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
-            __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8),
-            __point_onclick = getConfig(['point', 'onclick'], function () {}),
-            __point_onselected = getConfig(['point', 'onselected'], function () {}),
-            __point_onunselected = getConfig(['point', 'onunselected'], function () {});
+            __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
 
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
@@ -1754,7 +1754,7 @@
         //-- Selection --//
 
         function selectPoint(target, d, i) {
-            __point_onselected(target, d);
+            __data_onselected(d, target.node());
             // add selected-circle on low layer g
             main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll('.selected-circle-' + i)
                 .data([d])
@@ -1768,7 +1768,7 @@
                 .attr("r", __point_select_r);
         }
         function unselectPoint(target, d, i) {
-            __point_onunselected(target, d);
+            __data_onunselected(d, target.node());
             // remove selected-circle from low layer g
             main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll(".selected-circle-" + i)
               .transition().duration(100).attr('r', 0)
@@ -1779,9 +1779,11 @@
         }
 
         function selectBar(target, d) {
+            __data_onselected(d, target.node());
             target.transition().duration(100).style("fill", function () { return d3.rgb(color(d.id)).darker(1); });
         }
         function unselectBar(target, d) {
+            __data_onunselected(d, target.node());
             target.transition().duration(100).style("fill", function () { return color(d.id); });
         }
         function toggleBar(selected, target, d, i) {
@@ -2518,7 +2520,7 @@
                         isSelected ? c3.unselect() : c3.select([d.id], [i], true);
                     }
                 }
-                __point_onclick(d, _this); // TODO: should be __data_onclick
+                __data_onclick(d, target);
             }
         }
 
@@ -3538,16 +3540,20 @@
         c3.select = function (ids, indices, resetOther) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
-                var selectShape = (this.nodeName === 'circle') ? selectPoint : selectBar,
-                    unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
+                var shape = d3.select(this),
+                    select = (this.nodeName === 'circle') ? selectPoint : selectBar,
+                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
-                    isTargetIndex = !indices || indices.indexOf(i) >= 0;
+                    isTargetIndex = !indices || indices.indexOf(i) >= 0,
+                    isSelected = shape.classed(SELECTED);
                 if (isTargetId && isTargetIndex) {
-                    if (__data_selection_isselectable(d)) {
-                        selectShape(d3.select(this).classed(SELECTED, true), d, i);
+                    if (__data_selection_isselectable(d) && !isSelected) {
+                        select(shape.classed(SELECTED, true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
-                    unselectShape(d3.select(this).classed(SELECTED, false), d, i);
+                    if (isSelected) {
+                        unselect(shape.classed(SELECTED, false), d, i);
+                    }
                 }
             });
         };
@@ -3555,12 +3561,16 @@
         c3.unselect = function (ids, indices) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
-                var unselectShape = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
+                var shape = d3.select(this),
+                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
-                    isTargetIndex = !indices || indices.indexOf(i) >= 0;
+                    isTargetIndex = !indices || indices.indexOf(i) >= 0,
+                    isSelected = shape.classed(SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
-                        unselectShape(d3.select(this).classed(SELECTED, false), d, i);
+                        if (isSelected) {
+                            unselect(shape.classed(SELECTED, false), d, i);
+                        }
                     }
                 }
             });
