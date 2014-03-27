@@ -2424,7 +2424,7 @@
                         cancelClick = false;
                         return;
                     }
-                    main.selectAll('.-shape-' + i).each(function (d) { selectShape(this, d, i); });
+                    main.selectAll('.-shape-' + i).each(function (d) { toggleShape(this, d, i); });
                 })
                 .call(
                     d3.behavior.drag().origin(Object)
@@ -2488,7 +2488,7 @@
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
                         main.select('.-circles-' + getTargetSelectorSuffix(closest.id)).select('.-circle-' + closest.index).each(function () {
-                            selectShape(this, closest, closest.index);
+                            toggleShape(this, closest, closest.index);
                         });
                     }
                 })
@@ -2501,9 +2501,9 @@
                 .call(zoom).on("dblclick.zoom", null);
         }
 
-        function selectShape(target, d, i) {
-            var _this = d3.select(target),
-                isSelected = _this.classed(SELECTED);
+        function toggleShape(target, d, i) {
+            var shape = d3.select(target),
+                isSelected = shape.classed(SELECTED);
             var isWithin = false, toggle;
             if (target.nodeName === 'circle') {
                 isWithin = isWithinCircle(target, __point_select_r * 1.5);
@@ -2515,12 +2515,14 @@
             }
             if (__data_selection_grouped || isWithin) {
                 if (__data_selection_enabled && __data_selection_isselectable(d)) {
-                    if (__data_selection_multiple) {
-                        _this.classed(SELECTED, !isSelected);
-                        toggle(!isSelected, _this, d, i);
-                    } else {
-                        isSelected ? c3.unselect() : c3.select([d.id], [i], true);
+                    if (!__data_selection_multiple) {
+                        main.selectAll('.-shapes' + (__data_selection_grouped ? getTargetSelectorSuffix(d.id) : "")).selectAll('.-shape').each(function (d, i) {
+                            var shape = d3.select(this);
+                            if (shape.classed(SELECTED)) { toggle(false, shape.classed(SELECTED, false), d, i); }
+                        });
                     }
+                    shape.classed(SELECTED, !isSelected);
+                    toggle(!isSelected, shape, d, i);
                 }
                 __data_onclick(d, target);
             }
