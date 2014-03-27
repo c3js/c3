@@ -70,7 +70,9 @@
             __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true),
             __data_onclick = getConfig(['data', 'onclick'], function () {}),
             __data_onselected = getConfig(['data', 'onselected'], function () {}),
-            __data_onunselected = getConfig(['data', 'onunselected'], function () {});
+            __data_onunselected = getConfig(['data', 'onunselected'], function () {}),
+            __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
+            __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
@@ -2584,7 +2586,7 @@
                 .attr('class', 'dragarea')
                 .style('opacity', 0.1);
             dragging = true;
-            // TODO: add callback here
+            __data_ondragstart();
         }
 
         function dragend() {
@@ -2597,8 +2599,7 @@
             main.selectAll('.-shape')
                 .classed(INCLUDED, false);
             dragging = false;
-            // TODO: add callback here
-
+            __data_ondragend();
         }
 
         function redraw(options) {
