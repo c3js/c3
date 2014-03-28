@@ -1191,7 +1191,7 @@
             }
 
             // convert to target
-            targets = ids.map(function (id) {
+            targets = ids.map(function (id, index) {
                 var convertedId = __data_id_converter(id);
                 return {
                     id: convertedId,
@@ -1202,8 +1202,15 @@
                         if (isTimeSeries) {
                             x = d[xKey] instanceof Date ? d[xKey] : parseDate(d[xKey]);
                         }
-                        else if (isCustomX) {
+                        else if (isCustomX && !isCategorized) {
                             x = d[xKey] ? +d[xKey] : getXValue(id, i);
+                        }
+                        else if (isCustomX && isCategorized) {
+                            x = i;
+                            if (index === 0 && d[xKey]) {
+                                if (i === 0) { __axis_x_categories = []; }
+                                __axis_x_categories.push(d[xKey]);
+                            }
                         }
                         else {
                             x = i;
