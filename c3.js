@@ -1459,6 +1459,13 @@
             return closest;
         }
 
+        function getPathBox(path) {
+            var box = path.getBoundingClientRect(),
+                items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
+                minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
+            return {x: minX, y: minY, width: box.width, height: box.height};
+        }
+
         function isOrderDesc() {
             return __data_order && __data_order.toLowerCase() === 'desc';
         }
@@ -1729,7 +1736,7 @@
         }
         function isWithinBar(_this) {
             var mouse = d3.mouse(_this), box = _this.getBBox();
-            var x = box.x, y = box.y, w = box.width, h = box.height, offset = 10;
+            var x = box.x, y = box.y, w = box.width, h = box.height, offset = 2;
             var sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
             return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
         }
@@ -2557,19 +2564,21 @@
                     var _this = d3.select(this),
                         isSelected = _this.classed(SELECTED),
                         isIncluded = _this.classed(INCLUDED),
-                        _x, _y, _w, toggle, isWithin = false;
+                        _x, _y, _w, _h, toggle, isWithin = false, box;
                     if (this.nodeName === 'circle') {
                         _x = _this.attr("cx") * 1;
                         _y = _this.attr("cy") * 1;
                         toggle = togglePoint;
                         isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
                     }
-                    else if (this.nodeName === 'rect') {
-                        _x = _this.attr("x") * 1;
-                        _y = _this.attr("y") * 1;
-                        _w = _this.attr('width') * 1;
+                    else if (this.nodeName === 'path') {
+                        box = getPathBox(this);
+                        _x = box.x;
+                        _y = box.y;
+                        _w = box.width;
+                        _h = box.height;
                         toggle = toggleBar;
-                        isWithin = minX < _x + _w && _x < maxX && _y < maxY;
+                        isWithin = !(maxX < _x || _x + _w < minX) && !(maxY < _y || _y + _h < minY);
                     }
                     if (isWithin ^ isIncluded) {
                         _this.classed(INCLUDED, !isIncluded);
