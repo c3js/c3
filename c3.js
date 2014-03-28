@@ -475,7 +475,7 @@
         function getEventRectWidth() {
             var base = __axis_rotated ? height : width,
                 maxDataCount = getMaxDataCount(),
-                ratio = getXDomainRatio() * (hasBarType(c3.data.targets) ? (maxDataCount - 1) / maxDataCount : 0.98);
+                ratio = getXDomainRatio() * (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 0.98);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
         function updateLegndStep(step) {
@@ -3014,7 +3014,7 @@
                     .attr('height', height);
                 // exit : not needed becuase always only one rect exists
             } else {
-                if (isCustomX) {
+                if (isCustomX && !isCategorized) {
                     rectW = function (d, i) {
                         var prevX = getPrevX(i), nextX = getNextX(i);
                         return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
