@@ -331,7 +331,7 @@
         //-- Sizes --//
 
         // TODO: configurabale
-        var rotated_padding_left = 40, rotated_padding_right = 20, rotated_padding_top = 5;
+        var rotated_padding_left = 30, rotated_padding_right = 30, rotated_padding_top = 5;
 
         function updateSizes() {
             currentWidth = getCurrentWidth();
@@ -2373,7 +2373,7 @@
                 context.append("g")
                     .attr("class", CLASS.axisX)
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "");
+                    .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"));
             }
 
             // Set targets
