@@ -15,6 +15,62 @@
 
         var EXPANDED = '_expanded_', SELECTED = '_selected_', INCLUDED = '_included_';
 
+        var CLASS = {
+            target: 'c3-target',
+            chart : 'c3-chart',
+            chartLine: 'c3-chart-line',
+            chartLines: 'c3-chart-lines',
+            chartBar: 'c3-chart-bar',
+            chartBars: 'c3-chart-bars',
+            chartText: 'c3-chart-text',
+            chartTexts: 'c3-chart-texts',
+            chartArc: 'c3-chart-arc',
+            chartArcs: 'c3-chart-arcs',
+            chartArcsTitle: 'c3-chart-arcs-title',
+            selectedCircle: 'c3-selected-circle',
+            selectedCircles: 'c3-selected-circles',
+            eventRect: 'c3-event-rect',
+            eventRects: 'c3-event-rects',
+            zoomRect: 'c3-zoom-rect',
+            brush: 'c3-brush',
+            focused: 'c3-focused',
+            region: 'c3-region',
+            regions: 'c3-regions',
+            tooltip: 'c3-tooltip',
+            tooltipName: 'c3-tooltip-name',
+            shape: 'c3-shape',
+            shapes: 'c3-shapes',
+            line: 'c3-line',
+            bar: 'c3-bar',
+            bars: 'c3-bars',
+            circle: 'c3-circle',
+            circles: 'c3-circles',
+            arc: 'c3-arc',
+            area: 'c3-area',
+            text: 'c3-text',
+            texts: 'c3-texts',
+            grid: 'c3-grid',
+            xgrid: 'c3-xgrid',
+            xgrids: 'c3-xgrids',
+            xgridLine: 'c3-xgrid-line',
+            xgridLines: 'c3-xgrid-lines',
+            xgridFocus: 'c3-xgrid-focus',
+            ygrid: 'c3-ygrid',
+            ygrids: 'c3-ygrids',
+            ygridLine: 'c3-ygrid-line',
+            ygridLines: 'c3-ygrid-lines',
+            axisX: 'c3-axis-x',
+            axisXLabel: 'c3-axis-x-label',
+            axisY: 'c3-axis-y',
+            axisYLabel: 'c3-axis-y-label',
+            axisY2: 'c3-axis-y2',
+            axisY2Label: 'c3-axis-y2-label',
+            legendItem: 'c3-legend-item',
+            legendItemEvent: 'c3-legend-item-event',
+            legendItemTile: 'c3-legend-item-tile',
+            dragarea: 'c3-dragarea',
+        };
+
         /*-- Handle Config --*/
 
         function checkConfig(key, message) {
@@ -167,13 +223,16 @@
 
                 if (! text) {
                     title = titleFormat ? titleFormat(d[i].x) : d[i].x;
-                    text = "<table class='-tooltip'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+                    text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
                 }
 
                 name = d[i].name;
                 value = valueFormat(d[i].value, d[i].ratio);
 
-                text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
+                text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
+                text += "<td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td>";
+                text += "<td class='value'>" + value + "</td>";
+                text += "</tr>";
             }
             return text + "</table>";
         }),
@@ -246,15 +305,15 @@
 
         function transformMain() {
             main.attr("transform", translate.main);
-            main.select('.x.axis').attr("transform", translate.x);
-            main.select('.y.axis').attr("transform", translate.y);
-            main.select('.y2.axis').attr("transform", translate.y2);
-            main.select('.chart-arcs').attr("transform", translate.arc);
+            main.select('.' + CLASS.axisX).attr("transform", translate.x);
+            main.select('.' + CLASS.axisY).attr("transform", translate.y);
+            main.select('.' + CLASS.axisY2).attr("transform", translate.y2);
+            main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
         }
         function transformContext() {
             if (__subchart_show) {
                 context.attr("transform", translate.context);
-                context.select('.x.axis').attr("transform", translate.subx);
+                context.select('.' + CLASS.axisX).attr("transform", translate.subx);
             }
         }
         function transformLegend(withTransition) {
@@ -325,8 +384,8 @@
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getSvgLeft() {
-            var leftAxisClass = __axis_rotated ? ".x.axis" : ".y.axis",
-                leftAxis = d3.select(leftAxisClass).node(),
+            var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
+                leftAxis = d3.select('.' + leftAxisClass).node(),
                 svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
                 chartRect = d3.select(__bindto).node().getBoundingClientRect(),
                 svgLeft = svgRect.right - chartRect.left - getCurrentPaddingLeft();
@@ -667,8 +726,8 @@
             return textAnchorForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
         }
         function getMaxTickWidth(id) {
-            var maxWidth = 0;
-            d3.selectAll('.' + id + '.axis .tick text').each(function () {
+            var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
+            d3.selectAll('.' + axisClass + ' .tick text').each(function () {
                 var box = this.getBBox();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
@@ -913,8 +972,8 @@
             return format ? format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
         }
         function expandArc(id, withoutFadeOut) {
-            var target = svg.selectAll('.chart-arc' + getTargetSelector(id)),
-                noneTargets = svg.selectAll('.-arc').filter(function (data) { return data.data.id !== id; });
+            var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id)),
+                noneTargets = svg.selectAll('.' + CLASS.arc).filter(function (data) { return data.data.id !== id; });
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArcExpanded)
@@ -930,11 +989,11 @@
             }
         }
         function unexpandArc(id) {
-            var target = svg.selectAll('.chart-arc' + getTargetSelector(id));
+            var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id));
             target.selectAll('path')
               .transition().duration(50)
                 .attr("d", svgArc);
-            svg.selectAll('.-arc')
+            svg.selectAll('.' + CLASS.arc)
                 .style("opacity", 1);
         }
         function shouldShowArcLable() {
@@ -1332,19 +1391,24 @@
         function generateClass(prefix, targetId) {
             return " " + prefix + " " + prefix + getTargetSelectorSuffix(targetId);
         }
-        function classText(d) { return generateClass("-text", d.id); }
-        function classTexts(d) { return generateClass("-texts", d.id); }
-        function classShapes(d) { return generateClass("-shapes", d.id); }
-        function classLine(d) { return classShapes(d) + generateClass("-line", d.id); }
-        function classCircles(d) { return classShapes(d) + generateClass("-circles", d.id); }
-        function classBars(d) { return classShapes(d) + generateClass("-bars", d.id); }
-        function classArc(d) { return classShapes(d.data) + generateClass("-arc", d.data.id); }
-        function classArea(d) { return classShapes(d) + generateClass("-area", d.id); }
-        function classShape(d, i) { return generateClass("-shape", i); }
-        function classCircle(d, i) { return classShape(d, i) + generateClass("-circle", i); }
-        function classBar(d, i) { return classShape(d, i) + generateClass("-bar", i); }
-        function classRegion(d, i) { return generateClass("region", i) + ' ' + ('class' in d ? d.class : ''); }
-        function classEvent(d, i) { return generateClass("event-rect", i); }
+        function classText(d) { return generateClass(CLASS.text, d.id); }
+        function classTexts(d) { return generateClass(CLASS.texts, d.id); }
+        function classShape(d, i) { return generateClass(CLASS.shape, i); }
+        function classShapes(d) { return generateClass(CLASS.shapes, d.id); }
+        function classLine(d) { return classShapes(d) + generateClass(CLASS.line, d.id); }
+        function classCircle(d, i) { return classShape(d, i) + generateClass(CLASS.circle, i); }
+        function classCircles(d) { return classShapes(d) + generateClass(CLASS.circles, d.id); }
+        function classBar(d, i) { return classShape(d, i) + generateClass(CLASS.bar, i); }
+        function classBars(d) { return classShapes(d) + generateClass(CLASS.bars, d.id); }
+        function classArc(d) { return classShapes(d.data) + generateClass(CLASS.arc, d.data.id); }
+        function classArea(d) { return classShapes(d) + generateClass(CLASS.area, d.id); }
+        function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
+        function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
+
+        function getTargetSelectorSuffix(targetId) {
+            return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
+        }
+        function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
 
         function initialOpacity(d) {
             return withoutFadeIn[d.id] ? 1 : 0;
@@ -1550,14 +1614,14 @@
             if (! __tooltip_show) { return; }
             // Hide when scatter plot exists
             if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
-            main.selectAll('line.xgrid-focus')
+            main.selectAll('line.' + CLASS.xgridFocus)
                 .style("visibility", "visible")
                 .data([dataToShow[0]])
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
         }
         function hideXGridFocus() {
-            main.select('line.xgrid-focus').style("visibility", "hidden");
+            main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
         }
 
         //-- Circle --//
@@ -1771,10 +1835,10 @@
         function selectPoint(target, d, i) {
             __data_onselected(d, target.node());
             // add selected-circle on low layer g
-            main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll('.selected-circle-' + i)
+            main.select('.' + CLASS.selectedCircles + getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
                 .data([d])
               .enter().append('circle')
-                .attr("class", function () { return generateClass("selected-circle", i); })
+                .attr("class", function () { return generateClass(CLASS.selectedCircle, i); })
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("stroke", function () { return color(d.id); })
@@ -1785,7 +1849,7 @@
         function unselectPoint(target, d, i) {
             __data_onunselected(d, target.node());
             // remove selected-circle from low layer g
-            main.select(".selected-circles" + getTargetSelectorSuffix(d.id)).selectAll(".selected-circle-" + i)
+            main.select('.' + CLASS.selectedCircles + getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
               .transition().duration(100).attr('r', 0)
                 .remove();
         }
@@ -1812,7 +1876,7 @@
         //-- Shape --//
 
         function getCircles(i, id) {
-            return (id ? main.selectAll('.-circles' + getTargetSelectorSuffix(id)) : main).selectAll('.-circle' + (isValue(i) ? '-' + i : ''));
+            return (id ? main.selectAll('.' + CLASS.circles + getTargetSelectorSuffix(id)) : main).selectAll('.' + CLASS.circle + (isValue(i) ? '-' + i : ''));
         }
         function expandCircles(i, id) {
             getCircles(i, id)
@@ -1826,7 +1890,7 @@
                 .attr('r', __point_r);
         }
         function getBars(i) {
-            return main.selectAll(".-bar" + (isValue(i) ? '-' + i : ''));
+            return main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
         }
         function expandBars(i) {
             getBars(i).classed(EXPANDED, true);
@@ -2037,7 +2101,7 @@
 
         brush = d3.svg.brush().on("brush", redrawForBrush);
         brush.update = function () {
-            if (context) { context.select('.x.brush').call(this); }
+            if (context) { context.select('.' + CLASS.brush).call(this); }
             return this;
         };
         brush.scale = function (scale) {
@@ -2084,6 +2148,9 @@
                 selectChart.html("");
             }
 
+            // Set class
+            selectChart.classed("c3", true);
+
             // Init data as targets
             c3.data.x = {};
             c3.data.targets = convertDataToTargets(data);
@@ -2112,7 +2179,7 @@
             /*-- Basic Elements --*/
 
             // Define svgs
-            svg = d3.select(__bindto).append("svg")
+            svg = selectChart.append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .on('mouseenter', __onenter)
@@ -2157,11 +2224,11 @@
 
             // Add Axis
             main.append("g")
-                .attr("class", "x axis")
+                .attr("class", CLASS.axisX)
                 .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"))
                 .attr("transform", translate.x)
               .append("text")
-                .attr("class", "-axis-x-label")
+                .attr("class", CLASS.axisXLabel)
                 .attr("transform", __axis_rotated ? "rotate(-90)" : "")
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
@@ -2170,10 +2237,10 @@
 
             if (__axis_y_show) {
                 main.append("g")
-                    .attr("class", "y axis")
+                    .attr("class", CLASS.axisY)
                     .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
                   .append("text")
-                    .attr("class", "-axis-y-label")
+                    .attr("class", CLASS.axisYLabel)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .attr("dx", dxForYAxisLabel)
                     .attr("dy", dyForYAxisLabel)
@@ -2183,11 +2250,11 @@
 
             if (__axis_y2_show) {
                 main.append("g")
-                    .attr("class", "y2 axis")
+                    .attr("class", CLASS.axisY2)
                     // clip-path?
                     .attr("transform", translate.y2)
                   .append("text")
-                    .attr("class", "-axis-y2-label")
+                    .attr("class", CLASS.axisY2Label)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .attr("dx", dxForY2AxisLabel)
                     .style("text-anchor", textAnchorForY2AxisLabel)
@@ -2197,20 +2264,20 @@
             // Grids
             grid = main.append('g')
                 .attr("clip-path", clipPath)
-                .attr('class', 'grid');
+                .attr('class', CLASS.grid);
 
             // X-Grid
             if (__grid_x_show) {
-                grid.append("g").attr("class", "xgrids");
+                grid.append("g").attr("class", CLASS.xgrids);
             }
             if (__grid_x_lines) {
-                grid.append('g').attr("class", "xgrid-lines");
+                grid.append('g').attr("class", CLASS.xgridLines);
             }
             if (__point_focus_line_enabled) {
                 grid.append('g')
-                    .attr("class", "xgrid-focus")
+                    .attr("class", CLASS.xgridFocus)
                   .append('line')
-                    .attr('class', 'xgrid-focus')
+                    .attr('class', CLASS.xgridFocus)
                     .attr("x1", __axis_rotated ? 0 : -10)
                     .attr("x2", __axis_rotated ? width : -10)
                     .attr("y1", __axis_rotated ? -10 : margin.top)
@@ -2219,52 +2286,52 @@
 
             // Y-Grid
             if (__grid_y_show) {
-                grid.append('g').attr('class', 'ygrids');
+                grid.append('g').attr('class', CLASS.ygrids);
             }
             if (__grid_y_lines) {
-                grid.append('g').attr('class', 'ygrid-lines');
+                grid.append('g').attr('class', CLASS.ygridLines);
             }
 
             // Regions
             main.append('g')
                 .attr("clip-path", clipPath)
-                .attr("class", "regions");
+                .attr("class", CLASS.regions);
 
             // Define g for chart area
             main.append('g')
                 .attr("clip-path", clipPath)
-                .attr('class', 'chart');
+                .attr('class', CLASS.chart);
 
             // Cover whole with rects for events
-            eventRect = main.select('.chart').append("g")
-                .attr("class", "event-rects")
+            eventRect = main.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.eventRects)
                 .style('fill-opacity', 0)
                 .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
 
             // Define g for bar chart area
-            main.select(".chart").append("g")
-                .attr("class", "chart-bars");
+            main.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartBars);
 
             // Define g for line chart area
-            main.select(".chart").append("g")
-                .attr("class", "chart-lines");
+            main.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartLines);
 
             // Define g for arc chart area
-            main.select(".chart").append("g")
-                .attr("class", "chart-arcs")
+            main.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartArcs)
                 .attr("transform", translate.arc)
               .append('text')
-                .attr('class', 'chart-arcs-title')
+                .attr('class', CLASS.chartArcsTitle)
                 .style("text-anchor", "middle")
                 .text(getArcTitle());
 
-            main.select(".chart").append("g")
-                .attr("class", "chart-texts");
+            main.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartTexts);
 
             if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
                 main.insert('rect', __zoom_privileged ? null : 'g.grid')
-                    .attr('class', 'zoom-rect')
+                    .attr('class', CLASS.zoomRect)
                     .attr('width', width)
                     .attr('height', height)
                     .style('opacity', 0)
@@ -2283,20 +2350,20 @@
                 // Define g for chart area
                 context.append('g')
                     .attr("clip-path", clipPath)
-                    .attr('class', 'chart');
+                    .attr('class', CLASS.chart);
 
                 // Define g for bar chart area
-                context.select(".chart").append("g")
-                    .attr("class", "chart-bars");
+                context.select('.' + CLASS.chart).append("g")
+                    .attr("class", CLASS.chartBars);
 
                 // Define g for line chart area
-                context.select(".chart").append("g")
-                    .attr("class", "chart-lines");
+                context.select('.' + CLASS.chart).append("g")
+                    .attr("class", CLASS.chartLines);
 
                 // Add extent rect for Brush
                 context.append("g")
                     .attr("clip-path", clipPath)
-                    .attr("class", "x brush")
+                    .attr("class", CLASS.brush)
                     .call(brush)
                   .selectAll("rect")
                     .attr(__axis_rotated ? "width" : "height", __axis_rotated ? width2 : height2);
@@ -2304,7 +2371,7 @@
                 // ATTENTION: This must be called AFTER chart added
                 // Add Axis
                 context.append("g")
-                    .attr("class", "x axis")
+                    .attr("class", CLASS.axisX)
                     .attr("transform", translate.subx)
                     .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "");
             }
@@ -2314,10 +2381,10 @@
 
             // Update ticks for width calculation
             if (__axis_rotated) {
-                main.select(".x.axis").style("opacity", 0).call(xAxis);
+                main.select('.' + CLASS.axisX).style("opacity", 0).call(xAxis);
             } else {
-                main.select(".y.axis").style("opacity", 0).call(yAxis);
-                main.select(".y2.axis").style("opacity", 0).call(yAxis2);
+                main.select('.' + CLASS.axisY).style("opacity", 0).call(yAxis);
+                main.select('.' + CLASS.axisY2).style("opacity", 0).call(yAxis2);
             }
 
             // Draw with targets
@@ -2407,12 +2474,12 @@
                     if (! __data_selection_enabled) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
 
-                    main.selectAll('.-shape-' + i)
+                    main.selectAll('.' + CLASS.shape + '-' + i)
                         .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
                             var _this = d3.select(this).classed(EXPANDED, true);
                             if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
-                            svg.select('.event-rect-' + i).style('cursor', null);
+                            svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', null);
                         })
                         .filter(function () {
                             if (this.nodeName === 'circle') {
@@ -2428,7 +2495,7 @@
                                 _this.classed(EXPANDED, true);
                                 if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
                             }
-                            svg.select('.event-rect-' + i).style('cursor', 'pointer');
+                            svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', 'pointer');
                         });
                 })
                 .on('click', function (_, i) {
@@ -2437,7 +2504,7 @@
                         cancelClick = false;
                         return;
                     }
-                    main.selectAll('.-shape-' + i).each(function (d) { toggleShape(this, d, i); });
+                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) { toggleShape(this, d, i); });
                 })
                 .call(
                     d3.behavior.drag().origin(Object)
@@ -2454,7 +2521,7 @@
                 .attr('y', 0)
                 .attr('width', width)
                 .attr('height', height)
-                .attr('class', "event-rect")
+                .attr('class', CLASS.eventRect)
                 .on('mouseout', function () {
                     if (hasArcType(c3.data.targets)) { return; }
                     hideXGridFocus();
@@ -2484,11 +2551,7 @@
                     showXGridFocus(selectedData);
 
                     // Show cursor as pointer if point is close to mouse position
-                    if (dist(closest, mouse) < 100) {
-                        svg.select('.event-rect').style('cursor', 'pointer');
-                    } else {
-                        svg.select('.event-rect').style('cursor', null);
-                    }
+                    svg.select('.' + CLASS.eventRect).style('cursor', dist(closest, mouse) < 100 ? 'pointer' : null);
                 })
                 .on('click', function () {
                     var mouse, closest;
@@ -2500,7 +2563,7 @@
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
-                        main.select('.-circles-' + getTargetSelectorSuffix(closest.id)).select('.-circle-' + closest.index).each(function () {
+                        main.select('.' + CLASS.circles + '-' + getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
                             toggleShape(this, closest, closest.index);
                         });
                     }
@@ -2529,7 +2592,7 @@
             if (__data_selection_grouped || isWithin) {
                 if (__data_selection_enabled && __data_selection_isselectable(d)) {
                     if (!__data_selection_multiple) {
-                        main.selectAll('.-shapes' + (__data_selection_grouped ? getTargetSelectorSuffix(d.id) : "")).selectAll('.-shape').each(function (d, i) {
+                        main.selectAll('.' + CLASS.shapes + (__data_selection_grouped ? getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS.shape).each(function (d, i) {
                             var shape = d3.select(this);
                             if (shape.classed(SELECTED)) { toggle(false, shape.classed(SELECTED, false), d, i); }
                         });
@@ -2558,13 +2621,13 @@
             minY = (__data_selection_grouped) ? margin.top : Math.min(sy, my);
             maxY = (__data_selection_grouped) ? height : Math.max(sy, my);
 
-            main.select('.dragarea')
+            main.select('.' + CLASS.dragarea)
                 .attr('x', minX)
                 .attr('y', minY)
                 .attr('width', maxX - minX)
                 .attr('height', maxY - minY);
             // TODO: binary search when multiple xs
-            main.selectAll('.-shapes').selectAll('.-shape')
+            main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape)
                 .filter(function (d) { return __data_selection_isselectable(d); })
                 .each(function (d, i) {
                     var _this = d3.select(this),
@@ -2599,8 +2662,8 @@
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             dragStart = mouse;
-            main.select('.chart').append('rect')
-                .attr('class', 'dragarea')
+            main.select('.' + CLASS.chart).append('rect')
+                .attr('class', CLASS.dragarea)
                 .style('opacity', 0.1);
             dragging = true;
             __data_ondragstart();
@@ -2609,11 +2672,11 @@
         function dragend() {
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
-            main.select('.dragarea')
+            main.select('.' + CLASS.dragarea)
                 .transition().duration(100)
                 .style('opacity', 0)
                 .remove();
-            main.selectAll('.-shape')
+            main.selectAll('.' + CLASS.shape)
                 .classed(INCLUDED, false);
             dragging = false;
             __data_ondragend();
@@ -2664,9 +2727,9 @@
             y2.domain(getYDomain('y2'));
 
             // axis
-            main.select(".x.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
-            main.select(".y.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis);
-            main.select(".y2.axis").style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
+            main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
+            main.select('.' + CLASS.axisY).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis);
+            main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // setup drawer - MEMO: these must be called after axis updated
             drawBar = generateDrawBar(barIndices);
@@ -2674,9 +2737,9 @@
             yForText = generateXYForText(barIndices, false);
 
             // Update label position
-            main.select(".x.axis .-axis-x-label").attr("x", xForXAxisLabel);
-            main.select(".y.axis .-axis-y-label").attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel);
-            main.select(".y2.axis .-axis-y2-label").attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel);
+            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel);
+            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel);
+            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel);
 
             // Update sub domain
             subY.domain(y.domain());
@@ -2686,7 +2749,7 @@
             tooltip.style("display", "none");
 
             // grid
-            main.select('line.xgrid-focus')
+            main.select('line.' + CLASS.xgridFocus)
                 .style("visibility", "hidden")
                 .attr('y2', height);
             if (__grid_x_show) {
@@ -2702,9 +2765,9 @@
                     xgridData = x.ticks(10);
                 }
 
-                xgrid = main.select('.xgrids').selectAll(".xgrid")
+                xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
                     .data(xgridData);
-                xgrid.enter().append('line').attr("class", "xgrid");
+                xgrid.enter().append('line').attr("class", CLASS.xgrid);
                 xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return x(d) - xAxis.tickOffset(); })
                     .attr("x2", __axis_rotated ? width : function (d) { return x(d) - xAxis.tickOffset(); })
                     .attr("y1", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : margin.top)
@@ -2713,11 +2776,11 @@
                 xgrid.exit().remove();
             }
             if (__grid_x_lines) {
-                xgridLines = main.select('.xgrid-lines').selectAll('.xgrid-line')
+                xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
                     .data(__grid_x_lines);
                 // enter
                 xgridLine = xgridLines.enter().append('g')
-                    .attr("class", function (d) { return "xgrid-line xgrid-line-" + (d['class'] ? d['class'] : ''); });
+                    .attr("class", function (d) { return CLASS.xgridLine + (d.class ? d.class : ''); });
                 xgridLine.append('line')
                     .style("opacity", 0);
                 xgridLine.append('text')
@@ -2747,10 +2810,10 @@
             }
             // Y-Grid
             if (withY && __grid_y_show) {
-                ygrid = main.select('.ygrids').selectAll(".ygrid")
+                ygrid = main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
                     .data(y.ticks(__grid_y_ticks));
                 ygrid.enter().append('line')
-                    .attr('class', 'ygrid');
+                    .attr('class', CLASS.ygrid);
                 ygrid.attr("x1", __axis_rotated ? y : 0)
                     .attr("x2", __axis_rotated ? y : width)
                     .attr("y1", __axis_rotated ? 0 : y)
@@ -2758,11 +2821,11 @@
                 ygrid.exit().remove();
             }
             if (withY && __grid_y_lines) {
-                ygridLines = main.select('.ygrid-lines').selectAll('.ygrid-line')
+                ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
                     .data(__grid_y_lines);
                 // enter
                 ygridLine = ygridLines.enter().append('g')
-                    .attr("class", function (d) { return "ygrid-line ygrid-line-" + (d.class ? d.class : ''); });
+                    .attr("class", function (d) { return CLASS.ygridLine + (d.class ? d.class : ''); });
                 ygridLine.append('line')
                     .style("opacity", 0);
                 ygridLine.append('text')
@@ -2792,7 +2855,7 @@
             }
 
             // bars
-            mainBar = main.selectAll('.-bars').selectAll('.-bar')
+            mainBar = main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                 .data(barData);
             mainBar.enter().append('path')
                 .attr('d', drawBar)
@@ -2809,7 +2872,7 @@
                 .style('opacity', 0)
                 .remove();
 
-            mainText = main.selectAll('.-texts').selectAll('.-text')
+            mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
                 .data(barOrLineData);
             mainText.enter().append('text')
                 .attr("class", classText)
@@ -2829,17 +2892,17 @@
                 .remove();
 
             // lines and cricles
-            main.selectAll('.-line')
+            main.selectAll('.' + CLASS.line)
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr("d", lineOnMain)
                 .style("opacity", 1);
-            main.selectAll('.-area')
+            main.selectAll('.' + CLASS.area)
                 .style("opacity", 0)
               .transition().duration(duration)
                 .attr("d", areaOnMain)
                 .style("opacity", orgAreaOpacity);
-            mainCircle = main.selectAll('.-circles').selectAll('.-circle')
+            mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
                 .data(lineOrScatterData);
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
@@ -2854,7 +2917,7 @@
             mainCircle.exit().remove();
 
             // arc
-            main.selectAll('.chart-arc').select('.-arc')
+            main.selectAll('.' + CLASS.chartArc).select('.' + CLASS.arc)
                 .attr("transform", withTransform ? "scale(0)" : "")
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
               .transition().duration(duration)
@@ -2877,13 +2940,13 @@
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
                 .style("opacity", 1);
-            main.selectAll('.chart-arc').select('text')
+            main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
               .transition().duration(duration)
                 .text(textForArcLabel)
                 .style("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
-            main.select('.chart-arcs-title')
+            main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
 
             // subchart
@@ -2895,7 +2958,7 @@
                 // update subchart elements if needed
                 if (withSubchart) {
                     // axes
-                    context.select('.x.axis').style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(subXAxis);
+                    context.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(subXAxis);
                     // extent rect
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
@@ -2903,7 +2966,7 @@
                     // setup drawer - MEMO: this must be called after axis updated
                     drawBarOnSub = generateDrawBar(barIndices, true);
                     // bars
-                    contextBar = context.selectAll('.-bars').selectAll('.-bar')
+                    contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                         .data(barData);
                     contextBar.enter().append('path')
                         .attr('d', drawBarOnSub)
@@ -2919,7 +2982,7 @@
                         .style('opacity', 0)
                         .remove();
                     // lines
-                    context.selectAll('.-line')
+                    context.selectAll('.' + CLASS.line)
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
                         .attr("d", lineOnSub)
@@ -2928,18 +2991,18 @@
             }
 
             // circles for select
-            main.selectAll('.selected-circles')
+            main.selectAll('.' + CLASS.selectedCircles)
                 .filter(function (d) { return isBarType(d); })
                 .selectAll('circle')
                 .remove();
-            main.selectAll('.selected-circle')
+            main.selectAll('.' + CLASS.selectedCircle)
               .transition().duration(duration)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
             if (__data_xs) {
-                eventRectUpdate = main.select('.event-rects').selectAll('.event-rect')
+                eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
                     .data([0]);
                 // enter : only one rect will be added
                 generateEventRectsForMultipleXs(eventRectUpdate.enter());
@@ -2966,10 +3029,10 @@
                 }
                 // Set data
                 maxDataCountTarget = getMaxDataCountTarget();
-                main.select(".event-rects")
+                main.select('.' + CLASS.eventRects)
                     .datum(maxDataCountTarget ? maxDataCountTarget.values : []);
                 // Update rects
-                eventRectUpdate = main.select('.event-rects').selectAll('.event-rect')
+                eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
                     .data(function (d) { return d; });
                 // enter
                 generateEventRectsForSingleX(eventRectUpdate.enter());
@@ -2985,7 +3048,7 @@
             }
 
             // rect for regions
-            mainRegion = main.select('.regions').selectAll('rect.region')
+            mainRegion = main.select('.' + CLASS.regions).selectAll('rect.' + CLASS.region)
                 .data(__regions);
             mainRegion.enter().append('rect')
                 .style("fill-opacity", 0);
@@ -3051,7 +3114,7 @@
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
             svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
             svg.select('#yaxis-clip').select('rect').attr('width', getYAxisClipWidth);
-            svg.select('.zoom-rect').attr('width', width).attr('height', height);
+            svg.select('.' + CLASS.zoomRect).attr('width', width).attr('height', height);
         }
 
         function updateAndRedraw(options) {
@@ -3079,22 +3142,22 @@
             /*-- Main --*/
 
             //-- Text --//
-            mainTextUpdate = main.select('.chart-texts')
-                  .selectAll('.chart-text')
+            mainTextUpdate = main.select('.' + CLASS.chartTexts)
+                  .selectAll('.' + CLASS.chartText)
                     .data(targets);
             mainTextEnter = mainTextUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-text' + generateClass('target', d.id); })
+                .attr('class', function (d) { return CLASS.chartText + generateClass(CLASS.target, d.id); })
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
                 .style("fill", function (d) { return color(d.id); });
 
             //-- Bar --//
-            mainBarUpdate = main.select('.chart-bars')
-              .selectAll('.chart-bar')
+            mainBarUpdate = main.select('.' + CLASS.chartBars)
+              .selectAll('.' + CLASS.chartBar)
                 .data(targets);
             mainBarEnter = mainBarUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-bar' + generateClass('target', d.id); })
+                .attr('class', function (d) { return CLASS.chartBar + generateClass(CLASS.target, d.id); })
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -3104,11 +3167,11 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
 
             //-- Line --//
-            mainLineUpdate = main.select('.chart-lines')
-              .selectAll('.chart-line')
+            mainLineUpdate = main.select('.' + CLASS.chartLines)
+              .selectAll('.' + CLASS.chartLine)
                 .data(targets);
             mainLineEnter = mainLineUpdate.enter().append('g')
-                .attr('class', function (d) { return 'chart-line' + generateClass('target', d.id); })
+                .attr('class', function (d) { return CLASS.chartLine + generateClass(CLASS.target, d.id); })
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -3122,15 +3185,14 @@
                 .style("fill", function (d) { return color(d.id); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
-                .attr("class", function (d) { return generateClass("selected-circles", d.id); });
+                .attr("class", function (d) { return generateClass(CLASS.selectedCircles, d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
                 .style("fill", function (d) { return color(d.id); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
-                var suffix = getTargetSelectorSuffix(t.id);
-                main.selectAll('.selected-circles' + suffix).selectAll('.selected-circle').each(function (d) {
+                main.selectAll('.' + CLASS.selectedCircles + getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d) {
                     d.value = t.values[d.x].value;
                 });
             });
@@ -3138,11 +3200,11 @@
             //mainLineUpdate.exit().remove();
 
             //-- Pie --//
-            mainPieUpdate = main.select('.chart-arcs')
-              .selectAll(".chart-arc")
+            mainPieUpdate = main.select('.' + CLASS.chartArcs)
+              .selectAll('.' + CLASS.chartArc)
                 .data(pie(targets));
             mainPieEnter = mainPieUpdate.enter().append("g")
-                .attr("class", function (d) { return 'chart-arc target target-' + d.data.id; });
+                .attr("class", function (d) { return CLASS.chartArc + generateClass(CLASS.target, d.data.id); });
             mainPieEnter.append("path")
                 .attr("class", classArc)
                 .style("opacity", 0)
@@ -3182,22 +3244,22 @@
 
             if (__subchart_show) {
 
-                contextBarUpdate = context.select('.chart-bars')
-                  .selectAll('.chart-bar')
+                contextBarUpdate = context.select('.' + CLASS.chartBars)
+                  .selectAll('.' + CLASS.chartBar)
                     .data(targets);
                 contextBarEnter = contextBarUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-bar' + generateClass('target', d.id); });
+                    .attr('class', function (d) { return CLASS.chartBar + generateClass(CLASS.target, d.id); });
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
                     .style("fill", function (d) { return color(d.id); });
 
                 //-- Line --//
-                contextLineUpdate = context.select('.chart-lines')
-                  .selectAll('.chart-line')
+                contextLineUpdate = context.select('.' + CLASS.chartLines)
+                  .selectAll('.' + CLASS.chartLine)
                     .data(targets);
                 contextLineEnter = contextLineUpdate.enter().append('g')
-                    .attr('class', function (d) { return 'chart-line' + generateClass('target', d.id); });
+                    .attr('class', function (d) { return CLASS.chartLine + generateClass(CLASS.target, d.id); });
                 // Lines for each data
                 contextLineEnter.append("path")
                     .attr("class", classLine)
@@ -3208,7 +3270,7 @@
             /*-- Show --*/
 
             // Fade-in each chart
-            svg.selectAll('.target')
+            svg.selectAll('.' + CLASS.target)
                 .transition()
                 .style("opacity", 1);
         }
@@ -3240,7 +3302,7 @@
         function toggleFocusLegend(id, focus) {
             var legendItem, isTarget, notTarget;
             if (!__legend_show) { return; }
-            legendItem = legend.selectAll('.legend-item');
+            legendItem = legend.selectAll('.' + CLASS.legendItem);
             isTarget = function (d) { return !id || d === id; };
             notTarget = function (d) { return !isTarget(d); };
             legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : 1);
@@ -3254,7 +3316,7 @@
         }
         function revertLegend() {
             if (!__legend_show) { return; }
-            legend.selectAll('.legend-item')
+            legend.selectAll('.' + CLASS.legendItem)
               .transition().duration(100)
                 .style('opacity', 1);
         }
@@ -3337,10 +3399,10 @@
             yForLegendRect = function (id, i) { return yForLegend(id, i) - 7; };
 
             // Define g for legend area
-            l = legend.selectAll('.legend-item')
+            l = legend.selectAll('.' + CLASS.legendItem)
                 .data(ids)
               .enter().append('g')
-                .attr('class', function (id) { return generateClass('legend-item', id); })
+                .attr('class', function (id) { return generateClass(CLASS.legendItem, id); })
                 .style('cursor', 'pointer')
                 .on('click', function (id) {
                     __legend_item_onclick(id);
@@ -3358,14 +3420,14 @@
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegendText);
             l.append('rect')
-                .attr("class", "legend-item-event")
+                .attr("class", CLASS.legendItemEvent)
                 .style('fill-opacity', 0)
                 .attr('x', isLegendRight ? xForLegendRect : -200)
                 .attr('y', isLegendRight ? -200 : yForLegendRect)
                 .attr('width', function (id) { return widths[id]; })
                 .attr('height', function (id) { return heights[id]; });
             l.append('rect')
-                .attr("class", "legend-item-tile")
+                .attr("class", CLASS.legendItemTile)
                 .style("pointer-events", "none")
                 .style('fill', function (id) { return color(id); })
                 .attr('x', isLegendRight ? xForLegendText : -200)
@@ -3380,13 +3442,13 @@
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
 
-            legend.selectAll('rect.legend-item-event')
+            legend.selectAll('rect.' + CLASS.legendItemEvent)
                 .data(ids)
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendRect)
                 .attr('y', yForLegendRect);
 
-            legend.selectAll('rect.legend-item-tile')
+            legend.selectAll('rect.' + CLASS.legendItemTile)
                 .data(ids)
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegend)
@@ -3406,12 +3468,6 @@
 
         /*-- Event Handling --*/
 
-        function getTargetSelectorSuffix(targetId) {
-            return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
-        }
-        function getTargetSelector(targetId) {
-            return '.target' + getTargetSelectorSuffix(targetId);
-        }
         function isNoneArc(d) {
             return hasTarget(d.id);
         }
@@ -3425,7 +3481,7 @@
         }
 
         c3.focus = function (targetId) {
-            var candidates = svg.selectAll(getTargetSelector(targetId)),
+            var candidates = svg.selectAll(selectorTarget(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function focus(targets) {
@@ -3433,7 +3489,7 @@
             }
             c3.revert();
             c3.defocus();
-            focus(candidatesForNoneArc.classed('focused', true));
+            focus(candidatesForNoneArc.classed(CLASS.focused, true));
             focus(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
                 expandArc(targetId, true);
@@ -3442,14 +3498,14 @@
         };
 
         c3.defocus = function (targetId) {
-            var candidates = svg.selectAll(getTargetSelector(targetId)),
+            var candidates = svg.selectAll(selectorTarget(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function defocus(targets) {
                 targets.transition().duration(100).style('opacity', 0.3);
             }
             c3.revert();
-            defocus(candidatesForNoneArc.classed('focused', false));
+            defocus(candidatesForNoneArc.classed(CLASS.focused, false));
             defocus(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(targetId);
@@ -3458,13 +3514,13 @@
         };
 
         c3.revert = function (targetId) {
-            var candidates = svg.selectAll(getTargetSelector(targetId)),
+            var candidates = svg.selectAll(selectorTarget(targetId)),
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function revert(targets) {
                 targets.transition().duration(100).style('opacity', 1);
             }
-            revert(candidatesForNoneArc.classed('focused', false));
+            revert(candidatesForNoneArc.classed(CLASS.focused, false));
             revert(candidatesForArc);
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(targetId);
@@ -3473,13 +3529,13 @@
         };
 
         c3.show = function (targetId) {
-            svg.selectAll(getTargetSelector(targetId))
+            svg.selectAll(selectorTarget(targetId))
                 .transition()
                 .style('opacity', 1);
         };
 
         c3.hide = function (targetId) {
-            svg.selectAll(getTargetSelector(targetId))
+            svg.selectAll(selectorTarget(targetId))
                 .transition()
                 .style('opacity', 0);
         };
@@ -3532,13 +3588,13 @@
             c3.data.targets = c3.data.targets.filter(function (t) {
                 return t.id !== targetId;
             });
-            svg.selectAll(getTargetSelector(targetId))
+            svg.selectAll(selectorTarget(targetId))
               .transition()
                 .style('opacity', 0)
                 .remove();
 
             if (__legend_show) {
-                legend.selectAll('.legend-item' + getTargetSelectorSuffix(targetId)).remove();
+                legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(targetId)).remove();
             }
 
             if (c3.data.targets.length > 0) {
@@ -3547,9 +3603,8 @@
         };
 
         c3.selected = function (targetId) {
-            var suffix = getTargetSelectorSuffix(targetId);
             return d3.merge(
-                main.selectAll('.-shapes' + suffix).selectAll('.-shape')
+                main.selectAll('.' + CLASS.shapes + getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape)
                     .filter(function () { return d3.select(this).classed(SELECTED); })
                     .map(function (d) { return d.map(function (_d) { return _d.__data__; }); })
             );
@@ -3557,7 +3612,7 @@
 
         c3.select = function (ids, indices, resetOther) {
             if (! __data_selection_enabled) { return; }
-            main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
+            main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
                 var shape = d3.select(this),
                     select = (this.nodeName === 'circle') ? selectPoint : selectBar,
                     unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
@@ -3578,7 +3633,7 @@
 
         c3.unselect = function (ids, indices) {
             if (! __data_selection_enabled) { return; }
-            main.selectAll('.-shapes').selectAll('.-shape').each(function (d, i) {
+            main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
                 var shape = d3.select(this),
                     unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,

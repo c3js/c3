@@ -14,95 +14,95 @@ text {
           user-select: none;
 }
 
-.chart-arc path {
+.c3-chart-arc path {
   stroke: #fff;
 
 }
-.chart-arc text {
+.c3-chart-arc text {
   fill: #fff;
   font-size: 13px;
 }
 
 /*-- Grid --*/
 
-.grid line {
+.c3-grid line {
   stroke: #aaa;
 }
-.grid text {
+.c3-grid text {
   fill: #aaa;
 }
-.xgrid, .ygrid {
+.c3-xgrid, .c3-ygrid {
   stroke-dasharray: 3 3;
 }
-.xgrid-focus {
+.c3-xgrid-focus {
 }
 
 /*-- Text on Chart --*/
 
-.-text {
+.c3-text {
 }
 
 /*-- Line --*/
 
-.-line {
+.c3-line {
   stroke-width: 1px;
 }
 /*-- Point --*/
 
-.-circle._expanded_ {
+.c3-circle._expanded_ {
   stroke-width: 1px;
   stroke: white;
 }
-.selected-circle {
+.c3-selected-circle {
   fill: white;
   stroke-width: 2px;
 }
 
 /*-- Bar --*/
 
-.-bar._expanded_ {
+.c3-bar._expanded_ {
   fill-opacity: 0.75;
 }
 
 /*-- Arc --*/
 
-.chart-arcs-title {
+.c3-chart-arcs-title {
   font-size: 1.3em;
 }
 
 /*-- Focus --*/
 
-.target.focused path.-line {
+.c3-target.c3-focused path.-line {
   stroke-width: 2px;
 }
 
 /*-- Region --*/
 
-.region {
+.c3-region {
   fill: steelblue;
   fill-opacity: .1;
 }
 
 /*-- Brush --*/
 
-.brush .extent {
+.c3-brush .extent {
   fill-opacity: .1;
 }
 
 /*-- Select - Drag --*/
 
-.dragarea {
+.c3-dragarea {
 }
 
 /*-- Legend --*/
 
-.legend-item {
+.c3-legend-item {
   font-size: 12px;
 }
 
 /*-- Tooltip --*/
 
-.-tooltip {
+.c3-tooltip {
   border-collapse:collapse;
   border-spacing:0;
   background-color:#fff;
@@ -112,33 +112,33 @@ text {
           box-shadow: 7px 7px 12px -9px rgb(119,119,119);
   opacity: 0.9;
 }
-.-tooltip tr {
+.c3-tooltip tr {
   border:1px solid #CCC;
 }
-.-tooltip th {
+.c3-tooltip th {
   background-color: #aaa;
   font-size:14px;
   padding:2px 5px;
   text-align:left;
   color:#FFF;
 }
-.-tooltip td {
+.c3-tooltip td {
   font-size:13px;
   padding: 3px 6px;
   background-color:#fff;
   border-left:1px dotted #999;
 }
-.-tooltip td > span {
+.c3-tooltip td > span {
   display: inline-block;
   width: 10px;
   height: 10px;
   margin-right: 6px;
 }
-.-tooltip td.value{
+.c3-tooltip td.value{
   text-align: right;
 }
 
-.-area {
+.c3-area {
   stroke-width: 0;
   opacity: 0.2;
 }
