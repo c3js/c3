@@ -72,7 +72,7 @@ text {
 
 /*-- Focus --*/
 
-.c3-target.c3-focused path.-line {
+.c3-target.c3-focused path.c3-line {
   stroke-width: 2px;
 }
 
