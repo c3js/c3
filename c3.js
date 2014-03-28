@@ -1499,7 +1499,7 @@
             // don't show tooltip when no data
             if (dataToShow.length === 0) { return; }
             // Construct tooltip
-            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color));
+            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color)).style("display", "block");
             // Get tooltip dimensions
             tWidth = tooltip.property('offsetWidth');
             tHeight = tooltip.property('offsetHeight');
@@ -1532,8 +1532,7 @@
             // Set tooltip
             tooltip
                 .style("top", tooltipTop + "px")
-                .style("left", tooltipLeft + 'px')
-                .style("display", "block");
+                .style("left", tooltipLeft + 'px');
         }
         function hideTooltip() {
             tooltip.style("display", "none");
