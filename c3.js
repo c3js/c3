@@ -415,8 +415,8 @@
         }
         function getEventRectWidth() {
             var base = __axis_rotated ? height : width,
-                ratio = getXDomainRatio(),
-                maxDataCount = getMaxDataCount();
+                maxDataCount = getMaxDataCount(),
+                ratio = getXDomainRatio() * (hasBarType(c3.data.targets) ? (maxDataCount - 1) / maxDataCount : 0.98);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
         function updateLegndStep(step) {
