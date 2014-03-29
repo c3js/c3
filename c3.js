@@ -2764,8 +2764,8 @@
 
             // grid
             main.select('line.' + CLASS.xgridFocus)
-                .style("visibility", "hidden")
-                .attr('y2', height);
+                .attr(__axis_rotated ? 'y1' : 'x1', xx)
+                .attr(__axis_rotated ? 'y2' : 'x2', xx);
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
