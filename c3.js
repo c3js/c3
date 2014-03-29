@@ -1270,7 +1270,7 @@
                         var x, xKey = getXKey(id);
 
                         if (isTimeSeries) {
-                            x = d[xKey] instanceof Date ? d[xKey] : parseDate(d[xKey]);
+                            x = d[xKey] ? d[xKey] instanceof Date ? d[xKey] : parseDate(d[xKey]) : null;
                         }
                         else if (isCustomX && !isCategorized) {
                             x = d[xKey] ? +d[xKey] : getXValue(id, i);
@@ -1501,7 +1501,7 @@
             diff > 0 ? max = med : min = med;
 
             // if candidates are two closest min and max, stop recursive call
-            if ((max - min) === 1) {
+            if ((max - min) === 1 || (min === 0 && max === 0)) {
 
                 // Get candidates that has same min and max index
                 candidates = [];
