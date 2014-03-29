@@ -115,7 +115,7 @@
         checkConfig('data', 'data is required in config');
 
         var __data_x = getConfig(['data', 'x']),
-            __data_xs = getConfig(['data', 'xs']),
+            __data_xs = getConfig(['data', 'xs'], {}),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
@@ -142,7 +142,7 @@
             __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
 
         // color
-        var __color_pattern = getConfig(['color', 'pattern']);
+        var __color_pattern = getConfig(['color', 'pattern'], []);
 
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
@@ -258,7 +258,7 @@
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
-            isCustomX = !isTimeSeries && (__data_x || __data_xs);
+            isCustomX = !isTimeSeries && (__data_x || !isEmpty(__data_xs));
 
         var dragStart = null, dragging = false, cancelClick = false;
 
@@ -1190,13 +1190,13 @@
         //-- Data --//
 
         function isX(key) {
-            return (__data_x && key === __data_x) || (__data_xs && hasValue(__data_xs, key));
+            return (__data_x && key === __data_x) || (!isEmpty(__data_xs) && hasValue(__data_xs, key));
         }
         function isNotX(key) {
             return !isX(key);
         }
         function getXKey(id) {
-            return __data_x ? __data_x : __data_xs ? __data_xs[id] : null;
+            return __data_x ? __data_x : !isEmpty(__data_xs) ? __data_xs[id] : null;
         }
         function getXValue(id, i) {
             return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
@@ -1784,7 +1784,7 @@
         function generateColor(_colors, _pattern) {
             var ids = [],
                 colors = _colors,
-                pattern = _pattern ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
+                pattern = !isEmpty(_pattern) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
 
             return function (id) {
                 // if specified, choose that color
@@ -1829,6 +1829,9 @@
             return false;
         }
 
+        function isEmpty(dict) {
+            return Object.keys(dict).length === 0;
+        }
         function hasValue(dict, value) {
             var found = false;
             Object.keys(dict).forEach(function (key) {
@@ -2341,7 +2344,7 @@
 
             if (__zoom_enabled) { // TODO: __zoom_privileged here?
                 // if zoom privileged, insert rect to forefront
-                main.insert('rect', __zoom_privileged ? null : 'g.grid')
+                main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
                     .attr('class', CLASS.zoomRect)
                     .attr('width', width)
                     .attr('height', height)
@@ -3012,7 +3015,7 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (__data_xs) {
+            if (!isEmpty(__data_xs)) {
                 eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
                     .data([0]);
                 // enter : only one rect will be added
