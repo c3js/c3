@@ -2231,6 +2231,7 @@
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
+                .style("pointer-events", "none")
                 .style("z-index", "10")
                 .style("display", "none");
 
