@@ -78,9 +78,11 @@
         }
 
         function getConfig(keys, defaultValue) {
-            var target = config;
-            for (var i = 0; i < keys.length; i++) {
-                if (! (keys[i] in target)) { return defaultValue; }
+            var i, target = config, isDefaultObject = typeof defaultValue === 'object';
+            for (i = 0; i < keys.length; i++) {
+                if (!(keys[i] in target) || (i === keys.length - 1 && !isDefaultObject && typeof target[keys[i]] === 'object')) {
+                    return defaultValue;
+                }
                 target = target[keys[i]];
             }
             return target;
@@ -89,14 +91,14 @@
         // bindto - id to bind the chart
         var __bindto = getConfig(['bindto'], '#chart');
 
-        var __size_width = getConfig(['size', 'width'], null),
-            __size_height = getConfig(['size', 'height'], null);
+        var __size_width = getConfig(['size', 'width']),
+            __size_height = getConfig(['size', 'height']);
 
-        var __padding_left = getConfig(['padding', 'left'], null),
-            __padding_right = getConfig(['padding', 'right'], null);
+        var __padding_left = getConfig(['padding', 'left']),
+            __padding_right = getConfig(['padding', 'right']);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
-            __zoom_extent = getConfig(['zoom', 'extent'], null),
+            __zoom_extent = getConfig(['zoom', 'extent']),
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
 
         var __onenter = getConfig(['onenter'], function () {}),
@@ -107,17 +109,17 @@
         // data - data configuration
         checkConfig('data', 'data is required in config');
 
-        var __data_x = getConfig(['data', 'x'], null),
-            __data_xs = getConfig(['data', 'xs'], null),
+        var __data_x = getConfig(['data', 'x']),
+            __data_xs = getConfig(['data', 'xs']),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
             __data_groups = getConfig(['data', 'groups'], []),
             __data_axes = getConfig(['data', 'axes'], {}),
-            __data_type = getConfig(['data', 'type'], null),
+            __data_type = getConfig(['data', 'type']),
             __data_types = getConfig(['data', 'types'], {}),
             __data_labels = getConfig(['data', 'labels'], {}),
-            __data_order = getConfig(['data', 'order'], null),
+            __data_order = getConfig(['data', 'order']),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_colors = getConfig(['data', 'colors'], {}),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
@@ -135,7 +137,7 @@
             __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
 
         // color
-        var __color_pattern = getConfig(['color', 'pattern'], null);
+        var __color_pattern = getConfig(['color', 'pattern']);
 
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
@@ -148,40 +150,40 @@
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
-            __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format'], null),
+            __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_x_type === 'categorized' ? false : true),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
-            __axis_x_max = getConfig(['axis', 'x', 'max'], null),
-            __axis_x_min = getConfig(['axis', 'x', 'min'], null),
-            __axis_x_default = getConfig(['axis', 'x', 'default'], null),
-            __axis_x_label = getConfig(['axis', 'x', 'label'], null),
+            __axis_x_max = getConfig(['axis', 'x', 'max']),
+            __axis_x_min = getConfig(['axis', 'x', 'min']),
+            __axis_x_default = getConfig(['axis', 'x', 'default']),
+            __axis_x_label = getConfig(['axis', 'x', 'label'], {}),
             __axis_y_show = getConfig(['axis', 'y', 'show'], true),
-            __axis_y_max = getConfig(['axis', 'y', 'max'], null),
-            __axis_y_min = getConfig(['axis', 'y', 'min'], null),
-            __axis_y_center = getConfig(['axis', 'y', 'center'], null),
-            __axis_y_label = getConfig(['axis', 'y', 'label'], null),
+            __axis_y_max = getConfig(['axis', 'y', 'max']),
+            __axis_y_min = getConfig(['axis', 'y', 'min']),
+            __axis_y_center = getConfig(['axis', 'y', 'center']),
+            __axis_y_label = getConfig(['axis', 'y', 'label'], {}),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
-            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], null),
-            __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
+            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format']),
+            __axis_y_padding = getConfig(['axis', 'y', 'padding']),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
-            __axis_y2_max = getConfig(['axis', 'y2', 'max'], null),
-            __axis_y2_min = getConfig(['axis', 'y2', 'min'], null),
-            __axis_y2_center = getConfig(['axis', 'y2', 'center'], null),
-            __axis_y2_label = getConfig(['axis', 'y2', 'label'], null),
+            __axis_y2_max = getConfig(['axis', 'y2', 'max']),
+            __axis_y2_min = getConfig(['axis', 'y2', 'min']),
+            __axis_y2_center = getConfig(['axis', 'y2', 'center']),
+            __axis_y2_label = getConfig(['axis', 'y2', 'label']),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
-            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], null),
-            __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
+            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
+            __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
             __grid_x_type = getConfig(['grid', 'x', 'type'], 'tick'),
-            __grid_x_lines = getConfig(['grid', 'x', 'lines'], null),
+            __grid_x_lines = getConfig(['grid', 'x', 'lines']),
             __grid_y_show = getConfig(['grid', 'y', 'show'], false),
             // not used
             // __grid_y_type = getConfig(['grid', 'y', 'type'], 'tick'),
-            __grid_y_lines = getConfig(['grid', 'y', 'lines'], null),
+            __grid_y_lines = getConfig(['grid', 'y', 'lines']),
             __grid_y_ticks = getConfig(['grid', 'y', 'ticks'], 10);
 
         // point - point of each data
@@ -194,14 +196,14 @@
 
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
-            __pie_label_format = getConfig(['pie', 'label', 'format'], null),
+            __pie_label_format = getConfig(['pie', 'label', 'format']),
             __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
             __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
 
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
-            __donut_label_format = getConfig(['donut', 'label', 'format'], null),
+            __donut_label_format = getConfig(['donut', 'label', 'format']),
             __donut_title = getConfig(['donut', 'title'], ""),
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
             __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
@@ -212,8 +214,8 @@
 
         // tooltip - show when mouseover on each data
         var __tooltip_show = getConfig(['tooltip', 'show'], true),
-            __tooltip_format_title = getConfig(['tooltip', 'format', 'title'], null),
-            __tooltip_format_value = getConfig(['tooltip', 'format', 'value'], null),
+            __tooltip_format_title = getConfig(['tooltip', 'format', 'title']),
+            __tooltip_format_value = getConfig(['tooltip', 'format', 'value']),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d, defaultTitleFormat, defaultValueFormat, color) {
             var titleFormat = __tooltip_format_title ? __tooltip_format_title : defaultTitleFormat,
                 valueFormat = __tooltip_format_value ? __tooltip_format_value : defaultValueFormat,
@@ -1773,7 +1775,7 @@
         function generateColor(_colors, _pattern) {
             var ids = [],
                 colors = _colors,
-                pattern = (_pattern !== null) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
+                pattern = _pattern ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
 
             return function (id) {
                 // if specified, choose that color
@@ -2340,7 +2342,7 @@
             }
 
             // Set default extent if defined
-            if (__axis_x_default !== null) {
+            if (__axis_x_default) {
                 brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain()));
             }
 
