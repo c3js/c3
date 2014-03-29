@@ -2461,9 +2461,6 @@
                     // Expand shapes if needed
                     if (__point_focus_expand_enabled) { expandCircles(i); }
                     expandBars(i);
-
-                    // Show xgrid focus line
-                    showXGridFocus(selectedData);
                 })
                 .on('mouseout', function (_, i) {
                     if (hasArcType(c3.data.targets)) { return; }
@@ -2484,6 +2481,9 @@
                         return addName(d.values[i]);
                     });
                     showTooltip(selectedData, d3.mouse(this));
+
+                    // Show xgrid focus line
+                    showXGridFocus(selectedData);
 
                     if (! __data_selection_enabled) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
@@ -2763,9 +2763,7 @@
             tooltip.style("display", "none");
 
             // grid
-            main.select('line.' + CLASS.xgridFocus)
-                .attr(__axis_rotated ? 'y1' : 'x1', xx)
-                .attr(__axis_rotated ? 'y2' : 'x2', xx);
+            main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
             if (__grid_x_show) {
                 if (__grid_x_type === 'year') {
                     xgridData = [];
