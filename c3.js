@@ -184,11 +184,11 @@
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
             __grid_x_type = getConfig(['grid', 'x', 'type'], 'tick'),
-            __grid_x_lines = getConfig(['grid', 'x', 'lines']),
+            __grid_x_lines = getConfig(['grid', 'x', 'lines'], []),
             __grid_y_show = getConfig(['grid', 'y', 'show'], false),
             // not used
             // __grid_y_type = getConfig(['grid', 'y', 'type'], 'tick'),
-            __grid_y_lines = getConfig(['grid', 'y', 'lines']),
+            __grid_y_lines = getConfig(['grid', 'y', 'lines'], []),
             __grid_y_ticks = getConfig(['grid', 'y', 'ticks'], 10);
 
         // point - point of each data
@@ -2285,7 +2285,7 @@
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
-            if (__grid_x_lines) {
+            if (!isEmpty(__grid_x_lines)) {
                 grid.append('g').attr("class", CLASS.xgridLines);
             }
             if (__point_focus_line_enabled) {
@@ -2303,7 +2303,7 @@
             if (__grid_y_show) {
                 grid.append('g').attr('class', CLASS.ygrids);
             }
-            if (__grid_y_lines) {
+            if (!isEmpty(__grid_y_lines)) {
                 grid.append('g').attr('class', CLASS.ygridLines);
             }
 
@@ -2788,7 +2788,7 @@
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
             }
-            if (__grid_x_lines) {
+            if (!isEmpty(__grid_x_lines)) {
                 xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
                     .data(__grid_x_lines);
                 // enter
@@ -2833,7 +2833,7 @@
                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
             }
-            if (withY && __grid_y_lines) {
+            if (withY && !isEmpty(__grid_y_lines)) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
                     .data(__grid_y_lines);
                 // enter
