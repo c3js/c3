@@ -1,14 +1,14 @@
 /*-- Chart --*/
 
-svg {
+.c3 svg {
   font: 10px sans-serif;
 }
-path, line {
+.c3 path, .c3 line {
   fill: none;
   stroke: #000;
   stroke-width: 1px;
 }
-text {
+.c3 text {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
