@@ -199,6 +199,10 @@
             __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
             __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
 
+        // bar
+        var __bar_width = getConfig(['bar', 'width']),
+            __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6);
+
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
             __pie_label_format = getConfig(['pie', 'label', 'format']),
@@ -1688,7 +1692,7 @@
             };
         }
         function getBarW(axis, barTargetsNum) {
-            return barTargetsNum ? (axis.tickOffset() * 2 * 0.6) / barTargetsNum : 0;
+            return __bar_width ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
         }
 
         //-- Type --//
