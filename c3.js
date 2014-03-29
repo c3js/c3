@@ -78,12 +78,17 @@
         }
 
         function getConfig(keys, defaultValue) {
-            var i, target = config, isDefaultObject = typeof defaultValue === 'object';
+            var target = config, i, isLast, nextTarget;
             for (i = 0; i < keys.length; i++) {
-                if (!(keys[i] in target) || (i === keys.length - 1 && !isDefaultObject && typeof target[keys[i]] === 'object')) {
+                // return default if key not found
+                if (typeof target === 'object' && !(keys[i] in target)) { return defaultValue; }
+                // Check next key's value
+                isLast = (i === keys.length - 1);
+                nextTarget = target[keys[i]];
+                if ((!isLast && typeof nextTarget !== 'object') || (isLast && typeof defaultValue !== 'object' && typeof nextTarget === 'object')) {
                     return defaultValue;
                 }
-                target = target[keys[i]];
+                target = nextTarget;
             }
             return target;
         }
