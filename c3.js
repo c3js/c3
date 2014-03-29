@@ -258,7 +258,7 @@
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
-            isCustomX = !isTimeSeries && (__data_x || !isEmpty(__data_xs));
+            isCustomX = !isTimeSeries && (__data_x || notEmpty(__data_xs));
 
         var dragStart = null, dragging = false, cancelClick = false;
 
@@ -1190,13 +1190,13 @@
         //-- Data --//
 
         function isX(key) {
-            return (__data_x && key === __data_x) || (!isEmpty(__data_xs) && hasValue(__data_xs, key));
+            return (__data_x && key === __data_x) || (notEmpty(__data_xs) && hasValue(__data_xs, key));
         }
         function isNotX(key) {
             return !isX(key);
         }
         function getXKey(id) {
-            return __data_x ? __data_x : !isEmpty(__data_xs) ? __data_xs[id] : null;
+            return __data_x ? __data_x : notEmpty(__data_xs) ? __data_xs[id] : null;
         }
         function getXValue(id, i) {
             return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
@@ -1784,7 +1784,7 @@
         function generateColor(_colors, _pattern) {
             var ids = [],
                 colors = _colors,
-                pattern = !isEmpty(_pattern) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
+                pattern = notEmpty(_pattern) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
 
             return function (id) {
                 // if specified, choose that color
@@ -1829,8 +1829,8 @@
             return false;
         }
 
-        function isEmpty(dict) {
-            return Object.keys(dict).length === 0;
+        function notEmpty(o) {
+            return Object.keys(o).length > 0;
         }
         function hasValue(dict, value) {
             var found = false;
@@ -2285,7 +2285,7 @@
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
-            if (!isEmpty(__grid_x_lines)) {
+            if (notEmpty(__grid_x_lines)) {
                 grid.append('g').attr("class", CLASS.xgridLines);
             }
             if (__point_focus_line_enabled) {
@@ -2303,7 +2303,7 @@
             if (__grid_y_show) {
                 grid.append('g').attr('class', CLASS.ygrids);
             }
-            if (!isEmpty(__grid_y_lines)) {
+            if (notEmpty(__grid_y_lines)) {
                 grid.append('g').attr('class', CLASS.ygridLines);
             }
 
@@ -2788,7 +2788,7 @@
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
             }
-            if (!isEmpty(__grid_x_lines)) {
+            if (notEmpty(__grid_x_lines)) {
                 xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
                     .data(__grid_x_lines);
                 // enter
@@ -2833,7 +2833,7 @@
                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
             }
-            if (withY && !isEmpty(__grid_y_lines)) {
+            if (withY && notEmpty(__grid_y_lines)) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
                     .data(__grid_y_lines);
                 // enter
@@ -3014,7 +3014,7 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (!isEmpty(__data_xs)) {
+            if (notEmpty(__data_xs)) {
                 eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
                     .data([0]);
                 // enter : only one rect will be added
