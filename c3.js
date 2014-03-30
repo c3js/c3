@@ -132,6 +132,8 @@
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
             __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true),
             __data_onclick = getConfig(['data', 'onclick'], function () {}),
+            __data_onenter = getConfig(['data', 'onenter'], function () {}),
+            __data_onleave = getConfig(['data', 'onleave'], function () {}),
             __data_onselected = getConfig(['data', 'onselected'], function () {}),
             __data_onunselected = getConfig(['data', 'onunselected'], function () {}),
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
@@ -260,7 +262,7 @@
             isCategorized = (__axis_x_type === 'categorized'),
             isCustomX = !isTimeSeries && (__data_x || notEmpty(__data_xs));
 
-        var dragStart = null, dragging = false, cancelClick = false;
+        var dragStart = null, dragging = false, cancelClick = false, mouseover = false;
 
         var color = generateColor(__data_colors, __color_pattern);
 
@@ -2462,6 +2464,11 @@
                     // Expand shapes if needed
                     if (__point_focus_expand_enabled) { expandCircles(i); }
                     expandBars(i);
+
+                    // Call event handler
+                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) {
+                        __data_onenter(d);
+                    });
                 })
                 .on('mouseout', function (_, i) {
                     if (hasArcType(c3.data.targets)) { return; }
@@ -2470,6 +2477,10 @@
                     // Undo expanded shapes
                     unexpandCircles(i);
                     unexpandBars();
+                    // Call event handler
+                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) {
+                        __data_onleave(d);
+                    });
                 })
                 .on('mousemove', function (_, i) {
                     var selectedData;
@@ -2566,7 +2577,17 @@
                     showXGridFocus(selectedData);
 
                     // Show cursor as pointer if point is close to mouse position
-                    svg.select('.' + CLASS.eventRect).style('cursor', dist(closest, mouse) < 100 ? 'pointer' : null);
+                    if (dist(closest, mouse) < 100) {
+                        svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
+                        if (!mouseover) {
+                            __data_onenter(closest);
+                            mouseover = true;
+                        }
+                    } else {
+                        svg.select('.' + CLASS.eventRect).style('cursor', null);
+                        __data_onleave(closest);
+                        mouseover = false;
+                    }
                 })
                 .on('click', function () {
                     var mouse, closest;
