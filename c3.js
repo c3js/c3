@@ -284,6 +284,8 @@
             };
         })();
 
+        var hiddenTargetIds = [];
+
         /*-- Set Chart Params --*/
 
         var margin, margin2, margin3, width, width2, height, height2, currentWidth, currentHeight, legendHeight, legendWidth;
@@ -1081,8 +1083,8 @@
             }
             return d3.max(Object.keys(ys).map(function (key) { return d3.max(ys[key]); }));
         }
-        function getYDomain(axisId) {
-            var yTargets = getTargets(function (d) { return getAxisId(d.id) === axisId; }),
+        function getYDomain(targets, axisId) {
+            var yTargets = targets.filter(function (d) { return getAxisId(d.id) === axisId; }),
                 yMin = axisId === 'y2' ? __axis_y2_min : __axis_y_min,
                 yMax = axisId === 'y2' ? __axis_y2_max : __axis_y_max,
                 yDomainMin = isValue(yMin) ? yMin : getYDomainMin(yTargets),
@@ -1369,6 +1371,18 @@
         }
         function getTargets(filter) {
             return isDefined(filter) ? c3.data.targets.filter(filter) : c3.data.targets;
+        }
+        function isTargetToShow(targetId) {
+            return hiddenTargetIds.indexOf(targetId) < 0;
+        }
+        function filterTargetsToShow(targets) {
+            return targets.filter(function (t) { return isTargetToShow(t.id); });
+        }
+        function addHiddenTargetIds(targetIds) {
+            hiddenTargetIds = hiddenTargetIds.concat(targetIds);
+        }
+        function removeHiddenTargetIds(targetIds) {
+            hiddenTargetIds = hiddenTargetIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
         }
         function getValuesAsIdKeyed(targets) {
             var ys = {};
@@ -2179,8 +2193,8 @@
 
             // Set domains for each scale
             x.domain(d3.extent(getXDomain(c3.data.targets)));
-            y.domain(getYDomain('y'));
-            y2.domain(getYDomain('y2'));
+            y.domain(getYDomain(c3.data.targets, 'y'));
+            y2.domain(getYDomain(c3.data.targets, 'y2'));
             subX.domain(x.domain());
             subY.domain(y.domain());
             subY2.domain(y2.domain());
@@ -2727,6 +2741,7 @@
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
+            var targetsToShow = filterTargetsToShow(c3.data.targets);
 
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
@@ -2747,7 +2762,7 @@
             }
 
             if (withUpdateOrgXDomain) {
-                x.domain(d3.extent(getXDomain(c3.data.targets)));
+                x.domain(d3.extent(getXDomain(targetsToShow)));
                 orgXDomain = x.domain();
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 subX.domain(x.domain());
@@ -2759,8 +2774,8 @@
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
-            y.domain(getYDomain('y'));
-            y2.domain(getYDomain('y2'));
+            y.domain(getYDomain(targetsToShow, 'y'));
+            y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // axis
             main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
@@ -3304,7 +3319,7 @@
             /*-- Show --*/
 
             // Fade-in each chart
-            svg.selectAll('.' + CLASS.target)
+            svg.selectAll('.' + CLASS.target).filter(function (d) { return isTargetToShow(d.id); })
                 .transition()
                 .style("opacity", 1);
         }
@@ -3519,7 +3534,7 @@
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function focus(targets) {
-                targets.transition().duration(100).style('opacity', 1);
+                filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
             }
             c3.revert();
             c3.defocus();
@@ -3536,7 +3551,7 @@
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function defocus(targets) {
-                targets.transition().duration(100).style('opacity', 0.3);
+                filterTargetsToShow(targets).transition().duration(100).style('opacity', 0.3);
             }
             c3.revert();
             defocus(candidatesForNoneArc.classed(CLASS.focused, false));
@@ -3552,7 +3567,7 @@
                 candidatesForNoneArc = candidates.filter(isNoneArc),
                 candidatesForArc = candidates.filter(isArc);
             function revert(targets) {
-                targets.transition().duration(100).style('opacity', 1);
+                filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
             }
             revert(candidatesForNoneArc.classed(CLASS.focused, false));
             revert(candidatesForArc);
@@ -3563,15 +3578,19 @@
         };
 
         c3.show = function (targetId) {
+            removeHiddenTargetIds(targetId);
             svg.selectAll(selectorTarget(targetId))
-                .transition()
+              .transition()
                 .style('opacity', 1);
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: false});
         };
 
         c3.hide = function (targetId) {
+            addHiddenTargetIds(targetId);
             svg.selectAll(selectorTarget(targetId))
-                .transition()
+              .transition()
                 .style('opacity', 0);
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: false});
         };
 
         c3.unzoom = function () {
