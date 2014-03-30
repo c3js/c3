@@ -2743,6 +2743,11 @@
             var duration, durationForExit, durationForAxis;
             var targetsToShow = filterTargetsToShow(c3.data.targets);
 
+            // abort if no targets to show
+            if (targetsToShow.length === 0) {
+                return;
+            }
+
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
             withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
