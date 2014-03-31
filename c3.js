@@ -3389,6 +3389,21 @@
             done();
         }
 
+        function unload(targetIds) {
+            targetIds.forEach(function (id) {
+                c3.data.targets = c3.data.targets.filter(function (t) {
+                    return t.id !== id;
+                });
+                svg.selectAll(selectorTarget(id))
+                  .transition()
+                    .style('opacity', 0)
+                    .remove();
+                if (__legend_show) {
+                    legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(id)).remove();
+                }
+            });
+        }
+
         /*-- Draw Legend --*/
 
         function toggleFocusLegend(id, focus) {
@@ -3685,19 +3700,10 @@
             }
         };
 
-        c3.unload = function (targetId) {
-            c3.data.targets = c3.data.targets.filter(function (t) {
-                return t.id !== targetId;
-            });
-            svg.selectAll(selectorTarget(targetId))
-              .transition()
-                .style('opacity', 0)
-                .remove();
-
-            if (__legend_show) {
-                legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(targetId)).remove();
-            }
-
+        c3.unload = function (targetIds) {
+            // remove elements for targetId
+            unload(typeof targetIds === 'string' ? [targetIds] : targetIds);
+            // try redraw if targets exist
             if (c3.data.targets.length > 0) {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
             }
