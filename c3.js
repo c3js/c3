@@ -149,7 +149,7 @@
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
             __legend_position = getConfig(['legend', 'position'], 'bottom'),
-            __legend_item_onclick = getConfig(['legend', 'item', 'onclick'], function () {}),
+            __legend_item_onclick = getConfig(['legend', 'item', 'onclick']),
             __legend_equally = getConfig(['legend', 'equally'], false);
 
         // axis
@@ -3459,7 +3459,7 @@
                 .attr('class', function (id) { return generateClass(CLASS.legendItem, id); })
                 .style('cursor', 'pointer')
                 .on('click', function (id) {
-                    __legend_item_onclick(id);
+                    typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
                 })
                 .on('mouseover', function (id) {
                     c3.focus(id);
