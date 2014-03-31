@@ -3491,6 +3491,7 @@
 
             legend.selectAll('text')
                 .data(ids)
+                .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; }) // MEMO: needed for update
                 .each(function (id, i) { updatePositions(this, id, i === 0); })
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendText)
@@ -3823,6 +3824,12 @@
         c3.data.getAsTarget = function (targetId) {
             var targets = getTargets(function (t) { return t.id === targetId; });
             return targets.length > 0 ? targets[0] : undefined;
+        };
+        c3.data.names = function (names) {
+            if (!arguments.length) { return __data_names; }
+            __data_names = names;
+            updateLegend(c3.data.targets, {withTransition: true});
+            return __data_names;
         };
 
         c3.resize = function (size) {
