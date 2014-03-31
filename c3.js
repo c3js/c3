@@ -1438,7 +1438,7 @@
         function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
 
         function initialOpacity(d) {
-            return withoutFadeIn[d.id] ? 1 : 0;
+            return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
         }
         function initialOpacityForText(d) {
             var targetOpacity = opacityForText(d);
@@ -1485,7 +1485,7 @@
             return subX(d.x);
         }
         function defaultValueFormat(v) {
-            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
+            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return isValue(v) ? +v : ""; };
             return yFormat(v);
         }
         function defaultArcValueFormat(v, ratio) {
