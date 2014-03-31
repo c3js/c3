@@ -1105,6 +1105,9 @@
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, widths, diff, ratio,
                 showDataLabel = hasDataLabel() && __axis_rotated;
+            if (yTargets.length === 0) { // use current domain if target of axisId is none
+                return axisId === 'y2' ? y2.domain() : y.domain();
+            }
             if (yDomainMin === yDomainMax) {
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
