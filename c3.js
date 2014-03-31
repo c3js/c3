@@ -928,7 +928,7 @@
 
         function updateAngle(d) {
             var found = false;
-            pie(c3.data.targets).forEach(function (t) {
+            pie(filterTargetsToShow(c3.data.targets)).forEach(function (t) {
                 if (! found && t.data.id === d.data.id) {
                     found = true;
                     d = t;
@@ -970,7 +970,7 @@
             return translate;
         }
         function getArcRatio(d) {
-            return (d.endAngle - d.startAngle) / (Math.PI * 2);
+            return d ? (d.endAngle - d.startAngle) / (Math.PI * 2) : null;
         }
         function convertToArcData(d) {
             return addName({
@@ -980,11 +980,13 @@
             });
         }
         function textForArcLabel(d) {
-            var ratio, format;
+            var updated, value, ratio, format;
             if (! shouldShowArcLable()) { return ""; }
-            ratio = getArcRatio(d);
+            updated = updateAngle(d);
+            value = updated ? updated.value : null;
+            ratio = getArcRatio(updated);
             format = getArcLabelFormat();
-            return format ? format(d.value, ratio) : defaultArcValueFormat(d.v, ratio);
+            return format ? format(value, ratio) : defaultArcValueFormat(value, ratio);
         }
         function expandArc(id, withoutFadeOut) {
             var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id)),
@@ -2986,7 +2988,7 @@
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
               .transition().duration(duration)
                 .attrTween("d", function (d) {
-                    var updated = updateAngle(d);
+                    var updated = updateAngle(d), interpolate;
                     if (! updated) {
                         return function () { return "M 0 0"; };
                     }
@@ -2998,9 +3000,9 @@
                         };
                     }
 */
-                    var i = d3.interpolate(this._current, updated);
-                    this._current = i(0);
-                    return function (t) { return getArc(i(t), true); };
+                    interpolate = d3.interpolate(this._current, updated);
+                    this._current = interpolate(0);
+                    return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
                 .style("opacity", 1);
@@ -3009,7 +3011,7 @@
                 .style("opacity", 0)
               .transition().duration(duration)
                 .text(textForArcLabel)
-                .style("opacity", function (d) { return isArcType(d.data) ? 1 : 0; });
+                .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
 
@@ -3276,24 +3278,24 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
                 .on('mouseover', function (d, i) {
-                    var arcData = convertToArcData(d), callback = getArcOnMouseOver();
-                    expandArc(d.data.id);
-                    focusLegend(d.data.id);
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOver();
+                    expandArc(updated.data.id);
+                    focusLegend(updated.data.id);
                     callback(arcData, i);
                 })
                 .on('mousemove', function (d) {
-                    var selectedData = [convertToArcData(d)];
+                    var updated = updateAngle(d), selectedData = [convertToArcData(updated)];
                     showTooltip(selectedData, d3.mouse(this));
                 })
                 .on('mouseout', function (d, i) {
-                    var arcData = convertToArcData(d), callback = getArcOnMouseOut();
-                    unexpandArc(d.data.id);
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOut();
+                    unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
                     callback(arcData, i);
                 })
                 .on('click', function (d, i) {
-                    var arcData = convertToArcData(d), callback = getArcOnClick();
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
                     callback(arcData, i);
                 });
             mainPieEnter.append("text")
