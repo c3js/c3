@@ -2934,9 +2934,9 @@
                 .style("stroke", 'none')
                 .style("fill-opacity", 0);
             mainText
+                .text(function (d) { return defaultValueFormat(d.value); })
                 .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
-                .text(function (d) { return defaultValueFormat(d.value); })
                 .attr('x', xForText)
                 .attr('y', yForText)
                 .style("fill-opacity", opacityForText);
