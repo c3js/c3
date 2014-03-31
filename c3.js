@@ -1036,18 +1036,23 @@
         //-- Domain --//
 
         function getYDomainMin(targets) {
-            var ys = getValuesAsIdKeyed(targets), j, k, baseId, id, hasNegativeValue;
+            var ids = getTargetIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasNegativeValue;
             if (__data_groups.length > 0) {
                 hasNegativeValue = hasNegativeValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
-                    baseId = __data_groups[j][0];
+                    // Determine baseId
+                    idsInGroup = __data_groups[j].filter(function (id) { return ids.indexOf(id) >= 0; });
+                    if (idsInGroup.length === 0) { continue; }
+                    baseId = idsInGroup[0];
+                    // Consider negative values
                     if (hasNegativeValue && ys[baseId]) {
                         ys[baseId].forEach(function (v, i) {
                             ys[baseId][i] = v < 0 ? v : 0;
                         });
                     }
-                    for (k = 1; k < __data_groups[j].length; k++) {
-                        id = __data_groups[j][k];
+                    // Compute min
+                    for (k = 1; k < idsInGroup.length; k++) {
+                        id = idsInGroup[k];
                         if (! ys[id]) { continue; }
                         ys[id].forEach(function (v, i) {
                             if (getAxisId(id) === getAxisId(baseId) && ys[baseId] && !(hasNegativeValue && +v > 0)) {
@@ -1060,18 +1065,23 @@
             return d3.min(Object.keys(ys).map(function (key) { return d3.min(ys[key]); }));
         }
         function getYDomainMax(targets) {
-            var ys = getValuesAsIdKeyed(targets), j, k, baseId, id, hasPositiveValue;
+            var ids = getTargetIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasPositiveValue;
             if (__data_groups.length > 0) {
                 hasPositiveValue = hasPositiveValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
-                    baseId = __data_groups[j][0];
+                    // Determine baseId
+                    idsInGroup = __data_groups[j].filter(function (id) { return ids.indexOf(id) >= 0; });
+                    if (idsInGroup.length === 0) { continue; }
+                    baseId = idsInGroup[0];
+                    // Consider positive values
                     if (hasPositiveValue && ys[baseId]) {
                         ys[baseId].forEach(function (v, i) {
                             ys[baseId][i] = v > 0 ? v : 0;
                         });
                     }
-                    for (k = 1; k < __data_groups[j].length; k++) {
-                        id = __data_groups[j][k];
+                    // Compute max
+                    for (k = 1; k < idsInGroup.length; k++) {
+                        id = idsInGroup[k];
                         if (! ys[id]) { continue; }
                         ys[id].forEach(function (v, i) {
                             if (getAxisId(id) === getAxisId(baseId) && ys[baseId] && !(hasPositiveValue && +v < 0)) {
@@ -1664,7 +1674,7 @@
 
         function getBarIndices() {
             var indices = {}, i = 0, j, k;
-            getTargets(isBarType).forEach(function (d) {
+            filterTargetsToShow(getTargets(isBarType)).forEach(function (d) {
                 for (j = 0; j < __data_groups.length; j++) {
                     if (__data_groups[j].indexOf(d.id) < 0) { continue; }
                     for (k = 0; k < __data_groups[j].length; k++) {
@@ -1693,7 +1703,7 @@
             };
         }
         function getBarOffset(barIndices, isSub) {
-            var targets = orderTargets(getTargets(isBarType)),
+            var targets = orderTargets(filterTargetsToShow(getTargets(isBarType))),
                 targetIds = targets.map(function (t) { return t.id; });
             return function (d, i) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
