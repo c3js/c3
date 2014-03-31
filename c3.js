@@ -2513,7 +2513,7 @@
                     if (hasArcType(c3.data.targets)) { return; }
 
                     // Show tooltip
-                    selectedData = c3.data.targets.map(function (d) {
+                    selectedData = filterTargetsToShow(c3.data.targets).map(function (d) {
                         return addName(d.values[i]);
                     });
                     showTooltip(selectedData, d3.mouse(this));
