@@ -493,7 +493,7 @@
                 ratio = getXDomainRatio() * (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 0.98);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
-        function updateLegndStep(step) {
+        function updateLegendStep(step) {
             legendStep = step;
         }
         function updateLegendItemWidth(w) {
@@ -3512,7 +3512,7 @@
             // Update all to reflect change of legend
             updateLegendItemWidth(maxWidth);
             updateLegendItemHeight(maxHeight);
-            updateLegndStep(step);
+            updateLegendStep(step);
             // Update size and scale
             updateSizes();
             updateScales();
