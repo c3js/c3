@@ -1235,6 +1235,34 @@
             return data;
         }
 
+        function updateTargetX(targets, x) {
+            targets.forEach(function (t) {
+                t.values.filter(function (v) { return v.value !== null; }).forEach(function (v, i) {
+                    v.x = generateTargetX(x[i], t.id, i);
+                });
+                c3.data.x[t.id] = x;
+            });
+        }
+        function updateTargetXs(targets, xs) {
+            targets.forEach(function (t) {
+                if (xs[t.id]) {
+                    updateTargetX([t], xs[t.id]);
+                }
+            });
+        }
+        function generateTargetX(rawX, id, index) {
+            var x;
+            if (isTimeSeries) {
+                x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : null;
+            }
+            else if (isCustomX && !isCategorized) {
+                x = rawX ? +rawX : getXValue(id, index);
+            }
+            else {
+                x = index;
+            }
+            return x;
+        }
         function convertRowsToData(rows) {
             var keys = rows[0], new_row = {}, new_rows = [], i, j;
             for (i = 1; i < rows.length; i++) {
@@ -1267,17 +1295,25 @@
                 throw new Error('data.x or data.xs must be specified when axis.x.type == "timeseries"');
             }
 
-            // save x for update data by load
-            if (isCustomX) {
-                ids.forEach(function (id) {
-                    var xKey = getXKey(id);
+            // save x for update data by load when custom x and c3.x API
+            ids.forEach(function (id) {
+                var xKey = getXKey(id);
+                if (isCustomX) {
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.x[id] = data.map(function (d) { return d[xKey]; });
-                    } else { // if no x included, use same x of current will be used
-                        c3.data.x[id] = c3.data.x[Object.keys(c3.data.x)[0]];
                     }
-                });
-            }
+                    // MEMO: if no x included, use same x of current will be used
+                } else {
+                    c3.data.x[id] = data.map(function (d, i) { return i; });
+                }
+            });
+
+            // check x is defined
+            ids.forEach(function (id) {
+                if (!c3.data.x[id]) {
+                    throw new Error('x is not defined for id = "' + id + '".');
+                }
+            });
 
             // convert to target
             targets = ids.map(function (id, index) {
@@ -1286,26 +1322,12 @@
                     id: convertedId,
                     id_org: id,
                     values: data.map(function (d, i) {
-                        var x, xKey = getXKey(id);
-
-                        if (isTimeSeries) {
-                            x = d[xKey] ? d[xKey] instanceof Date ? d[xKey] : parseDate(d[xKey]) : null;
+                        var xKey = getXKey(id), rawX = d[xKey], x = generateTargetX(rawX, id, i);
+                        // use x as categories if custom x and categorized
+                        if (isCustomX && isCategorized && index === 0 && rawX) {
+                            if (i === 0) { __axis_x_categories = []; }
+                            __axis_x_categories.push(rawX);
                         }
-                        else if (isCustomX && !isCategorized) {
-                            x = d[xKey] ? +d[xKey] : getXValue(id, i);
-                        }
-                        else if (isCustomX && isCategorized) {
-                            x = i;
-                            if (index === 0 && d[xKey]) {
-                                if (i === 0) { __axis_x_categories = []; }
-                                __axis_x_categories.push(d[xKey]);
-                            }
-                        }
-                        else {
-                            x = i;
-                        }
-                        d.x = x; // used by event-rect
-
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
                     })
                 };
@@ -3085,16 +3107,18 @@
             } else {
                 if (isCustomX && !isCategorized) {
                     rectW = function (d, i) {
-                        var prevX = getPrevX(i), nextX = getNextX(i);
-                        return (x(nextX ? nextX : d.x + 50) - x(prevX ? prevX : d.x - 50)) / 2;
+                        var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.x[d.id][i];
+                        return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
                     };
                     rectX = function (d, i) {
-                        var prevX = getPrevX(i);
-                        return (x(d.x) + x(prevX ? prevX : d.x - 50)) / 2;
+                        var prevX = getPrevX(i), dx = c3.data.x[d.id][i];
+                        return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
                     };
                 } else {
                     rectW = getEventRectWidth();
-                    rectX = function (d) { return x(d.x) - (rectW / 2); };
+                    rectX = function (d) {
+                        return x(d.x) - (rectW / 2);
+                    };
                 }
                 // Set data
                 maxDataCountTarget = getMaxDataCountTarget();
@@ -3261,8 +3285,8 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
-                main.selectAll('.' + CLASS.selectedCircles + getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d) {
-                    d.value = t.values[d.x].value;
+                main.selectAll('.' + CLASS.selectedCircles + getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d, i) {
+                    d.value = t.values[i].value;
                 });
             });
             // MEMO: can not keep same color...
@@ -3845,6 +3869,21 @@
             __data_names = names;
             updateLegend(c3.data.targets, {withTransition: true});
             return __data_names;
+        };
+
+        c3.x = function (x) {
+            if (arguments.length) {
+                updateTargetX(c3.data.targets, x);
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            }
+            return c3.data.x;
+        };
+        c3.xs = function (xs) {
+            if (arguments.length) {
+                updateTargetXs(c3.data.targets, xs);
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            }
+            return c3.data.x;
         };
 
         c3.resize = function (size) {
