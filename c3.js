@@ -3598,6 +3598,10 @@
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: false});
         };
 
+        c3.toggle = function (targetId) {
+            isTargetToShow(targetId) ? c3.hide(targetId) : c3.show(targetId);
+        };
+
         c3.unzoom = function () {
             brush.clear().update();
             redraw({withUpdateXDomain: true});
