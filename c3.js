@@ -1253,7 +1253,7 @@
         function generateTargetX(rawX, id, index) {
             var x;
             if (isTimeSeries) {
-                x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : null;
+                x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : parseDate(getXValue(id, index));
             }
             else if (isCustomX && !isCategorized) {
                 x = rawX ? +rawX : getXValue(id, index);
@@ -1290,15 +1290,10 @@
         function convertDataToTargets(data) {
             var ids = d3.keys(data[0]).filter(isNotX), xs = d3.keys(data[0]).filter(isX), targets;
 
-            // check "x" is defined if timeseries
-            if (isTimeSeries && xs.length === 0) {
-                throw new Error('data.x or data.xs must be specified when axis.x.type == "timeseries"');
-            }
-
             // save x for update data by load when custom x and c3.x API
             ids.forEach(function (id) {
                 var xKey = getXKey(id);
-                if (isCustomX) {
+                if (isCustomX || isTimeSeries) {
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.x[id] = data.map(function (d) { return d[xKey]; });
                     }
