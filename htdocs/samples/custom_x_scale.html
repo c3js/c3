@@ -6,7 +6,7 @@
     <div id="chart"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="/js/c3.min.js"></script>
+    <script src="/js/c3.js"></script>
     <script>
       var chart = c3.generate({
         bindto: '#chart',
@@ -15,8 +15,10 @@
           columns: [
             ['x', 100, 120, 130, 200, 240, 500],
             ['sample', 30, 200, 100, 400, 150, 250]
-          ]
-        }
+          ],
+          onenter: function (d) { console.log("onenter", d); },
+          onleave: function (d) { console.log("onleave", d); }
+        },
       });
     </script>
   </body>
