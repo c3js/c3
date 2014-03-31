@@ -2932,11 +2932,11 @@
                 .attr("class", classText)
                 .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
                 .style("stroke", 'none')
-                .style("fill-opacity", 0)
-                .text(function (d) { return defaultValueFormat(d.value); });
+                .style("fill-opacity", 0);
             mainText
                 .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
+                .text(function (d) { return defaultValueFormat(d.value); })
                 .attr('x', xForText)
                 .attr('y', yForText)
                 .style("fill-opacity", opacityForText);
