@@ -1237,7 +1237,7 @@
 
         function updateTargetX(targets, x) {
             targets.forEach(function (t) {
-                t.values.filter(function (v) { return v.value !== null; }).forEach(function (v, i) {
+                t.values.forEach(function (v, i) {
                     v.x = generateTargetX(x[i], t.id, i);
                 });
                 c3.data.x[t.id] = x;
@@ -1328,8 +1328,12 @@
                             if (i === 0) { __axis_x_categories = []; }
                             __axis_x_categories.push(rawX);
                         }
+                        // mark as x = undefined if value is undefined and filter to remove after mapped
+                        if (typeof d[id] === 'undefined') {
+                            x = undefined;
+                        }
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
-                    })
+                    }).filter(function (v) { return typeof v.x !== 'undefined'; })
                 };
             });
 
