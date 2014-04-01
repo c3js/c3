@@ -2341,7 +2341,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", CLASS.axisX)
-                .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"))
+                .attr("clip-path", __axis_rotated ? "" : getClipPath(clipId + "-xaxis-clip"))
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", CLASS.axisXLabel)
@@ -2353,7 +2353,7 @@
             if (__axis_y_show) {
                 main.append("g")
                     .attr("class", CLASS.axisY)
-                    .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
+                    .attr("clip-path", __axis_rotated ? getClipPath(clipId + "-yaxis-clip") : "")
                   .append("text")
                     .attr("class", CLASS.axisYLabel)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
@@ -2486,7 +2486,7 @@
                 context.append("g")
                     .attr("class", CLASS.axisX)
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"));
+                    .attr("clip-path", __axis_rotated ? "" : getClipPath(clipId + "-xaxis-clip"));
             }
 
             // Set targets
