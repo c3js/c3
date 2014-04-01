@@ -3,6 +3,66 @@
 
     var c3 = {};
 
+    var CLASS = {
+        target: 'c3-target',
+        chart : 'c3-chart',
+        chartLine: 'c3-chart-line',
+        chartLines: 'c3-chart-lines',
+        chartBar: 'c3-chart-bar',
+        chartBars: 'c3-chart-bars',
+        chartText: 'c3-chart-text',
+        chartTexts: 'c3-chart-texts',
+        chartArc: 'c3-chart-arc',
+        chartArcs: 'c3-chart-arcs',
+        chartArcsTitle: 'c3-chart-arcs-title',
+        selectedCircle: 'c3-selected-circle',
+        selectedCircles: 'c3-selected-circles',
+        eventRect: 'c3-event-rect',
+        eventRects: 'c3-event-rects',
+        zoomRect: 'c3-zoom-rect',
+        brush: 'c3-brush',
+        focused: 'c3-focused',
+        region: 'c3-region',
+        regions: 'c3-regions',
+        tooltip: 'c3-tooltip',
+        tooltipName: 'c3-tooltip-name',
+        shape: 'c3-shape',
+        shapes: 'c3-shapes',
+        line: 'c3-line',
+        bar: 'c3-bar',
+        bars: 'c3-bars',
+        circle: 'c3-circle',
+        circles: 'c3-circles',
+        arc: 'c3-arc',
+        area: 'c3-area',
+        text: 'c3-text',
+        texts: 'c3-texts',
+        grid: 'c3-grid',
+        xgrid: 'c3-xgrid',
+        xgrids: 'c3-xgrids',
+        xgridLine: 'c3-xgrid-line',
+        xgridLines: 'c3-xgrid-lines',
+        xgridFocus: 'c3-xgrid-focus',
+        ygrid: 'c3-ygrid',
+        ygrids: 'c3-ygrids',
+        ygridLine: 'c3-ygrid-line',
+        ygridLines: 'c3-ygrid-lines',
+        axisX: 'c3-axis-x',
+        axisXLabel: 'c3-axis-x-label',
+        axisY: 'c3-axis-y',
+        axisYLabel: 'c3-axis-y-label',
+        axisY2: 'c3-axis-y2',
+        axisY2Label: 'c3-axis-y2-label',
+        legendItem: 'c3-legend-item',
+        legendItemEvent: 'c3-legend-item-event',
+        legendItemTile: 'c3-legend-item-tile',
+        dragarea: 'c3-dragarea',
+        EXPANDED: '_expanded_',
+        SELECTED: '_selected_',
+        INCLUDED: '_included_',
+    };
+
+
     c3.version = "0.1.24";
 
     /*
@@ -14,64 +74,6 @@
 
         var c3 = { data : {} },
             cache = {};
-
-        var EXPANDED = '_expanded_', SELECTED = '_selected_', INCLUDED = '_included_';
-
-        var CLASS = {
-            target: 'c3-target',
-            chart : 'c3-chart',
-            chartLine: 'c3-chart-line',
-            chartLines: 'c3-chart-lines',
-            chartBar: 'c3-chart-bar',
-            chartBars: 'c3-chart-bars',
-            chartText: 'c3-chart-text',
-            chartTexts: 'c3-chart-texts',
-            chartArc: 'c3-chart-arc',
-            chartArcs: 'c3-chart-arcs',
-            chartArcsTitle: 'c3-chart-arcs-title',
-            selectedCircle: 'c3-selected-circle',
-            selectedCircles: 'c3-selected-circles',
-            eventRect: 'c3-event-rect',
-            eventRects: 'c3-event-rects',
-            zoomRect: 'c3-zoom-rect',
-            brush: 'c3-brush',
-            focused: 'c3-focused',
-            region: 'c3-region',
-            regions: 'c3-regions',
-            tooltip: 'c3-tooltip',
-            tooltipName: 'c3-tooltip-name',
-            shape: 'c3-shape',
-            shapes: 'c3-shapes',
-            line: 'c3-line',
-            bar: 'c3-bar',
-            bars: 'c3-bars',
-            circle: 'c3-circle',
-            circles: 'c3-circles',
-            arc: 'c3-arc',
-            area: 'c3-area',
-            text: 'c3-text',
-            texts: 'c3-texts',
-            grid: 'c3-grid',
-            xgrid: 'c3-xgrid',
-            xgrids: 'c3-xgrids',
-            xgridLine: 'c3-xgrid-line',
-            xgridLines: 'c3-xgrid-lines',
-            xgridFocus: 'c3-xgrid-focus',
-            ygrid: 'c3-ygrid',
-            ygrids: 'c3-ygrids',
-            ygridLine: 'c3-ygrid-line',
-            ygridLines: 'c3-ygrid-lines',
-            axisX: 'c3-axis-x',
-            axisXLabel: 'c3-axis-x-label',
-            axisY: 'c3-axis-y',
-            axisYLabel: 'c3-axis-y-label',
-            axisY2: 'c3-axis-y2',
-            axisY2Label: 'c3-axis-y2-label',
-            legendItem: 'c3-legend-item',
-            legendItemEvent: 'c3-legend-item-event',
-            legendItemTile: 'c3-legend-item-tile',
-            dragarea: 'c3-dragarea',
-        };
 
         /*-- Handle Config --*/
 
@@ -1957,23 +1959,23 @@
         }
         function expandCircles(i, id) {
             getCircles(i, id)
-                .classed(EXPANDED, true)
+                .classed(CLASS.EXPANDED, true)
                 .attr('r', __point_focus_expand_r);
         }
         function unexpandCircles(i) {
             getCircles(i)
-                .filter(function () { return d3.select(this).classed(EXPANDED); })
-                .classed(EXPANDED, false)
+                .filter(function () { return d3.select(this).classed(CLASS.EXPANDED); })
+                .classed(CLASS.EXPANDED, false)
                 .attr('r', __point_r);
         }
         function getBars(i) {
             return main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
         }
         function expandBars(i) {
-            getBars(i).classed(EXPANDED, true);
+            getBars(i).classed(CLASS.EXPANDED, true);
         }
         function unexpandBars(i) {
-            getBars(i).classed(EXPANDED, false);
+            getBars(i).classed(CLASS.EXPANDED, false);
         }
 
         // For main region
@@ -2564,7 +2566,7 @@
                     main.selectAll('.' + CLASS.shape + '-' + i)
                         .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
-                            var _this = d3.select(this).classed(EXPANDED, true);
+                            var _this = d3.select(this).classed(CLASS.EXPANDED, true);
                             if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', null);
                         })
@@ -2578,8 +2580,8 @@
                         })
                         .each(function () {
                             var _this = d3.select(this);
-                            if (! _this.classed(EXPANDED)) {
-                                _this.classed(EXPANDED, true);
+                            if (! _this.classed(CLASS.EXPANDED)) {
+                                _this.classed(CLASS.EXPANDED, true);
                                 if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
                             }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', 'pointer');
@@ -2676,7 +2678,7 @@
 
         function toggleShape(target, d, i) {
             var shape = d3.select(target),
-                isSelected = shape.classed(SELECTED);
+                isSelected = shape.classed(CLASS.SELECTED);
             var isWithin = false, toggle;
             if (target.nodeName === 'circle') {
                 isWithin = isWithinCircle(target, __point_select_r * 1.5);
@@ -2691,10 +2693,10 @@
                     if (!__data_selection_multiple) {
                         main.selectAll('.' + CLASS.shapes + (__data_selection_grouped ? getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS.shape).each(function (d, i) {
                             var shape = d3.select(this);
-                            if (shape.classed(SELECTED)) { toggle(false, shape.classed(SELECTED, false), d, i); }
+                            if (shape.classed(CLASS.SELECTED)) { toggle(false, shape.classed(CLASS.SELECTED, false), d, i); }
                         });
                     }
-                    shape.classed(SELECTED, !isSelected);
+                    shape.classed(CLASS.SELECTED, !isSelected);
                     toggle(!isSelected, shape, d, i);
                 }
                 __data_onclick(d, target);
@@ -2728,8 +2730,8 @@
                 .filter(function (d) { return __data_selection_isselectable(d); })
                 .each(function (d, i) {
                     var _this = d3.select(this),
-                        isSelected = _this.classed(SELECTED),
-                        isIncluded = _this.classed(INCLUDED),
+                        isSelected = _this.classed(CLASS.SELECTED),
+                        isIncluded = _this.classed(CLASS.INCLUDED),
                         _x, _y, _w, _h, toggle, isWithin = false, box;
                     if (this.nodeName === 'circle') {
                         _x = _this.attr("cx") * 1;
@@ -2747,9 +2749,9 @@
                         isWithin = !(maxX < _x || _x + _w < minX) && !(maxY < _y || _y + _h < minY);
                     }
                     if (isWithin ^ isIncluded) {
-                        _this.classed(INCLUDED, !isIncluded);
+                        _this.classed(CLASS.INCLUDED, !isIncluded);
                         // TODO: included/unincluded callback here
-                        _this.classed(SELECTED, !isSelected);
+                        _this.classed(CLASS.SELECTED, !isSelected);
                         toggle(!isSelected, _this, d, i);
                     }
                 });
@@ -2774,7 +2776,7 @@
                 .style('opacity', 0)
                 .remove();
             main.selectAll('.' + CLASS.shape)
-                .classed(INCLUDED, false);
+                .classed(CLASS.INCLUDED, false);
             dragging = false;
             __data_ondragend();
         }
@@ -3739,7 +3741,7 @@
         c3.selected = function (targetId) {
             return d3.merge(
                 main.selectAll('.' + CLASS.shapes + getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape)
-                    .filter(function () { return d3.select(this).classed(SELECTED); })
+                    .filter(function () { return d3.select(this).classed(CLASS.SELECTED); })
                     .map(function (d) { return d.map(function (_d) { return _d.__data__; }); })
             );
         };
@@ -3752,14 +3754,14 @@
                     unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
-                    isSelected = shape.classed(SELECTED);
+                    isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d) && !isSelected) {
-                        select(shape.classed(SELECTED, true), d, i);
+                        select(shape.classed(CLASS.SELECTED, true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
                     if (isSelected) {
-                        unselect(shape.classed(SELECTED, false), d, i);
+                        unselect(shape.classed(CLASS.SELECTED, false), d, i);
                     }
                 }
             });
@@ -3772,11 +3774,11 @@
                     unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
-                    isSelected = shape.classed(SELECTED);
+                    isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
                         if (isSelected) {
-                            unselect(shape.classed(SELECTED, false), d, i);
+                            unselect(shape.classed(CLASS.SELECTED, false), d, i);
                         }
                     }
                 }
