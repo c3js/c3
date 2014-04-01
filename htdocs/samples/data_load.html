@@ -31,14 +31,17 @@
       }, 1000);
 
       setTimeout(function () {
+        chart.unload('data1');
+      }, 2000);
+
+      setTimeout(function () {
         chart.load({
           columns: [
             ['data1@test', 30, 20, 50, 40, 60, 50],
-            ['data2', 200, 130, 90, 240, 130, 220],
-            ['data3', 300, 200, 160, 400, 250, 250]
-          ]
+          ],
+          unload: ['data2', 'data3'],
         });
-      }, 2000);
+      }, 3000);
 
       setTimeout(function () {
         chart.load({
@@ -52,7 +55,7 @@
             [90, 220, 320],
           ]
         });
-      }, 3000);
+      }, 4000);
 
       setTimeout(function () {
         chart.load({
@@ -60,11 +63,11 @@
             ['data1', 30, 20, 50, 40, 60, 50,100,200]
           ]
         });
-      }, 4000);
+      }, 5000);
 
       setTimeout(function () {
         chart.unload('data1@test');
-      }, 5000);
+      }, 6000);
 
       setTimeout(function () {
         chart.load({
@@ -72,11 +75,29 @@
             ['data2', null, 30, 20, 50, 40, 60, 50]
           ]
         });
-      }, 6000);
+      }, 7000);
 
       setTimeout(function () {
-        chart.unload('data3');
-      }, 7000);
+        chart.unload();
+      }, 8000);
+
+      setTimeout(function () {
+        chart.load({
+          rows: [
+            ['data1@test', 'data2', 'data3'],
+            [90, 120, 300],
+            [40, 160, 240],
+            [50, 200, 290],
+            [120, 160, 230],
+            [80, 130, 300],
+            [90, 220, 320],
+          ]
+        });
+      }, 9000);
+
+      setTimeout(function () {
+        chart.unload(['data2', 'data3']);
+      }, 10000);
 
     </script>
   </body>
