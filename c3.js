@@ -71,7 +71,7 @@
 
         var d3 = window.d3 ? window.d3 : window.require ? window.require("d3") : undefined;
 
-        var c3 = { data : {} },
+        var c3 = { data : {}, axis: {} },
             cache = {};
 
         /*-- Handle Config --*/
@@ -180,7 +180,7 @@
             __axis_y2_max = getConfig(['axis', 'y2', 'max']),
             __axis_y2_min = getConfig(['axis', 'y2', 'min']),
             __axis_y2_center = getConfig(['axis', 'y2', 'center']),
-            __axis_y2_label = getConfig(['axis', 'y2', 'label']),
+            __axis_y2_label = getConfig(['axis', 'y2', 'label'], {}),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
@@ -634,11 +634,38 @@
             return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
         }
 
-        function getAxisLabelText(option) {
+        function getAxisLabelOptionByAxisId(axisId) {
+            var option;
+            if (axisId === 'y') {
+                option = __axis_y_label;
+            } else if (axisId === 'y2') {
+                option = __axis_y2_label;
+            } else if (axisId === 'x') {
+                option = __axis_x_label;
+            }
+            return option;
+        }
+        function getAxisLabelText(axisId) {
+            var option = getAxisLabelOptionByAxisId(axisId);
             return typeof option === 'string' ? option : option ? option.text : null;
         }
-        function getAxisLabelPosition(option, defaultPosition) {
-            var position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
+        function setAxisLabelText(axisId, text) {
+            var option = getAxisLabelOptionByAxisId(axisId);
+            if (typeof option === 'string') {
+                if (axisId === 'y') {
+                    __axis_y_label = text;
+                } else if (axisId === 'y2') {
+                    __axis_y2_label = text;
+                } else if (axisId === 'x') {
+                    __axis_x_label = text;
+                }
+            } else if (option) {
+                option.text = text;
+            }
+        }
+        function getAxisLabelPosition(axisId, defaultPosition) {
+            var option = getAxisLabelOptionByAxisId(axisId),
+                position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
             return {
                 isInner: position.indexOf('inner') >= 0,
                 isOuter: position.indexOf('outer') >= 0,
@@ -651,25 +678,25 @@
             };
         }
         function getXAxisLabelPosition() {
-            return getAxisLabelPosition(__axis_x_label, __axis_rotated ? 'inner-top' : 'inner-right');
+            return getAxisLabelPosition('x', __axis_rotated ? 'inner-top' : 'inner-right');
         }
         function getYAxisLabelPosition() {
-            return getAxisLabelPosition(__axis_y_label, __axis_rotated ? 'inner-right' : 'inner-top');
+            return getAxisLabelPosition('y', __axis_rotated ? 'inner-right' : 'inner-top');
         }
         function getY2AxisLabelPosition() {
-            return getAxisLabelPosition(__axis_y2_label, __axis_rotated ? 'inner-right' : 'inner-top');
+            return getAxisLabelPosition('y2', __axis_rotated ? 'inner-right' : 'inner-top');
         }
         function getAxisLabelPositionById(id) {
             return id === 'y2' ? getY2AxisLabelPosition() : id === 'y' ? getYAxisLabelPosition() : getXAxisLabelPosition();
         }
         function textForXAxisLabel() {
-            return getAxisLabelText(__axis_x_label);
+            return getAxisLabelText('x');
         }
         function textForYAxisLabel() {
-            return getAxisLabelText(__axis_y_label);
+            return getAxisLabelText('y');
         }
         function textForY2AxisLabel() {
-            return getAxisLabelText(__axis_y2_label);
+            return getAxisLabelText('y2');
         }
         function xForAxisLabel(forHorizontal, position) {
             if (forHorizontal) {
@@ -2321,8 +2348,7 @@
                 .attr("transform", __axis_rotated ? "rotate(-90)" : "")
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
-                .style("text-anchor", textAnchorForXAxisLabel)
-                .text(textForXAxisLabel);
+                .style("text-anchor", textAnchorForXAxisLabel);
 
             if (__axis_y_show) {
                 main.append("g")
@@ -2333,8 +2359,7 @@
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .attr("dx", dxForYAxisLabel)
                     .attr("dy", dyForYAxisLabel)
-                    .style("text-anchor", textAnchorForYAxisLabel)
-                    .text(textForYAxisLabel);
+                    .style("text-anchor", textAnchorForYAxisLabel);
             }
 
             if (__axis_y2_show) {
@@ -2346,8 +2371,7 @@
                     .attr("class", CLASS.axisY2Label)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .attr("dx", dxForY2AxisLabel)
-                    .style("text-anchor", textAnchorForY2AxisLabel)
-                    .text(textForY2AxisLabel);
+                    .style("text-anchor", textAnchorForY2AxisLabel);
             }
 
             // Grids
@@ -2850,10 +2874,10 @@
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
 
-            // Update label position
-            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel);
-            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel);
-            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel);
+            // Update axis label
+            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel).text(textForXAxisLabel);
+            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel).text(textForYAxisLabel);
+            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel).text(textForY2AxisLabel);
 
             // Update sub domain
             subY.domain(y.domain());
@@ -3929,6 +3953,16 @@
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
             return c3.data.x;
+        };
+
+        c3.axis.labels = function (labels) {
+            if (arguments.length) {
+                Object.keys(labels).forEach(function (axisId) {
+                    setAxisLabelText(axisId, labels[axisId]);
+                });
+                redraw({withY: false, withSubchart: false, withTransition: false});
+            }
+            // TODO: return some values?
         };
 
         c3.resize = function (size) {
