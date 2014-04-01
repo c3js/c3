@@ -1896,6 +1896,15 @@
             return Math.pow(x(data.x) - pos[0], 2) + Math.pow(y(data.value) - pos[1], 2);
         }
 
+        function endall(transition, callback) {
+            var n = 0;
+            transition
+                .each(function () { ++n; })
+                .each("end", function () {
+                    if (!--n) { callback.apply(this, arguments); }
+                });
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -3386,21 +3395,53 @@
             // Redraw with new targets
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 
-            done();
+            if (typeof done === 'function') { done(); }
+        }
+        function loadFromArgs(args) {
+            // load data
+            if ('data' in args) {
+                load(convertDataToTargets(args.data), args.done);
+            }
+            else if ('url' in args) {
+                d3.csv(args.url, function (error, data) {
+                    load(convertDataToTargets(data), args.done);
+                });
+            }
+            else if ('rows' in args) {
+                load(convertDataToTargets(convertRowsToData(args.rows)), args.done);
+            }
+            else if ('columns' in args) {
+                load(convertDataToTargets(convertColumnsToData(args.columns)), args.done);
+            }
+            else {
+                throw Error('url or rows or columns is required.');
+            }
         }
 
-        function unload(targetIds) {
+        function unload(targetIds, done) {
+            if (typeof done !== 'function') {
+                done = function () {};
+            }
+            if (!targetIds || targetIds.length === 0) {
+                done();
+                return;
+            }
+            svg.selectAll(targetIds.map(function (id) { return selectorTarget(id); }))
+              .transition()
+                .style('opacity', 0)
+                .remove()
+                .call(endall, done);
             targetIds.forEach(function (id) {
-                c3.data.targets = c3.data.targets.filter(function (t) {
-                    return t.id !== id;
-                });
-                svg.selectAll(selectorTarget(id))
-                  .transition()
-                    .style('opacity', 0)
-                    .remove();
+                // Reset fadein for future load
+                withoutFadeIn[id] = false;
+                // Remove target's elements
                 if (__legend_show) {
                     legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(id)).remove();
                 }
+                // Remove target
+                c3.data.targets = c3.data.targets.filter(function (t) {
+                    return t.id !== id;
+                });
             });
         }
 
@@ -3662,10 +3703,6 @@
         };
 
         c3.load = function (args) {
-            // check args
-            if (typeof args.done !== 'function') {
-                args.done = function () {};
-            }
             // update xs if exists
             if (args.xs) {
                 addXs(args.xs);
@@ -3680,33 +3717,20 @@
                 load(getCaches(args.cacheIds), args.done);
                 return;
             }
-            // load data
-            if ('data' in args) {
-                load(convertDataToTargets(args.data), args.done);
-            }
-            else if ('url' in args) {
-                d3.csv(args.url, function (error, data) {
-                    load(convertDataToTargets(data), args.done);
+            // unload if needed
+            if ('unload' in args) {
+                // TODO: do not unload if target will load (included in url/rows/columns)
+                unload(args.unload ? typeof args.unload === 'string' ? [args.unload] : args.unload : [], function () {
+                    loadFromArgs(args);
                 });
-            }
-            else if ('rows' in args) {
-                load(convertDataToTargets(convertRowsToData(args.rows)), args.done);
-            }
-            else if ('columns' in args) {
-                load(convertDataToTargets(convertColumnsToData(args.columns)), args.done);
-            }
-            else {
-                throw Error('url or rows or columns is required.');
+            } else {
+                loadFromArgs(args);
             }
         };
 
         c3.unload = function (targetIds) {
-            // remove elements for targetId
-            unload(typeof targetIds === 'string' ? [targetIds] : targetIds);
-            // try redraw if targets exist
-            if (c3.data.targets.length > 0) {
-                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-            }
+            unload(targetIds ? typeof targetIds === 'string' ? [targetIds] : targetIds : getTargetIds());
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
         };
 
         c3.selected = function (targetId) {
