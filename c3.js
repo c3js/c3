@@ -1519,7 +1519,7 @@
         function hasDataLabel() {
             if (typeof __data_labels === 'boolean' && __data_labels) {
                 return true;
-            } else if (typeof __data_labels === 'object') {
+            } else if (typeof __data_labels === 'object' && notEmpty(__data_labels)) {
                 return true;
             }
             return false;
