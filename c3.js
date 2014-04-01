@@ -3729,8 +3729,9 @@
         };
 
         c3.unload = function (targetIds) {
-            unload(targetIds ? typeof targetIds === 'string' ? [targetIds] : targetIds : getTargetIds());
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            unload(targetIds ? typeof targetIds === 'string' ? [targetIds] : targetIds : getTargetIds(), function () {
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            });
         };
 
         c3.selected = function (targetId) {
