@@ -62,7 +62,6 @@
         INCLUDED: '_included_',
     };
 
-
     c3.version = "0.1.24";
 
     /*
@@ -1487,16 +1486,13 @@
         function opacityForCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
-        function opacityForText(d) {
-            return hasDataLabel(d) ? 1 : 0;
+        function opacityForText() {
+            return hasDataLabel() ? 1 : 0;
         }
-        function hasDataLabel(d) {
-            var id = d ? d.id : null;
+        function hasDataLabel() {
             if (typeof __data_labels === 'boolean' && __data_labels) {
                 return true;
-            } else if (__data_labels[id] === 'boolean' && __data_labels[id]) {
-                return true;
-            } else if (__data_labels[id] && __data_labels[id].show) {
+            } else if (typeof __data_labels === 'object') {
                 return true;
             }
             return false;
@@ -1512,6 +1508,26 @@
             return widths;
         }
 
+        function defaultValueFormat(v) {
+            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return isValue(v) ? +v : ""; };
+            return yFormat(v);
+        }
+        function defaultArcValueFormat(v, ratio) {
+            return (ratio * 100).toFixed(1) + '%';
+        }
+        function formatByAxisId(id) {
+            var defaultFormat = function (v) { return isValue(v) ? +v : ""; }, axisId = getAxisId(id), format = defaultFormat;
+            // find format according to axis id
+            if (typeof __data_labels.format === 'function') {
+                format = __data_labels.format;
+            } else if (typeof __data_labels.format === 'object') {
+                if (typeof __data_labels.format[axisId] === 'function') {
+                    format = __data_labels.format[axisId];
+                }
+            }
+            return format;
+        }
+
         function xx(d) {
             return d ? x(d.x) : null;
         }
@@ -1523,13 +1539,6 @@
         }
         function subxx(d) {
             return subX(d.x);
-        }
-        function defaultValueFormat(v) {
-            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return isValue(v) ? +v : ""; };
-            return yFormat(v);
-        }
-        function defaultArcValueFormat(v, ratio) {
-            return (ratio * 100).toFixed(1) + '%';
         }
 
         function findSameXOfValues(values, index) {
@@ -2983,7 +2992,7 @@
                 .style("stroke", 'none')
                 .style("fill-opacity", 0);
             mainText
-                .text(function (d) { return defaultValueFormat(d.value); })
+                .text(function (d) { return formatByAxisId(d.id)(d.value); })
                 .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
                 .attr('x', xForText)
