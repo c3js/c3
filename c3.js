@@ -3895,7 +3895,9 @@
         };
         c3.data.names = function (names) {
             if (!arguments.length) { return __data_names; }
-            __data_names = names;
+            Object.keys(names).forEach(function (id) {
+                __data_names[id] = names[id];
+            });
             updateLegend(c3.data.targets, {withTransition: true});
             return __data_names;
         };
