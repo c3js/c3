@@ -3,6 +3,8 @@
 
     var c3 = {};
 
+    c3.version = "0.1.24";
+
     /*
      * Generate chart according to config
      */
