@@ -746,7 +746,7 @@
                 var box = this.getBBox();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
-            return maxWidth;
+            return maxWidth < 20 ? 20 : maxWidth;
         }
 
         function categoryAxis() {
