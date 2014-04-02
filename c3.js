@@ -782,6 +782,11 @@
             });
             return maxWidth < 20 ? 20 : maxWidth;
         }
+        function updateAxisLabels() {
+            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel).text(textForXAxisLabel);
+            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel).text(textForYAxisLabel);
+            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel).text(textForY2AxisLabel);
+        }
 
         function categoryAxis() {
             var scale = d3.scale.linear(), orient = "bottom";
@@ -2879,9 +2884,7 @@
             yForText = generateXYForText(barIndices, false);
 
             // Update axis label
-            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel).text(textForXAxisLabel);
-            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel).text(textForYAxisLabel);
-            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel).text(textForY2AxisLabel);
+            updateAxisLabels();
 
             // Update sub domain
             subY.domain(y.domain());
@@ -3967,7 +3970,7 @@
                 Object.keys(labels).forEach(function (axisId) {
                     setAxisLabelText(axisId, labels[axisId]);
                 });
-                redraw({withY: false, withSubchart: false, withTransition: false});
+                updateAxisLabels();
             }
             // TODO: return some values?
         };
