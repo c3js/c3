@@ -88,7 +88,7 @@
                 // Check next key's value
                 isLast = (i === keys.length - 1);
                 nextTarget = target[keys[i]];
-                if ((!isLast && typeof nextTarget !== 'object') || (isLast && typeof defaultValue !== 'object' && typeof nextTarget === 'object')) {
+                if ((!isLast && typeof nextTarget !== 'object') || (isLast && typeof defaultValue !== 'object' && typeof nextTarget === 'object' && nextTarget !== null)) {
                     return defaultValue;
                 }
                 target = nextTarget;
