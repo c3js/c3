@@ -31,7 +31,9 @@
       }, 1000);
 
       setTimeout(function () {
-        chart.unload('data1');
+//        chart.unload(['data1', 'data2']);
+//        chart.unload('data1');
+        chart.unload('data2');
       }, 2000);
 
       setTimeout(function () {
@@ -39,7 +41,9 @@
           columns: [
             ['data1@test', 30, 20, 50, 40, 60, 50],
           ],
-          unload: ['data2', 'data3'],
+          unload: true,
+//          unload: ['data2', 'data3'],
+//          unload: ['data2']
         });
       }, 3000);
 
