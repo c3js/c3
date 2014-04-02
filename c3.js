@@ -854,9 +854,9 @@
                             lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                             textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                             if (__axis_x_tick_show){
-                              text.attr("dy", ".71em").style("text-anchor", "middle");
+                                text.attr("dy", ".71em").style("text-anchor", "middle");
                             } else {
-                              text.attr("dy", ".71em").style("display", "none");
+                                text.attr("dy", ".71em").style("display", "none");
                             }
                             text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                             pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
