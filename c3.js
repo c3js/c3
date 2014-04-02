@@ -259,7 +259,11 @@
         /*-- Set Variables --*/
 
         var clipId = (typeof __bindto === "string" ? __bindto.replace('#', '') : __bindto.id)  + '-clip',
-            clipPath = getClipPath(clipId);
+            clipIdForXAxis = clipId + '-xaxis',
+            clipIdForYAxis = clipId + '-yaxis',
+            clipPath = getClipPath(clipId),
+            clipPathForXAxis = getClipPath(clipPathForXAxis),
+            clipPathForYAxis = getClipPath(clipPathForYAxis);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
@@ -2308,14 +2312,14 @@
                 .attr("width", width)
                 .attr("height", height);
             defs.append("clipPath")
-                .attr("id", "xaxis-clip")
+                .attr("id", clipIdForXAxis)
               .append("rect")
                 .attr("x", getXAxisClipX)
                 .attr("y", getXAxisClipY)
                 .attr("width", getXAxisClipWidth)
                 .attr("height", getXAxisClipHeight);
             defs.append("clipPath")
-                .attr("id", "yaxis-clip")
+                .attr("id", clipIdForYAxis)
               .append("rect")
                 .attr("x", getYAxisClipX)
                 .attr("y", getYAxisClipY)
@@ -2341,7 +2345,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", CLASS.axisX)
-                .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"))
+                .attr("clip-path", __axis_rotated ? "" : clipPathForXAxis)
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", CLASS.axisXLabel)
@@ -2353,7 +2357,7 @@
             if (__axis_y_show) {
                 main.append("g")
                     .attr("class", CLASS.axisY)
-                    .attr("clip-path", __axis_rotated ? getClipPath("yaxis-clip") : "")
+                    .attr("clip-path", __axis_rotated ? clipPathForYAxis : "")
                   .append("text")
                     .attr("class", CLASS.axisYLabel)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
@@ -2486,7 +2490,7 @@
                 context.append("g")
                     .attr("class", CLASS.axisX)
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "" : getClipPath("xaxis-clip"));
+                    .attr("clip-path", __axis_rotated ? "" : clipPathForXAxis);
             }
 
             // Set targets
@@ -3250,8 +3254,8 @@
         function updateSvgSize() {
             svg.attr('width', currentWidth).attr('height', currentHeight);
             svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
-            svg.select('#xaxis-clip').select('rect').attr('width', getXAxisClipWidth);
-            svg.select('#yaxis-clip').select('rect').attr('width', getYAxisClipWidth);
+            svg.select('#' + clipIdForXAxis).select('rect').attr('width', getXAxisClipWidth);
+            svg.select('#' + clipIdForYAxis).select('rect').attr('width', getYAxisClipWidth);
             svg.select('.' + CLASS.zoomRect).attr('width', width).attr('height', height);
         }
 
