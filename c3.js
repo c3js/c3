@@ -163,6 +163,7 @@
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_x_type === 'categorized' ? false : true),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
+            __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
@@ -1452,6 +1453,10 @@
         }
         function filterTargetsToShow(targets) {
             return targets.filter(function (t) { return isTargetToShow(t.id); });
+        }
+        function mapTargetsToUniqueXs(targets) {
+            var xs = d3.set(d3.merge(targets.map(function (t) { return t.values.map(function (v) { return v.x; }); }))).values();
+            return isTimeSeries ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
         }
         function addHiddenTargetIds(targetIds) {
             hiddenTargetIds = hiddenTargetIds.concat(targetIds);
@@ -2832,7 +2837,7 @@
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
-            var targetsToShow = filterTargetsToShow(c3.data.targets);
+            var targetsToShow = filterTargetsToShow(c3.data.targets), uniqueXs;
 
             // abort if no targets to show
             if (targetsToShow.length === 0) {
@@ -2872,6 +2877,13 @@
             }
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
+
+            // Fix tick position to data
+            if (__axis_x_tick_fit) {
+                uniqueXs = mapTargetsToUniqueXs(targetsToShow);
+                xAxis.tickValues(uniqueXs);
+                subXAxis.tickValues(uniqueXs);
+            }
 
             // axis
             main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
