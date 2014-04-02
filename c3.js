@@ -3459,6 +3459,9 @@
             if (typeof done !== 'function') {
                 done = function () {};
             }
+            // filter existing target
+            targetIds = targetIds.filter(function (id) { return hasTarget(id); });
+            // If no target, call done and return
             if (!targetIds || targetIds.length === 0) {
                 done();
                 return;
@@ -3757,7 +3760,7 @@
             // unload if needed
             if ('unload' in args) {
                 // TODO: do not unload if target will load (included in url/rows/columns)
-                unload(args.unload ? typeof args.unload === 'string' ? [args.unload] : args.unload : [], function () {
+                unload(typeof args.unload === 'string' ? [args.unload] : typeof args.unload === 'boolean' && args.unload ? getTargetIds() : args.unload, function () {
                     loadFromArgs(args);
                 });
             } else {
