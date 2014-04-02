@@ -163,6 +163,7 @@
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_x_type === 'categorized' ? false : true),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
+            __axis_x_tick_show = getConfig(['axis', 'x', 'tick', 'show'], true),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
@@ -852,7 +853,11 @@
                             textEnter.attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                             lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                             textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
-                            text.attr("dy", ".71em").style("text-anchor", "middle");
+                            if (__axis_x_tick_show){
+                              text.attr("dy", ".71em").style("text-anchor", "middle");
+                            } else {
+                              text.attr("dy", ".71em").style("display", "none");
+                            }
                             text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
                             pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
                             break;
