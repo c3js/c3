@@ -1,7 +1,9 @@
 (function (window) {
     'use strict';
 
-    var c3 = {};
+    var c3 = {
+        version: "0.1.26"
+    };
 
     var CLASS = {
         target: 'c3-target',
@@ -61,8 +63,6 @@
         SELECTED: '_selected_',
         INCLUDED: '_included_',
     };
-
-    c3.version = "0.1.24";
 
     /*
      * Generate chart according to config
