@@ -161,8 +161,9 @@
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
-            __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], __axis_x_type === 'categorized' ? false : true),
-            __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count'], 10),
+            __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], {}),
+            __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], __axis_x_type === 'categorized' ? Infinity : 10),
+            __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
@@ -520,7 +521,7 @@
         //-- Scales --//
 
         function updateScales() {
-            var xAxisTickFormat, xAxisTicks, forInit = !x;
+            var xAxisTickFormat, forInit = !x;
             // update edges
             xMin = __axis_rotated ? 1 : 0;
             xMax = __axis_rotated ? height : width;
@@ -539,9 +540,8 @@
             subY2 = getY(subYMin, subYMax);
             // update axes
             xAxisTickFormat = getXAxisTickFormat();
-            xAxisTicks = getXAxisTicks();
-            xAxis = getXAxis(x, xOrient, xAxisTickFormat, xAxisTicks);
-            subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTicks);
+            xAxis = getXAxis(x, xOrient, xAxisTickFormat);
+            subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat);
             yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
             yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
             // Set initialized scales to brush and zoom
@@ -596,11 +596,11 @@
 
         //-- Axes --//
 
-        function getXAxis(scale, orient, tickFormat, ticks) {
+        function getXAxis(scale, orient, tickFormat) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
 
             // Set tick
-            axis.tickFormat(tickFormat).ticks(ticks);
+            axis.tickFormat(tickFormat);
             if (isCategorized) {
                 axis.tickCentered(__axis_x_tick_centered);
             } else {
@@ -634,11 +634,6 @@
             }
             return format;
         }
-        function getXAxisTicks() {
-            var maxDataCount = getMaxDataCount();
-            return __axis_x_tick_culling && maxDataCount > __axis_x_tick_count ? __axis_x_tick_count : maxDataCount;
-        }
-
         function getAxisLabelOptionByAxisId(axisId) {
             var option;
             if (axisId === 'y') {
@@ -956,6 +951,9 @@
                 if (!arguments.length) { return tickCulling; }
                 tickCulling = culling;
                 return axis;
+            };
+            axis.tickValues = function () {
+                // TODO: do something
             };
             return axis;
         }
@@ -1457,6 +1455,30 @@
         function mapTargetsToUniqueXs(targets) {
             var xs = d3.set(d3.merge(targets.map(function (t) { return t.values.map(function (v) { return v.x; }); }))).values();
             return isTimeSeries ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
+        }
+        function generateTickValues(xs) {
+            var tickValues = xs, start, end, count, interval, i, tickValue;
+            if (!__axis_x_tick_fit && __axis_x_tick_count) {
+                // compute ticks according to __axis_x_tick_count
+                if (__axis_x_tick_count === 1) {
+                    tickValues = [xs[0]];
+                } else if (__axis_x_tick_count === 2) {
+                    tickValues = [xs[0], xs[xs.length - 1]];
+                } else if (__axis_x_tick_count > 2) {
+                    count = __axis_x_tick_count - 2;
+                    start = xs[0];
+                    end = xs[xs.length - 1];
+                    interval = (end - start) / (count + 1);
+                    // re-construct uniqueXs
+                    tickValues = [start];
+                    for (i = 0; i < count; i++) {
+                        tickValue = +start + interval * (i + 1);
+                        tickValues.push(isTimeSeries ? new Date(tickValue) : tickValue);
+                    }
+                    tickValues.push(end);
+                }
+            }
+            return tickValues;
         }
         function addHiddenTargetIds(targetIds) {
             hiddenTargetIds = hiddenTargetIds.concat(targetIds);
@@ -2841,7 +2863,7 @@
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
-            var targetsToShow = filterTargetsToShow(c3.data.targets), uniqueXs, i, intervalForCulling;
+            var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             // abort if no targets to show
             if (targetsToShow.length === 0) {
@@ -2878,25 +2900,13 @@
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+                // update axis tick values according to options
+                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
+                xAxis.tickValues(tickValues);
+                subXAxis.tickValues(tickValues);
             }
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
-
-            // Fix tick position to data
-            if (__axis_x_tick_fit) { // MEMO: supposed to be non categorized axis
-                uniqueXs = mapTargetsToUniqueXs(targetsToShow);
-                xAxis.tickValues(uniqueXs);
-                subXAxis.tickValues(uniqueXs);
-                // compute interval for culling if needed
-                if (__axis_x_tick_culling) {
-                    for (i = 1; i < uniqueXs.length; i++) {
-                        if (uniqueXs.length / i < __axis_x_tick_count) {
-                            intervalForCulling = i;
-                            break;
-                        }
-                    }
-                }
-            }
 
             // axis
             main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
@@ -2904,7 +2914,13 @@
             main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // show/hide if manual culling needed
-            if (__axis_x_tick_fit && __axis_x_tick_culling) {
+            if (withUpdateXDomain && __axis_x_tick_culling) {
+                for (i = 1; i < tickValues.length; i++) {
+                    if (tickValues.length / i < __axis_x_tick_culling_max) {
+                        intervalForCulling = i;
+                        break;
+                    }
+                }
                 d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e, i) {
                     d3.select(this).style('display', i % intervalForCulling ? 'none' : 'block');
                 });
