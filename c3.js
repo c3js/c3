@@ -1909,8 +1909,12 @@
         function parseDate(date) {
             var parsedDate;
             if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
-            parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
-            if (!parsedDate) { throw Error("Failed to parse '" + date + "' with format " + __data_x_format); }
+            try {
+                parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
+            } catch (e) {
+                parsedDate = undefined;
+            }
+            if (!parsedDate) { window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format); }
             return parsedDate;
         }
 
@@ -2837,7 +2841,7 @@
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
-            var targetsToShow = filterTargetsToShow(c3.data.targets), uniqueXs;
+            var targetsToShow = filterTargetsToShow(c3.data.targets), uniqueXs, i, intervalForCulling;
 
             // abort if no targets to show
             if (targetsToShow.length === 0) {
@@ -2879,16 +2883,32 @@
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // Fix tick position to data
-            if (__axis_x_tick_fit) {
+            if (__axis_x_tick_fit) { // MEMO: supposed to be non categorized axis
                 uniqueXs = mapTargetsToUniqueXs(targetsToShow);
                 xAxis.tickValues(uniqueXs);
                 subXAxis.tickValues(uniqueXs);
+                // compute interval for culling if needed
+                if (__axis_x_tick_culling) {
+                    for (i = 1; i < uniqueXs.length; i++) {
+                        if (uniqueXs.length / i < __axis_x_tick_count) {
+                            intervalForCulling = i;
+                            break;
+                        }
+                    }
+                }
             }
 
             // axis
             main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(xAxis);
             main.select('.' + CLASS.axisY).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis);
             main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
+
+            // show/hide if manual culling needed
+            if (__axis_x_tick_fit && __axis_x_tick_culling) {
+                d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e, i) {
+                    d3.select(this).style('display', i % intervalForCulling ? 'none' : 'block');
+                });
+            }
 
             // setup drawer - MEMO: these must be called after axis updated
             drawBar = generateDrawBar(barIndices);
