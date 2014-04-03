@@ -624,7 +624,7 @@
             return id in __data_axes ? __data_axes[id] : 'y';
         }
         function getXAxisTickFormat() {
-            var format = isTimeSeries ? defaultTimeFormat : isCategorized ? category : null;
+            var format = isTimeSeries ? defaultTimeFormat : isCategorized ? categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
             if (__axis_x_tick_format) {
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
@@ -1514,7 +1514,7 @@
         function hasPositiveValueInTargets(targets) {
             return checkValueInTargets(targets, function (v) { return v > 0; });
         }
-        function category(i) {
+        function categoryName(i) {
             return i < __axis_x_categories.length ? __axis_x_categories[i] : i;
         }
         function generateClass(prefix, targetId) {
@@ -2900,10 +2900,12 @@
             if (withUpdateXDomain) {
                 x.domain(brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
-                // update axis tick values according to options
-                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
-                xAxis.tickValues(tickValues);
-                subXAxis.tickValues(tickValues);
+                // update axis tick values according to options, except for scatter plot
+                if (! hasScatterType(targetsToShow)) { // TODO: fix this
+                    tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
+                    xAxis.tickValues(tickValues);
+                    subXAxis.tickValues(tickValues);
+                }
             }
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
@@ -2914,7 +2916,7 @@
             main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // show/hide if manual culling needed
-            if (withUpdateXDomain && __axis_x_tick_culling) {
+            if (withUpdateXDomain && __axis_x_tick_culling && tickValues) {
                 for (i = 1; i < tickValues.length; i++) {
                     if (tickValues.length / i < __axis_x_tick_culling_max) {
                         intervalForCulling = i;
