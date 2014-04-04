@@ -1827,12 +1827,11 @@
 
         //-- Type --//
 
-        function setTargetType(targets, type) {
-            var targetIds = isUndefined(targets) ? getTargetIds() : targets;
-            if (typeof targetIds === 'string') { targetIds = [targetIds]; }
-            for (var i = 0; i < targetIds.length; i++) {
-                withoutFadeIn[targetIds[i]] = (type === __data_types[targetIds[i]]);
-                __data_types[targetIds[i]] = type;
+        function setTargetType(targetIds, type) {
+            var i, ids = targetIds ? (typeof targetIds === 'string' ? [targetIds] : targetIds) : getTargetIds();
+            for (i = 0; i < ids.length; i++) {
+                withoutFadeIn[ids[i]] = (type === __data_types[ids[i]]);
+                __data_types[ids[i]] = type;
             }
         }
         function hasType(targets, type) {
@@ -2543,7 +2542,7 @@
             }
 
             // Draw with targets
-            updateAndRedraw({withTransform: true, withLegend: true, durationForAxis: 0});
+            updateAndRedraw({withTransform: true, withLegend: true, withTransitionForAxis: false});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -2861,7 +2860,7 @@
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
+            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
@@ -2881,9 +2880,12 @@
             withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
             withLegend = isDefined(options.withLegend) ? options.withLegend : false;
 
+            withTransitionForExit = isDefined(options.withTransitionForExit) ? options.withTransitionForExit : withTransition;
+            withTransitionForAxis = isDefined(options.withTransitionForAxis) ? options.withTransitionForAxis : withTransition;
+
             duration = withTransition ? __transition_duration : 0;
-            durationForExit = isDefined(options.durationForExit) ? options.durationForExit : duration;
-            durationForAxis = isDefined(options.durationForAxis) ? options.durationForAxis : duration;
+            durationForExit = withTransitionForExit ? duration : 0;
+            durationForAxis = withTransitionForAxis ? duration : 0;
 
             // update legend and transform each g
             if (withLegend && __legend_show) {
@@ -3321,7 +3323,7 @@
             options.withLegend = isDefined(options.withLegend) ? options.withLegend : false;
             options.withUpdateXDomain = true;
             options.withUpdateOrgXDomain = true;
-            options.durationForExit = 0;
+            options.withTransitionForExit = false;
             // Update sizes and scales
             updateSizes();
             updateScales();
@@ -3727,6 +3729,11 @@
                 klass = params && params['class'] ? params['class'] : null;
             return value ? function (line) { return line.value !== value; } : klass ? function (line) { return line['class'] !== klass; } : function () { return true; };
         }
+        function transformTo(targetIds, type, optionsForRedraw) {
+            var withTransitionForAxis = !hasArcType(c3.data.targets);
+            setTargetType(targetIds, type);
+            updateAndRedraw(optionsForRedraw ? optionsForRedraw : {withTransitionForAxis: withTransitionForAxis});
+        }
 
         c3.focus = function (targetId) {
             var candidates = svg.selectAll(selectorTarget(targetId)),
@@ -3880,44 +3887,36 @@
             });
         };
 
-        c3.toLine = function (targets) {
-            setTargetType(targets, 'line');
-            updateAndRedraw();
+        c3.toLine = function (targetIds) {
+            transformTo(targetIds, 'line');
         };
 
-        c3.toSpline = function (targets) {
-            setTargetType(targets, 'spline');
-            updateAndRedraw();
+        c3.toSpline = function (targetIds) {
+            transformTo(targetIds, 'spline');
         };
 
-        c3.toBar = function (targets) {
-            setTargetType(targets, 'bar');
-            updateAndRedraw();
+        c3.toBar = function (targetIds) {
+            transformTo(targetIds, 'bar');
         };
 
-        c3.toScatter = function (targets) {
-            setTargetType(targets, 'scatter');
-            updateAndRedraw();
+        c3.toScatter = function (targetIds) {
+            transformTo(targetIds, 'scatter');
         };
 
-        c3.toArea = function (targets) {
-            setTargetType(targets, 'area');
-            updateAndRedraw();
+        c3.toArea = function (targetIds) {
+            transformTo(targetIds, 'area');
         };
 
-        c3.toAreaSpline = function (targets) {
-            setTargetType(targets, 'area-spline');
-            updateAndRedraw();
+        c3.toAreaSpline = function (targetIds) {
+            transformTo(targetIds, 'area-spline');
         };
 
-        c3.toPie = function (targets) {
-            setTargetType(targets, 'pie');
-            updateAndRedraw({withTransform: true});
+        c3.toPie = function (targetIds) {
+            transformTo(targetIds, 'pie', {withTransform: true});
         };
 
-        c3.toDonut = function (targets) {
-            setTargetType(targets, 'donut');
-            updateAndRedraw({withTransform: true});
+        c3.toDonut = function (targetIds) {
+            transformTo(targetIds, 'donut', {withTransform: true});
         };
 
         c3.groups = function (groups) {
