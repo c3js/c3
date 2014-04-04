@@ -1457,15 +1457,17 @@
             return isTimeSeries ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
         }
         function generateTickValues(xs) {
-            var tickValues = xs, start, end, count, interval, i, tickValue;
+            var tickValues = xs, targetCount, start, end, count, interval, i, tickValue;
             if (!__axis_x_tick_fit && __axis_x_tick_count) {
+                // TODO: need some arguments for __axis_x_tick_count()?
+                targetCount = typeof __axis_x_tick_count === 'function' ? __axis_x_tick_count() : __axis_x_tick_count;
                 // compute ticks according to __axis_x_tick_count
-                if (__axis_x_tick_count === 1) {
+                if (targetCount === 1) {
                     tickValues = [xs[0]];
-                } else if (__axis_x_tick_count === 2) {
+                } else if (targetCount === 2) {
                     tickValues = [xs[0], xs[xs.length - 1]];
-                } else if (__axis_x_tick_count > 2) {
-                    count = __axis_x_tick_count - 2;
+                } else if (targetCount > 2) {
+                    count = targetCount - 2;
                     start = xs[0];
                     end = xs[xs.length - 1];
                     interval = (end - start) / (count + 1);
