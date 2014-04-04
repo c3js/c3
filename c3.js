@@ -4026,6 +4026,34 @@
             }
             // TODO: return some values?
         };
+        c3.axis.max = function (max) {
+            if (arguments.length) {
+                if (typeof max === 'object') {
+                    if (isValue(max.y)) { __axis_y_max = +max.y; }
+                    if (isValue(max.y2)) { __axis_y2_max = +max.y2; }
+                } else {
+                    __axis_y_max = __axis_y2_max = +max;
+                }
+                redraw();
+            }
+        };
+        c3.axis.min = function (min) {
+            if (arguments.length) {
+                if (typeof min === 'object') {
+                    if (isValue(min.y)) { __axis_y_min = +min.y; }
+                    if (isValue(min.y2)) { __axis_y2_min = +min.y2; }
+                } else {
+                    __axis_y_min = __axis_y2_min = +min;
+                }
+                redraw();
+            }
+        };
+        c3.axis.range = function (range) {
+            if (arguments.length) {
+                if (typeof range.max !== 'undefined') { c3.axis.max(range.max); }
+                if (typeof range.min !== 'undefined') { c3.axis.min(range.min); }
+            }
+        };
 
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
