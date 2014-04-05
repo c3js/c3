@@ -176,7 +176,7 @@
             __axis_y_label = getConfig(['axis', 'y', 'label'], {}),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format']),
-            __axis_y_padding = getConfig(['axis', 'y', 'padding']),
+            __axis_y_padding = getConfig(['axis', 'y', 'padding'], {}),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
             __axis_y2_max = getConfig(['axis', 'y2', 'max']),
@@ -185,7 +185,7 @@
             __axis_y2_label = getConfig(['axis', 'y2', 'label'], {}),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
-            __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
+            __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], {}),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
         // grid
@@ -1149,7 +1149,7 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, widths, diff, ratio,
-                showDataLabel = hasDataLabel() && __axis_rotated;
+                showHorizontalDataLabel = hasDataLabel() && __axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
                 return axisId === 'y2' ? y2.domain() : y.domain();
             }
@@ -1157,11 +1157,19 @@
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
             domainLength = Math.abs(yDomainMax - yDomainMin);
-            padding = padding_top = padding_bottom = showDataLabel ? 0 : domainLength * 0.1;
+            padding = padding_top = padding_bottom = showHorizontalDataLabel ? 0 : domainLength * 0.1;
             if (center) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
                 yDomainMin = center - yDomainAbs;
+            }
+            // add padding for data label
+            if (showHorizontalDataLabel) {
+                widths = getDataLabelWidth(yDomainMin, yDomainMax);
+                diff = diffDomain(y.range());
+                ratio = [widths[0] / diff, widths[1] / diff];
+                padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
+                padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
             }
             if (axisId === 'y' && __axis_y_padding) {
                 padding_top = isValue(__axis_y_padding.top) ? __axis_y_padding.top : padding;
@@ -1170,14 +1178,6 @@
             if (axisId === 'y2' && __axis_y2_padding) {
                 padding_top = isValue(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
                 padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
-            }
-            // add padding for data label
-            if (showDataLabel) {
-                widths = getDataLabelWidth(yDomainMin, yDomainMax);
-                diff = diffDomain(y.range());
-                ratio = [widths[0] / diff, widths[1] / diff];
-                padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
-                padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
             }
             // Bar chart with only positive values should be 0-based
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
