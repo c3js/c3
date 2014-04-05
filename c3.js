@@ -1916,9 +1916,14 @@
                 colors = _colors,
                 pattern = notEmpty(_pattern) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
 
-            return function (id) {
+            return function (d) {
+                var id = d.id || d;
+
+                // if callback function is provided
+                if (_colors[id] instanceof Function) { return colors[id](d); }
+
                 // if specified, choose that color
-                if (id in colors) { return _colors[id]; }
+                if (id in colors) { return colors[id]; }
 
                 // if not specified, choose from pattern
                 if (ids.indexOf(id) === -1) {
@@ -1998,7 +2003,7 @@
                 .attr("class", function () { return generateClass(CLASS.selectedCircle, i); })
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
-                .attr("stroke", function () { return color(d.id); })
+                .attr("stroke", function () { return color(d); })
                 .attr("r", __point_select_r * 1.4)
               .transition().duration(100)
                 .attr("r", __point_select_r);
@@ -2016,11 +2021,11 @@
 
         function selectBar(target, d) {
             __data_onselected(d, target.node());
-            target.transition().duration(100).style("fill", function () { return d3.rgb(color(d.id)).darker(1); });
+            target.transition().duration(100).style("fill", function () { return d3.rgb(color(d)).darker(1); });
         }
         function unselectBar(target, d) {
             __data_onunselected(d, target.node());
-            target.transition().duration(100).style("fill", function () { return color(d.id); });
+            target.transition().duration(100).style("fill", function () { return color(d); });
         }
         function toggleBar(selected, target, d, i) {
             selected ? selectBar(target, d, i) : unselectBar(target, d, i);
@@ -3056,7 +3061,7 @@
                 .attr('d', drawBar)
                 .style("stroke", 'none')
                 .style("opacity", 0)
-                .style("fill", function (d) { return color(d.id); })
+                .style("fill", function (d) { return color(d); })
                 .attr("class", classBar);
             mainBar
                 .style("opacity", initialOpacity)
@@ -3166,7 +3171,7 @@
                     contextBar.enter().append('path')
                         .attr('d', drawBarOnSub)
                         .style("stroke", 'none')
-                        .style("fill", function (d) { return color(d.id); })
+                        .style("fill", function (d) { return color(d); })
                         .attr("class", classBar);
                     contextBar
                         .style("opacity", initialOpacity)
@@ -3347,7 +3352,7 @@
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
-                .style("fill", function (d) { return color(d.id); });
+                .style("fill", function (d) { return color(d); });
 
             //-- Bar --//
             mainBarUpdate = main.select('.' + CLASS.chartBars)
@@ -3359,7 +3364,7 @@
             // Bars for each data
             mainBarEnter.append('g')
                 .attr("class", classBars)
-                .style("fill", function (d) { return color(d.id); })
+                .style("fill", function (d) { return color(d); })
                 .style("stroke", "none")
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
 
@@ -3374,18 +3379,18 @@
             mainLineEnter.append("path")
                 .attr("class", classLine)
                 .style("opacity", 0)
-                .style("stroke", function (d) { return color(d.id); });
+                .style("stroke", function (d) { return color(d); });
             // Areas
             mainLineEnter.append("path")
                 .attr("class", classArea)
                 .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; })
-                .style("fill", function (d) { return color(d.id); });
+                .style("fill", function (d) { return color(d); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
                 .attr("class", function (d) { return generateClass(CLASS.selectedCircles, d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
-                .style("fill", function (d) { return color(d.id); })
+                .style("fill", function (d) { return color(d); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
@@ -3405,7 +3410,7 @@
             mainPieEnter.append("path")
                 .attr("class", classArc)
                 .style("opacity", 0)
-                .style("fill", function (d) { return color(d.data.id); })
+                .style("fill", function (d) { return color(d.data); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
                 .on('mouseover', function (d, i) {
@@ -3449,7 +3454,7 @@
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
-                    .style("fill", function (d) { return color(d.id); });
+                    .style("fill", function (d) { return color(d); });
 
                 //-- Line --//
                 contextLineUpdate = context.select('.' + CLASS.chartLines)
@@ -3461,7 +3466,7 @@
                 contextLineEnter.append("path")
                     .attr("class", classLine)
                     .style("opacity", 0)
-                    .style("stroke", function (d) { return color(d.id); });
+                    .style("stroke", function (d) { return color(d); });
             }
 
             /*-- Show --*/
