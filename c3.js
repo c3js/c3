@@ -1920,7 +1920,7 @@
                 var id = d.id || d;
 
                 // if callback function is provided
-                if (_colors[id] instanceof Function) { return colors[id](d); }
+                if (colors[id] instanceof Function) { return colors[id](d); }
 
                 // if specified, choose that color
                 if (id in colors) { return colors[id]; }
