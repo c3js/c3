@@ -402,6 +402,13 @@
                 margin3.left = width / 2 + radiusExpanded;
             }
         }
+        function updateXgridFocus() {
+            main.select('line.' + CLASS.xgridFocus)
+                .attr("x1", __axis_rotated ? 0 : -10)
+                .attr("x2", __axis_rotated ? width : -10)
+                .attr("y1", __axis_rotated ? -10 : margin.top)
+                .attr("y2", __axis_rotated ? -10 : height);
+        }
         function updateRadius() {
             radiusExpanded = height / 2;
             radius = radiusExpanded * 0.95;
@@ -2431,11 +2438,7 @@
                 grid.append('g')
                     .attr("class", CLASS.xgridFocus)
                   .append('line')
-                    .attr('class', CLASS.xgridFocus)
-                    .attr("x1", __axis_rotated ? 0 : -10)
-                    .attr("x2", __axis_rotated ? width : -10)
-                    .attr("y1", __axis_rotated ? -10 : margin.top)
-                    .attr("y2", __axis_rotated ? -10 : height);
+                    .attr('class', CLASS.xgridFocus);
             }
 
             // Y-Grid
@@ -2946,6 +2949,9 @@
 
             // tooltip
             tooltip.style("display", "none");
+
+            // xgrid focus
+            updateXgridFocus();
 
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
