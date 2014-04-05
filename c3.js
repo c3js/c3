@@ -1677,6 +1677,9 @@
             });
             return closest;
         }
+        function filterSameX(targets, x) {
+            return d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x === x; });
+        }
 
         function getPathBox(path) {
             var box = path.getBoundingClientRect(),
@@ -1981,7 +1984,8 @@
         }
 
         function dist(data, pos) {
-            return Math.pow(x(data.x) - pos[0], 2) + Math.pow(y(data.value) - pos[1], 2);
+            var yScale = getAxisId(data.id) === 'y' ? y : y2;
+            return Math.pow(x(data.x) - pos[0], 2) + Math.pow(yScale(data.value) - pos[1], 2);
         }
 
         function endall(transition, callback) {
@@ -2695,7 +2699,7 @@
                     unexpandCircles();
                 })
                 .on('mousemove', function () {
-                    var mouse, closest, selectedData;
+                    var mouse, closest, sameXData, selectedData;
 
                     if (dragging) { return; } // do nothing when dragging
                     if (hasArcType(c3.data.targets)) { return; }
@@ -2703,8 +2707,12 @@
                     mouse = d3.mouse(this);
                     closest = findClosestFromTargets(c3.data.targets, mouse);
 
+                    sameXData = filterSameX(c3.data.targets, closest.x);
+
                     // show tooltip when cursor is close to some point
-                    selectedData = [addName(closest)];
+                    selectedData = sameXData.map(function (d) {
+                        return addName(d);
+                    });
                     showTooltip(selectedData, mouse);
 
                     // expand points
