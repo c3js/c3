@@ -2925,7 +2925,7 @@
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 // update axis tick values according to options, except for scatter plot
                 if (! hasScatterType(targetsToShow)) { // TODO: fix this
-                    tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
+                    tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow)).sort();
                     xAxis.tickValues(tickValues);
                     subXAxis.tickValues(tickValues);
                 }
