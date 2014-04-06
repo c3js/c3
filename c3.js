@@ -1633,7 +1633,7 @@
                 max = _max ? _max : values.length - 1,
                 med = Math.floor((max - min) / 2) + min,
                 value = values[med],
-                diff = x(value.x) - pos[0],
+                diff = x(value.x) - pos[__axis_rotated ? 1 : 0],
                 candidates;
 
             // Update range for search
@@ -1992,8 +1992,10 @@
         }
 
         function dist(data, pos) {
-            var yScale = getAxisId(data.id) === 'y' ? y : y2;
-            return Math.pow(x(data.x) - pos[0], 2) + Math.pow(yScale(data.value) - pos[1], 2);
+            var yScale = getAxisId(data.id) === 'y' ? y : y2,
+                xIndex = __axis_rotated ? 1 : 0,
+                yIndex = __axis_rotated ? 0 : 1;
+            return Math.pow(x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
         }
 
         function endall(transition, callback) {
