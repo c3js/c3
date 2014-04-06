@@ -1085,7 +1085,7 @@
         //-- Domain --//
 
         function getYDomainMin(targets) {
-            var ids = getTargetIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasNegativeValue;
+            var ids = mapToIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasNegativeValue;
             if (__data_groups.length > 0) {
                 hasNegativeValue = hasNegativeValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
@@ -1114,7 +1114,7 @@
             return d3.min(Object.keys(ys).map(function (key) { return d3.min(ys[key]); }));
         }
         function getYDomainMax(targets) {
-            var ids = getTargetIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasPositiveValue;
+            var ids = mapToIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasPositiveValue;
             if (__data_groups.length > 0) {
                 hasPositiveValue = hasPositiveValueInTargets(targets);
                 for (j = 0; j < __data_groups.length; j++) {
@@ -1397,7 +1397,7 @@
 
             // set target types
             if (__data_type) {
-                setTargetType(getTargetIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
+                setTargetType(mapToIds(targets).filter(function (id) { return ! (id in __data_types); }), __data_type);
             }
 
             // cache as original id keyed
@@ -1439,12 +1439,14 @@
             }
             return maxTarget;
         }
-        function getTargetIds(targets) {
-            targets = isUndefined(targets) ? c3.data.targets : targets;
+        function mapToIds(targets) {
             return targets.map(function (d) { return d.id; });
         }
-        function hasTarget(id) {
-            var ids = getTargetIds(), i;
+        function mapToTargetIds(ids) {
+            return ids ? (typeof ids === 'string' ? [ids] : ids) : mapToIds(c3.data.targets);
+        }
+        function hasTarget(targets, id) {
+            var ids = mapToIds(targets), i;
             for (i = 0; i < ids.length; i++) {
                 if (ids[i] === id) {
                     return true;
@@ -1549,6 +1551,7 @@
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
         function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
+        function selectorTargets(ids) { return ids.map(function (id) { return selectorTarget(id); }); }
 
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
@@ -1840,11 +1843,10 @@
         //-- Type --//
 
         function setTargetType(targetIds, type) {
-            var i, ids = targetIds ? (typeof targetIds === 'string' ? [targetIds] : targetIds) : getTargetIds();
-            for (i = 0; i < ids.length; i++) {
-                withoutFadeIn[ids[i]] = (type === __data_types[ids[i]]);
-                __data_types[ids[i]] = type;
-            }
+            mapToTargetIds(targetIds).forEach(function (id) {
+                withoutFadeIn[id] = (type === __data_types[id]);
+                __data_types[id] = type;
+            });
         }
         function hasType(targets, type) {
             var has = false;
@@ -3288,7 +3290,7 @@
                 .remove();
 
             // update fadein condition
-            getTargetIds().forEach(function (id) {
+            mapToIds(c3.data.targets).forEach(function (id) {
                 withoutFadeIn[id] = true;
             });
         }
@@ -3545,7 +3547,7 @@
                 done = function () {};
             }
             // filter existing target
-            targetIds = targetIds.filter(function (id) { return hasTarget(id); });
+            targetIds = targetIds.filter(function (id) { return hasTarget(c3.data.targets, id); });
             // If no target, call done and return
             if (!targetIds || targetIds.length === 0) {
                 done();
@@ -3595,7 +3597,7 @@
         }
 
         function updateLegend(targets, options) {
-            var ids = getTargetIds(targets), l;
+            var ids = mapToIds(targets), l;
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
             var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
             var totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = {}, steps = {}, step = 0;
@@ -3743,10 +3745,10 @@
         /*-- Event Handling --*/
 
         function isNoneArc(d) {
-            return hasTarget(d.id);
+            return hasTarget(c3.data.targets, d.id);
         }
         function isArc(d) {
-            return 'data' in d && hasTarget(d.data.id);
+            return 'data' in d && hasTarget(c3.data.targets, d.data.id);
         }
         function getGridFilter(params) {
             var value = params && params.value ? params.value : null,
@@ -3807,17 +3809,19 @@
             revertLegend();
         };
 
-        c3.show = function (targetId) {
-            removeHiddenTargetIds(targetId);
-            svg.selectAll(selectorTarget(targetId))
+        c3.show = function (targetIds) {
+            targetIds = mapToTargetIds(targetIds);
+            removeHiddenTargetIds(targetIds);
+            svg.selectAll(selectorTargets(targetIds))
               .transition()
                 .style('opacity', 1);
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: false});
         };
 
-        c3.hide = function (targetId) {
-            addHiddenTargetIds(targetId);
-            svg.selectAll(selectorTarget(targetId))
+        c3.hide = function (targetIds) {
+            targetIds = mapToTargetIds(targetIds);
+            addHiddenTargetIds(targetIds);
+            svg.selectAll(selectorTargets(targetIds))
               .transition()
                 .style('opacity', 0);
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: false});
@@ -3850,7 +3854,7 @@
             // unload if needed
             if ('unload' in args) {
                 // TODO: do not unload if target will load (included in url/rows/columns)
-                unload(typeof args.unload === 'string' ? [args.unload] : typeof args.unload === 'boolean' && args.unload ? getTargetIds() : args.unload, function () {
+                unload(mapToTargetIds((typeof args.unload === 'boolean' && args.unload) ? null : args.unload), function () {
                     loadFromArgs(args);
                 });
             } else {
@@ -3859,7 +3863,7 @@
         };
 
         c3.unload = function (targetIds) {
-            unload(targetIds ? typeof targetIds === 'string' ? [targetIds] : targetIds : getTargetIds(), function () {
+            unload(mapToTargetIds(targetIds), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
             });
         };
