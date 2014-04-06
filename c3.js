@@ -129,6 +129,7 @@
             __data_labels = getConfig(['data', 'labels'], {}),
             __data_order = getConfig(['data', 'order']),
             __data_regions = getConfig(['data', 'regions'], {}),
+            __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
@@ -273,7 +274,8 @@
 
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false;
 
-        var color = generateColor(__data_colors, __color_pattern);
+        var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
+            color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
         var defaultTimeFormat = (function () {
             var formats = [
@@ -1920,25 +1922,26 @@
 
         //-- Color --//
 
-        function generateColor(_colors, _pattern) {
-            var ids = [],
-                colors = _colors,
-                pattern = notEmpty(_pattern) ? _pattern : ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']; //same as d3.scale.category10()
+        function generateColor(colors, pattern, callback) {
+            var ids = [];
 
             return function (d) {
-                var id = d.id || d;
+                var id = d.id || d, color;
 
                 // if callback function is provided
-                if (colors[id] instanceof Function) { return colors[id](d); }
-
-                // if specified, choose that color
-                if (id in colors) { return colors[id]; }
-
-                // if not specified, choose from pattern
-                if (ids.indexOf(id) === -1) {
-                    ids.push(id);
+                if (colors[id] instanceof Function) {
+                    color = colors[id](d);
                 }
-                return pattern[ids.indexOf(id) % pattern.length];
+                // if specified, choose that color
+                else if (id in colors) {
+                    color = colors[id];
+                }
+                // if not specified, choose from pattern
+                else {
+                    if (ids.indexOf(id) < 0) { ids.push(id); }
+                    color = pattern[ids.indexOf(id) % pattern.length];
+                }
+                return callback instanceof Function ? callback(color, d) : color;
             };
         }
 
