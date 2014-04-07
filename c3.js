@@ -299,7 +299,7 @@
 
         /*-- Set Chart Params --*/
 
-        var margin, margin2, margin3, width, width2, height, height2, currentWidth, currentHeight, legendHeight, legendWidth;
+        var margin, margin2, margin3, width, width2, height, height2, currentWidth, currentHeight;
         var radius, radiusExpanded, innerRadius, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, subXMin, subXMax, subYMin, subYMax;
         var x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
@@ -345,9 +345,7 @@
         }
         function transformLegend(withTransition) {
             var duration = withTransition !== false ? 250 : 0;
-            if (__legend_show) {
-                legend.transition().duration(duration).attr("transform", translate.legend);
-            }
+            legend.transition().duration(duration).attr("transform", translate.legend);
         }
         function transformAll(withTransition) {
             transformMain(withTransition);
@@ -361,10 +359,10 @@
         var rotated_padding_left = 30, rotated_padding_right = 30, rotated_padding_top = 5;
 
         function updateSizes() {
+            var legendHeight = getLegendHeight(), legendWidth = getLegendWidth();
+
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
-            legendHeight = getLegendHeight();
-            legendWidth = getLegendWidth();
 
             // for main
             margin = {
@@ -448,7 +446,7 @@
             } else if (__padding_right) {
                 return __padding_right;
             } else if (isLegendRight) {
-                return legendWidth + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
+                return getLegendWidth() + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
             } else if (__axis_y2_show) {
                 return __axis_y2_inner || __axis_rotated ? defaultPadding : getAxisWidthByAxisId('y2');
             } else {
@@ -1994,6 +1992,9 @@
             return false;
         }
 
+        function isEmpty(o) {
+            return !o || (typeof o === 'string' && o.length === 0) || (typeof o === 'object' && Object.keys(o).length === 0);
+        }
         function notEmpty(o) {
             return Object.keys(o).length > 0;
         }
@@ -2401,7 +2402,12 @@
             // Define regions
             main = svg.append("g").attr("transform", translate.main);
             context = __subchart_show ? svg.append("g").attr("transform", translate.context) : null;
-            legend = __legend_show ? svg.append("g").attr("transform", translate.legend) : null;
+            legend = svg.append("g").attr("transform", translate.legend);
+
+            if (!__legend_show) {
+                legend.style('visibility', 'hidden');
+                hiddenLegendIds = mapToIds(c3.data.targets);
+            }
 
             // Define tooltip
             tooltip = d3.select(__bindto)
@@ -2603,7 +2609,7 @@
             }
             if (window.onresize.add) {
                 window.onresize.add(function () {
-                    updateAndRedraw({withTransition: false, withLegend: true});
+                    updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
                 });
             }
         }
@@ -3593,9 +3599,7 @@
                 // Reset fadein for future load
                 withoutFadeIn[id] = false;
                 // Remove target's elements
-                if (__legend_show) {
-                    legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(id)).remove();
-                }
+                legend.selectAll('.' + CLASS.legendItem + getTargetSelectorSuffix(id)).remove();
                 // Remove target
                 c3.data.targets = c3.data.targets.filter(function (t) {
                     return t.id !== id;
@@ -3606,11 +3610,9 @@
         /*-- Draw Legend --*/
 
         function toggleFocusLegend(id, focus) {
-            var legendItem, isTarget, notTarget;
-            if (!__legend_show) { return; }
-            legendItem = legend.selectAll('.' + CLASS.legendItem);
-            isTarget = function (d) { return (!id || d === id); };
-            notTarget = function (d) { return !isTarget(d); };
+            var legendItem = legend.selectAll('.' + CLASS.legendItem),
+                isTarget = function (d) { return (!id || d === id); },
+                notTarget = function (d) { return !isTarget(d); };
             legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : 1);
             legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? 1 : 0.3);
         }
@@ -3621,7 +3623,6 @@
             toggleFocusLegend(id, false);
         }
         function revertLegend() {
-            if (!__legend_show) { return; }
             legend.selectAll('.' + CLASS.legendItem)
               .transition().duration(100)
                 .style('opacity', 1);
@@ -3648,7 +3649,7 @@
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
             var withTransition, withTransitionForTransform, withTransformAll;
 
-            options = isUndefined(options) ? {} : options;
+            options = options || {};
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withTransitionForTransform = isDefined(options.withTransitionForTransform) ? options.withTransitionForTransform : true;
             withTransformAll = isDefined(options.withTransformAll) ? options.withTransformAll : true;
@@ -3658,7 +3659,7 @@
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
-                    areaLength = isLegendRight ? legendHeight : legendWidth,
+                    areaLength = isLegendRight ? getLegendHeight() : getLegendWidth(),
                     margin, maxLength;
 
                 // MEMO: care about condifion of step, totalLength
@@ -3684,7 +3685,7 @@
                     maxHeight = 0;
                 }
 
-                if (!isLegendToShow(id)) {
+                if (__legend_show && !isLegendToShow(id)) {
                     widths[id] = heights[id] = steps[id] = offsets[id] = 0;
                     return;
                 }
@@ -3730,6 +3731,7 @@
                 .data(targetIds)
               .enter().append('g')
                 .attr('class', function (id) { return generateClass(CLASS.legendItem, id); })
+                .style('visibility', function (id) { return isLegendToShow(id) ? 'visible' : 'hidden'; })
                 .style('cursor', 'pointer')
                 .on('click', function (id) {
                     typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
@@ -4151,12 +4153,18 @@
         };
 
         c3.legend.show = function (targetIds) {
-            if (!__legend_show) { return; }
+            if (!__legend_show) {
+                __legend_show = true;
+                legend.style('visibility', 'visible');
+            }
             showLegend(mapToTargetIds(targetIds));
             redraw({withTransitionForHorizontalAxis: false});
         };
         c3.legend.hide = function (targetIds) {
-            if (!__legend_show) { return; }
+            if (__legend_show && isEmpty(targetIds)) {
+                __legend_show = false;
+                legend.style('visibility', 'hidden');
+            }
             hideLegend(mapToTargetIds(targetIds));
             redraw({withTransitionForHorizontalAxis: false});
         };
@@ -4164,7 +4172,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            updateAndRedraw({withLegend: true, withTransition: false});
+            updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
         };
 
         c3.destroy = function () {
