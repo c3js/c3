@@ -3537,7 +3537,13 @@
                 .style("opacity", 1);
         }
 
-        function load(targets, done) {
+        function load(targets, args) {
+            // set type if args.types || args.type specified
+            if (args.type || args.types) {
+                targets.forEach(function (t) {
+                    args.types ? setTargetType(t.id, args.types[t.id]) : setTargetType(t.id, args.type);
+                });
+            }
             // Update/Add data
             c3.data.targets.forEach(function (d) {
                 for (var i = 0; i < targets.length; i++) {
@@ -3556,23 +3562,25 @@
             // Redraw with new targets
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 
-            if (typeof done === 'function') { done(); }
+            if (typeof args.done === 'function') {
+                args.done();
+            }
         }
         function loadFromArgs(args) {
             // load data
             if ('data' in args) {
-                load(convertDataToTargets(args.data), args.done);
+                load(convertDataToTargets(args.data), args);
             }
             else if ('url' in args) {
                 d3.csv(args.url, function (error, data) {
-                    load(convertDataToTargets(data), args.done);
+                    load(convertDataToTargets(data), args);
                 });
             }
             else if ('rows' in args) {
-                load(convertDataToTargets(convertRowsToData(args.rows)), args.done);
+                load(convertDataToTargets(convertRowsToData(args.rows)), args);
             }
             else if ('columns' in args) {
-                load(convertDataToTargets(convertColumnsToData(args.columns)), args.done);
+                load(convertDataToTargets(convertColumnsToData(args.columns)), args);
             }
             else {
                 throw Error('url or rows or columns is required.');
@@ -3907,7 +3915,7 @@
         };
 
         c3.load = function (args) {
-            // update xs if exists
+            // update xs if specified
             if (args.xs) {
                 addXs(args.xs);
             }
