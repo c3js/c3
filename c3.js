@@ -1338,10 +1338,15 @@
 
             // save x for update data by load when custom x and c3.x API
             ids.forEach(function (id) {
-                var xKey = getXKey(id);
+                var xKey = getXKey(id), idsForX = Object.keys(c3.data.x);
+
                 if (isCustomX || isTimeSeries) {
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                    }
+                    // Use other id's x when same x (data.x option) specified.
+                    else if (__data_x && idsForX.length > 0) {
+                        c3.data.x[id] = c3.data.x[idsForX[0]];
                     }
                     // MEMO: if no x included, use same x of current will be used
                 } else {
