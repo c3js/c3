@@ -21,6 +21,8 @@
         selectedCircles: 'c3-selected-circles',
         eventRect: 'c3-event-rect',
         eventRects: 'c3-event-rects',
+        eventRectsSingle: 'c3-event-rects-single',
+        eventRectsMultiple: 'c3-event-rects-multiple',
         zoomRect: 'c3-zoom-rect',
         brush: 'c3-brush',
         focused: 'c3-focused',
@@ -1263,13 +1265,25 @@
         function getXKey(id) {
             return __data_x ? __data_x : notEmpty(__data_xs) ? __data_xs[id] : null;
         }
+        function getXValuesOfXKey(key, targets) {
+            var xValues, ids = targets && notEmpty(targets) ? mapToIds(targets) : [];
+            ids.forEach(function (id) {
+                if (getXKey(id) === key) {
+                    xValues = c3.data.xs[id];
+                }
+            });
+            return xValues;
+        }
         function getXValue(id, i) {
-            return id in c3.data.x && c3.data.x[id] && c3.data.x[id][i] ? c3.data.x[id][i] : i;
+            return id in c3.data.xs && c3.data.xs[id] && c3.data.xs[id][i] ? c3.data.xs[id][i] : i;
         }
         function addXs(xs) {
             Object.keys(xs).forEach(function (id) {
                 __data_xs[id] = xs[id];
             });
+        }
+        function isSingleX(xs) {
+            return d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() === 1;
         }
 
         function addName(data) {
@@ -1286,7 +1300,7 @@
                 t.values.forEach(function (v, i) {
                     v.x = generateTargetX(x[i], t.id, i);
                 });
-                c3.data.x[t.id] = x;
+                c3.data.xs[t.id] = x;
             });
         }
         function updateTargetXs(targets, xs) {
@@ -1338,25 +1352,31 @@
 
             // save x for update data by load when custom x and c3.x API
             ids.forEach(function (id) {
-                var xKey = getXKey(id), idsForX = Object.keys(c3.data.x);
+                var xKey = getXKey(id), idsForX;
 
                 if (isCustomX || isTimeSeries) {
+                    // if included in input data
                     if (xs.indexOf(xKey) >= 0) {
-                        c3.data.x[id] = data.map(function (d) { return d[xKey]; });
+                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue);
                     }
-                    // Use other id's x when same x (data.x option) specified.
-                    else if (__data_x && idsForX.length > 0) {
-                        c3.data.x[id] = c3.data.x[idsForX[0]];
+                    // if not included in input data, find from preloaded data of other id's x
+                    else if (__data_x) {
+                        idsForX = Object.keys(c3.data.xs);
+                        c3.data.xs[id] = idsForX.length > 0 ? c3.data.xs[idsForX[0]] : undefined;
+                    }
+                    // if not included in input data, find from preloaded data
+                    else if (notEmpty(__data_xs)) {
+                        c3.data.xs[id] = getXValuesOfXKey(xKey, c3.data.targets);
                     }
                     // MEMO: if no x included, use same x of current will be used
                 } else {
-                    c3.data.x[id] = data.map(function (d, i) { return i; });
+                    c3.data.xs[id] = data.map(function (d, i) { return i; });
                 }
             });
 
             // check x is defined
             ids.forEach(function (id) {
-                if (!c3.data.x[id]) {
+                if (!c3.data.xs[id]) {
                     throw new Error('x is not defined for id = "' + id + '".');
                 }
             });
@@ -1375,7 +1395,7 @@
                             __axis_x_categories.push(rawX);
                         }
                         // mark as x = undefined if value is undefined and filter to remove after mapped
-                        if (typeof d[id] === 'undefined') {
+                        if (typeof d[id] === 'undefined' || c3.data.xs[id].length <= i) {
                             x = undefined;
                         }
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
@@ -2349,7 +2369,7 @@
             selectChart.classed("c3", true);
 
             // Init data as targets
-            c3.data.x = {};
+            c3.data.xs = {};
             c3.data.targets = convertDataToTargets(data);
 
             // TODO: set names if names not specified
@@ -2908,7 +2928,7 @@
 
         function redraw(options) {
             var xaxis, yaxis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
-            var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRectUpdate;
+            var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransitionForHorizontalAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -3264,7 +3284,14 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
             // rect for mouseover
-            if (notEmpty(__data_xs)) {
+            eventRect = main.select('.' + CLASS.eventRects);
+            if (notEmpty(__data_xs) && !isSingleX(__data_xs)) {
+
+                if (!eventRect.classed(CLASS.eventRectsMultiple)) {
+                    eventRect.classed(CLASS.eventRectsMultiple, true).classed(CLASS.eventRectsSingle, false)
+                        .selectAll('.' + CLASS.eventRect).remove();
+                }
+
                 eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
                     .data([0]);
                 // enter : only one rect will be added
@@ -3277,13 +3304,19 @@
                     .attr('height', height);
                 // exit : not needed becuase always only one rect exists
             } else {
+
+                if (!eventRect.classed(CLASS.eventRectsSingle)) {
+                    eventRect.classed(CLASS.eventRectsMultiple, false).classed(CLASS.eventRectsSingle, true)
+                        .selectAll('.' + CLASS.eventRect).remove();
+                }
+
                 if (isCustomX && !isCategorized) {
                     rectW = function (d, i) {
-                        var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.x[d.id][i];
+                        var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
                         return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
                     };
                     rectX = function (d, i) {
-                        var prevX = getPrevX(i), dx = c3.data.x[d.id][i];
+                        var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
                         return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
                     };
                 } else {
@@ -4117,14 +4150,14 @@
                 updateTargetX(c3.data.targets, x);
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
-            return c3.data.x;
+            return c3.data.xs;
         };
         c3.xs = function (xs) {
             if (arguments.length) {
                 updateTargetXs(c3.data.targets, xs);
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
-            return c3.data.x;
+            return c3.data.xs;
         };
 
         c3.axis.labels = function (labels) {
@@ -4190,7 +4223,7 @@
 
         c3.destroy = function () {
             c3.data.targets = undefined;
-            c3.data.x = {};
+            c3.data.xs = {};
             selectChart.html("");
             window.onresize = null;
         };
