@@ -1587,6 +1587,10 @@
             }
             return generateClass(CLASS.target, id) + additionalClass;
         }
+        function classChartText(d) { return CLASS.chartText + classTarget(d.id); }
+        function classChartLine(d) { return CLASS.chartLine + classTarget(d.id); }
+        function classChartBar(d) { return CLASS.chartBar + classTarget(d.id); }
+        function classChartArc(d) { return CLASS.chartArc + classTarget(d.data.id); }
 
         function getTargetSelectorSuffix(targetId) {
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
@@ -3451,22 +3455,22 @@
             /*-- Main --*/
 
             //-- Text --//
-            mainTextUpdate = main.select('.' + CLASS.chartTexts)
-                  .selectAll('.' + CLASS.chartText)
-                    .data(targets);
+            mainTextUpdate = main.select('.' + CLASS.chartTexts).selectAll('.' + CLASS.chartText)
+                .data(targets)
+                .attr('class', classChartText);
             mainTextEnter = mainTextUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartText + classTarget(d.id); })
+                .attr('class', classChartText)
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
                 .style("fill", function (d) { return color(d); });
 
             //-- Bar --//
-            mainBarUpdate = main.select('.' + CLASS.chartBars)
-              .selectAll('.' + CLASS.chartBar)
-                .data(targets);
+            mainBarUpdate = main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+                .data(targets)
+                .attr('class', classChartBar);
             mainBarEnter = mainBarUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartBar + classTarget(d.id); })
+                .attr('class', classChartBar)
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -3478,9 +3482,10 @@
             //-- Line --//
             mainLineUpdate = main.select('.' + CLASS.chartLines)
               .selectAll('.' + CLASS.chartLine)
-                .data(targets);
+                .data(targets)
+              .attr('class', classChartLine);
             mainLineEnter = mainLineUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartLine + classTarget(d.id); })
+                .attr('class', classChartLine)
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -3509,11 +3514,11 @@
             //mainLineUpdate.exit().remove();
 
             //-- Pie --//
-            mainPieUpdate = main.select('.' + CLASS.chartArcs)
-              .selectAll('.' + CLASS.chartArc)
-                .data(pie(targets));
+            mainPieUpdate = main.select('.' + CLASS.chartArcs).selectAll('.' + CLASS.chartArc)
+                .data(pie(targets))
+                .attr("class", classChartArc);
             mainPieEnter = mainPieUpdate.enter().append("g")
-                .attr("class", function (d) { return CLASS.chartArc + classTarget(d.data.id); });
+                .attr("class", classChartArc);
             mainPieEnter.append("path")
                 .attr("class", classArc)
                 .style("opacity", 0)
@@ -3553,22 +3558,22 @@
 
             if (__subchart_show) {
 
-                contextBarUpdate = context.select('.' + CLASS.chartBars)
-                  .selectAll('.' + CLASS.chartBar)
-                    .data(targets);
+                contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+                    .data(targets)
+                    .attr('class', classChartBar);
                 contextBarEnter = contextBarUpdate.enter().append('g')
-                    .attr('class', function (d) { return CLASS.chartBar + classTarget(d.id); });
+                    .attr('class', classChartBar);
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
                     .style("fill", function (d) { return color(d); });
 
                 //-- Line --//
-                contextLineUpdate = context.select('.' + CLASS.chartLines)
-                  .selectAll('.' + CLASS.chartLine)
-                    .data(targets);
+                contextLineUpdate = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
+                    .data(targets)
+                    .attr('class', classChartLine);
                 contextLineEnter = contextLineUpdate.enter().append('g')
-                    .attr('class', function (d) { return CLASS.chartLine + classTarget(d.id); });
+                    .attr('class', classChartLine);
                 // Lines for each data
                 contextLineEnter.append("path")
                     .attr("class", classLine)
@@ -3965,6 +3970,12 @@
             // update xs if specified
             if (args.xs) {
                 addXs(args.xs);
+            }
+            // update classes if exists
+            if ('classes' in args) {
+                Object.keys(args.classes).forEach(function (id) {
+                    __data_classes[id] = args.classes[id];
+                });
             }
             // update categories if exists
             if ('categories' in args && isCategorized) {
