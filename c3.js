@@ -124,6 +124,7 @@
             __data_x_format = getConfig(['data', 'x_format']),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
+            __data_classes = getConfig(['data', 'classes'], {}),
             __data_groups = getConfig(['data', 'groups'], []),
             __data_axes = getConfig(['data', 'axes'], {}),
             __data_type = getConfig(['data', 'type']),
@@ -1579,6 +1580,13 @@
         function classArea(d) { return classShapes(d) + generateClass(CLASS.area, d.id); }
         function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
         function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
+        function classTarget(id) {
+            var additionalClassSuffix = __data_classes[id], additionalClass = '';
+            if (additionalClassSuffix) {
+                additionalClass = ' ' + CLASS.target + '-' + additionalClassSuffix;
+            }
+            return generateClass(CLASS.target, id) + additionalClass;
+        }
 
         function getTargetSelectorSuffix(targetId) {
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
@@ -3447,7 +3455,7 @@
                   .selectAll('.' + CLASS.chartText)
                     .data(targets);
             mainTextEnter = mainTextUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartText + generateClass(CLASS.target, d.id); })
+                .attr('class', function (d) { return CLASS.chartText + classTarget(d.id); })
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
@@ -3458,7 +3466,7 @@
               .selectAll('.' + CLASS.chartBar)
                 .data(targets);
             mainBarEnter = mainBarUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartBar + generateClass(CLASS.target, d.id); })
+                .attr('class', function (d) { return CLASS.chartBar + classTarget(d.id); })
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -3472,7 +3480,7 @@
               .selectAll('.' + CLASS.chartLine)
                 .data(targets);
             mainLineEnter = mainLineUpdate.enter().append('g')
-                .attr('class', function (d) { return CLASS.chartLine + generateClass(CLASS.target, d.id); })
+                .attr('class', function (d) { return CLASS.chartLine + classTarget(d.id); })
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -3505,7 +3513,7 @@
               .selectAll('.' + CLASS.chartArc)
                 .data(pie(targets));
             mainPieEnter = mainPieUpdate.enter().append("g")
-                .attr("class", function (d) { return CLASS.chartArc + generateClass(CLASS.target, d.data.id); });
+                .attr("class", function (d) { return CLASS.chartArc + classTarget(d.data.id); });
             mainPieEnter.append("path")
                 .attr("class", classArc)
                 .style("opacity", 0)
@@ -3549,7 +3557,7 @@
                   .selectAll('.' + CLASS.chartBar)
                     .data(targets);
                 contextBarEnter = contextBarUpdate.enter().append('g')
-                    .attr('class', function (d) { return CLASS.chartBar + generateClass(CLASS.target, d.id); });
+                    .attr('class', function (d) { return CLASS.chartBar + classTarget(d.id); });
                 // Bars for each data
                 contextBarEnter.append('g')
                     .attr("class", classBars)
@@ -3560,7 +3568,7 @@
                   .selectAll('.' + CLASS.chartLine)
                     .data(targets);
                 contextLineEnter = contextLineUpdate.enter().append('g')
-                    .attr('class', function (d) { return CLASS.chartLine + generateClass(CLASS.target, d.id); });
+                    .attr('class', function (d) { return CLASS.chartLine + classTarget(d.id); });
                 // Lines for each data
                 contextLineEnter.append("path")
                     .attr("class", classLine)
