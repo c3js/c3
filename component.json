@@ -9,7 +9,7 @@
   "license": "MIT",
   "main": "c3.min.js",
   "scripts": [
-    "c3.min.js"
+    "c3.js"
   ],
   "styles": [
     "c3.css"
