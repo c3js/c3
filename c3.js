@@ -3010,6 +3010,7 @@
                         break;
                     }
                 }
+                d3.selectAll('.' + CLASS.axisX + ' .tick').sort(function (e1, e2) { return e1 - e2; });
                 d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e, i) {
                     d3.select(this).style('display', i % intervalForCulling ? 'none' : 'block');
                 });
