@@ -60,6 +60,7 @@
         legendItem: 'c3-legend-item',
         legendItemEvent: 'c3-legend-item-event',
         legendItemTile: 'c3-legend-item-tile',
+        legendItemHidden: 'c3-legend-item-hidden',
         dragarea: 'c3-dragarea',
         EXPANDED: '_expanded_',
         SELECTED: '_selected_',
@@ -3669,12 +3670,15 @@
 
         /*-- Draw Legend --*/
 
+        function opacityForLegend(id) {
+            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? 0.5 : 1;
+        }
         function toggleFocusLegend(id, focus) {
             var legendItem = legend.selectAll('.' + CLASS.legendItem),
                 isTarget = function (d) { return (!id || d === id); },
                 notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : 1);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? 1 : 0.3);
+            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : opacityForLegend);
+            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : 0.3);
         }
         function focusLegend(id) {
             toggleFocusLegend(id, true);
@@ -3685,14 +3689,14 @@
         function revertLegend() {
             legend.selectAll('.' + CLASS.legendItem)
               .transition().duration(100)
-                .style('opacity', 1);
+                .style('opacity', opacityForLegend);
         }
         function showLegend(targetIds) {
             removeHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('visibility', 'visible')
               .transition()
-                .style('opacity', 1);
+                .style('opacity', opacityForLegend);
             updateLegend(mapToIds(c3.data.targets));
         }
         function hideLegend(targetIds) {
@@ -3936,6 +3940,11 @@
 
             if (options.withLegend) {
                 showLegend(targetIds);
+            } else {
+                legend.selectAll(selectorLegends(targetIds))
+                    .classed(CLASS.legendItemHidden, false)
+                  .transition()
+                    .style('opacity', 1);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
@@ -3952,6 +3961,11 @@
 
             if (options.withLegend) {
                 hideLegend(targetIds);
+            } else {
+                legend.selectAll(selectorLegends(targetIds))
+                    .classed(CLASS.legendItemHidden, true)
+                  .transition()
+                    .style('opacity', 0.5);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
