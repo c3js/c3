@@ -2156,8 +2156,8 @@
                     isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
                     return area(data);
                 } else {
-                    x0 = x(data[0].x);
-                    y0 = getYScale(d.id)(data[0].value);
+                    x0 = data[0] ? x(data[0].x) : 0;
+                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
                     return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
             };
