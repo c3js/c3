@@ -10,5 +10,8 @@
   "main": "c3.min.js",
   "scripts": [
     "c3.min.js"
+  ],
+  "styles": [
+    "c3.css"
   ]
 }
