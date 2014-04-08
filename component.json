@@ -7,7 +7,7 @@
   "dependencies": {},
   "development": {},
   "license": "MIT",
-  "main": "c3.min.js",
+  "main": "c3.js",
   "scripts": [
     "c3.js"
   ],
