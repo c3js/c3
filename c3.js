@@ -2141,8 +2141,8 @@
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
                     return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
                 } else {
-                    x0 = x(data[0].x);
-                    y0 = getYScale(d.id)(data[0].value);
+                    x0 = data[0] ? x(data[0].x) : 0;
+                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
                     return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
             };
