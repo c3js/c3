@@ -269,8 +269,8 @@
             clipIdForXAxis = clipId + '-xaxis',
             clipIdForYAxis = clipId + '-yaxis',
             clipPath = getClipPath(clipId),
-            clipPathForXAxis = getClipPath(clipPathForXAxis),
-            clipPathForYAxis = getClipPath(clipPathForYAxis);
+            clipPathForXAxis = getClipPath(clipIdForXAxis),
+            clipPathForYAxis = getClipPath(clipIdForYAxis);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
