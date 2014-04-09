@@ -785,7 +785,7 @@
         function getMaxTickWidth(id) {
             var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
             d3.selectAll('.' + axisClass + ' .tick text').each(function () {
-                var box = this.getBBox();
+                var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
             return maxWidth < 20 ? 20 : maxWidth;
@@ -1628,7 +1628,7 @@
                 .data([min, max])
               .enter().append('text')
                 .text(function (d) { return d; })
-                .each(function (d, i) { var box = this.getBBox(); widths[i] = box.width * paddingCoef; })
+                .each(function (d, i) { widths[i] = this.getBoundingClientRect().width * paddingCoef; })
               .remove();
             return widths;
         }
@@ -2017,8 +2017,9 @@
             return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
         }
         function isWithinBar(_this) {
-            var mouse = d3.mouse(_this), box = _this.getBBox();
-            var x = box.x, y = box.y, w = box.width, h = box.height, offset = 2;
+            var mouse = d3.mouse(_this), box = _this.getBoundingClientRect(),
+                seg0 = _this.pathSegList.getItem(0), seg1 = _this.pathSegList.getItem(1);
+            var x = seg0.x, y = Math.min(seg0.y, seg1.y), w = box.width, h = box.height, offset = 2;
             var sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
             return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
         }
@@ -2212,7 +2213,7 @@
             }
         }
         function getYForText(points, d, textElement) {
-            var box = textElement.getBBox();
+            var box = textElement.getBoundingClientRect();
             if (__axis_rotated) {
                 return (points[0][0] + points[2][0] + box.height * 0.6) / 2;
             } else {
@@ -3719,7 +3720,7 @@
             withTransformAll = isDefined(options.withTransformAll) ? options.withTransformAll : true;
 
             function updatePositions(textElement, id, reset) {
-                var box = textElement.getBBox(),
+                var box = textElement.getBoundingClientRect(),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
