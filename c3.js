@@ -212,6 +212,8 @@
             __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
             __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
 
+        var __line_connect_null = getConfig(['line', 'connect_null'], false);
+
         // bar
         var __bar_width = getConfig(['bar', 'width']),
             __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6);
@@ -2141,8 +2143,9 @@
             var line = d3.svg.line()
                 .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
                 .y(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
+            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
             return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
+                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values, x0, y0;
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
                     return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
