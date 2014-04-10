@@ -1218,8 +1218,13 @@
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets, xDomain),
-                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
+                min = 0, max = 0;
+            if (firstX || firstX === 0) {
+                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding;
+            }
+            if (lastX || lastX === 0) {
                 max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+            }
             return [min, max];
         }
         function diffDomain(d) {
@@ -2001,13 +2006,11 @@
 
         function parseDate(date) {
             var parsedDate;
-            if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
             try {
                 parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
             } catch (e) {
-                parsedDate = undefined;
+                window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
             }
-            if (!parsedDate) { window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format); }
             return parsedDate;
         }
 
@@ -4266,7 +4269,19 @@
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
-            d3.csv(config.data.url, function (error, data) { init(data); });
+            d3.xhr(config.data.url, function (error, data) {
+                // TODO: other mine/type
+                var rows = d3.csv.parseRows(data.response), d;
+                if (rows.length === 1) {
+                    d = [{}];
+                    rows[0].forEach(function (id) {
+                        d[0][id] = null;
+                    });
+                } else {
+                    d = d3.csv.parse(data.response);
+                }
+                init(d);
+            });
         }
         else if ('rows' in config.data) {
             init(convertRowsToData(config.data.rows));
