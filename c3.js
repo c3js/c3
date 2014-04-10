@@ -1527,6 +1527,7 @@
                     tickValues.push(end);
                 }
             }
+            if (!isTimeSeries) { tickValues = tickValues.sort(); }
             return tickValues;
         }
         function addHiddenTargetIds(targetIds) {
@@ -3001,7 +3002,7 @@
 
             // update axis tick values according to options, except for scatter plot
             if (! hasScatterType(targetsToShow)) { // TODO: fix this
-                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow)).sort();
+                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
                 xAxis.tickValues(tickValues);
                 subXAxis.tickValues(tickValues);
             }
@@ -3029,9 +3030,11 @@
                         break;
                     }
                 }
-                d3.selectAll('.' + CLASS.axisX + ' .tick').sort(function (e1, e2) { return e1 - e2; });
-                d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e, i) {
-                    d3.select(this).style('display', i % intervalForCulling ? 'none' : 'block');
+                d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+                    var index = tickValues.indexOf(e);
+                    if (index > 0) {
+                        d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+                    }
                 });
             }
 
