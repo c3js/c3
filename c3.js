@@ -163,7 +163,7 @@
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
-            __axis_x_utc = getConfig(['axis', 'x', 'utc'], true),
+            __axis_x_localtime = getConfig(['axis', 'x', 'localtime'], false),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
@@ -282,7 +282,7 @@
         var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
-        var xTimeFormat = __axis_x_utc ? d3.time.format.utc : d3.time.format,
+        var xTimeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
             defaultTimeFormat = (function () {
             var formats = [
                 [xTimeFormat("%Y/%-m/%-d"), function () { return true; }],
