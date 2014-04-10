@@ -163,6 +163,7 @@
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
+            __axis_x_utc = getConfig(['axis', 'x', 'utc'], true),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
@@ -281,16 +282,17 @@
         var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
-        var defaultTimeFormat = (function () {
+        var xTimeFormat = __axis_x_utc ? d3.time.format.utc : d3.time.format,
+            defaultTimeFormat = (function () {
             var formats = [
-                [d3.time.format("%Y/%-m/%-d"), function () { return true; }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getMonth(); }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getDate() !== 1; }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getDay() && d.getDate() !== 1; }],
-                [d3.time.format("%I %p"), function (d) { return d.getHours(); }],
-                [d3.time.format("%I:%M"), function (d) { return d.getMinutes(); }],
-                [d3.time.format(":%S"), function (d) { return d.getSeconds(); }],
-                [d3.time.format(".%L"), function (d) { return d.getMilliseconds(); }]
+                [xTimeFormat("%Y/%-m/%-d"), function () { return true; }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getMonth(); }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getDate() !== 1; }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getDay() && d.getDate() !== 1; }],
+                [xTimeFormat("%I %p"), function (d) { return d.getHours(); }],
+                [xTimeFormat("%I:%M"), function (d) { return d.getMinutes(); }],
+                [xTimeFormat(":%S"), function (d) { return d.getSeconds(); }],
+                [xTimeFormat(".%L"), function (d) { return d.getMilliseconds(); }]
             ];
             return function (date) {
                 var i = formats.length - 1, f = formats[i];
@@ -641,7 +643,7 @@
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
-                    format = function (date) { return d3.time.format(__axis_x_tick_format)(date); };
+                    format = function (date) { return xTimeFormat(__axis_x_tick_format)(date); };
                 }
             }
             return format;
