@@ -1180,8 +1180,8 @@
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
                 padding_bottom = yDomainMin;
             }
-            if (__zero_padding) {
-              padding_bottom = yDomainMin;
+            if (__zero_padding && !hasNegativeValueInTargets(yTargets)) {
+              padding_bottom -= padding_bottom;
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
