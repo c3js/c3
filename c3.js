@@ -236,6 +236,9 @@
         // region - region to change style
         var __regions = getConfig(['regions'], []);
 
+        // interaction
+        var __interaction_expand_arc = getConfig(['interaction', 'expandArc'], true);
+
         // tooltip - show when mouseover on each data
         var __tooltip_show = getConfig(['tooltip', 'show'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title']),
@@ -3540,7 +3543,7 @@
                 .each(function (d) { this._current = d; })
                 .on('mouseover', function (d, i) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOver();
-                    expandArc(updated.data.id);
+                    if (__interaction_expand_arc) expandArc(updated.data.id);
                     focusLegend(updated.data.id);
                     callback(arcData, i);
                 })
@@ -3550,7 +3553,7 @@
                 })
                 .on('mouseout', function (d, i) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOut();
-                    unexpandArc(updated.data.id);
+                    if (__interaction_expand_arc) unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
                     callback(arcData, i);
