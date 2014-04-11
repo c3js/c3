@@ -1053,7 +1053,7 @@
               .transition().duration(50)
                 .attr("d", svgArc);
             svg.selectAll('.' + CLASS.arc)
-                .style("opacity", 1);
+                .style("opacity", (__color_opacity) ? __color_opacity : 1);
         }
         function shouldShowArcLable() {
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
@@ -3362,7 +3362,7 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
-                .style("opacity", 1);
+                .style("opacity", (__color_opacity) ? __color_opacity : 1);
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
