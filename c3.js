@@ -113,7 +113,9 @@
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
 
         var __onenter = getConfig(['onenter'], function () {}),
-            __onleave = getConfig(['onleave'], function () {});
+            __onleave = getConfig(['onleave'], function () {}),
+            __onresize = getConfig(['onresize'], function () {}),
+            __onresized = getConfig(['onresized'], function () {});
 
         var __transition_duration = getConfig(['transition', 'duration'], 350);
 
@@ -2656,9 +2658,11 @@
                 window.onresize = generateResize();
             }
             if (window.onresize.add) {
+                window.onresize.add(__onresize);
                 window.onresize.add(function () {
                     updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
                 });
+                window.onresize.add(__onresized);
             }
         }
 
