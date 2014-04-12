@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.29"
+        version: "0.1.30"
     };
 
     var CLASS = {
@@ -113,7 +113,9 @@
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
 
         var __onenter = getConfig(['onenter'], function () {}),
-            __onleave = getConfig(['onleave'], function () {});
+            __onleave = getConfig(['onleave'], function () {}),
+            __onresize = getConfig(['onresize'], function () {}),
+            __onresized = getConfig(['onresized'], function () {});
 
         var __transition_duration = getConfig(['transition', 'duration'], 350);
 
@@ -163,13 +165,15 @@
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
+            __axis_x_localtime = getConfig(['axis', 'x', 'localtime'], false),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], {}),
-            __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], __axis_x_type === 'categorized' ? Infinity : 10),
+            __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], 10),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
+            __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], []),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
@@ -210,6 +214,8 @@
             __point_focus_expand_enabled = getConfig(['point', 'focus', 'expand', 'enabled'], true),
             __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
             __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
+
+        var __line_connect_null = getConfig(['line', 'connect_null'], false);
 
         // bar
         var __bar_width = getConfig(['bar', 'width']),
@@ -269,8 +275,8 @@
             clipIdForXAxis = clipId + '-xaxis',
             clipIdForYAxis = clipId + '-yaxis',
             clipPath = getClipPath(clipId),
-            clipPathForXAxis = getClipPath(clipPathForXAxis),
-            clipPathForYAxis = getClipPath(clipPathForYAxis);
+            clipPathForXAxis = getClipPath(clipIdForXAxis),
+            clipPathForYAxis = getClipPath(clipIdForYAxis);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
@@ -281,16 +287,17 @@
         var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
-        var defaultTimeFormat = (function () {
+        var xTimeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
+            defaultTimeFormat = (function () {
             var formats = [
-                [d3.time.format("%Y/%-m/%-d"), function () { return true; }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getMonth(); }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getDate() !== 1; }],
-                [d3.time.format("%-m/%-d"), function (d) { return d.getDay() && d.getDate() !== 1; }],
-                [d3.time.format("%I %p"), function (d) { return d.getHours(); }],
-                [d3.time.format("%I:%M"), function (d) { return d.getMinutes(); }],
-                [d3.time.format(":%S"), function (d) { return d.getSeconds(); }],
-                [d3.time.format(".%L"), function (d) { return d.getMilliseconds(); }]
+                [xTimeFormat("%Y/%-m/%-d"), function () { return true; }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getMonth(); }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getDate() !== 1; }],
+                [xTimeFormat("%-m/%-d"), function (d) { return d.getDay() && d.getDate() !== 1; }],
+                [xTimeFormat("%I %p"), function (d) { return d.getHours(); }],
+                [xTimeFormat("%I:%M"), function (d) { return d.getMinutes(); }],
+                [xTimeFormat(":%S"), function (d) { return d.getSeconds(); }],
+                [xTimeFormat(".%L"), function (d) { return d.getMilliseconds(); }]
             ];
             return function (date) {
                 var i = formats.length - 1, f = formats[i];
@@ -615,6 +622,9 @@
             axis.tickFormat(tickFormat);
             if (isCategorized) {
                 axis.tickCentered(__axis_x_tick_centered);
+                if (isEmpty(__axis_x_tick_culling)) {
+                    __axis_x_tick_culling = false;
+                }
             } else {
                 axis.tickOffset = function () {
                     var base = __axis_rotated ? height : width;
@@ -641,7 +651,7 @@
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
-                    format = function (date) { return d3.time.format(__axis_x_tick_format)(date); };
+                    format = function (date) { return xTimeFormat(__axis_x_tick_format)(date); };
                 }
             }
             return format;
@@ -785,7 +795,7 @@
         function getMaxTickWidth(id) {
             var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
             d3.selectAll('.' + axisClass + ' .tick text').each(function () {
-                var box = this.getBBox();
+                var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
             return maxWidth < 20 ? 20 : maxWidth;
@@ -823,10 +833,6 @@
                     ticks.unshift(ticks[0] - (ticks[1] - ticks[0]));
                 }
                 return ticks;
-            }
-            function shouldShowTickText(ticks, i) {
-                var length = ticks.length - 1;
-                return length <= tickTextNum || i % Math.ceil(length / tickTextNum) === 0;
             }
             function category(i) {
                 return i < categories.length ? categories[i] : i;
@@ -870,7 +876,7 @@
                             lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                             textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                             text.attr("dy", ".71em").style("text-anchor", "middle");
-                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
                             break;
                         }
@@ -895,7 +901,7 @@
                             lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
                             textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
                             text.attr("dy", ".32em").style("text-anchor", "end");
-                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
                             break;
                         }
@@ -1216,8 +1222,13 @@
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets, xDomain),
-                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
+                min = 0, max = 0;
+            if (firstX || firstX === 0) {
+                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding;
+            }
+            if (lastX || lastX === 0) {
                 max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+            }
             return [min, max];
         }
         function diffDomain(d) {
@@ -1520,6 +1531,7 @@
                     tickValues.push(end);
                 }
             }
+            if (!isTimeSeries) { tickValues = tickValues.sort(function (a, b) { return a - b; }); }
             return tickValues;
         }
         function addHiddenTargetIds(targetIds) {
@@ -1628,7 +1640,7 @@
                 .data([min, max])
               .enter().append('text')
                 .text(function (d) { return d; })
-                .each(function (d, i) { var box = this.getBBox(); widths[i] = box.width * paddingCoef; })
+                .each(function (d, i) { widths[i] = this.getBoundingClientRect().width * paddingCoef; })
               .remove();
             return widths;
         }
@@ -1999,13 +2011,11 @@
 
         function parseDate(date) {
             var parsedDate;
-            if (!date) { throw Error(date + " can not be parsed as d3.time with format " + __data_x_format + ". Maybe 'x' of this data is not defined. See data.x or data.xs option."); }
             try {
                 parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
             } catch (e) {
-                parsedDate = undefined;
+                window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
             }
-            if (!parsedDate) { window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format); }
             return parsedDate;
         }
 
@@ -2017,8 +2027,9 @@
             return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
         }
         function isWithinBar(_this) {
-            var mouse = d3.mouse(_this), box = _this.getBBox();
-            var x = box.x, y = box.y, w = box.width, h = box.height, offset = 2;
+            var mouse = d3.mouse(_this), box = _this.getBoundingClientRect(),
+                seg0 = _this.pathSegList.getItem(0), seg1 = _this.pathSegList.getItem(1);
+            var x = seg0.x, y = Math.min(seg0.y, seg1.y), w = box.width, h = box.height, offset = 2;
             var sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
             return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
         }
@@ -2134,14 +2145,15 @@
             var line = d3.svg.line()
                 .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
                 .y(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
+            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
             return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
+                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values, x0, y0;
                 if (isLineType(d)) {
                     isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
                     return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
                 } else {
-                    x0 = x(data[0].x);
-                    y0 = getYScale(d.id)(data[0].value);
+                    x0 = data[0] ? x(data[0].x) : 0;
+                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
                     return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
             };
@@ -2212,7 +2224,7 @@
             }
         }
         function getYForText(points, d, textElement) {
-            var box = textElement.getBBox();
+            var box = textElement.getBoundingClientRect();
             if (__axis_rotated) {
                 return (points[0][0] + points[2][0] + box.height * 0.6) / 2;
             } else {
@@ -2646,9 +2658,11 @@
                 window.onresize = generateResize();
             }
             if (window.onresize.add) {
+                window.onresize.add(__onresize);
                 window.onresize.add(function () {
                     updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
                 });
+                window.onresize.add(__onresized);
             }
         }
 
@@ -2995,7 +3009,7 @@
 
             // update axis tick values according to options, except for scatter plot
             if (! hasScatterType(targetsToShow)) { // TODO: fix this
-                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow)).sort();
+                tickValues = __axis_x_tick_values ? __axis_x_tick_values : generateTickValues(mapTargetsToUniqueXs(targetsToShow));
                 xAxis.tickValues(tickValues);
                 subXAxis.tickValues(tickValues);
             }
@@ -3016,17 +3030,23 @@
             main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // show/hide if manual culling needed
-            if (withUpdateXDomain && __axis_x_tick_culling && tickValues) {
-                for (i = 1; i < tickValues.length; i++) {
-                    if (tickValues.length / i < __axis_x_tick_culling_max) {
-                        intervalForCulling = i;
-                        break;
+            if (withUpdateXDomain) {
+                if (__axis_x_tick_culling && tickValues) {
+                    for (i = 1; i < tickValues.length; i++) {
+                        if (tickValues.length / i < __axis_x_tick_culling_max) {
+                            intervalForCulling = i;
+                            break;
+                        }
                     }
+                    d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+                        var index = tickValues.indexOf(e);
+                        if (index >= 0) {
+                            d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+                        }
+                    });
+                } else {
+                    d3.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
                 }
-                d3.selectAll('.' + CLASS.axisX + ' .tick').sort(function (e1, e2) { return e1 - e2; });
-                d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e, i) {
-                    d3.select(this).style('display', i % intervalForCulling ? 'none' : 'block');
-                });
             }
 
             // setup drawer - MEMO: these must be called after axis updated
@@ -3671,14 +3691,16 @@
         /*-- Draw Legend --*/
 
         function opacityForLegend(id) {
-            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? 0.5 : 1;
+            var item = legend.select(selectorLegend(id));
+            item.style('opacity', null); // MEMO: remove to get opacity by css
+            return item.classed(CLASS.legendItemHidden) ? item.style('opacity') : 1;
         }
         function toggleFocusLegend(id, focus) {
-            var legendItem = legend.selectAll('.' + CLASS.legendItem),
+            var items = legend.selectAll('.' + CLASS.legendItem).filter(function () { return !d3.select(this).classed(CLASS.legendItemHidden); }),
                 isTarget = function (d) { return (!id || d === id); },
                 notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : opacityForLegend);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : 0.3);
+            items.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : opacityForLegend);
+            items.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : 0.3);
         }
         function focusLegend(id) {
             toggleFocusLegend(id, true);
@@ -3719,7 +3741,7 @@
             withTransformAll = isDefined(options.withTransformAll) ? options.withTransformAll : true;
 
             function updatePositions(textElement, id, reset) {
-                var box = textElement.getBBox(),
+                var box = textElement.getBoundingClientRect(),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
@@ -3942,9 +3964,7 @@
                 showLegend(targetIds);
             } else {
                 legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, false)
-                  .transition()
-                    .style('opacity', 1);
+                    .classed(CLASS.legendItemHidden, false);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
@@ -3963,9 +3983,7 @@
                 hideLegend(targetIds);
             } else {
                 legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, true)
-                  .transition()
-                    .style('opacity', 0.5);
+                    .classed(CLASS.legendItemHidden, true);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
@@ -4265,7 +4283,19 @@
         /*-- Load data and init chart with defined functions --*/
 
         if ('url' in config.data) {
-            d3.csv(config.data.url, function (error, data) { init(data); });
+            d3.xhr(config.data.url, function (error, data) {
+                // TODO: other mine/type
+                var rows = d3.csv.parseRows(data.response), d;
+                if (rows.length === 1) {
+                    d = [{}];
+                    rows[0].forEach(function (id) {
+                        d[0][id] = null;
+                    });
+                } else {
+                    d = d3.csv.parse(data.response);
+                }
+                init(d);
+            });
         }
         else if ('rows' in config.data) {
             init(convertRowsToData(config.data.rows));
