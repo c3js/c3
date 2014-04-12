@@ -170,9 +170,10 @@
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], {}),
-            __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], __axis_x_type === 'categorized' ? Infinity : 10),
+            __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], 10),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
+            __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], []),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
@@ -621,6 +622,9 @@
             axis.tickFormat(tickFormat);
             if (isCategorized) {
                 axis.tickCentered(__axis_x_tick_centered);
+                if (isEmpty(__axis_x_tick_culling)) {
+                    __axis_x_tick_culling = false;
+                }
             } else {
                 axis.tickOffset = function () {
                     var base = __axis_rotated ? height : width;
@@ -830,10 +834,6 @@
                 }
                 return ticks;
             }
-            function shouldShowTickText(ticks, i) {
-                var length = ticks.length - 1;
-                return length <= tickTextNum || i % Math.ceil(length / tickTextNum) === 0;
-            }
             function category(i) {
                 return i < categories.length ? categories[i] : i;
             }
@@ -876,7 +876,7 @@
                             lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
                             textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
                             text.attr("dy", ".71em").style("text-anchor", "middle");
-                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
                             break;
                         }
@@ -901,7 +901,7 @@
                             lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
                             textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
                             text.attr("dy", ".32em").style("text-anchor", "end");
-                            text.text(function (i) { return shouldShowTickText(ticks, i) ? formattedCategory(i) : ""; });
+                            text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
                             break;
                         }
@@ -3009,7 +3009,7 @@
 
             // update axis tick values according to options, except for scatter plot
             if (! hasScatterType(targetsToShow)) { // TODO: fix this
-                tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow));
+                tickValues = __axis_x_tick_values ? __axis_x_tick_values : generateTickValues(mapTargetsToUniqueXs(targetsToShow));
                 xAxis.tickValues(tickValues);
                 subXAxis.tickValues(tickValues);
             }
@@ -3030,19 +3030,23 @@
             main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
 
             // show/hide if manual culling needed
-            if (withUpdateXDomain && __axis_x_tick_culling && tickValues) {
-                for (i = 1; i < tickValues.length; i++) {
-                    if (tickValues.length / i < __axis_x_tick_culling_max) {
-                        intervalForCulling = i;
-                        break;
+            if (withUpdateXDomain) {
+                if (__axis_x_tick_culling && tickValues) {
+                    for (i = 1; i < tickValues.length; i++) {
+                        if (tickValues.length / i < __axis_x_tick_culling_max) {
+                            intervalForCulling = i;
+                            break;
+                        }
                     }
+                    d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+                        var index = tickValues.indexOf(e);
+                        if (index >= 0) {
+                            d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+                        }
+                    });
+                } else {
+                    d3.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
                 }
-                d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
-                    var index = tickValues.indexOf(e);
-                    if (index > 0) {
-                        d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
-                    }
-                });
             }
 
             // setup drawer - MEMO: these must be called after axis updated
