@@ -1531,7 +1531,7 @@
                     tickValues.push(end);
                 }
             }
-            if (!isTimeSeries) { tickValues = tickValues.sort(); }
+            if (!isTimeSeries) { tickValues = tickValues.sort(function (a, b) { return a - b; }); }
             return tickValues;
         }
         function addHiddenTargetIds(targetIds) {
