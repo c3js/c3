@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.30"
+        version: "0.1.31"
     };
 
     var CLASS = {
@@ -173,7 +173,7 @@
             __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], 10),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
-            __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], []),
+            __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
