@@ -224,6 +224,7 @@
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
             __pie_label_format = getConfig(['pie', 'label', 'format']),
+            __pie_expand = getConfig(['pie', 'expand'], true),
             __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
             __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
@@ -231,6 +232,7 @@
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
+            __donut_expand = getConfig(['donut', 'expand'], true),
             __donut_title = getConfig(['donut', 'title'], ""),
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
             __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
@@ -1047,16 +1049,19 @@
         function expandArc(id, withoutFadeOut) {
             var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id)),
                 noneTargets = svg.selectAll('.' + CLASS.arc).filter(function (data) { return data.data.id !== id; });
-            target.selectAll('path')
-              .transition().duration(50)
-                .attr("d", svgArcExpanded)
-              .transition().duration(100)
-                .attr("d", svgArcExpandedSub)
-                .each(function (d) {
-                    if (isDonutType(d.data)) {
-                        // callback here
-                    }
-                });
+
+            if (shouldExpand(id)) {
+                target.selectAll('path')
+                  .transition().duration(50)
+                    .attr("d", svgArcExpanded)
+                  .transition().duration(100)
+                    .attr("d", svgArcExpandedSub)
+                    .each(function (d) {
+                        if (isDonutType(d.data)) {
+                            // callback here
+                        }
+                    });
+            }
             if (!withoutFadeOut) {
                 noneTargets.style("opacity", 0.3);
             }
@@ -1980,6 +1985,10 @@
         }
         function barOrLineData(d) {
             return isBarType(d) || isLineType(d) ? d.values : [];
+        }
+
+        function shouldExpand(id) {
+            return (isDonutType(id) && __donut_expand) || (isPieType(id) && __pie_expand);
         }
 
         //-- Color --//
