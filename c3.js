@@ -655,7 +655,9 @@
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
-                    format = function (date) { return xTimeFormat(__axis_x_tick_format)(date); };
+                    format = function (date) {
+                        return date ? xTimeFormat(__axis_x_tick_format)(date) : "";
+                    };
                 }
             }
             return format;
