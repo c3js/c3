@@ -160,6 +160,8 @@
         var __legend_show = getConfig(['legend', 'show'], true),
             __legend_position = getConfig(['legend', 'position'], 'bottom'),
             __legend_item_onclick = getConfig(['legend', 'item', 'onclick']),
+            __legend_item_onmouseover = getConfig(['legend', 'item', 'onmouseover']),
+            __legend_item_onmouseout = getConfig(['legend', 'item', 'onmouseout']),
             __legend_equally = getConfig(['legend', 'equally'], false);
 
         // axis
@@ -3833,9 +3835,15 @@
                 })
                 .on('mouseover', function (id) {
                     c3.focus(id);
+                    if (typeof __legend_item_onmouseover === 'function') {
+                        __legend_item_onmouseover(id);
+                    }
                 })
-                .on('mouseout', function () {
+                .on('mouseout', function (id) {
                     c3.revert();
+                    if (typeof __legend_item_onmouseout === 'function') {
+                        __legend_item_onmouseout(id);
+                    }
                 });
             l.append('text')
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
