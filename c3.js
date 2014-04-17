@@ -167,7 +167,7 @@
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
-            __axis_x_localtime = getConfig(['axis', 'x', 'localtime'], false),
+            __axis_x_localtime = getConfig(['axis', 'x', 'localtime'], true),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
             __axis_x_tick_centered = getConfig(['axis', 'x', 'tick', 'centered'], false),
             __axis_x_tick_format = getConfig(['axis', 'x', 'tick', 'format']),
