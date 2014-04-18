@@ -178,6 +178,7 @@
             __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
+            __axis_x_padding = getConfig(['axis', 'x', 'padding'], {}),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
             __axis_x_label = getConfig(['axis', 'x', 'label'], {}),
             __axis_y_show = getConfig(['axis', 'y', 'show'], true),
@@ -1216,7 +1217,7 @@
             return __axis_x_max ? __axis_x_max : d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
         }
         function getXDomainPadding(targets, domain) {
-            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), maxDataCount, padding;
+            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), maxDataCount, padding, paddingLeft, paddingRight;
             if (isCategorized) {
                 padding = 0;
             } else if (hasBarType(targets)) {
@@ -1225,7 +1226,15 @@
             } else {
                 padding = diff * 0.01;
             }
-            return padding;
+            if (typeof __axis_x_padding === 'object' && notEmpty(__axis_x_padding)) {
+                paddingLeft = isValue(__axis_x_padding.left) ? __axis_x_padding.left : padding;
+                paddingRight = isValue(__axis_x_padding.right) ? __axis_x_padding.right : padding;
+            } else if (typeof __axis_x_padding === 'number') {
+                paddingLeft = paddingRight = __axis_x_padding;
+            } else {
+                paddingLeft = paddingRight = padding;
+            }
+            return {left: paddingLeft, right: paddingRight};
         }
         function getXDomain(targets) {
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
@@ -1233,10 +1242,10 @@
                 padding = getXDomainPadding(targets, xDomain),
                 min = 0, max = 0;
             if (firstX || firstX === 0) {
-                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding;
+                min = isTimeSeries ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;
             }
             if (lastX || lastX === 0) {
-                max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+                max = isTimeSeries ? new Date(lastX.getTime() + padding.right) : lastX + padding.right;
             }
             return [min, max];
         }
