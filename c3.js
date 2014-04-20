@@ -1690,7 +1690,8 @@
             return x(isTimeSeries ? parseDate(d.value) : d.value);
         }
         function yv(d) {
-            return y(d.value);
+            var yScale = d.axis && d.axis === 'y2' ? y2 : y;
+            return yScale(d.value);
         }
         function subxx(d) {
             return subX(d.x);
