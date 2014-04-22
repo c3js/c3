@@ -382,7 +382,7 @@
 
             // for main
             margin = {
-                top: __axis_rotated ? getHorizontalAxisHeight('y2') : rotated_padding_top,
+                top: __axis_rotated ? getHorizontalAxisHeight('y2') : 0,
                 right: getCurrentPaddingRight(),
                 bottom: getHorizontalAxisHeight(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
                 left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
@@ -1274,15 +1274,41 @@
 
         //-- Regions --//
 
-        function regionStart(d) {
-            return ('start' in d) ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0;
+        function regionX(d) {
+            var xPos, yScale = d.axis === 'y' ? y : y2;
+            if (d.axis === 'y' || d.axis === 'y2') {
+                xPos = __axis_rotated ? ('start' in d ? yScale(d.start) : 0) : 0;
+            } else {
+                xPos = __axis_rotated ? 0 : ('start' in d ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0);
+            }
+            return xPos;
         }
-
+        function regionY(d) {
+            var yPos, yScale = d.axis === 'y' ? y : y2;
+            if (d.axis === 'y' || d.axis === 'y2') {
+                yPos = __axis_rotated ? 0 : ('end' in d ? yScale(d.end) : 0);
+            } else {
+                yPos = __axis_rotated ? ('start' in d ? x(isTimeSeries ? parseDate(d.start) : d.start) : 0) : 0;
+            }
+            return yPos;
+        }
         function regionWidth(d) {
-            var start = regionStart(d),
-                end = ('end' in d) ? x(isTimeSeries ? parseDate(d.end) : d.end) : width,
-                w = end - start;
-            return (w < 0) ? 0 : w;
+            var start = regionX(d), end, yScale = d.axis === 'y' ? y : y2;
+            if (d.axis === 'y' || d.axis === 'y2') {
+                end = __axis_rotated ? ('end' in d ? yScale(d.end) : width) : width;
+            } else {
+                end = __axis_rotated ? width : ('end' in d ? x(isTimeSeries ? parseDate(d.end) : d.end) : width);
+            }
+            return end < start ? 0 : end - start;
+        }
+        function regionHeight(d) {
+            var start = regionY(d), end, yScale = d.axis === 'y' ? y : y2;
+            if (d.axis === 'y' || d.axis === 'y2') {
+                end = __axis_rotated ? height : ('start' in d ? yScale(d.start) : height);
+            } else {
+                end = __axis_rotated ? ('end' in d ? x(isTimeSeries ? parseDate(d.end) : d.end) : height) : height;
+            }
+            return end < start ? 0 : end - start;
         }
 
         //-- Data --//
@@ -3409,10 +3435,10 @@
                 .style("fill-opacity", 0);
             mainRegion
                 .attr('class', classRegion)
-                .attr("x", __axis_rotated ? 0 : regionStart)
-                .attr("y", __axis_rotated ? regionStart : margin.top)
-                .attr("width", __axis_rotated ? width : regionWidth)
-                .attr("height", __axis_rotated ? regionWidth : height)
+                .attr("x", regionX)
+                .attr("y", regionY)
+                .attr("width", regionWidth)
+                .attr("height", regionHeight)
               .transition().duration(duration)
                 .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
             mainRegion.exit().transition().duration(duration)

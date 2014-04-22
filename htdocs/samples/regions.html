@@ -11,13 +11,37 @@
       var chart = c3.generate({
         data: {
           columns: [
-            ['sample', 30, 200, 100, 400, 150, 250]
+            ['sample', 30, 200, 100, 400, 150, 250, 300]
           ]
         },
+        axis: {
+          rotated: true,
+          y2: {
+//            show: true,
+          }
+        },
         regions: [
-          {start:2,end:4,class:'region1'}
-        ]
+          {end:1,class:'region1'},
+          {start:2,end:4,class:'region1'},
+          {start:5,class:'region1'},
+          {end:50,axis:'y'},
+          {start:100,end:200,axis:'y'},
+          {start:300,axis:'y'},
+        ],
+        zoom: {
+//          enabled: true
+        }
       });
+
+/*
+      setTimeout(function () {
+        chart.load({
+          columns: [
+            ['sample', -100, 200, 50, 100, 400, 299]
+          ]
+        });
+      }, 1000);
+*/
     </script>
   </body>
 </html>
