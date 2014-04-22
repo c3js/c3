@@ -2526,7 +2526,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", CLASS.axisX)
-                .attr("clip-path", __axis_rotated ? "" : clipPathForXAxis)
+                .attr("clip-path", clipPathForXAxis)
                 .attr("transform", translate.x)
               .append("text")
                 .attr("class", CLASS.axisXLabel)
@@ -2538,7 +2538,7 @@
             if (__axis_y_show) {
                 main.append("g")
                     .attr("class", CLASS.axisY)
-                    .attr("clip-path", __axis_rotated ? clipPathForYAxis : "")
+                    .attr("clip-path", clipPathForYAxis)
                     .attr("transform", translate.y)
                   .append("text")
                     .attr("class", CLASS.axisYLabel)
