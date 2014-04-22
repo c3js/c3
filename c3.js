@@ -2843,7 +2843,11 @@
                     mouse = d3.mouse(this);
                     closest = findClosestFromTargets(c3.data.targets, mouse);
 
-                    sameXData = filterSameX(c3.data.targets, closest.x);
+                    if (isScatterType(closest)) {
+                        sameXData = [closest];
+                    } else {
+                        sameXData = filterSameX(c3.data.targets, closest.x);
+                    }
 
                     // show tooltip when cursor is close to some point
                     selectedData = sameXData.map(function (d) {
