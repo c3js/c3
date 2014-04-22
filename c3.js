@@ -174,7 +174,7 @@
             __axis_x_tick_culling = getConfig(['axis', 'x', 'tick', 'culling'], {}),
             __axis_x_tick_culling_max = getConfig(['axis', 'x', 'tick', 'culling', 'max'], 10),
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
-            __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], false),
+            __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], true),
             __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
@@ -1553,7 +1553,7 @@
         }
         function generateTickValues(xs) {
             var tickValues = xs, targetCount, start, end, count, interval, i, tickValue;
-            if (!__axis_x_tick_fit && __axis_x_tick_count) {
+            if (__axis_x_tick_count) {
                 // TODO: need some arguments for __axis_x_tick_count()?
                 targetCount = typeof __axis_x_tick_count === 'function' ? __axis_x_tick_count() : __axis_x_tick_count;
                 // compute ticks according to __axis_x_tick_count
@@ -3056,8 +3056,8 @@
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
-            // update axis tick values according to options, except for scatter plot
-            if (! hasScatterType(targetsToShow)) { // TODO: fix this
+            // update axis tick values according to options
+            if (__axis_x_tick_fit || __axis_x_tick_count) {
                 tickValues = __axis_x_tick_values ? __axis_x_tick_values : generateTickValues(mapTargetsToUniqueXs(targetsToShow));
                 xAxis.tickValues(tickValues);
                 subXAxis.tickValues(tickValues);
