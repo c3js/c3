@@ -3744,16 +3744,14 @@
         /*-- Draw Legend --*/
 
         function opacityForLegend(id) {
-            var item = legend.select(selectorLegend(id));
-            item.style('opacity', null); // MEMO: remove to get opacity by css
-            return item.classed(CLASS.legendItemHidden) ? item.style('opacity') : 1;
+            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? 0.5 : 1;
         }
         function toggleFocusLegend(id, focus) {
-            var items = legend.selectAll('.' + CLASS.legendItem).filter(function () { return !d3.select(this).classed(CLASS.legendItemHidden); }),
+            var legendItem = legend.selectAll('.' + CLASS.legendItem),
                 isTarget = function (d) { return (!id || d === id); },
                 notTarget = function (d) { return !isTarget(d); };
-            items.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : opacityForLegend);
-            items.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : 0.3);
+            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? 0.3 : opacityForLegend);
+            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : 0.3);
         }
         function focusLegend(id) {
             toggleFocusLegend(id, true);
@@ -4023,7 +4021,9 @@
                 showLegend(targetIds);
             } else {
                 legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, false);
+                    .classed(CLASS.legendItemHidden, false)
+                  .transition()
+                    .style('opacity', 1);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
@@ -4042,7 +4042,9 @@
                 hideLegend(targetIds);
             } else {
                 legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, true);
+                    .classed(CLASS.legendItemHidden, true)
+                  .transition()
+                    .style('opacity', 0.5);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
