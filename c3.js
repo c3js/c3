@@ -166,6 +166,7 @@
 
         // axis
         var __axis_rotated = getConfig(['axis', 'rotated'], false),
+            __axis_x_show = getConfig(['axis', 'x', 'show'], true),
             __axis_x_type = getConfig(['axis', 'x', 'type'], 'indexed'),
             __axis_x_localtime = getConfig(['axis', 'x', 'localtime'], true),
             __axis_x_categories = getConfig(['axis', 'x', 'categories'], []),
@@ -372,7 +373,7 @@
         //-- Sizes --//
 
         // TODO: configurabale
-        var rotated_padding_left = 30, rotated_padding_right = 30, rotated_padding_top = 5;
+        var rotated_padding_left = 30, rotated_padding_right = __axis_rotated && !__axis_x_show ? 0 : 30, rotated_padding_top = 5;
 
         function updateSizes() {
             var legendHeight = getLegendHeight(), legendWidth = getLegendWidth();
@@ -474,6 +475,7 @@
             return position.isInner ? 20 + getMaxTickWidth(id) : 40 + getMaxTickWidth(id);
         }
         function getHorizontalAxisHeight(axisId) {
+            if (axisId === 'x' && !__axis_x_show) { return 0; }
             if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight ? 10 : 1; }
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
@@ -2524,16 +2526,18 @@
             /*-- Main Region --*/
 
             // Add Axis
-            main.append("g")
-                .attr("class", CLASS.axisX)
-                .attr("clip-path", clipPathForXAxis)
-                .attr("transform", translate.x)
-              .append("text")
-                .attr("class", CLASS.axisXLabel)
-                .attr("transform", __axis_rotated ? "rotate(-90)" : "")
-                .attr("dx", dxForXAxisLabel)
-                .attr("dy", dyForXAxisLabel)
-                .style("text-anchor", textAnchorForXAxisLabel);
+            if (__axis_x_show) {
+                main.append("g")
+                    .attr("class", CLASS.axisX)
+                    .attr("clip-path", clipPathForXAxis)
+                    .attr("transform", translate.x)
+                  .append("text")
+                    .attr("class", CLASS.axisXLabel)
+                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
+                    .attr("dx", dxForXAxisLabel)
+                    .attr("dy", dyForXAxisLabel)
+                    .style("text-anchor", textAnchorForXAxisLabel);
+            }
 
             if (__axis_y_show) {
                 main.append("g")
