@@ -378,37 +378,42 @@
         var rotated_padding_left = 30, rotated_padding_right = __axis_rotated && !__axis_x_show ? 0 : 30, rotated_padding_top = 5;
 
         function updateSizes() {
-            var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(), subchartHeight = __subchart_show ? (__subchart_size_height + getHorizontalAxisHeight('x')) : 0;
+            var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(),
+                legendHeightForBottom = isLegendRight ? 0 : legendHeight,
+                xAxisHeight = __axis_rotated ? 0 : getHorizontalAxisHeight('x'),
+                subchartHeight = __subchart_show ? (__subchart_size_height + xAxisHeight) : 0;
 
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
 
-            // TODO: refactor..
-
-            // for main
-            margin = {
-                top: __axis_rotated ? getHorizontalAxisHeight('y2') : 0,
-                right: getCurrentPaddingRight(),
-                bottom: getHorizontalAxisHeight(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : subchartHeight) + (isLegendRight ? 0 : legendHeight),
-                left: (__axis_rotated ? subchartHeight + rotated_padding_right : 0) + getCurrentPaddingLeft()
-            };
-            width = currentWidth - margin.left - margin.right;
-            height = currentHeight - margin.top - margin.bottom;
-            if (width < 0) { width = 0; }
-            if (height < 0) { height = 0; }
-
-            // for context
-            margin2 = {
-                top: __axis_rotated ? margin.top : (currentHeight - subchartHeight - (isLegendRight ? 0 : legendHeight)),
-                right: NaN,
-                bottom: (__axis_rotated ? 20 : getHorizontalAxisHeight('x')) + (isLegendRight ? 0 : legendHeight),
-                left: __axis_rotated ? rotated_padding_left : margin.left
-            };
-            width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
-            height2 = __axis_rotated ? height : currentHeight - margin2.top - margin2.bottom;
-            if (width2 < 0) { width2 = 0; }
-            if (height2 < 0) { height2 = 0; }
-
+            // for main, context
+            if (__axis_rotated) {
+                margin = {
+                    top: getHorizontalAxisHeight('y2'),
+                    right: getCurrentPaddingRight(),
+                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom,
+                    left: subchartHeight + rotated_padding_right + getCurrentPaddingLeft()
+                };
+                margin2 = {
+                    top: margin.top,
+                    right: NaN,
+                    bottom: 20 + legendHeightForBottom,
+                    left: rotated_padding_left
+                };
+            } else {
+                margin = {
+                    top: 0,
+                    right: getCurrentPaddingRight(),
+                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom,
+                    left: getCurrentPaddingLeft()
+                };
+                margin2 = {
+                    top: currentHeight - subchartHeight - legendHeightForBottom,
+                    right: NaN,
+                    bottom: xAxisHeight + legendHeightForBottom,
+                    left: margin.left
+                };
+            }
             // for legend
             margin3 = {
                 top: isLegendRight ? 0 : currentHeight - legendHeight,
@@ -416,6 +421,16 @@
                 bottom: 0,
                 left: isLegendRight ? currentWidth - legendWidth : 0
             };
+
+            width = currentWidth - margin.left - margin.right;
+            height = currentHeight - margin.top - margin.bottom;
+            if (width < 0) { width = 0; }
+            if (height < 0) { height = 0; }
+
+            width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
+            height2 = __axis_rotated ? height : currentHeight - margin2.top - margin2.bottom;
+            if (width2 < 0) { width2 = 0; }
+            if (height2 < 0) { height2 = 0; }
 
             // for arc
             updateRadius();
