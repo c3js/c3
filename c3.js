@@ -1787,10 +1787,10 @@
 
                 // Get candidates that has same min and max index
                 candidates = [];
-                if (values[min].x) {
+                if (values[min].x || values[min].x === 0) {
                     candidates = candidates.concat(findSameXOfValues(values, min));
                 }
-                if (values[max].x) {
+                if (values[max].x || values[max].x === 0) {
                     candidates = candidates.concat(findSameXOfValues(values, max));
                 }
 
