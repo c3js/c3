@@ -528,7 +528,7 @@
             return forHorizontal ? width + 2 + 4 : margin.left + 20;
         }
         function getAxisClipHeight(forHorizontal) {
-            return forHorizontal ? 80 : height + 2;
+            return forHorizontal ? (__axis_x_height ? __axis_x_height : 0) + 40 : height + 2;
         }
         function getXAxisClipWidth() {
             return getAxisClipWidth(!__axis_rotated);
