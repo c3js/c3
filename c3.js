@@ -151,7 +151,7 @@
 
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
-            __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
+            __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
 
         // color
         var __color_pattern = getConfig(['color', 'pattern'], []);
@@ -177,9 +177,11 @@
             __axis_x_tick_count = getConfig(['axis', 'x', 'tick', 'count']),
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], true),
             __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
+            __axis_x_tick_rotate = getConfig(['axis', 'x', 'tick', 'rotate']),
             __axis_x_max = getConfig(['axis', 'x', 'max']),
             __axis_x_min = getConfig(['axis', 'x', 'min']),
             __axis_x_padding = getConfig(['axis', 'x', 'padding'], {}),
+            __axis_x_height = getConfig(['axis', 'x', 'height']),
             __axis_x_default = getConfig(['axis', 'x', 'default']),
             __axis_x_label = getConfig(['axis', 'x', 'label'], {}),
             __axis_y_show = getConfig(['axis', 'y', 'show'], true),
@@ -376,17 +378,19 @@
         var rotated_padding_left = 30, rotated_padding_right = __axis_rotated && !__axis_x_show ? 0 : 30, rotated_padding_top = 5;
 
         function updateSizes() {
-            var legendHeight = getLegendHeight(), legendWidth = getLegendWidth();
+            var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(), subchartHeight = __subchart_show ? (__subchart_size_height + getHorizontalAxisHeight('x')) : 0;
 
             currentWidth = getCurrentWidth();
             currentHeight = getCurrentHeight();
+
+            // TODO: refactor..
 
             // for main
             margin = {
                 top: __axis_rotated ? getHorizontalAxisHeight('y2') : 0,
                 right: getCurrentPaddingRight(),
-                bottom: getHorizontalAxisHeight(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : __subchart_size_height) + (isLegendRight ? 0 : legendHeight),
-                left: (__axis_rotated ? __subchart_size_height + rotated_padding_right : 0) + getCurrentPaddingLeft()
+                bottom: getHorizontalAxisHeight(__axis_rotated ? 'y' : 'x') + (__axis_rotated ? 0 : subchartHeight) + (isLegendRight ? 0 : legendHeight),
+                left: (__axis_rotated ? subchartHeight + rotated_padding_right : 0) + getCurrentPaddingLeft()
             };
             width = currentWidth - margin.left - margin.right;
             height = currentHeight - margin.top - margin.bottom;
@@ -395,9 +399,9 @@
 
             // for context
             margin2 = {
-                top: __axis_rotated ? margin.top : (currentHeight - __subchart_size_height - (isLegendRight ? 0 : legendHeight)),
+                top: __axis_rotated ? margin.top : (currentHeight - subchartHeight - (isLegendRight ? 0 : legendHeight)),
                 right: NaN,
-                bottom: 20 + (isLegendRight ? 0 : legendHeight),
+                bottom: (__axis_rotated ? 20 : getHorizontalAxisHeight('x')) + (isLegendRight ? 0 : legendHeight),
                 left: __axis_rotated ? rotated_padding_left : margin.left
             };
             width2 = __axis_rotated ? margin.left - rotated_padding_left - rotated_padding_right : width;
@@ -476,6 +480,7 @@
         }
         function getHorizontalAxisHeight(axisId) {
             if (axisId === 'x' && !__axis_x_show) { return 0; }
+            if (axisId === 'x' && __axis_x_height) { return __axis_x_height; }
             if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight ? 10 : 1; }
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
@@ -693,6 +698,19 @@
             } else if (option) {
                 option.text = text;
             }
+        }
+        function xForRotatedTickText(r) {
+            return 10 * Math.sin(Math.PI * (r / 180));
+        }
+        function yForRotatedTickText(r) {
+            return 11.5 - 2.5 * (r / 15);
+        }
+        function rotateTickText(axis) {
+            axis.selectAll('.tick text')
+                .attr("y", yForRotatedTickText(__axis_x_tick_rotate))
+                .attr("x", xForRotatedTickText(__axis_x_tick_rotate))
+                .attr("transform", "rotate(" + __axis_x_tick_rotate + ")")
+                .style("text-anchor", "start");
         }
         function getAxisLabelPosition(axisId, defaultPosition) {
             var option = getAxisLabelOptionByAxisId(axisId),
@@ -3011,7 +3029,7 @@
         }
 
         function redraw(options) {
-            var xaxis, yaxis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
+            var xaxis, subxaxis, yaxis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
@@ -3104,6 +3122,11 @@
                 } else {
                     d3.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
                 }
+            }
+
+            // rotate tick text if needed
+            if (!__axis_rotated && __axis_x_tick_rotate) {
+                rotateTickText(xaxis);
             }
 
             // setup drawer - MEMO: these must be called after axis updated
@@ -3332,7 +3355,17 @@
                 // update subchart elements if needed
                 if (withSubchart) {
                     // axes
-                    context.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1).transition().duration(duration).call(subXAxis);
+                    subxaxis = context.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1);
+                    if (__axis_rotated || withTransitionForHorizontalAxis) {
+                        subxaxis = subxaxis.transition().duration(durationForAxis);
+                    }
+                    subxaxis.call(subXAxis);
+
+                    // rotate tick text if needed
+                    if (!__axis_rotated && __axis_x_tick_rotate) {
+                        rotateTickText(subxaxis);
+                    }
+
                     // extent rect
                     if (!brush.empty()) {
                         brush.extent(x.orgDomain()).update();
