@@ -1246,10 +1246,10 @@
             return isSub || currentDiff === 0 ? 1 : orgDiff / currentDiff;
         }
         function getXDomainMin(targets) {
-            return __axis_x_min ? __axis_x_min : d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
+            return __axis_x_min ? (isTimeSeries ? parseDate(__axis_x_min) : __axis_x_min) : d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
         }
         function getXDomainMax(targets) {
-            return __axis_x_max ? __axis_x_max : d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
+            return __axis_x_max ? (isTimeSeries ? parseDate(__axis_x_max) : __axis_x_max) : d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
         }
         function getXDomainPadding(targets, domain) {
             var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), maxDataCount, padding, paddingLeft, paddingRight;
