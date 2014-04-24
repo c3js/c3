@@ -17,6 +17,9 @@
         chartArc: 'c3-chart-arc',
         chartArcs: 'c3-chart-arcs',
         chartArcsTitle: 'c3-chart-arcs-title',
+//        gauge: 'c3-gauge',
+//        gaugeDial: 'c3-gauge-dial',
+//        gaugeTitle: 'c3-gauge-title',
         selectedCircle: 'c3-selected-circle',
         selectedCircles: 'c3-selected-circles',
         eventRect: 'c3-event-rect',
@@ -143,6 +146,12 @@
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
             __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
+        // configuration for no plot-able data supplied.
+        var __data_empty_abort = getConfig(['data', 'empty', 'abort'], true),
+            __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], ""),
+            __data_empty_label_size = getConfig(['data', 'empty', 'label', 'size'], false),
+            __data_empty_label_fill = getConfig(['data', 'empty', 'label', 'fill'], false);
+
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
@@ -228,6 +237,11 @@
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
             __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
             __donut_onmouseout = getConfig(['donut', 'onmouseout'], function () {});
+
+//        var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
+//            __gauge_label_format = getConfig(['gauge', 'label', 'format']),
+//            __gauge_title = getConfig(['gauge', 'title'], ""),
+//            __gauge_onclick = getConfig(['gauge', 'onclick'], function () {});
 
         // region - region to change style
         var __regions = getConfig(['regions'], []);
@@ -1077,6 +1091,12 @@
             return typeof callback === 'function' ? callback : function () {};
         }
 
+        // -- Gauge --//
+
+//        function getGaugeTitle() {
+//          return hasGaugeType(c3.data.targets) ? __gauge_title : "";
+//        }
+
         //-- Domain --//
 
         function getYDomainMin(targets) {
@@ -1213,8 +1233,8 @@
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets, xDomain),
-                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
-                max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+                min = firstX == undefined ? padding : (isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding),
+                max = lastX == undefined ? padding : (isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding);
             return [min, max];
         }
         function diffDomain(d) {
@@ -1334,6 +1354,11 @@
             }
             return new_rows;
         }
+//        function convertValueToData(value) {
+//          var new_rows = [];
+//          new_rows[0] = {'value': value};
+//          return new_rows;
+//        }
         function convertDataToTargets(data) {
             var ids = d3.keys(data[0]).filter(isNotX), xs = d3.keys(data[0]).filter(isX), targets;
 
@@ -1969,8 +1994,11 @@
         function hasDonutType(targets) {
             return hasType(targets, 'donut');
         }
+//        function hasGaugeType(targets) {
+//            return hasType(targets, 'gauge') || hasType(targets, 'google-gauge');
+//        }
         function hasArcType(targets) {
-            return hasPieType(targets) || hasDonutType(targets);
+            return hasPieType(targets) || hasDonutType(targets);// || hasGaugeType(targets);
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -2004,8 +2032,12 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'donut';
         }
+//        function isGaugeType(d) {
+//          var id = (typeof d === 'string') ? d : d.id;
+//          return __data_types[id] === 'gauge' || __data_types[id] === 'google-gauge'
+//        }
         function isArcType(d) {
-            return isPieType(d) || isDonutType(d);
+            return isPieType(d) || isDonutType(d);// || isGaugeType(d);
         }
         /* not used
         function lineData(d) {
@@ -2595,6 +2627,15 @@
                 .style("display", "none");
 
             /*-- Main Region --*/
+            if (c3.data.targets.length == 0) {
+              main.append("text")
+                .attr("class", CLASS.text)
+                .attr("x", (main[0][0].parentNode.width.baseVal.value / 2) - margin.left)
+                .attr("y", (main[0][0].parentNode.height.baseVal.value / 2) - margin.top)
+                .attr("text-anchor", "middle")
+                .attr("style", (__data_empty_label_fill ? "fill:"+ __data_empty_label_fill +"; " : "") + (__data_empty_label_size ? "font-size:"+ __data_empty_label_size +"; " : "") )
+                .text(__data_empty_label_text);
+            }
 
             // Add Axis
             main.append("g")
@@ -2695,6 +2736,30 @@
                 .attr('class', CLASS.chartArcsTitle)
                 .style("text-anchor", "middle")
                 .text(getArcTitle());
+
+            // Define g for gauge chart area
+//            main.select('.' + CLASS.chart).append("g")
+//                .attr('class', CLASS.gauge)
+//                .attr("width", height)
+//                .attr("height", height);
+//            main.select('.' + CLASS.gauge).append('circle')
+//                .attr("cx", height / 2)
+//                .attr("cy", height / 2)
+//                .attr("r", height * 0.97 / 2)
+//                .style("fill", "#ccc")
+//                .style("stroke", "#000")
+//                .style("stroke-width", "0.5px");
+//            main.select('.' + CLASS.gauge).append("circle")
+//                .attr("cx", (height / 2))
+//                .attr("cy", (height / 2))
+//                .attr("r", 0.9 * (height * 0.97 / 2) )
+//                .style("fill", "#fff")
+//                .style("stroke", "#e0e0e0")
+//                .style("stroke-width", "2px");
+//            main.select('.' + CLASS.gauge).append('text')
+//                .attr('class', CLASS.gaugeTitle)
+//                .style("text-anchor", "middle")
+//                .text(getGaugeTitle());
 
             main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.chartTexts);
@@ -3084,7 +3149,7 @@
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             // abort if no targets to show
-            if (targetsToShow.length === 0) {
+            if (targetsToShow.length === 0 && __data_empty_abort) {
                 return;
             }
 
@@ -3150,6 +3215,7 @@
             drawArea = generateDrawArea(areaIndices);
             drawBar = generateDrawBar(barIndices);
             drawLine = generateDrawLine(lineIndices);
+//            drawNeedle = generateDrawNeedle();
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
 
@@ -3371,6 +3437,9 @@
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
+
+            // gauge
+//            main.selectAll('.' + CLASS.gauge).select('.' + CLASS.arc);
 
             // subchart
             if (__subchart_show) {
@@ -4316,6 +4385,9 @@
         else if ('columns' in config.data) {
             init(convertColumnsToData(config.data.columns));
         }
+//        else if ('value' in config.data) {
+//            init(convertValueToData(config.data.value));
+//        }
         else {
             throw Error('url or rows or columns is required.');
         }
