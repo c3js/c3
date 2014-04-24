@@ -143,6 +143,12 @@
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
             __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
+        // configuration for no plot-able data supplied.
+        var __data_empty_abort = getConfig(['data', 'empty', 'abort'], true);
+        var __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], "");
+        var __data_empty_label_size = getConfig(['data', 'empty', 'label', 'size'], false);
+        var __data_empty_label_fill = getConfig(['data', 'empty', 'label', 'fill'], false);
+
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = __subchart_show ? getConfig(['subchart', 'size', 'height'], 60) : 0;
@@ -1213,8 +1219,8 @@
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets, xDomain),
-                min = isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding,
-                max = isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding;
+                min = firstX == undefined ? padding : (isTimeSeries ? new Date(firstX.getTime() - padding) : firstX - padding),
+                max = lastX == undefined ? padding : (isTimeSeries ? new Date(lastX.getTime() + padding) : lastX + padding);
             return [min, max];
         }
         function diffDomain(d) {
@@ -2595,6 +2601,15 @@
                 .style("display", "none");
 
             /*-- Main Region --*/
+            if (c3.data.targets.length == 0) {
+              main.append("text")
+                .attr("class", CLASS.text)
+                .attr("x", (main[0][0].parentNode.width.baseVal.value / 2) - margin.left)
+                .attr("y", (main[0][0].parentNode.height.baseVal.value / 2) - margin.top)
+                .attr("text-anchor", "middle")
+                .attr("style", (__data_empty_label_fill ? "fill:"+ __data_empty_label_fill +"; " : "") + (__data_empty_label_size ? "font-size:"+ __data_empty_label_size +"; " : "") )
+                .text(__data_empty_label_text);
+            }
 
             // Add Axis
             main.append("g")
@@ -3084,7 +3099,7 @@
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             // abort if no targets to show
-            if (targetsToShow.length === 0) {
+            if (targetsToShow.length === 0 && __data_empty_abort) {
                 return;
             }
 
