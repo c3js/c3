@@ -392,7 +392,7 @@
                     top: getHorizontalAxisHeight('y2'),
                     right: getCurrentPaddingRight(),
                     bottom: getHorizontalAxisHeight('y') + legendHeightForBottom,
-                    left: subchartHeight + rotated_padding_right + getCurrentPaddingLeft()
+                    left: subchartHeight + getCurrentPaddingLeft()
                 };
                 margin2 = {
                     top: margin.top,
@@ -402,7 +402,7 @@
                 };
             } else {
                 margin = {
-                    top: 0,
+                    top: 4, // for top tick text
                     right: getCurrentPaddingRight(),
                     bottom: xAxisHeight + subchartHeight + legendHeightForBottom,
                     left: getCurrentPaddingLeft()
@@ -471,8 +471,10 @@
                 return 0;
             } else if (__padding_left) {
                 return __padding_left;
+            } else if (__axis_rotated) {
+                return !__axis_x_show ? 1 : getAxisWidthByAxisId('x');
             } else {
-                return __axis_rotated || !__axis_y_show || __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
+                return !__axis_y_show || __axis_y_inner ? 1 : getAxisWidthByAxisId('y');
             }
         }
         function getCurrentPaddingRight() {
@@ -510,7 +512,7 @@
             return forHorizontal ? -(1 + 4) : -(margin.left - 1);
         }
         function getAxisClipY(forHorizontal) {
-            return forHorizontal ? -20 : -1;
+            return forHorizontal ? -20 : -4;
         }
         function getXAxisClipX() {
             return getAxisClipX(!__axis_rotated);
@@ -528,7 +530,7 @@
             return forHorizontal ? width + 2 + 4 : margin.left + 20;
         }
         function getAxisClipHeight(forHorizontal) {
-            return forHorizontal ? (__axis_x_height ? __axis_x_height : 0) + 40 : height + 2;
+            return forHorizontal ? (__axis_x_height ? __axis_x_height : 0) + 80 : height + 8;
         }
         function getXAxisClipWidth() {
             return getAxisClipWidth(!__axis_rotated);
@@ -579,11 +581,11 @@
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
             x = getX(xMin, xMax, forInit ? undefined : x.domain(), function () { return xAxis.tickOffset(); });
-            y = getY(yMin, yMax);
-            y2 = getY(yMin, yMax);
+            y = getY(yMin, yMax, forInit ? undefined : y.domain());
+            y2 = getY(yMin, yMax, forInit ? undefined : y2.domain());
             subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
-            subY = getY(subYMin, subYMax);
-            subY2 = getY(subYMin, subYMax);
+            subY = getY(subYMin, subYMax, forInit ? undefined : subY.domain());
+            subY2 = getY(subYMin, subYMax, forInit ? undefined : subY2.domain());
             // update axes
             xAxisTickFormat = getXAxisTickFormat();
             xAxis = getXAxis(x, xOrient, xAxisTickFormat);
@@ -607,7 +609,7 @@
             var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
             // Set function and values for c3
             scale.orgDomain = function () { return scale.domain(); };
-            if (isDefined(domain)) { scale.domain(domain); }
+            if (domain) { scale.domain(domain); }
             if (isUndefined(offset)) { offset = function () { return 0; }; }
             // Define customized scale if categorized axis
             if (isCategorized) {
@@ -630,8 +632,10 @@
             }
             return scale;
         }
-        function getY(min, max) {
-            return d3.scale.linear().range([min, max]);
+        function getY(min, max, domain) {
+            var scale = d3.scale.linear().range([min, max]);
+            if (domain) { scale.domain(domain); }
+            return scale;
         }
         function getYScale(id) {
             return getAxisId(id) === 'y2' ? y2 : y;
@@ -804,9 +808,9 @@
         function dyForXAxisLabel() {
             var position = getXAxisLabelPosition();
             if (__axis_rotated) {
-                return position.isInner ? "1.2em" : -30 - getMaxTickWidth('x');
+                return position.isInner ? "1.2em" : -25 - getMaxTickWidth('x');
             } else {
-                return position.isInner ? "-0.5em" : "3em";
+                return position.isInner ? "-0.5em" : __axis_x_height ? __axis_x_height - 10 : "3em";
             }
         }
         function dyForYAxisLabel() {
@@ -840,12 +844,25 @@
                 var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
-            return maxWidth < 20 ? 20 : maxWidth;
+            return maxWidth < 30 ? 30 : maxWidth;
         }
         function updateAxisLabels() {
-            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel).attr("x", xForXAxisLabel).text(textForXAxisLabel);
-            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel).attr("x", xForYAxisLabel).attr("dy", dyForYAxisLabel).text(textForYAxisLabel);
-            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label).attr("x", xForY2AxisLabel).attr("dy", dyForY2AxisLabel).text(textForY2AxisLabel);
+            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
+                .attr("x", xForXAxisLabel)
+                .attr("dx", dxForXAxisLabel)
+                .attr("dy", dyForXAxisLabel)
+                .text(textForXAxisLabel);
+            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel)
+                .attr("x", xForYAxisLabel)
+                .attr("dx", dxForYAxisLabel)
+                .attr("dy", dyForYAxisLabel)
+                .attr("dy", dyForYAxisLabel)
+                .text(textForYAxisLabel);
+            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
+                .attr("x", xForY2AxisLabel)
+                .attr("dx", dxForY2AxisLabel)
+                .attr("dy", dyForY2AxisLabel)
+                .text(textForY2AxisLabel);
         }
 
         function categoryAxis() {
@@ -2567,8 +2584,6 @@
                   .append("text")
                     .attr("class", CLASS.axisXLabel)
                     .attr("transform", __axis_rotated ? "rotate(-90)" : "")
-                    .attr("dx", dxForXAxisLabel)
-                    .attr("dy", dyForXAxisLabel)
                     .style("text-anchor", textAnchorForXAxisLabel);
             }
 
@@ -2580,8 +2595,6 @@
                   .append("text")
                     .attr("class", CLASS.axisYLabel)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .attr("dx", dxForYAxisLabel)
-                    .attr("dy", dyForYAxisLabel)
                     .style("text-anchor", textAnchorForYAxisLabel);
             }
 
@@ -2593,7 +2606,6 @@
                   .append("text")
                     .attr("class", CLASS.axisY2Label)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .attr("dx", dxForY2AxisLabel)
                     .style("text-anchor", textAnchorForY2AxisLabel);
             }
 
@@ -2718,6 +2730,12 @@
                 main.select('.' + CLASS.axisY).style("opacity", 0).call(yAxis);
                 main.select('.' + CLASS.axisY2).style("opacity", 0).call(yAxis2);
             }
+
+            // Update sizes according to tick width updated by above
+            updateSizes();
+            updateScales();
+            updateSvgSize();
+            transformAll();
 
             // Draw with targets
             redraw({withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
@@ -3548,10 +3566,22 @@
 
         function updateSvgSize() {
             svg.attr('width', currentWidth).attr('height', currentHeight);
-            svg.select('#' + clipId).select('rect').attr('width', width).attr('height', height);
-            svg.select('#' + clipIdForXAxis).select('rect').attr('width', getXAxisClipWidth);
-            svg.select('#' + clipIdForYAxis).select('rect').attr('width', getYAxisClipWidth);
-            svg.select('.' + CLASS.zoomRect).attr('width', width).attr('height', height);
+            svg.select('#' + clipId).select('rect')
+                .attr('width', width)
+                .attr('height', height);
+            svg.select('#' + clipIdForXAxis).select('rect')
+                .attr('x', getXAxisClipX)
+                .attr('y', getXAxisClipY)
+                .attr('width', getXAxisClipWidth)
+                .attr('height', getXAxisClipHeight);
+            svg.select('#' + clipIdForYAxis).select('rect')
+                .attr('x', getYAxisClipX)
+                .attr('y', getYAxisClipY)
+                .attr('width', getYAxisClipWidth)
+                .attr('height', getYAxisClipHeight);
+            svg.select('.' + CLASS.zoomRect)
+                .attr('width', width)
+                .attr('height', height);
             // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
             selectChart.style('max-height', currentHeight + "px");
         }
