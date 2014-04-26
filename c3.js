@@ -545,9 +545,11 @@
             return getAxisClipHeight(__axis_rotated);
         }
         function getEventRectWidth() {
-            var base = __axis_rotated ? height : width,
+            var target = getMaxDataCountTarget(c3.data.targets),
+                firstData = target.values[0], lastData = target.values[target.values.length - 1],
+                base = x(lastData.x) - x(firstData.x),
                 maxDataCount = getMaxDataCount(),
-                ratio = getXDomainRatio() * (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 0.98);
+                ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
         function updateLegendStep(step) {
@@ -658,8 +660,8 @@
                 }
             } else {
                 axis.tickOffset = function () {
-                    var base = __axis_rotated ? height : width;
-                    return ((base * getXDomainRatio()) / getMaxDataCount()) / 2;
+                    var edgeX = getEdgeX(c3.data.targets), base = x(edgeX[1]) - x(edgeX[0]);
+                    return (base / getMaxDataCount()) / 2;
                 };
             }
 
@@ -1258,18 +1260,15 @@
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
-        function getXDomainRatio(isSub) {
-            var orgDiff = diffDomain(orgXDomain), currentDiff = diffDomain(x.domain());
-            return isSub || currentDiff === 0 ? 1 : orgDiff / currentDiff;
-        }
         function getXDomainMin(targets) {
             return __axis_x_min ? (isTimeSeries ? parseDate(__axis_x_min) : __axis_x_min) : d3.min(targets, function (t) { return d3.min(t.values, function (v) { return v.x; }); });
         }
         function getXDomainMax(targets) {
             return __axis_x_max ? (isTimeSeries ? parseDate(__axis_x_max) : __axis_x_max) : d3.max(targets, function (t) { return d3.max(t.values, function (v) { return v.x; }); });
         }
-        function getXDomainPadding(targets, domain) {
-            var firstX = domain[0], lastX = domain[1], diff = Math.abs(firstX - lastX), maxDataCount, padding, paddingLeft, paddingRight;
+        function getXDomainPadding(targets) {
+            var edgeX = getEdgeX(targets), diff = edgeX[1] - edgeX[0],
+                maxDataCount, padding, paddingLeft, paddingRight;
             if (isCategorized) {
                 padding = 0;
             } else if (hasBarType(targets)) {
@@ -1291,7 +1290,7 @@
         function getXDomain(targets) {
             var xDomain = [getXDomainMin(targets), getXDomainMax(targets)],
                 firstX = xDomain[0], lastX = xDomain[1],
-                padding = getXDomainPadding(targets, xDomain),
+                padding = getXDomainPadding(targets),
                 min = 0, max = 0;
             if (firstX || firstX === 0) {
                 min = isTimeSeries ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;
@@ -1558,19 +1557,24 @@
         function getMaxDataCount() {
             return d3.max(c3.data.targets, function (t) { return t.values.length; });
         }
-        function getMaxDataCountTarget() {
-            var length = c3.data.targets.length, max = 0, maxTarget;
+        function getMaxDataCountTarget(targets) {
+            var length = targets.length, max = 0, maxTarget;
             if (length > 1) {
-                c3.data.targets.forEach(function (t) {
+                targets.forEach(function (t) {
                     if (t.values.length > max) {
                         maxTarget = t;
                         max = t.values.length;
                     }
                 });
             } else {
-                maxTarget = length ? c3.data.targets[0] : null;
+                maxTarget = length ? targets[0] : null;
             }
             return maxTarget;
+        }
+        function getEdgeX(targets) {
+            var target = getMaxDataCountTarget(targets),
+                firstData = target.values[0], lastData = target.values[target.values.length - 1];
+            return [firstData.x, lastData.x];
         }
         function mapToIds(targets) {
             return targets.map(function (d) { return d.id; });
@@ -3483,7 +3487,7 @@
                     };
                 }
                 // Set data
-                maxDataCountTarget = getMaxDataCountTarget();
+                maxDataCountTarget = getMaxDataCountTarget(c3.data.targets);
                 main.select('.' + CLASS.eventRects)
                     .datum(maxDataCountTarget ? maxDataCountTarget.values : []);
                 // Update rects
