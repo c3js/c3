@@ -1424,7 +1424,7 @@
                 x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : parseDate(getXValue(id, index));
             }
             else if (isCustomX && !isCategorized) {
-                x = rawX ? +rawX : getXValue(id, index);
+                x = isValue(rawX) ? +rawX : getXValue(id, index);
             }
             else {
                 x = index;
