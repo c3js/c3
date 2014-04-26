@@ -2894,18 +2894,21 @@
                     unexpandCircles();
                 })
                 .on('mousemove', function () {
+                    var targetsToShow = filterTargetsToShow(c3.data.targets);
                     var mouse, closest, sameXData, selectedData;
 
                     if (dragging) { return; } // do nothing when dragging
-                    if (hasArcType(c3.data.targets)) { return; }
+                    if (hasArcType(targetsToShow)) { return; }
 
                     mouse = d3.mouse(this);
-                    closest = findClosestFromTargets(c3.data.targets, mouse);
+                    closest = findClosestFromTargets(targetsToShow, mouse);
+
+                    if (! closest) { return; }
 
                     if (isScatterType(closest)) {
                         sameXData = [closest];
                     } else {
-                        sameXData = filterSameX(c3.data.targets, closest.x);
+                        sameXData = filterSameX(targetsToShow, closest.x);
                     }
 
                     // show tooltip when cursor is close to some point
@@ -2937,12 +2940,15 @@
                     }
                 })
                 .on('click', function () {
+                    var targetsToShow = filterTargetsToShow(c3.data.targets);
                     var mouse, closest;
 
-                    if (hasArcType(c3.data.targets)) { return; }
+                    if (hasArcType(targetsToShow)) { return; }
 
                     mouse = d3.mouse(this);
-                    closest = findClosestFromTargets(c3.data.targets, mouse);
+                    closest = findClosestFromTargets(targetsToShow, mouse);
+
+                    if (! closest) { return; }
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
