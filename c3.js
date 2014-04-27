@@ -3193,7 +3193,7 @@
 
             // rotate tick text if needed
             if (!__axis_rotated && __axis_x_tick_rotate) {
-                rotateTickText(xaxis);
+                rotateTickText(transitions.axisX);
             }
 
             // setup drawer - MEMO: these must be called after axis updated
@@ -3441,7 +3441,7 @@
 
                     // rotate tick text if needed
                     if (!__axis_rotated && __axis_x_tick_rotate) {
-                        rotateTickText(subxaxis);
+                        rotateTickText(transitions.axisSubX);
                     }
 
                     // extent rect
