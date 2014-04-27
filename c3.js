@@ -3095,7 +3095,7 @@
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransitionForHorizontalAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
+            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var transitions, duration, durationForExit, durationForAxis;
@@ -3112,16 +3112,15 @@
 
             withTransitionForExit = isDefined(options.withTransitionForExit) ? options.withTransitionForExit : withTransition;
             withTransitionForAxis = isDefined(options.withTransitionForAxis) ? options.withTransitionForAxis : withTransition;
-            withTransitionForHorizontalAxis = isDefined(options.withTransitionForHorizontalAxis) ? options.withTransitionForHorizontalAxis : withTransition;
 
             duration = withTransition ? __transition_duration : 0;
             durationForExit = withTransitionForExit ? duration : 0;
             durationForAxis = withTransitionForAxis ? duration : 0;
 
-            xaxis = main.select('.' + CLASS.axisX);
-            yaxis = main.select('.' + CLASS.axisY);
-            y2axis = main.select('.' + CLASS.axisY2);
-            subxaxis = context.select('.' + CLASS.axisX);
+            xaxis = main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1);
+            yaxis = main.select('.' + CLASS.axisY).style("opacity", hideAxis ? 0 : 1);
+            y2axis = main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1);
+            subxaxis = context.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1);
 
             transitions = {
                 axisX: xaxis.transition().duration(durationForAxis),
@@ -3133,6 +3132,13 @@
             // update legend and transform each g
             if (withLegend && __legend_show) {
                 updateLegend(mapToIds(c3.data.targets), options, transitions);
+            }
+
+            if (isCategorized) {
+                // ATTENTION: need to update domain with current domain when categoryAxis
+                if (targetsToShow.length === 0 || !withUpdateOrgXDomain || withUpdateXDomain) {
+                    x.domain([0, xaxis.selectAll('.tick').size()]);
+                }
             }
 
             if (targetsToShow.length) {
@@ -3148,11 +3154,6 @@
                     x.domain(brush.empty() ? orgXDomain : brush.extent());
                     if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 }
-            } else {
-                // ticks increase without this when no data shown
-                if (isCategorized) {
-                    x.domain([0, xaxis.selectAll('.tick').size()]);
-                }
             }
 
             y.domain(getYDomain(targetsToShow, 'y'));
@@ -3165,33 +3166,11 @@
                 subXAxis.tickValues(tickValues);
             }
 
-            // x axis
-            xaxis.style("opacity", hideAxis ? 0 : 1);
-            if (__axis_rotated || withTransitionForHorizontalAxis) {
-                xaxis = transitions.axisX;
-            }
-            xaxis.call(xAxis);
-
-            // y axis
-            yaxis.style("opacity", hideAxis ? 0 : 1);
-            if (!__axis_rotated || withTransitionForHorizontalAxis) {
-                yaxis = transitions.axisY;
-            }
-            yaxis.call(yAxis);
-
-            // y2 axis
-            y2axis.style("opacity", hideAxis ? 0 : 1);
-            if (!__axis_rotated || withTransitionForHorizontalAxis) {
-                y2axis = transitions.axisY2;
-            }
-            y2axis.call(y2Axis);
-
-            // sub x axis
-            subxaxis.style("opacity", hideAxis ? 0 : 1);
-            if (__axis_rotated || withTransitionForHorizontalAxis) {
-                subxaxis = transitions.axisSubX;
-            }
-            subxaxis.call(subXAxis);
+            // axes
+            transitions.axisX.call(xAxis);
+            transitions.axisY.call(yAxis);
+            transitions.axisY2.call(y2Axis);
+            transitions.axisSubX.call(subXAxis);
 
             // show/hide if manual culling needed
             if (withUpdateXDomain) {
@@ -3907,14 +3886,12 @@
                 .style('visibility', 'visible')
               .transition()
                 .style('opacity', opacityForLegend);
-            updateLegend(mapToIds(c3.data.targets));
         }
         function hideLegend(targetIds) {
             addHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('opacity', 0)
                 .style('visibility', 'hidden');
-            updateLegend(mapToIds(c3.data.targets));
         }
 
         function updateLegend(targetIds, options, transitions) {
@@ -4163,7 +4140,7 @@
                     .style('opacity', 1);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
         };
 
         c3.hide = function (targetIds, options) {
@@ -4184,7 +4161,7 @@
                     .style('opacity', legendOpacityForHidden);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withTransitionForHorizontalAxis: false});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
         };
 
         c3.toggle = function (targetId) {
@@ -4454,15 +4431,15 @@
                 legend.style('visibility', 'visible');
             }
             showLegend(mapToTargetIds(targetIds));
-            redraw({withTransitionForHorizontalAxis: false});
+            redraw({withLegend: true});
         };
         c3.legend.hide = function (targetIds) {
+            hideLegend(mapToTargetIds(targetIds));
+            redraw({withLegend: true});
             if (__legend_show && isEmpty(targetIds)) {
                 __legend_show = false;
                 legend.style('visibility', 'hidden');
             }
-            hideLegend(mapToTargetIds(targetIds));
-            redraw({withTransitionForHorizontalAxis: false});
         };
 
         c3.resize = function (size) {
