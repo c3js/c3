@@ -549,10 +549,14 @@
         }
         function getEventRectWidth() {
             var target = getMaxDataCountTarget(c3.data.targets),
-                firstData = target.values[0], lastData = target.values[target.values.length - 1],
-                base = x(lastData.x) - x(firstData.x),
-                maxDataCount = getMaxDataCount(),
-                ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
+                firstData, lastData, base, maxDataCount, ratio;
+            if (!target) {
+                return 0;
+            }
+            firstData = target.values[0], lastData = target.values[target.values.length - 1];
+            base = x(lastData.x) - x(firstData.x);
+            maxDataCount = getMaxDataCount();
+            ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         }
         function updateLegendStep(step) {
