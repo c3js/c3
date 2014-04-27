@@ -2717,8 +2717,7 @@
             // Define g for chart area
             context.append('g')
                 .attr("clip-path", clipPath)
-                .attr('class', CLASS.chart)
-                .attr("display", "none");
+                .attr('class', CLASS.chart);
 
             // Define g for bar chart area
             context.select('.' + CLASS.chart).append("g")
