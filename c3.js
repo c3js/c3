@@ -321,7 +321,7 @@
         var margin, margin2, margin3, width, width2, height, height2, currentWidth, currentHeight;
         var radius, radiusExpanded, innerRadius, svgArc, svgArcExpanded, svgArcExpandedSub, pie;
         var xMin, xMax, yMin, yMax, subXMin, subXMax, subYMin, subYMax;
-        var x, y, y2, subX, subY, subY2, xAxis, yAxis, yAxis2, subXAxis;
+        var x, y, y2, subX, subY, subY2, xAxis, yAxis, y2Axis, subXAxis;
 
         var xOrient = __axis_rotated ? "left" : "bottom",
             yOrient = __axis_rotated ? (__axis_y_inner ? "top" : "bottom") : (__axis_y_inner ? "right" : "left"),
@@ -348,27 +348,30 @@
             return "url(" + document.URL.split('#')[0] + "#" + id + ")";
         }
 
-        function transformMain(withTransition) {
-            var duration = withTransition !== false ? 250 : 0;
+        function transformMain(withTransition, transitions) {
+            var duration = withTransition !== false ? 250 : 0,
+                xAxis = (transitions && transitions.axisX) ? transitions.axisX : main.select('.' + CLASS.axisX).transition().duration(duration),
+                yAxis = (transitions && transitions.axisY) ? transitions.axisY : main.select('.' + CLASS.axisY).transition().duration(duration),
+                y2Axis = (transitions && transitions.axisYs) ? transitions.axisY2 : main.select('.' + CLASS.axisY2).transition().duration(duration);
             main.attr("transform", translate.main);
-            main.select('.' + CLASS.axisX).transition().duration(duration).attr("transform", translate.x);
-            main.select('.' + CLASS.axisY).transition().duration(duration).attr("transform", translate.y);
-            main.select('.' + CLASS.axisY2).attr("transform", translate.y2);
+            xAxis.attr("transform", translate.x);
+            yAxis.attr("transform", translate.y);
+            y2Axis.attr("transform", translate.y2);
             main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
         }
-        function transformContext() {
-            if (__subchart_show) {
-                context.attr("transform", translate.context);
-                context.select('.' + CLASS.axisX).attr("transform", translate.subx);
-            }
+        function transformContext(withTransition, transitions) {
+            var duration = withTransition !== false ? 250 : 0,
+                subXAxis = (transitions && transitions.axisSubX) ? transitions.axisSubX : context.select('.' + CLASS.axisX).transition().duration(duration);
+            context.attr("transform", translate.context);
+            subXAxis.attr("transform", translate.subx);
         }
         function transformLegend(withTransition) {
             var duration = withTransition !== false ? 250 : 0;
             legend.transition().duration(duration).attr("transform", translate.legend);
         }
-        function transformAll(withTransition) {
-            transformMain(withTransition);
-            transformContext(withTransition);
+        function transformAll(withTransition, transitions) {
+            transformMain(withTransition, transitions);
+            if (__subchart_show) { transformContext(withTransition, transitions); }
             transformLegend(withTransition);
         }
 
@@ -593,7 +596,7 @@
             xAxis = getXAxis(x, xOrient, xAxisTickFormat);
             subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat);
             yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
-            yAxis2 = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+            y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
             // Set initialized scales to brush and zoom
             if (!forInit) {
                 brush.scale(subX);
@@ -902,31 +905,41 @@
                 var c = category(i);
                 return tickFormat ? tickFormat(c) : c;
             }
+            function copyScale() {
+                var newScale = scale.copy(), domain = scale.domain();
+                newScale.domain([domain[0], domain[1] - 1]);
+                return newScale;
+            }
             function axis(g) {
                 g.each(function () {
                     var g = d3.select(this);
-                    var ticks = generateTicks(scale.domain());
-                    var tick = g.selectAll(".tick.major").data(ticks, String),
+                    var scale1 = copyScale(), scale0 = this.__chart__ || scale1;
+                    var tick = g.selectAll(".tick.major").data(generateTicks(scale1.domain()), String),
                         tickEnter = tick.enter().insert("g", "path").attr("class", "tick major").style("opacity", 1e-6),
                         tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
                         tickUpdate = d3.transition(tick).style("opacity", 1),
                         tickTransform,
                         tickX;
-                    var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
-                        path = g.selectAll(".domain").data([ 0 ]);
+                    var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range());
+                    var path = g.selectAll(".domain").data([ 0 ]), pathUpdate;
+                    var lineEnter, lineUpdate, text, textEnter, textUpdate;
 
                     path.enter().append("path").attr("class", "domain");
+                    pathUpdate = d3.transition(path);
 
-                    var pathUpdate = d3.transition(path);
-
-                    var scale1 = scale.copy(), scale0 = this.__chart__ || scale1;
-                    this.__chart__ = scale1;
                     tickEnter.append("line");
                     tickEnter.append("text");
-                    var lineEnter = tickEnter.select("line"), lineUpdate = tickUpdate.select("line"), text = tick.select("text"), textEnter = tickEnter.select("text"), textUpdate = tickUpdate.select("text");
+
+                    lineEnter = tickEnter.select("line");
+                    lineUpdate = tickUpdate.select("line");
+                    text = tick.select("text");
+                    textEnter = tickEnter.select("text");
+                    textUpdate = tickUpdate.select("text");
 
                     tickOffset = (scale1(1) - scale1(0)) / 2;
                     tickX = tickCentered ? 0 : tickOffset;
+
+                    this.__chart__ = scale1;
 
                     switch (orient) {
                     case "bottom":
@@ -1572,8 +1585,11 @@
             return maxTarget;
         }
         function getEdgeX(targets) {
-            var target = getMaxDataCountTarget(targets),
-                firstData = target.values[0], lastData = target.values[target.values.length - 1];
+            var target = getMaxDataCountTarget(targets), firstData, lastData;
+            if (!target) {
+                return [0, 0];
+            }
+            firstData = target.values[0], lastData = target.values[target.values.length - 1];
             return [firstData.x, lastData.x];
         }
         function mapToIds(targets) {
@@ -2556,8 +2572,12 @@
 
             // Define regions
             main = svg.append("g").attr("transform", translate.main);
-            context = __subchart_show ? svg.append("g").attr("transform", translate.context) : null;
+            context = svg.append("g").attr("transform", translate.context);
             legend = svg.append("g").attr("transform", translate.legend);
+
+            if (!__subchart_show) {
+                context.style('visibility', 'hidden');
+            }
 
             if (!__legend_show) {
                 legend.style('visibility', 'hidden');
@@ -2694,35 +2714,34 @@
 
             /*-- Context Region --*/
 
-            if (__subchart_show) {
-                // Define g for chart area
-                context.append('g')
-                    .attr("clip-path", clipPath)
-                    .attr('class', CLASS.chart);
+            // Define g for chart area
+            context.append('g')
+                .attr("clip-path", clipPath)
+                .attr('class', CLASS.chart)
+                .attr("display", "none");
 
-                // Define g for bar chart area
-                context.select('.' + CLASS.chart).append("g")
-                    .attr("class", CLASS.chartBars);
+            // Define g for bar chart area
+            context.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartBars);
 
-                // Define g for line chart area
-                context.select('.' + CLASS.chart).append("g")
-                    .attr("class", CLASS.chartLines);
+            // Define g for line chart area
+            context.select('.' + CLASS.chart).append("g")
+                .attr("class", CLASS.chartLines);
 
-                // Add extent rect for Brush
-                context.append("g")
-                    .attr("clip-path", clipPath)
-                    .attr("class", CLASS.brush)
-                    .call(brush)
-                  .selectAll("rect")
-                    .attr(__axis_rotated ? "width" : "height", __axis_rotated ? width2 : height2);
+            // Add extent rect for Brush
+            context.append("g")
+                .attr("clip-path", clipPath)
+                .attr("class", CLASS.brush)
+                .call(brush)
+              .selectAll("rect")
+                .attr(__axis_rotated ? "width" : "height", __axis_rotated ? width2 : height2);
 
-                // ATTENTION: This must be called AFTER chart added
-                // Add Axis
-                context.append("g")
-                    .attr("class", CLASS.axisX)
-                    .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "" : clipPathForXAxis);
-            }
+            // ATTENTION: This must be called AFTER chart added
+            // Add Axis
+            context.append("g")
+                .attr("class", CLASS.axisX)
+                .attr("transform", translate.subx)
+                .attr("clip-path", __axis_rotated ? "" : clipPathForXAxis);
 
             // Set targets
             updateTargets(c3.data.targets);
@@ -2732,14 +2751,14 @@
                 main.select('.' + CLASS.axisX).style("opacity", 0).call(xAxis);
             } else {
                 main.select('.' + CLASS.axisY).style("opacity", 0).call(yAxis);
-                main.select('.' + CLASS.axisY2).style("opacity", 0).call(yAxis2);
+                main.select('.' + CLASS.axisY2).style("opacity", 0).call(y2Axis);
             }
 
             // Update sizes according to tick width updated by above
             updateSizes();
             updateScales();
             updateSvgSize();
-            transformAll();
+            transformAll(false);
 
             // Draw with targets
             redraw({withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
@@ -3072,20 +3091,15 @@
         }
 
         function redraw(options) {
-            var xaxis, subxaxis, yaxis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
+            var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransitionForHorizontalAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
-            var duration, durationForExit, durationForAxis;
+            var transitions, duration, durationForExit, durationForAxis;
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
-
-            // abort if no targets to show
-            if (targetsToShow.length === 0) {
-                return;
-            }
 
             options = isDefined(options) ? options : {};
             withY = isDefined(options.withY) ? options.withY : true;
@@ -3104,24 +3118,43 @@
             durationForExit = withTransitionForExit ? duration : 0;
             durationForAxis = withTransitionForAxis ? duration : 0;
 
+            xaxis = main.select('.' + CLASS.axisX);
+            yaxis = main.select('.' + CLASS.axisY);
+            y2axis = main.select('.' + CLASS.axisY2);
+            subxaxis = context.select('.' + CLASS.axisX);
+
+            transitions = {
+                axisX: xaxis.transition().duration(durationForAxis),
+                axisY: yaxis.transition().duration(durationForAxis),
+                axisY2: y2axis.transition().duration(durationForAxis),
+                axisSubX: subxaxis.transition().duration(durationForAxis),
+            };
+
             // update legend and transform each g
             if (withLegend && __legend_show) {
-                updateLegend(mapToIds(c3.data.targets), options);
+                updateLegend(mapToIds(c3.data.targets), options, transitions);
             }
 
-            if (withUpdateOrgXDomain) {
-                x.domain(d3.extent(getXDomain(targetsToShow)));
-                orgXDomain = x.domain();
-                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
-                subX.domain(x.domain());
-                brush.scale(subX);
+            if (targetsToShow.length) {
+                if (withUpdateOrgXDomain) {
+                    x.domain(d3.extent(getXDomain(targetsToShow)));
+                    orgXDomain = x.domain();
+                    if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+                    subX.domain(x.domain());
+                    brush.scale(subX);
+                }
+                // ATTENTION: call here to update tickOffset
+                if (withUpdateXDomain) {
+                    x.domain(brush.empty() ? orgXDomain : brush.extent());
+                    if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+                }
+            } else {
+                // ticks increase without this when no data shown
+                if (isCategorized) {
+                    x.domain([0, xaxis.selectAll('.tick').size()]);
+                }
             }
 
-            // ATTENTION: call here to update tickOffset
-            if (withUpdateXDomain) {
-                x.domain(brush.empty() ? orgXDomain : brush.extent());
-                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
-            }
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
@@ -3133,19 +3166,32 @@
             }
 
             // x axis
-            xaxis = main.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1);
+            xaxis.style("opacity", hideAxis ? 0 : 1);
             if (__axis_rotated || withTransitionForHorizontalAxis) {
-                xaxis = xaxis.transition().duration(durationForAxis);
+                xaxis = transitions.axisX;
             }
             xaxis.call(xAxis);
+
             // y axis
-            yaxis = main.select('.' + CLASS.axisY).style("opacity", hideAxis ? 0 : 1);
+            yaxis.style("opacity", hideAxis ? 0 : 1);
             if (!__axis_rotated || withTransitionForHorizontalAxis) {
-                yaxis = yaxis.transition().duration(durationForAxis);
+                yaxis = transitions.axisY;
             }
             yaxis.call(yAxis);
+
             // y2 axis
-            main.select('.' + CLASS.axisY2).style("opacity", hideAxis ? 0 : 1).transition().duration(durationForAxis).call(yAxis2);
+            y2axis.style("opacity", hideAxis ? 0 : 1);
+            if (!__axis_rotated || withTransitionForHorizontalAxis) {
+                y2axis = transitions.axisY2;
+            }
+            y2axis.call(y2Axis);
+
+            // sub x axis
+            subxaxis.style("opacity", hideAxis ? 0 : 1);
+            if (__axis_rotated || withTransitionForHorizontalAxis) {
+                subxaxis = transitions.axisSubX;
+            }
+            subxaxis.call(subXAxis);
 
             // show/hide if manual culling needed
             if (withUpdateXDomain) {
@@ -3294,6 +3340,23 @@
                     .remove();
             }
 
+            // rect for regions
+            mainRegion = main.select('.' + CLASS.regions).selectAll('rect.' + CLASS.region)
+                .data(__regions);
+            mainRegion.enter().append('rect')
+                .style("fill-opacity", 0);
+            mainRegion
+                .attr('class', classRegion)
+                .attr("x", regionX)
+                .attr("y", regionY)
+                .attr("width", regionWidth)
+                .attr("height", regionHeight)
+              .transition().duration(duration)
+                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
+            mainRegion.exit().transition().duration(duration)
+                .style("fill-opacity", 0)
+                .remove();
+
             // bars
             mainBar = main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                 .data(barData);
@@ -3397,12 +3460,6 @@
                 }
                 // update subchart elements if needed
                 if (withSubchart) {
-                    // axes
-                    subxaxis = context.select('.' + CLASS.axisX).style("opacity", hideAxis ? 0 : 1);
-                    if (__axis_rotated || withTransitionForHorizontalAxis) {
-                        subxaxis = subxaxis.transition().duration(durationForAxis);
-                    }
-                    subxaxis.call(subXAxis);
 
                     // rotate tick text if needed
                     if (!__axis_rotated && __axis_x_tick_rotate) {
@@ -3511,23 +3568,6 @@
                 // exit
                 eventRectUpdate.exit().remove();
             }
-
-            // rect for regions
-            mainRegion = main.select('.' + CLASS.regions).selectAll('rect.' + CLASS.region)
-                .data(__regions);
-            mainRegion.enter().append('rect')
-                .style("fill-opacity", 0);
-            mainRegion
-                .attr('class', classRegion)
-                .attr("x", regionX)
-                .attr("y", regionY)
-                .attr("width", regionWidth)
-                .attr("height", regionHeight)
-              .transition().duration(duration)
-                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
-            mainRegion.exit().transition().duration(duration)
-                .style("fill-opacity", 0)
-                .remove();
 
             // update fadein condition
             mapToIds(c3.data.targets).forEach(function (id) {
@@ -3877,7 +3917,7 @@
             updateLegend(mapToIds(c3.data.targets));
         }
 
-        function updateLegend(targetIds, options) {
+        function updateLegend(targetIds, options, transitions) {
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
             var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
@@ -4034,7 +4074,7 @@
             updateSvgSize();
             // Update g positions
             if (withTransformAll) {
-                transformAll(withTransitionForTransform);
+                transformAll(withTransitionForTransform, transitions);
             }
         }
 
@@ -4054,7 +4094,7 @@
         function transformTo(targetIds, type, optionsForRedraw) {
             var withTransitionForAxis = !hasArcType(c3.data.targets);
             setTargetType(targetIds, type);
-            updateAndRedraw(optionsForRedraw ? optionsForRedraw : {withTransitionForAxis: withTransitionForAxis});
+            updateAndRedraw(optionsForRedraw || {withTransitionForAxis: withTransitionForAxis});
         }
 
         c3.focus = function (targetId) {
