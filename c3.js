@@ -729,12 +729,13 @@
         function yForRotatedTickText(r) {
             return 11.5 - 2.5 * (r / 15);
         }
-        function rotateTickText(axis) {
+        function rotateTickText(axis, transition, rotate) {
             axis.selectAll('.tick text')
-                .attr("y", yForRotatedTickText(__axis_x_tick_rotate))
-                .attr("x", xForRotatedTickText(__axis_x_tick_rotate))
-                .attr("transform", "rotate(" + __axis_x_tick_rotate + ")")
                 .style("text-anchor", "start");
+            transition.selectAll('.tick text')
+                .attr("y", yForRotatedTickText(rotate))
+                .attr("x", xForRotatedTickText(rotate))
+                .attr("transform", "rotate(" + rotate + ")");
         }
         function getAxisLabelPosition(axisId, defaultPosition) {
             var option = getAxisLabelOptionByAxisId(axisId),
@@ -3193,7 +3194,7 @@
 
             // rotate tick text if needed
             if (!__axis_rotated && __axis_x_tick_rotate) {
-                rotateTickText(transitions.axisX);
+                rotateTickText(xaxis, transitions.axisX, __axis_x_tick_rotate);
             }
 
             // setup drawer - MEMO: these must be called after axis updated
@@ -3441,7 +3442,7 @@
 
                     // rotate tick text if needed
                     if (!__axis_rotated && __axis_x_tick_rotate) {
-                        rotateTickText(transitions.axisSubX);
+                        rotateTickText(subxaxis, transitions.axisSubX, __axis_x_tick_rotate);
                     }
 
                     // extent rect
