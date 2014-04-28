@@ -456,7 +456,7 @@
         }
         function getSvgLeft() {
             var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
-                leftAxis = d3.select('.' + leftAxisClass).node(),
+                leftAxis = main.select('.' + leftAxisClass).node(),
                 svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
                 chartRect = d3.select(__bindto).node().getBoundingClientRect(),
                 svgLeft = svgRect.right - chartRect.left - getCurrentPaddingLeft();
