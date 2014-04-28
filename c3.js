@@ -3175,7 +3175,7 @@
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // update axis tick values according to options
-            if (__axis_x_tick_fit || __axis_x_tick_count) {
+            if ((__axis_x_tick_fit || __axis_x_tick_count) && targetsToShow.length) {
                 tickValues = __axis_x_tick_values ? __axis_x_tick_values : generateTickValues(mapTargetsToUniqueXs(targetsToShow));
                 xAxis.tickValues(tickValues);
                 subXAxis.tickValues(tickValues);
@@ -3188,7 +3188,7 @@
             transitions.axisSubX.call(subXAxis);
 
             // show/hide if manual culling needed
-            if (withUpdateXDomain) {
+            if (withUpdateXDomain && targetsToShow.length) {
                 if (__axis_x_tick_culling && tickValues) {
                     for (i = 1; i < tickValues.length; i++) {
                         if (tickValues.length / i < __axis_x_tick_culling_max) {
