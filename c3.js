@@ -2517,24 +2517,17 @@
         var orgAreaOpacity, withoutFadeIn = {};
 
         function init(data) {
-            var eventRect, grid;
-            var i;
+            var eventRect, grid, i;
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                throw new Error('No bind element found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
-            } else {
-                selectChart.html("");
+                throw new Error('Bind element not found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
             }
-
-            // Set class
-            selectChart.classed("c3", true);
+            selectChart.html("").classed("c3", true);
 
             // Init data as targets
             c3.data.xs = {};
             c3.data.targets = convertDataToTargets(data);
-
-            // TODO: set names if names not specified
 
             // Init sizes and scales
             updateSizes();
