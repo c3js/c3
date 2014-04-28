@@ -264,7 +264,7 @@
                 }
 
                 name = d[i].name;
-                value = valueFormat(d[i].value, d[i].ratio);
+                value = valueFormat(d[i].value, d[i].ratio, d[i].id);
 
                 text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
                 text += "<td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td>";
@@ -1765,10 +1765,24 @@
               .remove();
             return widths;
         }
-
+        function getYFormat(forArc) {
+            var formatForY = forArc ? defaultArcValueFormat : yFormat,
+                formatForY2 = forArc ? defaultArcValueFormat : y2Format;
+            return function (v, ratio, id) {
+                var format = getAxisId(id) === 'y2' ? formatForY2 : formatForY;
+                return format(v, ratio);
+            };
+        }
+        function yFormat(v) {
+            var format = __axis_y_tick_format ? __axis_y_tick_format : defaultValueFormat;
+            return format(v);
+        }
+        function y2Format(v) {
+            var format = __axis_y2_tick_format ? __axis_y2_tick_format : defaultValueFormat;
+            return format(v);
+        }
         function defaultValueFormat(v) {
-            var yFormat = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return isValue(v) ? +v : ""; };
-            return yFormat(v);
+            return isValue(v) ? +v : "";
         }
         function defaultArcValueFormat(v, ratio) {
             return (ratio * 100).toFixed(1) + '%';
@@ -1899,16 +1913,13 @@
         //-- Tooltip --//
 
         function showTooltip(selectedData, mouse) {
-            var tWidth, tHeight;
-            var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
-            var forArc = hasArcType(c3.data.targets);
-            var valueFormat = forArc ? defaultArcValueFormat : defaultValueFormat;
-            var dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-            if (! __tooltip_show) { return; }
-            // don't show tooltip when no data
-            if (dataToShow.length === 0) { return; }
-            // Construct tooltip
-            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), valueFormat, color)).style("display", "block");
+            var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
+            var forArc = hasArcType(c3.data.targets),
+                dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
+            if (dataToShow.length === 0 || !__tooltip_show) {
+                return;
+            }
+            tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), getYFormat(forArc), color)).style("display", "block");
             // Get tooltip dimensions
             tWidth = tooltip.property('offsetWidth');
             tHeight = tooltip.property('offsetHeight');
@@ -2778,7 +2789,7 @@
                 }
                 tooltip.html(__tooltip_contents(c3.data.targets.map(function (d) {
                     return addName(d.values[__tooltip_init_x]);
-                }), getXAxisTickFormat(), defaultValueFormat, color));
+                }), getXAxisTickFormat(), getYFormat(hasArcType(c3.data.targets)), color));
                 tooltip.style("top", __tooltip_init_position.top)
                        .style("left", __tooltip_init_position.left)
                        .style("display", "block");
