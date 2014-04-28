@@ -2787,18 +2787,6 @@
                        .style("left", __tooltip_init_position.left)
                        .style("display", "block");
             }
-
-            // Bind resize event
-            if (window.onresize == null) {
-                window.onresize = generateResize();
-            }
-            if (window.onresize.add) {
-                window.onresize.add(__onresize);
-                window.onresize.add(function () {
-                    updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
-                });
-                window.onresize.add(__onresized);
-            }
         }
 
         function generateEventRectsForSingleX(eventRectEnter) {
