@@ -3144,7 +3144,7 @@
 
             if (isCategorized) {
                 // ATTENTION: need to update domain with current domain when categoryAxis
-                if (targetsToShow.length === 0 || !withUpdateOrgXDomain || withUpdateXDomain) {
+                if (targetsToShow.length === 0 || !withUpdateOrgXDomain || !withUpdateXDomain) {
                     x.domain([0, xaxis.selectAll('.tick').size()]);
                 }
             }
