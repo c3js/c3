@@ -578,7 +578,7 @@
         //-- Scales --//
 
         function updateScales() {
-            var xAxisTickFormat, forInit = !x;
+            var xAxisTickFormat, xAxisTickValues, forInit = !x;
             // update edges
             xMin = __axis_rotated ? 1 : 0;
             xMax = __axis_rotated ? height : width;
@@ -597,8 +597,9 @@
             subY2 = getY(subYMin, subYMax, forInit ? undefined : subY2.domain());
             // update axes
             xAxisTickFormat = getXAxisTickFormat();
-            xAxis = getXAxis(x, xOrient, xAxisTickFormat);
-            subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat);
+            xAxisTickValues = __axis_x_tick_values ? __axis_x_tick_values : (forInit ? undefined : xAxis.tickValues());
+            xAxis = getXAxis(x, xOrient, xAxisTickFormat, xAxisTickValues);
+            subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTickValues);
             yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
             y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
             // Set initialized scales to brush and zoom
@@ -655,11 +656,11 @@
 
         //-- Axes --//
 
-        function getXAxis(scale, orient, tickFormat) {
+        function getXAxis(scale, orient, tickFormat, tickValues) {
             var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
 
             // Set tick
-            axis.tickFormat(tickFormat);
+            axis.tickFormat(tickFormat).tickValues(tickValues);
             if (isCategorized) {
                 axis.tickCentered(__axis_x_tick_centered);
                 if (isEmpty(__axis_x_tick_culling)) {
@@ -1628,11 +1629,10 @@
             var xs = d3.set(d3.merge(targets.map(function (t) { return t.values.map(function (v) { return v.x; }); }))).values();
             return isTimeSeries ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
         }
-        function generateTickValues(xs) {
+        function generateTickValues(xs, tickCount) {
             var tickValues = xs, targetCount, start, end, count, interval, i, tickValue;
-            if (__axis_x_tick_count) {
-                // TODO: need some arguments for __axis_x_tick_count()?
-                targetCount = typeof __axis_x_tick_count === 'function' ? __axis_x_tick_count() : __axis_x_tick_count;
+            if (tickCount) {
+                targetCount = typeof tickCount === 'function' ? tickCount() : tickCount;
                 // compute ticks according to __axis_x_tick_count
                 if (targetCount === 1) {
                     tickValues = [xs[0]];
@@ -3162,17 +3162,16 @@
                     x.domain(brush.empty() ? orgXDomain : brush.extent());
                     if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 }
+                // update axis tick values according to options
+                if (!__axis_x_tick_values && (__axis_x_tick_fit || __axis_x_tick_count)) {
+                    tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow), __axis_x_tick_count);
+                    xAxis.tickValues(tickValues);
+                    subXAxis.tickValues(tickValues);
+                }
             }
 
             y.domain(getYDomain(targetsToShow, 'y'));
             y2.domain(getYDomain(targetsToShow, 'y2'));
-
-            // update axis tick values according to options
-            if ((__axis_x_tick_fit || __axis_x_tick_count) && targetsToShow.length) {
-                tickValues = __axis_x_tick_values ? __axis_x_tick_values : generateTickValues(mapTargetsToUniqueXs(targetsToShow));
-                xAxis.tickValues(tickValues);
-                subXAxis.tickValues(tickValues);
-            }
 
             // axes
             transitions.axisX.call(xAxis);
