@@ -290,7 +290,7 @@
             isCategorized = (__axis_x_type === 'categorized'),
             isCustomX = !isTimeSeries && (__data_x || notEmpty(__data_xs));
 
-        var dragStart = null, dragging = false, cancelClick = false, mouseover = false;
+        var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
 
         var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
@@ -3403,7 +3403,7 @@
             mainCircle.exit().remove();
 
             // arc
-            main.selectAll('.' + CLASS.chartArc).select('.' + CLASS.arc)
+            main.each(function () { transiting = true; }).selectAll('.' + CLASS.chartArc).select('.' + CLASS.arc)
                 .attr("transform", withTransform ? "scale(0)" : "")
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
               .transition().duration(duration)
@@ -3425,7 +3425,10 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
-                .style("opacity", 1);
+                .style("opacity", 1)
+                .call(endall, function () {
+                    transiting = false;
+                });
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
@@ -3717,17 +3720,31 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
                 .on('mouseover', function (d, i) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOver();
+                    var updated, arcData, callback;
+                    if (transiting) { // skip while transiting
+                        return;
+                    }
+                    updated = updateAngle(d);
+                    arcData = convertToArcData(updated);
+                    callback = getArcOnMouseOver();
+                    // transitions
                     expandArc(updated.data.id);
                     focusLegend(updated.data.id);
                     callback(arcData, i);
                 })
                 .on('mousemove', function (d) {
-                    var updated = updateAngle(d), selectedData = [convertToArcData(updated)];
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
                     showTooltip(selectedData, d3.mouse(this));
                 })
                 .on('mouseout', function (d, i) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnMouseOut();
+                    var updated, arcData, callback;
+                    if (transiting) { // skip while transiting
+                        return;
+                    }
+                    updated = updateAngle(d);
+                    arcData = convertToArcData(updated);
+                    callback = getArcOnMouseOut();
+                    // transitions
                     unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
@@ -3992,13 +4009,17 @@
                     typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
                 })
                 .on('mouseover', function (id) {
-                    c3.focus(id);
+                    if (!transiting) {
+                        c3.focus(id);
+                    }
                     if (typeof __legend_item_onmouseover === 'function') {
                         __legend_item_onmouseover(id);
                     }
                 })
                 .on('mouseout', function (id) {
-                    c3.revert();
+                    if (!transiting) {
+                        c3.revert();
+                    }
                     if (typeof __legend_item_onmouseout === 'function') {
                         __legend_item_onmouseout(id);
                     }
@@ -4074,6 +4095,7 @@
         }
         function transformTo(targetIds, type, optionsForRedraw) {
             var withTransitionForAxis = !hasArcType(c3.data.targets);
+            transiting = false;
             setTargetType(targetIds, type);
             updateAndRedraw(optionsForRedraw || {withTransitionForAxis: withTransitionForAxis});
         }
