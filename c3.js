@@ -4233,9 +4233,10 @@
             }
         };
 
-        c3.unload = function (targetIds) {
+        c3.unload = function (targetIds, done) {
             unload(mapToTargetIds(targetIds), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+                if (typeof done === 'function') { done(); }
             });
         };
 
