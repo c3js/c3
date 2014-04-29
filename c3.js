@@ -855,7 +855,7 @@
                 var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
-            return maxWidth < 30 ? 30 : maxWidth;
+            return maxWidth < 0 ? 0 : maxWidth;
         }
         function updateAxisLabels() {
             main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
