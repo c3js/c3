@@ -3672,7 +3672,6 @@
             // Bars for each data
             mainBarEnter.append('g')
                 .attr("class", classBars)
-                .style("fill", function (d) { return color(d); })
                 .style("stroke", "none")
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
 
