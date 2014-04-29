@@ -349,10 +349,27 @@
         }
 
         function transformMain(withTransition, transitions) {
-            var duration = withTransition !== false ? 250 : 0,
-                xAxis = (transitions && transitions.axisX) ? transitions.axisX : main.select('.' + CLASS.axisX).transition().duration(duration),
-                yAxis = (transitions && transitions.axisY) ? transitions.axisY : main.select('.' + CLASS.axisY).transition().duration(duration),
-                y2Axis = (transitions && transitions.axisYs) ? transitions.axisY2 : main.select('.' + CLASS.axisY2).transition().duration(duration);
+            var xAxis, yAxis, y2Axis;
+
+            if (transitions && transitions.axisX) {
+                xAxis = transitions.axisX;
+            } else {
+                xAxis  = main.select('.' + CLASS.axisX);
+                if (withTransition) { xAxis = xAxis.transition(); }
+            }
+            if (transitions && transitions.axisY) {
+                yAxis = transitions.axisY;
+            } else {
+                yAxis = main.select('.' + CLASS.axisY);
+                if (withTransition) { yAxis = yAxis.transition(); }
+            }
+            if (transitions && transitions.axisY2) {
+                y2Axis = transitions.axisY2;
+            } else {
+                y2Axis = main.select('.' + CLASS.axisY2);
+                if (withTransition) { y2Axis = y2Axis.transition(); }
+            }
+
             main.attr("transform", translate.main);
             xAxis.attr("transform", translate.x);
             yAxis.attr("transform", translate.y);
