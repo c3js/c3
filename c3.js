@@ -61,6 +61,7 @@
         legendItemEvent: 'c3-legend-item-event',
         legendItemTile: 'c3-legend-item-tile',
         legendItemHidden: 'c3-legend-item-hidden',
+        legendItemFocused: 'c3-legend-item-focused',
         dragarea: 'c3-dragarea',
         EXPANDED: '_expanded_',
         SELECTED: '_selected_',
@@ -351,7 +352,6 @@
 
         function transformMain(withTransition, transitions) {
             var xAxis, yAxis, y2Axis;
-
             if (transitions && transitions.axisX) {
                 xAxis = transitions.axisX;
             } else {
@@ -370,7 +370,6 @@
                 y2Axis = main.select('.' + CLASS.axisY2);
                 if (withTransition) { y2Axis = y2Axis.transition(); }
             }
-
             main.attr("transform", translate.main);
             xAxis.attr("transform", translate.x);
             yAxis.attr("transform", translate.y);
@@ -378,14 +377,18 @@
             main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
         }
         function transformContext(withTransition, transitions) {
-            var duration = withTransition !== false ? 250 : 0,
-                subXAxis = (transitions && transitions.axisSubX) ? transitions.axisSubX : context.select('.' + CLASS.axisX).transition().duration(duration);
+            var subXAxis;
+            if (transitions && transitions.axisSubX) {
+                subXAxis = transitions.axisSubX;
+            } else {
+                subXAxis = context.select('.' + CLASS.axisX);
+                if (withTransition) { subXAxis = subXAxis.transition(); }
+            }
             context.attr("transform", translate.context);
             subXAxis.attr("transform", translate.subx);
         }
         function transformLegend(withTransition) {
-            var duration = withTransition !== false ? 250 : 0;
-            legend.transition().duration(duration).attr("transform", translate.legend);
+            (withTransition ? legend.transition() : legend).attr("transform", translate.legend);
         }
         function transformAll(withTransition, transitions) {
             transformMain(withTransition, transitions);
@@ -2630,7 +2633,7 @@
 
             // MEMO: call here to update legend box and tranlate for all
             // MEMO: translate will be upated by this, so transform not needed in updateLegend()
-            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false, withLegendState: true});
+            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
 
@@ -3910,18 +3913,23 @@
 
         /*-- Draw Legend --*/
 
-        function opacityForLegend(id) {
-            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 1;
+        function opacityForLegend(legendItem) {
+            return legendItem.classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 1;
         }
-        function opacityForUnfocusedLegend(id) {
-            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 0.3;
+        function opacityForUnfocusedLegend(legendItem) {
+            return legendItem.classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 0.3;
         }
         function toggleFocusLegend(id, focus) {
-            var legendItem = legend.selectAll('.' + CLASS.legendItem),
-                isTarget = function (d) { return (!id || d === id); },
-                notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? opacityForUnfocusedLegend : opacityForLegend);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : opacityForUnfocusedLegend);
+            legend.selectAll('.' + CLASS.legendItem)
+              .transition().duration(100)
+                .style('opacity', function (_id) {
+                    var This = d3.select(this);
+                    if (id && _id !== id) {
+                        return focus ? opacityForUnfocusedLegend(This) : opacityForLegend(This);
+                    } else {
+                        return focus ? opacityForLegend(This) : opacityForUnfocusedLegend(This);
+                    }
+                });
         }
         function focusLegend(id) {
             toggleFocusLegend(id, true);
@@ -3932,7 +3940,7 @@
         function revertLegend() {
             legend.selectAll('.' + CLASS.legendItem)
               .transition().duration(100)
-                .style('opacity', opacityForLegend);
+                .style('opacity', function () { return opacityForLegend(d3.select(this)); });
         }
         function showLegend(targetIds) {
             if (!__legend_show) {
@@ -3943,7 +3951,7 @@
             legend.selectAll(selectorLegends(targetIds))
                 .style('visibility', 'visible')
               .transition()
-                .style('opacity', opacityForLegend);
+                .style('opacity', function () { return opacityForLegend(d3.select(this)); });
         }
         function hideLegend(targetIds) {
             if (__legend_show && isEmpty(targetIds)) {
@@ -3961,6 +3969,7 @@
             var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
             var withTransition, withTransitionForTransform;
+            var hasFocused = legend.selectAll('.' + CLASS.legendItemFocused).size();
 
             options = options || {};
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
@@ -4049,6 +4058,7 @@
                     typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
                 })
                 .on('mouseover', function (id) {
+                    d3.select(this).classed(CLASS.legendItemFocused, true);
                     if (!transiting) {
                         c3.focus(id);
                     }
@@ -4057,6 +4067,7 @@
                     }
                 })
                 .on('mouseout', function (id) {
+                    d3.select(this).classed(CLASS.legendItemFocused, false);
                     if (!transiting) {
                         c3.revert();
                     }
@@ -4107,12 +4118,17 @@
                 .attr('y', yForLegend);
 
             // toggle legend state
-            if (options.withLegendState) {
-                legend.selectAll('.' + CLASS.legendItem)
-                    .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
-                  .transition()
-                    .style('opacity', function (id) { return isTargetToShow(id) ? 1 : legendOpacityForHidden; });
-            }
+            legend.selectAll('.' + CLASS.legendItem)
+                .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
+              .transition()
+                .style('opacity', function (id) {
+                    var This = d3.select(this);
+                    if (isTargetToShow(id)) {
+                        return !hasFocused || This.classed(CLASS.legendItemFocused) ? opacityForLegend(This) : opacityForUnfocusedLegend(This);
+                    } else {
+                        return legendOpacityForHidden;
+                    }
+                });
 
             // Update all to reflect change of legend
             updateLegendItemWidth(maxWidth);
