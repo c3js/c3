@@ -3926,6 +3926,10 @@
                 .style('opacity', opacityForLegend);
         }
         function showLegend(targetIds) {
+            if (!__legend_show) {
+                __legend_show = true;
+                legend.style('visibility', 'visible');
+            }
             removeHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('visibility', 'visible')
@@ -3933,6 +3937,10 @@
                 .style('opacity', opacityForLegend);
         }
         function hideLegend(targetIds) {
+            if (__legend_show && isEmpty(targetIds)) {
+                __legend_show = false;
+                legend.style('visibility', 'hidden');
+            }
             addHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('opacity', 0)
@@ -4475,20 +4483,12 @@
         };
 
         c3.legend.show = function (targetIds) {
-            if (!__legend_show) {
-                __legend_show = true;
-                legend.style('visibility', 'visible');
-            }
             showLegend(mapToTargetIds(targetIds));
             redraw({withLegend: true});
         };
         c3.legend.hide = function (targetIds) {
             hideLegend(mapToTargetIds(targetIds));
             redraw({withLegend: true});
-            if (__legend_show && isEmpty(targetIds)) {
-                __legend_show = false;
-                legend.style('visibility', 'hidden');
-            }
         };
 
         c3.resize = function (size) {
