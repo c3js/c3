@@ -2630,7 +2630,7 @@
 
             // MEMO: call here to update legend box and tranlate for all
             // MEMO: translate will be upated by this, so transform not needed in updateLegend()
-            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
+            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false, withLegendState: true});
 
             /*-- Main Region --*/
 
@@ -3960,12 +3960,11 @@
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
             var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
-            var withTransition, withTransitionForTransform, withTransformAll;
+            var withTransition, withTransitionForTransform;
 
             options = options || {};
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withTransitionForTransform = isDefined(options.withTransitionForTransform) ? options.withTransitionForTransform : true;
-            withTransformAll = isDefined(options.withTransformAll) ? options.withTransformAll : true;
 
             function updatePositions(textElement, id, reset) {
                 var box = textElement.getBoundingClientRect(),
@@ -4108,10 +4107,12 @@
                 .attr('y', yForLegend);
 
             // toggle legend state
-            legend.selectAll('.' + CLASS.legendItem)
-                .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
-              .transition()
-                .style('opacity', function (id) { return isTargetToShow(id) ? 1 : legendOpacityForHidden; });
+            if (options.withLegendState) {
+                legend.selectAll('.' + CLASS.legendItem)
+                    .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
+                  .transition()
+                    .style('opacity', function (id) { return isTargetToShow(id) ? 1 : legendOpacityForHidden; });
+            }
 
             // Update all to reflect change of legend
             updateLegendItemWidth(maxWidth);
@@ -4122,9 +4123,7 @@
             updateScales();
             updateSvgSize();
             // Update g positions
-            if (withTransformAll) {
-                transformAll(withTransitionForTransform, transitions);
-            }
+            transformAll(withTransitionForTransform, transitions);
         }
 
         /*-- Event Handling --*/
@@ -4209,7 +4208,6 @@
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-            c3.revert();
         };
 
         c3.hide = function (targetIds, options) {
@@ -4226,7 +4224,6 @@
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-            c3.revert();
         };
 
         c3.toggle = function (targetId) {
