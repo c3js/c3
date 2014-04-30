@@ -1747,9 +1747,9 @@
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
         function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
-        function selectorTargets(ids) { return ids.map(function (id) { return selectorTarget(id); }); }
+        function selectorTargets(ids) { return ids.length ? ids.map(function (id) { return selectorTarget(id); }) : null; }
         function selectorLegend(id) { return '.' + CLASS.legendItem + getTargetSelectorSuffix(id); }
-        function selectorLegends(ids) { return ids.map(function (id) { return selectorLegend(id); }); }
+        function selectorLegends(ids) { return ids.length ? ids.map(function (id) { return selectorLegend(id); }) : null; }
 
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
@@ -4090,6 +4090,12 @@
                 .attr('x', xForLegend)
                 .attr('y', yForLegend);
 
+            // toggle legend state
+            legend.selectAll('.' + CLASS.legendItem)
+                .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
+              .transition()
+                .style('opacity', function (id) { return isTargetToShow(id) ? 1 : legendOpacityForHidden; });
+
             // Update all to reflect change of legend
             updateLegendItemWidth(maxWidth);
             updateLegendItemHeight(maxHeight);
@@ -4183,14 +4189,10 @@
 
             if (options.withLegend) {
                 showLegend(targetIds);
-            } else {
-                legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, false)
-                  .transition()
-                    .style('opacity', 1);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            c3.revert();
         };
 
         c3.hide = function (targetIds, options) {
@@ -4204,14 +4206,10 @@
 
             if (options.withLegend) {
                 hideLegend(targetIds);
-            } else {
-                legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, true)
-                  .transition()
-                    .style('opacity', legendOpacityForHidden);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            c3.revert();
         };
 
         c3.toggle = function (targetId) {
