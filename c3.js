@@ -877,17 +877,20 @@
         }
         function updateAxisLabels() {
             main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
+              .transition()
                 .attr("x", xForXAxisLabel)
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
                 .text(textForXAxisLabel);
             main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel)
+              .transition()
                 .attr("x", xForYAxisLabel)
                 .attr("dx", dxForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .text(textForYAxisLabel);
             main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
+              .transition()
                 .attr("x", xForY2AxisLabel)
                 .attr("dx", dxForY2AxisLabel)
                 .attr("dy", dyForY2AxisLabel)
