@@ -217,11 +217,11 @@
 
         // point - point of each data
         var __point_show = getConfig(['point', 'show'], true),
-            __point_r = __point_show ? getConfig(['point', 'r'], 2.5) : 0,
+            __point_r = getConfig(['point', 'r'], 2.5),
             __point_focus_line_enabled = getConfig(['point', 'focus', 'line', 'enabled'], true),
             __point_focus_expand_enabled = getConfig(['point', 'focus', 'expand', 'enabled'], true),
-            __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
-            __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
+            __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r']),
+            __point_select_r = getConfig(['point', 'focus', 'select', 'r']);
 
         var __line_connect_null = getConfig(['line', 'connect_null'], false);
 
@@ -2244,9 +2244,9 @@
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("stroke", function () { return color(d); })
-                .attr("r", __point_select_r * 1.4)
+                .attr("r", pointSelectR(d) * 1.4)
               .transition().duration(100)
-                .attr("r", __point_select_r);
+                .attr("r", pointSelectR);
         }
         function unselectPoint(target, d, i) {
             __data_onunselected(d, target.node());
@@ -2275,6 +2275,18 @@
             return data.filter(function (d) { return isValue(d.value); });
         }
 
+        //-- Point --//
+
+        function pointR(d) {
+            return __point_show ? (typeof __point_r === 'function' ? __point_r(d) : __point_r) : 0;
+        }
+        function pointExpandedR(d) {
+            return __point_focus_expand_enabled ? (__point_focus_expand_r ? __point_focus_expand_r : pointR(d) * 1.75) : pointR(d);
+        }
+        function pointSelectR(d) {
+            return __point_select_r ? __point_select_r : pointR(d) * 4;
+        }
+
         //-- Shape --//
 
         function getCircles(i, id) {
@@ -2283,13 +2295,13 @@
         function expandCircles(i, id) {
             getCircles(i, id)
                 .classed(CLASS.EXPANDED, true)
-                .attr('r', __point_focus_expand_r);
+                .attr('r', pointExpandedR);
         }
         function unexpandCircles(i) {
             getCircles(i)
                 .filter(function () { return d3.select(this).classed(CLASS.EXPANDED); })
                 .classed(CLASS.EXPANDED, false)
-                .attr('r', __point_r);
+                .attr('r', pointR);
         }
         function getBars(i) {
             return main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
@@ -2899,12 +2911,12 @@
                         .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
                             var _this = d3.select(this).classed(CLASS.EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
+                            if (this.nodeName === 'circle') { _this.attr('r', pointExpandedR); }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', null);
                         })
-                        .filter(function () {
+                        .filter(function (d) {
                             if (this.nodeName === 'circle') {
-                                return isWithinCircle(this, __point_select_r);
+                                return isWithinCircle(this, pointSelectR(d));
                             }
                             else if (this.nodeName === 'path') {
                                 return isWithinBar(this);
@@ -2914,7 +2926,7 @@
                             var _this = d3.select(this);
                             if (! _this.classed(CLASS.EXPANDED)) {
                                 _this.classed(CLASS.EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
+                                if (this.nodeName === 'circle') { _this.attr('r', pointSelectR); }
                             }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', 'pointer');
                         });
@@ -3027,7 +3039,7 @@
                 isSelected = shape.classed(CLASS.SELECTED);
             var isWithin = false, toggle;
             if (target.nodeName === 'circle') {
-                isWithin = isWithinCircle(target, __point_select_r * 1.5);
+                isWithin = isWithinCircle(target, pointSelectR(d) * 1.5);
                 toggle = togglePoint;
             }
             else if (target.nodeName === 'path') {
@@ -3425,7 +3437,7 @@
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
                 .style('opacity', 0)
-                .attr("r", __point_r);
+                .attr("r", pointR);
             mainCircle
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
