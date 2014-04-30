@@ -3823,7 +3823,7 @@
 
             // Fade-in each chart
             svg.selectAll('.' + CLASS.target).filter(function (d) { return isTargetToShow(d.id); })
-                .transition().duration(750)
+                .transition().duration(__transition_duration)
                 .style("opacity", 1);
         }
 
