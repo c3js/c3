@@ -105,7 +105,7 @@
         var __size_width = getConfig(['size', 'width']),
             __size_height = getConfig(['size', 'height']);
 
-        var __padding_left = getConfig(['padding', 'left']),
+        var __padding_left = getConfig(['padding', 'left'], 50),
             __padding_right = getConfig(['padding', 'right']);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
