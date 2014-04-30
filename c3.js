@@ -3763,7 +3763,7 @@
                     callback = getArcOnMouseOver();
                     // transitions
                     expandArc(updated.data.id);
-                    focusLegend(updated.data.id);
+                    toggleFocusLegend(updated.data.id, true);
                     callback(arcData, i);
                 })
                 .on('mousemove', function (d) {
@@ -3930,12 +3930,6 @@
                         return focus ? opacityForLegend(This) : opacityForUnfocusedLegend(This);
                     }
                 });
-        }
-        function focusLegend(id) {
-            toggleFocusLegend(id, true);
-        }
-        function defocusLegend(id) {
-            toggleFocusLegend(id, false);
         }
         function revertLegend() {
             legend.selectAll('.' + CLASS.legendItem)
@@ -4176,7 +4170,7 @@
             if (hasArcType(c3.data.targets)) {
                 expandArc(targetId, true);
             }
-            focusLegend(targetId);
+            toggleFocusLegend(targetId, true);
         };
 
         c3.defocus = function (targetId) {
@@ -4192,7 +4186,7 @@
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(targetId);
             }
-            defocusLegend(targetId);
+            toggleFocusLegend(targetId, false);
         };
 
         c3.revert = function (targetId) {
