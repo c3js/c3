@@ -137,6 +137,7 @@
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
+            __data_hide = getConfig(['data', 'hide'], false),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
@@ -2545,6 +2546,11 @@
             // Init data as targets
             c3.data.xs = {};
             c3.data.targets = convertDataToTargets(data);
+
+            // Set targets to hide if needed
+            if (__data_hide) {
+                addHiddenTargetIds(__data_hide === true ? mapToIds(c3.data.targets) : __data_hide);
+            }
 
             // Init sizes and scales
             updateSizes();
