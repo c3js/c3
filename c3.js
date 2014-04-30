@@ -1903,7 +1903,7 @@
             return closest;
         }
         function filterSameX(targets, x) {
-            return d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x === x; });
+            return d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x - x === 0; });
         }
 
         function getPathBox(path) {
