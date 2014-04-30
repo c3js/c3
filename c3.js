@@ -3674,6 +3674,7 @@
                 .attr('class', classChartText);
             mainTextEnter = mainTextUpdate.enter().append('g')
                 .attr('class', classChartText)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
@@ -3685,6 +3686,7 @@
                 .attr('class', classChartBar);
             mainBarEnter = mainBarUpdate.enter().append('g')
                 .attr('class', classChartBar)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -3699,6 +3701,7 @@
               .attr('class', classChartLine);
             mainLineEnter = mainLineUpdate.enter().append('g')
                 .attr('class', classChartLine)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -3789,6 +3792,7 @@
                     .data(targets)
                     .attr('class', classChartBar);
                 contextBarEnter = contextBarUpdate.enter().append('g')
+                    .style('opacity', 0)
                     .attr('class', classChartBar);
                 // Bars for each data
                 contextBarEnter.append('g')
@@ -3800,6 +3804,7 @@
                     .data(targets)
                     .attr('class', classChartLine);
                 contextLineEnter = contextLineUpdate.enter().append('g')
+                    .style('opacity', 0)
                     .attr('class', classChartLine);
                 // Lines for each data
                 contextLineEnter.append("path")
@@ -3812,7 +3817,7 @@
 
             // Fade-in each chart
             svg.selectAll('.' + CLASS.target).filter(function (d) { return isTargetToShow(d.id); })
-                .transition()
+                .transition().duration(750)
                 .style("opacity", 1);
         }
 
