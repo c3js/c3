@@ -500,7 +500,7 @@
         }
         function getHorizontalAxisHeight(axisId) {
             if (axisId === 'x' && !__axis_x_show) { return 0; }
-            if (axisId === 'x' && __axis_x_height) { return 50; }
+            if (axisId === 'x' && __axis_x_height) { return __axis_x_height; }
             if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight ? 10 : 1; }
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
@@ -4451,12 +4451,12 @@
             redraw({withLegend: true});
         };
         c3.legend.hide = function (targetIds) {
-            hideLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: true});
             if (__legend_show && isEmpty(targetIds)) {
                 __legend_show = false;
                 legend.style('visibility', 'hidden');
             }
+            hideLegend(mapToTargetIds(targetIds));
+            redraw({withLegend: false});
         };
 
         c3.resize = function (size) {
