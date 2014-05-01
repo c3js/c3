@@ -2221,7 +2221,7 @@
                     isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
                     return area(data);
                 } else if (hasType([d], 'area-step')) {
-                    isStepType(d) ? area.interpolate("step-after") : '';
+                    isStepType(d) ? area.interpolate("step-after") : area.interpolate("linear");
                     return area(data);
                 } else {
                     x0 = x(data[0].x);
@@ -2401,7 +2401,28 @@
                 .y(__axis_rotated ? subxx : function (d) { return getSubYScale(d.id)(d.value); });
             return function (d) {
                 var data = filterRemoveNull(d.values);
-                return isLineType(d) ? line(data) : "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
+                if (isLineType(d)) {
+                  return line(data);
+                } else if (isStepType(d)) {
+                  line.interpolate("step-after");
+                  return line(data);
+                } else {
+                  return "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
+                }
+            };
+        })();
+        var areaOnSub = (function () {
+            var area = d3.svg.area()
+                .x(xx)
+                .y0(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return getSubYScale(d.id)(0); })
+                .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[1][1]; } return getSubYScale(d.id)(d.value); });
+            return function (d) {
+                var data = filterRemoveNull(d.values);
+                if (isLineType(d) || isStepType(d)) {
+                  return area(data);
+                } else {
+                  return "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
+                }
             };
         })();
 
@@ -3328,12 +3349,14 @@
 //                .attr("d", lineOnMain)
                 .attr("d", drawLine)
                 .style("opacity", 1);
+            // steps
             main.selectAll('.' + CLASS.step)
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
 //                .attr("d", lineOnMain)
                 .attr("d", drawLine)
                 .style("opacity", 1);
+            // area
             main.selectAll('.' + CLASS.area)
                 .style("opacity", 0)
               .transition().duration(duration)
@@ -3425,11 +3448,18 @@
                       .transition().duration(duration)
                         .attr("d", lineOnSub)
                         .style('opacity', 1);
+                    // steps
                     context.selectAll('.' + CLASS.step)
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
                         .attr("d", lineOnSub)
                         .style('opacity', 1);
+                    // area
+                    context.selectAll('.' + CLASS.area)
+                        .style("opacity", initialOpacity)
+                      .transition().duration(duration)
+                        .attr("d", lineOnSub)
+                        .style('opacity', orgAreaOpacity);
                 }
             }
 
@@ -3623,6 +3653,7 @@
                 .attr("class", classLine)
                 .style("opacity", 0)
                 .style("stroke", function (d) { return color(d.id); });
+            // Steps
             mainLineEnter.append("path")
                 .attr('class', classStep)
                 .style("opacity", 0)
@@ -3630,7 +3661,7 @@
             // Areas
             mainLineEnter.append("path")
                 .attr("class", classArea)
-                .style("opacity", function () { orgAreaOpacity = (__color_opacity) ? __color_opacity : 1; return 0; })//+d3.select(this).style('opacity'); return 0; })
+                .style("opacity", function () { orgAreaOpacity = (__color_opacity) ? __color_opacity : 1; return orgAreaOpacity; })//+d3.select(this).style('opacity'); return 0; })
                 .style("fill", function (d) { return color(d.id); });
             // Circles for each data point on lines
             mainLineEnter.append('g')
@@ -3713,7 +3744,17 @@
                 contextLineEnter.append("path")
                     .attr("class", classLine)
                     .style("opacity", 0)
+                    .style("stroke", function (d) { return color(d.id); })
+                // Steps
+                contextLineEnter.append("path")
+                    .attr("class", classStep)
+                    .style("opacity", 0)
                     .style("stroke", function (d) { return color(d.id); });
+                // Area
+                contextLineEnter.append("path")
+                    .attr("class", classArea)
+                    .style("opacity", orgAreaOpacity)
+                    .style("fill", function (d) { return color(d.id); });
             }
 
             /*-- Show --*/
