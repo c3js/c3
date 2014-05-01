@@ -336,7 +336,7 @@
               if (__legend_show === true) {
                 return "translate(0," + (__axis_rotated ? 0 : height) + ")";
               }
-              return "translate(0," + (__axis_rotated ? 0 : currentHeight - margin.top) + ")";
+              return "translate(0," + (__axis_rotated ? 0 : height + margin3.top) + ")";
             },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
