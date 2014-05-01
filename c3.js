@@ -61,6 +61,7 @@
         legendItemEvent: 'c3-legend-item-event',
         legendItemTile: 'c3-legend-item-tile',
         legendItemHidden: 'c3-legend-item-hidden',
+        legendItemFocused: 'c3-legend-item-focused',
         dragarea: 'c3-dragarea',
         EXPANDED: '_expanded_',
         SELECTED: '_selected_',
@@ -91,7 +92,7 @@
                 // Check next key's value
                 isLast = (i === keys.length - 1);
                 nextTarget = target[keys[i]];
-                if ((!isLast && typeof nextTarget !== 'object') || (isLast && typeof defaultValue !== 'object' && typeof nextTarget === 'object' && nextTarget !== null)) {
+                if (!isLast && typeof nextTarget !== 'object') {
                     return defaultValue;
                 }
                 target = nextTarget;
@@ -105,7 +106,7 @@
         var __size_width = getConfig(['size', 'width']),
             __size_height = getConfig(['size', 'height']);
 
-        var __padding_left = getConfig(['padding', 'left']),
+        var __padding_left = getConfig(['padding', 'left'], 50),
             __padding_right = getConfig(['padding', 'right']);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
@@ -137,6 +138,7 @@
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
+            __data_hide = getConfig(['data', 'hide'], false),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
@@ -215,11 +217,11 @@
 
         // point - point of each data
         var __point_show = getConfig(['point', 'show'], true),
-            __point_r = __point_show ? getConfig(['point', 'r'], 2.5) : 0,
+            __point_r = getConfig(['point', 'r'], 2.5),
             __point_focus_line_enabled = getConfig(['point', 'focus', 'line', 'enabled'], true),
             __point_focus_expand_enabled = getConfig(['point', 'focus', 'expand', 'enabled'], true),
-            __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r'], __point_focus_expand_enabled ? 4 : __point_r),
-            __point_select_r = getConfig(['point', 'focus', 'select', 'r'], 8);
+            __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r']),
+            __point_select_r = getConfig(['point', 'focus', 'select', 'r']);
 
         var __line_connect_null = getConfig(['line', 'connect_null'], false);
 
@@ -350,7 +352,6 @@
 
         function transformMain(withTransition, transitions) {
             var xAxis, yAxis, y2Axis;
-
             if (transitions && transitions.axisX) {
                 xAxis = transitions.axisX;
             } else {
@@ -369,7 +370,6 @@
                 y2Axis = main.select('.' + CLASS.axisY2);
                 if (withTransition) { y2Axis = y2Axis.transition(); }
             }
-
             main.attr("transform", translate.main);
             xAxis.attr("transform", translate.x);
             yAxis.attr("transform", translate.y);
@@ -377,14 +377,18 @@
             main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
         }
         function transformContext(withTransition, transitions) {
-            var duration = withTransition !== false ? 250 : 0,
-                subXAxis = (transitions && transitions.axisSubX) ? transitions.axisSubX : context.select('.' + CLASS.axisX).transition().duration(duration);
+            var subXAxis;
+            if (transitions && transitions.axisSubX) {
+                subXAxis = transitions.axisSubX;
+            } else {
+                subXAxis = context.select('.' + CLASS.axisX);
+                if (withTransition) { subXAxis = subXAxis.transition(); }
+            }
             context.attr("transform", translate.context);
             subXAxis.attr("transform", translate.subx);
         }
         function transformLegend(withTransition) {
-            var duration = withTransition !== false ? 250 : 0;
-            legend.transition().duration(duration).attr("transform", translate.legend);
+            (withTransition ? legend.transition() : legend).attr("transform", translate.legend);
         }
         function transformAll(withTransition, transitions) {
             transformMain(withTransition, transitions);
@@ -876,17 +880,20 @@
         }
         function updateAxisLabels() {
             main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
+              .transition()
                 .attr("x", xForXAxisLabel)
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
                 .text(textForXAxisLabel);
             main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel)
+              .transition()
                 .attr("x", xForYAxisLabel)
                 .attr("dx", dxForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .text(textForYAxisLabel);
             main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
+              .transition()
                 .attr("x", xForY2AxisLabel)
                 .attr("dx", dxForY2AxisLabel)
                 .attr("dy", dyForY2AxisLabel)
@@ -1747,9 +1754,9 @@
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
         function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
-        function selectorTargets(ids) { return ids.map(function (id) { return selectorTarget(id); }); }
+        function selectorTargets(ids) { return ids.length ? ids.map(function (id) { return selectorTarget(id); }) : null; }
         function selectorLegend(id) { return '.' + CLASS.legendItem + getTargetSelectorSuffix(id); }
-        function selectorLegends(ids) { return ids.map(function (id) { return selectorLegend(id); }); }
+        function selectorLegends(ids) { return ids.length ? ids.map(function (id) { return selectorLegend(id); }) : null; }
 
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
@@ -1896,7 +1903,7 @@
             return closest;
         }
         function filterSameX(targets, x) {
-            return d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x === x; });
+            return d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x - x === 0; });
         }
 
         function getPathBox(path) {
@@ -2047,7 +2054,7 @@
             };
         }
         function getBarW(axis, barTargetsNum) {
-            return __bar_width ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
+            return typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
         }
 
         //-- Type --//
@@ -2237,9 +2244,9 @@
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY)
                 .attr("stroke", function () { return color(d); })
-                .attr("r", __point_select_r * 1.4)
+                .attr("r", pointSelectR(d) * 1.4)
               .transition().duration(100)
-                .attr("r", __point_select_r);
+                .attr("r", pointSelectR);
         }
         function unselectPoint(target, d, i) {
             __data_onunselected(d, target.node());
@@ -2268,6 +2275,18 @@
             return data.filter(function (d) { return isValue(d.value); });
         }
 
+        //-- Point --//
+
+        function pointR(d) {
+            return __point_show ? (typeof __point_r === 'function' ? __point_r(d) : __point_r) : 0;
+        }
+        function pointExpandedR(d) {
+            return __point_focus_expand_enabled ? (__point_focus_expand_r ? __point_focus_expand_r : pointR(d) * 1.75) : pointR(d);
+        }
+        function pointSelectR(d) {
+            return __point_select_r ? __point_select_r : pointR(d) * 4;
+        }
+
         //-- Shape --//
 
         function getCircles(i, id) {
@@ -2276,13 +2295,13 @@
         function expandCircles(i, id) {
             getCircles(i, id)
                 .classed(CLASS.EXPANDED, true)
-                .attr('r', __point_focus_expand_r);
+                .attr('r', pointExpandedR);
         }
         function unexpandCircles(i) {
             getCircles(i)
                 .filter(function () { return d3.select(this).classed(CLASS.EXPANDED); })
                 .classed(CLASS.EXPANDED, false)
-                .attr('r', __point_r);
+                .attr('r', pointR);
         }
         function getBars(i) {
             return main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
@@ -2545,6 +2564,11 @@
             // Init data as targets
             c3.data.xs = {};
             c3.data.targets = convertDataToTargets(data);
+
+            // Set targets to hide if needed
+            if (__data_hide) {
+                addHiddenTargetIds(__data_hide === true ? mapToIds(c3.data.targets) : __data_hide);
+            }
 
             // Init sizes and scales
             updateSizes();
@@ -2887,12 +2911,12 @@
                         .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
                             var _this = d3.select(this).classed(CLASS.EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', __point_focus_expand_r); }
+                            if (this.nodeName === 'circle') { _this.attr('r', pointExpandedR); }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', null);
                         })
-                        .filter(function () {
+                        .filter(function (d) {
                             if (this.nodeName === 'circle') {
-                                return isWithinCircle(this, __point_select_r);
+                                return isWithinCircle(this, pointSelectR(d));
                             }
                             else if (this.nodeName === 'path') {
                                 return isWithinBar(this);
@@ -2902,7 +2926,7 @@
                             var _this = d3.select(this);
                             if (! _this.classed(CLASS.EXPANDED)) {
                                 _this.classed(CLASS.EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', __point_select_r); }
+                                if (this.nodeName === 'circle') { _this.attr('r', pointSelectR); }
                             }
                             svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', 'pointer');
                         });
@@ -3015,7 +3039,7 @@
                 isSelected = shape.classed(CLASS.SELECTED);
             var isWithin = false, toggle;
             if (target.nodeName === 'circle') {
-                isWithin = isWithinCircle(target, __point_select_r * 1.5);
+                isWithin = isWithinCircle(target, pointSelectR(d) * 1.5);
                 toggle = togglePoint;
             }
             else if (target.nodeName === 'path') {
@@ -3413,7 +3437,7 @@
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
                 .style('opacity', 0)
-                .attr("r", __point_r);
+                .attr("r", pointR);
             mainCircle
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
@@ -3674,6 +3698,7 @@
                 .attr('class', classChartText);
             mainTextEnter = mainTextUpdate.enter().append('g')
                 .attr('class', classChartText)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
@@ -3685,6 +3710,7 @@
                 .attr('class', classChartBar);
             mainBarEnter = mainBarUpdate.enter().append('g')
                 .attr('class', classChartBar)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             // Bars for each data
             mainBarEnter.append('g')
@@ -3699,6 +3725,7 @@
               .attr('class', classChartLine);
             mainLineEnter = mainLineUpdate.enter().append('g')
                 .attr('class', classChartLine)
+                .style('opacity', 0)
                 .style("pointer-events", "none");
             // Lines for each data
             mainLineEnter.append("path")
@@ -3748,7 +3775,7 @@
                     callback = getArcOnMouseOver();
                     // transitions
                     expandArc(updated.data.id);
-                    focusLegend(updated.data.id);
+                    toggleFocusLegend(updated.data.id, true);
                     callback(arcData, i);
                 })
                 .on('mousemove', function (d) {
@@ -3789,6 +3816,7 @@
                     .data(targets)
                     .attr('class', classChartBar);
                 contextBarEnter = contextBarUpdate.enter().append('g')
+                    .style('opacity', 0)
                     .attr('class', classChartBar);
                 // Bars for each data
                 contextBarEnter.append('g')
@@ -3800,6 +3828,7 @@
                     .data(targets)
                     .attr('class', classChartLine);
                 contextLineEnter = contextLineUpdate.enter().append('g')
+                    .style('opacity', 0)
                     .attr('class', classChartLine);
                 // Lines for each data
                 contextLineEnter.append("path")
@@ -3812,7 +3841,7 @@
 
             // Fade-in each chart
             svg.selectAll('.' + CLASS.target).filter(function (d) { return isTargetToShow(d.id); })
-                .transition()
+                .transition().duration(__transition_duration)
                 .style("opacity", 1);
         }
 
@@ -3896,38 +3925,45 @@
 
         /*-- Draw Legend --*/
 
-        function opacityForLegend(id) {
-            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 1;
+        function opacityForLegend(legendItem) {
+            return legendItem.classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 1;
         }
-        function opacityForUnfocusedLegend(id) {
-            return d3.select(selectorLegend(id)).classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 0.3;
+        function opacityForUnfocusedLegend(legendItem) {
+            return legendItem.classed(CLASS.legendItemHidden) ? legendOpacityForHidden : 0.3;
         }
         function toggleFocusLegend(id, focus) {
-            var legendItem = legend.selectAll('.' + CLASS.legendItem),
-                isTarget = function (d) { return (!id || d === id); },
-                notTarget = function (d) { return !isTarget(d); };
-            legendItem.filter(notTarget).transition().duration(100).style('opacity', focus ? opacityForUnfocusedLegend : opacityForLegend);
-            legendItem.filter(isTarget).transition().duration(100).style('opacity', focus ? opacityForLegend : opacityForUnfocusedLegend);
-        }
-        function focusLegend(id) {
-            toggleFocusLegend(id, true);
-        }
-        function defocusLegend(id) {
-            toggleFocusLegend(id, false);
+            legend.selectAll('.' + CLASS.legendItem)
+              .transition().duration(100)
+                .style('opacity', function (_id) {
+                    var This = d3.select(this);
+                    if (id && _id !== id) {
+                        return focus ? opacityForUnfocusedLegend(This) : opacityForLegend(This);
+                    } else {
+                        return focus ? opacityForLegend(This) : opacityForUnfocusedLegend(This);
+                    }
+                });
         }
         function revertLegend() {
             legend.selectAll('.' + CLASS.legendItem)
               .transition().duration(100)
-                .style('opacity', opacityForLegend);
+                .style('opacity', function () { return opacityForLegend(d3.select(this)); });
         }
         function showLegend(targetIds) {
+            if (!__legend_show) {
+                __legend_show = true;
+                legend.style('visibility', 'visible');
+            }
             removeHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('visibility', 'visible')
               .transition()
-                .style('opacity', opacityForLegend);
+                .style('opacity', function () { return opacityForLegend(d3.select(this)); });
         }
         function hideLegend(targetIds) {
+            if (__legend_show && isEmpty(targetIds)) {
+                __legend_show = false;
+                legend.style('visibility', 'hidden');
+            }
             addHiddenLegendIds(targetIds);
             legend.selectAll(selectorLegends(targetIds))
                 .style('opacity', 0)
@@ -3938,12 +3974,12 @@
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
             var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
-            var withTransition, withTransitionForTransform, withTransformAll;
+            var withTransition, withTransitionForTransform;
+            var hasFocused = legend.selectAll('.' + CLASS.legendItemFocused).size();
 
             options = options || {};
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withTransitionForTransform = isDefined(options.withTransitionForTransform) ? options.withTransitionForTransform : true;
-            withTransformAll = isDefined(options.withTransformAll) ? options.withTransformAll : true;
 
             function updatePositions(textElement, id, reset) {
                 var box = textElement.getBoundingClientRect(),
@@ -4028,6 +4064,7 @@
                     typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
                 })
                 .on('mouseover', function (id) {
+                    d3.select(this).classed(CLASS.legendItemFocused, true);
                     if (!transiting) {
                         c3.focus(id);
                     }
@@ -4036,6 +4073,7 @@
                     }
                 })
                 .on('mouseout', function (id) {
+                    d3.select(this).classed(CLASS.legendItemFocused, false);
                     if (!transiting) {
                         c3.revert();
                     }
@@ -4085,6 +4123,19 @@
                 .attr('x', xForLegend)
                 .attr('y', yForLegend);
 
+            // toggle legend state
+            legend.selectAll('.' + CLASS.legendItem)
+                .classed(CLASS.legendItemHidden, function (id) { return !isTargetToShow(id); })
+              .transition()
+                .style('opacity', function (id) {
+                    var This = d3.select(this);
+                    if (isTargetToShow(id)) {
+                        return !hasFocused || This.classed(CLASS.legendItemFocused) ? opacityForLegend(This) : opacityForUnfocusedLegend(This);
+                    } else {
+                        return legendOpacityForHidden;
+                    }
+                });
+
             // Update all to reflect change of legend
             updateLegendItemWidth(maxWidth);
             updateLegendItemHeight(maxHeight);
@@ -4094,9 +4145,7 @@
             updateScales();
             updateSvgSize();
             // Update g positions
-            if (withTransformAll) {
-                transformAll(withTransitionForTransform, transitions);
-            }
+            transformAll(withTransitionForTransform, transitions);
         }
 
         /*-- Event Handling --*/
@@ -4133,7 +4182,7 @@
             if (hasArcType(c3.data.targets)) {
                 expandArc(targetId, true);
             }
-            focusLegend(targetId);
+            toggleFocusLegend(targetId, true);
         };
 
         c3.defocus = function (targetId) {
@@ -4149,7 +4198,7 @@
             if (hasArcType(c3.data.targets)) {
                 unexpandArc(targetId);
             }
-            defocusLegend(targetId);
+            toggleFocusLegend(targetId, false);
         };
 
         c3.revert = function (targetId) {
@@ -4178,11 +4227,6 @@
 
             if (options.withLegend) {
                 showLegend(targetIds);
-            } else {
-                legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, false)
-                  .transition()
-                    .style('opacity', 1);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
@@ -4199,11 +4243,6 @@
 
             if (options.withLegend) {
                 hideLegend(targetIds);
-            } else {
-                legend.selectAll(selectorLegends(targetIds))
-                    .classed(CLASS.legendItemHidden, true)
-                  .transition()
-                    .style('opacity', legendOpacityForHidden);
             }
 
             redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
@@ -4472,20 +4511,12 @@
         };
 
         c3.legend.show = function (targetIds) {
-            if (!__legend_show) {
-                __legend_show = true;
-                legend.style('visibility', 'visible');
-            }
             showLegend(mapToTargetIds(targetIds));
             redraw({withLegend: true});
         };
         c3.legend.hide = function (targetIds) {
             hideLegend(mapToTargetIds(targetIds));
             redraw({withLegend: true});
-            if (__legend_show && isEmpty(targetIds)) {
-                __legend_show = false;
-                legend.style('visibility', 'hidden');
-            }
         };
 
         c3.resize = function (size) {
