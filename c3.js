@@ -266,7 +266,7 @@
                 }
 
                 name = d[i].name;
-                value = valueFormat(d[i].value, d[i].ratio, d[i].id);
+                value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
 
                 text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
                 text += "<td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td>";
