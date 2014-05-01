@@ -333,7 +333,7 @@
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () {
-              if (__legend_show) {
+              if (__legend_show === true) {
                 return "translate(0," + (__axis_rotated ? 0 : height) + ")";
               }
               return "translate(0," + (__axis_rotated ? 0 : currentHeight - margin.top) + ")";
