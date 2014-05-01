@@ -332,7 +332,7 @@
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
-            x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
+            x : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
             subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
@@ -354,7 +354,7 @@
                 yAxis = (transitions && transitions.axisY) ? transitions.axisY : main.select('.' + CLASS.axisY).transition().duration(duration),
                 y2Axis = (transitions && transitions.axisYs) ? transitions.axisY2 : main.select('.' + CLASS.axisY2).transition().duration(duration);
             main.attr("transform", translate.main);
-            xAxis.attr("transform", 50);
+            xAxis.attr("transform", translate.x);
             yAxis.attr("transform", translate.y);
             y2Axis.attr("transform", translate.y2);
             main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
