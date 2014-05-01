@@ -2602,32 +2602,15 @@
 
             // Define svgs
             svg = selectChart.append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
                 .on('mouseenter', __onenter)
                 .on('mouseleave', __onleave);
 
             // Define defs
             defs = svg.append("defs");
-            defs.append("clipPath")
-                .attr("id", clipId)
-              .append("rect")
-                .attr("width", width)
-                .attr("height", height);
-            defs.append("clipPath")
-                .attr("id", clipIdForXAxis)
-              .append("rect")
-                .attr("x", getXAxisClipX)
-                .attr("y", getXAxisClipY)
-                .attr("width", getXAxisClipWidth)
-                .attr("height", getXAxisClipHeight);
-            defs.append("clipPath")
-                .attr("id", clipIdForYAxis)
-              .append("rect")
-                .attr("x", getYAxisClipX)
-                .attr("y", getYAxisClipY)
-                .attr("width", getYAxisClipWidth)
-                .attr("height", getYAxisClipHeight);
+            defs.append("clipPath").attr("id", clipId).append("rect");
+            defs.append("clipPath").attr("id", clipIdForXAxis).append("rect");
+            defs.append("clipPath").attr("id", clipIdForYAxis).append("rect");
+            updateSvgSize();
 
             // Define regions
             main = svg.append("g").attr("transform", translate.main);
