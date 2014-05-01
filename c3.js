@@ -2649,6 +2649,33 @@
 
             /*-- Main Region --*/
 
+            // Grids
+            grid = main.append('g')
+                .attr("clip-path", clipPath)
+                .attr('class', CLASS.grid);
+
+            // X-Grid
+            if (__grid_x_show) {
+                grid.append("g").attr("class", CLASS.xgrids);
+            }
+            if (notEmpty(__grid_x_lines)) {
+                grid.append('g').attr("class", CLASS.xgridLines);
+            }
+            if (__point_focus_line_enabled) {
+                grid.append('g')
+                    .attr("class", CLASS.xgridFocus)
+                  .append('line')
+                    .attr('class', CLASS.xgridFocus);
+            }
+
+            // Y-Grid
+            if (__grid_y_show) {
+                grid.append('g').attr('class', CLASS.ygrids);
+            }
+            if (notEmpty(__grid_y_lines)) {
+                grid.append('g').attr('class', CLASS.ygridLines);
+            }
+
             // Add Axis
             if (__axis_x_show) {
                 main.append("g")
@@ -2681,33 +2708,6 @@
                     .attr("class", CLASS.axisY2Label)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .style("text-anchor", textAnchorForY2AxisLabel);
-            }
-
-            // Grids
-            grid = main.append('g')
-                .attr("clip-path", clipPath)
-                .attr('class', CLASS.grid);
-
-            // X-Grid
-            if (__grid_x_show) {
-                grid.append("g").attr("class", CLASS.xgrids);
-            }
-            if (notEmpty(__grid_x_lines)) {
-                grid.append('g').attr("class", CLASS.xgridLines);
-            }
-            if (__point_focus_line_enabled) {
-                grid.append('g')
-                    .attr("class", CLASS.xgridFocus)
-                  .append('line')
-                    .attr('class', CLASS.xgridFocus);
-            }
-
-            // Y-Grid
-            if (__grid_y_show) {
-                grid.append('g').attr('class', CLASS.ygrids);
-            }
-            if (notEmpty(__grid_y_lines)) {
-                grid.append('g').attr('class', CLASS.ygridLines);
             }
 
             // Regions
