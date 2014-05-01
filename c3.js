@@ -332,7 +332,12 @@
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
-            x : function () { return "translate(0," + (__axis_rotated ? 0 : currentHeight - margin.bottom) + ")"; },
+            x : function () {
+              if (__legend_show) {
+                return "translate(0," + (__axis_rotated ? 0 : height) + ")";
+              }
+              return "translate(0," + (__axis_rotated ? 0 : currentHeight - margin.top) + ")";
+            },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
             subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
