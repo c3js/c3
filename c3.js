@@ -576,6 +576,9 @@
             }
             firstData = target.values[0], lastData = target.values[target.values.length - 1];
             base = x(lastData.x) - x(firstData.x);
+            if (base === 0) {
+                return __axis_rotated ? height : width;
+            }
             maxDataCount = getMaxDataCount();
             ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
@@ -689,7 +692,8 @@
                 }
             } else {
                 axis.tickOffset = function () {
-                    var edgeX = getEdgeX(c3.data.targets), base = x(edgeX[1]) - x(edgeX[0]);
+                    var edgeX = getEdgeX(c3.data.targets), diff = x(edgeX[1]) - x(edgeX[0]),
+                        base = diff ? diff : (__axis_rotated ? height : width);
                     return (base / getMaxDataCount()) / 2;
                 };
             }
@@ -1335,6 +1339,11 @@
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets),
                 min = 0, max = 0;
+            // show center of x domain if min and max are the same
+            if ((firstX - lastX) === 0) {
+                firstX = isTimeSeries ? new Date(firstX.getTime() * 0.5) : -0.5;
+                lastX = isTimeSeries ? new Date(lastX.getTime() * 1.5) : 0.5;
+            }
             if (firstX || firstX === 0) {
                 min = isTimeSeries ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;
             }
