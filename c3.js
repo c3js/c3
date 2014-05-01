@@ -4462,7 +4462,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
+            updateAndRedraw({withLegend: false, withTransition: false, withTransitionForTransform: false});
         };
 
         c3.destroy = function () {
