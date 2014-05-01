@@ -3811,7 +3811,7 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
 
             if (typeof args.done === 'function') {
                 args.done();
@@ -4157,7 +4157,7 @@
                     .style('opacity', 1);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
         };
 
         c3.hide = function (targetIds, options) {
@@ -4178,7 +4178,7 @@
                     .style('opacity', legendOpacityForHidden);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
         };
 
         c3.toggle = function (targetId) {
@@ -4224,7 +4224,7 @@
 
         c3.unload = function (targetIds) {
             unload(mapToTargetIds(targetIds), function () {
-                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
             });
         };
 
@@ -4448,7 +4448,7 @@
                 legend.style('visibility', 'visible');
             }
             showLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: true});
+            redraw({withLegend: __legend_show});
         };
         c3.legend.hide = function (targetIds) {
             if (__legend_show && isEmpty(targetIds)) {
@@ -4456,13 +4456,13 @@
                 legend.style('visibility', 'hidden');
             }
             hideLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: false});
+            redraw({withLegend: __legend_show});
         };
 
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            updateAndRedraw({withLegend: false, withTransition: false, withTransitionForTransform: false});
+            updateAndRedraw({withLegend: __legend_show, withTransition: false, withTransitionForTransform: false});
         };
 
         c3.destroy = function () {
