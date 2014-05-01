@@ -354,7 +354,7 @@
                 yAxis = (transitions && transitions.axisY) ? transitions.axisY : main.select('.' + CLASS.axisY).transition().duration(duration),
                 y2Axis = (transitions && transitions.axisYs) ? transitions.axisY2 : main.select('.' + CLASS.axisY2).transition().duration(duration);
             main.attr("transform", translate.main);
-            xAxis.attr("transform", translate.x);
+            xAxis.attr("transform", 50);
             yAxis.attr("transform", translate.y);
             y2Axis.attr("transform", translate.y2);
             main.select('.' + CLASS.chartArcs).attr("transform", translate.arc);
