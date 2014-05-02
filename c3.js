@@ -2291,6 +2291,9 @@
         function toggleArc(selected, target, d, i) {
             toggleBar(selected, target, d.data, i);
         }
+        function getToggle(that) {
+            return that.nodeName === 'circle' ? togglePoint : (d3.select(that).classed(CLASS.bar) ? toggleBar : toggleArc);
+        }
 
         function filterRemoveNull(data) {
             return data.filter(function (d) { return isValue(d.value); });
@@ -4337,19 +4340,17 @@
         c3.select = function (ids, indices, resetOther) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-                var shape = d3.select(this),
-                    select = (this.nodeName === 'circle') ? selectPoint : selectBar,
-                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
-                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = getToggle(this),
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d) && !isSelected) {
-                        select(shape.classed(CLASS.SELECTED, true), d, i);
+                        toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
                     if (isSelected) {
-                        unselect(shape.classed(CLASS.SELECTED, false), d, i);
+                        toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
                     }
                 }
             });
@@ -4358,15 +4359,14 @@
         c3.unselect = function (ids, indices) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-                var shape = d3.select(this),
-                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
-                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = getToggle(this),
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
                         if (isSelected) {
-                            unselect(shape.classed(CLASS.SELECTED, false), d, i);
+                            toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
                         }
                     }
                 }
