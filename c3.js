@@ -3405,6 +3405,7 @@
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr('d', drawBar)
+                .style("fill", color)
                 .style("opacity", 1);
             mainBar.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
