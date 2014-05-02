@@ -3462,7 +3462,7 @@
                 .style("stroke", 'none')
                 .style("fill-opacity", 0);
             mainText
-                .text(function (d) { return formatByAxisId(d.id)(d.value); })
+                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
                 .style("fill-opacity", initialOpacityForText)
               .transition().duration(duration)
                 .attr('x', xForText)
