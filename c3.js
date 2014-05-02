@@ -334,13 +334,13 @@
             subXOrient = __axis_rotated ? "left" : "bottom";
 
         var translate = {
-            main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
-            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
+            main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
+            context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
-            subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
+            subx : function () { return "translate(0," + (__axis_rotated ? 0 : Math.ceil(height2)) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
@@ -469,9 +469,9 @@
         function updateXgridFocus() {
             main.select('line.' + CLASS.xgridFocus)
                 .attr("x1", __axis_rotated ? 0 : -10)
-                .attr("x2", __axis_rotated ? width : -10)
-                .attr("y1", __axis_rotated ? -10 : margin.top)
-                .attr("y2", __axis_rotated ? -10 : height);
+                .attr("x2", __axis_rotated ? Math.ceil(width) : -10)
+                .attr("y1", __axis_rotated ? -10 : Math.ceil(margin.top))
+                .attr("y2", __axis_rotated ? -10 : Math.ceil(height));
         }
         function updateRadius() {
             radiusExpanded = height / 2;
@@ -982,10 +982,10 @@
                     case "bottom":
                         {
                             tickTransform = axisX;
-                            lineEnter.attr("y2", tickMajorSize);
-                            textEnter.attr("y", Math.max(tickMajorSize, 0) + tickPadding);
-                            lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickMajorSize);
-                            textUpdate.attr("x", 0).attr("y", Math.max(tickMajorSize, 0) + tickPadding);
+                            lineEnter.attr("y2", Math.ceil(tickMajorSize));
+                            textEnter.attr("y", Math.ceil(Math.max(tickMajorSize, 0) + tickPadding));
+                            lineUpdate.attr("x1", Math.ceil(tickX)).attr("x2", Math.ceil(tickX)).attr("y2", Math.ceil(tickMajorSize));
+                            textUpdate.attr("x", 0).attr("y", Math.ceil(Math.max(tickMajorSize, 0) + tickPadding));
                             text.attr("dy", ".71em").style("text-anchor", "middle");
                             text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
@@ -1007,10 +1007,10 @@
                     case "left":
                         {
                             tickTransform = axisY;
-                            lineEnter.attr("x2", -tickMajorSize);
-                            textEnter.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding));
-                            lineUpdate.attr("x2", -tickMajorSize).attr("y2", 0);
-                            textUpdate.attr("x", -(Math.max(tickMajorSize, 0) + tickPadding)).attr("y", tickOffset);
+                            lineEnter.attr("x2", -(Math.ceil(tickMajorSize)));
+                            textEnter.attr("x", -(Math.ceil(Math.max(tickMajorSize, 0) + tickPadding)));
+                            lineUpdate.attr("x2", -(Math.ceil(tickMajorSize))).attr("y2", 0);
+                            textUpdate.attr("x", -(Math.ceil(Math.max(tickMajorSize, 0) + tickPadding))).attr("y", Math.ceil(tickOffset));
                             text.attr("dy", ".32em").style("text-anchor", "end");
                             text.text(formattedCategory);
                             pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
@@ -2002,11 +2002,14 @@
             if (! __tooltip_show) { return; }
             // Hide when scatter plot exists
             if (hasScatterType(c3.data.targets) || hasArcType(c3.data.targets)) { return; }
-            main.selectAll('line.' + CLASS.xgridFocus)
+            var focusEl = main.selectAll('line.' + CLASS.xgridFocus);
+            focusEl
                 .style("visibility", "visible")
                 .data([dataToShow[0]])
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
+            smoothLines(focusEl, 'grid');
+                
         }
         function hideXGridFocus() {
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
@@ -3149,7 +3152,31 @@
             __data_ondragend();
         }
 
+        function smoothLines(el, type) {
+            if (type === 'tick') {
+                var t = d3.transform(el.attr("transform")),
+                    x = t.translate[0],
+                    y = t.translate[1];
+                el.attr("transform", "translate(" + Math.ceil(x) + "," + Math.ceil(y) + ")");
+            } else if (type === 'grid') {
+                el.each(function () {
+                    var g = d3.select(this),
+                        x1 = g.attr('x1'),
+                        x2 = g.attr('x2'),
+                        y1 = g.attr('y1'),
+                        y2 = g.attr('y2');
+                    g.attr({
+                        'x1': Math.ceil(x1),
+                        'x2': Math.ceil(x2),
+                        'y1': Math.ceil(y1),
+                        'y2': Math.ceil(y2),
+                    });
+                });
+            }
+        }
+
         function redraw(options) {
+        
             var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
@@ -3225,10 +3252,29 @@
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // axes
-            transitions.axisX.call(xAxis);
-            transitions.axisY.call(yAxis);
-            transitions.axisY2.call(y2Axis);
-            transitions.axisSubX.call(subXAxis);
+            transitions.axisX.call(xAxis).each('end', function () {
+                d3.select(this).selectAll('.tick').each(function () {
+                    smoothLines(d3.select(this), 'tick');
+                });
+            });
+            
+            transitions.axisY.call(yAxis).each('end', function () {
+                d3.select(this).selectAll('.tick').each(function () {
+                    smoothLines(d3.select(this), 'tick');
+                });
+            });
+            
+            transitions.axisY2.call(y2Axis).each('end', function () {
+                d3.select(this).selectAll('.tick').each(function () {
+                    smoothLines(d3.select(this), 'tick');
+                });
+            });
+            
+            transitions.axisSubX.call(subXAxis).each('end', function () {
+                d3.select(this).selectAll('.tick').each(function () {
+                    smoothLines(d3.select(this), 'tick');
+                });
+            });
 
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
@@ -3291,10 +3337,10 @@
                 xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
                     .data(xgridData);
                 xgrid.enter().append('line').attr("class", CLASS.xgrid);
-                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("x2", __axis_rotated ? width : function (d) { return x(d) - xAxis.tickOffset(); })
-                    .attr("y1", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : margin.top)
-                    .attr("y2", __axis_rotated ? function (d) { return x(d) - xAxis.tickOffset(); } : height)
+                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
+                    .attr("x2", __axis_rotated ? Math.ceil(width) : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
+                    .attr("y1", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(margin.top))
+                    .attr("y2", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(height))
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
             }
@@ -3315,10 +3361,10 @@
                 // udpate
                 xgridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? 0 : xv)
-                    .attr("x2", __axis_rotated ? width : xv)
-                    .attr("y1", __axis_rotated ? xv : margin.top)
-                    .attr("y2", __axis_rotated ? xv : height)
+                    .attr("x1", __axis_rotated ? 0 : Math.ceil(xv))
+                    .attr("x2", __axis_rotated ? Math.ceil(width) : Math.ceil(xv))
+                    .attr("y1", __axis_rotated ? Math.ceil(xv) : Math.ceil(margin.top))
+                    .attr("y2", __axis_rotated ? Math.ceil(xv) : Math.ceil(height))
                     .style("opacity", 1);
                 xgridLines.select('text')
                   .transition().duration(duration)
@@ -3342,6 +3388,9 @@
                     .attr("y1", __axis_rotated ? 0 : y)
                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
+                
+                smoothLines(ygrid, 'grid');
+                
             }
             if (withY && notEmpty(__grid_y_lines)) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
@@ -3360,10 +3409,10 @@
                 // update
                 ygridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? yv : 0)
-                    .attr("x2", __axis_rotated ? yv : width)
-                    .attr("y1", __axis_rotated ? 0 : yv)
-                    .attr("y2", __axis_rotated ? height : yv)
+                    .attr("x1", __axis_rotated ? Math.ceil(yv) : 0)
+                    .attr("x2", __axis_rotated ? Math.ceil(yv) : Math.ceil(width))
+                    .attr("y1", __axis_rotated ? 0 : Math.ceil(yv))
+                    .attr("y2", __axis_rotated ? Math.ceil(height) : Math.ceil(yv))
                     .style("opacity", 1);
                 ygridLines.select('text')
                   .transition().duration(duration)
