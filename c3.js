@@ -337,7 +337,12 @@
             main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
-            x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
+            x : function () {
+              if (__legend_show === true) {
+                return "translate(0," + (__axis_rotated ? 0 : height) + ")";
+              }
+              return "translate(0," + (__axis_rotated ? 0 : height + margin3.top) + ")";
+            },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
             subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
@@ -3890,7 +3895,7 @@
             updateTargets(c3.data.targets);
 
             // Redraw with new targets
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
 
             if (typeof args.done === 'function') {
                 args.done();
@@ -4251,7 +4256,7 @@
                 showLegend(targetIds);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
         };
 
         c3.hide = function (targetIds, options) {
@@ -4267,7 +4272,7 @@
                 hideLegend(targetIds);
             }
 
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
         };
 
         c3.toggle = function (targetId) {
@@ -4313,8 +4318,7 @@
 
         c3.unload = function (targetIds, done) {
             unload(mapToTargetIds(targetIds), function () {
-                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-                if (typeof done === 'function') { done(); }
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
             });
         };
 
@@ -4531,7 +4535,7 @@
 
         c3.legend.show = function (targetIds) {
             showLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: true});
+            redraw({withLegend: __legend_show});
         };
         c3.legend.hide = function (targetIds) {
             hideLegend(mapToTargetIds(targetIds));
@@ -4541,7 +4545,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
+            updateAndRedraw({withLegend: __legend_show, withTransition: false, withTransitionForTransform: false});
         };
 
         c3.destroy = function () {
