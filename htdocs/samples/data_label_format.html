@@ -15,10 +15,10 @@
             ['data2', 50, 20, 10, 40, 15, 25]
           ],
           labels: {
-//            format: function (v) { return "Default Format"; },
+//            format: function (v, id) { return "Default Format on " + id; },
             format: {
-              y: function (v) { return "Y Format"; },
-              y2: function (v) { return "Y2 Format"; }
+              y: function (v, id) { return "Y Format on " + id; },
+              y2: function (v, id) { return "Y2 Format on " + id; }
             }
           },
           axes: {
