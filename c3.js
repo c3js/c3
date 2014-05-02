@@ -2174,7 +2174,7 @@
                     color = colors[id](d);
                 }
                 // if specified, choose that color
-                else if (id in colors) {
+                else if (colors[id]) {
                     color = colors[id];
                 }
                 // if not specified, choose from pattern
@@ -3421,6 +3421,7 @@
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr("d", lineOnMain)
+                .style("stroke", color)
                 .style("opacity", 1);
             mainLine.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
@@ -3436,6 +3437,7 @@
                 .style("opacity", 0)
               .transition().duration(duration)
                 .attr("d", areaOnMain)
+                .style("fill", color)
                 .style("opacity", orgAreaOpacity);
             mainArea.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
@@ -3445,11 +3447,13 @@
                 .data(lineOrScatterData);
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
-                .attr("r", pointR);
+                .attr("r", pointR)
+                .style("fill", color);
             mainCircle
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .style('opacity', opacityForCircle)
+                .style("fill", color)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.exit().remove();
@@ -3460,6 +3464,7 @@
                 .attr("class", classText)
                 .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
                 .style("stroke", 'none')
+                .style("fill", color)
                 .style("fill-opacity", 0);
             mainText
                 .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
@@ -3467,6 +3472,7 @@
               .transition().duration(duration)
                 .attr('x', xForText)
                 .attr('y', yForText)
+                .style("fill", color)
                 .style("fill-opacity", opacityForText);
             mainText.exit()
               .transition().duration(durationForExit)
@@ -3541,6 +3547,7 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
+                .style("fill", function (d) { return color(d.data); })
                 .style("opacity", 1)
                 .call(endall, function () {
                     transiting = false;
@@ -3783,8 +3790,7 @@
                 .style('opacity', 0)
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
-                .attr('class', classTexts)
-                .style("fill", color);
+                .attr('class', classTexts);
 
             //-- Bar --//
             mainBarUpdate = main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
@@ -3818,7 +3824,6 @@
                 .attr("class", function (d) { return generateClass(CLASS.selectedCircles, d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
-                .style("fill", color)
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
@@ -4131,7 +4136,7 @@
             l.append('rect')
                 .attr("class", CLASS.legendItemTile)
                 .style("pointer-events", "none")
-                .style('fill', function (id) { return color(id); })
+                .style('fill', color)
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegend)
                 .attr('width', 10)
@@ -4154,6 +4159,7 @@
             legend.selectAll('rect.' + CLASS.legendItemTile)
                 .data(targetIds)
               .transition().duration(withTransition ? 250 : 0)
+                .style('fill', color)
                 .attr('x', xForLegend)
                 .attr('y', yForLegend);
 
@@ -4486,6 +4492,14 @@
             });
             updateLegend(mapToIds(c3.data.targets), {withTransition: true});
             return __data_names;
+        };
+        c3.data.colors = function (colors) {
+            if (!arguments.length) { return __data_colors; }
+            Object.keys(colors).forEach(function (id) {
+                __data_colors[id] = colors[id];
+            });
+            redraw({withLegend: true});
+            return __data_colors;
         };
 
         c3.x = function (x) {
