@@ -3783,7 +3783,7 @@
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
-                .style("fill", function (d) { return color(d); });
+                .style("fill", color);
 
             //-- Bar --//
             mainBarUpdate = main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
