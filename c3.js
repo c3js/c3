@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.33"
+        version: "0.1.34"
     };
 
     var CLASS = {
@@ -33,12 +33,15 @@
         shape: 'c3-shape',
         shapes: 'c3-shapes',
         line: 'c3-line',
+        lines: 'c3-lines',
         bar: 'c3-bar',
         bars: 'c3-bars',
         circle: 'c3-circle',
         circles: 'c3-circles',
         arc: 'c3-arc',
+        arcs: 'c3-arcs',
         area: 'c3-area',
+        areas: 'c3-areas',
         text: 'c3-text',
         texts: 'c3-texts',
         grid: 'c3-grid',
@@ -193,7 +196,7 @@
             __axis_y_label = getConfig(['axis', 'y', 'label'], {}),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format']),
-            __axis_y_padding = getConfig(['axis', 'y', 'padding'], {}),
+            __axis_y_padding = getConfig(['axis', 'y', 'padding']),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
             __axis_y2_max = getConfig(['axis', 'y2', 'max']),
@@ -202,7 +205,7 @@
             __axis_y2_label = getConfig(['axis', 'y2', 'label'], {}),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
-            __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], {}),
+            __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
         // grid
@@ -576,6 +579,9 @@
             }
             firstData = target.values[0], lastData = target.values[target.values.length - 1];
             base = x(lastData.x) - x(firstData.x);
+            if (base === 0) {
+                return __axis_rotated ? height : width;
+            }
             maxDataCount = getMaxDataCount();
             ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
             return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
@@ -689,7 +695,8 @@
                 }
             } else {
                 axis.tickOffset = function () {
-                    var edgeX = getEdgeX(c3.data.targets), base = x(edgeX[1]) - x(edgeX[0]);
+                    var edgeX = getEdgeX(c3.data.targets), diff = x(edgeX[1]) - x(edgeX[0]),
+                        base = diff ? diff : (__axis_rotated ? height : width);
                     return (base / getMaxDataCount()) / 2;
                 };
             }
@@ -1335,6 +1342,11 @@
                 firstX = xDomain[0], lastX = xDomain[1],
                 padding = getXDomainPadding(targets),
                 min = 0, max = 0;
+            // show center of x domain if min and max are the same
+            if ((firstX - lastX) === 0) {
+                firstX = isTimeSeries ? new Date(firstX.getTime() * 0.5) : -0.5;
+                lastX = isTimeSeries ? new Date(lastX.getTime() * 1.5) : 0.5;
+            }
             if (firstX || firstX === 0) {
                 min = isTimeSeries ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;
             }
@@ -1729,13 +1741,16 @@
         function classTexts(d) { return generateClass(CLASS.texts, d.id); }
         function classShape(d, i) { return generateClass(CLASS.shape, i); }
         function classShapes(d) { return generateClass(CLASS.shapes, d.id); }
-        function classLine(d) { return classShapes(d) + generateClass(CLASS.line, d.id); }
+        function classLine(d) { return classShape(d) + generateClass(CLASS.line, d.id); }
+        function classLines(d) { return classShapes(d) + generateClass(CLASS.lines, d.id); }
         function classCircle(d, i) { return classShape(d, i) + generateClass(CLASS.circle, i); }
         function classCircles(d) { return classShapes(d) + generateClass(CLASS.circles, d.id); }
         function classBar(d, i) { return classShape(d, i) + generateClass(CLASS.bar, i); }
         function classBars(d) { return classShapes(d) + generateClass(CLASS.bars, d.id); }
-        function classArc(d) { return classShapes(d.data) + generateClass(CLASS.arc, d.data.id); }
-        function classArea(d) { return classShapes(d) + generateClass(CLASS.area, d.id); }
+        function classArc(d) { return classShape(d.data) + generateClass(CLASS.arc, d.data.id); }
+        function classArcs(d) { return classShapes(d.data) + generateClass(CLASS.arcs, d.data.id); }
+        function classArea(d) { return classShape(d) + generateClass(CLASS.area, d.id); }
+        function classAreas(d) { return classShapes(d) + generateClass(CLASS.areas, d.id); }
         function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
         function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
         function classTarget(id) {
@@ -1781,7 +1796,7 @@
         }
         function getDataLabelWidth(min, max) {
             var widths = [], paddingCoef = 1.3;
-            d3.select('svg').selectAll('.dummy')
+            selectChart.select('svg').selectAll('.dummy')
                 .data([min, max])
               .enter().append('text')
                 .text(function (d) { return d; })
@@ -2121,10 +2136,13 @@
         function isArcType(d) {
             return isPieType(d) || isDonutType(d);
         }
-        /* not used
         function lineData(d) {
-            return isLineType(d) ? d.values : [];
+            return isLineType(d) ? [d] : [];
         }
+        function arcData(d) {
+            return isArcType(d.data) ? [d] : [];
+        }
+        /* not used
         function scatterData(d) {
             return isScatterType(d) ? d.values : [];
         }
@@ -2261,7 +2279,7 @@
 
         function selectBar(target, d) {
             __data_onselected(d, target.node());
-            target.transition().duration(100).style("fill", function () { return d3.rgb(color(d)).darker(1); });
+            target.transition().duration(100).style("fill", function () { return d3.rgb(color(d)).brighter(0.75); });
         }
         function unselectBar(target, d) {
             __data_onunselected(d, target.node());
@@ -2269,6 +2287,12 @@
         }
         function toggleBar(selected, target, d, i) {
             selected ? selectBar(target, d, i) : unselectBar(target, d, i);
+        }
+        function toggleArc(selected, target, d, i) {
+            toggleBar(selected, target, d.data, i);
+        }
+        function getToggle(that) {
+            return that.nodeName === 'circle' ? togglePoint : (d3.select(that).classed(CLASS.bar) ? toggleBar : toggleArc);
         }
 
         function filterRemoveNull(data) {
@@ -2408,17 +2432,17 @@
         function generateGetBarPoints(barIndices, isSub) {
             var barTargetsNum = barIndices.__max__ + 1,
                 barW = getBarW(xAxis, barTargetsNum),
-                x = getBarX(barW, barTargetsNum, barIndices, !!isSub),
-                y = getBarY(!!isSub),
+                barX = getBarX(barW, barTargetsNum, barIndices, !!isSub),
+                barY = getBarY(!!isSub),
                 barOffset = getBarOffset(barIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
                 var y0 = yScale(d.id)(0),
                     offset = barOffset(d, i) || y0, // offset is for stacked bar chart
-                    posX = x(d), posY = y(d);
+                    posX = barX(d), posY = barY(d);
                 // fix posY not to overflow opposite quadrant
                 if (__axis_rotated) {
-                    if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                    if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
                 }
                 // 4 points that make a bar
                 return [
@@ -2593,32 +2617,15 @@
 
             // Define svgs
             svg = selectChart.append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
                 .on('mouseenter', __onenter)
                 .on('mouseleave', __onleave);
 
             // Define defs
             defs = svg.append("defs");
-            defs.append("clipPath")
-                .attr("id", clipId)
-              .append("rect")
-                .attr("width", width)
-                .attr("height", height);
-            defs.append("clipPath")
-                .attr("id", clipIdForXAxis)
-              .append("rect")
-                .attr("x", getXAxisClipX)
-                .attr("y", getXAxisClipY)
-                .attr("width", getXAxisClipWidth)
-                .attr("height", getXAxisClipHeight);
-            defs.append("clipPath")
-                .attr("id", clipIdForYAxis)
-              .append("rect")
-                .attr("x", getYAxisClipX)
-                .attr("y", getYAxisClipY)
-                .attr("width", getYAxisClipWidth)
-                .attr("height", getYAxisClipHeight);
+            defs.append("clipPath").attr("id", clipId).append("rect");
+            defs.append("clipPath").attr("id", clipIdForXAxis).append("rect");
+            defs.append("clipPath").attr("id", clipIdForYAxis).append("rect");
+            updateSvgSize();
 
             // Define regions
             main = svg.append("g").attr("transform", translate.main);
@@ -2648,6 +2655,33 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
+
+            // Grids
+            grid = main.append('g')
+                .attr("clip-path", clipPath)
+                .attr('class', CLASS.grid);
+
+            // X-Grid
+            if (__grid_x_show) {
+                grid.append("g").attr("class", CLASS.xgrids);
+            }
+            if (notEmpty(__grid_x_lines)) {
+                grid.append('g').attr("class", CLASS.xgridLines);
+            }
+            if (__point_focus_line_enabled) {
+                grid.append('g')
+                    .attr("class", CLASS.xgridFocus)
+                  .append('line')
+                    .attr('class', CLASS.xgridFocus);
+            }
+
+            // Y-Grid
+            if (__grid_y_show) {
+                grid.append('g').attr('class', CLASS.ygrids);
+            }
+            if (notEmpty(__grid_y_lines)) {
+                grid.append('g').attr('class', CLASS.ygridLines);
+            }
 
             // Add Axis
             if (__axis_x_show) {
@@ -2681,33 +2715,6 @@
                     .attr("class", CLASS.axisY2Label)
                     .attr("transform", __axis_rotated ? "" : "rotate(-90)")
                     .style("text-anchor", textAnchorForY2AxisLabel);
-            }
-
-            // Grids
-            grid = main.append('g')
-                .attr("clip-path", clipPath)
-                .attr('class', CLASS.grid);
-
-            // X-Grid
-            if (__grid_x_show) {
-                grid.append("g").attr("class", CLASS.xgrids);
-            }
-            if (notEmpty(__grid_x_lines)) {
-                grid.append('g').attr("class", CLASS.xgridLines);
-            }
-            if (__point_focus_line_enabled) {
-                grid.append('g')
-                    .attr("class", CLASS.xgridFocus)
-                  .append('line')
-                    .attr('class', CLASS.xgridFocus);
-            }
-
-            // Y-Grid
-            if (__grid_y_show) {
-                grid.append('g').attr('class', CLASS.ygrids);
-            }
-            if (notEmpty(__grid_y_lines)) {
-                grid.append('g').attr('class', CLASS.ygridLines);
             }
 
             // Regions
@@ -3034,17 +3041,20 @@
                 .call(zoom).on("dblclick.zoom", null);
         }
 
-        function toggleShape(target, d, i) {
-            var shape = d3.select(target),
-                isSelected = shape.classed(CLASS.SELECTED);
-            var isWithin = false, toggle;
-            if (target.nodeName === 'circle') {
-                isWithin = isWithinCircle(target, pointSelectR(d) * 1.5);
+        function toggleShape(that, d, i) {
+            var shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED), isWithin,  toggle;
+            if (that.nodeName === 'circle') {
+                isWithin = isWithinCircle(that, pointSelectR(d) * 1.5);
                 toggle = togglePoint;
             }
-            else if (target.nodeName === 'path') {
-                isWithin = isWithinBar(target);
-                toggle = toggleBar;
+            else if (that.nodeName === 'path') {
+                if (shape.classed(CLASS.bar)) {
+                    isWithin = isWithinBar(that);
+                    toggle = toggleBar;
+                } else { // would be arc
+                    isWithin = true;
+                    toggle = toggleArc;
+                }
             }
             if (__data_selection_grouped || isWithin) {
                 if (__data_selection_enabled && __data_selection_isselectable(d)) {
@@ -3057,7 +3067,7 @@
                     shape.classed(CLASS.SELECTED, !isSelected);
                     toggle(!isSelected, shape, d, i);
                 }
-                __data_onclick(d, target);
+                __data_onclick(d, that);
             }
         }
 
@@ -3141,7 +3151,7 @@
 
         function redraw(options) {
             var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
-            var mainCircle, mainBar, mainRegion, mainText, contextBar, eventRect, eventRectUpdate;
+            var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -3229,14 +3239,14 @@
                             break;
                         }
                     }
-                    d3.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+                    svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
                         var index = tickValues.indexOf(e);
                         if (index >= 0) {
                             d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
                         }
                     });
                 } else {
-                    d3.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
+                    svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
                 }
             }
 
@@ -3388,19 +3398,61 @@
             mainBar = main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                 .data(barData);
             mainBar.enter().append('path')
-                .attr('d', drawBar)
+                .attr("class", classBar)
                 .style("stroke", 'none')
-                .style("opacity", 0)
-                .style("fill", function (d) { return color(d); })
-                .attr("class", classBar);
+                .style("fill", color);
             mainBar
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr('d', drawBar)
+                .style("fill", color)
                 .style("opacity", 1);
             mainBar.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
+
+            // lines and cricles
+            mainLine = main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+                .data(lineData);
+            mainLine.enter().append('path')
+                .attr('class', classLine)
+                .style("stroke", color);
+            mainLine
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
+                .attr("d", lineOnMain)
+                .style("opacity", 1);
+            mainLine.exit().transition().duration(durationForExit)
+                .style('opacity', 0)
+                .remove();
+
+            mainArea = main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+                .data(lineData);
+            mainArea.enter().append('path')
+                .attr("class", classArea)
+                .style("fill", color)
+                .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+            mainArea
+                .style("opacity", 0)
+              .transition().duration(duration)
+                .attr("d", areaOnMain)
+                .style("opacity", orgAreaOpacity);
+            mainArea.exit().transition().duration(durationForExit)
+                .style('opacity', 0)
+                .remove();
+
+            mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
+                .data(lineOrScatterData);
+            mainCircle.enter().append("circle")
+                .attr("class", classCircle)
+                .attr("r", pointR);
+            mainCircle
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
+                .style('opacity', opacityForCircle)
+                .attr("cx", __axis_rotated ? circleY : circleX)
+                .attr("cy", __axis_rotated ? circleX : circleY);
+            mainCircle.exit().remove();
 
             mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
                 .data(barOrLineData);
@@ -3421,35 +3473,55 @@
                 .style('fill-opacity', 0)
                 .remove();
 
-            // lines and cricles
-            main.selectAll('.' + CLASS.line)
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .attr("d", lineOnMain)
-                .style("opacity", 1);
-            main.selectAll('.' + CLASS.area)
-                .style("opacity", 0)
-              .transition().duration(duration)
-                .attr("d", areaOnMain)
-                .style("opacity", orgAreaOpacity);
-            mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
-                .data(lineOrScatterData);
-            mainCircle.enter().append("circle")
-                .attr("class", classCircle)
-                .style('opacity', 0)
-                .attr("r", pointR);
-            mainCircle
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .style('opacity', opacityForCircle)
-                .attr("cx", __axis_rotated ? circleY : circleX)
-                .attr("cy", __axis_rotated ? circleX : circleY);
-            mainCircle.exit().remove();
-
             // arc
-            main.each(function () { transiting = true; }).selectAll('.' + CLASS.chartArc).select('.' + CLASS.arc)
+            mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
+                .data(arcData);
+            mainArc.enter().append('path')
+                .attr("class", classArc)
+                .style("fill", function (d) { return color(d.data); })
+                .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
+                .style("opacity", 0)
+                .each(function (d) { this._current = d; })
+                .on('mouseover', function (d, i) {
+                    var updated, arcData, callback;
+                    if (transiting) { // skip while transiting
+                        return;
+                    }
+                    updated = updateAngle(d);
+                    arcData = convertToArcData(updated);
+                    callback = getArcOnMouseOver();
+                    // transitions
+                    expandArc(updated.data.id);
+                    toggleFocusLegend(updated.data.id, true);
+                    callback(arcData, i);
+                })
+                .on('mousemove', function (d) {
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
+                    showTooltip(selectedData, d3.mouse(this));
+                })
+                .on('mouseout', function (d, i) {
+                    var updated, arcData, callback;
+                    if (transiting) { // skip while transiting
+                        return;
+                    }
+                    updated = updateAngle(d);
+                    arcData = convertToArcData(updated);
+                    callback = getArcOnMouseOut();
+                    // transitions
+                    unexpandArc(updated.data.id);
+                    revertLegend();
+                    hideTooltip();
+                    callback(arcData, i);
+                })
+                .on('click', function (d, i) {
+                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
+                    toggleShape(this, d, i);
+                    callback(arcData, i);
+                });
+            mainArc
                 .attr("transform", withTransform ? "scale(0)" : "")
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
+                .each(function () { transiting = true; })
               .transition().duration(duration)
                 .attrTween("d", function (d) {
                     var updated = updateAngle(d), interpolate;
@@ -3473,6 +3545,9 @@
                 .call(endall, function () {
                     transiting = false;
                 });
+            mainArc.exit().transition().duration(durationForExit)
+                .style('opacity', 0)
+                .remove();
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
@@ -3506,10 +3581,9 @@
                     contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                         .data(barData);
                     contextBar.enter().append('path')
-                        .attr('d', drawBarOnSub)
+                        .attr("class", classBar)
                         .style("stroke", 'none')
-                        .style("fill", function (d) { return color(d); })
-                        .attr("class", classBar);
+                        .style("fill", color);
                     contextBar
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
@@ -3519,11 +3593,19 @@
                         .style('opacity', 0)
                         .remove();
                     // lines
-                    context.selectAll('.' + CLASS.line)
+                    contextLine = context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+                        .data(lineData);
+                    contextLine.enter().append('path')
+                        .attr('class', classLine)
+                        .style('stroke', color);
+                    contextLine
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
                         .attr("d", lineOnSub)
                         .style('opacity', 1);
+                    contextLine.exit().transition().duration(duration)
+                        .style('opacity', 0)
+                        .remove();
                 }
             }
 
@@ -3702,7 +3784,7 @@
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
                 .attr('class', classTexts)
-                .style("fill", function (d) { return color(d); });
+                .style("fill", color);
 
             //-- Bar --//
             mainBarUpdate = main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
@@ -3715,34 +3797,28 @@
             // Bars for each data
             mainBarEnter.append('g')
                 .attr("class", classBars)
-                .style("stroke", "none")
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
 
             //-- Line --//
-            mainLineUpdate = main.select('.' + CLASS.chartLines)
-              .selectAll('.' + CLASS.chartLine)
+            mainLineUpdate = main.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
                 .data(targets)
-              .attr('class', classChartLine);
+                .attr('class', classChartLine);
             mainLineEnter = mainLineUpdate.enter().append('g')
                 .attr('class', classChartLine)
                 .style('opacity', 0)
                 .style("pointer-events", "none");
             // Lines for each data
-            mainLineEnter.append("path")
-                .attr("class", classLine)
-                .style("opacity", 0)
-                .style("stroke", function (d) { return color(d); });
+            mainLineEnter.append('g')
+                .attr("class", classLines);
             // Areas
-            mainLineEnter.append("path")
-                .attr("class", classArea)
-                .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; })
-                .style("fill", function (d) { return color(d); });
+            mainLineEnter.append('g')
+                .attr('class', classAreas);
             // Circles for each data point on lines
             mainLineEnter.append('g')
                 .attr("class", function (d) { return generateClass(CLASS.selectedCircles, d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
-                .style("fill", function (d) { return color(d); })
+                .style("fill", color)
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
@@ -3759,47 +3835,8 @@
                 .attr("class", classChartArc);
             mainPieEnter = mainPieUpdate.enter().append("g")
                 .attr("class", classChartArc);
-            mainPieEnter.append("path")
-                .attr("class", classArc)
-                .style("opacity", 0)
-                .style("fill", function (d) { return color(d.data); })
-                .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
-                .each(function (d) { this._current = d; })
-                .on('mouseover', function (d, i) {
-                    var updated, arcData, callback;
-                    if (transiting) { // skip while transiting
-                        return;
-                    }
-                    updated = updateAngle(d);
-                    arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOver();
-                    // transitions
-                    expandArc(updated.data.id);
-                    toggleFocusLegend(updated.data.id, true);
-                    callback(arcData, i);
-                })
-                .on('mousemove', function (d) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
-                    showTooltip(selectedData, d3.mouse(this));
-                })
-                .on('mouseout', function (d, i) {
-                    var updated, arcData, callback;
-                    if (transiting) { // skip while transiting
-                        return;
-                    }
-                    updated = updateAngle(d);
-                    arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOut();
-                    // transitions
-                    unexpandArc(updated.data.id);
-                    revertLegend();
-                    hideTooltip();
-                    callback(arcData, i);
-                })
-                .on('click', function (d, i) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
-                    callback(arcData, i);
-                });
+            mainPieEnter.append('g')
+                .attr('class', classArcs);
             mainPieEnter.append("text")
                 .attr("dy", ".35em")
                 .style("opacity", 0)
@@ -3820,8 +3857,7 @@
                     .attr('class', classChartBar);
                 // Bars for each data
                 contextBarEnter.append('g')
-                    .attr("class", classBars)
-                    .style("fill", function (d) { return color(d); });
+                    .attr("class", classBars);
 
                 //-- Line --//
                 contextLineUpdate = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
@@ -3831,10 +3867,8 @@
                     .style('opacity', 0)
                     .attr('class', classChartLine);
                 // Lines for each data
-                contextLineEnter.append("path")
-                    .attr("class", classLine)
-                    .style("opacity", 0)
-                    .style("stroke", function (d) { return color(d); });
+                contextLineEnter.append('g')
+                    .attr("class", classLines);
             }
 
             /*-- Show --*/
@@ -4300,26 +4334,24 @@
             return d3.merge(
                 main.selectAll('.' + CLASS.shapes + getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape)
                     .filter(function () { return d3.select(this).classed(CLASS.SELECTED); })
-                    .map(function (d) { return d.map(function (_d) { return _d.__data__; }); })
+                    .map(function (d) { return d.map(function (d) { var data = d.__data__; return data.data ? data.data : data; }); })
             );
         };
 
         c3.select = function (ids, indices, resetOther) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-                var shape = d3.select(this),
-                    select = (this.nodeName === 'circle') ? selectPoint : selectBar,
-                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
-                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = getToggle(this),
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d) && !isSelected) {
-                        select(shape.classed(CLASS.SELECTED, true), d, i);
+                        toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
                     }
                 } else if (isDefined(resetOther) && resetOther) {
                     if (isSelected) {
-                        unselect(shape.classed(CLASS.SELECTED, false), d, i);
+                        toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
                     }
                 }
             });
@@ -4328,15 +4360,14 @@
         c3.unselect = function (ids, indices) {
             if (! __data_selection_enabled) { return; }
             main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-                var shape = d3.select(this),
-                    unselect = (this.nodeName === 'circle') ? unselectPoint : unselectBar,
-                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(d.id) >= 0,
+                var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = getToggle(this),
+                    isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
                         if (isSelected) {
-                            unselect(shape.classed(CLASS.SELECTED, false), d, i);
+                            toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
                         }
                     }
                 }

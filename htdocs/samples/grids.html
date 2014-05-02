@@ -13,10 +13,18 @@
         data: {
           columns: [
             ['sample', 30, 200, 100, 400, 150, 250]
-          ],
-          onclick: function (d, element) { console.log("onclick", d, element); },
-          onenter: function (d) { console.log("onenter", d); },
-          onleave: function (d) { console.log("onleave", d); },
+          ]
+        },
+        axis: {
+//          rotated: true,
+        },
+        grid: {
+          x: {
+            show: true
+          },
+          y: {
+            show: true
+          }
         }
       });
     </script>
