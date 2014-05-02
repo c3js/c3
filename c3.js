@@ -511,7 +511,7 @@
             } else if (__padding_right) {
                 return __padding_right;
             } else if (isLegendRight) {
-                return getLegendWidth() + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
+                return getLegendWidth() + 20 + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
             } else if (__axis_y2_show) {
                 return __axis_y2_inner || __axis_rotated ? defaultPadding : getAxisWidthByAxisId('y2');
             } else {
@@ -4081,11 +4081,11 @@
             }
 
             if (isLegendRight) {
-                xForLegend = function (id) { return maxWidth * (0.2 + steps[id]); };
+                xForLegend = function (id) { return maxWidth * steps[id]; };
                 yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
             } else {
                 xForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
-                yForLegend = function (id) { return maxHeight * (0.2 + steps[id]); };
+                yForLegend = function (id) { return maxHeight * steps[id]; };
             }
             xForLegendText = function (id, i) { return xForLegend(id, i) + 14; };
             yForLegendText = function (id, i) { return yForLegend(id, i) + 9; };
