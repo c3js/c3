@@ -4130,9 +4130,7 @@
                 .attr("class", CLASS.legendItemEvent)
                 .style('fill-opacity', 0)
                 .attr('x', isLegendRight ? xForLegendRect : -200)
-                .attr('y', isLegendRight ? -200 : yForLegendRect)
-                .attr('width', function (id) { return widths[id]; })
-                .attr('height', function (id) { return heights[id]; });
+                .attr('y', isLegendRight ? -200 : yForLegendRect);
             l.append('rect')
                 .attr("class", CLASS.legendItemTile)
                 .style("pointer-events", "none")
@@ -4153,6 +4151,8 @@
             legend.selectAll('rect.' + CLASS.legendItemEvent)
                 .data(targetIds)
               .transition().duration(withTransition ? 250 : 0)
+                .attr('width', function (id) { return widths[id]; })
+                .attr('height', function (id) { return heights[id]; })
                 .attr('x', xForLegendRect)
                 .attr('y', yForLegendRect);
 
@@ -4490,7 +4490,7 @@
             Object.keys(names).forEach(function (id) {
                 __data_names[id] = names[id];
             });
-            updateLegend(mapToIds(c3.data.targets), {withTransition: true});
+            redraw({withLegend: true});
             return __data_names;
         };
         c3.data.colors = function (colors) {
