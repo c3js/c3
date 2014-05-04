@@ -110,7 +110,9 @@
             __size_height = getConfig(['size', 'height']);
 
         var __padding_left = getConfig(['padding', 'left'], 50),
-            __padding_right = getConfig(['padding', 'right']);
+            __padding_right = getConfig(['padding', 'right'], 0),
+            __padding_top = getConfig(['padding', 'top'], 0),
+            __padding_bottom = getConfig(['padding', 'bottom'], 0);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent']),
@@ -416,9 +418,9 @@
             // for main, context
             if (__axis_rotated) {
                 margin = {
-                    top: getHorizontalAxisHeight('y2'),
+                    top: getHorizontalAxisHeight('y2') + __padding_top,
                     right: getCurrentPaddingRight(),
-                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom,
+                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom + __padding_bottom,
                     left: subchartHeight + getCurrentPaddingLeft()
                 };
                 margin2 = {
@@ -429,9 +431,9 @@
                 };
             } else {
                 margin = {
-                    top: 4, // for top tick text
+                    top: 4 + __padding_top, // for top tick text
                     right: getCurrentPaddingRight(),
-                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom,
+                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom + __padding_bottom,
                     left: getCurrentPaddingLeft()
                 };
                 margin2 = {
@@ -885,22 +887,22 @@
             });
             return maxWidth < 0 ? 0 : maxWidth;
         }
-        function updateAxisLabels() {
-            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
-              .transition()
+        function updateAxisLabels(withTransition) {
+            var axisXLabel = main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
+                axisYLabel = main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
+                axisY2Label = main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
+            (withTransition ? axisXLabel.transition() : axisXLabel)
                 .attr("x", xForXAxisLabel)
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
                 .text(textForXAxisLabel);
-            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel)
-              .transition()
+            (withTransition ? axisYLabel.transition() : axisYLabel)
                 .attr("x", xForYAxisLabel)
                 .attr("dx", dxForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .text(textForYAxisLabel);
-            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
-              .transition()
+            (withTransition ? axisY2Label.transition() : axisY2Label)
                 .attr("x", xForY2AxisLabel)
                 .attr("dx", dxForY2AxisLabel)
                 .attr("dy", dyForY2AxisLabel)
@@ -3230,6 +3232,9 @@
             transitions.axisY2.call(y2Axis);
             transitions.axisSubX.call(subXAxis);
 
+            // Update axis label
+            updateAxisLabels(withTransition);
+
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
                 if (__axis_x_tick_culling && tickValues) {
@@ -3259,9 +3264,6 @@
             drawBar = generateDrawBar(barIndices);
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
-
-            // Update axis label
-            updateAxisLabels();
 
             // Update sub domain
             subY.domain(y.domain());
