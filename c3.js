@@ -3380,12 +3380,13 @@
             }
 
             // rect for regions
-            mainRegion = main.select('.' + CLASS.regions).selectAll('rect.' + CLASS.region)
+            mainRegion = main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
                 .data(__regions);
-            mainRegion.enter().append('rect')
-                .style("fill-opacity", 0);
-            mainRegion
+            mainRegion.enter().append('g')
                 .attr('class', classRegion)
+              .append('rect')
+                .style("fill-opacity", 0);
+            mainRegion.selectAll('rect')
                 .attr("x", regionX)
                 .attr("y", regionY)
                 .attr("width", regionWidth)
