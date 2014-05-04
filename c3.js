@@ -1345,7 +1345,7 @@
                 padding = getXDomainPadding(targets),
                 min = 0, max = 0;
             // show center of x domain if min and max are the same
-            if ((firstX - lastX) === 0) {
+            if ((firstX - lastX) === 0 && !isCategorized) {
                 firstX = isTimeSeries ? new Date(firstX.getTime() * 0.5) : -0.5;
                 lastX = isTimeSeries ? new Date(lastX.getTime() * 1.5) : 0.5;
             }
