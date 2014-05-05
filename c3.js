@@ -1843,11 +1843,11 @@
             return d ? x(d.x) : null;
         }
         function xv(d) {
-            return x(isTimeSeries ? parseDate(d.value) : d.value);
+            return Math.ceil(x(isTimeSeries ? parseDate(d.value) : d.value));
         }
         function yv(d) {
             var yScale = d.axis && d.axis === 'y2' ? y2 : y;
-            return yScale(d.value);
+            return Math.ceil(yScale(d.value));
         }
         function subxx(d) {
             return subX(d.x);
@@ -2009,7 +2009,6 @@
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
             smoothLines(focusEl, 'grid');
-                
         }
         function hideXGridFocus() {
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
@@ -3176,7 +3175,6 @@
         }
 
         function redraw(options) {
-        
             var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget;
@@ -3257,19 +3255,19 @@
                     smoothLines(d3.select(this), 'tick');
                 });
             });
-            
+
             transitions.axisY.call(yAxis).each('end', function () {
                 d3.select(this).selectAll('.tick').each(function () {
                     smoothLines(d3.select(this), 'tick');
                 });
             });
-            
+
             transitions.axisY2.call(y2Axis).each('end', function () {
                 d3.select(this).selectAll('.tick').each(function () {
                     smoothLines(d3.select(this), 'tick');
                 });
             });
-            
+
             transitions.axisSubX.call(subXAxis).each('end', function () {
                 d3.select(this).selectAll('.tick').each(function () {
                     smoothLines(d3.select(this), 'tick');
@@ -3361,10 +3359,10 @@
                 // udpate
                 xgridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? 0 : Math.ceil(xv))
-                    .attr("x2", __axis_rotated ? Math.ceil(width) : Math.ceil(xv))
-                    .attr("y1", __axis_rotated ? Math.ceil(xv) : Math.ceil(margin.top))
-                    .attr("y2", __axis_rotated ? Math.ceil(xv) : Math.ceil(height))
+                    .attr("x1", __axis_rotated ? 0 : xv)
+                    .attr("x2", __axis_rotated ? Math.ceil(width) : xv)
+                    .attr("y1", __axis_rotated ? xv : Math.ceil(margin.top))
+                    .attr("y2", __axis_rotated ? xv : Math.ceil(height))
                     .style("opacity", 1);
                 xgridLines.select('text')
                   .transition().duration(duration)
@@ -3388,9 +3386,7 @@
                     .attr("y1", __axis_rotated ? 0 : y)
                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
-                
                 smoothLines(ygrid, 'grid');
-                
             }
             if (withY && notEmpty(__grid_y_lines)) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
@@ -3409,10 +3405,10 @@
                 // update
                 ygridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? Math.ceil(yv) : 0)
-                    .attr("x2", __axis_rotated ? Math.ceil(yv) : Math.ceil(width))
-                    .attr("y1", __axis_rotated ? 0 : Math.ceil(yv))
-                    .attr("y2", __axis_rotated ? Math.ceil(height) : Math.ceil(yv))
+                    .attr("x1", __axis_rotated ? yv : 0)
+                    .attr("x2", __axis_rotated ? yv : Math.ceil(width))
+                    .attr("y1", __axis_rotated ? 0 : yv)
+                    .attr("y2", __axis_rotated ? Math.ceil(height) : yv)
                     .style("opacity", 1);
                 ygridLines.select('text')
                   .transition().duration(duration)
