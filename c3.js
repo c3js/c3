@@ -337,13 +337,13 @@
 
         var translate = {
 
-			main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
-			context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
+            main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
+            context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
-			subx : function () { return "translate(0," + (__axis_rotated ? 0 : Math.ceil(height2)) + ")"; },
+            subx : function () { return "translate(0," + (__axis_rotated ? 0 : Math.ceil(height2)) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
