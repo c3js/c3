@@ -643,21 +643,24 @@
             svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
         function getX(min, max, domain, offset) {
-            var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
-            // Set function and values for c3
-            scale.orgDomain = function () { return scale.domain(); };
-            if (domain) { scale.domain(domain); }
-            if (isUndefined(offset)) { offset = function () { return 0; }; }
+            var scale = (isTimeSeries ? d3.time.scale() : d3.scale.linear()).range([min, max]),
+                _scale = domain ? scale.domain(domain) : scale, key;
             // Define customized scale if categorized axis
             if (isCategorized) {
-                var _scale = scale, key;
-                scale = function (d) { return _scale(d) + offset(d); };
-                for (key in _scale) {
-                    scale[key] = _scale[key];
-                }
-                scale.orgDomain = function () {
-                    return _scale.domain();
-                };
+                offset = offset || function () { return 0; };
+                scale = function (d) { return Math.ceil(_scale(d) + offset(d)); };
+            } else {
+                scale = function (d) { return Math.ceil(_scale(d)); };
+            }
+            // define functions
+            for (key in _scale) {
+                scale[key] = _scale[key];
+            }
+            scale.orgDomain = function () {
+                return _scale.domain();
+            };
+            // define custom domain() for categorized axis
+            if (isCategorized) {
                 scale.domain = function (domain) {
                     if (!arguments.length) {
                         domain = _scale.domain();
@@ -693,7 +696,9 @@
                 if (isEmpty(__axis_x_tick_culling)) {
                     __axis_x_tick_culling = false;
                 }
+                axis.categories(__axis_x_categories);
             } else {
+                // TODO: move this to c3_axis
                 axis.tickOffset = function () {
                     var edgeX = getEdgeX(c3.data.targets), diff = x(edgeX[1]) - x(edgeX[0]),
                         base = diff ? diff : (__axis_rotated ? height : width);
@@ -701,15 +706,10 @@
                 };
             }
 
-            // Set categories
-            if (isCategorized) {
-                axis.categories(__axis_x_categories);
-            }
-
             return axis;
         }
         function getYAxis(scale, orient, tickFormat, ticks) {
-            return d3.svg.axis().scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks).outerTickSize(0);
+            return c3_axis().scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -1832,6 +1832,20 @@
         }
         function hideXGridFocus() {
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
+        }
+        function generateGridData(type, scale) {
+            var gridData = [], xDomain, firstYear, lastYear, i;
+            if (type === 'year') {
+                xDomain = getXDomain();
+                firstYear = xDomain[0].getFullYear();
+                lastYear = xDomain[1].getFullYear();
+                for (i = firstYear; i <= lastYear; i++) {
+                    gridData.push(new Date(i + '-01-01 00:00:00'));
+                }
+            } else {
+                gridData = scale.ticks(10);
+            }
+            return gridData;
         }
 
         //-- Circle --//
@@ -2972,12 +2986,7 @@
         }
 
         function smoothLines(el, type) {
-            if (type === 'tick') {
-                var t = d3.transform(el.attr("transform")),
-                    x = t.translate[0],
-                    y = t.translate[1];
-                el.attr("transform", "translate(" + Math.ceil(x) + "," + Math.ceil(y) + ")");
-            } else if (type === 'grid') {
+            if (type === 'grid') {
                 el.each(function () {
                     var g = d3.select(this),
                         x1 = g.attr('x1'),
@@ -2995,9 +3004,9 @@
         }
 
         function redraw(options) {
-            var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
+            var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
-            var barIndices = getBarIndices(), maxDataCountTarget;
+            var barIndices = getBarIndices(), maxDataCountTarget, tickOffset;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
@@ -3070,29 +3079,10 @@
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // axes
-            transitions.axisX.call(xAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-
-            transitions.axisY.call(yAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-
-            transitions.axisY2.call(y2Axis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-
-            transitions.axisSubX.call(subXAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
+            transitions.axisX.call(xAxis);
+            transitions.axisY.call(yAxis);
+            transitions.axisY2.call(y2Axis);
+            transitions.axisSubX.call(subXAxis);
 
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
@@ -3113,6 +3103,8 @@
                     svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
                 }
             }
+
+            tickOffset = xAxis.tickOffset();
 
             // rotate tick text if needed
             if (!__axis_rotated && __axis_x_tick_rotate) {
@@ -3140,25 +3132,22 @@
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
             if (__grid_x_show) {
-                if (__grid_x_type === 'year') {
-                    xgridData = [];
-                    var xDomain = getXDomain();
-                    var firstYear = xDomain[0].getFullYear();
-                    var lastYear = xDomain[1].getFullYear();
-                    for (var year = firstYear; year <= lastYear; year++) {
-                        xgridData.push(new Date(year + '-01-01 00:00:00'));
-                    }
-                } else {
-                    xgridData = x.ticks(10);
-                }
-
+                xgridData = generateGridData(__grid_x_type, x);
+                xgridAttr = __axis_rotated ? {
+                    'x1': 0,
+                    'x2': Math.ceil(width),
+                    'y1': function (d) { return x(d) - tickOffset; },
+                    'y2': function (d) { return x(d) - tickOffset; }
+                } : {
+                    'x1': function (d) { return x(d) + tickOffset; },
+                    'x2': function (d) { return x(d) + tickOffset; },
+                    'y1': Math.ceil(margin.top),
+                    'y2': Math.ceil(height)
+                };
                 xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
                     .data(xgridData);
                 xgrid.enter().append('line').attr("class", CLASS.xgrid);
-                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
-                    .attr("x2", __axis_rotated ? Math.ceil(width) : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
-                    .attr("y1", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(margin.top))
-                    .attr("y2", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(height))
+                xgrid.attr(xgridAttr)
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
             }
@@ -4475,28 +4464,35 @@
     }
     // TODO: module.exports
 
+    // Features:
+    // 1. category axis
+    // 2. ceil values of translate/x/y to int for half pixel antialiasing
     function c3_axis(isCategory) {
-        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat;
+        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
-        var tickOffset = 0, tickTextNum = 10, tickCulling = true;
+        var tickOffset = 0, tickCulling = true;
         var categories = [], tickCentered;
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
-                return "translate(" + (x(d) + tickOffset) + ", 0)";
+                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
-                return "translate(0," + y(d) + ")";
+                return "translate(0," + Math.ceil(y(d)) + ")";
             });
         }
         function scaleExtent(domain) {
             var start = domain[0], stop = domain[domain.length - 1];
             return start < stop ? [ start, stop ] : [ stop, start ];
         }
-        function generateTicks(domain) {
-            var i, ticks = [];
+        function generateTicks(scale) {
+            var i, domain, ticks = [];
+            if (scale.ticks) {
+                return scale.ticks.apply(scale, tickArguments);
+            }
+            domain = scale.domain();
             for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
                 ticks.push(i);
             }
@@ -4522,7 +4518,7 @@
                 var g = d3.select(this);
                 var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
 
-                var ticks = tickValues ? tickValues : generateTicks(scale1.domain()),
+                var ticks = tickValues ? tickValues : generateTicks(scale1),
                     tick = g.selectAll(".tick").data(ticks, scale1),
                     tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                     tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
@@ -4542,7 +4538,7 @@
                     textUpdate = tickUpdate.select("text");
 
                 if (isCategory) {
-                    tickOffset = (scale1(1) - scale1(0)) / 2;
+                    tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
                     tickOffset = tickX = 0;
@@ -4628,12 +4624,12 @@
             tickCentered = isCentered;
             return axis;
         };
-        axis.tickOffset = function () {
+        axis.tickOffset = function () { // This will be overwritten when normal x axis
             return tickOffset;
         };
-        axis.ticks = function (n) {
-            if (!arguments.length) { return tickTextNum; }
-            tickTextNum = n;
+        axis.ticks = function() {
+            if (!arguments.length) return tickArguments;
+            tickArguments = arguments;
             return axis;
         };
         axis.tickCulling = function (culling) {
