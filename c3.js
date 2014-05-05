@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.34"
+        version: "0.1.35"
     };
 
     var CLASS = {
@@ -110,7 +110,9 @@
             __size_height = getConfig(['size', 'height']);
 
         var __padding_left = getConfig(['padding', 'left'], 50),
-            __padding_right = getConfig(['padding', 'right']);
+            __padding_right = getConfig(['padding', 'right'], 0),
+            __padding_top = getConfig(['padding', 'top'], 0),
+            __padding_bottom = getConfig(['padding', 'bottom'], 0);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent']),
@@ -334,13 +336,13 @@
             subXOrient = __axis_rotated ? "left" : "bottom";
 
         var translate = {
-            main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
-            context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
+            main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
+            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
-            subx : function () { return "translate(0," + (__axis_rotated ? 0 : Math.ceil(height2)) + ")"; },
+            subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
@@ -404,6 +406,7 @@
         // TODO: configurabale
         var rotated_padding_left = 30, rotated_padding_right = __axis_rotated && !__axis_x_show ? 0 : 30, rotated_padding_top = 5;
 
+        // MEMO: each value should be int to avoid disabling antialiasing
         function updateSizes() {
             var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(),
                 legendHeightForBottom = isLegendRight ? 0 : legendHeight,
@@ -416,9 +419,9 @@
             // for main, context
             if (__axis_rotated) {
                 margin = {
-                    top: getHorizontalAxisHeight('y2'),
+                    top: getHorizontalAxisHeight('y2') + __padding_top,
                     right: getCurrentPaddingRight(),
-                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom,
+                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom + __padding_bottom,
                     left: subchartHeight + getCurrentPaddingLeft()
                 };
                 margin2 = {
@@ -429,9 +432,9 @@
                 };
             } else {
                 margin = {
-                    top: 4, // for top tick text
+                    top: 4 + __padding_top, // for top tick text
                     right: getCurrentPaddingRight(),
-                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom,
+                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom + __padding_bottom,
                     left: getCurrentPaddingLeft()
                 };
                 margin2 = {
@@ -469,9 +472,9 @@
         function updateXgridFocus() {
             main.select('line.' + CLASS.xgridFocus)
                 .attr("x1", __axis_rotated ? 0 : -10)
-                .attr("x2", __axis_rotated ? Math.ceil(width) : -10)
-                .attr("y1", __axis_rotated ? -10 : Math.ceil(margin.top))
-                .attr("y2", __axis_rotated ? -10 : Math.ceil(height));
+                .attr("x2", __axis_rotated ? width : -10)
+                .attr("y1", __axis_rotated ? -10 : margin.top)
+                .attr("y2", __axis_rotated ? -10 : height);
         }
         function updateRadius() {
             radiusExpanded = height / 2;
@@ -511,7 +514,7 @@
             } else if (__padding_right) {
                 return __padding_right;
             } else if (isLegendRight) {
-                return getLegendWidth() + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
+                return getLegendWidth() + 20 + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
             } else if (__axis_y2_show) {
                 return __axis_y2_inner || __axis_rotated ? defaultPadding : getAxisWidthByAxisId('y2');
             } else {
@@ -643,21 +646,24 @@
             svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
         function getX(min, max, domain, offset) {
-            var scale = ((isTimeSeries) ? d3.time.scale() : d3.scale.linear()).range([min, max]);
-            // Set function and values for c3
-            scale.orgDomain = function () { return scale.domain(); };
-            if (domain) { scale.domain(domain); }
-            if (isUndefined(offset)) { offset = function () { return 0; }; }
+            var scale = (isTimeSeries ? d3.time.scale() : d3.scale.linear()).range([min, max]),
+                _scale = domain ? scale.domain(domain) : scale, key;
             // Define customized scale if categorized axis
             if (isCategorized) {
-                var _scale = scale, key;
-                scale = function (d) { return _scale(d) + offset(d); };
-                for (key in _scale) {
-                    scale[key] = _scale[key];
-                }
-                scale.orgDomain = function () {
-                    return _scale.domain();
-                };
+                offset = offset || function () { return 0; };
+                scale = function (d) { return Math.ceil(_scale(d) + offset(d)); };
+            } else {
+                scale = function (d) { return Math.ceil(_scale(d)); };
+            }
+            // define functions
+            for (key in _scale) {
+                scale[key] = _scale[key];
+            }
+            scale.orgDomain = function () {
+                return _scale.domain();
+            };
+            // define custom domain() for categorized axis
+            if (isCategorized) {
                 scale.domain = function (domain) {
                     if (!arguments.length) {
                         domain = _scale.domain();
@@ -684,7 +690,7 @@
         //-- Axes --//
 
         function getXAxis(scale, orient, tickFormat, tickValues) {
-            var axis = (isCategorized ? categoryAxis() : d3.svg.axis()).scale(scale).orient(orient);
+            var axis = c3_axis(d3, isCategorized).scale(scale).orient(orient);
 
             // Set tick
             axis.tickFormat(tickFormat).tickValues(tickValues);
@@ -693,7 +699,9 @@
                 if (isEmpty(__axis_x_tick_culling)) {
                     __axis_x_tick_culling = false;
                 }
+                axis.categories(__axis_x_categories);
             } else {
+                // TODO: move this to c3_axis
                 axis.tickOffset = function () {
                     var edgeX = getEdgeX(c3.data.targets), diff = x(edgeX[1]) - x(edgeX[0]),
                         base = diff ? diff : (__axis_rotated ? height : width);
@@ -701,15 +709,10 @@
                 };
             }
 
-            // Set categories
-            if (isCategorized) {
-                axis.categories(__axis_x_categories);
-            }
-
             return axis;
         }
         function getYAxis(scale, orient, tickFormat, ticks) {
-            return d3.svg.axis().scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks).outerTickSize(0);
+            return c3_axis(d3).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -885,206 +888,26 @@
             });
             return maxWidth < 0 ? 0 : maxWidth;
         }
-        function updateAxisLabels() {
-            main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel)
-              .transition()
+        function updateAxisLabels(withTransition) {
+            var axisXLabel = main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
+                axisYLabel = main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
+                axisY2Label = main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
+            (withTransition ? axisXLabel.transition() : axisXLabel)
                 .attr("x", xForXAxisLabel)
                 .attr("dx", dxForXAxisLabel)
                 .attr("dy", dyForXAxisLabel)
                 .text(textForXAxisLabel);
-            main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel)
-              .transition()
+            (withTransition ? axisYLabel.transition() : axisYLabel)
                 .attr("x", xForYAxisLabel)
                 .attr("dx", dxForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .attr("dy", dyForYAxisLabel)
                 .text(textForYAxisLabel);
-            main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
-              .transition()
+            (withTransition ? axisY2Label.transition() : axisY2Label)
                 .attr("x", xForY2AxisLabel)
                 .attr("dx", dxForY2AxisLabel)
                 .attr("dy", dyForY2AxisLabel)
                 .text(textForY2AxisLabel);
-        }
-
-        function categoryAxis() {
-            var scale = d3.scale.linear(), orient = "bottom";
-            var tickMajorSize = 6, /*tickMinorSize = 6,*/ tickEndSize = 6, tickPadding = 3, tickCentered = false, tickTextNum = 10, tickOffset = 0, tickFormat = null, tickCulling = true;
-            var categories = [];
-            function axisX(selection, x) {
-                selection.attr("transform", function (d) {
-                    return "translate(" + (x(d) + tickOffset) + ", 0)";
-                });
-            }
-            function axisY(selection, y) {
-                selection.attr("transform", function (d) {
-                    return "translate(0," + y(d) + ")";
-                });
-            }
-            function scaleExtent(domain) {
-                var start = domain[0], stop = domain[domain.length - 1];
-                return start < stop ? [ start, stop ] : [ stop, start ];
-            }
-            function generateTicks(domain) {
-                var ticks = [];
-                for (var i = Math.ceil(domain[0]); i < domain[1]; i++) {
-                    ticks.push(i);
-                }
-                if (ticks.length > 0 && ticks[0] > 0) {
-                    ticks.unshift(ticks[0] - (ticks[1] - ticks[0]));
-                }
-                return ticks;
-            }
-            function category(i) {
-                return i < categories.length ? categories[i] : i;
-            }
-            function formattedCategory(i) {
-                var c = category(i);
-                return tickFormat ? tickFormat(c) : c;
-            }
-            function copyScale() {
-                var newScale = scale.copy(), domain = scale.domain();
-                newScale.domain([domain[0], domain[1] - 1]);
-                return newScale;
-            }
-            function axis(g) {
-                g.each(function () {
-                    var g = d3.select(this);
-                    var scale1 = copyScale(), scale0 = this.__chart__ || scale1;
-                    var tick = g.selectAll(".tick.major").data(generateTicks(scale1.domain()), String),
-                        tickEnter = tick.enter().insert("g", "path").attr("class", "tick major").style("opacity", 1e-6),
-                        tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
-                        tickUpdate = d3.transition(tick).style("opacity", 1),
-                        tickTransform,
-                        tickX;
-                    var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range());
-                    var path = g.selectAll(".domain").data([ 0 ]), pathUpdate;
-                    var lineEnter, lineUpdate, text, textEnter, textUpdate;
-
-                    path.enter().append("path").attr("class", "domain");
-                    pathUpdate = d3.transition(path);
-
-                    tickEnter.append("line");
-                    tickEnter.append("text");
-
-                    lineEnter = tickEnter.select("line");
-                    lineUpdate = tickUpdate.select("line");
-                    text = tick.select("text");
-                    textEnter = tickEnter.select("text");
-                    textUpdate = tickUpdate.select("text");
-
-                    tickOffset = (scale1(1) - scale1(0)) / 2;
-                    tickX = tickCentered ? 0 : tickOffset;
-
-                    this.__chart__ = scale1;
-
-                    switch (orient) {
-                    case "bottom":
-                        {
-                            tickTransform = axisX;
-                            lineEnter.attr("y2", Math.ceil(tickMajorSize));
-                            textEnter.attr("y", Math.ceil(Math.max(tickMajorSize, 0) + tickPadding));
-                            lineUpdate.attr("x1", Math.ceil(tickX)).attr("x2", Math.ceil(tickX)).attr("y2", Math.ceil(tickMajorSize));
-                            textUpdate.attr("x", 0).attr("y", Math.ceil(Math.max(tickMajorSize, 0) + tickPadding));
-                            text.attr("dy", ".71em").style("text-anchor", "middle");
-                            text.text(formattedCategory);
-                            pathUpdate.attr("d", "M" + range[0] + "," + tickEndSize + "V0H" + range[1] + "V" + tickEndSize);
-                            break;
-                        }
-/* TODO: implement
-                    case "top":
-                        {
-                        tickTransform = axisX
-                        lineEnter.attr("y2", -tickMajorSize)
-                        textEnter.attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
-                        lineUpdate.attr("x2", 0).attr("y2", -tickMajorSize)
-                        textUpdate.attr("x", 0).attr("y", -(Math.max(tickMajorSize, 0) + tickPadding))
-                        text.attr("dy", "0em").style("text-anchor", "middle")
-                        pathUpdate.attr("d", "M" + range[0] + "," + -tickEndSize + "V0H" + range[1] + "V" + -tickEndSize)
-                        break
-                        }
-*/
-                    case "left":
-                        {
-                            tickTransform = axisY;
-                            lineEnter.attr("x2", -(Math.ceil(tickMajorSize)));
-                            textEnter.attr("x", -(Math.ceil(Math.max(tickMajorSize, 0) + tickPadding)));
-                            lineUpdate.attr("x2", -(Math.ceil(tickMajorSize))).attr("y2", 0);
-                            textUpdate.attr("x", -(Math.ceil(Math.max(tickMajorSize, 0) + tickPadding))).attr("y", Math.ceil(tickOffset));
-                            text.attr("dy", ".32em").style("text-anchor", "end");
-                            text.text(formattedCategory);
-                            pathUpdate.attr("d", "M" + -tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + -tickEndSize);
-                            break;
-                        }
-/*
-                case "right":
-                    {
-                        tickTransform = axisY
-                        lineEnter.attr("x2", tickMajorSize)
-                        textEnter.attr("x", Math.max(tickMajorSize, 0) + tickPadding)
-                        lineUpdate.attr("x2", tickMajorSize).attr("y2", 0)
-                        textUpdate.attr("x", Math.max(tickMajorSize, 0) + tickPadding).attr("y", 0)
-                        text.attr("dy", ".32em").style("text-anchor", "start")
-                        pathUpdate.attr("d", "M" + tickEndSize + "," + range[0] + "H0V" + range[1] + "H" + tickEndSize)
-                        break
-                    }
-*/
-                    }
-                    if (scale.ticks) {
-                        tickEnter.call(tickTransform, scale0);
-                        tickUpdate.call(tickTransform, scale1);
-                        tickExit.call(tickTransform, scale1);
-                    } else {
-                        var dx = scale1.rangeBand() / 2, x = function (d) {
-                            return scale1(d) + dx;
-                        };
-                        tickEnter.call(tickTransform, x);
-                        tickUpdate.call(tickTransform, x);
-                    }
-                });
-            }
-            axis.scale = function (x) {
-                if (!arguments.length) { return scale; }
-                scale = x;
-                return axis;
-            };
-            axis.orient = function (x) {
-                if (!arguments.length) { return orient; }
-                orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
-                return axis;
-            };
-            axis.categories = function (x) {
-                if (!arguments.length) { return categories; }
-                categories = x;
-                return axis;
-            };
-            axis.tickCentered = function (x) {
-                if (!arguments.length) { return tickCentered; }
-                tickCentered = x;
-                return axis;
-            };
-            axis.tickFormat = function (format) {
-                if (!arguments.length) { return tickFormat; }
-                tickFormat = format;
-                return axis;
-            };
-            axis.tickOffset = function () {
-                return tickOffset;
-            };
-            axis.ticks = function (n) {
-                if (!arguments.length) { return tickTextNum; }
-                tickTextNum = n;
-                return axis;
-            };
-            axis.tickCulling = function (culling) {
-                if (!arguments.length) { return tickCulling; }
-                tickCulling = culling;
-                return axis;
-            };
-            axis.tickValues = function () {
-                // TODO: do something
-            };
-            return axis;
         }
 
         //-- Arc --//
@@ -1343,7 +1166,7 @@
                 padding = getXDomainPadding(targets),
                 min = 0, max = 0;
             // show center of x domain if min and max are the same
-            if ((firstX - lastX) === 0) {
+            if ((firstX - lastX) === 0 && !isCategorized) {
                 firstX = isTimeSeries ? new Date(firstX.getTime() * 0.5) : -0.5;
                 lastX = isTimeSeries ? new Date(lastX.getTime() * 1.5) : 0.5;
             }
@@ -1843,11 +1666,11 @@
             return d ? x(d.x) : null;
         }
         function xv(d) {
-            return x(isTimeSeries ? parseDate(d.value) : d.value);
+            return Math.ceil(x(isTimeSeries ? parseDate(d.value) : d.value));
         }
         function yv(d) {
             var yScale = d.axis && d.axis === 'y2' ? y2 : y;
-            return yScale(d.value);
+            return Math.ceil(yScale(d.value));
         }
         function subxx(d) {
             return subX(d.x);
@@ -2009,10 +1832,23 @@
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
             smoothLines(focusEl, 'grid');
-                
         }
         function hideXGridFocus() {
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
+        }
+        function generateGridData(type, scale) {
+            var gridData = [], xDomain, firstYear, lastYear, i;
+            if (type === 'year') {
+                xDomain = getXDomain();
+                firstYear = xDomain[0].getFullYear();
+                lastYear = xDomain[1].getFullYear();
+                for (i = firstYear; i <= lastYear; i++) {
+                    gridData.push(new Date(i + '-01-01 00:00:00'));
+                }
+            } else {
+                gridData = scale.ticks(10);
+            }
+            return gridData;
         }
 
         //-- Circle --//
@@ -2177,7 +2013,7 @@
                     color = colors[id](d);
                 }
                 // if specified, choose that color
-                else if (id in colors) {
+                else if (colors[id]) {
                     color = colors[id];
                 }
                 // if not specified, choose from pattern
@@ -3153,12 +2989,7 @@
         }
 
         function smoothLines(el, type) {
-            if (type === 'tick') {
-                var t = d3.transform(el.attr("transform")),
-                    x = t.translate[0],
-                    y = t.translate[1];
-                el.attr("transform", "translate(" + Math.ceil(x) + "," + Math.ceil(y) + ")");
-            } else if (type === 'grid') {
+            if (type === 'grid') {
                 el.each(function () {
                     var g = d3.select(this),
                         x1 = g.attr('x1'),
@@ -3176,10 +3007,9 @@
         }
 
         function redraw(options) {
-        
-            var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
+            var xaxis, subxaxis, yaxis, y2axis, xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
-            var barIndices = getBarIndices(), maxDataCountTarget;
+            var barIndices = getBarIndices(), maxDataCountTarget, tickOffset;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
@@ -3252,29 +3082,13 @@
             y2.domain(getYDomain(targetsToShow, 'y2'));
 
             // axes
-            transitions.axisX.call(xAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-            
-            transitions.axisY.call(yAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-            
-            transitions.axisY2.call(y2Axis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
-            
-            transitions.axisSubX.call(subXAxis).each('end', function () {
-                d3.select(this).selectAll('.tick').each(function () {
-                    smoothLines(d3.select(this), 'tick');
-                });
-            });
+            transitions.axisX.call(xAxis);
+            transitions.axisY.call(yAxis);
+            transitions.axisY2.call(y2Axis);
+            transitions.axisSubX.call(subXAxis);
+
+            // Update axis label
+            updateAxisLabels(withTransition);
 
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
@@ -3296,6 +3110,8 @@
                 }
             }
 
+            tickOffset = xAxis.tickOffset();
+
             // rotate tick text if needed
             if (!__axis_rotated && __axis_x_tick_rotate) {
                 rotateTickText(xaxis, transitions.axisX, __axis_x_tick_rotate);
@@ -3305,9 +3121,6 @@
             drawBar = generateDrawBar(barIndices);
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
-
-            // Update axis label
-            updateAxisLabels();
 
             // Update sub domain
             subY.domain(y.domain());
@@ -3322,25 +3135,22 @@
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
             if (__grid_x_show) {
-                if (__grid_x_type === 'year') {
-                    xgridData = [];
-                    var xDomain = getXDomain();
-                    var firstYear = xDomain[0].getFullYear();
-                    var lastYear = xDomain[1].getFullYear();
-                    for (var year = firstYear; year <= lastYear; year++) {
-                        xgridData.push(new Date(year + '-01-01 00:00:00'));
-                    }
-                } else {
-                    xgridData = x.ticks(10);
-                }
-
+                xgridData = generateGridData(__grid_x_type, x);
+                xgridAttr = __axis_rotated ? {
+                    'x1': 0,
+                    'x2': width,
+                    'y1': function (d) { return x(d) - tickOffset; },
+                    'y2': function (d) { return x(d) - tickOffset; }
+                } : {
+                    'x1': function (d) { return x(d) + tickOffset; },
+                    'x2': function (d) { return x(d) + tickOffset; },
+                    'y1': margin.top,
+                    'y2': height
+                };
                 xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
                     .data(xgridData);
                 xgrid.enter().append('line').attr("class", CLASS.xgrid);
-                xgrid.attr("x1", __axis_rotated ? 0 : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
-                    .attr("x2", __axis_rotated ? Math.ceil(width) : function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); })
-                    .attr("y1", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(margin.top))
-                    .attr("y2", __axis_rotated ? function (d) { return Math.ceil(x(d) - xAxis.tickOffset()); } : Math.ceil(height))
+                xgrid.attr(xgridAttr)
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
             }
@@ -3361,10 +3171,10 @@
                 // udpate
                 xgridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? 0 : Math.ceil(xv))
-                    .attr("x2", __axis_rotated ? Math.ceil(width) : Math.ceil(xv))
-                    .attr("y1", __axis_rotated ? Math.ceil(xv) : Math.ceil(margin.top))
-                    .attr("y2", __axis_rotated ? Math.ceil(xv) : Math.ceil(height))
+                    .attr("x1", __axis_rotated ? 0 : xv)
+                    .attr("x2", __axis_rotated ? width : xv)
+                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y2", __axis_rotated ? xv : height)
                     .style("opacity", 1);
                 xgridLines.select('text')
                   .transition().duration(duration)
@@ -3388,9 +3198,7 @@
                     .attr("y1", __axis_rotated ? 0 : y)
                     .attr("y2", __axis_rotated ? height : y);
                 ygrid.exit().remove();
-                
                 smoothLines(ygrid, 'grid');
-                
             }
             if (withY && notEmpty(__grid_y_lines)) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
@@ -3409,10 +3217,10 @@
                 // update
                 ygridLines.select('line')
                   .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? Math.ceil(yv) : 0)
-                    .attr("x2", __axis_rotated ? Math.ceil(yv) : Math.ceil(width))
-                    .attr("y1", __axis_rotated ? 0 : Math.ceil(yv))
-                    .attr("y2", __axis_rotated ? Math.ceil(height) : Math.ceil(yv))
+                    .attr("x1", __axis_rotated ? yv : 0)
+                    .attr("x2", __axis_rotated ? yv : width)
+                    .attr("y1", __axis_rotated ? 0 : yv)
+                    .attr("y2", __axis_rotated ? height : yv)
                     .style("opacity", 1);
                 ygridLines.select('text')
                   .transition().duration(duration)
@@ -3427,12 +3235,13 @@
             }
 
             // rect for regions
-            mainRegion = main.select('.' + CLASS.regions).selectAll('rect.' + CLASS.region)
+            mainRegion = main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
                 .data(__regions);
-            mainRegion.enter().append('rect')
-                .style("fill-opacity", 0);
-            mainRegion
+            mainRegion.enter().append('g')
                 .attr('class', classRegion)
+              .append('rect')
+                .style("fill-opacity", 0);
+            mainRegion.selectAll('rect')
                 .attr("x", regionX)
                 .attr("y", regionY)
                 .attr("width", regionWidth)
@@ -3470,6 +3279,7 @@
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .attr("d", lineOnMain)
+                .style("stroke", color)
                 .style("opacity", 1);
             mainLine.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
@@ -3485,6 +3295,7 @@
                 .style("opacity", 0)
               .transition().duration(duration)
                 .attr("d", areaOnMain)
+                .style("fill", color)
                 .style("opacity", orgAreaOpacity);
             mainArea.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
@@ -3494,11 +3305,13 @@
                 .data(lineOrScatterData);
             mainCircle.enter().append("circle")
                 .attr("class", classCircle)
-                .attr("r", pointR);
+                .attr("r", pointR)
+                .style("fill", color);
             mainCircle
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
                 .style('opacity', opacityForCircle)
+                .style("fill", color)
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.exit().remove();
@@ -3509,6 +3322,7 @@
                 .attr("class", classText)
                 .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
                 .style("stroke", 'none')
+                .style("fill", color)
                 .style("fill-opacity", 0);
             mainText
                 .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
@@ -3516,6 +3330,7 @@
               .transition().duration(duration)
                 .attr('x', xForText)
                 .attr('y', yForText)
+                .style("fill", color)
                 .style("fill-opacity", opacityForText);
             mainText.exit()
               .transition().duration(durationForExit)
@@ -3590,6 +3405,7 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
+                .style("fill", function (d) { return color(d.data); })
                 .style("opacity", 1)
                 .call(endall, function () {
                     transiting = false;
@@ -3832,8 +3648,7 @@
                 .style('opacity', 0)
                 .style("pointer-events", "none");
             mainTextEnter.append('g')
-                .attr('class', classTexts)
-                .style("fill", color);
+                .attr('class', classTexts);
 
             //-- Bar --//
             mainBarUpdate = main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
@@ -3867,7 +3682,6 @@
                 .attr("class", function (d) { return generateClass(CLASS.selectedCircles, d.id); });
             mainLineEnter.append('g')
                 .attr("class", classCircles)
-                .style("fill", color)
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
@@ -4125,11 +3939,11 @@
             }
 
             if (isLegendRight) {
-                xForLegend = function (id) { return maxWidth * (0.2 + steps[id]); };
+                xForLegend = function (id) { return maxWidth * steps[id]; };
                 yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
             } else {
                 xForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
-                yForLegend = function (id) { return maxHeight * (0.2 + steps[id]); };
+                yForLegend = function (id) { return maxHeight * steps[id]; };
             }
             xForLegendText = function (id, i) { return xForLegend(id, i) + 14; };
             yForLegendText = function (id, i) { return yForLegend(id, i) + 9; };
@@ -4174,13 +3988,11 @@
                 .attr("class", CLASS.legendItemEvent)
                 .style('fill-opacity', 0)
                 .attr('x', isLegendRight ? xForLegendRect : -200)
-                .attr('y', isLegendRight ? -200 : yForLegendRect)
-                .attr('width', function (id) { return widths[id]; })
-                .attr('height', function (id) { return heights[id]; });
+                .attr('y', isLegendRight ? -200 : yForLegendRect);
             l.append('rect')
                 .attr("class", CLASS.legendItemTile)
                 .style("pointer-events", "none")
-                .style('fill', function (id) { return color(id); })
+                .style('fill', color)
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegend)
                 .attr('width', 10)
@@ -4197,12 +4009,15 @@
             legend.selectAll('rect.' + CLASS.legendItemEvent)
                 .data(targetIds)
               .transition().duration(withTransition ? 250 : 0)
+                .attr('width', function (id) { return widths[id]; })
+                .attr('height', function (id) { return heights[id]; })
                 .attr('x', xForLegendRect)
                 .attr('y', yForLegendRect);
 
             legend.selectAll('rect.' + CLASS.legendItemTile)
                 .data(targetIds)
               .transition().duration(withTransition ? 250 : 0)
+                .style('fill', color)
                 .attr('x', xForLegend)
                 .attr('y', yForLegend);
 
@@ -4533,8 +4348,16 @@
             Object.keys(names).forEach(function (id) {
                 __data_names[id] = names[id];
             });
-            updateLegend(mapToIds(c3.data.targets), {withTransition: true});
+            redraw({withLegend: true});
             return __data_names;
+        };
+        c3.data.colors = function (colors) {
+            if (!arguments.length) { return __data_colors; }
+            Object.keys(colors).forEach(function (id) {
+                __data_colors[id] = colors[id];
+            });
+            redraw({withLegend: true});
+            return __data_colors;
         };
 
         c3.x = function (x) {
@@ -4564,23 +4387,25 @@
         c3.axis.max = function (max) {
             if (arguments.length) {
                 if (typeof max === 'object') {
+                    if (isValue(max.x)) { __axis_x_max = +max.x; }
                     if (isValue(max.y)) { __axis_y_max = +max.y; }
                     if (isValue(max.y2)) { __axis_y2_max = +max.y2; }
                 } else {
                     __axis_y_max = __axis_y2_max = +max;
                 }
-                redraw();
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
         };
         c3.axis.min = function (min) {
             if (arguments.length) {
                 if (typeof min === 'object') {
+                    if (isValue(min.x)) { __axis_x_min = +min.x; }
                     if (isValue(min.y)) { __axis_y_min = +min.y; }
                     if (isValue(min.y2)) { __axis_y2_min = +min.y2; }
                 } else {
                     __axis_y_min = __axis_y2_min = +min;
                 }
-                redraw();
+                redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
         };
         c3.axis.range = function (range) {
@@ -4658,5 +4483,191 @@
         window.c3 = c3;
     }
     // TODO: module.exports
+
+    // Features:
+    // 1. category axis
+    // 2. ceil values of translate/x/y to int for half pixel antialiasing
+    function c3_axis(d3, isCategory) {
+        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+
+        var tickOffset = 0, tickCulling = true;
+        var categories = [], tickCentered;
+
+        function axisX(selection, x) {
+            selection.attr("transform", function (d) {
+                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+            });
+        }
+        function axisY(selection, y) {
+            selection.attr("transform", function (d) {
+                return "translate(0," + Math.ceil(y(d)) + ")";
+            });
+        }
+        function scaleExtent(domain) {
+            var start = domain[0], stop = domain[domain.length - 1];
+            return start < stop ? [ start, stop ] : [ stop, start ];
+        }
+        function generateTicks(scale) {
+            var i, domain, ticks = [];
+            if (scale.ticks) {
+                return scale.ticks.apply(scale, tickArguments);
+            }
+            domain = scale.domain();
+            for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
+                ticks.push(i);
+            }
+            if (ticks.length > 0 && ticks[0] > 0) {
+                ticks.unshift(ticks[0] - (ticks[1] - ticks[0]));
+            }
+            return ticks;
+        }
+        function copyScale() {
+            var newScale = scale.copy(), domain;
+            if (isCategory) {
+                domain = scale.domain();
+                newScale.domain([domain[0], domain[1] - 1]);
+            }
+            return newScale;
+        }
+        function textFormatted(i) {
+            var v = isCategory && i < categories.length ? categories[i] : i;
+            return tickFormat ? tickFormat(v) : v;
+        }
+        function axis(g) {
+            g.each(function () {
+                var g = d3.select(this);
+                var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
+
+                var ticks = tickValues ? tickValues : generateTicks(scale1),
+                    tick = g.selectAll(".tick").data(ticks, scale1),
+                    tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
+                    tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
+                    tickUpdate = d3.transition(tick).style("opacity", 1),
+                    tickTransform, tickX;
+
+                var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
+                    path = g.selectAll(".domain").data([ 0 ]),
+                    pathUpdate = (path.enter().append("path").attr("class", "domain"), d3.transition(path));
+                tickEnter.append("line");
+                tickEnter.append("text");
+
+                var lineEnter = tickEnter.select("line"),
+                    lineUpdate = tickUpdate.select("line"),
+                    text = tick.select("text").text(textFormatted),
+                    textEnter = tickEnter.select("text"),
+                    textUpdate = tickUpdate.select("text");
+
+                if (isCategory) {
+                    tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
+                    tickX = tickCentered ? 0 : tickOffset;
+                } else {
+                    tickOffset = tickX = 0;
+                }
+
+                switch (orient) {
+                case "bottom":
+                    {
+                        tickTransform = axisX;
+                        lineEnter.attr("y2", innerTickSize);
+                        textEnter.attr("y", Math.max(innerTickSize, 0) + tickPadding);
+                        lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", innerTickSize);
+                        textUpdate.attr("x", 0).attr("y", Math.max(innerTickSize, 0) + tickPadding);
+                        text.attr("dy", ".71em").style("text-anchor", "middle");
+                        pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
+                        break;
+                    }
+                case "top":
+                    {
+                        tickTransform = axisX;
+                        lineEnter.attr("y2", -innerTickSize);
+                        textEnter.attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
+                        lineUpdate.attr("x2", 0).attr("y2", -innerTickSize);
+                        textUpdate.attr("x", 0).attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
+                        text.attr("dy", "0em").style("text-anchor", "middle");
+                        pathUpdate.attr("d", "M" + range[0] + "," + -outerTickSize + "V0H" + range[1] + "V" + -outerTickSize);
+                        break;
+                    }
+                case "left":
+                    {
+                        tickTransform = axisY;
+                        lineEnter.attr("x2", -innerTickSize);
+                        textEnter.attr("x", -(Math.max(innerTickSize, 0) + tickPadding));
+                        lineUpdate.attr("x2", -innerTickSize).attr("y2", 0);
+                        textUpdate.attr("x", -(Math.max(innerTickSize, 0) + tickPadding)).attr("y", tickOffset);
+                        text.attr("dy", ".32em").style("text-anchor", "end");
+                        pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);
+                        break;
+                    }
+                case "right":
+                    {
+                        tickTransform = axisY;
+                        lineEnter.attr("x2", innerTickSize);
+                        textEnter.attr("x", Math.max(innerTickSize, 0) + tickPadding);
+                        lineUpdate.attr("x2", innerTickSize).attr("y2", 0);
+                        textUpdate.attr("x", Math.max(innerTickSize, 0) + tickPadding).attr("y", 0);
+                        text.attr("dy", ".32em").style("text-anchor", "start");
+                        pathUpdate.attr("d", "M" + outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + outerTickSize);
+                        break;
+                    }
+                }
+                if (scale1.rangeBand) {
+                    var x = scale1, dx = x.rangeBand() / 2;
+                    scale0 = scale1 = function (d) {
+                        return x(d) + dx;
+                    };
+                } else if (scale0.rangeBand) {
+                    scale0 = scale1;
+                } else {
+                    tickExit.call(tickTransform, scale1);
+                }
+                tickEnter.call(tickTransform, scale0);
+                tickUpdate.call(tickTransform, scale1);
+            });
+        }
+        axis.scale = function (x) {
+            if (!arguments.length) { return scale; }
+            scale = x;
+            return axis;
+        };
+        axis.orient = function (x) {
+            if (!arguments.length) { return orient; }
+            orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
+            return axis;
+        };
+        axis.tickFormat = function (format) {
+            if (!arguments.length) { return tickFormat; }
+            tickFormat = format;
+            return axis;
+        };
+        axis.tickCentered = function (isCentered) {
+            if (!arguments.length) { return tickCentered; }
+            tickCentered = isCentered;
+            return axis;
+        };
+        axis.tickOffset = function () { // This will be overwritten when normal x axis
+            return tickOffset;
+        };
+        axis.ticks = function () {
+            if (!arguments.length) { return tickArguments; }
+            tickArguments = arguments;
+            return axis;
+        };
+        axis.tickCulling = function (culling) {
+            if (!arguments.length) { return tickCulling; }
+            tickCulling = culling;
+            return axis;
+        };
+        axis.tickValues = function (x) {
+            if (!arguments.length) { return tickValues; }
+            tickValues = x;
+            return axis;
+        };
+        axis.categories = function (x) {
+            if (!arguments.length) { return categories; }
+            categories = x;
+            return axis;
+        };
+        return axis;
+    }
 
 })(window);

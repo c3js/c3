@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+<style type="text/css">
+<!--
+.c3 svg {
+    font-size: 13px;
+}
+-->
+</style>
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+      var chart = c3.generate({
+        bindto: '#chart',
+        padding: {
+          top: 20,
+//          left: 60
+          bottom: 20
+        },
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 200, 100, 150, 150]
+          ],
+          axes: {
+            data2: 'y2'
+          },
+        },
+        legend: {
+//          position: 'right'
+        },
+        subchart: {
+//          show: true
+        },
+        axis: {
+          rotated: true,
+          y: {
+            label: {
+              text: 'Y Label', 
+              position: 'outer-center'
+            }
+          },
+          y2: {
+            show: true,
+            label: {
+              text: 'Y2 Label',
+              position: 'outer-center'
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
