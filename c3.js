@@ -334,13 +334,13 @@
             subXOrient = __axis_rotated ? "left" : "bottom";
 
         var translate = {
-            main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
-            context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
+            main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
+            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () { return "translate(0," + (__axis_rotated ? 0 : height) + ")"; },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
-            subx : function () { return "translate(0," + (__axis_rotated ? 0 : Math.ceil(height2)) + ")"; },
+            subx : function () { return "translate(0," + (__axis_rotated ? 0 : height2) + ")"; },
             arc: function () { return "translate(" + width / 2 + "," + height / 2 + ")"; }
         };
 
@@ -404,6 +404,7 @@
         // TODO: configurabale
         var rotated_padding_left = 30, rotated_padding_right = __axis_rotated && !__axis_x_show ? 0 : 30, rotated_padding_top = 5;
 
+        // MEMO: each value should be int to avoid disabling antialiasing
         function updateSizes() {
             var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(),
                 legendHeightForBottom = isLegendRight ? 0 : legendHeight,
@@ -469,9 +470,9 @@
         function updateXgridFocus() {
             main.select('line.' + CLASS.xgridFocus)
                 .attr("x1", __axis_rotated ? 0 : -10)
-                .attr("x2", __axis_rotated ? Math.ceil(width) : -10)
-                .attr("y1", __axis_rotated ? -10 : Math.ceil(margin.top))
-                .attr("y2", __axis_rotated ? -10 : Math.ceil(height));
+                .attr("x2", __axis_rotated ? width : -10)
+                .attr("y1", __axis_rotated ? -10 : margin.top)
+                .attr("y2", __axis_rotated ? -10 : height);
         }
         function updateRadius() {
             radiusExpanded = height / 2;
@@ -3135,14 +3136,14 @@
                 xgridData = generateGridData(__grid_x_type, x);
                 xgridAttr = __axis_rotated ? {
                     'x1': 0,
-                    'x2': Math.ceil(width),
+                    'x2': width,
                     'y1': function (d) { return x(d) - tickOffset; },
                     'y2': function (d) { return x(d) - tickOffset; }
                 } : {
                     'x1': function (d) { return x(d) + tickOffset; },
                     'x2': function (d) { return x(d) + tickOffset; },
-                    'y1': Math.ceil(margin.top),
-                    'y2': Math.ceil(height)
+                    'y1': margin.top,
+                    'y2': height
                 };
                 xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
                     .data(xgridData);
@@ -3169,9 +3170,9 @@
                 xgridLines.select('line')
                   .transition().duration(duration)
                     .attr("x1", __axis_rotated ? 0 : xv)
-                    .attr("x2", __axis_rotated ? Math.ceil(width) : xv)
-                    .attr("y1", __axis_rotated ? xv : Math.ceil(margin.top))
-                    .attr("y2", __axis_rotated ? xv : Math.ceil(height))
+                    .attr("x2", __axis_rotated ? width : xv)
+                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y2", __axis_rotated ? xv : height)
                     .style("opacity", 1);
                 xgridLines.select('text')
                   .transition().duration(duration)
@@ -3215,9 +3216,9 @@
                 ygridLines.select('line')
                   .transition().duration(duration)
                     .attr("x1", __axis_rotated ? yv : 0)
-                    .attr("x2", __axis_rotated ? yv : Math.ceil(width))
+                    .attr("x2", __axis_rotated ? yv : width)
                     .attr("y1", __axis_rotated ? 0 : yv)
-                    .attr("y2", __axis_rotated ? Math.ceil(height) : yv)
+                    .attr("y2", __axis_rotated ? height : yv)
                     .style("opacity", 1);
                 ygridLines.select('text')
                   .transition().duration(duration)
