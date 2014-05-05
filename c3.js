@@ -336,7 +336,6 @@
             subXOrient = __axis_rotated ? "left" : "bottom";
 
         var translate = {
-
             main : function () { return "translate(" + (Math.ceil(margin.left) + 0.5) + "," + (Math.ceil(margin.top) + 0.5) + ")"; },
             context : function () { return "translate(" + (Math.ceil(margin2.left) + 0.5) + "," + (Math.ceil(margin2.top) + 0.5) + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
