@@ -2522,40 +2522,6 @@
                 grid.append('g').attr('class', CLASS.ygridLines);
             }
 
-            // Add Axis
-            if (__axis_x_show) {
-                main.append("g")
-                    .attr("class", CLASS.axisX)
-                    .attr("clip-path", clipPathForXAxis)
-                    .attr("transform", translate.x)
-                  .append("text")
-                    .attr("class", CLASS.axisXLabel)
-                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
-                    .style("text-anchor", textAnchorForXAxisLabel);
-            }
-
-            if (__axis_y_show) {
-                main.append("g")
-                    .attr("class", CLASS.axisY)
-                    .attr("clip-path", clipPathForYAxis)
-                    .attr("transform", translate.y)
-                  .append("text")
-                    .attr("class", CLASS.axisYLabel)
-                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .style("text-anchor", textAnchorForYAxisLabel);
-            }
-
-            if (__axis_y2_show) {
-                main.append("g")
-                    .attr("class", CLASS.axisY2)
-                    // clip-path?
-                    .attr("transform", translate.y2)
-                  .append("text")
-                    .attr("class", CLASS.axisY2Label)
-                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .style("text-anchor", textAnchorForY2AxisLabel);
-            }
-
             // Regions
             main.append('g')
                 .attr("clip-path", clipPath)
@@ -2606,6 +2572,40 @@
             // Set default extent if defined
             if (__axis_x_default) {
                 brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain()));
+            }
+
+            // Add Axis
+            if (__axis_x_show) {
+                main.append("g")
+                    .attr("class", CLASS.axisX)
+                    .attr("clip-path", clipPathForXAxis)
+                    .attr("transform", translate.x)
+                  .append("text")
+                    .attr("class", CLASS.axisXLabel)
+                    .attr("transform", __axis_rotated ? "rotate(-90)" : "")
+                    .style("text-anchor", textAnchorForXAxisLabel);
+            }
+
+            if (__axis_y_show) {
+                main.append("g")
+                    .attr("class", CLASS.axisY)
+                    .attr("clip-path", clipPathForYAxis)
+                    .attr("transform", translate.y)
+                  .append("text")
+                    .attr("class", CLASS.axisYLabel)
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .style("text-anchor", textAnchorForYAxisLabel);
+            }
+
+            if (__axis_y2_show) {
+                main.append("g")
+                    .attr("class", CLASS.axisY2)
+                    // clip-path?
+                    .attr("transform", translate.y2)
+                  .append("text")
+                    .attr("class", CLASS.axisY2Label)
+                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                    .style("text-anchor", textAnchorForY2AxisLabel);
             }
 
             /*-- Context Region --*/
