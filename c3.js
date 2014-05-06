@@ -17,6 +17,9 @@
         chartArc: 'c3-chart-arc',
         chartArcs: 'c3-chart-arcs',
         chartArcsTitle: 'c3-chart-arcs-title',
+        gaugeArc: 'c3-gauge-arc',
+        gaugeArcs: 'c3-gauge-arcs',
+        gaugeArcsTitle: 'c3-gauge-arcs-title',
         selectedCircle: 'c3-selected-circle',
         selectedCircles: 'c3-selected-circles',
         eventRect: 'c3-event-rect',
@@ -227,6 +230,13 @@
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
             __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
 
+        // gauge
+        var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
+            __gauge_label_format = getConfig(['gauge', 'label', 'format']),
+            __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
+            __gauge_onmouseover = getConfig(['gauge', 'onmouseover'], function () {}),
+            __gauge_onmouseout = getConfig(['gauge', 'onmouseout'], function () {});
+
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
@@ -415,7 +425,7 @@
         function updateRadius() {
             radiusExpanded = height / 2;
             radius = radiusExpanded * 0.95;
-            innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
+            innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getSvgLeft() {
             var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
@@ -1972,11 +1982,14 @@
         function hasPieType(targets) {
             return hasType(targets, 'pie');
         }
+        function hasGaugeType(targets) {
+            return hasType(targets, 'gauge');
+        }
         function hasDonutType(targets) {
             return hasType(targets, 'donut');
         }
         function hasArcType(targets) {
-            return hasPieType(targets) || hasDonutType(targets);
+            return hasPieType(targets) || hasDonutType(targets) || hasGaugeType(targets);
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -2006,12 +2019,16 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'pie';
         }
+        function isGaugeType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'gauge';
+        }
         function isDonutType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'donut';
         }
         function isArcType(d) {
-            return isPieType(d) || isDonutType(d);
+            return isPieType(d) || isDonutType(d) || isGaugeType(d);
         }
         /* not used
         function lineData(d) {
@@ -3414,7 +3431,7 @@
                 .text(textForArcLabel)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             main.select('.' + CLASS.chartArcsTitle)
-                .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
+                .style("opacity", hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? 1 : 0);
 
             // subchart
             if (__subchart_show) {
