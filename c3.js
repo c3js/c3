@@ -3241,11 +3241,11 @@
               .append('rect')
                 .style("fill-opacity", 0);
             mainRegion.selectAll('rect')
+              .transition().duration(duration)
                 .attr("x", regionX)
                 .attr("y", regionY)
                 .attr("width", regionWidth)
                 .attr("height", regionHeight)
-              .transition().duration(duration)
                 .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
             mainRegion.exit().transition().duration(duration)
                 .style("fill-opacity", 0)
