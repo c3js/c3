@@ -3110,8 +3110,6 @@
                 }
             }
 
-            tickOffset = xAxis.tickOffset();
-
             // rotate tick text if needed
             if (!__axis_rotated && __axis_x_tick_rotate) {
                 rotateTickText(xaxis, transitions.axisX, __axis_x_tick_rotate);
@@ -3136,6 +3134,7 @@
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
             if (__grid_x_show) {
                 xgridData = generateGridData(__grid_x_type, x);
+                tickOffset = isCategorized ? xAxis.tickOffset() : 0;
                 xgridAttr = __axis_rotated ? {
                     'x1': 0,
                     'x2': width,
