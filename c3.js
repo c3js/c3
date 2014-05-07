@@ -2140,6 +2140,7 @@
             toggleBar(selected, target, d.data, i);
         }
         function getToggle(that) {
+            // path selection not supported yet
             return that.nodeName === 'circle' ? togglePoint : (d3.select(that).classed(CLASS.bar) ? toggleBar : toggleArc);
         }
 
@@ -4218,6 +4219,7 @@
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
+                if (this.nodeName === 'path') { return; } // path selection not supported yet
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d) && !isSelected) {
                         toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
@@ -4237,6 +4239,7 @@
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
+                if (this.nodeName === 'path') { return; } // path selection not supported yet
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
                         if (isSelected) {
