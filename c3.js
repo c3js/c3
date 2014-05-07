@@ -664,13 +664,17 @@
                 scale[key] = _scale[key];
             }
             scale.orgDomain = function () {
-                return _scale.domain();
+                var domain = _scale.domain();
+                if (orgXDomain && orgXDomain[0] === domain[0] && orgXDomain[1] < domain[1]) {
+                    domain[1] = orgXDomain[1];
+                }
+                return domain;
             };
             // define custom domain() for categorized axis
             if (isCategorized) {
                 scale.domain = function (domain) {
                     if (!arguments.length) {
-                        domain = _scale.domain();
+                        domain = this.orgDomain();
                         return [domain[0], domain[1] + 1];
                     }
                     _scale.domain(domain);
@@ -1841,7 +1845,8 @@
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
         }
         function generateGridData(type, scale) {
-            var gridData = [], xDomain, firstYear, lastYear, i;
+            var gridData = [], xDomain, firstYear, lastYear, i,
+                tickNum = main.select("." + CLASS.axisX).selectAll('.tick').size();
             if (type === 'year') {
                 xDomain = getXDomain();
                 firstYear = xDomain[0].getFullYear();
@@ -1852,7 +1857,7 @@
             } else {
                 gridData = scale.ticks(10);
             }
-            return gridData;
+            return gridData.slice(0, tickNum);
         }
 
         //-- Circle --//
@@ -3054,11 +3059,9 @@
                 updateLegend(mapToIds(c3.data.targets), options, transitions);
             }
 
-            if (isCategorized) {
-                // ATTENTION: need to update domain with current domain when categoryAxis
-                if (targetsToShow.length === 0 || !withUpdateOrgXDomain || !withUpdateXDomain) {
-                    x.domain([0, xaxis.selectAll('.tick').size()]);
-                }
+            // MEMO: needed for grids calculation
+            if (isCategorized && targetsToShow.length === 0) {
+                x.domain([0, xaxis.selectAll('.tick').size()]);
             }
 
             if (targetsToShow.length) {
@@ -3428,7 +3431,7 @@
             // subchart
             if (__subchart_show) {
                 // reflect main chart to extent on subchart if zoomed
-                if (d3.event !== null && d3.event.type === 'zoom') {
+                if (d3.event && d3.event.type === 'zoom') {
                     brush.extent(x.orgDomain()).update();
                 }
                 // update subchart elements if needed
@@ -3563,6 +3566,9 @@
             });
         }
         function redrawForZoom() {
+            if (filterTargetsToShow(c3.data.targets).length === 0) {
+                return;
+            }
             if (d3.event.sourceEvent.type === 'mousemove' && zoom.altDomain) {
                 x.domain(zoom.altDomain);
                 zoom.scale(x).updateScaleExtent();
