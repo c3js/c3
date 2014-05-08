@@ -7,7 +7,7 @@ require.config({
 
 require(["d3", "c3"], function(d3, c3) {
 
-    var chart = c3.generate({
+    window.chart = c3.generate({
         data: {
             columns: [
                 ['sample', 30, 200, 100, 400, 150, 250]
