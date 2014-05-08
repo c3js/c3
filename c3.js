@@ -302,24 +302,17 @@
         var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
-        var xTimeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
-            defaultTimeFormat = (function () {
-            var formats = [
-                [xTimeFormat("%Y/%-m/%-d"), function () { return true; }],
-                [xTimeFormat("%-m/%-d"), function (d) { return d.getMonth(); }],
-                [xTimeFormat("%-m/%-d"), function (d) { return d.getDate() !== 1; }],
-                [xTimeFormat("%-m/%-d"), function (d) { return d.getDay() && d.getDate() !== 1; }],
-                [xTimeFormat("%I %p"), function (d) { return d.getHours(); }],
-                [xTimeFormat("%I:%M"), function (d) { return d.getMinutes(); }],
-                [xTimeFormat(":%S"), function (d) { return d.getSeconds(); }],
-                [xTimeFormat(".%L"), function (d) { return d.getMilliseconds(); }]
-            ];
-            return function (date) {
-                var i = formats.length - 1, f = formats[i];
-                while (!f[1](date)) { f = formats[--i]; }
-                return f[0](date);
-            };
-        })();
+        var timeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
+            defaultTimeFormat = timeFormat.multi([
+                [".%L", function (d) { return d.getMilliseconds(); }],
+                [":%S", function (d) { return d.getSeconds(); }],
+                ["%I:%M", function (d) { return d.getMinutes(); }],
+                ["%I %p", function (d) { return d.getHours(); }],
+                ["%-m/%-d", function (d) { return d.getDay() && d.getDate() !== 1; }],
+                ["%-m/%-d", function (d) { return d.getDate() !== 1; }],
+                ["%-m/%-d", function (d) { return d.getMonth(); }],
+                ["%Y/%-m/%-d", function () { return true; }]
+            ]);
 
         var hiddenTargetIds = [], hiddenLegendIds = [];
 
@@ -734,7 +727,7 @@
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
                     format = function (date) {
-                        return date ? xTimeFormat(__axis_x_tick_format)(date) : "";
+                        return date ? timeFormat(__axis_x_tick_format)(date) : "";
                     };
                 }
             }
