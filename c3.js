@@ -644,15 +644,24 @@
             svgArcExpanded = getSvgArcExpanded();
             svgArcExpandedSub = getSvgArcExpanded(0.98);
         }
+        function getScale(min, max, forTimeseries) {
+            return (forTimeseries ? d3.time.scale() : d3.scale.linear()).range([min, max]);
+        }
         function getX(min, max, domain, offset) {
-            var scale = (isTimeSeries ? d3.time.scale() : d3.scale.linear()).range([min, max]),
+            var scale = getScale(min, max, isTimeSeries),//(isTimeSeries ? d3.time.scale() : d3.scale.linear()).range([min, max]),
                 _scale = domain ? scale.domain(domain) : scale, key;
             // Define customized scale if categorized axis
             if (isCategorized) {
                 offset = offset || function () { return 0; };
-                scale = function (d) { return Math.ceil(_scale(d) + offset(d)); };
+                scale = function (d, raw) {
+                    var v = _scale(d) + offset(d);
+                    return raw ? v : Math.ceil(v);
+                };
             } else {
-                scale = function (d) { return Math.ceil(_scale(d)); };
+                scale = function (d, raw) {
+                    var v = _scale(d);
+                    return raw ? v : Math.ceil(v);
+                };
             }
             // define functions
             for (key in _scale) {
@@ -679,7 +688,7 @@
             return scale;
         }
         function getY(min, max, domain) {
-            var scale = d3.scale.linear().range([min, max]);
+            var scale = getScale(min, max);
             if (domain) { scale.domain(domain); }
             return scale;
         }
@@ -2312,7 +2321,7 @@
         function lineWithRegions(d, x, y, _regions) {
             var prev = -1, i, j;
             var s = "M", sWithRegion;
-            var xp, yp, dx, dy, dd, diff;
+            var xp, yp, dx, dy, dd, diff, diffx2;
             var xValue, yValue;
             var regions = [];
 
@@ -2347,26 +2356,27 @@
                 };
             } else {
                 sWithRegion = function (d0, d1, j, diff) {
-                    return "M" + x(xp(j)) + " " + y(yp(j)) + " " + x(xp(j + diff)) + " " + y(yp(j + diff));
+                    return "M" + x(xp(j), true) + " " + y(yp(j)) + " " + x(xp(j + diff), true) + " " + y(yp(j + diff));
                 };
             }
 
             // Generate
             for (i = 0; i < d.length; i++) {
+
                 // Draw as normal
                 if (isUndefined(regions) || ! isWithinRegions(d[i].x, regions)) {
                     s += " " + xValue(d[i]) + " " + yValue(d[i]);
                 }
                 // Draw with region // TODO: Fix for horizotal charts
                 else {
-                    xp = getX(d[i - 1].x, d[i].x);
-                    yp = getY(d[i - 1].value, d[i].value);
+                    xp = getScale(d[i - 1].x, d[i].x, isTimeSeries);
+                    yp = getScale(d[i - 1].value, d[i].value);
 
                     dx = x(d[i].x) - x(d[i - 1].x);
                     dy = y(d[i].value) - y(d[i - 1].value);
                     dd = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
                     diff = 2 / dd;
-                    var diffx2 = diff * 2;
+                    diffx2 = diff * 2;
 
                     for (j = diff; j <= 1; j += diffx2) {
                         s += sWithRegion(d[i - 1], d[i], j, diff);
