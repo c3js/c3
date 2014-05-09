@@ -33,7 +33,6 @@
         }
       });
 
-/*
       setTimeout(function () {
         chart.load({
           columns: [
@@ -41,7 +40,20 @@
           ]
         });
       }, 1000);
-*/
+
+      setTimeout(function () {
+        chart.regions([]);
+      }, 2000);
+
+      setTimeout(function () {
+        chart.regions([{start:0.5,end:2.5}]);
+      }, 3000);
+
+      setTimeout(function () {
+        chart.regions.add([{start:4.5}]);
+      }, 4000);
+
+
     </script>
   </body>
 </html>
