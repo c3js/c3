@@ -3648,7 +3648,7 @@
             options.withTransitionForExit = false;
             // MEMO: called in updateLegend in redraw if withLegend
             if (!(options.withLegend && __legend_show)) {
-                transitions = generateAxisTransitions(options.withTransition ? __transition_duration : 0);
+                transitions = generateAxisTransitions(options.withTransitionForAxis ? __transition_duration : 0);
                 // Update sizes and scales
                 updateSizes();
                 updateScales();
