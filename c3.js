@@ -289,7 +289,8 @@
 
         /*-- Set Variables --*/
 
-        var clipId = (typeof __bindto === "string" ? __bindto.replace('#', '') : __bindto.id)  + '-clip',
+        // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
+        var clipId = (typeof __bindto === "string" ? __bindto.replace(/[# .>~+]/g, '') : CLASS.chart + (+new Date()))  + '-clip',
             clipIdForXAxis = clipId + '-xaxis',
             clipIdForYAxis = clipId + '-yaxis',
             clipPath = getClipPath(clipId),
@@ -489,7 +490,7 @@
             var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
                 leftAxis = main.select('.' + leftAxisClass).node(),
                 svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
-                chartRect = d3.select(__bindto).node().getBoundingClientRect(),
+                chartRect = selectChart.node().getBoundingClientRect(),
                 hasArc = hasArcType(c3.data.targets),
                 svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : getCurrentPaddingLeft());
             return svgLeft > 0 ? svgLeft : 0;
@@ -538,10 +539,10 @@
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
         function getParentWidth() {
-            return +d3.select(__bindto).style("width").replace('px', ''); // TODO: if rotated, use height
+            return +selectChart.style("width").replace('px', ''); // TODO: if rotated, use height
         }
         function getParentHeight() {
-            return +d3.select(__bindto).style('height').replace('px', ''); // TODO: if rotated, use width
+            return +selectChart.style('height').replace('px', ''); // TODO: if rotated, use width
         }
         function getAxisClipX(forHorizontal) {
             // axis line width + padding for left
@@ -2448,7 +2449,7 @@
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                throw new Error('Bind element not found. Check the selector specified by "bindto" and existance of that element. Default "bindto" is "#chart".');
+                throw new Error('Element to bind not found');
             }
             selectChart.html("").classed("c3", true);
 
@@ -2513,7 +2514,7 @@
             }
 
             // Define tooltip
-            tooltip = d3.select(__bindto)
+            tooltip = selectChart
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
