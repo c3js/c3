@@ -463,7 +463,7 @@
             updateRadius();
 
             if (isLegendRight && hasArcType(c3.data.targets)) {
-                margin3.left = width / 2 + radiusExpanded;
+                margin3.left = width / 2 + radiusExpanded * 1.1;
             }
         }
         function updateXgridFocus() {
