@@ -53,6 +53,14 @@
         chart.regions.add([{start:4.5}]);
       }, 4000);
 
+      setTimeout(function () {
+        chart.regions.add([{start:3,end:3.5,class:"region1"}, {start:4,end:4.5,class:"region2"}]);
+      }, 4000);
+
+      setTimeout(function () {
+        chart.regions.remove({classes:['region1', 'region2'], duration: 0});
+      }, 5000);
+
 
     </script>
   </body>

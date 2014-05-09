@@ -4353,19 +4353,22 @@
             redraw();
             return __regions;
         };
-        c3.regions.remove = function (classes, options) {
-            var regionClasses = [].concat(classes);
-            options = isDefined(options) ? options : {};
-            regionClasses.forEach(function (cls) {
-                var duration = isValue(options.duration) ? options.duration : 0;
-                svg.selectAll('.' + cls)
-                  .transition().duration(duration)
-                    .style('fill-opacity', 0)
-                    .remove();
-                __regions = __regions.filter(function (region) {
-                    return region.classes.indexOf(cls) < 0;
-                });
+        c3.regions.remove = function (options) {
+            var duration, classes, regions;
+
+            options = options || {};
+            duration = getOption(options, "duration", __transition_duration);
+            classes = getOption(options, "classes", [CLASS.region]);
+
+            regions = main.select('.' + CLASS.regions).selectAll(classes.map(function (c) { return '.' + c; }));
+            (duration ? regions.transition().duration(duration) : regions)
+                .style('opacity', 0)
+                .remove();
+
+            __regions = __regions.filter(function (region) {
+                return classes.indexOf(region.class) < 0;
             });
+
             return __regions;
         };
 
