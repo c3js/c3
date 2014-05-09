@@ -109,10 +109,10 @@
         var __size_width = getConfig(['size', 'width']),
             __size_height = getConfig(['size', 'height']);
 
-        var __padding_left = getConfig(['padding', 'left'], 50),
-            __padding_right = getConfig(['padding', 'right'], 10),
-            __padding_top = getConfig(['padding', 'top'], 0),
-            __padding_bottom = getConfig(['padding', 'bottom'], 0);
+        var __padding_left = getConfig(['padding', 'left']),
+            __padding_right = getConfig(['padding', 'right']),
+            __padding_top = getConfig(['padding', 'top']),
+            __padding_bottom = getConfig(['padding', 'bottom']);
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent']),
@@ -421,9 +421,9 @@
             // for main, context
             if (__axis_rotated) {
                 margin = {
-                    top: getHorizontalAxisHeight('y2') + __padding_top,
+                    top: getHorizontalAxisHeight('y2') + getCurrentPaddingTop(),
                     right: hasArc ? 0 : getCurrentPaddingRight(),
-                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom + __padding_bottom,
+                    bottom: getHorizontalAxisHeight('y') + legendHeightForBottom + getCurrentPaddingBottom(),
                     left: subchartHeight + (hasArc ? 0 : getCurrentPaddingLeft())
                 };
                 margin2 = {
@@ -434,9 +434,9 @@
                 };
             } else {
                 margin = {
-                    top: 4 + __padding_top, // for top tick text
+                    top: 4 + getCurrentPaddingTop(), // for top tick text
                     right: hasArc ? 0 : getCurrentPaddingRight(),
-                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom + __padding_bottom,
+                    bottom: xAxisHeight + subchartHeight + legendHeightForBottom + getCurrentPaddingBottom(),
                     left: hasArc ? 0 : getCurrentPaddingLeft()
                 };
                 margin2 = {
@@ -501,26 +501,29 @@
             var h = __size_height ? __size_height : getParentHeight();
             return h > 0 ? h : 320;
         }
+        function getCurrentPaddingTop() {
+            return __padding_top ? __padding_top : 0;
+        }
+        function getCurrentPaddingBottom() {
+            return __padding_bottom ? __padding_bottom : 0;
+        }
         function getCurrentPaddingLeft() {
-            var defaultPadding = 1;
             if (__padding_left) {
                 return __padding_left;
             } else if (__axis_rotated) {
-                return !__axis_x_show ? defaultPadding : getAxisWidthByAxisId('x');
+                return !__axis_x_show ? 1 : ceil10(getAxisWidthByAxisId('x'));
             } else {
-                return !__axis_y_show || __axis_y_inner ? defaultPadding : getAxisWidthByAxisId('y');
+                return !__axis_y_show || __axis_y_inner ? 1 : ceil10(getAxisWidthByAxisId('y'));
             }
         }
         function getCurrentPaddingRight() {
-            var defaultPadding = 1;
+            var defaultPadding = 10, legendWidthOnRight = isLegendRight ? getLegendWidth() + 20 : 0;
             if (__padding_right) {
                 return __padding_right;
-            } else if (isLegendRight) {
-                return getLegendWidth() + 20 + (__axis_y2_show && !__axis_rotated ? getAxisWidthByAxisId('y2') : defaultPadding);
-            } else if (__axis_y2_show) {
-                return __axis_y2_inner || __axis_rotated ? defaultPadding : getAxisWidthByAxisId('y2');
+            } else if (__axis_rotated) {
+                return defaultPadding + legendWidthOnRight;
             } else {
-                return defaultPadding;
+                return (!__axis_y2_show || __axis_y2_inner ? defaultPadding : ceil10(getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
             }
         }
         function getAxisWidthByAxisId(id) {
@@ -2108,6 +2111,10 @@
             return isDefined(options[key]) ? options[key] : defaultValue;
         }
 
+        function ceil10(v) {
+            return Math.ceil(v / 10) * 10;
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -2663,22 +2670,8 @@
             // Set targets
             updateTargets(c3.data.targets);
 
-            // Update ticks for width calculation
-            if (__axis_rotated) {
-                main.select('.' + CLASS.axisX).style("opacity", 0).call(xAxis);
-            } else {
-                main.select('.' + CLASS.axisY).style("opacity", 0).call(yAxis);
-                main.select('.' + CLASS.axisY2).style("opacity", 0).call(y2Axis);
-            }
-
-            // Update sizes according to tick width updated by above
-            updateSizes();
-            updateScales();
-            updateSvgSize();
-            transformAll(false);
-
             // Draw with targets
-            redraw({withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+            redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -3033,7 +3026,7 @@
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
             var barIndices = getBarIndices(), maxDataCountTarget, tickOffset;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
+            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
             var hideAxis = hasArcType(c3.data.targets);
             var drawBar, drawBarOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
@@ -3046,6 +3039,7 @@
             withTransform = getOption(options, "withTransform", false);
             withUpdateXDomain = getOption(options, "withUpdateXDomain", false);
             withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
+            withUpdateTranslate = getOption(options, "withUpdateTranslate", false);
             withLegend = getOption(options, "withLegend", false);
             withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
             withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
@@ -3102,6 +3096,14 @@
 
             // Update axis label
             updateAxisLabels(withTransition);
+
+            // MEMO: need to be called after axis updated because updated tick's width will be used
+            if (withUpdateTranslate) {
+                updateSizes();
+                updateScales();
+                updateSvgSize();
+                transformAll(false);
+            }
 
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
@@ -4536,12 +4538,12 @@
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
-                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+                return "translate(" + Math.round(x(d) + tickOffset) + ", 0)";
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
-                return "translate(0," + Math.ceil(y(d)) + ")";
+                return "translate(0," + Math.round(y(d)) + ")";
             });
         }
         function scaleExtent(domain) {
