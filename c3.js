@@ -118,6 +118,8 @@
             __zoom_extent = getConfig(['zoom', 'extent']),
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
 
+        var __interaction_enabled = getConfig(['interaction', 'enabled'], true);
+
         var __onenter = getConfig(['onenter'], function () {}),
             __onleave = getConfig(['onleave'], function () {}),
             __onresize = getConfig(['onresize'], function () {}),
@@ -3494,66 +3496,68 @@
                 .attr("cx", __axis_rotated ? circleY : circleX)
                 .attr("cy", __axis_rotated ? circleX : circleY);
 
-            // rect for mouseover
-            eventRect = main.select('.' + CLASS.eventRects);
-            if (notEmpty(__data_xs) && !isSingleX(__data_xs)) {
+            if (__interaction_enabled) {
+                // rect for mouseover
+                eventRect = main.select('.' + CLASS.eventRects);
+                if (notEmpty(__data_xs) && !isSingleX(__data_xs)) {
 
-                if (!eventRect.classed(CLASS.eventRectsMultiple)) {
-                    eventRect.classed(CLASS.eventRectsMultiple, true).classed(CLASS.eventRectsSingle, false)
-                        .selectAll('.' + CLASS.eventRect).remove();
-                }
+                    if (!eventRect.classed(CLASS.eventRectsMultiple)) {
+                        eventRect.classed(CLASS.eventRectsMultiple, true).classed(CLASS.eventRectsSingle, false)
+                            .selectAll('.' + CLASS.eventRect).remove();
+                    }
 
-                eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
-                    .data([0]);
-                // enter : only one rect will be added
-                generateEventRectsForMultipleXs(eventRectUpdate.enter());
-                // update
-                eventRectUpdate
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', width)
-                    .attr('height', height);
-                // exit : not needed becuase always only one rect exists
-            } else {
-
-                if (!eventRect.classed(CLASS.eventRectsSingle)) {
-                    eventRect.classed(CLASS.eventRectsMultiple, false).classed(CLASS.eventRectsSingle, true)
-                        .selectAll('.' + CLASS.eventRect).remove();
-                }
-
-                if (isCustomX && !isCategorized) {
-                    rectW = function (d, i) {
-                        var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
-                        return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
-                    };
-                    rectX = function (d, i) {
-                        var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
-                        return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
-                    };
+                    eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
+                        .data([0]);
+                    // enter : only one rect will be added
+                    generateEventRectsForMultipleXs(eventRectUpdate.enter());
+                    // update
+                    eventRectUpdate
+                        .attr('x', 0)
+                        .attr('y', 0)
+                        .attr('width', width)
+                        .attr('height', height);
+                    // exit : not needed becuase always only one rect exists
                 } else {
-                    rectW = getEventRectWidth();
-                    rectX = function (d) {
-                        return x(d.x) - (rectW / 2);
-                    };
+
+                    if (!eventRect.classed(CLASS.eventRectsSingle)) {
+                        eventRect.classed(CLASS.eventRectsMultiple, false).classed(CLASS.eventRectsSingle, true)
+                            .selectAll('.' + CLASS.eventRect).remove();
+                    }
+
+                    if (isCustomX && !isCategorized) {
+                        rectW = function (d, i) {
+                            var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
+                            return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
+                        };
+                        rectX = function (d, i) {
+                            var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
+                            return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
+                        };
+                    } else {
+                        rectW = getEventRectWidth();
+                        rectX = function (d) {
+                            return x(d.x) - (rectW / 2);
+                        };
+                    }
+                    // Set data
+                    maxDataCountTarget = getMaxDataCountTarget(c3.data.targets);
+                    main.select('.' + CLASS.eventRects)
+                        .datum(maxDataCountTarget ? maxDataCountTarget.values : []);
+                    // Update rects
+                    eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
+                        .data(function (d) { return d; });
+                    // enter
+                    generateEventRectsForSingleX(eventRectUpdate.enter());
+                    // update
+                    eventRectUpdate
+                        .attr('class', classEvent)
+                        .attr("x", __axis_rotated ? 0 : rectX)
+                        .attr("y", __axis_rotated ? rectX : 0)
+                        .attr("width", __axis_rotated ? width : rectW)
+                        .attr("height", __axis_rotated ? rectW : height);
+                    // exit
+                    eventRectUpdate.exit().remove();
                 }
-                // Set data
-                maxDataCountTarget = getMaxDataCountTarget(c3.data.targets);
-                main.select('.' + CLASS.eventRects)
-                    .datum(maxDataCountTarget ? maxDataCountTarget.values : []);
-                // Update rects
-                eventRectUpdate = main.select('.' + CLASS.eventRects).selectAll('.' + CLASS.eventRect)
-                    .data(function (d) { return d; });
-                // enter
-                generateEventRectsForSingleX(eventRectUpdate.enter());
-                // update
-                eventRectUpdate
-                    .attr('class', classEvent)
-                    .attr("x", __axis_rotated ? 0 : rectX)
-                    .attr("y", __axis_rotated ? rectX : 0)
-                    .attr("width", __axis_rotated ? width : rectW)
-                    .attr("height", __axis_rotated ? rectW : height);
-                // exit
-                eventRectUpdate.exit().remove();
             }
 
             // update fadein condition
