@@ -144,6 +144,7 @@
             __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
             __data_hide = getConfig(['data', 'hide'], false),
+            __data_filter = getConfig(['data', 'filter']),
             __data_selection_enabled = getConfig(['data', 'selection', 'enabled'], false),
             __data_selection_grouped = getConfig(['data', 'selection', 'grouped'], false),
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
@@ -1486,9 +1487,6 @@
             }
             return false;
         }
-        function getTargets(filter) {
-            return isDefined(filter) ? c3.data.targets.filter(filter) : c3.data.targets;
-        }
         function isTargetToShow(targetId) {
             return hiddenTargetIds.indexOf(targetId) < 0;
         }
@@ -1879,7 +1877,7 @@
 
         function getBarIndices() {
             var indices = {}, i = 0, j, k;
-            filterTargetsToShow(getTargets(isBarType)).forEach(function (d) {
+            filterTargetsToShow(c3.data.targets.filter(isBarType)).forEach(function (d) {
                 for (j = 0; j < __data_groups.length; j++) {
                     if (__data_groups[j].indexOf(d.id) < 0) { continue; }
                     for (k = 0; k < __data_groups[j].length; k++) {
@@ -1908,7 +1906,7 @@
             };
         }
         function getBarOffset(barIndices, isSub) {
-            var targets = orderTargets(filterTargetsToShow(getTargets(isBarType))),
+            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isBarType))),
                 targetIds = targets.map(function (t) { return t.id; });
             return function (d, i) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
@@ -2448,6 +2446,10 @@
             // Init data as targets
             c3.data.xs = {};
             c3.data.targets = convertDataToTargets(data);
+
+            if (__data_filter) {
+                c3.data.targets = c3.data.targets.filter(__data_filter);
+            }
 
             // Set targets to hide if needed
             if (__data_hide) {
@@ -3768,6 +3770,10 @@
         }
 
         function load(targets, args) {
+            // filter loading targets if needed
+            if (args.filter) {
+                targets = targets.filter(args.filter);
+            }
             // set type if args.types || args.type specified
             if (args.type || args.types) {
                 targets.forEach(function (t) {
@@ -4368,7 +4374,7 @@
             return isDefined(target) ? target.values.map(function (d) { return d.value; }) : undefined;
         };
         c3.data.getAsTarget = function (targetId) {
-            var targets = getTargets(function (t) { return t.id === targetId; });
+            var targets = c3.data.targets.filter(function (t) { return t.id === targetId; });
             return targets.length > 0 ? targets[0] : undefined;
         };
         c3.data.names = function (names) {
