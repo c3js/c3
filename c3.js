@@ -3259,7 +3259,7 @@
                 .attr("height", regionHeight)
                 .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
             mainRegion.exit().transition().duration(duration)
-                .style("fill-opacity", 0)
+                .style("opacity", 0)
                 .remove();
 
             // bars
@@ -4342,13 +4342,13 @@
         };
 
         c3.regions = function (regions) {
-            if (isUndefined(regions)) { return __regions; }
+            if (!regions) { return __regions; }
             __regions = regions;
             redraw();
             return __regions;
         };
         c3.regions.add = function (regions) {
-            if (isUndefined(regions)) { return __regions; }
+            if (!regions) { return __regions; }
             __regions = __regions.concat(regions);
             redraw();
             return __regions;
