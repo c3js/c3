@@ -3103,6 +3103,11 @@
                 updateScales();
                 updateSvgSize();
                 transformAll(false);
+                // update axis again
+                axes.x.call(xAxis);
+                axes.y.call(yAxis);
+                axes.y2.call(y2Axis);
+                axes.subx.call(subXAxis);
             }
 
             // show/hide if manual culling needed
