@@ -2104,6 +2104,10 @@
                 });
         }
 
+        function getOption(options, key, defaultValue) {
+            return isDefined(options[key]) ? options[key] : defaultValue;
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -3032,16 +3036,15 @@
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             options = options || {};
-            withY = isDefined(options.withY) ? options.withY : true;
-            withSubchart = isDefined(options.withSubchart) ? options.withSubchart : true;
-            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
-            withTransform = isDefined(options.withTransform) ? options.withTransform : false;
-            withUpdateXDomain = isDefined(options.withUpdateXDomain) ? options.withUpdateXDomain : false;
-            withUpdateOrgXDomain = isDefined(options.withUpdateOrgXDomain) ? options.withUpdateOrgXDomain : false;
-            withLegend = isDefined(options.withLegend) ? options.withLegend : false;
-
-            withTransitionForExit = isDefined(options.withTransitionForExit) ? options.withTransitionForExit : withTransition;
-            withTransitionForAxis = isDefined(options.withTransitionForAxis) ? options.withTransitionForAxis : withTransition;
+            withY = getOption(options, "withY", true);
+            withSubchart = getOption(options, "withSubchart", true);
+            withTransition = getOption(options, "withTransition", true);
+            withTransform = getOption(options, "withTransform", false);
+            withUpdateXDomain = getOption(options, "withUpdateXDomain", false);
+            withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
+            withLegend = getOption(options, "withLegend", false);
+            withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
+            withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
 
             duration = withTransition ? __transition_duration : 0;
             durationForExit = withTransitionForExit ? duration : 0;
@@ -3634,9 +3637,9 @@
             var transitions;
             options = options || {};
             // same with redraw
-            options.withTransition = isDefined(options.withTransition) ? options.withTransition : true;
-            options.withTransform = isDefined(options.withTransform) ? options.withTransform : false;
-            options.withLegend = isDefined(options.withLegend) ? options.withLegend : false;
+            options.withTransition = getOption(options, "withTransition", true);
+            options.withTransform = getOption(options, "withTransform", false);
+            options.withLegend = getOption(options, "withLegend", false);
             // NOT same with redraw
             options.withUpdateXDomain = true;
             options.withUpdateOrgXDomain = true;
@@ -3898,8 +3901,8 @@
             var texts, rects, tiles;
 
             options = options || {};
-            withTransition = isDefined(options.withTransition) ? options.withTransition : true;
-            withTransitionForTransform = isDefined(options.withTransitionForTransform) ? options.withTransitionForTransform : true;
+            withTransition = getOption(options, "withTransition", true);
+            withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
             function updatePositions(textElement, id, reset) {
                 var box = textElement.getBoundingClientRect(),
