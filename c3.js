@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.37"
+        version: "0.1.38"
     };
 
     var CLASS = {
