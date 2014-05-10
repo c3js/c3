@@ -2954,17 +2954,17 @@
             main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape)
                 .filter(function (d) { return __data_selection_isselectable(d); })
                 .each(function (d, i) {
-                    var _this = d3.select(this),
-                        isSelected = _this.classed(CLASS.SELECTED),
-                        isIncluded = _this.classed(CLASS.INCLUDED),
+                    var shape = d3.select(this),
+                        isSelected = shape.classed(CLASS.SELECTED),
+                        isIncluded = shape.classed(CLASS.INCLUDED),
                         _x, _y, _w, _h, toggle, isWithin = false, box;
-                    if (this.nodeName === 'circle') {
-                        _x = _this.attr("cx") * 1;
-                        _y = _this.attr("cy") * 1;
+                    if (shape.classed(CLASS.circle)) {
+                        _x = shape.attr("cx") * 1;
+                        _y = shape.attr("cy") * 1;
                         toggle = togglePoint;
                         isWithin = minX < _x && _x < maxX && minY < _y && _y < maxY;
                     }
-                    else if (this.nodeName === 'path') {
+                    else if (shape.classed(CLASS.bar)) {
                         box = getPathBox(this);
                         _x = box.x;
                         _y = box.y;
@@ -2972,12 +2972,15 @@
                         _h = box.height;
                         toggle = toggleBar;
                         isWithin = !(maxX < _x || _x + _w < minX) && !(maxY < _y || _y + _h < minY);
+                    } else {
+                        // line/area selection not supported yet
+                        return;
                     }
                     if (isWithin ^ isIncluded) {
-                        _this.classed(CLASS.INCLUDED, !isIncluded);
+                        shape.classed(CLASS.INCLUDED, !isIncluded);
                         // TODO: included/unincluded callback here
-                        _this.classed(CLASS.SELECTED, !isSelected);
-                        toggle(!isSelected, _this, d, i);
+                        shape.classed(CLASS.SELECTED, !isSelected);
+                        toggle(!isSelected, shape, d, i);
                     }
                 });
         }
