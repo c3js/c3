@@ -350,7 +350,8 @@
         /*-- Define Functions --*/
 
         function getClipPath(id) {
-            return "url(" + document.URL.split('#')[0] + "#" + id + ")";
+            var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
+            return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";
         }
 
         function asHalfPixel(n) {
