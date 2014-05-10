@@ -4257,7 +4257,10 @@
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
-                if (this.nodeName === 'path') { return; } // path selection not supported yet
+                // line/area selection not supported yet
+                if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
+                    return;
+                }
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d) && !isSelected) {
                         toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
@@ -4277,7 +4280,10 @@
                     isTargetId = __data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                     isTargetIndex = !indices || indices.indexOf(i) >= 0,
                     isSelected = shape.classed(CLASS.SELECTED);
-                if (this.nodeName === 'path') { return; } // path selection not supported yet
+                // line/area selection not supported yet
+                if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
+                    return;
+                }
                 if (isTargetId && isTargetIndex) {
                     if (__data_selection_isselectable(d)) {
                         if (isSelected) {
