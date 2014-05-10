@@ -4617,13 +4617,18 @@
                     tickOffset = tickX = 0;
                 }
 
+                function tickSize(d) {
+                    var tickPosition = scale(d) + tickOffset;
+                    return range[0] < tickPosition && tickPosition < range[1] ? innerTickSize : 0;
+                }
+
                 switch (orient) {
                 case "bottom":
                     {
                         tickTransform = axisX;
                         lineEnter.attr("y2", innerTickSize);
                         textEnter.attr("y", Math.max(innerTickSize, 0) + tickPadding);
-                        lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", innerTickSize);
+                        lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
                         textUpdate.attr("x", 0).attr("y", Math.max(innerTickSize, 0) + tickPadding);
                         text.attr("dy", ".71em").style("text-anchor", "middle");
                         pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
