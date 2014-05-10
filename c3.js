@@ -3053,6 +3053,21 @@
 
             transitions = transitions || generateAxisTransitions(durationForAxis);
 
+            // MEMO: call axis to generate ticks and get those length, then update translate with them
+            if (withUpdateTranslate) {
+                if (__axis_rotated) {
+                    axes.x.call(xAxis);
+                    axes.subx.call(subXAxis);
+                } else {
+                    axes.y.call(yAxis);
+                    axes.y2.call(y2Axis);
+                }
+                updateSizes();
+                updateScales();
+                updateSvgSize();
+                transformAll(false);
+            }
+
             // update legend and transform each g
             if (withLegend && __legend_show) {
                 updateLegend(mapToIds(c3.data.targets), options, transitions);
@@ -3099,19 +3114,6 @@
 
             // Update axis label
             updateAxisLabels(withTransition);
-
-            // MEMO: need to be called after axis updated because updated tick's width will be used
-            if (withUpdateTranslate) {
-                updateSizes();
-                updateScales();
-                updateSvgSize();
-                transformAll(false);
-                // update axis again
-                axes.x.call(xAxis);
-                axes.y.call(yAxis);
-                axes.y2.call(y2Axis);
-                axes.subx.call(subXAxis);
-            }
 
             // show/hide if manual culling needed
             if (withUpdateXDomain && targetsToShow.length) {
@@ -4609,7 +4611,7 @@
                     textUpdate = tickUpdate.select("text");
 
                 if (isCategory) {
-                    tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
+                    tickOffset = Math.round((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
                     tickOffset = tickX = 0;
