@@ -2490,6 +2490,7 @@
 
             // Define svgs
             svg = selectChart.append("svg")
+                .style("overflow", "hidden")
                 .on('mouseenter', __onenter)
                 .on('mouseleave', __onleave);
 
