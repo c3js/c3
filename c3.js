@@ -3489,6 +3489,7 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
+                .style("fill", function (d) { return (__color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.
                 .style("opacity", (__color_opacity) ? __color_opacity : 1);
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
