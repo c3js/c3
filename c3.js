@@ -2495,8 +2495,8 @@
         var areaOnSub = (function () {
             var area = d3.svg.area()
                 .x(xx)
-                .y0(function (d, i) { return getSubYScale(d.id)(0); })
-                .y1(function (d, i) { return getSubYScale(d.id)(d.value); });
+                .y0(function (d) { return getSubYScale(d.id)(margin.bottom - __subchart_size_height); })
+                .y1(function (d) { return getSubYScale(d.id)(d.value); });
             return function (d) {
                 var data = filterRemoveNull(d.values), x0, y0;
                 if (hasType([d], 'area') || hasType([d], 'area-spline')) {
