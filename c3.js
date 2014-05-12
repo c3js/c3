@@ -273,7 +273,7 @@
 
                 name = d[i].name;
                 value = valueFormat(d[i].value, d[i].ratio);
-                bgcolor = (__color_values) ? levelColor(d[i].value) : color(d[i].id);
+                bgcolor = (__gauge_style === 'arc' && __color_values) ? levelColor(d[i].value) : color(d[i].id);
 
                 text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
                 text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
@@ -3489,7 +3489,7 @@
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
-                .style("fill", function (d) { return (__color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.
+                .style("fill", function (d) { return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.
                 .style("opacity", (__color_opacity) ? __color_opacity : 1);
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .attr("transform", transformForArcLabel)
@@ -3812,7 +3812,7 @@
             mainPieEnter.append("path")
                 .attr("class", classArc)
                 .style("opacity", 0)
-                .style("fill", function (d) { return (__color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.
+                .style("fill", function (d) { return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .each(function (d) { this._current = d; })
                 .on('mouseover', function (d, i) {
