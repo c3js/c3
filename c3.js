@@ -76,7 +76,7 @@
      */
     c3.generate = function (config) {
 
-        var d3 = window.d3 ? window.d3 : window.require ? window.require("d3") : undefined;
+        var d3 = window.d3 ? window.d3 : 'undefined' != typeof require ? require("d3") : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
             cache = {};
@@ -4541,10 +4541,11 @@
 
     if (typeof window.define === "function" && window.define.amd) {
         window.define("c3", ["d3"], c3);
+    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module){
+        module.exports = c3;
     } else {
         window.c3 = c3;
     }
-    // TODO: module.exports
 
     // Features:
     // 1. category axis
