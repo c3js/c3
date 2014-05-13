@@ -2,9 +2,11 @@
   "name": "c3",
   "repo": "masayuki0812/c3",
   "description": "A D3-based reusable chart library",
-  "version": "0.0.1",
+  "version": "0.1.39",
   "keywords": [],
-  "dependencies": {},
+  "dependencies": {
+    "mbostock/d3": "*"
+  },
   "development": {},
   "license": "MIT",
   "main": "c3.js",

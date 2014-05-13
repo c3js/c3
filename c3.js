@@ -4541,10 +4541,11 @@
 
     if (typeof window.define === "function" && window.define.amd) {
         window.define("c3", ["d3"], c3);
+    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module){
+        module.exports = c3;
     } else {
         window.c3 = c3;
     }
-    // TODO: module.exports
 
     // Features:
     // 1. category axis
