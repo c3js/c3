@@ -76,7 +76,7 @@
      */
     c3.generate = function (config) {
 
-        var d3 = window.d3 ? window.d3 : window.require ? window.require("d3") : undefined;
+        var d3 = window.d3 ? window.d3 : 'undefined' != typeof require ? require("d3") : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
             cache = {};
