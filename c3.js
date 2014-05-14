@@ -3733,8 +3733,8 @@
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; });
             // Update date for selected circles
             targets.forEach(function (t) {
-                main.selectAll('.' + CLASS.selectedCircles + getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d, i) {
-                    d.value = t.values[i].value;
+                main.selectAll('.' + CLASS.selectedCircles + getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d) {
+                    d.value = t.values[d.index].value;
                 });
             });
             // MEMO: can not keep same color...
