@@ -4393,7 +4393,14 @@
                 .remove();
 
             __regions = __regions.filter(function (region) {
-                return classes.indexOf(region.class) < 0;
+                var found = false;
+                if (!region.class) {
+                    return true;
+                }
+                region.class.split(' ').forEach(function (c) {
+                    if (classes.indexOf(c) >= 0) { found = true; }
+                });
+                return !found;
             });
 
             return __regions;
