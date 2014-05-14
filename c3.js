@@ -515,7 +515,7 @@
             if (__padding_left) {
                 return __padding_left;
             } else if (__axis_rotated) {
-                return !__axis_x_show ? 1 : ceil10(getAxisWidthByAxisId('x'));
+                return !__axis_x_show ? 1 : Math.max(ceil10(getAxisWidthByAxisId('x')), 40);
             } else {
                 return !__axis_y_show || __axis_y_inner ? 1 : ceil10(getAxisWidthByAxisId('y'));
             }
