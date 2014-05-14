@@ -1,6 +1,8 @@
 (function (window) {
     'use strict';
 
+    /*global define, module, exports, require */
+
     var c3 = {
         version: "0.1.38"
     };
@@ -76,7 +78,7 @@
      */
     c3.generate = function (config) {
 
-        var d3 = window.d3 ? window.d3 : 'undefined' != typeof require ? require("d3") : undefined;
+        var d3 = window.d3 ? window.d3 : 'undefined' !== typeof require ? require("d3") : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
             cache = {};
@@ -4539,9 +4541,9 @@
         return typeof v !== 'undefined';
     }
 
-    if (typeof window.define === "function" && window.define.amd) {
-        window.define("c3", ["d3"], c3);
-    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module){
+    if (typeof define === "function" && define.amd) {
+        define("c3", ["d3"], c3);
+    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
         module.exports = c3;
     } else {
         window.c3 = c3;
