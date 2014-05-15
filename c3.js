@@ -1694,7 +1694,7 @@
             return Math.ceil(yScale(d.value));
         }
         function subxx(d) {
-            return subX(d.x);
+            return d ? subX(d.x) : null;
         }
 
         function findSameXOfValues(values, index) {
@@ -2207,24 +2207,8 @@
             getBars(i).classed(CLASS.EXPANDED, false);
         }
 
-        // For main region
-        var lineOnMain = (function () {
-            var line = d3.svg.line()
-                .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
-                .y(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
-            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
-            return function (d) {
-                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values, x0, y0;
-                if (isLineType(d)) {
-                    isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
-                } else {
-                    x0 = data[0] ? x(data[0].x) : 0;
-                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-                }
-            };
-        })();
+        var lineOnMain = generateDrawLine(x, xx, getYScale),
+            lineOnSub = generateDrawLine(subX, subxx, getSubYScale);
 
         var areaOnMain = (function () {
             var area;
@@ -2254,6 +2238,32 @@
                 }
             };
         })();
+
+        function generateDrawLine(x, xValue, yScaleGetter) {
+            var yValue = function (d) { return yScaleGetter(d.id)(d.value); },
+                line = d3.svg.line()
+                    .x(__axis_rotated ? yValue : xValue)
+                    .y(__axis_rotated ? xValue : yValue);
+            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
+            return function (d) {
+                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values,
+                    y = yScaleGetter(d.id), x0 = 0, y0 = 0;
+                if (isLineType(d)) {
+                    if (__data_regions[d.id]) {
+                        return lineWithRegions(data, x, y, __data_regions[d.id]);
+                    } else {
+                        line.interpolate(isSplineType(d) ? "cardinal" : "linear");
+                        return line(data);
+                    }
+                } else {
+                    if (data[0]) {
+                        x0 = x(data[0].x);
+                        y0 = y(data[0].value);
+                    }
+                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+                }
+            };
+        }
 
         function generateDrawBar(barIndices, isSub) {
             var getPoints = generateGetBarPoints(barIndices, isSub);
@@ -2323,17 +2333,6 @@
                 ];
             };
         }
-
-        // For brush region
-        var lineOnSub = (function () {
-            var line = d3.svg.line()
-                .x(__axis_rotated ? function (d) { return getSubYScale(d.id)(d.value); } : subxx)
-                .y(__axis_rotated ? subxx : function (d) { return getSubYScale(d.id)(d.value); });
-            return function (d) {
-                var data = filterRemoveNull(d.values);
-                return isLineType(d) ? line(data) : "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
-            };
-        })();
 
         function lineWithRegions(d, x, y, _regions) {
             var prev = -1, i, j;
