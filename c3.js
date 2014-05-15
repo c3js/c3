@@ -2716,23 +2716,20 @@
                     if (dragging) { return; } // do nothing if dragging
                     if (hasArcType(c3.data.targets)) { return; }
 
-                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
-                    var j, newData;
+                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); }),
+                        newData = [];
 
                     // Sort selectedData as names order
-                    if (Object.keys(__data_names).length > 0) {
-                        newData = [];
-                        for (var id in __data_names) {
-                            for (j = 0; j < selectedData.length; j++) {
-                                if (selectedData[j].id === id) {
-                                    newData.push(selectedData[j]);
-                                    selectedData.shift(j);
-                                    break;
-                                }
+                    Object.keys(__data_names).forEach(function (id) {
+                        for (var j = 0; j < selectedData.length; j++) {
+                            if (selectedData[j] && selectedData[j].id === id) {
+                                newData.push(selectedData[j]);
+                                selectedData.shift(j);
+                                break;
                             }
                         }
-                        selectedData = newData.concat(selectedData); // Add remained
-                    }
+                    });
+                    selectedData = newData.concat(selectedData); // Add remained
 
                     // Expand shapes if needed
                     if (__point_focus_expand_enabled) { expandCircles(i); }
