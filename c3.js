@@ -305,7 +305,7 @@
 
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
 
-        var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
+        var defaultColorPattern = d3.scale.category10().range(),
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
 
         var timeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
