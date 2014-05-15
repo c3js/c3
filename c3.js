@@ -2495,7 +2495,7 @@
         var areaOnSub = (function () {
             var area = d3.svg.area()
                 .x(xx)
-                .y0(function (d) { return getSubYScale(d.id)(margin.bottom - __subchart_size_height); })
+                .y0(function (d) { return getSubYScale(d.id)( (__axis_y_min) ? __axis_y_min : 0 ); })
                 .y1(function (d) { return getSubYScale(d.id)(d.value); });
             return function (d) {
                 var data = filterRemoveNull(d.values), x0, y0;
