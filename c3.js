@@ -4504,7 +4504,7 @@
         c3.destroy = function () {
             c3.data.targets = undefined;
             c3.data.xs = {};
-            selectChart.html("");
+            selectChart.classed('c3', false).html("");
             window.onresize = null;
         };
 
