@@ -1963,10 +1963,10 @@
             return hasType(targets, 'scatter');
         }
         function hasPieType(targets) {
-            return hasType(targets, 'pie');
+            return __data_type === 'pie' || hasType(targets, 'pie');
         }
         function hasDonutType(targets) {
-            return hasType(targets, 'donut');
+            return __data_type === 'donut' || hasType(targets, 'donut');
         }
         function hasArcType(targets) {
             return hasPieType(targets) || hasDonutType(targets);
