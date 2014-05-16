@@ -3345,26 +3345,28 @@
                 .attr("cy", __axis_rotated ? circleX : circleY);
             mainCircle.exit().remove();
 
-            mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
-                .data(barOrLineData);
-            mainText.enter().append('text')
-                .attr("class", classText)
-                .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
-                .style("stroke", 'none')
-                .style("fill", color)
-                .style("fill-opacity", 0);
-            mainText
-                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
-                .style("fill-opacity", initialOpacityForText)
-              .transition().duration(duration)
-                .attr('x', xForText)
-                .attr('y', yForText)
-                .style("fill", color)
-                .style("fill-opacity", opacityForText);
-            mainText.exit()
-              .transition().duration(durationForExit)
-                .style('fill-opacity', 0)
-                .remove();
+            if (hasDataLabel()) {
+                mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
+                    .data(barOrLineData);
+                mainText.enter().append('text')
+                    .attr("class", classText)
+                    .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
+                    .style("stroke", 'none')
+                    .style("fill", color)
+                    .style("fill-opacity", 0);
+                mainText
+                    .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
+                    .style("fill-opacity", initialOpacityForText)
+                  .transition().duration(duration)
+                    .attr('x', xForText)
+                    .attr('y', yForText)
+                    .style("fill", color)
+                    .style("fill-opacity", opacityForText);
+                mainText.exit()
+                  .transition().duration(durationForExit)
+                    .style('fill-opacity', 0)
+                    .remove();
+            }
 
             // arc
             mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
