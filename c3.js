@@ -1826,7 +1826,7 @@
                 }
 
                 if (tooltipRight > chartRight) {
-                    tooltipLeft -= tWidth + 60;
+                    tooltipLeft -= tooltipRight - chartRight;
                 }
                 if (tooltipTop + tHeight > getCurrentHeight()) {
                     tooltipTop -= tHeight + 30;
