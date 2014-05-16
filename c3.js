@@ -1367,7 +1367,8 @@
                 if (isCustomX || isTimeSeries) {
                     // if included in input data
                     if (xs.indexOf(xKey) >= 0) {
-                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue);
+                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue).map(function (rawX, i) { return generateTargetX(rawX, id, i); });
+
                     }
                     // if not included in input data, find from preloaded data of other id's x
                     else if (__data_x) {
@@ -3537,14 +3538,14 @@
                             .selectAll('.' + CLASS.eventRect).remove();
                     }
 
-                    if (isCustomX && !isCategorized) {
+                    if ((isCustomX || isTimeSeries) && !isCategorized) {
                         rectW = function (d, i) {
                             var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
-                            return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
+                            return (x(nextX ? nextX : dx * 1.1) - x(prevX ? prevX : dx * 0.9)) / 2;
                         };
                         rectX = function (d, i) {
                             var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
-                            return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
+                            return (x(dx) + x(prevX ? prevX : dx * 0.9)) / 2;
                         };
                     } else {
                         rectW = getEventRectWidth();
