@@ -946,7 +946,6 @@
                 if (! found && t.data.id === d.data.id) {
                     found = true;
                     d = t;
-                    return;
                 }
             });
             return found ? d : null;
