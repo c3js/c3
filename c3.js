@@ -974,11 +974,15 @@
             return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
         }
         function transformForArcLabel(d) {
-            var updated = updateAngle(d), c, x, y, h, translate = "";
+            var updated = updateAngle(d), c, x, y, h, ratio, translate = "";
             if (updated) {
                 c = svgArc.centroid(updated);
-                x = c[0], y = c[1], h = Math.sqrt(x * x + y * y);
-                translate = "translate(" + ((x / h) * radius * 0.8) +  ',' + ((y / h) * radius * 0.8) +  ")";
+                x = c[0];
+                y = c[1];
+                h = Math.sqrt(x * x + y * y);
+                // TODO: ratio should be an option?
+                ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
+                translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
         }
@@ -3439,10 +3443,10 @@
                 .style('opacity', 0)
                 .remove();
             main.selectAll('.' + CLASS.chartArc).select('text')
-                .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
-              .transition().duration(duration)
                 .text(textForArcLabel)
+                .attr("transform", transformForArcLabel)
+              .transition().duration(duration)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
