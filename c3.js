@@ -587,7 +587,7 @@
         }
         function getEventRectWidth() {
             var target = getMaxDataCountTarget(c3.data.targets),
-                firstData, lastData, base, maxDataCount, ratio;
+                firstData, lastData, base, maxDataCount, ratio, w;
             if (!target) {
                 return 0;
             }
@@ -598,7 +598,8 @@
             }
             maxDataCount = getMaxDataCount();
             ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
-            return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
+            w = maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
+            return w < 1 ? 1 : w;
         }
         function updateLegendStep(step) {
             legendStep = step;
