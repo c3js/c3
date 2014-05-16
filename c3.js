@@ -1647,7 +1647,7 @@
             selectChart.select('svg').selectAll('.dummy')
                 .data([min, max])
               .enter().append('text')
-                .text(function (d) { return d; })
+                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
                 .each(function (d, i) { widths[i] = this.getBoundingClientRect().width * paddingCoef; })
               .remove();
             return widths;
