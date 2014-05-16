@@ -3330,20 +3330,22 @@
                 .style('opacity', 0)
                 .remove();
 
-            mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
-                .data(lineOrScatterData);
-            mainCircle.enter().append("circle")
-                .attr("class", classCircle)
-                .attr("r", pointR)
-                .style("fill", color);
-            mainCircle
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .style('opacity', opacityForCircle)
-                .style("fill", color)
-                .attr("cx", __axis_rotated ? circleY : circleX)
-                .attr("cy", __axis_rotated ? circleX : circleY);
-            mainCircle.exit().remove();
+            if (__point_show) {
+                mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
+                    .data(lineOrScatterData);
+                mainCircle.enter().append("circle")
+                    .attr("class", classCircle)
+                    .attr("r", pointR)
+                    .style("fill", color);
+                mainCircle
+                    .style("opacity", initialOpacity)
+                  .transition().duration(duration)
+                    .style('opacity', opacityForCircle)
+                    .style("fill", color)
+                    .attr("cx", __axis_rotated ? circleY : circleX)
+                    .attr("cy", __axis_rotated ? circleX : circleY);
+                mainCircle.exit().remove();
+            }
 
             if (hasDataLabel()) {
                 mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
