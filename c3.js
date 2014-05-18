@@ -2236,8 +2236,8 @@
             getBars(i).classed(CLASS.EXPANDED, false);
         }
 
-        var lineOnMain = generateDrawLine(x, xx, getYScale),
-            lineOnSub = generateDrawLine(subX, subxx, getSubYScale);
+        var lineOnMain = generateDrawLine(false),
+            lineOnSub = generateDrawLine(true);
 
         var areaOnMain = (function () {
             var area;
@@ -2268,15 +2268,17 @@
             };
         })();
 
-        function generateDrawLine(x, xValue, yScaleGetter) {
-            var yValue = function (d) { return yScaleGetter(d.id)(d.value); },
+        function generateDrawLine(isSub) {
+            var yScaleGetter = isSub ? getSubYScale : getYScale,
+                xValue = isSub ? xx : subxx,
+                yValue = function (d) { return yScaleGetter(d.id)(d.value); },
                 line = d3.svg.line()
                     .x(__axis_rotated ? yValue : xValue)
                     .y(__axis_rotated ? xValue : yValue);
             if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
             return function (d) {
                 var data = __line_connect_null ? filterRemoveNull(d.values) : d.values,
-                    y = yScaleGetter(d.id), x0 = 0, y0 = 0;
+                    x = isSub ? x : subX, y = yScaleGetter(d.id), x0 = 0, y0 = 0;
                 if (isLineType(d)) {
                     if (__data_regions[d.id]) {
                         return lineWithRegions(data, x, y, __data_regions[d.id]);
