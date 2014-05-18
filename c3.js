@@ -541,9 +541,19 @@
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
+        function getParentRectValue(key) {
+            var parent = selectChart.node(), v;
+            while (parent && parent.tagName !== 'BODY') {
+                v = parent.getBoundingClientRect()[key];
+                if (v) {
+                    break;
+                }
+                parent = parent.parentNode;
+            }
+            return v;
+        }
         function getParentWidth() {
-            var w = selectChart.style("width");
-            return w.indexOf('px') > 0 ? +w.replace('px', '') : 0;
+            return getParentRectValue('width');
         }
         function getParentHeight() {
             var h = selectChart.style('height');
