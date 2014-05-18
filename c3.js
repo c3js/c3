@@ -4564,6 +4564,7 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
+            c3.flush(); // TODO: need to be called twice because of update of legend
             c3.flush();
         };
 
