@@ -1957,6 +1957,9 @@
                 withoutFadeIn[id] = (type === __data_types[id]);
                 __data_types[id] = type;
             });
+            if (!targetIds) {
+                __data_type = type;
+            }
         }
         function hasType(targets, type) {
             var has = false;
