@@ -2768,6 +2768,9 @@
                 });
                 window.onresize.add(__onresized);
             }
+
+            // export element of the chart
+            c3.element = selectChart.node();
         }
 
         function generateEventRectsForSingleX(eventRectEnter) {
@@ -4601,8 +4604,6 @@
         else {
             throw Error('url or rows or columns is required.');
         }
-
-        c3.element = selectChart.node();
 
         return c3;
     };
