@@ -4636,12 +4636,12 @@
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
-                return "translate(" + Math.round(x(d) + tickOffset) + ", 0)";
+                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
-                return "translate(0," + Math.round(y(d)) + ")";
+                return "translate(0," + Math.ceil(y(d)) + ")";
             });
         }
         function scaleExtent(domain) {
@@ -4699,7 +4699,7 @@
                     textUpdate = tickUpdate.select("text");
 
                 if (isCategory) {
-                    tickOffset = Math.round((scale1(1) - scale1(0)) / 2);
+                    tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
                     tickOffset = tickX = 0;
