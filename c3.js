@@ -2754,7 +2754,7 @@
             if (window.onresize.add) {
                 window.onresize.add(__onresize);
                 window.onresize.add(function () {
-                    updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
+                    c3.flush();
                 });
                 window.onresize.add(__onresized);
             }
@@ -4551,6 +4551,10 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
+            c3.flush();
+        };
+
+        c3.flush = function () {
             updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
         };
 
