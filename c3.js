@@ -292,7 +292,7 @@
         /*-- Set Variables --*/
 
         // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
-        var clipId = (typeof __bindto === "string" ? __bindto.replace(/[# .>~+]/g, '') : CLASS.chart + (+new Date()))  + '-clip',
+        var clipId = "c3-" + (+new Date()) + '-clip',
             clipIdForXAxis = clipId + '-xaxis',
             clipIdForYAxis = clipId + '-yaxis',
             clipPath = getClipPath(clipId),
@@ -542,10 +542,12 @@
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
         function getParentWidth() {
-            return +selectChart.style("width").replace('px', ''); // TODO: if rotated, use height
+            var w = selectChart.style("width");
+            return w.indexOf('px') > 0 ? +w.replace('px', '') : 0;
         }
         function getParentHeight() {
-            return +selectChart.style('height').replace('px', ''); // TODO: if rotated, use width
+            var h = selectChart.style('height');
+            return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
         }
         function getAxisClipX(forHorizontal) {
             // axis line width + padding for left
@@ -2451,12 +2453,34 @@
         // for save value
         var orgAreaOpacity, withoutFadeIn = {};
 
+        function observeInserted(selection) {
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.type === 'childList' && mutation.previousSibling) {
+                        observer.disconnect();
+                        // need to wait for completion of load because size calculation requires the actual sizes determined after that completion
+                        var interval = window.setInterval(function () {
+                            // parentNode will NOT be null when completed
+                            if (selection.node().parentNode) {
+                                window.clearInterval(interval);
+                                redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransition: false, withLegend: true});
+                                selection.transition().style('opacity', 1);
+                            }
+                        }, 10);
+                    }
+                });
+            });
+            observer.observe(selection.node(), {attributes: true, childList: true, characterData: true});
+        }
+
         function init(data) {
-            var eventRect, grid, i;
+            var eventRect, grid, i, binding = true;
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                throw new Error('Element to bind not found');
+                selectChart = d3.select(document.createElement('div')).style('opacity', 0);
+                observeInserted(selectChart);
+                binding = false;
             }
             selectChart.html("").classed("c3", true);
 
@@ -2680,7 +2704,9 @@
             updateTargets(c3.data.targets);
 
             // Draw with targets
-            redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+            if (binding) {
+                redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+            }
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -4539,6 +4565,8 @@
         else {
             throw Error('url or rows or columns is required.');
         }
+
+        c3.element = selectChart.node();
 
         return c3;
     };
