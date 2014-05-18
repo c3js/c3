@@ -2136,6 +2136,18 @@
             return Math.ceil(v / 10) * 10;
         }
 
+        function getTextRect(text, cls) {
+            var rect;
+            d3.select('body').selectAll('.dummy')
+                .data([text])
+              .enter().append('text')
+                .classed(cls ? cls : "", true)
+                .text(text)
+                .each(function () { rect = this.getBoundingClientRect(); })
+              .remove();
+            return rect;
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -3973,7 +3985,7 @@
             withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
             function updatePositions(textElement, id, reset) {
-                var box = textElement.getBoundingClientRect(),
+                var box = getTextRect(textElement.textContent, CLASS.legendItem),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
