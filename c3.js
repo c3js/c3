@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.1.41"
+        version: "0.1.42"
     };
 
     var CLASS = {
