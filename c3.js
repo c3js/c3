@@ -2485,7 +2485,15 @@
                             // parentNode will NOT be null when completed
                             if (selection.node().parentNode) {
                                 window.clearInterval(interval);
-                                redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransition: false, withLegend: true});
+                                redraw({
+                                    withUpdateTranslate: true,
+                                    withTransform: true,
+                                    withUpdateXDomain: true,
+                                    withUpdateOrgXDomain: true,
+                                    withTransition: false,
+                                    withTransitionForTransform: false,
+                                    withLegend: true
+                                });
                                 selection.transition().style('opacity', 1);
                             }
                         }, 10);
