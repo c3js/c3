@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+  </head>
+  <body>
+<!--    <div id="chart"></div>-->
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+      var chart = c3.generate({
+        data: {
+          columns: [
+            ['sample', 30, 200, 100, null, 150, 250]
+          ],
+        },
+//        size: {
+//          width: 640,
+//          height: 320
+//        }
+      });
+
+      setTimeout(function () {
+        document.body.appendChild(chart.element);
+      }, 1000);
+    </script>
+  </body>
+</html>
