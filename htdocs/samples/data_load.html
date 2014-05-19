@@ -11,7 +11,10 @@
       var chart = c3.generate({
         data: {
           url: '/data/c3_test.csv',
-          labels: true
+          labels: true,
+          filter: function (t) {
+            return t.id !== 'data1';
+          }
         },
         subchart: {
           show: true
@@ -26,7 +29,10 @@
 
       setTimeout(function () {
         chart.load({
-          url: '/data/c3_test2.csv'
+          url: '/data/c3_test2.csv',
+          filter: function (t) {
+            return t.id !== 'data1';
+          }
         });
       }, 1000);
 
