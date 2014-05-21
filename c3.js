@@ -706,7 +706,7 @@
                         domain = this.orgDomain();
                         return [domain[0], domain[1] + 1];
                     }
-					orgXDomain = domain;
+                    orgXDomain = domain;
                     _scale.domain(domain);
                     return scale;
                 };
