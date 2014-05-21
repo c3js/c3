@@ -1427,7 +1427,8 @@
                             x = undefined;
                         }
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
-                    }).filter(function (v) { return typeof v.x !== 'undefined'; })
+                    }).filter(function (v) { return typeof v.x !== 'undefined'; }),
+                    color: color(id)
                 };
             });
 
