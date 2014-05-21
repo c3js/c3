@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.1.41"
+        version: "0.1.42"
     };
 
     var CLASS = {
@@ -321,7 +321,7 @@
         /*-- Set Variables --*/
 
         // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
-        var clipId = (typeof __bindto === "string" ? __bindto.replace(/[# .>~+]/g, '') : CLASS.chart + (+new Date()))  + '-clip',
+        var clipId = "c3-" + (+new Date()) + '-clip',
             clipIdForXAxis = clipId + '-xaxis',
             clipIdForYAxis = clipId + '-yaxis',
             clipPath = getClipPath(clipId),
@@ -334,7 +334,7 @@
 
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
 
-        var defaultColorPattern = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'], //same as d3.scale.category10()
+        var defaultColorPattern = d3.scale.category10().range(),
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color),
             levelColor = generateLevelColor(__color_pattern, __color_values);
 
@@ -572,11 +572,23 @@
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
+        function getParentRectValue(key) {
+            var parent = selectChart.node(), v;
+            while (parent && parent.tagName !== 'BODY') {
+                v = parent.getBoundingClientRect()[key];
+                if (v) {
+                    break;
+                }
+                parent = parent.parentNode;
+            }
+            return v;
+        }
         function getParentWidth() {
-            return +selectChart.style("width").replace('px', ''); // TODO: if rotated, use height
+            return getParentRectValue('width');
         }
         function getParentHeight() {
-            return +selectChart.style('height').replace('px', ''); // TODO: if rotated, use width
+            var h = selectChart.style('height');
+            return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
         }
         function getAxisClipX(forHorizontal) {
             // axis line width + padding for left
@@ -618,7 +630,7 @@
         }
         function getEventRectWidth() {
             var target = getMaxDataCountTarget(c3.data.targets),
-                firstData, lastData, base, maxDataCount, ratio;
+                firstData, lastData, base, maxDataCount, ratio, w;
             if (!target) {
                 return 0;
             }
@@ -629,7 +641,8 @@
             }
             maxDataCount = getMaxDataCount();
             ratio = (hasBarType(c3.data.targets) ? (maxDataCount - (isCategorized ? 0.25 : 1)) / maxDataCount : 1);
-            return maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
+            w = maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
+            return w < 1 ? 1 : w;
         }
         function updateLegendStep(step) {
             legendStep = step;
@@ -724,6 +737,7 @@
                         domain = this.orgDomain();
                         return [domain[0], domain[1] + 1];
                     }
+                    orgXDomain = domain;
                     _scale.domain(domain);
                     return scale;
                 };
@@ -977,7 +991,6 @@
                 if (! found && t.data.id === d.data.id) {
                     found = true;
                     d = t;
-                    return;
                 }
             });
             if (isNaN(d.endAngle)) d.endAngle = d.startAngle;
@@ -1015,11 +1028,15 @@
             return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
         }
         function transformForArcLabel(d) {
-            var updated = updateAngle(d), c, x, y, h, translate = "";
+            var updated = updateAngle(d), c, x, y, h, ratio, translate = "";
             if (updated) {
                 c = svgArc.centroid(updated);
-                x = c[0], y = c[1], h = Math.sqrt(x * x + y * y);
-                translate = __gauge_style == 'arc' ? "translate(1,1)" : "translate(" + ((x / h) * radius * 0.8) +  ',' + ((y / h) * radius * 0.8) +  ")";
+                x = c[0];
+                y = c[1];
+                h = Math.sqrt(x * x + y * y);
+                // TODO: ratio should be an option?
+                ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
+                translate = __gauge_style == 'arc' ? "translate(1,1)" : "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
         }
@@ -1429,7 +1446,8 @@
                 if (isCustomX || isTimeSeries) {
                     // if included in input data
                     if (xs.indexOf(xKey) >= 0) {
-                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue);
+                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue).map(function (rawX, i) { return generateTargetX(rawX, id, i); });
+
                     }
                     // if not included in input data, find from preloaded data of other id's x
                     else if (__data_x) {
@@ -1707,7 +1725,7 @@
             selectChart.select('svg').selectAll('.dummy')
                 .data([min, max])
               .enter().append('text')
-                .text(function (d) { return d; })
+                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
                 .each(function (d, i) { widths[i] = this.getBoundingClientRect().width * paddingCoef; })
               .remove();
             return widths;
@@ -1758,7 +1776,7 @@
             return Math.ceil(yScale(d.value));
         }
         function subxx(d) {
-            return subX(d.x);
+            return d ? subX(d.x) : null;
         }
 
         function findSameXOfValues(values, index) {
@@ -1891,7 +1909,7 @@
                 }
 
                 if (tooltipRight > chartRight) {
-                    tooltipLeft -= tWidth + 60;
+                    tooltipLeft -= tooltipRight - chartRight;
                 }
                 if (tooltipTop + tHeight > getCurrentHeight()) {
                     tooltipTop -= tHeight + 30;
@@ -2103,6 +2121,9 @@
                 withoutFadeIn[id] = (type === __data_types[id]);
                 __data_types[id] = type;
             });
+            if (!targetIds) {
+                __data_type = type;
+            }
         }
         function hasType(targets, type) {
             var has = false;
@@ -2125,13 +2146,13 @@
             return hasType(targets, 'scatter');
         }
         function hasPieType(targets) {
-            return hasType(targets, 'pie');
+            return __data_type === 'pie' || hasType(targets, 'pie');
         }
         function hasGaugeType(targets) {
             return hasType(targets, 'gauge');
         }
         function hasDonutType(targets) {
-            return hasType(targets, 'donut');
+            return __data_type === 'donut' || hasType(targets, 'donut');
         }
         function hasArcType(targets) {
             return hasPieType(targets) || hasDonutType(targets) || hasGaugeType(targets);
@@ -2320,6 +2341,18 @@
             return Math.ceil(v / 10) * 10;
         }
 
+        function getTextRect(text, cls) {
+            var rect;
+            d3.select('body').selectAll('.dummy')
+                .data([text])
+              .enter().append('text')
+                .classed(cls ? cls : "", true)
+                .text(text)
+                .each(function () { rect = this.getBoundingClientRect(); })
+              .remove();
+            return rect;
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -2408,73 +2441,21 @@
             getBars(i).classed(CLASS.EXPANDED, false);
         }
 
-        // For main region
-        var lineOnMain = (function () {
-            var line = d3.svg.line()
-                .x(__axis_rotated ? function (d) { return getYScale(d.id)(d.value); } : xx)
-                .y(__axis_rotated ? xx : function (d) { return getYScale(d.id)(d.value); });
-            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
-            return function (d) {
-                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values, x0, y0;
-                if (isLineType(d)) {
-                    isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                    return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
-                } else if (isStepType(d)) {
-                    line.interpolate("step-after");
-                    return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
-                } else {
-                    x0 = data[0] ? x(data[0].x) : 0;
-                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-                }
-            };
-        })(); // usage replace by generateDrawLine
-
-        var areaOnMain = (function () {
-            var area;
-
-            if (__axis_rotated) {
-                area = d3.svg.area()
-                    .x0(function (d) { return getYScale(d.id)(0); })
-                    .x1(function (d) { return getYScale(d.id)(d.value); })
-                    .y(xx);
-            } else {
-                area = d3.svg.area()
-                    .x(xx)
-                    .y0(function (d) { return getYScale(d.id)(0); })
-                    .y1(function (d) { return getYScale(d.id)(d.value); });
-            }
-
-            return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
-
-                if (hasType([d], 'area') || hasType([d], 'area-spline')) {
-                    isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
-                    return area(data);
-                } else if (hasType([d], 'area-step')) {
-                    isStepType(d) ? area.interpolate("step-after") : area.interpolate("linear");
-                    return area(data);
-                } else {
-                    x0 = data[0] ? x(data[0].x) : 0;
-                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-                }
-            };
-        })(); // usage replaced by generateDrawArea
-
         function generateDrawArea(areaIndices, isSub) {
-          var area, getPoint = generateGetAreaPoint(areaIndices, isSub);
+          var area,
+              getPoint = generateGetAreaPoint(areaIndices, isSub),
+              yScaleGetter = isSub ? getSubYScale : getYScale;
 
           if (__axis_rotated) {
               area = d3.svg.area()
-                  .x0(function (d, i) { return getYScale(d.id)(0); })
-                  .x1(function (d, i) { return getYScale(d.id)(d.value); })
+                  .x0(function (d, i) { return yScaleGetter(d.id)(0); })
+                  .x1(function (d, i) { return yScaleGetter(d.id)(d.value); })
                   .y(xx);
           } else {
               area = d3.svg.area()
                   .x(xx)
-                  .y0(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return getYScale(d.id)(0); })
-                  .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[1][1]; } return getYScale(d.id)(d.value); });
+                  .y0(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return yScaleGetter(d.id)(0); })
+                  .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[1][1]; } return yScaleGetter(d.id)(d.value); });
           }
 
           return function (d, i) {
@@ -2493,6 +2474,39 @@
               }
           };
         }
+
+        function generateDrawLine(lineIndices, isSub) {
+            var getPoint = generateGetLinePoint(lineIndices, isSub),
+                yScaleGetter = isSub ? getSubYScale : getYScale,
+                xValue = isSub ? subxx : xx,
+                yValue = function (d,i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return yScaleGetter(d.id)(d.value); },
+                line = d3.svg.line()
+                    .x(__axis_rotated ? yValue : xValue)
+                    .y(__axis_rotated ? xValue : yValue);
+            if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
+            return function (d) {
+                var data = __line_connect_null ? filterRemoveNull(d.values) : d.values,
+                    x = isSub ? x : subX, y = yScaleGetter(d.id), x0 = 0, y0 = 0;
+                if (isLineType(d)) {
+                    if (__data_regions[d.id]) {
+                        return lineWithRegions(data, x, y, __data_regions[d.id]);
+                    } else {
+                        line.interpolate(isSplineType(d) ? "cardinal" : "linear");
+                        return line(data);
+                    }
+                } else if (isStepType(d)) {
+                  line.interpolate("step-after");
+                  return line(data);
+                } else {
+                    if (data[0]) {
+                        x0 = x(data[0].x);
+                        y0 = y(data[0].value);
+                    }
+                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+                }
+            };
+        }
+
         function generateDrawBar(barIndices, isSub) {
             var getPoints = generateGetBarPoints(barIndices, isSub);
             return function (d, i) {
@@ -2511,26 +2525,6 @@
 
                 return path;
             };
-        }
-        function generateDrawLine(lineIndices, isSub) {
-          var getPoint = generateGetLinePoint(lineIndices, isSub),
-              line = d3.svg.line()
-              .x(__axis_rotated ? function (d,i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return getYScale(d.id)(d.value); } : xx)
-              .y(__axis_rotated ? xx : function (d,i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return getYScale(d.id)(d.value); });
-          return function (d) {
-              var data = filterRemoveNull(d.values), x0, y0;
-              if (isLineType(d)) {
-                  isSplineType(d) ? line.interpolate("cardinal") : line.interpolate("linear");
-                  return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
-              } else if (isStepType(d)) {
-                  line.interpolate("step-after");
-                  return __data_regions[d.id] ? lineWithRegions(data, x, getYScale(d.id), __data_regions[d.id]) : line(data);
-              } else {
-                  x0 = x(data[0].x);
-                  y0 = getYScale(d.id)(data[0].value);
-                  return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-              }
-          };
         }
         function generateXYForText(barIndices, forX) {
             var getPoints = generateGetBarPoints(barIndices, false),
@@ -2624,44 +2618,6 @@
                 ];
           };
         }
-
-        // For brush region
-        var lineOnSub = (function () {
-            var line = d3.svg.line()
-                .x(__axis_rotated ? function (d) { return getSubYScale(d.id)(d.value); } : subxx)
-                .y(__axis_rotated ? subxx : function (d) { return getSubYScale(d.id)(d.value); });
-            return function (d) {
-                var data = filterRemoveNull(d.values);
-                if (isLineType(d)) {
-                  return line(data);
-                } else if (isStepType(d)) {
-                  line.interpolate("step-after");
-                  return line(data);
-                } else {
-                  return "M " + subX(data[0].x) + " " + getSubYScale(d.id)(data[0].value);
-                }
-            };
-        })();
-        var areaOnSub = (function () {
-            var area = d3.svg.area()
-                .x(xx)
-                .y0(function (d) { return getSubYScale(d.id)( (__axis_y_min) ? __axis_y_min : 0 ); })
-                .y1(function (d) { return getSubYScale(d.id)(d.value); });
-            return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
-                if (hasType([d], 'area') || hasType([d], 'area-spline')) {
-                  isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
-                  return area(data);
-                } else if (hasType([d], 'area-step')) {
-                  isStepType(d) ? area.interpolate("step-after") : area.interpolate("linear");
-                  return area(data);
-                } else {
-                  x0 = subX(data[0].x);
-                  y0 = getSubYScale(d.id)(data[0].value);
-                  return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-                }
-            };
-        })();
 
         function lineWithRegions(d, x, y, _regions) {
             var prev = -1, i, j;
@@ -2775,12 +2731,42 @@
         // for save value
         var orgAreaOpacity, withoutFadeIn = {};
 
+        function observeInserted(selection) {
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.type === 'childList' && mutation.previousSibling) {
+                        observer.disconnect();
+                        // need to wait for completion of load because size calculation requires the actual sizes determined after that completion
+                        var interval = window.setInterval(function () {
+                            // parentNode will NOT be null when completed
+                            if (selection.node().parentNode) {
+                                window.clearInterval(interval);
+                                redraw({
+                                    withUpdateTranslate: true,
+                                    withTransform: true,
+                                    withUpdateXDomain: true,
+                                    withUpdateOrgXDomain: true,
+                                    withTransition: false,
+                                    withTransitionForTransform: false,
+                                    withLegend: true
+                                });
+                                selection.transition().style('opacity', 1);
+                            }
+                        }, 10);
+                    }
+                });
+            });
+            observer.observe(selection.node(), {attributes: true, childList: true, characterData: true});
+        }
+
         function init(data) {
-            var eventRect, grid, i;
+            var eventRect, grid, i, binding = true;
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
-                throw new Error('Element to bind not found');
+                selectChart = d3.select(document.createElement('div')).style('opacity', 0);
+                observeInserted(selectChart);
+                binding = false;
             }
             selectChart.html("").classed("c3", true);
 
@@ -3013,7 +2999,9 @@
             updateTargets(c3.data.targets);
 
             // Draw with targets
-            redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+            if (binding) {
+                redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+            }
 
             // Show tooltip if needed
             if (__tooltip_init_show) {
@@ -3039,10 +3027,13 @@
             if (window.onresize.add) {
                 window.onresize.add(__onresize);
                 window.onresize.add(function () {
-                    updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
+                    c3.flush();
                 });
                 window.onresize.add(__onresized);
             }
+
+            // export element of the chart
+            c3.element = selectChart.node();
         }
 
         function generateEventRectsForSingleX(eventRectEnter) {
@@ -3053,23 +3044,20 @@
                     if (dragging) { return; } // do nothing if dragging
                     if (hasArcType(c3.data.targets)) { return; }
 
-                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); });
-                    var j, newData;
+                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); }),
+                        newData = [];
 
                     // Sort selectedData as names order
-                    if (Object.keys(__data_names).length > 0) {
-                        newData = [];
-                        for (var id in __data_names) {
-                            for (j = 0; j < selectedData.length; j++) {
-                                if (selectedData[j].id === id) {
-                                    newData.push(selectedData[j]);
-                                    selectedData.shift(j);
-                                    break;
-                                }
+                    Object.keys(__data_names).forEach(function (id) {
+                        for (var j = 0; j < selectedData.length; j++) {
+                            if (selectedData[j] && selectedData[j].id === id) {
+                                newData.push(selectedData[j]);
+                                selectedData.shift(j);
+                                break;
                             }
                         }
-                        selectedData = newData.concat(selectedData); // Add remained
-                    }
+                    });
+                    selectedData = newData.concat(selectedData); // Add remained
 
                     // Expand shapes if needed
                     if (__point_focus_expand_enabled) { expandCircles(i); }
@@ -3373,7 +3361,7 @@
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
             var hideAxis = hasArcType(c3.data.targets);
-            var drawArea, drawBar, drawBarOnSub, drawLine, xForText, yForText;
+            var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
@@ -3488,9 +3476,9 @@
             }
 
             // setup drawer - MEMO: these must be called after axis updated
-            drawArea = generateDrawArea(areaIndices);
+            drawArea = generateDrawArea(areaIndices, false);
             drawBar = generateDrawBar(barIndices);
-            drawLine = generateDrawLine(lineIndices);
+            drawLine = generateDrawLine(lineIndices, false);
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
 
@@ -3654,7 +3642,7 @@
             mainLine
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr("d", drawLine)//lineOnMain)
+                .attr("d", drawLine)
                 .style("stroke", color)
                 .style("opacity", 1);
             mainLine.exit().transition().duration(durationForExit)
@@ -3669,7 +3657,7 @@
             mainStep
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr("d", drawLine)//lineOnMain)
+                .attr("d", drawLine)
                 .style("stroke", color)
                 .style("opacity", 1);
             mainStep.exit().transition().duration(durationForExit)
@@ -3692,41 +3680,45 @@
                 .style('opacity', 0)
                 .remove();
 
-            mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
-                .data(lineOrScatterData);
-            mainCircle.enter().append("circle")
-                .attr("class", classCircle)
-                .attr("r", pointR)
-                .style("fill", color);
-            mainCircle
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .style('opacity', opacityForCircle)
-                .style("fill", color)
-                .attr("cx", __axis_rotated ? circleY : circleX)
-                .attr("cy", __axis_rotated ? circleX : circleY);
-            mainCircle.exit().remove();
+            if (__point_show) {
+                mainCircle = main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
+                    .data(lineOrScatterData);
+                mainCircle.enter().append("circle")
+                    .attr("class", classCircle)
+                    .attr("r", pointR)
+                    .style("fill", color);
+                mainCircle
+                    .style("opacity", initialOpacity)
+                  .transition().duration(duration)
+                    .style('opacity', opacityForCircle)
+                    .style("fill", color)
+                    .attr("cx", __axis_rotated ? circleY : circleX)
+                    .attr("cy", __axis_rotated ? circleX : circleY);
+                mainCircle.exit().remove();
+            }
 
-            mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
-                .data(barOrLineData);
-            mainText.enter().append('text')
-                .attr("class", classText)
-                .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
-                .style("stroke", 'none')
-                .style("fill", color)
-                .style("fill-opacity", 0);
-            mainText
-                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
-                .style("fill-opacity", initialOpacityForText)
-              .transition().duration(duration)
-                .attr('x', xForText)
-                .attr('y', yForText)
-                .style("fill", color)
-                .style("fill-opacity", opacityForText);
-            mainText.exit()
-              .transition().duration(durationForExit)
-                .style('fill-opacity', 0)
-                .remove();
+            if (hasDataLabel()) {
+                mainText = main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
+                    .data(barOrLineData);
+                mainText.enter().append('text')
+                    .attr("class", classText)
+                    .attr('text-anchor', function (d) { return __axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
+                    .style("stroke", 'none')
+                    .style("fill", color)
+                    .style("fill-opacity", 0);
+                mainText
+                    .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
+                    .style("fill-opacity", initialOpacityForText)
+                  .transition().duration(duration)
+                    .attr('x', xForText)
+                    .attr('y', yForText)
+                    .style("fill", color)
+                    .style("fill-opacity", opacityForText);
+                mainText.exit()
+                  .transition().duration(durationForExit)
+                    .style('fill-opacity', 0)
+                    .remove();
+            }
 
             // arc
             mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
@@ -3823,10 +3815,10 @@
                 .style('opacity', 0)
                 .remove();
             main.selectAll('.' + CLASS.chartArc).select('text')
-                .attr("transform", transformForArcLabel)
                 .style("opacity", 0)
-              .transition().duration(duration)
                 .text(textForArcLabel)
+                .attr("transform", transformForArcLabel)
+              .transition().duration(duration)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             if (__gauge_style === "arc") {
               main.selectAll('.' + CLASS.chartArc).select('text.units')
@@ -3870,7 +3862,9 @@
                         brush.extent(x.orgDomain()).update();
                     }
                     // setup drawer - MEMO: this must be called after axis updated
+                    drawAreaOnSub = generateDrawArea(areaIndices, true);
                     drawBarOnSub = generateDrawBar(barIndices, true);
+                    drawLineOnSub = generateDrawLine(lineIndices, true);
                     // bars
                     contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                         .data(barData);
@@ -3895,7 +3889,7 @@
                     contextLine
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
-                        .attr("d", lineOnSub)
+                        .attr("d", drawLineOnSub)
                         .style('opacity', 1);
                     contextLine.exit().transition().duration(duration)
                         .style('opacity', 0)
@@ -3909,7 +3903,7 @@
                     contextStep
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
-                        .attr("d", lineOnSub)
+                        .attr("d", drawLineOnSub)
                         .style('opacity', 1);
                     contextStep.exit().transition().duration(duration)
                         .style('opacity', 0)
@@ -3924,7 +3918,7 @@
                     contextArea
                         .style("opacity", 0)
                       .transition().duration(duration)
-                        .attr("d", areaOnSub)
+                        .attr("d", drawAreaOnSub)
                         .style("fill", color)
                         .style("opacity", orgAreaOpacity);
                     contextArea.exit().transition().duration(durationForExit)
@@ -3971,14 +3965,16 @@
                             .selectAll('.' + CLASS.eventRect).remove();
                     }
 
-                    if (isCustomX && !isCategorized) {
+                    if ((isCustomX || isTimeSeries) && !isCategorized) {
                         rectW = function (d, i) {
                             var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
-                            return (x(nextX ? nextX : dx + 50) - x(prevX ? prevX : dx - 50)) / 2;
+                            var xnX = x(nextX ? nextX : dx);
+                            var xpX = x(prevX ? prevX : dx);
+                            return (xnX - xpX) / 2;
                         };
                         rectX = function (d, i) {
                             var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
-                            return (x(dx) + x(prevX ? prevX : dx - 50)) / 2;
+                            return (x(dx) + x(prevX ? prevX : dx)) / 2;
                         };
                     } else {
                         rectW = getEventRectWidth();
@@ -4401,7 +4397,7 @@
             withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
             function updatePositions(textElement, id, reset) {
-                var box = textElement.getBoundingClientRect(),
+                var box = getTextRect(textElement.textContent, CLASS.legendItem),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
@@ -4967,13 +4963,18 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
+            c3.flush(); // TODO: need to be called twice because of update of legend
+            c3.flush();
+        };
+
+        c3.flush = function () {
             updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
         };
 
         c3.destroy = function () {
             c3.data.targets = undefined;
             c3.data.xs = {};
-            selectChart.html("");
+            selectChart.classed('c3', false).html("");
             window.onresize = null;
         };
 
@@ -5036,12 +5037,12 @@
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
-                return "translate(" + Math.round(x(d) + tickOffset) + ", 0)";
+                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
-                return "translate(0," + Math.round(y(d)) + ")";
+                return "translate(0," + Math.ceil(y(d)) + ")";
             });
         }
         function scaleExtent(domain) {
@@ -5099,7 +5100,7 @@
                     textUpdate = tickUpdate.select("text");
 
                 if (isCategory) {
-                    tickOffset = Math.round((scale1(1) - scale1(0)) / 2);
+                    tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
                     tickOffset = tickX = 0;
