@@ -164,12 +164,6 @@
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
             __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
-        // configuration for no plot-able data supplied.
-        var __data_empty_abort = getConfig(['data', 'empty', 'abort'], true),
-            __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], ""),
-            __data_empty_label_size = getConfig(['data', 'empty', 'label', 'size'], false),
-            __data_empty_label_fill = getConfig(['data', 'empty', 'label', 'fill'], false);
-
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
@@ -2825,15 +2819,6 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
-            if (c3.data.targets.length == 0) {
-              main.append("text")
-                .attr("class", CLASS.text)
-                .attr("x", (main[0][0].parentNode.width.baseVal.value / 2) - margin.left)
-                .attr("y", (main[0][0].parentNode.height.baseVal.value / 2) - margin.top)
-                .attr("text-anchor", "middle")
-                .attr("style", (__data_empty_label_fill ? "fill:"+ __data_empty_label_fill +"; " : "") + (__data_empty_label_size ? "font-size:"+ __data_empty_label_size +"; " : "") )
-                .text(__data_empty_label_text);
-            }
 
             // Grids
             grid = main.append('g')
@@ -3344,11 +3329,6 @@
             var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
-
-            // abort if no targets to show
-            if (targetsToShow.length === 0 && __data_empty_abort) {
-                return;
-            }
 
             options = options || {};
             withY = getOption(options, "withY", true);
