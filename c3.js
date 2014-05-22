@@ -228,8 +228,6 @@
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
-        var __zero_padding = getConfig(['zeropadding'], false);
-
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
             __grid_x_type = getConfig(['grid', 'x', 'type'], 'tick'),
@@ -1229,9 +1227,6 @@
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
                 padding_bottom = yDomainMin;
             }
-            if (__zero_padding && !hasNegativeValueInTargets(yTargets)) {
-              padding_bottom -= padding_bottom;
-            }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainMin(targets) {
@@ -1248,8 +1243,6 @@
             } else if (hasBarType(targets)) {
                 maxDataCount = getMaxDataCount();
                 padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
-            } else if (__zero_padding) {
-                padding = diff * 0.001;
             } else {
                 padding = diff * 0.01;
             }
