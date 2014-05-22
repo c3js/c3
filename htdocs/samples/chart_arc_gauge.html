@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <link href="/css/c3.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+      var chart = c3.generate({
+        data: {
+          columns: [
+            [ '%', 91.4 ]
+          ],
+          type: 'gauge'
+        },
+        gauge: {
+    //      color: '', // default value is #e0e0e0 (gray). "color: '', " removes background color (transparent).
+          label: {
+            format: function(value, ratio) {
+              return value;
+            },
+    //        show: false // to turn off the min/max labels.
+          },
+          min: 0,//can handle negative min e.g. vacuum / voltage / current flow / rate of change
+          max: 100,
+          style: 'arc', // Only style currently.
+          units: ' %',
+    //      width: 39 // for adjusting arc thickness
+        },
+        legend: {
+          show: false
+        },
+        size: {
+          height: 240,
+          width: 240
+        },
+        color: {
+          pattern: ['#FF0000', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+          values: ['percentage', 30, 60, 90] // alternate first value is 'value'
+        }
+      });
+
+      var cycleDemo = function () {
+        setTimeout(function () {
+            chart = chart.update(['gauge', 'color'], '');
+        }, 2000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 0 ]]
+            });
+        }, 4000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 50 ]]
+            });
+        }, 5000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 91.4 ]]
+            });
+        }, 6000);
+
+        setTimeout(function () {
+            chart = chart.update(['gauge', 'color'], '#e0e0e0');
+        }, 8000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 0 ]]
+            });
+        }, 10000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 50 ]]
+            });
+        }, 11000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 91.4 ]]
+            });
+        }, 12000);
+
+        setTimeout(function () {
+            chart = chart.update(['gauge', 'width'], 10);
+        }, 14000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 0 ]]
+            });
+        }, 16000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 50 ]]
+            });
+        }, 15000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 91.4 ]]
+            });
+        }, 18000);
+
+        setTimeout(function () {
+            chart = chart.update(['gauge', 'width'], 39);
+        }, 20000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 0 ]]
+            });
+        }, 22000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 50 ]]
+            });
+        }, 23000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 91.4 ]]
+            });
+        }, 24000);
+      }
+
+      cycleDemo();
+
+      setInterval(cycleDemo, 30000);
+    </script>
+  </body>
+</html>

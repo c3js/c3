@@ -4674,6 +4674,27 @@
             redraw({withUpdateXDomain: true});
         };
 
+        // For passing the configuration you want to update.
+        c3.update = function (keys, value) {
+            var target = config, i, isLast, nextTarget;
+
+            for (i = 0; i < keys.length; i++) {
+                isLast = (i === keys.length - 1);
+                nextTarget = target[keys[i]];
+                if (isLast) {
+                    if (target[keys[i]] === undefined) {
+                      target[keys[i]] = '';
+                    }
+                    target[keys[i]] = value;
+                } else {
+                    target = nextTarget;
+                }
+            }
+
+            // Don't have a way to set the __variables without regenerating.
+            return parent.c3.generate(config);
+        };
+
         c3.load = function (args) {
             // update xs if specified
             if (args.xs) {
