@@ -515,7 +515,7 @@
         function updateRadius() {
             radiusExpanded = Math.min(arcWidth, arcHeight) / 2;
             radius = radiusExpanded * 0.95;
-            var innerRadiusRatio = __gauge_width ? ((radius-__gauge_width)/radius) : 0.6;
+            var innerRadiusRatio = __gauge_width ? ((radius - __gauge_width) / radius) : 0.6;
             innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * innerRadiusRatio : 0;
         }
         function getSvgLeft() {
@@ -991,14 +991,16 @@
                     d = t;
                 }
             });
-            if (isNaN(d.endAngle)) d.endAngle = d.startAngle;
+            if (isNaN(d.endAngle)) {
+              d.endAngle = d.startAngle;
+            }
             if (isGaugeType(d.data)) {
-              var sA = d.startAngle, eA = d.endAngle;
-              var gMin = __gauge_min, gMax = __gauge_max,
-                  gF = Math.abs(gMin)+gMax, fA = Math.abs(sA)+eA,
-                  aTic = (Math.PI)/gF;
-              d.startAngle = (-1*(Math.PI/2))+(aTic*Math.abs(gMin));
-              d.endAngle = d.startAngle+(aTic*( (d.value > gMax) ? gMax : d.value ));
+                var sA = d.startAngle, eA = d.endAngle;
+                var gMin = __gauge_min, gMax = __gauge_max,
+                    gF = Math.abs(gMin) + gMax, fA = Math.abs(sA) + eA,
+                    aTic = (Math.PI) / gF;
+                d.startAngle = (-1 * (Math.PI / 2)) + (aTic * Math.abs(gMin));
+                d.endAngle = d.startAngle + (aTic * ((d.value > gMax) ? gMax : d.value ));
             }
             return found ? d : null;
         }
@@ -1034,7 +1036,7 @@
                 h = Math.sqrt(x * x + y * y);
                 // TODO: ratio should be an option?
                 ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
-                translate = __gauge_style == 'arc' ? "translate(1,1)" : "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
+                translate = __gauge_style === 'arc' ? "translate(1,1)" : "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
         }
@@ -1089,13 +1091,13 @@
         }
         function shouldShowArcLable() {
             if (hasGaugeType(c3.data.targets)) {
-              return true;
+                return true;
             }
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
         }
         function getArcLabelFormat() {
             if (hasGaugeType(c3.data.targets)) {
-              return __gauge_label_format;
+                return __gauge_label_format;
             }
             return hasDonutType(c3.data.targets) ? __donut_label_format : __pie_label_format;
         }
@@ -1104,21 +1106,21 @@
         }
         function getArcOnClick() {
             if (hasGaugeType(c3.data.targets)) {
-              return typeof __gauge_onclick === 'function' ? __gauge_onclick : function () {};
+                return typeof __gauge_onclick === 'function' ? __gauge_onclick : function () {};
             }
             var callback = hasDonutType(c3.data.targets) ? __donut_onclick : __pie_onclick;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOver() {
             if (hasGaugeType(c3.data.targets)) {
-              return typeof __gauge_onmouseover === 'function' ? __gauge_onmouseover : function () {};
+                return typeof __gauge_onmouseover === 'function' ? __gauge_onmouseover : function () {};
             }
             var callback = hasDonutType(c3.data.targets) ? __donut_onmouseover : __pie_onmouseover;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOut() {
             if (hasGaugeType(c3.data.targets)) {
-              return typeof __gauge_onmouseout === 'function' ? __gauge_onmouseout : function () {};
+                return typeof __gauge_onmouseout === 'function' ? __gauge_onmouseout : function () {};
             }
             var callback = hasDonutType(c3.data.targets) ? __donut_onmouseout : __pie_onmouseout;
             return typeof callback === 'function' ? callback : function () {};
@@ -1228,7 +1230,7 @@
                 padding_bottom = yDomainMin;
             }
             if (!hasNegativeValueInTargets(yTargets)) {
-              padding_bottom -= padding_bottom;
+                padding_bottom -= padding_bottom;
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
@@ -1957,9 +1959,9 @@
         function circleX(d) {
             return d.x || d.x === 0 ? x(d.x) : null;
         }
-        function circleY(d,i) {
+        function circleY(d, i) {
             var lineIndices = getLineIndices(), getPoint = generateGetLinePoint(lineIndices);
-            if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; }
+            if (__data_groups.length > 0) { var point = getPoint(d, i); return point[0][1]; }
             return getYScale(d.id)(d.value);
         }
 
@@ -2249,20 +2251,20 @@
         }
 
         function generateLevelColor(_colors, _values) {
-          var colors = _colors,
-              levels = _values;
+            var colors = _colors,
+                levels = _values;
 
-          return function (value) {
-            for (var a=1; a<levels.length; a++) {
-              if (levels[0] === 'percentage' && ((value/__gauge_max)*100) < levels[a]) {
-                return colors[a-1];
-              }
-              if (levels[0] === 'whole' && value < levels[a]) {
-                return colors[a-1];
-              }
-            }
-            return colors[colors.length-1];
-          };
+            return function (value) {
+                for (var a = 1; a < levels.length; a++) {
+                    if (levels[0] === 'percentage' && ((value / __gauge_max) * 100) < levels[a]) {
+                        return colors[a-1];
+                    }
+                    if (levels[0] === 'whole' && value < levels[a]) {
+                        return colors[a-1];
+                    }
+                }
+                return colors[colors.length-1];
+            };
         }
 
         //-- Date --//
@@ -2491,8 +2493,8 @@
                         return line(data);
                     }
                 } else if (isStepType(d)) {
-                  line.interpolate("step-after");
-                  return line(data);
+                    line.interpolate("step-after");
+                    return line(data);
                 } else {
                     if (data[0]) {
                         x0 = x(data[0].x);
