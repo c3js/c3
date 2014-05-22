@@ -96,7 +96,7 @@
 
 /*-- Focus --*/
 
-.c3-target.c3-focused path.c3-line {
+.c3-target.c3-focused path.c3-line, .c3-target.c3-focused path.c3-step {
   stroke-width: 2px;
 }
 
