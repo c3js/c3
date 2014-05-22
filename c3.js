@@ -39,8 +39,6 @@
         shapes: 'c3-shapes',
         line: 'c3-line',
         lines: 'c3-lines',
-        step: 'c3-step',
-        steps: 'c3-steps',
         bar: 'c3-bar',
         bars: 'c3-bars',
         circle: 'c3-circle',
@@ -1670,8 +1668,6 @@
         function classAreas(d) { return classShapes(d) + generateClass(CLASS.areas, d.id); }
         function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
         function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
-        function classStep(d) { return classShape(d) + generateClass(CLASS.step, d.id); }
-        function classSteps(d) { return classShapes(d) + generateClass(CLASS.steps, d.id); }
         function classTarget(id) {
             var additionalClassSuffix = __data_classes[id], additionalClass = '';
             if (additionalClassSuffix) {
@@ -2152,7 +2148,7 @@
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline';
+            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline' || __data_types[id] === 'step' || __data_types[id] === 'area-step';
         }
         function isStepType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -2192,9 +2188,6 @@
         function lineData(d) {
             return isLineType(d) ? [d] : [];
         }
-        function stepData(d) {
-            return isStepType(d) ? [d] : [];
-        }
         function arcData(d) {
             return isArcType(d.data) ? [d] : [];
         }
@@ -2208,9 +2201,6 @@
         }
         function lineOrScatterData(d) {
             return isLineType(d) || isScatterType(d) ? d.values : [];
-        }
-        function lineOrStepData(d) {
-            return isLineType(d) || isStepType(d) ? [d] : [];
         }
         function barOrLineData(d) {
             return isBarType(d) || isLineType(d) ? d.values : [];
@@ -2399,7 +2389,7 @@
         //-- Point --//
 
         function pointR(d) {
-            return __point_show ? (typeof __point_r === 'function' ? __point_r(d) : __point_r) : 0;
+            return __point_show && !isStepType(d) ? (typeof __point_r === 'function' ? __point_r(d) : __point_r) : 0;
         }
         function pointExpandedR(d) {
             return __point_focus_expand_enabled ? (__point_focus_expand_r ? __point_focus_expand_r : pointR(d) * 1.75) : pointR(d);
@@ -2484,12 +2474,9 @@
                     if (__data_regions[d.id]) {
                         return lineWithRegions(data, x, y, __data_regions[d.id]);
                     } else {
-                        line.interpolate(isSplineType(d) ? "cardinal" : "linear");
+                        line.interpolate(isSplineType(d) ? "cardinal" : isStepType(d) ? "step-after" : "linear");
                         return line(data);
                     }
-                } else if (isStepType(d)) {
-                  line.interpolate("step-after");
-                  return line(data);
                 } else {
                     if (data[0]) {
                         x0 = x(data[0].x);
@@ -3349,7 +3336,7 @@
 
         function redraw(options, transitions) {
             var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
-            var mainLine, mainStep, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextStep, contextArea, contextBar, eventRect, eventRectUpdate;
+            var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine,  contextArea, contextBar, eventRect, eventRectUpdate;
             var areaIndices = getAreaIndices(), barIndices = getBarIndices(), lineIndices = getLineIndices(), maxDataCountTarget, tickOffset;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
@@ -3641,24 +3628,9 @@
             mainLine.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
-            // steps
-            mainStep = main.selectAll('.' + CLASS.steps).selectAll('.' + CLASS.step)
-                .data(stepData);
-            mainStep.enter().append('path')
-                .attr('class', classStep)
-                .style("stroke", color);
-            mainStep
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .attr("d", drawLine)
-                .style("stroke", color)
-                .style("opacity", 1);
-            mainStep.exit().transition().duration(durationForExit)
-                .style('opacity', 0)
-                .remove();
             // area
             mainArea = main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
-                .data(lineOrStepData);
+                .data(lineData);
             mainArea.enter().append('path')
                 .attr("class", classArea)
                 .style("fill", color)
@@ -3887,23 +3859,9 @@
                     contextLine.exit().transition().duration(duration)
                         .style('opacity', 0)
                         .remove();
-                    // steps
-                    contextStep = context.selectAll('.' + CLASS.steps).selectAll('.' + CLASS.step)
-                        .data(stepData);
-                    contextStep.enter().append('path')
-                        .attr('class', classLine)
-                        .style('stroke', color);
-                    contextStep
-                        .style("opacity", initialOpacity)
-                      .transition().duration(duration)
-                        .attr("d", drawLineOnSub)
-                        .style('opacity', 1);
-                    contextStep.exit().transition().duration(duration)
-                        .style('opacity', 0)
-                        .remove();
                     // area
                     contextArea = context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
-                        .data((isStepType ? stepData : lineData));
+                        .data(lineData);
                     contextArea.enter().append('path')
                         .attr("class", classArea)
                         .style("fill", color)
@@ -4141,9 +4099,6 @@
             // Lines for each data
             mainLineEnter.append('g')
                 .attr("class", classLines);
-            // Steps
-            mainLineEnter.append('g')
-                .attr('class', classSteps);
             // Areas
             mainLineEnter.append('g')
                 .attr('class', classAreas);
@@ -4232,9 +4187,6 @@
                 // Lines for each data
                 contextLineEnter.append("g")
                     .attr("class", classLines);
-                // Steps
-                contextLineEnter.append("g")
-                    .attr("class", classSteps);
                 // Area
                 contextLineEnter.append("g")
                     .attr("class", classAreas);
