@@ -2163,7 +2163,7 @@
         }
         function isStepType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return !(id in __data_types) || __data_types[id] === 'step' || __data_types[id] === 'area-step';
+            return __data_types[id] === 'step' || __data_types[id] === 'area-step';
         }
         function isSplineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
