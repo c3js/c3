@@ -995,7 +995,6 @@
                 d.endAngle = d.startAngle;
             }
             if (isGaugeType(d.data)) {
-                var sA = d.startAngle, eA = d.endAngle;
                 var gMin = __gauge_min, gMax = __gauge_max,
                     gF = Math.abs(gMin) + gMax,
                     aTic = (Math.PI) / gF;
@@ -3799,7 +3798,7 @@
                     }
 */
                     if (isNaN(this._current.endAngle)) {
-                      this._current.endAngle = this._current.startAngle;
+                        this._current.endAngle = this._current.startAngle;
                     }
                     interpolate = d3.interpolate(this._current, updated);
                     this._current = interpolate(0);
