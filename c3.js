@@ -997,7 +997,7 @@
             if (isGaugeType(d.data)) {
                 var sA = d.startAngle, eA = d.endAngle;
                 var gMin = __gauge_min, gMax = __gauge_max,
-                    gF = Math.abs(gMin) + gMax, fA = Math.abs(sA) + eA,
+                    gF = Math.abs(gMin) + gMax,
                     aTic = (Math.PI) / gF;
                 d.startAngle = (-1 * (Math.PI / 2)) + (aTic * Math.abs(gMin));
                 d.endAngle = d.startAngle + (aTic * ((d.value > gMax) ? gMax : d.value));
@@ -2446,8 +2446,8 @@
 
             if (__axis_rotated) {
                 area = d3.svg.area()
-                    .x0(function (d, i) { return yScaleGetter(d.id)(0); })
-                    .x1(function (d, i) { return yScaleGetter(d.id)(d.value); })
+                    .x0(function (d) { return yScaleGetter(d.id)(0); })
+                    .x1(function (d) { return yScaleGetter(d.id)(d.value); })
                     .y(xx);
             } else {
                 area = d3.svg.area()
@@ -2456,7 +2456,7 @@
                     .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d, i); return point[1][1]; } return yScaleGetter(d.id)(d.value); });
             }
 
-            return function (d, i) {
+            return function (d) {
                 var data = filterRemoveNull(d.values), x0, y0;
 
                 if (hasType([d], 'area') || hasType([d], 'area-spline')) {
@@ -2556,19 +2556,19 @@
                 areaOffset = getAreaOffset(areaIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
-                  var y0 = yScale(d.id)(0),
-                      offset = areaOffset(d, i) || y0, // offset is for stacked area chart
-                      posX = x(d), posY = y(d);
-                  // fix posY not to overflow opposite quadrant
-                  if (__axis_rotated) {
-                      if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
-                  }
-                  // 1 point that marks the area position
-                  return [
-                      [posX, offset],
-                      [posX, posY - (y0 - offset)]
-                  ];
-            };
+                    var y0 = yScale(d.id)(0),
+                        offset = areaOffset(d, i) || y0, // offset is for stacked area chart
+                        posX = x(d), posY = y(d);
+                    // fix posY not to overflow opposite quadrant
+                    if (__axis_rotated) {
+                        if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                    }
+                    // 1 point that marks the area position
+                    return [
+                        [posX, offset],
+                        [posX, posY - (y0 - offset)]
+                    ];
+                };
         }
 
         function generateGetBarPoints(barIndices, isSub) {
@@ -2603,18 +2603,18 @@
                 lineOffset = getLineOffset(lineIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
-                  var y0 = yScale(d.id)(0),
-                      offset = lineOffset(d, i) || y0, // offset is for stacked area chart
-                      posX = x(d), posY = y(d);
-                  // fix posY not to overflow opposite quadrant
-                  if (__axis_rotated) {
-                      if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
-                  }
-                  // 1 point that marks the line position
-                  return [
-                      [posX, posY - (y0 - offset)]
-                  ];
-            };
+                    var y0 = yScale(d.id)(0),
+                        offset = lineOffset(d, i) || y0, // offset is for stacked area chart
+                        posX = x(d), posY = y(d);
+                    // fix posY not to overflow opposite quadrant
+                    if (__axis_rotated) {
+                        if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                    }
+                    // 1 point that marks the line position
+                    return [
+                        [posX, posY - (y0 - offset)]
+                    ];
+                };
         }
 
         function lineWithRegions(d, x, y, _regions) {
@@ -3729,14 +3729,14 @@
                   .style("cursor", "pointer")
                   .attr("transform", "scale(1,1)")
                   .attr("d", function (d) {
-                      d.value = __gauge_max;
-                      d.startAngle = -1 * (Math.PI / 2);
-                      d.endAngle = Math.PI / 2;
-                      return getArc(d, true);
-                  });
-            mainArc.exit().transition().duration(durationForExit)
-                .style('opacity', 0)
-                .remove();
+                        d.value = __gauge_max;
+                        d.startAngle = -1 * (Math.PI / 2);
+                        d.endAngle = Math.PI / 2;
+                        return getArc(d, true);
+                    });
+                mainArc.exit().transition().duration(durationForExit)
+                  .style('opacity', 0)
+                  .remove();
             }
             mainArc.enter().append('path')
                 .attr("class", classArc)
@@ -3798,13 +3798,17 @@
                         };
                     }
 */
-                    if (isNaN(this._current.endAngle)) this._current.endAngle = this._current.startAngle;
+                    if (isNaN(this._current.endAngle)) {
+                      this._current.endAngle = this._current.startAngle;
+                    }
                     interpolate = d3.interpolate(this._current, updated);
                     this._current = interpolate(0);
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
-                .style("fill", function (d) { return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.//color(d.data); })
+                .style("fill", function (d) {
+                    return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id);
+                }) // Where gauge reading color would receive customization.
                 .style("opacity", (__color_opacity) ? __color_opacity : 1)
                 .call(endall, function () {
                     transiting = false;
@@ -3819,24 +3823,24 @@
               .transition().duration(duration)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             if (__gauge_style === "arc") {
-              main.selectAll('.' + CLASS.chartArc).select('text.units')
-                  .attr("transform", transformForArcLabel)
-                  .style("opacity", 0)
-                .transition().duration(duration)
-                  .text((__gauge_label_show) ? __gauge_units : '')
-                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-              main.selectAll('.' + CLASS.chartArc).select('text.min')
-                  .attr("transform", transformForArcLabel)
-                  .style("opacity", 0)
-                .transition().duration(duration)
-                  .text((__gauge_label_show) ? __gauge_min : '')
-                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-              main.selectAll('.' + CLASS.chartArc).select('text.max')
-                  .attr("transform", transformForArcLabel)
-                  .style("opacity", 0)
-                .transition().duration(duration)
-                  .text((__gauge_label_show) ? __gauge_max : '')
-                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+                main.selectAll('.' + CLASS.chartArc).select('text.units')
+                    .attr("transform", transformForArcLabel)
+                    .style("opacity", 0)
+                  .transition().duration(duration)
+                    .text((__gauge_label_show) ? __gauge_units : '')
+                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+                main.selectAll('.' + CLASS.chartArc).select('text.min')
+                    .attr("transform", transformForArcLabel)
+                    .style("opacity", 0)
+                  .transition().duration(duration)
+                    .text((__gauge_label_show) ? __gauge_min : '')
+                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+                main.selectAll('.' + CLASS.chartArc).select('text.max')
+                    .attr("transform", transformForArcLabel)
+                    .style("opacity", 0)
+                  .transition().duration(duration)
+                    .text((__gauge_label_show) ? __gauge_max : '')
+                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
             }
             main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? 1 : 0);
@@ -4192,7 +4196,7 @@
                   .style('fill', '#000')
                   .style("font-size", width / 15 + "px");
                 mainPieEnter.append("text")
-                  .attr("dx", -1*(innerRadius+((radius-innerRadius)/2)) + "px")
+                  .attr("dx", -1 * (innerRadius + ((radius - innerRadius) / 2)) + "px")
                   .attr("dy", "1em")
                   .attr("class", "min")
                   .style("opacity", 0)
@@ -4201,7 +4205,7 @@
                   .style('fill', '#777')
                   .style("font-size", width / 20 + "px");
                 mainPieEnter.append("text")
-                  .attr("dx", innerRadius+((radius-innerRadius)/2) + "px")
+                  .attr("dx", innerRadius + ((radius - innerRadius) / 2) + "px")
                   .attr("dy", "1em")
                   .attr("class", "max")
                   .style("opacity", 0)
@@ -5049,7 +5053,7 @@
         }
         function generateTicks(scale) {
             var i, domain, ticks = [];
-            if (scale.ticks && tickArguments != undefined) {
+            if (scale.ticks && tickArguments !== undefined) {
                 return scale.ticks.apply(scale, tickArguments);
             }
             domain = scale.domain();
