@@ -19,6 +19,9 @@
         chartArc: 'c3-chart-arc',
         chartArcs: 'c3-chart-arcs',
         chartArcsTitle: 'c3-chart-arcs-title',
+        gaugeArc: 'c3-gauge-arc',
+        gaugeArcs: 'c3-gauge-arcs',
+        gaugeArcsTitle: 'c3-gauge-arcs-title',
         selectedCircle: 'c3-selected-circle',
         selectedCircles: 'c3-selected-circles',
         eventRect: 'c3-event-rect',
@@ -36,6 +39,8 @@
         shapes: 'c3-shapes',
         line: 'c3-line',
         lines: 'c3-lines',
+        step: 'c3-step',
+        steps: 'c3-steps',
         bar: 'c3-bar',
         bars: 'c3-bars',
         circle: 'c3-circle',
@@ -161,12 +166,20 @@
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
             __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
+        // configuration for no plot-able data supplied.
+        var __data_empty_abort = getConfig(['data', 'empty', 'abort'], true),
+            __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], ""),
+            __data_empty_label_size = getConfig(['data', 'empty', 'label', 'size'], false),
+            __data_empty_label_fill = getConfig(['data', 'empty', 'label', 'fill'], false);
+
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
 
         // color
-        var __color_pattern = getConfig(['color', 'pattern'], []);
+        var __color_pattern = getConfig(['color', 'pattern'], []),
+            __color_opacity = getConfig(['color', 'opacity'], null),
+            __color_values  = getConfig(['color', 'values'], []);
 
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
@@ -215,6 +228,8 @@
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
+        var __zero_padding = getConfig(['zeropadding'], false);
+
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
             __grid_x_type = getConfig(['grid', 'x', 'type'], 'tick'),
@@ -247,6 +262,19 @@
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
             __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
 
+        // gauge
+        var __gauge_color = getConfig(['gauge', 'color'], "#e0e0e0"),
+            __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
+            __gauge_label_format = getConfig(['gauge', 'label', 'format']),
+            __gauge_max = getConfig(['gauge', 'max']),
+            __gauge_min = getConfig(['gauge', 'min']),
+            __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
+            __gauge_onmouseover = getConfig(['gauge', 'onmouseover'], function () {}),
+            __gauge_onmouseout = getConfig(['gauge', 'onmouseout'], function () {}),
+            __gauge_style = getConfig(['gauge', 'style']),
+            __gauge_units = getConfig(['gauge', 'units']),
+            __gauge_width = getConfig(['gauge', 'width'], false);
+
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
@@ -266,7 +294,7 @@
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d, defaultTitleFormat, defaultValueFormat, color) {
             var titleFormat = __tooltip_format_title ? __tooltip_format_title : defaultTitleFormat,
                 valueFormat = __tooltip_format_value ? __tooltip_format_value : defaultValueFormat,
-                text, i, title, value, name;
+                text, i, title, value, name, bgcolor;
             for (i = 0; i < d.length; i++) {
                 if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
@@ -277,9 +305,10 @@
 
                 name = d[i].name;
                 value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+                bgcolor = (__gauge_style === 'arc' && __color_values) ? levelColor(d[i].value) : color(d[i].id);
 
                 text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
-                text += "<td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td>";
+                text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
                 text += "<td class='value'>" + value + "</td>";
                 text += "</tr>";
             }
@@ -306,7 +335,8 @@
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
 
         var defaultColorPattern = d3.scale.category10().range(),
-            color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color);
+            color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color),
+            levelColor = generateLevelColor(__color_pattern, __color_values);
 
         var timeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
             defaultTimeFormat = timeFormat.multi([
@@ -487,7 +517,8 @@
         function updateRadius() {
             radiusExpanded = Math.min(arcWidth, arcHeight) / 2;
             radius = radiusExpanded * 0.95;
-            innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
+            var innerRadiusRatio = __gauge_width ? ((radius-__gauge_width)/radius) : 0.6;
+            innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * innerRadiusRatio : 0;
         }
         function getSvgLeft() {
             var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
@@ -962,6 +993,15 @@
                     d = t;
                 }
             });
+            if (isNaN(d.endAngle)) d.endAngle = d.startAngle;
+            if (isGaugeType(d.data)) {
+              var sA = d.startAngle, eA = d.endAngle;
+              var gMin = __gauge_min, gMax = __gauge_max,
+                  gF = Math.abs(gMin)+gMax, fA = Math.abs(sA)+eA,
+                  aTic = (Math.PI)/gF;
+              d.startAngle = (-1*(Math.PI/2))+(aTic*Math.abs(gMin));
+              d.endAngle = d.startAngle+(aTic*( (d.value > gMax) ? gMax : d.value ));
+            }
             return found ? d : null;
         }
 
@@ -996,12 +1036,13 @@
                 h = Math.sqrt(x * x + y * y);
                 // TODO: ratio should be an option?
                 ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
-                translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
+                translate = __gauge_style == 'arc' ? "translate(1,1)" : "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
         }
         function getArcRatio(d) {
-            return d ? (d.endAngle - d.startAngle) / (Math.PI * 2) : null;
+            var whole = __gauge_style == 'arc' ? Math.PI : (Math.PI * 2);
+            return d ? (d.endAngle - d.startAngle) / whole : null;
         }
         function convertToArcData(d) {
             return addName({
@@ -1035,36 +1076,52 @@
                         }
                     });
             }
+
             if (!withoutFadeOut) {
                 noneTargets.style("opacity", 0.3);
             }
         }
         function unexpandArc(id) {
             var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id));
-            target.selectAll('path')
+            target.selectAll('path.c3-arc')
               .transition().duration(50)
                 .attr("d", svgArc);
             svg.selectAll('.' + CLASS.arc)
-                .style("opacity", 1);
+                .style("opacity", (__color_opacity) ? __color_opacity : 1);
         }
         function shouldShowArcLable() {
+            if (hasGaugeType(c3.data.targets)) {
+              return true;
+            }
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
         }
         function getArcLabelFormat() {
+            if (hasGaugeType(c3.data.targets)) {
+              return __gauge_label_format;
+            }
             return hasDonutType(c3.data.targets) ? __donut_label_format : __pie_label_format;
         }
         function getArcTitle() {
             return hasDonutType(c3.data.targets) ? __donut_title : "";
         }
         function getArcOnClick() {
+            if (hasGaugeType(c3.data.targets)) {
+              return typeof __gauge_onclick === 'function' ? __gauge_onclick : function () {};
+            }
             var callback = hasDonutType(c3.data.targets) ? __donut_onclick : __pie_onclick;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOver() {
+            if (hasGaugeType(c3.data.targets)) {
+              return typeof __gauge_onmouseover === 'function' ? __gauge_onmouseover : function () {};
+            }
             var callback = hasDonutType(c3.data.targets) ? __donut_onmouseover : __pie_onmouseover;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOut() {
+            if (hasGaugeType(c3.data.targets)) {
+              return typeof __gauge_onmouseout === 'function' ? __gauge_onmouseout : function () {};
+            }
             var callback = hasDonutType(c3.data.targets) ? __donut_onmouseout : __pie_onmouseout;
             return typeof callback === 'function' ? callback : function () {};
         }
@@ -1172,6 +1229,9 @@
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
                 padding_bottom = yDomainMin;
             }
+            if (__zero_padding && !hasNegativeValueInTargets(yTargets)) {
+              padding_bottom -= padding_bottom;
+            }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
         function getXDomainMin(targets) {
@@ -1188,6 +1248,8 @@
             } else if (hasBarType(targets)) {
                 maxDataCount = getMaxDataCount();
                 padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
+            } else if (__zero_padding) {
+                padding = diff * 0.001;
             } else {
                 padding = diff * 0.01;
             }
@@ -1615,6 +1677,8 @@
         function classAreas(d) { return classShapes(d) + generateClass(CLASS.areas, d.id); }
         function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
         function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
+        function classStep(d) { return classShape(d) + generateClass(CLASS.step, d.id); }
+        function classSteps(d) { return classShapes(d) + generateClass(CLASS.steps, d.id); }
         function classTarget(id) {
             var additionalClassSuffix = __data_classes[id], additionalClass = '';
             if (additionalClassSuffix) {
@@ -1667,8 +1731,8 @@
             return widths;
         }
         function getYFormat(forArc) {
-            var formatForY = forArc ? defaultArcValueFormat : yFormat,
-                formatForY2 = forArc ? defaultArcValueFormat : y2Format;
+            var formatForY = forArc && !hasGaugeType(c3.data.targets) ? defaultArcValueFormat : yFormat,
+                formatForY2 = forArc && !hasGaugeType(c3.data.targets) ? defaultArcValueFormat : y2Format;
             return function (v, ratio, id) {
                 var format = getAxisId(id) === 'y2' ? formatForY2 : formatForY;
                 return format(v, ratio);
@@ -1821,6 +1885,7 @@
                 return;
             }
             tooltip.html(__tooltip_contents(selectedData, getXAxisTickFormat(), getYFormat(forArc), color)).style("display", "block");
+
             // Get tooltip dimensions
             tWidth = tooltip.property('offsetWidth');
             tHeight = tooltip.property('offsetHeight');
@@ -1896,7 +1961,9 @@
         function circleX(d) {
             return d.x || d.x === 0 ? x(d.x) : null;
         }
-        function circleY(d) {
+        function circleY(d,i) {
+            var lineIndices = getLineIndices(), getPoint = generateGetLinePoint(lineIndices);
+            if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; }
             return getYScale(d.id)(d.value);
         }
 
@@ -1951,6 +2018,102 @@
             return typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
         }
 
+        //-- Area --//
+
+        function getAreaIndices() { // replication of getBarIndices
+            var indices = {}, i = 0, j, k;
+            filterTargetsToShow(c3.data.targets.filter(isAreaType)).forEach(function (d) {
+                for (j = 0; j < __data_groups.length; j++) {
+                    if (__data_groups[j].indexOf(d.id) < 0) { continue; }
+                    for (k = 0; k < __data_groups[j].length; k++) {
+                        if (__data_groups[j][k] in indices) {
+                            indices[d.id] = indices[__data_groups[j][k]];
+                            break;
+                        }
+                    }
+                }
+                if (isUndefined(indices[d.id])) { indices[d.id] = i++; }
+            });
+            indices.__max__ = i - 1;
+            return indices;
+        }
+        function getAreaX(areaTargetsNum, areaIndices, isSub) { // partial duplication of getBarX
+            var scale = isSub ? subX : x;
+            return function (d) {
+                var areaIndex = d.id in areaIndices ? areaIndices[d.id] : 0;
+                return d.x || d.x === 0 ? scale(d.x) - 0 * (areaTargetsNum / 2 - areaIndex) : 0;
+            };
+        }
+        function getAreaY(isSub) { // replication of getBarY
+            return function (d) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
+                return scale(d.value);
+            };
+        }
+        function getAreaOffset(areaIndices, isSub) { // partial duplication of getBarOffset
+            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isAreaType))),
+                targetIds = targets.map(function (t) { return t.id; });
+            return function (d, i) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
+                    y0 = scale(0), offset = y0;
+                targets.forEach(function (t) {
+                    if (t.id === d.id || areaIndices[t.id] !== areaIndices[d.id]) { return; }
+                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value > 0) {
+                        offset += scale(t.values[i].value) - y0;
+                    }
+                });
+                return offset;
+            };
+        }
+
+        //-- Line --//
+
+        function getLineIndices() { // replication of getBarIndices
+            var indices = {}, i = 0, j, k;
+            filterTargetsToShow(c3.data.targets.filter(isLineType)).forEach(function (d) {
+                for (j = 0; j < __data_groups.length; j++) {
+                    if (__data_groups[j].indexOf(d.id) < 0) { continue; }
+                    for (k = 0; k < __data_groups[j].length; k++) {
+                        if (__data_groups[j][k] in indices) {
+                            indices[d.id] = indices[__data_groups[j][k]];
+                            break;
+                        }
+                    }
+                }
+                if (isUndefined(indices[d.id])) { indices[d.id] = i++; }
+            });
+            indices.__max__ = i - 1;
+            return indices;
+        }
+        function getLineX(lineTargetsNum, lineIndices, isSub) { // partial duplication of getBarX
+            var scale = isSub ? subX : x;
+            return function (d) {
+                var lineIndex = d.id in lineIndices ? lineIndices[d.id] : 0;
+                return d.x || d.x === 0 ? scale(d.x) - 0 * (lineTargetsNum / 2 - lineIndex) : 0;
+            };
+        }
+        function getLineY(isSub) { // replication of getBarY
+            return function (d) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
+                return scale(d.value);
+            };
+        }
+        function getLineOffset(lineIndices, isSub) { // partial duplication of getBarOffset
+            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isLineType))),
+                targetIds = targets.map(function (t) { return t.id; });
+            return function (d, i) {
+                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
+                    y0 = scale(0), offset = y0;
+                targets.forEach(function (t) {
+                    if (t.id === d.id || lineIndices[t.id] !== lineIndices[d.id]) { return; }
+                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value > 0) {
+                        offset += scale(t.values[i].value) - y0;
+                    }
+                });
+                return offset;
+            };
+        }
+
         //-- Type --//
 
         function setTargetType(targetIds, type) {
@@ -1985,19 +2148,30 @@
         function hasPieType(targets) {
             return __data_type === 'pie' || hasType(targets, 'pie');
         }
+        function hasGaugeType(targets) {
+            return hasType(targets, 'gauge');
+        }
         function hasDonutType(targets) {
             return __data_type === 'donut' || hasType(targets, 'donut');
         }
         function hasArcType(targets) {
-            return hasPieType(targets) || hasDonutType(targets);
+            return hasPieType(targets) || hasDonutType(targets) || hasGaugeType(targets);
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline';
         }
+        function isStepType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return !(id in __data_types) || __data_types[id] === 'step' || __data_types[id] === 'area-step';
+        }
         function isSplineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'spline' || __data_types[id] === 'area-spline';
+        }
+        function isAreaType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'area';
         }
         function isBarType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -2011,15 +2185,22 @@
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'pie';
         }
+        function isGaugeType(d) {
+            var id = (typeof d === 'string') ? d : d.id;
+            return __data_types[id] === 'gauge';
+        }
         function isDonutType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'donut';
         }
         function isArcType(d) {
-            return isPieType(d) || isDonutType(d);
+            return isPieType(d) || isDonutType(d) || isGaugeType(d);
         }
         function lineData(d) {
             return isLineType(d) ? [d] : [];
+        }
+        function stepData(d) {
+            return isStepType(d) ? [d] : [];
         }
         function arcData(d) {
             return isArcType(d.data) ? [d] : [];
@@ -2034,6 +2215,9 @@
         }
         function lineOrScatterData(d) {
             return isLineType(d) || isScatterType(d) ? d.values : [];
+        }
+        function lineOrStepData(d) {
+            return isLineType(d) || isStepType(d) ? [d] : [];
         }
         function barOrLineData(d) {
             return isBarType(d) || isLineType(d) ? d.values : [];
@@ -2066,6 +2250,23 @@
                 }
                 return callback instanceof Function ? callback(color, d) : color;
             };
+        }
+
+        function generateLevelColor(_colors, _values) {
+          var colors = _colors,
+              levels = _values;
+
+          return function (value) {
+            for (var a=1; a<levels.length; a++) {
+              if (levels[0] === 'percentage' && ((value/__gauge_max)*100) < levels[a]) {
+                return colors[a-1];
+              }
+              if (levels[0] === 'whole' && value < levels[a]) {
+                return colors[a-1];
+              }
+            }
+            return colors[colors.length-1];
+          };
         }
 
         //-- Date --//
@@ -2240,42 +2441,45 @@
             getBars(i).classed(CLASS.EXPANDED, false);
         }
 
-        var lineOnMain = generateDrawLine(false),
-            lineOnSub = generateDrawLine(true);
+        function generateDrawArea(areaIndices, isSub) {
+          var area,
+              getPoint = generateGetAreaPoint(areaIndices, isSub),
+              yScaleGetter = isSub ? getSubYScale : getYScale;
 
-        var areaOnMain = (function () {
-            var area;
+          if (__axis_rotated) {
+              area = d3.svg.area()
+                  .x0(function (d, i) { return yScaleGetter(d.id)(0); })
+                  .x1(function (d, i) { return yScaleGetter(d.id)(d.value); })
+                  .y(xx);
+          } else {
+              area = d3.svg.area()
+                  .x(xx)
+                  .y0(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return yScaleGetter(d.id)(0); })
+                  .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[1][1]; } return yScaleGetter(d.id)(d.value); });
+          }
 
-            if (__axis_rotated) {
-                area = d3.svg.area()
-                    .x0(function (d) { return getYScale(d.id)(0); })
-                    .x1(function (d) { return getYScale(d.id)(d.value); })
-                    .y(xx);
-            } else {
-                area = d3.svg.area()
-                    .x(xx)
-                    .y0(function (d) { return getYScale(d.id)(0); })
-                    .y1(function (d) { return getYScale(d.id)(d.value); });
-            }
+          return function (d, i) {
+              var data = filterRemoveNull(d.values), x0, y0;
 
-            return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
+              if (hasType([d], 'area') || hasType([d], 'area-spline')) {
+                  isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
+                  return area(data);
+              } else if (hasType([d], 'area-step')) {
+                  isStepType(d) ? area.interpolate("step-after") : area.interpolate("linear");
+                  return area(data);
+              } else {
+                  x0 = x(data[0].x);
+                  y0 = getYScale(d.id)(data[0].value);
+                  return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+              }
+          };
+        }
 
-                if (hasType([d], 'area') || hasType([d], 'area-spline')) {
-                    isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
-                    return area(data);
-                } else {
-                    x0 = data[0] ? x(data[0].x) : 0;
-                    y0 = data[0] ? getYScale(d.id)(data[0].value) : 0;
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-                }
-            };
-        })();
-
-        function generateDrawLine(isSub) {
-            var yScaleGetter = isSub ? getSubYScale : getYScale,
-                xValue = isSub ? xx : subxx,
-                yValue = function (d) { return yScaleGetter(d.id)(d.value); },
+        function generateDrawLine(lineIndices, isSub) {
+            var getPoint = generateGetLinePoint(lineIndices, isSub),
+                yScaleGetter = isSub ? getSubYScale : getYScale,
+                xValue = isSub ? subxx : xx,
+                yValue = function (d,i) { if (__data_groups.length > 0) { var point = getPoint(d,i); return point[0][1]; } return yScaleGetter(d.id)(d.value); },
                 line = d3.svg.line()
                     .x(__axis_rotated ? yValue : xValue)
                     .y(__axis_rotated ? xValue : yValue);
@@ -2290,6 +2494,9 @@
                         line.interpolate(isSplineType(d) ? "cardinal" : "linear");
                         return line(data);
                     }
+                } else if (isStepType(d)) {
+                  line.interpolate("step-after");
+                  return line(data);
                 } else {
                     if (data[0]) {
                         x0 = x(data[0].x);
@@ -2344,6 +2551,28 @@
             }
         }
 
+        function generateGetAreaPoint(areaIndices, isSub) { // partial duplication of generateGetBarPoints
+          var areaTargetsNum = areaIndices.__max__ + 1,
+              x = getAreaX(areaTargetsNum, areaIndices, !!isSub),
+              y = getAreaY(!!isSub),
+              areaOffset = getAreaOffset(areaIndices, !!isSub),
+              yScale = isSub ? getSubYScale : getYScale;
+          return function (d, i) {
+                var y0 = yScale(d.id)(0),
+                    offset = areaOffset(d, i) || y0, // offset is for stacked area chart
+                    posX = x(d), posY = y(d);
+                // fix posY not to overflow opposite quadrant
+                if (__axis_rotated) {
+                    if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                }
+                // 1 point that marks the area position
+                return [
+                    [posX, offset],
+                    [posX, posY - (y0 - offset)]
+                ];
+          };
+        }
+
         function generateGetBarPoints(barIndices, isSub) {
             var barTargetsNum = barIndices.__max__ + 1,
                 barW = getBarW(xAxis, barTargetsNum),
@@ -2367,6 +2596,27 @@
                     [posX + barW, offset]
                 ];
             };
+        }
+
+        function generateGetLinePoint(lineIndices, isSub) { // partial duplication of generateGetBarPoints
+          var lineTargetsNum = lineIndices.__max__ + 1,
+              x = getLineX(lineTargetsNum, lineIndices, !!isSub),
+              y = getLineY(!!isSub),
+              lineOffset = getLineOffset(lineIndices, !!isSub),
+              yScale = isSub ? getSubYScale : getYScale;
+          return function (d, i) {
+                var y0 = yScale(d.id)(0),
+                    offset = lineOffset(d, i) || y0, // offset is for stacked area chart
+                    posX = x(d), posY = y(d);
+                // fix posY not to overflow opposite quadrant
+                if (__axis_rotated) {
+                    if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
+                }
+                // 1 point that marks the line position
+                return [
+                    [posX, posY - (y0 - offset)]
+                ];
+          };
         }
 
         function lineWithRegions(d, x, y, _regions) {
@@ -2595,6 +2845,15 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
+            if (c3.data.targets.length == 0) {
+              main.append("text")
+                .attr("class", CLASS.text)
+                .attr("x", (main[0][0].parentNode.width.baseVal.value / 2) - margin.left)
+                .attr("y", (main[0][0].parentNode.height.baseVal.value / 2) - margin.top)
+                .attr("text-anchor", "middle")
+                .attr("style", (__data_empty_label_fill ? "fill:"+ __data_empty_label_fill +"; " : "") + (__data_empty_label_size ? "font-size:"+ __data_empty_label_size +"; " : "") )
+                .text(__data_empty_label_text);
+            }
 
             // Grids
             grid = main.append('g')
@@ -3097,14 +3356,19 @@
 
         function redraw(options, transitions) {
             var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
-            var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextBar, eventRect, eventRectUpdate;
-            var barIndices = getBarIndices(), maxDataCountTarget, tickOffset;
+            var mainLine, mainStep, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine, contextStep, contextArea, contextBar, eventRect, eventRectUpdate;
+            var areaIndices = getAreaIndices(), barIndices = getBarIndices(), lineIndices = getLineIndices(), maxDataCountTarget, tickOffset;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
             var hideAxis = hasArcType(c3.data.targets);
-            var drawBar, drawBarOnSub, xForText, yForText;
+            var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis;
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
+
+            // abort if no targets to show
+            if (targetsToShow.length === 0 && __data_empty_abort) {
+                return;
+            }
 
             options = options || {};
             withY = getOption(options, "withY", true);
@@ -3212,7 +3476,9 @@
             }
 
             // setup drawer - MEMO: these must be called after axis updated
+            drawArea = generateDrawArea(areaIndices, false);
             drawBar = generateDrawBar(barIndices);
+            drawLine = generateDrawLine(lineIndices, false);
             xForText = generateXYForText(barIndices, true);
             yForText = generateXYForText(barIndices, false);
 
@@ -3352,8 +3618,11 @@
                 .data(barData);
             mainBar.enter().append('path')
                 .attr("class", classBar)
-                .style("stroke", 'none')
-                .style("fill", color);
+                .style("stroke", function (d) { return color(d.id); })//'none')
+                .style("stroke-width", 2)
+                .style("opacity", 0)
+                .style("fill", function (d) { return color(d.id); })
+                .style("fill-opacity", function () { if (__color_opacity) { return __color_opacity; } return initialOpacity; });
             mainBar
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
@@ -3373,15 +3642,30 @@
             mainLine
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
-                .attr("d", lineOnMain)
+                .attr("d", drawLine)
                 .style("stroke", color)
                 .style("opacity", 1);
             mainLine.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
-
+            // steps
+            mainStep = main.selectAll('.' + CLASS.steps).selectAll('.' + CLASS.step)
+                .data(stepData);
+            mainStep.enter().append('path')
+                .attr('class', classStep)
+                .style("stroke", color);
+            mainStep
+                .style("opacity", initialOpacity)
+              .transition().duration(duration)
+                .attr("d", drawLine)
+                .style("stroke", color)
+                .style("opacity", 1);
+            mainStep.exit().transition().duration(durationForExit)
+                .style('opacity', 0)
+                .remove();
+            // area
             mainArea = main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
-                .data(lineData);
+                .data(lineOrStepData);
             mainArea.enter().append('path')
                 .attr("class", classArea)
                 .style("fill", color)
@@ -3389,7 +3673,7 @@
             mainArea
                 .style("opacity", 0)
               .transition().duration(duration)
-                .attr("d", areaOnMain)
+                .attr("d", drawArea)//areaOnMain)
                 .style("fill", color)
                 .style("opacity", orgAreaOpacity);
             mainArea.exit().transition().duration(durationForExit)
@@ -3439,6 +3723,23 @@
             // arc
             mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
                 .data(arcData);
+            if (__gauge_style === "arc") {
+              mainArc.enter().append("path")
+                .attr("class", "")
+                .style("opacity", 1)
+                .style("fill", __gauge_color) // Where background color would receive customization.
+                .style("cursor", "pointer")
+                .attr("transform", "scale(1,1)")
+                .attr("d", function (d) {
+                  d.value = __gauge_max;
+                  d.startAngle = -1*(Math.PI/2);
+                  d.endAngle = Math.PI/2;
+                  return getArc(d, true);
+                });
+            mainArc.exit().transition().duration(durationForExit)
+                .style('opacity', 0)
+                .remove();
+            }
             mainArc.enter().append('path')
                 .attr("class", classArc)
                 .style("fill", function (d) { return color(d.data); })
@@ -3499,13 +3800,14 @@
                         };
                     }
 */
+                    if (isNaN(this._current.endAngle)) this._current.endAngle = this._current.startAngle;
                     interpolate = d3.interpolate(this._current, updated);
                     this._current = interpolate(0);
                     return function (t) { return getArc(interpolate(t), true); };
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
-                .style("fill", function (d) { return color(d.data); })
-                .style("opacity", 1)
+                .style("fill", function (d) { return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.//color(d.data); })
+                .style("opacity", (__color_opacity) ? __color_opacity : 1)//1)
                 .call(endall, function () {
                     transiting = false;
                 });
@@ -3518,8 +3820,28 @@
                 .attr("transform", transformForArcLabel)
               .transition().duration(duration)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+            if (__gauge_style === "arc") {
+              main.selectAll('.' + CLASS.chartArc).select('text.units')
+                  .attr("transform", transformForArcLabel)
+                  .style("opacity", 0)
+                .transition().duration(duration)
+                  .text((__gauge_label_show) ? __gauge_units : '')
+                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+              main.selectAll('.' + CLASS.chartArc).select('text.min')
+                  .attr("transform", transformForArcLabel)
+                  .style("opacity", 0)
+                .transition().duration(duration)
+                  .text((__gauge_label_show) ? __gauge_min : '')
+                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+              main.selectAll('.' + CLASS.chartArc).select('text.max')
+                  .attr("transform", transformForArcLabel)
+                  .style("opacity", 0)
+                .transition().duration(duration)
+                  .text((__gauge_label_show) ? __gauge_max : '')
+                  .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
+            }
             main.select('.' + CLASS.chartArcsTitle)
-                .style("opacity", hasDonutType(c3.data.targets) ? 1 : 0);
+                .style("opacity", hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? 1 : 0);
 
             // subchart
             if (__subchart_show) {
@@ -3540,7 +3862,9 @@
                         brush.extent(x.orgDomain()).update();
                     }
                     // setup drawer - MEMO: this must be called after axis updated
+                    drawAreaOnSub = generateDrawArea(areaIndices, true);
                     drawBarOnSub = generateDrawBar(barIndices, true);
+                    drawLineOnSub = generateDrawLine(lineIndices, true);
                     // bars
                     contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                         .data(barData);
@@ -3565,9 +3889,39 @@
                     contextLine
                         .style("opacity", initialOpacity)
                       .transition().duration(duration)
-                        .attr("d", lineOnSub)
+                        .attr("d", drawLineOnSub)
                         .style('opacity', 1);
                     contextLine.exit().transition().duration(duration)
+                        .style('opacity', 0)
+                        .remove();
+                    // steps
+                    contextStep = context.selectAll('.' + CLASS.steps).selectAll('.' + CLASS.step)
+                        .data(stepData);
+                    contextStep.enter().append('path')
+                        .attr('class', classLine)
+                        .style('stroke', color);
+                    contextStep
+                        .style("opacity", initialOpacity)
+                      .transition().duration(duration)
+                        .attr("d", drawLineOnSub)
+                        .style('opacity', 1);
+                    contextStep.exit().transition().duration(duration)
+                        .style('opacity', 0)
+                        .remove();
+                    // area
+                    contextArea = context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+                        .data((isStepType ? stepData : lineData));
+                    contextArea.enter().append('path')
+                        .attr("class", classArea)
+                        .style("fill", color)
+                        .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+                    contextArea
+                        .style("opacity", 0)
+                      .transition().duration(duration)
+                        .attr("d", drawAreaOnSub)
+                        .style("fill", color)
+                        .style("opacity", orgAreaOpacity);
+                    contextArea.exit().transition().duration(durationForExit)
                         .style('opacity', 0)
                         .remove();
                 }
@@ -3614,11 +3968,13 @@
                     if ((isCustomX || isTimeSeries) && !isCategorized) {
                         rectW = function (d, i) {
                             var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
-                            return (x(nextX ? nextX : dx * 1.1) - x(prevX ? prevX : dx * 0.9)) / 2;
+                            var xnX = x(nextX ? nextX : dx);
+                            var xpX = x(prevX ? prevX : dx);
+                            return (xnX - xpX) / 2;
                         };
                         rectX = function (d, i) {
                             var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
-                            return (x(dx) + x(prevX ? prevX : dx * 0.9)) / 2;
+                            return (x(dx) + x(prevX ? prevX : dx)) / 2;
                         };
                     } else {
                         rectW = getEventRectWidth();
@@ -3792,6 +4148,9 @@
             // Lines for each data
             mainLineEnter.append('g')
                 .attr("class", classLines);
+            // Steps
+            mainLineEnter.append('g')
+                .attr('class', classSteps);
             // Areas
             mainLineEnter.append('g')
                 .attr('class', classAreas);
@@ -3819,10 +4178,40 @@
             mainPieEnter.append('g')
                 .attr('class', classArcs);
             mainPieEnter.append("text")
-                .attr("dy", ".35em")
+                .attr("dy", __gauge_style === "arc" ? "-0.35em" : ".35em")
                 .style("opacity", 0)
                 .style("text-anchor", "middle")
-                .style("pointer-events", "none");
+                .style("pointer-events", "none")
+                .style("font-size", width / 10 + "px");
+            if (__gauge_style === "arc") {
+                mainPieEnter.select('text').style('fill', '#000');
+                mainPieEnter.append("text")
+                  .attr("dy", ".75em")
+                  .attr("class", "units")
+                  .style("opacity", 0)
+                  .style("text-anchor", "middle")
+                  .style("pointer-events", "none")
+                  .style('fill', '#000')
+                  .style("font-size", width / 15 + "px");
+                mainPieEnter.append("text")
+                  .attr("dx", -1*(innerRadius+((radius-innerRadius)/2)) + "px")
+                  .attr("dy", "1em")
+                  .attr("class", "min")
+                  .style("opacity", 0)
+                  .style("text-anchor", "middle")
+                  .style("pointer-events", "none")
+                  .style('fill', '#777')
+                  .style("font-size", width / 20 + "px");
+                mainPieEnter.append("text")
+                  .attr("dx", innerRadius+((radius-innerRadius)/2) + "px")
+                  .attr("dy", "1em")
+                  .attr("class", "max")
+                  .style("opacity", 0)
+                  .style("text-anchor", "middle")
+                  .style("pointer-events", "none")
+                  .style('fill', '#777')
+                  .style("font-size", width / 20 + "px");
+            }
             // MEMO: can not keep same color..., but not bad to update color in redraw
             //mainPieUpdate.exit().remove();
 
@@ -3848,8 +4237,14 @@
                     .style('opacity', 0)
                     .attr('class', classChartLine);
                 // Lines for each data
-                contextLineEnter.append('g')
+                contextLineEnter.append("g")
                     .attr("class", classLines);
+                // Steps
+                contextLineEnter.append("g")
+                    .attr("class", classSteps);
+                // Area
+                contextLineEnter.append("g")
+                    .attr("class", classAreas);
             }
 
             /*-- Show --*/
@@ -4656,7 +5051,7 @@
         }
         function generateTicks(scale) {
             var i, domain, ticks = [];
-            if (scale.ticks) {
+            if (scale.ticks && tickArguments != undefined) {
                 return scale.ticks.apply(scale, tickArguments);
             }
             domain = scale.domain();
