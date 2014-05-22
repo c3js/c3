@@ -228,8 +228,6 @@
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
-        var __zero_padding = getConfig(['zeropadding'], false);
-
         // grid
         var __grid_x_show = getConfig(['grid', 'x', 'show'], false),
             __grid_x_type = getConfig(['grid', 'x', 'type'], 'tick'),
@@ -1229,7 +1227,7 @@
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
                 padding_bottom = yDomainMin;
             }
-            if (__zero_padding && !hasNegativeValueInTargets(yTargets)) {
+            if (!hasNegativeValueInTargets(yTargets)) {
               padding_bottom -= padding_bottom;
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
@@ -1248,8 +1246,6 @@
             } else if (hasBarType(targets)) {
                 maxDataCount = getMaxDataCount();
                 padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
-            } else if (__zero_padding) {
-                padding = diff * 0.001;
             } else {
                 padding = diff * 0.01;
             }
@@ -3618,7 +3614,7 @@
                 .data(barData);
             mainBar.enter().append('path')
                 .attr("class", classBar)
-                .style("stroke", function (d) { return color(d.id); })//'none')
+                .style("stroke", function (d) { return color(d.id); })
                 .style("stroke-width", 2)
                 .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
@@ -3673,7 +3669,7 @@
             mainArea
                 .style("opacity", 0)
               .transition().duration(duration)
-                .attr("d", drawArea)//areaOnMain)
+                .attr("d", drawArea)
                 .style("fill", color)
                 .style("opacity", orgAreaOpacity);
             mainArea.exit().transition().duration(durationForExit)
@@ -3807,7 +3803,7 @@
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
                 .style("fill", function (d) { return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id); }) // Where gauge reading color would receive customization.//color(d.data); })
-                .style("opacity", (__color_opacity) ? __color_opacity : 1)//1)
+                .style("opacity", (__color_opacity) ? __color_opacity : 1)
                 .call(endall, function () {
                     transiting = false;
                 });
