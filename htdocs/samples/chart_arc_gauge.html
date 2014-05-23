@@ -11,30 +11,21 @@
       var chart = c3.generate({
         data: {
           columns: [
-            [ '%', 91.4 ]
+            [ 'data', 91.4 ]
           ],
           type: 'gauge'
         },
         gauge: {
-    //      color: '', // default value is #e0e0e0 (gray). "color: '', " removes background color (transparent).
           label: {
-            format: function(value, ratio) {
-              return value;
-            },
-    //        show: false // to turn off the min/max labels.
+//            format: function(value, ratio) {
+//              return value;
+//            },
+//          show: false // to turn off the min/max labels.
           },
-          min: 0,//can handle negative min e.g. vacuum / voltage / current flow / rate of change
-          max: 100,
-          style: 'arc', // Only style currently.
-          units: ' %',
-    //      width: 39 // for adjusting arc thickness
-        },
-        legend: {
-          show: false
-        },
-        size: {
-          height: 240,
-          width: 240
+//          min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
+//          max: 100, // 100 is default
+//          units: ' %',
+//          width: 39 // for adjusting arc thickness
         },
         color: {
           pattern: ['#FF0000', '#F6C600', '#60B044'], // the three color levels for the percentage values.
@@ -47,31 +38,54 @@
       });
 
       var cycleDemo = function () {
+
         setTimeout(function () {
             chart = chart.update(['gauge', 'color'], '');
-        }, 2000);
+        }, 1000);
 
         setTimeout(function () {
             chart.load({
-              columns: [[ '%', 0 ]]
+              columns: [[ 'data', 10 ]]
             });
-        }, 4000);
+        }, 2000);
 
         setTimeout(function () {
             chart.load({
               columns: [[ '%', 50 ]]
             });
-        }, 5000);
+        }, 3000);
 
         setTimeout(function () {
             chart.load({
               columns: [[ '%', 91.4 ]]
             });
+        }, 4000);
+
+//        setTimeout(function () {
+//            chart = chart.update(['gauge', 'color'], '#e0e0e0');
+//        }, 5000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 0 ]]
+            });
         }, 6000);
 
         setTimeout(function () {
-            chart = chart.update(['gauge', 'color'], '#e0e0e0');
+            chart.load({
+              columns: [[ '%', 50 ]]
+            });
+        }, 7000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ '%', 91.4 ]]
+            });
         }, 8000);
+
+//        setTimeout(function () {
+//            chart = chart.update(['gauge', 'width'], 10);
+//        }, 9000);
 
         setTimeout(function () {
             chart.load({
@@ -91,15 +105,15 @@
             });
         }, 12000);
 
-        setTimeout(function () {
-            chart = chart.update(['gauge', 'width'], 10);
-        }, 14000);
+//        setTimeout(function () {
+//            chart = chart.update(['gauge', 'width'], 39);
+//        }, 13000);
 
         setTimeout(function () {
             chart.load({
               columns: [[ '%', 0 ]]
             });
-        }, 16000);
+        }, 14000);
 
         setTimeout(function () {
             chart.load({
@@ -111,34 +125,13 @@
             chart.load({
               columns: [[ '%', 91.4 ]]
             });
-        }, 18000);
+        }, 16000);
 
-        setTimeout(function () {
-            chart = chart.update(['gauge', 'width'], 39);
-        }, 20000);
-
-        setTimeout(function () {
-            chart.load({
-              columns: [[ '%', 0 ]]
-            });
-        }, 22000);
-
-        setTimeout(function () {
-            chart.load({
-              columns: [[ '%', 50 ]]
-            });
-        }, 23000);
-
-        setTimeout(function () {
-            chart.load({
-              columns: [[ '%', 91.4 ]]
-            });
-        }, 24000);
       }
 
       cycleDemo();
 
-      setInterval(cycleDemo, 30000);
+//      setInterval(cycleDemo, 30000);
     </script>
   </body>
 </html>

@@ -19,9 +19,10 @@
         chartArc: 'c3-chart-arc',
         chartArcs: 'c3-chart-arcs',
         chartArcsTitle: 'c3-chart-arcs-title',
-        gaugeArc: 'c3-gauge-arc',
-        gaugeArcs: 'c3-gauge-arcs',
-        gaugeArcsTitle: 'c3-gauge-arcs-title',
+        chartArcsBackground: 'c3-chart-arcs-background',
+        chartArcsGaugeUnit: 'c3-chart-arcs-gauge-unit',
+        chartArcsGaugeMax: 'c3-chart-arcs-gauge-max',
+        chartArcsGaugeMin: 'c3-chart-arcs-gauge-min',
         selectedCircle: 'c3-selected-circle',
         selectedCircles: 'c3-selected-circles',
         eventRect: 'c3-event-rect',
@@ -49,6 +50,7 @@
         areas: 'c3-areas',
         text: 'c3-text',
         texts: 'c3-texts',
+        gaugeValue: 'c3-gauge-value',
         grid: 'c3-grid',
         xgrid: 'c3-xgrid',
         xgrids: 'c3-xgrids',
@@ -252,17 +254,15 @@
             __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
 
         // gauge
-        var __gauge_color = getConfig(['gauge', 'color'], "#e0e0e0"),
-            __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
+        var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
             __gauge_label_format = getConfig(['gauge', 'label', 'format']),
-            __gauge_max = getConfig(['gauge', 'max']),
-            __gauge_min = getConfig(['gauge', 'min']),
+            __gauge_min = getConfig(['gauge', 'min'], 0),
+            __gauge_max = getConfig(['gauge', 'max'], 100),
             __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
             __gauge_onmouseover = getConfig(['gauge', 'onmouseover'], function () {}),
             __gauge_onmouseout = getConfig(['gauge', 'onmouseout'], function () {}),
-            __gauge_style = getConfig(['gauge', 'style']),
             __gauge_units = getConfig(['gauge', 'units']),
-            __gauge_width = getConfig(['gauge', 'width'], false);
+            __gauge_width = getConfig(['gauge', 'width']);
 
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
@@ -504,9 +504,10 @@
                 .attr("y2", __axis_rotated ? -10 : height);
         }
         function updateRadius() {
+            var innerRadiusRatio;
             radiusExpanded = Math.min(arcWidth, arcHeight) / 2;
             radius = radiusExpanded * 0.95;
-            var innerRadiusRatio = __gauge_width ? ((radius - __gauge_width) / radius) : 0.6;
+            innerRadiusRatio = __gauge_width ? (radius - __gauge_width) / radius : 0.6;
             innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * innerRadiusRatio : 0;
         }
         function getSvgLeft() {
@@ -1014,24 +1015,24 @@
                 return updated ? arc(updated) : "M 0 0";
             };
         }
-        function getArc(d, withoutUpdate) {
-            return isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
+        function getArc(d, withoutUpdate, force) {
+            return force || isArcType(d.data) ? svgArc(d, withoutUpdate) : "M 0 0";
         }
         function transformForArcLabel(d) {
             var updated = updateAngle(d), c, x, y, h, ratio, translate = "";
-            if (updated) {
+            if (updated && !hasGaugeType(c3.data.targets)) {
                 c = svgArc.centroid(updated);
                 x = c[0];
                 y = c[1];
                 h = Math.sqrt(x * x + y * y);
                 // TODO: ratio should be an option?
                 ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
-                translate = __gauge_style === 'arc' ? "translate(1,1)" : "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
+                translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
         }
         function getArcRatio(d) {
-            var whole = __gauge_style === 'arc' ? Math.PI : (Math.PI * 2);
+            var whole = hasGaugeType(c3.data.targets) ? Math.PI : (Math.PI * 2);
             return d ? (d.endAngle - d.startAngle) / whole : null;
         }
         function convertToArcData(d) {
@@ -1080,10 +1081,14 @@
                 .style("opacity", 1);
         }
         function shouldShowArcLable() {
-            if (hasGaugeType(c3.data.targets)) {
-                return true;
+            var shouldShow = true;
+            if (hasDonutType(c3.data.targets)) {
+                shouldShow = __donut_label_show;
+            } else if (hasPieType(c3.data.targets)) {
+                shouldShow = __pie_label_show;
             }
-            return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
+            // when gauge, always true
+            return shouldShow;
         }
         function getArcLabelFormat() {
             var format = __pie_label_format;
@@ -2646,7 +2651,7 @@
         }
 
         function init(data) {
-            var eventRect, grid, i, binding = true;
+            var arcs, eventRect, grid, i, binding = true;
 
             selectChart = d3.select(__bindto);
             if (selectChart.empty()) {
@@ -2667,6 +2672,11 @@
             // Set targets to hide if needed
             if (__data_hide) {
                 addHiddenTargetIds(__data_hide === true ? mapToIds(c3.data.targets) : __data_hide);
+            }
+
+            // when gauge, hide legend // TODO: fix
+            if (hasGaugeType(c3.data.targets)) {
+                __legend_show = false;
             }
 
             // Init sizes and scales
@@ -2784,13 +2794,45 @@
                 .attr("class", CLASS.chartLines);
 
             // Define g for arc chart area
-            main.select('.' + CLASS.chart).append("g")
+            arcs = main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.chartArcs)
-                .attr("transform", translate.arc)
-              .append('text')
+                .attr("transform", translate.arc);
+            arcs.append('text')
                 .attr('class', CLASS.chartArcsTitle)
                 .style("text-anchor", "middle")
                 .text(getArcTitle());
+            if (hasGaugeType(c3.data.targets)) {
+                arcs.append('path')
+                    .attr("class", CLASS.chartArcsBackground)
+                    .attr("d", function () {
+                        var d = {
+                            data: [{value: __gauge_max}],
+                            startAngle: -1 * (Math.PI / 2),
+                            endAngle: Math.PI / 2
+                        };
+                        return getArc(d, true, true);
+                    });
+                arcs.append("text")
+                    .attr("dy", ".75em")
+                    .attr("class", CLASS.chartArcsGaugeUnit)
+                    .style("text-anchor", "middle")
+                    .style("pointer-events", "none")
+                    .text(__gauge_label_show ? __gauge_units : '');
+                arcs.append("text")
+                    .attr("dx", -1 * (innerRadius + ((radius - innerRadius) / 2)) + "px")
+                    .attr("dy", "1.2em")
+                    .attr("class", CLASS.chartArcsGaugeMin)
+                    .style("text-anchor", "middle")
+                    .style("pointer-events", "none")
+                    .text(__gauge_label_show ? __gauge_min : '');
+                arcs.append("text")
+                    .attr("dx", innerRadius + ((radius - innerRadius) / 2) + "px")
+                    .attr("dy", "1.2em")
+                    .attr("class", CLASS.chartArcsGaugeMax)
+                    .style("text-anchor", "middle")
+                    .style("pointer-events", "none")
+                    .text(__gauge_label_show ? __gauge_max : '');
+            }
 
             main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.chartTexts);
@@ -3577,29 +3619,17 @@
             // arc
             mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
                 .data(arcData);
-            if (__gauge_style === "arc") {
-                mainArc.enter().append("path")
-                  .attr("class", "")
-                  .style("opacity", 1)
-                  .style("fill", __gauge_color) // Where background color would receive customization.
-                  .style("cursor", "pointer")
-                  .attr("transform", "scale(1,1)")
-                  .attr("d", function (d) {
-                        d.value = __gauge_max;
-                        d.startAngle = -1 * (Math.PI / 2);
-                        d.endAngle = Math.PI / 2;
-                        return getArc(d, true);
-                    });
-                mainArc.exit().transition().duration(durationForExit)
-                  .style('opacity', 0)
-                  .remove();
-            }
             mainArc.enter().append('path')
                 .attr("class", classArc)
                 .style("fill", function (d) { return color(d.data); })
                 .style("cursor", function (d) { return __data_selection_isselectable(d) ? "pointer" : null; })
                 .style("opacity", 0)
-                .each(function (d) { this._current = d; })
+                .each(function (d) {
+                    if (isGaugeType(d.data)) {
+                        d.startAngle = d.endAngle = -1 * (Math.PI / 2);
+                    }
+                    this._current = d;
+                })
                 .on('mouseover', function (d, i) {
                     var updated, arcData, callback;
                     if (transiting) { // skip while transiting
@@ -3637,12 +3667,13 @@
                     callback(arcData, i);
                 });
             mainArc
-                .attr("transform", withTransform ? "scale(0)" : "")
+                .attr("transform", function (d) { return !isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
                 .style("opacity", function (d) { return d === this._current ? 0 : 1; })
                 .each(function () { transiting = true; })
               .transition().duration(duration)
                 .attrTween("d", function (d) {
                     var updated = updateAngle(d), interpolate;
+
                     if (! updated) {
                         return function () { return "M 0 0"; };
                     }
@@ -3674,30 +3705,11 @@
                 .remove();
             main.selectAll('.' + CLASS.chartArc).select('text')
                 .style("opacity", 0)
+                .attr('class', function (d) { return isGaugeType(d.data) ? CLASS.gaugeValue : ''; })
                 .text(textForArcLabel)
                 .attr("transform", transformForArcLabel)
               .transition().duration(duration)
                 .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-            if (__gauge_style === "arc") {
-                main.selectAll('.' + CLASS.chartArc).select('text.units')
-                    .attr("transform", transformForArcLabel)
-                    .style("opacity", 0)
-                  .transition().duration(duration)
-                    .text((__gauge_label_show) ? __gauge_units : '')
-                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-                main.selectAll('.' + CLASS.chartArc).select('text.min')
-                    .attr("transform", transformForArcLabel)
-                    .style("opacity", 0)
-                  .transition().duration(duration)
-                    .text((__gauge_label_show) ? __gauge_min : '')
-                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-                main.selectAll('.' + CLASS.chartArc).select('text.max')
-                    .attr("transform", transformForArcLabel)
-                    .style("opacity", 0)
-                  .transition().duration(duration)
-                    .text((__gauge_label_show) ? __gauge_max : '')
-                    .style("opacity", function (d) { return isTargetToShow(d.data.id) && isArcType(d.data) ? 1 : 0; });
-            }
             main.select('.' + CLASS.chartArcsTitle)
                 .style("opacity", hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? 1 : 0);
 
@@ -4019,40 +4031,10 @@
             mainPieEnter.append('g')
                 .attr('class', classArcs);
             mainPieEnter.append("text")
-                .attr("dy", __gauge_style === "arc" ? "-0.35em" : ".35em")
+                .attr("dy", hasGaugeType(c3.data.targets) ? "-0.35em" : ".35em")
                 .style("opacity", 0)
                 .style("text-anchor", "middle")
-                .style("pointer-events", "none")
-                .style("font-size", width / 10 + "px");
-            if (__gauge_style === "arc") {
-                mainPieEnter.select('text').style('fill', '#000');
-                mainPieEnter.append("text")
-                  .attr("dy", ".75em")
-                  .attr("class", "units")
-                  .style("opacity", 0)
-                  .style("text-anchor", "middle")
-                  .style("pointer-events", "none")
-                  .style('fill', '#000')
-                  .style("font-size", width / 15 + "px");
-                mainPieEnter.append("text")
-                  .attr("dx", -1 * (innerRadius + ((radius - innerRadius) / 2)) + "px")
-                  .attr("dy", "1em")
-                  .attr("class", "min")
-                  .style("opacity", 0)
-                  .style("text-anchor", "middle")
-                  .style("pointer-events", "none")
-                  .style('fill', '#777')
-                  .style("font-size", width / 20 + "px");
-                mainPieEnter.append("text")
-                  .attr("dx", innerRadius + ((radius - innerRadius) / 2) + "px")
-                  .attr("dy", "1em")
-                  .attr("class", "max")
-                  .style("opacity", 0)
-                  .style("text-anchor", "middle")
-                  .style("pointer-events", "none")
-                  .style('fill', '#777')
-                  .style("font-size", width / 20 + "px");
-            }
+                .style("pointer-events", "none");
             // MEMO: can not keep same color..., but not bad to update color in redraw
             //mainPieUpdate.exit().remove();
 
