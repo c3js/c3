@@ -1086,33 +1086,42 @@
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
         }
         function getArcLabelFormat() {
+            var format = __pie_label_format;
             if (hasGaugeType(c3.data.targets)) {
-                return __gauge_label_format;
+                format = __gauge_label_format;
+            } else if (hasDonutType(c3.data.targets)) {
+                format = __donut_label_format;
             }
-            return hasDonutType(c3.data.targets) ? __donut_label_format : __pie_label_format;
+            return format;
         }
         function getArcTitle() {
             return hasDonutType(c3.data.targets) ? __donut_title : "";
         }
         function getArcOnClick() {
+            var callback = __pie_onclick;
             if (hasGaugeType(c3.data.targets)) {
-                return typeof __gauge_onclick === 'function' ? __gauge_onclick : function () {};
+                callback = __gauge_onclick;
+            } else if (hasDonutType(c3.data.targets)) {
+                callback = __donut_onclick;
             }
-            var callback = hasDonutType(c3.data.targets) ? __donut_onclick : __pie_onclick;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOver() {
+            var callback = __pie_onmouseover;
             if (hasGaugeType(c3.data.targets)) {
-                return typeof __gauge_onmouseover === 'function' ? __gauge_onmouseover : function () {};
+                callback = __gauge_onmouseover;
+            } else if (hasDonutType(c3.data.targets)) {
+                callback = __donut_onmouseover;
             }
-            var callback = hasDonutType(c3.data.targets) ? __donut_onmouseover : __pie_onmouseover;
             return typeof callback === 'function' ? callback : function () {};
         }
         function getArcOnMouseOut() {
+            var callback = __pie_onmouseout;
             if (hasGaugeType(c3.data.targets)) {
-                return typeof __gauge_onmouseout === 'function' ? __gauge_onmouseout : function () {};
+                callback = __gauge_onmouseout;
+            } else if (hasDonutType(c3.data.targets)) {
+                callback = __donut_onmouseout;
             }
-            var callback = hasDonutType(c3.data.targets) ? __donut_onmouseout : __pie_onmouseout;
             return typeof callback === 'function' ? callback : function () {};
         }
 
