@@ -1939,22 +1939,11 @@
             return gridData.slice(0, tickNum);
         }
 
-        //-- Circle --//
+        //-- Shape --//
 
-        function circleX(d) {
-            return d.x || d.x === 0 ? x(d.x) : null;
-        }
-        function circleY(d, i) {
-            var lineIndices = getLineIndices(), getPoint = generateGetLinePoint(lineIndices);
-            if (__data_groups.length > 0) { var point = getPoint(d, i); return point[0][1]; }
-            return getYScale(d.id)(d.value);
-        }
-
-        //-- Bar --//
-
-        function getBarIndices() {
+        function getShapeIndices(typeFilter) {
             var indices = {}, i = 0, j, k;
-            filterTargetsToShow(c3.data.targets.filter(isBarType)).forEach(function (d) {
+            filterTargetsToShow(c3.data.targets.filter(typeFilter)).forEach(function (d) {
                 for (j = 0; j < __data_groups.length; j++) {
                     if (__data_groups[j].indexOf(d.id) < 0) { continue; }
                     for (k = 0; k < __data_groups[j].length; k++) {
@@ -1969,27 +1958,27 @@
             indices.__max__ = i - 1;
             return indices;
         }
-        function getBarX(barW, barTargetsNum, barIndices, isSub) {
+        function getShapeX(offset, targetsNum, indices, isSub) {
             var scale = isSub ? subX : x;
             return function (d) {
-                var barIndex = d.id in barIndices ? barIndices[d.id] : 0;
-                return d.x || d.x === 0 ? scale(d.x) - barW * (barTargetsNum / 2 - barIndex) : 0;
+                var index = d.id in indices ? indices[d.id] : 0;
+                return d.x || d.x === 0 ? scale(d.x) - offset * (targetsNum / 2 - index) : 0;
             };
         }
-        function getBarY(isSub) {
+        function getShapeY(isSub) {
             return function (d) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
                 return scale(d.value);
             };
         }
-        function getBarOffset(barIndices, isSub) {
-            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isBarType))),
+        function getShapeOffset(typeFilter, indices, isSub) {
+            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(typeFilter))),
                 targetIds = targets.map(function (t) { return t.id; });
             return function (d, i) {
                 var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
                     y0 = scale(0), offset = y0;
                 targets.forEach(function (t) {
-                    if (t.id === d.id || barIndices[t.id] !== barIndices[d.id]) { return; }
+                    if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
                     if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
                         offset += scale(t.values[i].value) - y0;
                     }
@@ -1997,104 +1986,21 @@
                 return offset;
             };
         }
+
+        //-- Circle --//
+
+        function circleX(d) {
+            return d.x || d.x === 0 ? x(d.x) : null;
+        }
+        function circleY(d, i) {
+            var lineIndices = getShapeIndices(isLineType), getPoint = generateGetLinePoint(lineIndices);
+            return __data_groups.length > 0 ? getPoint(d, i)[0][1] : getYScale(d.id)(d.value);
+        }
+
+        //-- Bar --//
+
         function getBarW(axis, barTargetsNum) {
             return typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
-        }
-
-        //-- Area --//
-
-        function getAreaIndices() { // replication of getBarIndices
-            var indices = {}, i = 0, j, k;
-            filterTargetsToShow(c3.data.targets.filter(isAreaType)).forEach(function (d) {
-                for (j = 0; j < __data_groups.length; j++) {
-                    if (__data_groups[j].indexOf(d.id) < 0) { continue; }
-                    for (k = 0; k < __data_groups[j].length; k++) {
-                        if (__data_groups[j][k] in indices) {
-                            indices[d.id] = indices[__data_groups[j][k]];
-                            break;
-                        }
-                    }
-                }
-                if (isUndefined(indices[d.id])) { indices[d.id] = i++; }
-            });
-            indices.__max__ = i - 1;
-            return indices;
-        }
-        function getAreaX(areaTargetsNum, areaIndices, isSub) { // partial duplication of getBarX
-            var scale = isSub ? subX : x;
-            return function (d) {
-                var areaIndex = d.id in areaIndices ? areaIndices[d.id] : 0;
-                return d.x || d.x === 0 ? scale(d.x) - 0 * (areaTargetsNum / 2 - areaIndex) : 0;
-            };
-        }
-        function getAreaY(isSub) { // replication of getBarY
-            return function (d) {
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
-                return scale(d.value);
-            };
-        }
-        function getAreaOffset(areaIndices, isSub) { // partial duplication of getBarOffset
-            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isAreaType))),
-                targetIds = targets.map(function (t) { return t.id; });
-            return function (d, i) {
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
-                    y0 = scale(0), offset = y0;
-                targets.forEach(function (t) {
-                    if (t.id === d.id || areaIndices[t.id] !== areaIndices[d.id]) { return; }
-                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value > 0) {
-                        offset += scale(t.values[i].value) - y0;
-                    }
-                });
-                return offset;
-            };
-        }
-
-        //-- Line --//
-
-        function getLineIndices() { // replication of getBarIndices
-            var indices = {}, i = 0, j, k;
-            filterTargetsToShow(c3.data.targets.filter(isLineType)).forEach(function (d) {
-                for (j = 0; j < __data_groups.length; j++) {
-                    if (__data_groups[j].indexOf(d.id) < 0) { continue; }
-                    for (k = 0; k < __data_groups[j].length; k++) {
-                        if (__data_groups[j][k] in indices) {
-                            indices[d.id] = indices[__data_groups[j][k]];
-                            break;
-                        }
-                    }
-                }
-                if (isUndefined(indices[d.id])) { indices[d.id] = i++; }
-            });
-            indices.__max__ = i - 1;
-            return indices;
-        }
-        function getLineX(lineTargetsNum, lineIndices, isSub) { // partial duplication of getBarX
-            var scale = isSub ? subX : x;
-            return function (d) {
-                var lineIndex = d.id in lineIndices ? lineIndices[d.id] : 0;
-                return d.x || d.x === 0 ? scale(d.x) - 0 * (lineTargetsNum / 2 - lineIndex) : 0;
-            };
-        }
-        function getLineY(isSub) { // replication of getBarY
-            return function (d) {
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id);
-                return scale(d.value);
-            };
-        }
-        function getLineOffset(lineIndices, isSub) { // partial duplication of getBarOffset
-            var targets = orderTargets(filterTargetsToShow(c3.data.targets.filter(isLineType))),
-                targetIds = targets.map(function (t) { return t.id; });
-            return function (d, i) {
-                var scale = isSub ? getSubYScale(d.id) : getYScale(d.id),
-                    y0 = scale(0), offset = y0;
-                targets.forEach(function (t) {
-                    if (t.id === d.id || lineIndices[t.id] !== lineIndices[d.id]) { return; }
-                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value > 0) {
-                        offset += scale(t.values[i].value) - y0;
-                    }
-                });
-                return offset;
-            };
         }
 
         //-- Type --//
@@ -2142,19 +2048,19 @@
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return !(id in __data_types) || __data_types[id] === 'line' || __data_types[id] === 'spline' || __data_types[id] === 'area' || __data_types[id] === 'area-spline' || __data_types[id] === 'step' || __data_types[id] === 'area-step';
+            return !(id in __data_types) || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(__data_types[id]) >= 0;
         }
         function isStepType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'step' || __data_types[id] === 'area-step';
+            return ['step', 'area-step'].indexOf(__data_types[id]) >= 0;
         }
         function isSplineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'spline' || __data_types[id] === 'area-spline';
+            return ['spline', 'area-spline'].indexOf(__data_types[id]) >= 0;
         }
         function isAreaType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return __data_types[id] === 'area';
+            return ['area', 'area-spline', 'area-step'].indexOf(__data_types[id]) >= 0;
         }
         function isBarType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -2330,6 +2236,10 @@
             return rect;
         }
 
+        function getInterporate(d) {
+            return isSplineType(d) ? "cardinal" : isStepType(d) ? "step-after" : "linear";
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -2419,31 +2329,23 @@
         }
 
         function generateDrawArea(areaIndices, isSub) {
-            var area,
+            var area = d3.svg.area(),
                 getPoint = generateGetAreaPoint(areaIndices, isSub),
-                yScaleGetter = isSub ? getSubYScale : getYScale;
+                yScaleGetter = isSub ? getSubYScale : getYScale,
+                value0 = function (d, i) {
+                    return __data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter(d.id)(0);
+                },
+                value1 = function (d, i) {
+                    return __data_groups.length > 0 ? getPoint(d, i)[1][1] : yScaleGetter(d.id)(d.value);
+                };
 
-            if (__axis_rotated) {
-                area = d3.svg.area()
-                    .x0(function (d) { return yScaleGetter(d.id)(0); })
-                    .x1(function (d) { return yScaleGetter(d.id)(d.value); })
-                    .y(xx);
-            } else {
-                area = d3.svg.area()
-                    .x(xx)
-                    .y0(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d, i); return point[0][1]; } return yScaleGetter(d.id)(0); })
-                    .y1(function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d, i); return point[1][1]; } return yScaleGetter(d.id)(d.value); });
-            }
+            area = __axis_rotated ? area.x0(value0).x1(value1).y(xx) : area.x(xx).y0(value0).y1(value1);
 
             return function (d) {
                 var data = filterRemoveNull(d.values), x0, y0;
 
-                if (hasType([d], 'area') || hasType([d], 'area-spline')) {
-                    isSplineType(d) ? area.interpolate("cardinal") : area.interpolate("linear");
-                    return area(data);
-                } else if (hasType([d], 'area-step')) {
-                    isStepType(d) ? area.interpolate("step-after") : area.interpolate("linear");
-                    return area(data);
+                if (isAreaType(d)) {
+                    return area.interpolate(getInterporate(d))(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
@@ -2453,13 +2355,15 @@
         }
 
         function generateDrawLine(lineIndices, isSub) {
-            var getPoint = generateGetLinePoint(lineIndices, isSub),
+            var line = d3.svg.line(),
+                getPoint = generateGetLinePoint(lineIndices, isSub),
                 yScaleGetter = isSub ? getSubYScale : getYScale,
                 xValue = isSub ? subxx : xx,
-                yValue = function (d, i) { if (__data_groups.length > 0) { var point = getPoint(d, i); return point[0][1]; } return yScaleGetter(d.id)(d.value); },
-                line = d3.svg.line()
-                    .x(__axis_rotated ? yValue : xValue)
-                    .y(__axis_rotated ? xValue : yValue);
+                yValue = function (d, i) {
+                    return __data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter(d.id)(d.value);
+                };
+
+            line = __axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
             if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
             return function (d) {
                 var data = __line_connect_null ? filterRemoveNull(d.values) : d.values,
@@ -2468,8 +2372,7 @@
                     if (__data_regions[d.id]) {
                         return lineWithRegions(data, x, y, __data_regions[d.id]);
                     } else {
-                        line.interpolate(isSplineType(d) ? "cardinal" : isStepType(d) ? "step-after" : "linear");
-                        return line(data);
+                        return line.interpolate(getInterporate(d))(data);
                     }
                 } else {
                     if (data[0]) {
@@ -2527,32 +2430,32 @@
 
         function generateGetAreaPoint(areaIndices, isSub) { // partial duplication of generateGetBarPoints
             var areaTargetsNum = areaIndices.__max__ + 1,
-                x = getAreaX(areaTargetsNum, areaIndices, !!isSub),
-                y = getAreaY(!!isSub),
-                areaOffset = getAreaOffset(areaIndices, !!isSub),
+                x = getShapeX(0, areaTargetsNum, areaIndices, !!isSub),
+                y = getShapeY(!!isSub),
+                areaOffset = getShapeOffset(isAreaType, areaIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
-                    var y0 = yScale(d.id)(0),
-                        offset = areaOffset(d, i) || y0, // offset is for stacked area chart
-                        posX = x(d), posY = y(d);
+                var y0 = yScale(d.id)(0),
+                    offset = areaOffset(d, i) || y0, // offset is for stacked area chart
+                    posX = x(d), posY = y(d);
                     // fix posY not to overflow opposite quadrant
-                    if (__axis_rotated) {
-                        if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
-                    }
-                    // 1 point that marks the area position
-                    return [
-                        [posX, offset],
-                        [posX, posY - (y0 - offset)]
-                    ];
-                };
+                if (__axis_rotated) {
+                    if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
+                }
+                // 1 point that marks the area position
+                return [
+                    [posX, offset],
+                    [posX, posY - (y0 - offset)]
+                ];
+            };
         }
 
         function generateGetBarPoints(barIndices, isSub) {
             var barTargetsNum = barIndices.__max__ + 1,
                 barW = getBarW(xAxis, barTargetsNum),
-                barX = getBarX(barW, barTargetsNum, barIndices, !!isSub),
-                barY = getBarY(!!isSub),
-                barOffset = getBarOffset(barIndices, !!isSub),
+                barX = getShapeX(barW, barTargetsNum, barIndices, !!isSub),
+                barY = getShapeY(!!isSub),
+                barOffset = getShapeOffset(isBarType, barIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
                 var y0 = yScale(d.id)(0),
@@ -2574,23 +2477,23 @@
 
         function generateGetLinePoint(lineIndices, isSub) { // partial duplication of generateGetBarPoints
             var lineTargetsNum = lineIndices.__max__ + 1,
-                x = getLineX(lineTargetsNum, lineIndices, !!isSub),
-                y = getLineY(!!isSub),
-                lineOffset = getLineOffset(lineIndices, !!isSub),
+                x = getShapeX(0, lineTargetsNum, lineIndices, !!isSub),
+                y = getShapeY(!!isSub),
+                lineOffset = getShapeOffset(isLineType, lineIndices, !!isSub),
                 yScale = isSub ? getSubYScale : getYScale;
             return function (d, i) {
-                    var y0 = yScale(d.id)(0),
-                        offset = lineOffset(d, i) || y0, // offset is for stacked area chart
-                        posX = x(d), posY = y(d);
-                    // fix posY not to overflow opposite quadrant
-                    if (__axis_rotated) {
-                        if ((d.value > 0 && posY < offset) || (d.value < 0 && posY > offset)) { posY = offset; }
-                    }
-                    // 1 point that marks the line position
-                    return [
-                        [posX, posY - (y0 - offset)]
-                    ];
-                };
+                var y0 = yScale(d.id)(0),
+                    offset = lineOffset(d, i) || y0, // offset is for stacked area chart
+                    posX = x(d), posY = y(d);
+                // fix posY not to overflow opposite quadrant
+                if (__axis_rotated) {
+                    if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
+                }
+                // 1 point that marks the line position
+                return [
+                    [posX, posY - (y0 - offset)]
+                ];
+            };
         }
 
         function lineWithRegions(d, x, y, _regions) {
@@ -3322,7 +3225,7 @@
         function redraw(options, transitions) {
             var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine,  contextArea, contextBar, eventRect, eventRectUpdate;
-            var areaIndices = getAreaIndices(), barIndices = getBarIndices(), lineIndices = getLineIndices(), maxDataCountTarget, tickOffset;
+            var areaIndices = getShapeIndices(isAreaType), barIndices = getShapeIndices(isBarType), lineIndices = getShapeIndices(isLineType), maxDataCountTarget, tickOffset;
             var rectX, rectW;
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
             var hideAxis = hasArcType(c3.data.targets);
@@ -4998,7 +4901,7 @@
         }
         function generateTicks(scale) {
             var i, domain, ticks = [];
-            if (scale.ticks && tickArguments !== undefined) {
+            if (scale.ticks) {
                 return scale.ticks.apply(scale, tickArguments);
             }
             domain = scale.domain();
