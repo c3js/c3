@@ -1073,7 +1073,7 @@
         }
         function unexpandArc(id) {
             var target = svg.selectAll('.' + CLASS.chartArc + selectorTarget(id));
-            target.selectAll('path.c3-arc')
+            target.selectAll('path.' + CLASS.arc)
               .transition().duration(50)
                 .attr("d", svgArc);
             svg.selectAll('.' + CLASS.arc)
