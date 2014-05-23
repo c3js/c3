@@ -2251,7 +2251,7 @@
             return rect;
         }
 
-        function getInterporate(d) {
+        function getInterpolate(d) {
             return isSplineType(d) ? "cardinal" : isStepType(d) ? "step-after" : "linear";
         }
 
@@ -2360,7 +2360,7 @@
                 var data = filterRemoveNull(d.values), x0, y0;
 
                 if (isAreaType(d)) {
-                    return area.interpolate(getInterporate(d))(data);
+                    return area.interpolate(getInterpolate(d))(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
@@ -2387,7 +2387,7 @@
                     if (__data_regions[d.id]) {
                         return lineWithRegions(data, x, y, __data_regions[d.id]);
                     } else {
-                        return line.interpolate(getInterporate(d))(data);
+                        return line.interpolate(getInterpolate(d))(data);
                     }
                 } else {
                     if (data[0]) {
