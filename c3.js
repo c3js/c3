@@ -170,7 +170,6 @@
 
         // color
         var __color_pattern = getConfig(['color', 'pattern'], []),
-            __color_opacity = getConfig(['color', 'opacity'], null),
             __color_values  = getConfig(['color', 'values'], []);
 
         // legend
@@ -1078,7 +1077,7 @@
               .transition().duration(50)
                 .attr("d", svgArc);
             svg.selectAll('.' + CLASS.arc)
-                .style("opacity", (__color_opacity) ? __color_opacity : 1);
+                .style("opacity", 1);
         }
         function shouldShowArcLable() {
             if (hasGaugeType(c3.data.targets)) {
@@ -3580,8 +3579,7 @@
             mainBar.enter().append('path')
                 .attr("class", classBar)
                 .style("stroke", function (d) { return color(d.id); })
-                .style("fill", function (d) { return color(d.id); })
-                .style("fill-opacity", function () { if (__color_opacity) { return __color_opacity; } return initialOpacity; });
+                .style("fill", function (d) { return color(d.id); });
             mainBar
                 .style("opacity", initialOpacity)
               .transition().duration(duration)
@@ -3755,7 +3753,7 @@
                 .style("fill", function (d) {
                     return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id);
                 }) // Where gauge reading color would receive customization.
-                .style("opacity", (__color_opacity) ? __color_opacity : 1)
+                .style("opacity", 1)
                 .call(endall, function () {
                     transiting = false;
                 });
