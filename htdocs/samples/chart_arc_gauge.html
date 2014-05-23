@@ -38,7 +38,11 @@
         },
         color: {
           pattern: ['#FF0000', '#F6C600', '#60B044'], // the three color levels for the percentage values.
-          values: ['percentage', 30, 60, 90] // alternate first value is 'value'
+          threshold: {
+//            unit: 'value', // percentage is default
+//            max: 200, // 100 is default
+            values: [30, 60, 90] // alternate first value is 'value'
+          }
         }
       });
 

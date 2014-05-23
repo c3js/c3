@@ -170,7 +170,7 @@
 
         // color
         var __color_pattern = getConfig(['color', 'pattern'], []),
-            __color_values  = getConfig(['color', 'values'], []);
+            __color_threshold  = getConfig(['color', 'threshold'], {});
 
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
@@ -294,7 +294,7 @@
 
                 name = d[i].name;
                 value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
-                bgcolor = (__gauge_style === 'arc' && __color_values) ? levelColor(d[i].value) : color(d[i].id);
+                bgcolor = levelColor ? levelColor(d[i].value) : color(d[i].id);
 
                 text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
                 text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
@@ -325,7 +325,7 @@
 
         var defaultColorPattern = d3.scale.category10().range(),
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color),
-            levelColor = generateLevelColor(__color_pattern, __color_values);
+            levelColor = notEmpty(__color_threshold) ? generateLevelColor(__color_pattern, __color_threshold) : null;
 
         var timeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
             defaultTimeFormat = timeFormat.multi([
@@ -2229,20 +2229,20 @@
             };
         }
 
-        function generateLevelColor(_colors, _values) {
-            var colors = _colors,
-                levels = _values;
-
+        function generateLevelColor(colors, threshold) {
+            var asValue = threshold.unit === 'value',
+                values = threshold.values && threshold.values.length ? threshold.values : [],
+                max = threshold.max || 100;
             return function (value) {
-                for (var a = 1; a < levels.length; a++) {
-                    if (levels[0] === 'percentage' && ((value / __gauge_max) * 100) < levels[a]) {
-                        return colors[a - 1];
-                    }
-                    if (levels[0] === 'whole' && value < levels[a]) {
-                        return colors[a - 1];
+                var i, v, color = colors[colors.length - 1];
+                for (i = 0; i < values.length; i++) {
+                    v = asValue ? value : (value * 100 / max);
+                    if (v < values[i]) {
+                        color = colors[i];
+                        break;
                     }
                 }
-                return colors[colors.length - 1];
+                return color;
             };
         }
 
@@ -3751,7 +3751,7 @@
                 })
                 .attr("transform", withTransform ? "scale(1)" : "")
                 .style("fill", function (d) {
-                    return (__gauge_style === 'arc' && __color_values) ? levelColor(d.data.values[0].value) : color(d.data.id);
+                    return levelColor ? levelColor(d.data.values[0].value) : color(d.data.id);
                 }) // Where gauge reading color would receive customization.
                 .style("opacity", 1)
                 .call(endall, function () {
