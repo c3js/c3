@@ -84,6 +84,9 @@
 
 /*-- Bar --*/
 
+.c3-bar {
+  stroke-width: 0;
+}
 .c3-bar._expanded_ {
   fill-opacity: 0.75;
 }

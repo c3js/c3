@@ -3580,8 +3580,6 @@
             mainBar.enter().append('path')
                 .attr("class", classBar)
                 .style("stroke", function (d) { return color(d.id); })
-                .style("stroke-width", 2)
-                .style("opacity", 0)
                 .style("fill", function (d) { return color(d.id); })
                 .style("fill-opacity", function () { if (__color_opacity) { return __color_opacity; } return initialOpacity; });
             mainBar
