@@ -61,6 +61,7 @@
         ygrids: 'c3-ygrids',
         ygridLine: 'c3-ygrid-line',
         ygridLines: 'c3-ygrid-lines',
+        axis: 'c3-axis',
         axisX: 'c3-axis-x',
         axisXLabel: 'c3-axis-x-label',
         axisY: 'c3-axis-y',
@@ -2855,7 +2856,7 @@
 
             // Add Axis
             axes.x = main.append("g")
-                .attr("class", CLASS.axisX)
+                .attr("class", CLASS.axis + ' ' + CLASS.axisX)
                 .attr("clip-path", clipPathForXAxis)
                 .attr("transform", translate.x)
                 .style("visibility", __axis_x_show ? 'visible' : 'hidden');
@@ -2865,7 +2866,7 @@
                 .style("text-anchor", textAnchorForXAxisLabel);
 
             axes.y = main.append("g")
-                .attr("class", CLASS.axisY)
+                .attr("class", CLASS.axis + ' ' + CLASS.axisY)
                 .attr("clip-path", clipPathForYAxis)
                 .attr("transform", translate.y)
                 .style("visibility", __axis_y_show ? 'visible' : 'hidden');
@@ -2875,7 +2876,7 @@
                 .style("text-anchor", textAnchorForYAxisLabel);
 
             axes.y2 = main.append("g")
-                .attr("class", CLASS.axisY2)
+                .attr("class", CLASS.axis + ' ' + CLASS.axisY2)
                 // clip-path?
                 .attr("transform", translate.y2)
                 .style("visibility", __axis_y2_show ? 'visible' : 'hidden');
