@@ -1133,6 +1133,11 @@
 
         //-- Domain --//
 
+        function getAxisPadding(padding, key, defaultValue, all) {
+            var ratio = padding.unit === 'ratio' ? all : 1;
+            return isValue(padding[key]) ? padding[key] * ratio : defaultValue;
+        }
+
         function getYDomainMin(targets) {
             var ids = mapToIds(targets), ys = getValuesAsIdKeyed(targets), j, k, baseId, idsInGroup, id, hasNegativeValue;
             if (__data_groups.length > 0) {
@@ -1223,12 +1228,12 @@
                 padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
             }
             if (axisId === 'y' && __axis_y_padding) {
-                padding_top = isValue(__axis_y_padding.top) ? __axis_y_padding.top : padding;
-                padding_bottom = isValue(__axis_y_padding.bottom) ? __axis_y_padding.bottom : padding;
+                padding_top = getAxisPadding(__axis_y_padding, 'top', padding, domainLength);
+                padding_bottom = getAxisPadding(__axis_y_padding, 'bottom', padding, domainLength);
             }
             if (axisId === 'y2' && __axis_y2_padding) {
-                padding_top = isValue(__axis_y2_padding.top) ? __axis_y2_padding.top : padding;
-                padding_bottom = isValue(__axis_y2_padding.bottom) ? __axis_y2_padding.bottom : padding;
+                padding_top = getAxisPadding(__axis_y2_padding, 'top', padding, domainLength);
+                padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
             // Bar chart with only positive values should be 0-based
             if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
