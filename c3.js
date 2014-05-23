@@ -4206,7 +4206,7 @@
 
         function updateLegend(targetIds, options, transitions) {
             var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
-            var paddingTop = 4, paddingRight = 26, maxWidth = 0, maxHeight = 0, posMin = 10;
+            var paddingTop = 4, paddingRight = 36, maxWidth = 0, maxHeight = 0, posMin = 10;
             var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
             var withTransition, withTransitionForTransform;
             var hasFocused = legend.selectAll('.' + CLASS.legendItemFocused).size();
