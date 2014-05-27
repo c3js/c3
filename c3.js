@@ -5102,8 +5102,7 @@
             }
             return newScale;
         }
-        function textFormatted(i) {
-            var v = isCategory && i < categories.length ? categories[i] : i;
+        function textFormatted(v) {
             return tickFormat ? tickFormat(v) : v;
         }
         function axis(g) {
