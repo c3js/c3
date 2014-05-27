@@ -257,6 +257,7 @@
         // gauge
         var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
             __gauge_label_format = getConfig(['gauge', 'label', 'format']),
+            __gauge_expand = getConfig(['gauge', 'expand'], true),
             __gauge_min = getConfig(['gauge', 'min'], 0),
             __gauge_max = getConfig(['gauge', 'max'], 100),
             __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
@@ -2156,7 +2157,7 @@
         }
 
         function shouldExpand(id) {
-            return (isDonutType(id) && __donut_expand) || (isPieType(id) && __pie_expand);
+            return (isDonutType(id) && __donut_expand) || (isGaugeType(id) && __gauge_expand) || (isPieType(id) && __pie_expand);
         }
 
         //-- Color --//
