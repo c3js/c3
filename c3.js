@@ -759,7 +759,6 @@
                 if (isEmpty(__axis_x_tick_culling)) {
                     __axis_x_tick_culling = false;
                 }
-                axis.categories(__axis_x_categories);
             } else {
                 // TODO: move this to c3_axis
                 axis.tickOffset = function () {
@@ -4637,7 +4636,6 @@
             // update categories if exists
             if ('categories' in args && isCategorized) {
                 __axis_x_categories = args.categories;
-                xAxis.categories(__axis_x_categories);
             }
             // use cache if exists
             if ('cacheIds' in args && hasCaches(args.cacheIds)) {
@@ -5063,8 +5061,7 @@
     function c3_axis(d3, isCategory) {
         var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
-        var tickOffset = 0, tickCulling = true;
-        var categories = [], tickCentered;
+        var tickOffset = 0, tickCulling = true, tickCentered;
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
@@ -5102,8 +5099,7 @@
             }
             return newScale;
         }
-        function textFormatted(i) {
-            var v = isCategory && i < categories.length ? categories[i] : i;
+        function textFormatted(v) {
             return tickFormat ? tickFormat(v) : v;
         }
         function axis(g) {
@@ -5238,11 +5234,6 @@
         axis.tickValues = function (x) {
             if (!arguments.length) { return tickValues; }
             tickValues = x;
-            return axis;
-        };
-        axis.categories = function (x) {
-            if (!arguments.length) { return categories; }
-            categories = x;
             return axis;
         };
         return axis;
