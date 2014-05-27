@@ -1012,7 +1012,7 @@
         }
         function textForArcLabel(d) {
             var updated, value, ratio, format;
-            if (! shouldShowArcLable()) { return ""; }
+            if (! shouldShowArcLabel()) { return ""; }
             updated = updateAngle(d);
             value = updated ? updated.value : null;
             ratio = getArcRatio(updated);
@@ -1047,7 +1047,7 @@
             svg.selectAll('.' + CLASS.arc)
                 .style("opacity", 1);
         }
-        function shouldShowArcLable() {
+        function shouldShowArcLabel() {
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
         }
         function getArcLabelFormat() {
