@@ -242,6 +242,7 @@
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
             __pie_label_format = getConfig(['pie', 'label', 'format']),
+            __pie_label_threshold = getConfig(['pie', 'label', 'threshold'], 0.05),
             __pie_expand = getConfig(['pie', 'expand'], true),
             __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
@@ -250,6 +251,7 @@
         // donut
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
+            __donut_label_threshold = getConfig(['donut', 'label', 'threshold'], 0.05),
             __donut_expand = getConfig(['donut', 'expand'], true),
             __donut_title = getConfig(['donut', 'title'], ""),
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
@@ -1016,6 +1018,7 @@
             updated = updateAngle(d);
             value = updated ? updated.value : null;
             ratio = getArcRatio(updated);
+            if (! meetsArcLabelThreshold(ratio)) { return ""; }
             format = getArcLabelFormat();
             return format ? format(value, ratio) : defaultArcValueFormat(value, ratio);
         }
@@ -1049,6 +1052,10 @@
         }
         function shouldShowArcLabel() {
             return hasDonutType(c3.data.targets) ? __donut_label_show : __pie_label_show;
+        }
+        function meetsArcLabelThreshold(ratio) {
+            var threshold = hasDonutType(c3.data.targets) ? __donut_label_threshold : __pie_label_threshold;
+            return ratio >= threshold;
         }
         function getArcLabelFormat() {
             return hasDonutType(c3.data.targets) ? __donut_label_format : __pie_label_format;
