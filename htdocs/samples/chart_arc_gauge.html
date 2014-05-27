@@ -40,7 +40,9 @@
       var cycleDemo = function () {
 
         setTimeout(function () {
-            chart = chart.update(['gauge', 'color'], '');
+          d3.select('#chart .c3-chart-arcs-background')
+            .transition()
+            .style('fill', '#333');
         }, 1000);
 
         setTimeout(function () {
@@ -61,9 +63,11 @@
             });
         }, 4000);
 
-//        setTimeout(function () {
-//            chart = chart.update(['gauge', 'color'], '#e0e0e0');
-//        }, 5000);
+        setTimeout(function () {
+          d3.select('#chart .c3-chart-arcs-background')
+            .transition()
+            .style('fill', '#e0e0e0');
+        }, 5000);
 
         setTimeout(function () {
             chart.load({
@@ -83,49 +87,41 @@
             });
         }, 8000);
 
-//        setTimeout(function () {
-//            chart = chart.update(['gauge', 'width'], 10);
-//        }, 9000);
-
         setTimeout(function () {
             chart.load({
               columns: [[ 'data', 0 ]]
+            });
+        }, 9000);
+
+        setTimeout(function () {
+            chart.load({
+              columns: [[ 'data', 50 ]]
             });
         }, 10000);
 
         setTimeout(function () {
             chart.load({
-              columns: [[ 'data', 50 ]]
+              columns: [[ 'data', 91.4 ]]
             });
         }, 11000);
 
         setTimeout(function () {
             chart.load({
-              columns: [[ 'data', 91.4 ]]
-            });
-        }, 12000);
-
-//        setTimeout(function () {
-//            chart = chart.update(['gauge', 'width'], 39);
-//        }, 13000);
-
-        setTimeout(function () {
-            chart.load({
               columns: [[ 'data', 0 ]]
             });
-        }, 14000);
+        }, 12000);
 
         setTimeout(function () {
             chart.load({
               columns: [[ 'data', 50 ]]
             });
-        }, 15000);
+        }, 13000);
 
         setTimeout(function () {
             chart.load({
               columns: [[ 'data', 91.4 ]]
             });
-        }, 16000);
+        }, 14000);
 
       }
 
