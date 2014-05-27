@@ -1427,8 +1427,7 @@
                             x = undefined;
                         }
                         return {x: x, value: d[id] !== null && !isNaN(d[id]) ? +d[id] : null, id: convertedId};
-                    }).filter(function (v) { return typeof v.x !== 'undefined'; }),
-                    color: color(id)
+                    }).filter(function (v) { return typeof v.x !== 'undefined'; })
                 };
             });
 
@@ -4501,6 +4500,7 @@
             redraw({withLegend: true});
             return __data_colors;
         };
+        c3.getTargetColor = color;
 
         c3.x = function (x) {
             if (arguments.length) {
