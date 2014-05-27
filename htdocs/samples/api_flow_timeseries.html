@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="/js/d3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+
+      var chart = c3.generate({
+        data: {
+          x: 'x',
+          columns: [
+            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-10', '2013-01-11', '2013-01-12'],
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 310, 400, 200, 100, 450, 150],
+//            ['data3', 310, 400, 200, 100, null, 150],
+          ],
+          types: {
+            data2: 'area',
+            data3: 'bar',
+          }
+        },
+        bar: {
+          width: 10
+        },
+        axis: {
+          x: {
+            type: 'timeseries',
+            tick: {
+              format: '%m/%d',
+            },
+            padding: {
+              left: 0,
+              right: 0
+            }
+          },
+          y: {
+/*
+            min: -100,
+            max: 1000
+*/
+          }
+        }
+      });
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-01-21'],
+            ['data1', 500],
+//            ['data2', 100],
+            ['data3', 200],
+          ]
+        });
+      }, 1000);
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-02-01'],
+            ['data1', 200],
+            ['data2', 100],
+            ['data3', 100]
+          ]
+        });
+      }, 2000);
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-03-01'],
+            ['data1', 200],
+            ['data2', 300],
+            ['data3', 400]
+          ]
+        });
+      }, 3000);
+
+    </script>
+  </body>
+</html>

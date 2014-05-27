@@ -1286,6 +1286,19 @@
             }
             return [min, max];
         }
+        function updateXDomain(targets, withUpdateXDomain, withUpdateOrgXDomain) {
+            if (withUpdateOrgXDomain) {
+                x.domain(d3.extent(getXDomain(targets)));
+                orgXDomain = x.domain();
+                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+                subX.domain(x.domain());
+                brush.scale(subX);
+            }
+            if (withUpdateXDomain) {
+                x.domain(brush.empty() ? orgXDomain : brush.extent());
+                if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
+            }
+        }
         function diffDomain(d) {
             return d[1] - d[0];
         }
@@ -1371,6 +1384,14 @@
         function getXValue(id, i) {
             return id in c3.data.xs && c3.data.xs[id] && c3.data.xs[id][i] ? c3.data.xs[id][i] : i;
         }
+        function getOtherTargetXs() {
+            var idsForX = Object.keys(c3.data.xs);
+            return idsForX.length ? c3.data.xs[idsForX[0]] : null;
+        }
+        function getOtherTargetX(index) {
+            var xs = getOtherTargetXs();
+            return xs && index < xs.length ? xs[index] : null;
+        }
         function addXs(xs) {
             Object.keys(xs).forEach(function (id) {
                 __data_xs[id] = xs[id];
@@ -1387,6 +1408,11 @@
                 data.name = name ? name : data.id;
             }
             return data;
+        }
+
+        function getValueOnIndex(values, index) {
+            var valueOnIndex = values.filter(function (v) { return v.index === index; });
+            return valueOnIndex.length ? valueOnIndex[0] : null;
         }
 
         function updateTargetX(targets, x) {
@@ -1441,23 +1467,25 @@
             }
             return new_rows;
         }
-        function convertDataToTargets(data) {
+        function convertDataToTargets(data, appendXs) {
             var ids = d3.keys(data[0]).filter(isNotX), xs = d3.keys(data[0]).filter(isX), targets;
 
             // save x for update data by load when custom x and c3.x API
             ids.forEach(function (id) {
-                var xKey = getXKey(id), idsForX;
+                var xKey = getXKey(id);
 
                 if (isCustomX || isTimeSeries) {
                     // if included in input data
                     if (xs.indexOf(xKey) >= 0) {
-                        c3.data.xs[id] = data.map(function (d) { return d[xKey]; }).filter(isValue).map(function (rawX, i) { return generateTargetX(rawX, id, i); });
-
+                        c3.data.xs[id] = (appendXs && c3.data.xs[id] ? c3.data.xs[id] : []).concat(
+                            data.map(function (d) { return d[xKey]; })
+                                .filter(isValue)
+                                .map(function (rawX, i) { return generateTargetX(rawX, id, i); })
+                        );
                     }
                     // if not included in input data, find from preloaded data of other id's x
                     else if (__data_x) {
-                        idsForX = Object.keys(c3.data.xs);
-                        c3.data.xs[id] = idsForX.length > 0 ? c3.data.xs[idsForX[0]] : undefined;
+                        c3.data.xs[id] = getOtherTargetXs();
                     }
                     // if not included in input data, find from preloaded data
                     else if (notEmpty(__data_xs)) {
@@ -1536,10 +1564,12 @@
             };
         }
         function getPrevX(i) {
-            return i > 0 && c3.data.targets[0].values[i - 1] ? c3.data.targets[0].values[i - 1].x : undefined;
+            var value = getValueOnIndex(c3.data.targets[0].values, i - 1);
+            return value ? value.x : null;
         }
         function getNextX(i) {
-            return i < getMaxDataCount() - 1 ? c3.data.targets[0].values[i + 1].x : undefined;
+            var value = getValueOnIndex(c3.data.targets[0].values, i + 1);
+            return value ? value.x : null;
         }
         function getMaxDataCount() {
             return d3.max(c3.data.targets, function (t) { return t.values.length; });
@@ -1668,20 +1698,20 @@
         }
         function classText(d) { return generateClass(CLASS.text, d.id); }
         function classTexts(d) { return generateClass(CLASS.texts, d.id); }
-        function classShape(d, i) { return generateClass(CLASS.shape, i); }
+        function classShape(d) { return generateClass(CLASS.shape, d.index); }
         function classShapes(d) { return generateClass(CLASS.shapes, d.id); }
         function classLine(d) { return classShape(d) + generateClass(CLASS.line, d.id); }
         function classLines(d) { return classShapes(d) + generateClass(CLASS.lines, d.id); }
-        function classCircle(d, i) { return classShape(d, i) + generateClass(CLASS.circle, i); }
+        function classCircle(d) { return classShape(d) + generateClass(CLASS.circle, d.index); }
         function classCircles(d) { return classShapes(d) + generateClass(CLASS.circles, d.id); }
-        function classBar(d, i) { return classShape(d, i) + generateClass(CLASS.bar, i); }
+        function classBar(d) { return classShape(d) + generateClass(CLASS.bar, d.index); }
         function classBars(d) { return classShapes(d) + generateClass(CLASS.bars, d.id); }
         function classArc(d) { return classShape(d.data) + generateClass(CLASS.arc, d.data.id); }
         function classArcs(d) { return classShapes(d.data) + generateClass(CLASS.arcs, d.data.id); }
         function classArea(d) { return classShape(d) + generateClass(CLASS.area, d.id); }
         function classAreas(d) { return classShapes(d) + generateClass(CLASS.areas, d.id); }
         function classRegion(d, i) { return generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : ''); }
-        function classEvent(d, i) { return generateClass(CLASS.eventRect, i); }
+        function classEvent(d) { return generateClass(CLASS.eventRect, d.index); }
         function classTarget(id) {
             var additionalClassSuffix = __data_classes[id], additionalClass = '';
             if (additionalClassSuffix) {
@@ -2177,7 +2207,7 @@
         function parseDate(date) {
             var parsedDate;
             try {
-                parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
+                parsedDate = date instanceof Date || !__data_x_format ? new Date(date) : d3.time.format(__data_x_format).parse(date);
             } catch (e) {
                 window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
             }
@@ -2234,6 +2264,34 @@
                 .each("end", function () {
                     if (!--n) { callback.apply(this, arguments); }
                 });
+        }
+
+        function generateWait() {
+            var transitionsToWait = [],
+                f = function (transition, callback) {
+                    var timer = setInterval(function () {
+                        var done = 0;
+                        transitionsToWait.forEach(function (t) {
+                            if (t.empty()) {
+                                done += 1;
+                                return;
+                            }
+                            try {
+                                t.transition();
+                            } catch (e) {
+                                done += 1;
+                            }
+                        });
+                        if (done === transitionsToWait.length) {
+                            clearInterval(timer);
+                            if (callback) { callback(); }
+                        }
+                    }, 10);
+                };
+            f.add = function (transition) {
+                transitionsToWait.push(transition);
+            };
+            return f;
         }
 
         function getOption(options, key, defaultValue) {
@@ -2965,14 +3023,18 @@
             eventRectEnter.append("rect")
                 .attr("class", classEvent)
                 .style("cursor", __data_selection_enabled && __data_selection_grouped ? "pointer" : null)
-                .on('mouseover', function (_, i) {
+                .on('mouseover', function (d) {
+                    var index = d.index, selectedData, newData;
+
                     if (dragging) { return; } // do nothing if dragging
                     if (hasArcType(c3.data.targets)) { return; }
 
-                    var selectedData = c3.data.targets.map(function (d) { return addName(d.values[i]); }),
-                        newData = [];
+                    selectedData = c3.data.targets.map(function (t) {
+                        return addName(getValueOnIndex(t.values, index));
+                    });
 
                     // Sort selectedData as names order
+                    newData = [];
                     Object.keys(__data_names).forEach(function (id) {
                         for (var j = 0; j < selectedData.length; j++) {
                             if (selectedData[j] && selectedData[j].id === id) {
@@ -2985,35 +3047,36 @@
                     selectedData = newData.concat(selectedData); // Add remained
 
                     // Expand shapes if needed
-                    if (__point_focus_expand_enabled) { expandCircles(i); }
-                    expandBars(i);
+                    if (__point_focus_expand_enabled) { expandCircles(index); }
+                    expandBars(index);
 
                     // Call event handler
-                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) {
+                    main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                         __data_onenter(d);
                     });
                 })
-                .on('mouseout', function (_, i) {
+                .on('mouseout', function (d) {
+                    var index = d.index;
                     if (hasArcType(c3.data.targets)) { return; }
                     hideXGridFocus();
                     hideTooltip();
                     // Undo expanded shapes
-                    unexpandCircles(i);
+                    unexpandCircles(index);
                     unexpandBars();
                     // Call event handler
-                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) {
+                    main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                         __data_onleave(d);
                     });
                 })
-                .on('mousemove', function (_, i) {
-                    var selectedData;
+                .on('mousemove', function (d) {
+                    var selectedData, index = d.index;
 
                     if (dragging) { return; } // do nothing when dragging
                     if (hasArcType(c3.data.targets)) { return; }
 
                     // Show tooltip
-                    selectedData = filterTargetsToShow(c3.data.targets).map(function (d) {
-                        return addName(d.values[i]);
+                    selectedData = filterTargetsToShow(c3.data.targets).map(function (t) {
+                        return addName(getValueOnIndex(t.values, index));
                     });
                     showTooltip(selectedData, d3.mouse(this));
 
@@ -3023,12 +3086,12 @@
                     if (! __data_selection_enabled) { return; }
                     if (__data_selection_grouped) { return; } // nothing to do when grouped
 
-                    main.selectAll('.' + CLASS.shape + '-' + i)
+                    main.selectAll('.' + CLASS.shape + '-' + index)
                         .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
                             var _this = d3.select(this).classed(CLASS.EXPANDED, true);
                             if (this.nodeName === 'circle') { _this.attr('r', pointExpandedR); }
-                            svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', null);
+                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', null);
                         })
                         .filter(function (d) {
                             if (this.nodeName === 'circle') {
@@ -3044,16 +3107,17 @@
                                 _this.classed(CLASS.EXPANDED, true);
                                 if (this.nodeName === 'circle') { _this.attr('r', pointSelectR); }
                             }
-                            svg.select('.' + CLASS.eventRect + '-' + i).style('cursor', 'pointer');
+                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', 'pointer');
                         });
                 })
-                .on('click', function (_, i) {
+                .on('click', function (d) {
+                    var index = d.index;
                     if (hasArcType(c3.data.targets)) { return; }
                     if (cancelClick) {
                         cancelClick = false;
                         return;
                     }
-                    main.selectAll('.' + CLASS.shape + '-' + i).each(function (d) { toggleShape(this, d, i); });
+                    main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) { toggleShape(this, d, index); });
                 })
                 .call(
                     d3.behavior.drag().origin(Object)
@@ -3287,7 +3351,7 @@
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
             var hideAxis = hasArcType(c3.data.targets);
             var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
-            var duration, durationForExit, durationForAxis;
+            var duration, durationForExit, durationForAxis, waitForDraw = generateWait();
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             options = options || {};
@@ -3334,18 +3398,7 @@
             }
 
             if (targetsToShow.length) {
-                if (withUpdateOrgXDomain) {
-                    x.domain(d3.extent(getXDomain(targetsToShow)));
-                    orgXDomain = x.domain();
-                    if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
-                    subX.domain(x.domain());
-                    brush.scale(subX);
-                }
-                // ATTENTION: call here to update tickOffset
-                if (withUpdateXDomain) {
-                    x.domain(brush.empty() ? orgXDomain : brush.extent());
-                    if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
-                }
+                updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
                 // update axis tick values according to options
                 if (!__axis_x_tick_values && (__axis_x_tick_fit || __axis_x_tick_count)) {
                     tickValues = generateTickValues(mapTargetsToUniqueXs(targetsToShow), __axis_x_tick_count);
@@ -3541,16 +3594,12 @@
                 .style("stroke", function (d) { return color(d.id); })
                 .style("fill", function (d) { return color(d.id); });
             mainBar
-                .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .attr('d', drawBar)
-                .style("fill", color)
-                .style("opacity", 1);
+                .style("opacity", initialOpacity);
             mainBar.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
 
-            // lines and cricles
+            // lines, areas and cricles
             mainLine = main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
                 .data(lineData);
             mainLine.enter().append('path')
@@ -3558,14 +3607,11 @@
                 .style("stroke", color);
             mainLine
                 .style("opacity", initialOpacity)
-              .transition().duration(duration)
-                .attr("d", drawLine)
-                .style("stroke", color)
-                .style("opacity", 1);
+                .attr('transform', null);
             mainLine.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
                 .remove();
-            // area
+
             mainArea = main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
                 .data(lineData);
             mainArea.enter().append('path')
@@ -3573,10 +3619,6 @@
                 .style("fill", color)
                 .style("opacity", function () { orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
             mainArea
-                .style("opacity", 0)
-              .transition().duration(duration)
-                .attr("d", drawArea)
-                .style("fill", color)
                 .style("opacity", orgAreaOpacity);
             mainArea.exit().transition().duration(durationForExit)
                 .style('opacity', 0)
@@ -3590,13 +3632,10 @@
                     .attr("r", pointR)
                     .style("fill", color);
                 mainCircle
-                    .style("opacity", initialOpacity)
-                  .transition().duration(duration)
-                    .style('opacity', opacityForCircle)
-                    .style("fill", color)
-                    .attr("cx", __axis_rotated ? circleY : circleX)
-                    .attr("cy", __axis_rotated ? circleX : circleY);
+                    .style("opacity", initialOpacity);
                 mainCircle.exit().remove();
+            } else {
+                mainCircle = d3.selectAll([]);
             }
 
             if (hasDataLabel()) {
@@ -3794,10 +3833,6 @@
                 .filter(function (d) { return isBarType(d); })
                 .selectAll('circle')
                 .remove();
-            main.selectAll('.' + CLASS.selectedCircle)
-              .transition().duration(duration)
-                .attr("cx", __axis_rotated ? circleY : circleX)
-                .attr("cy", __axis_rotated ? circleX : circleY);
 
             if (__interaction_enabled) {
                 // rect for mouseover
@@ -3828,14 +3863,12 @@
                     }
 
                     if ((isCustomX || isTimeSeries) && !isCategorized) {
-                        rectW = function (d, i) {
-                            var prevX = getPrevX(i), nextX = getNextX(i), dx = c3.data.xs[d.id][i];
-                            var xnX = x(nextX ? nextX : dx);
-                            var xpX = x(prevX ? prevX : dx);
-                            return (xnX - xpX) / 2;
+                        rectW = function (d) {
+                            var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index];
+                            return (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
                         };
-                        rectX = function (d, i) {
-                            var prevX = getPrevX(i), dx = c3.data.xs[d.id][i];
+                        rectX = function (d) {
+                            var prevX = getPrevX(d.index), dx = c3.data.xs[d.id][d.index];
                             return (x(dx) + x(prevX ? prevX : dx)) / 2;
                         };
                     } else {
@@ -3864,6 +3897,97 @@
                     eventRectUpdate.exit().remove();
                 }
             }
+
+            // transition should be derived from one transition
+            d3.transition().duration(duration).each(function () {
+                waitForDraw.add(mainBar.transition()
+                    .attr('d', drawBar)
+                    .style("fill", color)
+                    .style("opacity", 1));
+                waitForDraw.add(mainLine.transition()
+                    .attr("d", drawLine)
+                    .style("stroke", color)
+                    .style("opacity", 1));
+                waitForDraw.add(mainArea.transition()
+                    .attr("d", drawArea)
+                    .style("fill", color)
+                    .style("opacity", orgAreaOpacity));
+                waitForDraw.add(mainCircle.transition()
+                    .style('opacity', opacityForCircle)
+                    .style("fill", color)
+                    .attr("cx", __axis_rotated ? circleY : circleX)
+                    .attr("cy", __axis_rotated ? circleX : circleY));
+                waitForDraw.add(main.selectAll('.' + CLASS.selectedCircle).transition()
+                    .attr("cx", __axis_rotated ? circleY : circleX)
+                    .attr("cy", __axis_rotated ? circleX : circleY));
+            })
+            .call(waitForDraw, options.flow ? function () { // only for flow
+                var translateX, scaleX = 1, transform,
+                    flowIndex = options.flow.index,
+                    flowLength = options.flow.length,
+                    flowStart = getValueOnIndex(c3.data.targets[0].values, flowIndex),
+                    flowEnd = getValueOnIndex(c3.data.targets[0].values, flowIndex + flowLength),
+                    orgDomain = x.domain(),
+                    wait = generateWait();
+
+                // remove head data after rendered
+                c3.data.targets.forEach(function (d) {
+                    d.values.splice(0, flowLength);
+                });
+
+                // update x domain to generate axis elements for flow
+                updateXDomain(targetsToShow, true, true);
+
+                // generate transform to flow
+                translateX = x(flowStart.x) - x(flowEnd.x);
+                if (isTimeSeries) {
+                    translateX = translateX * 0.9; // TODO: fix 0.9, I don't know why 0.9..
+                    scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
+                }
+                transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
+
+                d3.transition().ease('linear').each(function () {
+                    wait.add(axes.x.transition().call(xAxis));
+                    wait.add(mainBar.transition().attr('transform', transform));
+                    wait.add(mainLine.transition().attr('transform', transform));
+                    wait.add(mainArea.transition().attr('transform', transform));
+                    wait.add(mainCircle.transition().attr('transform', transform));
+                })
+                .call(wait, function () {
+                    var i, targets = [], eventRects = [];
+
+                    // remove flowed elements
+                    for (i = 0; i < flowLength; i++) {
+                        targets.push('.' + CLASS.shape + '-' + (flowIndex + i));
+                        eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
+                    }
+                    svg.selectAll('.' + CLASS.shapes).selectAll(targets).remove();
+                    svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
+
+                    // draw again for removing flowed elements
+                    mainBar
+                        .attr('transform', null)
+                        .attr("d", drawBar);
+                    mainLine
+                        .attr('transform', null)
+                        .attr("d", drawLine);
+                    mainArea
+                        .attr('transform', null)
+                        .attr("d", drawArea);
+                    mainCircle
+                        .attr('transform', null)
+                        .attr("cx", __axis_rotated ? circleY : circleX)
+                        .attr("cy", __axis_rotated ? circleX : circleY);
+                    eventRectUpdate
+                        .attr("x", __axis_rotated ? 0 : rectX)
+                        .attr("y", __axis_rotated ? rectX : 0)
+                        .attr("width", __axis_rotated ? width : rectW)
+                        .attr("height", __axis_rotated ? rectW : height);
+
+                        // callback here?
+
+                });
+            } : null);
 
             // update fadein condition
             mapToIds(c3.data.targets).forEach(function (id) {
@@ -4535,6 +4659,87 @@
             unload(mapToTargetIds(targetIds), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
                 if (typeof done === 'function') { done(); }
+            });
+        };
+
+        c3.flow = function (args) {
+            var targets = convertDataToTargets(convertColumnsToData(args.columns), true),
+                notfoundIds = [], length, tail;
+
+            // Update/Add data
+            c3.data.targets.forEach(function (t) {
+                var found = false, i, j;
+                for (i = 0; i < targets.length; i++) {
+                    if (t.id === targets[i].id) {
+                        found = true;
+
+                        tail = t.values[t.values.length - 1].index + 1;
+                        length = targets[i].values.length;
+
+                        for (j = 0; j < targets[i].values.length; j++) {
+                            targets[i].values[j].index = tail + j;
+                            if (!isTimeSeries) {
+                                targets[i].values[j].x = tail + j;
+                            }
+                        }
+                        t.values = t.values.concat(targets[i].values);
+
+                        targets.splice(i, 1);
+                        break;
+                    }
+                }
+                if (!found) { notfoundIds.push(t.id); }
+            });
+
+            // Append null for not found targets
+            c3.data.targets.forEach(function (t) {
+                var i, j;
+                for (i = 0; i < notfoundIds.length; i++) {
+                    if (t.id === notfoundIds[i]) {
+                        tail = t.values[t.values.length - 1].index + 1;
+                        for (j = 0; j < length; j++) {
+                            t.values.push({
+                                id: t.id,
+                                index: tail + j,
+                                x: isTimeSeries ? getOtherTargetX(tail + j) : tail + j,
+                                value: null
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Generate null values for new target
+            targets.forEach(function (t) {
+                var i, missing = [];
+                for (i = c3.data.targets[0].values[0].index; i < tail; i++) {
+                    missing.push({
+                        id: t.id,
+                        index: i,
+                        x: isTimeSeries ? getOtherTargetX(i) : i,
+                        value: null
+                    });
+                }
+                t.values.forEach(function (v) {
+                    v.index += tail;
+                    if (!isTimeSeries) {
+                        v.x += tail;
+                    }
+                });
+                t.values = missing.concat(t.values);
+            });
+            c3.data.targets = c3.data.targets.concat(targets); // add remained
+
+            // Set targets
+            updateTargets(c3.data.targets);
+
+            // Redraw with new targets
+            redraw({
+                flow: {
+                    index: c3.data.targets[0].values[0].index,
+                    length: length
+                },
+                withLegend: true
             });
         };
 
