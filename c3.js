@@ -3513,19 +3513,7 @@
                     .attr('dy', -5)
                     .style("opacity", 0);
                 // udpate
-                xgridLines.select('line')
-                  .transition().duration(duration)
-                    .attr("x1", __axis_rotated ? 0 : xv)
-                    .attr("x2", __axis_rotated ? width : xv)
-                    .attr("y1", __axis_rotated ? xv : margin.top)
-                    .attr("y2", __axis_rotated ? xv : height)
-                    .style("opacity", 1);
-                xgridLines.select('text')
-                  .transition().duration(duration)
-                    .attr("x", __axis_rotated ? width : 0)
-                    .attr("y", xv)
-                    .text(function (d) { return d.text; })
-                    .style("opacity", 1);
+                // done in d3.transition() of the end of this function
                 // exit
                 xgridLines.exit().transition().duration(duration)
                     .style("opacity", 0)
@@ -3930,6 +3918,17 @@
                 waitForDraw.add(main.selectAll('.' + CLASS.selectedCircle).transition()
                     .attr("cx", __axis_rotated ? circleY : circleX)
                     .attr("cy", __axis_rotated ? circleX : circleY));
+                waitForDraw.add(xgridLines.select('line').transition()
+                    .attr("x1", __axis_rotated ? 0 : xv)
+                    .attr("x2", __axis_rotated ? width : xv)
+                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y2", __axis_rotated ? xv : height)
+                    .style("opacity", 1));
+                waitForDraw.add(xgridLines.select('text').transition()
+                    .attr("x", __axis_rotated ? width : 0)
+                    .attr("y", xv)
+                    .text(function (d) { return d.text; })
+                    .style("opacity", 1));
             })
             .call(waitForDraw, options.flow ? function () { // only for flow
                 var translateX, scaleX = 1, transform,
@@ -3963,6 +3962,7 @@
                     wait.add(mainArea.transition().attr('transform', transform));
                     wait.add(mainCircle.transition().attr('transform', transform));
                     wait.add(xgrid.transition().attr('transform', transform));
+                    wait.add(xgridLines.transition().attr('transform', transform));
                 })
                 .call(wait, function () {
                     var i, targets = [], eventRects = [];
@@ -3979,6 +3979,14 @@
                     // draw again for removing flowed elements and reverting attr
                     xgrid
                         .attr('transform', null);
+                    xgridLines
+                        .attr('transform', null);
+                    xgridLines.select('line')
+                        .attr("x1", __axis_rotated ? 0 : xv)
+                        .attr("x2", __axis_rotated ? width : xv);
+                    xgridLines.select('text')
+                        .attr("x", __axis_rotated ? width : 0)
+                        .attr("y", xv);
                     mainBar
                         .attr('transform', null)
                         .attr("d", drawBar);
