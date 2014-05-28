@@ -1,6 +1,12 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/css/c3.css">
+    <style>
+      .c3-region-1 {
+        fill: #dd3333;
+        fill-opacity: 0.8
+      }
+    </style>
   </head>
   <body>
     <div id="chart"></div>
@@ -47,7 +53,11 @@
           y: {
             show: true
           }
-        }
+        },
+        regions: [
+          {start:2, end:4, class:'region1'},
+          {start:100, end:200, axis:'y'},
+        ],
       });
 
       setTimeout(function () {
