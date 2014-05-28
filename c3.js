@@ -1703,7 +1703,7 @@
         function generateClass(prefix, targetId) {
             return " " + prefix + " " + prefix + getTargetSelectorSuffix(targetId);
         }
-        function classText(d) { return generateClass(CLASS.text, d.id); }
+        function classText(d) { return generateClass(CLASS.text, d.index); }
         function classTexts(d) { return generateClass(CLASS.texts, d.id); }
         function classShape(d) { return generateClass(CLASS.shape, d.index); }
         function classShapes(d) { return generateClass(CLASS.shapes, d.id); }
@@ -3497,6 +3497,8 @@
                 xgrid.attr(xgridAttr)
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
+            } else {
+                xgrid = d3.selectAll([]);
             }
             if (notEmpty(__grid_x_lines)) {
                 xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
@@ -3518,6 +3520,8 @@
                 xgridLines.exit().transition().duration(duration)
                     .style("opacity", 0)
                     .remove();
+            } else {
+                xgridLines = d3.selectAll([]);
             }
             // Y-Grid
             if (withY && __grid_y_show) {
@@ -3647,16 +3651,13 @@
                     .style("fill-opacity", 0);
                 mainText
                     .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
-                    .style("fill-opacity", initialOpacityForText)
-                  .transition().duration(duration)
-                    .attr('x', xForText)
-                    .attr('y', yForText)
-                    .style("fill", color)
-                    .style("fill-opacity", opacityForText);
+                    .style("fill-opacity", initialOpacityForText);
                 mainText.exit()
                   .transition().duration(durationForExit)
                     .style('fill-opacity', 0)
                     .remove();
+            } else {
+                mainText = d3.selectAll([]);
             }
 
             // arc
@@ -3918,6 +3919,11 @@
                 waitForDraw.add(main.selectAll('.' + CLASS.selectedCircle).transition()
                     .attr("cx", __axis_rotated ? circleY : circleX)
                     .attr("cy", __axis_rotated ? circleX : circleY));
+                waitForDraw.add(mainText.transition()
+                    .attr('x', xForText)
+                    .attr('y', yForText)
+                    .style("fill", color)
+                    .style("fill-opacity", opacityForText));
                 waitForDraw.add(xgridLines.select('line').transition()
                     .attr("x1", __axis_rotated ? 0 : xv)
                     .attr("x2", __axis_rotated ? width : xv)
@@ -3961,18 +3967,21 @@
                     wait.add(mainLine.transition().attr('transform', transform));
                     wait.add(mainArea.transition().attr('transform', transform));
                     wait.add(mainCircle.transition().attr('transform', transform));
+                    wait.add(mainText.transition().attr('transform', transform));
                     wait.add(xgrid.transition().attr('transform', transform));
                     wait.add(xgridLines.transition().attr('transform', transform));
                 })
                 .call(wait, function () {
-                    var i, targets = [], eventRects = [];
+                    var i, shapes = [], texts = [], eventRects = [];
 
                     // remove flowed elements
                     for (i = 0; i < flowLength; i++) {
-                        targets.push('.' + CLASS.shape + '-' + (flowIndex + i));
+                        shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
+                        texts.push('.' + CLASS.text + '-' + (flowIndex + i));
                         eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
                     }
-                    svg.selectAll('.' + CLASS.shapes).selectAll(targets).remove();
+                    svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
+                    svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
                     svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
                     svg.select('.' + CLASS.xgrid).remove();
 
@@ -4000,6 +4009,10 @@
                         .attr('transform', null)
                         .attr("cx", __axis_rotated ? circleY : circleX)
                         .attr("cy", __axis_rotated ? circleX : circleY);
+                    mainText
+                        .attr('transform', null)
+                        .attr('x', xForText)
+                        .attr('y', yForText);
                     eventRectUpdate
                         .attr("x", __axis_rotated ? 0 : rectX)
                         .attr("y", __axis_rotated ? rectX : 0)
