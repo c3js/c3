@@ -48,6 +48,7 @@
         arcs: 'c3-arcs',
         area: 'c3-area',
         areas: 'c3-areas',
+        empty: 'c3-empty',
         text: 'c3-text',
         texts: 'c3-texts',
         gaugeValue: 'c3-gauge-value',
@@ -167,6 +168,9 @@
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
             __data_ondragend = getConfig(['data', 'ondragend'], function () {});
 
+        // configuration for no plot-able data supplied.
+        var __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], "");
+        
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
@@ -2812,6 +2816,15 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
+            if (c3.data.targets.length === 0) {
+              main.append("text")
+                .attr("class", CLASS.text + ' ' + CLASS.empty)
+                .attr("x", (getCurrentWidth() - margin.left - margin.right) / 2)
+                .attr("y", (getCurrentHeight() - margin.top - margin.bottom) / 2)
+                .attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
+                .attr("dominant-baseline", "middle") // vertical centering of text at y position in all browsers, except IE.
+                .text(__data_empty_label_text);
+            }
 
             // Grids
             grid = main.append('g')
