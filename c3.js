@@ -1029,7 +1029,7 @@
                 y = c[1];
                 h = Math.sqrt(x * x + y * y);
                 // TODO: ratio should be an option?
-                ratio = (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h;
+                ratio = radius && h ? (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h : 0;
                 translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
             }
             return translate;
