@@ -3962,6 +3962,7 @@
                     wait.add(mainLine.transition().attr('transform', transform));
                     wait.add(mainArea.transition().attr('transform', transform));
                     wait.add(mainCircle.transition().attr('transform', transform));
+                    wait.add(xgrid.transition().attr('transform', transform));
                 })
                 .call(wait, function () {
                     var i, targets = [], eventRects = [];
@@ -3973,8 +3974,11 @@
                     }
                     svg.selectAll('.' + CLASS.shapes).selectAll(targets).remove();
                     svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
+                    svg.select('.' + CLASS.xgrid).remove();
 
-                    // draw again for removing flowed elements
+                    // draw again for removing flowed elements and reverting attr
+                    xgrid
+                        .attr('transform', null);
                     mainBar
                         .attr('transform', null)
                         .attr("d", drawBar);
