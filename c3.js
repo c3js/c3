@@ -140,7 +140,7 @@
 
         var __data_x = getConfig(['data', 'x']),
             __data_xs = getConfig(['data', 'xs'], {}),
-            __data_x_format = getConfig(['data', 'x_format']),
+            __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
             __data_classes = getConfig(['data', 'classes'], {}),
@@ -2239,7 +2239,7 @@
         function parseDate(date) {
             var parsedDate;
             try {
-                parsedDate = date instanceof Date || !__data_x_format ? new Date(date) : d3.time.format(__data_x_format).parse(date);
+                parsedDate = date instanceof Date ? new Date(date) : d3.time.format(__data_x_format).parse(date);
             } catch (e) {
                 window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
             }
