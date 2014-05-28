@@ -1453,6 +1453,13 @@
             }
             return x;
         }
+        function convertJsonToData(json) {
+            var keys = Object.keys(json), new_rows = [];
+            keys.forEach(function (key) {
+                new_rows.push([key].concat(json[key]));
+            });
+            return convertColumnsToData(new_rows);
+        }
         function convertRowsToData(rows) {
             var keys = rows[0], new_row = {}, new_rows = [], i, j;
             for (i = 1; i < rows.length; i++) {
@@ -5054,7 +5061,7 @@
 
         /*-- Load data and init chart with defined functions --*/
 
-        if ('url' in config.data) {
+        if (config.data.url) {
             d3.xhr(config.data.url, function (error, data) {
                 // TODO: other mine/type
                 var rows = d3.csv.parseRows(data.response), d;
@@ -5069,10 +5076,13 @@
                 init(d);
             });
         }
-        else if ('rows' in config.data) {
+        else if (config.data.json) {
+            init(convertJsonToData(config.data.json));
+        }
+        else if (config.data.rows) {
             init(convertRowsToData(config.data.rows));
         }
-        else if ('columns' in config.data) {
+        else if (config.data.columns) {
             init(convertColumnsToData(config.data.columns));
         }
         else {
