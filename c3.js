@@ -1992,8 +1992,11 @@
                 }
             } else {
                 gridData = scale.ticks(10);
+                if (gridData.length > tickNum) { // use only int
+                    gridData = gridData.filter(function (d) { return ("" + d).indexOf('.') < 0; });
+                }
             }
-            return gridData.slice(0, tickNum);
+            return gridData;
         }
 
         //-- Shape --//
