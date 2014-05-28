@@ -2808,15 +2808,10 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
-            if (c3.data.targets.length === 0) {
-              main.append("text")
+            main.append("text")
                 .attr("class", CLASS.text + ' ' + CLASS.empty)
-                .attr("x", (getCurrentWidth() - margin.left - margin.right) / 2)
-                .attr("y", (getCurrentHeight() - margin.top - margin.bottom) / 2)
                 .attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
-                .attr("dominant-baseline", "middle") // vertical centering of text at y position in all browsers, except IE.
-                .text(__data_empty_label_text);
-            }
+                .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
             // Grids
             grid = main.append('g')
@@ -3476,6 +3471,14 @@
 
             // xgrid focus
             updateXgridFocus();
+
+            // Data empty label positioning and text.
+            if (c3.data.targets.length === 0) {
+                main.select("text." + CLASS.text + '.' + CLASS.empty)
+                    .attr("x", width / 2)
+                    .attr("y", height / 2)
+                    .text(__data_empty_label_text);
+            }
 
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
