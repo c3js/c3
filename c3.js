@@ -3943,6 +3943,7 @@
                     flowStart = getValueOnIndex(c3.data.targets[0].values, flowIndex),
                     flowEnd = getValueOnIndex(c3.data.targets[0].values, flowIndex + flowLength),
                     orgDomain = x.domain(),
+                    durationForFlow = options.flow.duration || duration,
                     wait = generateWait();
 
                 // remove head data after rendered
@@ -3961,7 +3962,7 @@
                 }
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
 
-                d3.transition().ease('linear').each(function () {
+                d3.transition().ease('linear').duration(durationForFlow).each(function () {
                     wait.add(axes.x.transition().call(xAxis));
                     wait.add(mainBar.transition().attr('transform', transform));
                     wait.add(mainLine.transition().attr('transform', transform));
@@ -4776,7 +4777,8 @@
             redraw({
                 flow: {
                     index: c3.data.targets[0].values[0].index,
-                    length: length
+                    length: length,
+                    duration: args.duration
                 },
                 withLegend: true
             });
