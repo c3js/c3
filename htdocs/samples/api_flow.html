@@ -67,7 +67,16 @@
             ['data2', 100],
             ['data3', 200],
           ],
-          duration: 500
+          duration: 500,
+          onend: function () {
+            chart.flow({
+              columns: [
+                ['data1', 200],
+                ['data3', 100]
+              ],
+              duration: 150
+            });
+          }
         });
       }, 1000);
 
@@ -80,7 +89,7 @@
           ],
           duration: 150
         });
-      }, 2000);
+      }, 3000);
 
       setTimeout(function () {
         chart.flow({
@@ -90,7 +99,7 @@
             ['data3', 400]
           ]
         });
-      }, 3000);
+      }, 4000);
 
     </script>
   </body>
