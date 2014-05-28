@@ -1367,6 +1367,9 @@
             }
             return end < start ? 0 : end - start;
         }
+        function isRegionOnX(d) {
+            return !d.axis || d.axis === 'x';
+        }
 
         //-- Data --//
 
@@ -3579,13 +3582,6 @@
                 .attr('class', classRegion)
               .append('rect')
                 .style("fill-opacity", 0);
-            mainRegion.selectAll('rect')
-              .transition().duration(duration)
-                .attr("x", regionX)
-                .attr("y", regionY)
-                .attr("width", regionWidth)
-                .attr("height", regionHeight)
-                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
             mainRegion.exit().transition().duration(duration)
                 .style("opacity", 0)
                 .remove();
@@ -3922,6 +3918,12 @@
                     .attr('y', yForText)
                     .style("fill", color)
                     .style("fill-opacity", opacityForText));
+                waitForDraw.add(mainRegion.selectAll('rect').transition()
+                    .attr("x", regionX)
+                    .attr("y", regionY)
+                    .attr("width", regionWidth)
+                    .attr("height", regionHeight)
+                    .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
                 waitForDraw.add(xgridLines.select('line').transition()
                     .attr("x1", __axis_rotated ? 0 : xv)
                     .attr("x2", __axis_rotated ? width : xv)
@@ -3966,6 +3968,7 @@
                     wait.add(mainArea.transition().attr('transform', transform));
                     wait.add(mainCircle.transition().attr('transform', transform));
                     wait.add(mainText.transition().attr('transform', transform));
+                    wait.add(mainRegion.filter(isRegionOnX).transition().attr('transform', transform));
                     wait.add(xgrid.transition().attr('transform', transform));
                     wait.add(xgridLines.transition().attr('transform', transform));
                 })
@@ -4011,6 +4014,10 @@
                         .attr('transform', null)
                         .attr('x', xForText)
                         .attr('y', yForText);
+                    mainRegion
+                        .attr('transform', null);
+                    mainRegion.select('rect').filter(isRegionOnX)
+                        .attr("x", regionX);
                     eventRectUpdate
                         .attr("x", __axis_rotated ? 0 : rectX)
                         .attr("y", __axis_rotated ? rectX : 0)
