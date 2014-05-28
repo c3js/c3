@@ -1453,6 +1453,18 @@
             }
             return x;
         }
+        function convertCsvToData(csv) {
+            var rows = d3.csv.parseRows(csv), d;
+            if (rows.length === 1) {
+                d = [{}];
+                rows[0].forEach(function (id) {
+                    d[0][id] = null;
+                });
+            } else {
+                d = d3.csv.parse(csv);
+            }
+            return d;
+        }
         function convertJsonToData(json) {
             var keys = Object.keys(json), new_rows = [];
             keys.forEach(function (key) {
@@ -2118,7 +2130,7 @@
         }
         function isLineType(d) {
             var id = (typeof d === 'string') ? d : d.id;
-            return !(id in __data_types) || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(__data_types[id]) >= 0;
+            return !__data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(__data_types[id]) >= 0;
         }
         function isStepType(d) {
             var id = (typeof d === 'string') ? d : d.id;
@@ -5061,20 +5073,21 @@
 
         /*-- Load data and init chart with defined functions --*/
 
-        if (config.data.url) {
+        function initWithUrl(args) {
+            var type = args.mineType ? args.mineType : 'csv';
             d3.xhr(config.data.url, function (error, data) {
-                // TODO: other mine/type
-                var rows = d3.csv.parseRows(data.response), d;
-                if (rows.length === 1) {
-                    d = [{}];
-                    rows[0].forEach(function (id) {
-                        d[0][id] = null;
-                    });
+                var d;
+                if (type === 'json') {
+                    d = convertJsonToData(JSON.parse(data.response));
                 } else {
-                    d = d3.csv.parse(data.response);
+                    d = convertCsvToData(data.response);
                 }
                 init(d);
             });
+        }
+
+        if (config.data.url) {
+            initWithUrl(config.data);
         }
         else if (config.data.json) {
             init(convertJsonToData(config.data.json));
@@ -5086,7 +5099,7 @@
             init(convertColumnsToData(config.data.columns));
         }
         else {
-            throw Error('url or rows or columns is required.');
+            throw Error('url or json or rows or columns is required.');
         }
 
         return c3;
