@@ -4140,11 +4140,12 @@
             options.withUpdateXDomain = true;
             options.withUpdateOrgXDomain = true;
             options.withTransitionForExit = false;
+            // MEMO: this needs to be called before updateLegend and it means this ALWAYS needs to be called)
+            updateSizes();
             // MEMO: called in updateLegend in redraw if withLegend
             if (!(options.withLegend && __legend_show)) {
                 transitions = generateAxisTransitions(options.withTransitionForAxis ? __transition_duration : 0);
-                // Update sizes and scales
-                updateSizes();
+                // Update scales
                 updateScales();
                 updateSvgSize();
                 // Update g positions
@@ -5056,7 +5057,6 @@
         c3.resize = function (size) {
             __size_width = size ? size.width : null;
             __size_height = size ? size.height : null;
-            c3.flush(); // TODO: need to be called twice because of update of legend
             c3.flush();
         };
 
