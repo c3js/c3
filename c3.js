@@ -2328,6 +2328,10 @@
             return isSplineType(d) ? "cardinal" : isStepType(d) ? "step-after" : "linear";
         }
 
+        function getEmptySelection() {
+            return d3.selectAll([]);
+        }
+
         //-- Selection --//
 
         function selectPoint(target, d, i) {
@@ -3364,6 +3368,8 @@
             var duration, durationForExit, durationForAxis, waitForDraw = generateWait();
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
+            xgrid = xgridLines = mainCircle = mainText = getEmptySelection();
+
             options = options || {};
             withY = getOption(options, "withY", true);
             withSubchart = getOption(options, "withSubchart", true);
@@ -3497,8 +3503,6 @@
                 xgrid.attr(xgridAttr)
                     .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
                 xgrid.exit().remove();
-            } else {
-                xgrid = d3.selectAll([]);
             }
             if (notEmpty(__grid_x_lines)) {
                 xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
@@ -3520,8 +3524,6 @@
                 xgridLines.exit().transition().duration(duration)
                     .style("opacity", 0)
                     .remove();
-            } else {
-                xgridLines = d3.selectAll([]);
             }
             // Y-Grid
             if (withY && __grid_y_show) {
@@ -3636,8 +3638,6 @@
                 mainCircle
                     .style("opacity", initialOpacity);
                 mainCircle.exit().remove();
-            } else {
-                mainCircle = d3.selectAll([]);
             }
 
             if (hasDataLabel()) {
@@ -3656,8 +3656,6 @@
                   .transition().duration(durationForExit)
                     .style('fill-opacity', 0)
                     .remove();
-            } else {
-                mainText = d3.selectAll([]);
             }
 
             // arc
