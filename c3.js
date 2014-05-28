@@ -5074,7 +5074,7 @@
         /*-- Load data and init chart with defined functions --*/
 
         function initWithUrl(args) {
-            var type = args.mineType ? args.mineType : 'csv';
+            var type = args.mimeType ? args.mimeType : 'csv';
             d3.xhr(config.data.url, function (error, data) {
                 var d;
                 if (type === 'json') {
