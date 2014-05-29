@@ -287,9 +287,11 @@
         // tooltip - show when mouseover on each data
         var __tooltip_show = getConfig(['tooltip', 'show'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title']),
+            __tooltip_format_name = getConfig(['tooltip', 'format', 'name']),
             __tooltip_format_value = getConfig(['tooltip', 'format', 'value']),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d, defaultTitleFormat, defaultValueFormat, color) {
             var titleFormat = __tooltip_format_title ? __tooltip_format_title : defaultTitleFormat,
+                nameFormat = __tooltip_format_name ? __tooltip_format_name : function (name) { return name; },
                 valueFormat = __tooltip_format_value ? __tooltip_format_value : defaultValueFormat,
                 text, i, title, value, name, bgcolor;
             for (i = 0; i < d.length; i++) {
@@ -300,7 +302,7 @@
                     text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
                 }
 
-                name = d[i].name;
+                name = nameFormat(d[i].name);
                 value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
                 bgcolor = levelColor ? levelColor(d[i].value) : color(d[i].id);
 
