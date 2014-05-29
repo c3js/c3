@@ -2478,15 +2478,16 @@
             area = __axis_rotated ? area.x0(value0).x1(value1).y(xx) : area.x(xx).y0(value0).y1(value1);
 
             return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0;
+                var data = filterRemoveNull(d.values), x0, y0, path;
 
                 if (isAreaType(d)) {
-                    return area.interpolate(getInterpolate(d))(data);
+                    path = area.interpolate(getInterpolate(d))(data);
                 } else {
                     x0 = x(data[0].x);
                     y0 = getYScale(d.id)(data[0].value);
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+                    path = __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
+                return path ? path : "M 0 0";
             };
         }
 
@@ -2503,20 +2504,21 @@
             if (!__line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
             return function (d) {
                 var data = __line_connect_null ? filterRemoveNull(d.values) : d.values,
-                    x = isSub ? x : subX, y = yScaleGetter(d.id), x0 = 0, y0 = 0;
+                    x = isSub ? x : subX, y = yScaleGetter(d.id), x0 = 0, y0 = 0, path;
                 if (isLineType(d)) {
                     if (__data_regions[d.id]) {
-                        return lineWithRegions(data, x, y, __data_regions[d.id]);
+                        path = lineWithRegions(data, x, y, __data_regions[d.id]);
                     } else {
-                        return line.interpolate(getInterpolate(d))(data);
+                        path = line.interpolate(getInterpolate(d))(data);
                     }
                 } else {
                     if (data[0]) {
                         x0 = x(data[0].x);
                         y0 = y(data[0].value);
                     }
-                    return __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+                    path = __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
+                return path ? path : "M 0 0";
             };
         }
 
@@ -3408,7 +3410,7 @@
         }
 
         function redraw(options, transitions) {
-            var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine;
+            var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine, flushXGrid;
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine,  contextArea, contextBar, eventRect, eventRectUpdate;
             var areaIndices = getShapeIndices(isAreaType), barIndices = getShapeIndices(isBarType), lineIndices = getShapeIndices(isLineType), maxDataCountTarget, tickOffset;
             var rectX, rectW;
@@ -3542,8 +3544,6 @@
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
             if (__grid_x_show) {
-                xgridData = generateGridData(__grid_x_type, x);
-                tickOffset = isCategorized ? xAxis.tickOffset() : 0;
                 xgridAttr = __axis_rotated ? {
                     'x1': 0,
                     'x2': width,
@@ -3555,12 +3555,20 @@
                     'y1': margin.top,
                     'y2': height
                 };
-                xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
-                    .data(xgridData);
-                xgrid.enter().append('line').attr("class", CLASS.xgrid);
-                xgrid.attr(xgridAttr)
-                    .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
-                xgrid.exit().remove();
+                // this is used to flow
+                flushXGrid = function (withoutUpdate) {
+                    xgridData = generateGridData(__grid_x_type, x);
+                    tickOffset = isCategorized ? xAxis.tickOffset() : 0;
+                    xgrid = main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
+                        .data(xgridData);
+                    xgrid.enter().append('line').attr("class", CLASS.xgrid);
+                    if (!withoutUpdate) {
+                        xgrid.attr(xgridAttr)
+                            .style("opacity", function () { return +d3.select(this).attr(__axis_rotated ? 'y1' : 'x1') === (__axis_rotated ? height : 0) ? 0 : 1; });
+                    }
+                    xgrid.exit().remove();
+                };
+                flushXGrid();
             }
             if (notEmpty(__grid_x_lines)) {
                 xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
@@ -4009,13 +4017,12 @@
 
                 // update x domain to generate axis elements for flow
                 updateXDomain(targetsToShow, true, true);
+                // update elements related to x scale
+                flushXGrid(true);
 
                 // generate transform to flow
-                translateX = x(flowStart.x) - x(flowEnd.x);
-                if (isTimeSeries) {
-                    translateX = translateX * 0.9; // TODO: fix 0.9, I don't know why 0.9..
-                    scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
-                }
+                translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1); // TODO: fix 0.9, I don't know why 0.9..
+                scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
 
                 d3.transition().ease('linear').duration(durationForFlow).each(function () {
@@ -4033,19 +4040,22 @@
                     var i, shapes = [], texts = [], eventRects = [];
 
                     // remove flowed elements
-                    for (i = 0; i < flowLength; i++) {
-                        shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
-                        texts.push('.' + CLASS.text + '-' + (flowIndex + i));
-                        eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
+                    if (flowLength) {
+                        for (i = 0; i < flowLength; i++) {
+                            shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
+                            texts.push('.' + CLASS.text + '-' + (flowIndex + i));
+                            eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
+                        }
+                        svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
+                        svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
+                        svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
+                        svg.select('.' + CLASS.xgrid).remove();
                     }
-                    svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
-                    svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
-                    svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
-                    svg.select('.' + CLASS.xgrid).remove();
 
                     // draw again for removing flowed elements and reverting attr
                     xgrid
-                        .attr('transform', null);
+                        .attr('transform', null)
+                        .attr(xgridAttr);
                     xgridLines
                         .attr('transform', null);
                     xgridLines.select('line')
@@ -4074,7 +4084,8 @@
                     mainRegion
                         .attr('transform', null);
                     mainRegion.select('rect').filter(isRegionOnX)
-                        .attr("x", regionX);
+                        .attr("x", regionX)
+                        .attr("width", regionWidth);
                     eventRectUpdate
                         .attr("x", __axis_rotated ? 0 : rectX)
                         .attr("y", __axis_rotated ? rectX : 0)
@@ -4826,6 +4837,16 @@
                 t.values = missing.concat(t.values);
             });
             c3.data.targets = c3.data.targets.concat(targets); // add remained
+
+            // Update length to flow if needed
+            if (isDefined(args.to)) {
+                length = 0;
+                c3.data.targets[0].values.forEach(function (v) {
+                    if (v.x <= args.to) { length++; }
+                });
+            } else if (isDefined(args.length)) {
+                length = args.length;
+            }
 
             // Set targets
             updateTargets(c3.data.targets);
