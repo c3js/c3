@@ -5020,6 +5020,8 @@
             return __data_colors;
         };
 
+        c3.color = color;
+
         c3.x = function (x) {
             if (arguments.length) {
                 updateTargetX(c3.data.targets, x);
