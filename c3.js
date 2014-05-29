@@ -4020,7 +4020,7 @@
                 // update x domain to generate axis elements for flow
                 updateXDomain(targetsToShow, true, true);
                 // update elements related to x scale
-                flushXGrid(true);
+                if (flushXGrid) { flushXGrid(true); }
 
                 // generate transform to flow
                 translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1); // TODO: fix 0.9, I don't know why 0.9..
