@@ -5021,6 +5021,7 @@
             redraw({withLegend: true});
             return __data_colors;
         };
+        c3.getTargetColor = color;
 
         c3.color = color;
 
