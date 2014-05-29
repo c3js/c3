@@ -2816,6 +2816,8 @@
             updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
 
             /*-- Main Region --*/
+
+            // text when empty
             main.append("text")
                 .attr("class", CLASS.text + ' ' + CLASS.empty)
                 .attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
@@ -3481,12 +3483,12 @@
             updateXgridFocus();
 
             // Data empty label positioning and text.
-            if (c3.data.targets.length === 0) {
-                main.select("text." + CLASS.text + '.' + CLASS.empty)
-                    .attr("x", width / 2)
-                    .attr("y", height / 2)
-                    .text(__data_empty_label_text);
-            }
+            main.select("text." + CLASS.text + '.' + CLASS.empty)
+                .attr("x", width / 2)
+                .attr("y", height / 2)
+                .text(__data_empty_label_text)
+              .transition()
+                .style('opacity', targetsToShow.length ? 0 : 1);
 
             // grid
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
