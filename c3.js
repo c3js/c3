@@ -4894,36 +4894,9 @@
             });
         };
 
-        c3.toLine = function (targetIds) {
-            transformTo(targetIds, 'line');
-        };
-
-        c3.toSpline = function (targetIds) {
-            transformTo(targetIds, 'spline');
-        };
-
-        c3.toBar = function (targetIds) {
-            transformTo(targetIds, 'bar');
-        };
-
-        c3.toScatter = function (targetIds) {
-            transformTo(targetIds, 'scatter');
-        };
-
-        c3.toArea = function (targetIds) {
-            transformTo(targetIds, 'area');
-        };
-
-        c3.toAreaSpline = function (targetIds) {
-            transformTo(targetIds, 'area-spline');
-        };
-
-        c3.toPie = function (targetIds) {
-            transformTo(targetIds, 'pie', {withTransform: true});
-        };
-
-        c3.toDonut = function (targetIds) {
-            transformTo(targetIds, 'donut', {withTransform: true});
+        c3.transform = function (type, targetIds) {
+            var options = ['pie', 'donut'].indexOf(type) >= 0 ? {withTransform: true} : null;
+            transformTo(targetIds, type, options);
         };
 
         c3.groups = function (groups) {
