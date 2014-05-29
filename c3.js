@@ -327,7 +327,7 @@
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
-            isCustomX = !isTimeSeries && (__data_x || notEmpty(__data_xs));
+            isCustomX = function () { return !isTimeSeries && (__data_x || notEmpty(__data_xs)); };
 
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
 
@@ -1449,7 +1449,7 @@
             if (isTimeSeries) {
                 x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : parseDate(getXValue(id, index));
             }
-            else if (isCustomX && !isCategorized) {
+            else if (isCustomX() && !isCategorized) {
                 x = isValue(rawX) ? +rawX : getXValue(id, index);
             }
             else {
@@ -1469,12 +1469,30 @@
             }
             return d;
         }
-        function convertJsonToData(json) {
-            var keys = Object.keys(json), new_rows = [];
-            keys.forEach(function (key) {
-                new_rows.push([key].concat(json[key]));
-            });
-            return convertColumnsToData(new_rows);
+        function convertJsonToData(json, keys) {
+            var new_rows = [], targetKeys, data;
+            if (keys) { // when keys specified, json would be an array that includes objects
+                targetKeys = keys.value;
+                if (keys.x) {
+                    targetKeys.push(keys.x);
+                    __data_x = keys.x;
+                }
+                new_rows.push(targetKeys);
+                json.forEach(function (o) {
+                    var new_row = [];
+                    targetKeys.forEach(function (key) {
+                        new_row.push(o[key]);
+                    });
+                    new_rows.push(new_row);
+                });
+                data = convertRowsToData(new_rows);
+            } else {
+                Object.keys(json).forEach(function (key) {
+                    new_rows.push([key].concat(json[key]));
+                });
+                data = convertColumnsToData(new_rows);
+            }
+            return data;
         }
         function convertRowsToData(rows) {
             var keys = rows[0], new_row = {}, new_rows = [], i, j;
@@ -1507,7 +1525,7 @@
             ids.forEach(function (id) {
                 var xKey = getXKey(id);
 
-                if (isCustomX || isTimeSeries) {
+                if (isCustomX() || isTimeSeries) {
                     // if included in input data
                     if (xs.indexOf(xKey) >= 0) {
                         c3.data.xs[id] = (appendXs && c3.data.xs[id] ? c3.data.xs[id] : []).concat(
@@ -1546,7 +1564,7 @@
                     values: data.map(function (d, i) {
                         var xKey = getXKey(id), rawX = d[xKey], x = generateTargetX(rawX, id, i);
                         // use x as categories if custom x and categorized
-                        if (isCustomX && isCategorized && index === 0 && rawX) {
+                        if (isCustomX() && isCategorized && index === 0 && rawX) {
                             if (i === 0) { __axis_x_categories = []; }
                             __axis_x_categories.push(rawX);
                         }
@@ -3892,7 +3910,7 @@
                             .selectAll('.' + CLASS.eventRect).remove();
                     }
 
-                    if ((isCustomX || isTimeSeries) && !isCategorized) {
+                    if ((isCustomX() || isTimeSeries) && !isCategorized) {
                         rectW = function (d) {
                             var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index];
                             return (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
@@ -5093,10 +5111,10 @@
 
         function initWithUrl(args) {
             var type = args.mimeType ? args.mimeType : 'csv';
-            d3.xhr(config.data.url, function (error, data) {
+            d3.xhr(args.url, function (error, data) {
                 var d;
                 if (type === 'json') {
-                    d = convertJsonToData(JSON.parse(data.response));
+                    d = convertJsonToData(JSON.parse(data.response), args.keys);
                 } else {
                     d = convertCsvToData(data.response);
                 }
@@ -5108,7 +5126,7 @@
             initWithUrl(config.data);
         }
         else if (config.data.json) {
-            init(convertJsonToData(config.data.json));
+            init(convertJsonToData(config.data.json, config.data.keys));
         }
         else if (config.data.rows) {
             init(convertRowsToData(config.data.rows));
