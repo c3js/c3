@@ -5102,11 +5102,11 @@
         c3.axis.max = function (max) {
             if (arguments.length) {
                 if (typeof max === 'object') {
-                    if (isValue(max.x)) { __axis_x_max = +max.x; }
-                    if (isValue(max.y)) { __axis_y_max = +max.y; }
-                    if (isValue(max.y2)) { __axis_y2_max = +max.y2; }
+                    if (isValue(max.x)) { __axis_x_max = max.x; }
+                    if (isValue(max.y)) { __axis_y_max = max.y; }
+                    if (isValue(max.y2)) { __axis_y2_max = max.y2; }
                 } else {
-                    __axis_y_max = __axis_y2_max = +max;
+                    __axis_y_max = __axis_y2_max = max;
                 }
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
@@ -5114,11 +5114,11 @@
         c3.axis.min = function (min) {
             if (arguments.length) {
                 if (typeof min === 'object') {
-                    if (isValue(min.x)) { __axis_x_min = +min.x; }
-                    if (isValue(min.y)) { __axis_y_min = +min.y; }
-                    if (isValue(min.y2)) { __axis_y2_min = +min.y2; }
+                    if (isValue(min.x)) { __axis_x_min = min.x; }
+                    if (isValue(min.y)) { __axis_y_min = min.y; }
+                    if (isValue(min.y2)) { __axis_y2_min = min.y2; }
                 } else {
-                    __axis_y_min = __axis_y2_min = +min;
+                    __axis_y_min = __axis_y2_min = min;
                 }
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             }
