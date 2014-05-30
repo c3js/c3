@@ -328,7 +328,7 @@
             clipPathForYAxis = getClipPath(clipIdForYAxis);
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
-            isCategorized = (__axis_x_type === 'categorized'),
+            isCategorized = (__axis_x_type.indexOf('categor') >= 0),
             isCustomX = function () { return !isTimeSeries && (__data_x || notEmpty(__data_xs)); };
 
         var dragStart = null, dragging = false, cancelClick = false, mouseover = false, transiting = false;
