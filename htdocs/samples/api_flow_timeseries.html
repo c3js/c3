@@ -9,13 +9,16 @@
     <script src="/js/c3.js"></script>
     <script>
 
-      var chart = c3.generate({
+      var generate = function () { return c3.generate({
         data: {
           x: 'x',
           columns: [
-            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-10', '2013-01-11', '2013-01-12'],
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 310, 400, 200, 100, 450, 150],
+            ['x', ],
+            ['data1', ],
+            ['data2', ],
+//            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-10', '2013-01-11', '2013-01-12'],
+//            ['data1', 30, 200, 100, 400, 150, 250],
+//            ['data2', 310, 400, 200, 100, 450, 150],
 //            ['data3', 310, 400, 200, 100, null, 150],
           ],
           types: {
@@ -55,19 +58,67 @@
           }
         }
 */
-      });
+      }); }, chart = generate();
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-01-21'],
+            ['data1', 500],
+            ['data3', 200],
+          ],
+        });
+      }, 1000);
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-02-01', '2013-02-08', '2013-02-15'],
+            ['data1', 200, 400, 300],
+            ['data2', 100, 300, 200],
+            ['data3', 100, 200, 50]
+          ],
+          length: 1,
+        });
+      }, 2000);
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-03-01', '2013-03-08'],
+            ['data1', 200, 500],
+            ['data2', 300, 400],
+            ['data3', 400, 200]
+          ],
+          to: '2013-02-15'
+        });
+      }, 3000);
+
+      setTimeout(function () {
+        chart.flow({
+          columns: [
+            ['x', '2013-03-15', '2013-05-01'],
+            ['data1', 200, 500],
+            ['data2', 300, 400],
+            ['data3', 400, 200]
+          ],
+          length: 0
+        });
+      }, 4000);
+
+      setTimeout(function () {
+        chart = generate();
+      }, 6000);
 
       setTimeout(function () {
         chart.flow({
           columns: [
             ['x', '2013-01-21', '2013-01-25'],
             ['data1', 500, 300],
-//            ['data2', 100, 100],
             ['data3', 200, 150],
           ],
-          to: new Date('2013-01-20'),
         });
-      }, 1000);
+      }, 7000);
 
       setTimeout(function () {
         chart.flow({
@@ -77,9 +128,9 @@
             ['data2', 100],
             ['data3', 100]
           ],
-          length: 0
+          length: 0,
         });
-      }, 2000);
+      }, 8000);
 
       setTimeout(function () {
         chart.flow({
@@ -90,7 +141,7 @@
             ['data3', 400]
           ]
         });
-      }, 3000);
+      }, 9000);
 
     </script>
   </body>

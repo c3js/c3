@@ -657,7 +657,7 @@
             return __legend_show ? isLegendRight ? legendItemWidth * (legendStep + 1) : currentWidth : 0;
         }
         function getLegendHeight() {
-            return __legend_show ? isLegendRight ? currentHeight : legendItemHeight * (legendStep + 1) : 0;
+            return __legend_show ? isLegendRight ? currentHeight : Math.max(20, legendItemHeight) * (legendStep + 1) : 0;
         }
 
         //-- Scales --//
@@ -1299,16 +1299,16 @@
             }
             return [min, max];
         }
-        function updateXDomain(targets, withUpdateXDomain, withUpdateOrgXDomain) {
+        function updateXDomain(targets, withUpdateXDomain, withUpdateOrgXDomain, domain) {
             if (withUpdateOrgXDomain) {
-                x.domain(d3.extent(getXDomain(targets)));
+                x.domain(domain ? domain : d3.extent(getXDomain(targets)));
                 orgXDomain = x.domain();
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
                 subX.domain(x.domain());
                 brush.scale(subX);
             }
             if (withUpdateXDomain) {
-                x.domain(brush.empty() ? orgXDomain : brush.extent());
+                x.domain(domain ? domain : brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
         }
@@ -2480,13 +2480,15 @@
             area = __axis_rotated ? area.x0(value0).x1(value1).y(xx) : area.x(xx).y0(value0).y1(value1);
 
             return function (d) {
-                var data = filterRemoveNull(d.values), x0, y0, path;
+                var data = filterRemoveNull(d.values), x0 = 0, y0 = 0, path;
 
                 if (isAreaType(d)) {
                     path = area.interpolate(getInterpolate(d))(data);
                 } else {
-                    x0 = x(data[0].x);
-                    y0 = getYScale(d.id)(data[0].value);
+                    if (data[0]) {
+                        x0 = x(data[0].x);
+                        y0 = getYScale(d.id)(data[0].value);
+                    }
                     path = __axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
                 }
                 return path ? path : "M 0 0";
@@ -3475,6 +3477,9 @@
                     xAxis.tickValues(tickValues);
                     subXAxis.tickValues(tickValues);
                 }
+            } else {
+                xAxis.tickValues([]);
+                subXAxis.tickValues([]);
             }
 
             y.domain(getYDomain(targetsToShow, 'y'));
@@ -4023,7 +4028,20 @@
                 if (flushXGrid) { flushXGrid(true); }
 
                 // generate transform to flow
-                translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1); // TODO: fix 0.9, I don't know why 0.9..
+                if (!options.flow.orgDataCount) { // if empty
+                    if (isTimeSeries || c3.data.targets[0].values.length !== 1) {
+                        flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
+                        flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
+                        translateX = x(flowStart.x) - x(flowEnd.x);
+                    } else {
+                        translateX = x(-0.5) - x(0);
+                    }
+                } else if (options.flow.orgDataCount === 1 || flowStart.x === flowEnd.x) {
+                    translateX = x(orgDomain[0]) - x(flowEnd.x);
+                } else {
+                    // TODO: fix 0.9, I don't know why 0.9..
+                    translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1);
+                }
                 scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
 
@@ -4773,8 +4791,8 @@
         };
 
         c3.flow = function (args) {
-            var targets = convertDataToTargets(convertColumnsToData(args.columns), true),
-                notfoundIds = [], length, tail;
+            var targets = convertDataToTargets(convertColumnsToData(args.columns), true), notfoundIds = [],
+                orgDataCount = getMaxDataCount(), dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
 
             // Update/Add data
             c3.data.targets.forEach(function (t) {
@@ -4783,10 +4801,12 @@
                     if (t.id === targets[i].id) {
                         found = true;
 
-                        tail = t.values[t.values.length - 1].index + 1;
+                        if (t.values[t.values.length - 1]) {
+                            tail = t.values[t.values.length - 1].index + 1;
+                        }
                         length = targets[i].values.length;
 
-                        for (j = 0; j < targets[i].values.length; j++) {
+                        for (j = 0; j < length; j++) {
                             targets[i].values[j].index = tail + j;
                             if (!isTimeSeries) {
                                 targets[i].values[j].x = tail + j;
@@ -4820,34 +4840,63 @@
             });
 
             // Generate null values for new target
-            targets.forEach(function (t) {
-                var i, missing = [];
-                for (i = c3.data.targets[0].values[0].index; i < tail; i++) {
-                    missing.push({
-                        id: t.id,
-                        index: i,
-                        x: isTimeSeries ? getOtherTargetX(i) : i,
-                        value: null
-                    });
-                }
-                t.values.forEach(function (v) {
-                    v.index += tail;
-                    if (!isTimeSeries) {
-                        v.x += tail;
+            if (c3.data.targets.length) {
+                targets.forEach(function (t) {
+                    var i, missing = [];
+                    for (i = c3.data.targets[0].values[0].index; i < tail; i++) {
+                        missing.push({
+                            id: t.id,
+                            index: i,
+                            x: isTimeSeries ? getOtherTargetX(i) : i,
+                            value: null
+                        });
                     }
+                    t.values.forEach(function (v) {
+                        v.index += tail;
+                        if (!isTimeSeries) {
+                            v.x += tail;
+                        }
+                    });
+                    t.values = missing.concat(t.values);
                 });
-                t.values = missing.concat(t.values);
-            });
+            }
             c3.data.targets = c3.data.targets.concat(targets); // add remained
+
+            // check data count becuase behavior needs to change when it's only one
+            dataCount = getMaxDataCount();
+            baseTarget = c3.data.targets[0];
+            baseValue = baseTarget.values[0];
 
             // Update length to flow if needed
             if (isDefined(args.to)) {
                 length = 0;
-                c3.data.targets[0].values.forEach(function (v) {
-                    if (v.x <= args.to) { length++; }
+                to = isTimeSeries ? parseDate(args.to) : args.to;
+                baseTarget.values.forEach(function (v) {
+                    if (v.x < to) { length++; }
                 });
             } else if (isDefined(args.length)) {
                 length = args.length;
+            }
+
+            // If only one data, update the domain to flow from left edge of the chart
+            if (!orgDataCount) {
+                if (isTimeSeries) {
+                    if (baseTarget.values.length > 1) {
+                        diff = baseTarget.values[baseTarget.values.length - 1].x - baseValue.x;
+                    } else {
+                        diff = baseValue.x - getXDomain(c3.data.targets)[0];
+                    }
+                } else {
+                    diff = 1;
+                }
+                domain = [baseValue.x - diff, baseValue.x];
+                updateXDomain(null, true, true, domain);
+            } else if (orgDataCount === 1) {
+                if (isTimeSeries) {
+                    diff = (baseTarget.values[baseTarget.values.length - 1].x - baseValue.x) / 2;
+                    domain = [new Date(+baseValue.x - diff), new Date(+baseValue.x + diff)];
+                    updateXDomain(null, true, true, domain);
+                }
             }
 
             // Set targets
@@ -4856,12 +4905,14 @@
             // Redraw with new targets
             redraw({
                 flow: {
-                    index: c3.data.targets[0].values[0].index,
+                    index: baseValue.index,
                     length: length,
-                    duration: args.duration,
+                    duration: isValue(args.duration) ? args.duration : __transition_duration,
                     onend: args.onend,
+                    orgDataCount: orgDataCount,
                 },
-                withLegend: true
+                withLegend: true,
+                withTransition: orgDataCount > 1,
             });
         };
 
