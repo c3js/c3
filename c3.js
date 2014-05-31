@@ -1031,8 +1031,8 @@
             var updated = updateAngle(d), c, x, y, h, ratio, translate = "";
             if (updated && !hasGaugeType(c3.data.targets)) {
                 c = svgArc.centroid(updated);
-                x = c[0];
-                y = c[1];
+                x = isNaN(c[0]) ? 0 : c[0];
+                y = isNaN(c[1]) ? 0 : c[1];
                 h = Math.sqrt(x * x + y * y);
                 // TODO: ratio should be an option?
                 ratio = radius && h ? (36 / radius > 0.375 ? 1.175 - 36 / radius : 0.8) * radius / h : 0;
