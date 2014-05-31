@@ -1217,7 +1217,7 @@
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
-                yDomainAbs, widths, diff, ratio,
+                yDomainAbs, lengths, diff, ratio,
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
                 return axisId === 'y2' ? y2.domain() : y.domain();
@@ -1234,11 +1234,15 @@
             }
             // add padding for data label
             if (showHorizontalDataLabel) {
-                widths = getDataLabelWidth(yDomainMin, yDomainMax, axisId);
+                lengths = getDataLabelLength(yDomainMin, yDomainMax, axisId, 'width');
                 diff = diffDomain(y.range());
-                ratio = [widths[0] / diff, widths[1] / diff];
+                ratio = [lengths[0] / diff, lengths[1] / diff];
                 padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
                 padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
+            } else {
+                lengths = getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
+                padding_top += lengths[1];
+                padding_bottom += lengths[0];
             }
             if (axisId === 'y' && __axis_y_padding) {
                 padding_top = getAxisPadding(__axis_y_padding, 'top', padding, domainLength);
@@ -1806,17 +1810,17 @@
             }
             return false;
         }
-        function getDataLabelWidth(min, max, axisId) {
-            var widths = [], paddingCoef = 1.3;
+        function getDataLabelLength(min, max, axisId, key) {
+            var lengths = [0, 0], paddingCoef = 1.3;
             selectChart.select('svg').selectAll('.dummy')
                 .data([min, max])
               .enter().append('text')
                 .text(function (d) { return formatByAxisId(axisId)(d); })
                 .each(function (d, i) {
-                    widths[i] = this.getBoundingClientRect().width * paddingCoef;
+                    lengths[i] = this.getBoundingClientRect()[key] * paddingCoef;
                 })
               .remove();
-            return widths;
+            return lengths;
         }
         function getYFormat(forArc) {
             var formatForY = forArc && !hasGaugeType(c3.data.targets) ? defaultArcValueFormat : yFormat,
