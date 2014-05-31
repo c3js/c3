@@ -2885,23 +2885,19 @@
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
-            if (notEmpty(__grid_x_lines)) {
-                grid.append('g').attr("class", CLASS.xgridLines);
-            }
             if (__point_focus_line_enabled) {
                 grid.append('g')
                     .attr("class", CLASS.xgridFocus)
                   .append('line')
                     .attr('class', CLASS.xgridFocus);
             }
+            grid.append('g').attr("class", CLASS.xgridLines);
 
             // Y-Grid
             if (__grid_y_show) {
                 grid.append('g').attr('class', CLASS.ygrids);
             }
-            if (notEmpty(__grid_y_lines)) {
-                grid.append('g').attr('class', CLASS.ygridLines);
-            }
+            grid.append('g').attr('class', CLASS.ygridLines);
 
             // Regions
             main.append('g')
@@ -3577,27 +3573,25 @@
                 };
                 flushXGrid();
             }
-            if (notEmpty(__grid_x_lines)) {
-                xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
-                    .data(__grid_x_lines);
-                // enter
-                xgridLine = xgridLines.enter().append('g')
-                    .attr("class", function (d) { return CLASS.xgridLine + (d.class ? d.class : ''); });
-                xgridLine.append('line')
-                    .style("opacity", 0);
-                xgridLine.append('text')
-                    .attr("text-anchor", "end")
-                    .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                    .attr('dx', __axis_rotated ? 0 : -margin.top)
-                    .attr('dy', -5)
-                    .style("opacity", 0);
-                // udpate
-                // done in d3.transition() of the end of this function
-                // exit
-                xgridLines.exit().transition().duration(duration)
-                    .style("opacity", 0)
-                    .remove();
-            }
+            xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
+                .data(__grid_x_lines);
+            // enter
+            xgridLine = xgridLines.enter().append('g')
+                .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
+            xgridLine.append('line')
+                .style("opacity", 0);
+            xgridLine.append('text')
+                .attr("text-anchor", "end")
+                .attr("transform", __axis_rotated ? "" : "rotate(-90)")
+                .attr('dx', __axis_rotated ? 0 : -margin.top)
+                .attr('dy', -5)
+                .style("opacity", 0);
+            // udpate
+            // done in d3.transition() of the end of this function
+            // exit
+            xgridLines.exit().transition().duration(duration)
+                .style("opacity", 0)
+                .remove();
             // Y-Grid
             if (withY && __grid_y_show) {
                 ygrid = main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
@@ -3611,7 +3605,7 @@
                 ygrid.exit().remove();
                 smoothLines(ygrid, 'grid');
             }
-            if (withY && notEmpty(__grid_y_lines)) {
+            if (withY) {
                 ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
                     .data(__grid_y_lines);
                 // enter
@@ -4652,9 +4646,24 @@
             return 'data' in d && hasTarget(c3.data.targets, d.data.id);
         }
         function getGridFilter(params) {
-            var value = params && params.value ? params.value : null,
-                klass = params && params['class'] ? params['class'] : null;
-            return value ? function (line) { return line.value !== value; } : klass ? function (line) { return line['class'] !== klass; } : function () { return true; };
+            params = params || {};
+            return function (line) {
+                return !(('value' in params && line.value === params.value) || ('class' in params && line.class === params.class));
+            };
+        }
+        function removeGridLines(params, forX) {
+            var toShow = getGridFilter(params),
+                toRemove = function (line) { return !toShow(line); },
+                classLines = forX ? CLASS.xgridLines : CLASS.ygridLines,
+                classLine = forX ? CLASS.xgridLine : CLASS.ygridLine;
+            main.select('.' + classLines).selectAll('.' + classLine).filter(toRemove)
+              .transition().duration(__transition_duration)
+                .style('opacity', 0).remove();
+            if (forX) {
+                __grid_x_lines = __grid_x_lines.filter(toShow);
+            } else {
+                __grid_y_lines = __grid_y_lines.filter(toShow);
+            }
         }
         function transformTo(targetIds, type, optionsForRedraw) {
             var withTransitionForAxis = !hasArcType(c3.data.targets);
@@ -4991,8 +5000,7 @@
             return c3.xgrids(__grid_x_lines.concat(grids));
         };
         c3.xgrids.remove = function (params) { // TODO: multiple
-            var filter = getGridFilter(params);
-            return c3.xgrids(__grid_x_lines.filter(filter));
+            removeGridLines(params, true);
         };
 
         c3.ygrids = function (grids) {
@@ -5006,8 +5014,7 @@
             return c3.ygrids(__grid_y_lines.concat(grids));
         };
         c3.ygrids.remove = function (params) { // TODO: multiple
-            var filter = getGridFilter(params);
-            return c3.ygrids(__grid_y_lines.filter(filter));
+            removeGridLines(params, false);
         };
 
         c3.regions = function (regions) {
