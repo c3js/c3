@@ -1234,7 +1234,7 @@
             }
             // add padding for data label
             if (showHorizontalDataLabel) {
-                widths = getDataLabelWidth(yDomainMin, yDomainMax);
+                widths = getDataLabelWidth(yDomainMin, yDomainMax, axisId);
                 diff = diffDomain(y.range());
                 ratio = [widths[0] / diff, widths[1] / diff];
                 padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
@@ -1806,13 +1806,15 @@
             }
             return false;
         }
-        function getDataLabelWidth(min, max) {
+        function getDataLabelWidth(min, max, axisId) {
             var widths = [], paddingCoef = 1.3;
             selectChart.select('svg').selectAll('.dummy')
                 .data([min, max])
               .enter().append('text')
-                .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
-                .each(function (d, i) { widths[i] = this.getBoundingClientRect().width * paddingCoef; })
+                .text(function (d) { return formatByAxisId(axisId)(d); })
+                .each(function (d, i) {
+                    widths[i] = this.getBoundingClientRect().width * paddingCoef;
+                })
               .remove();
             return widths;
         }
@@ -1838,8 +1840,8 @@
         function defaultArcValueFormat(v, ratio) {
             return (ratio * 100).toFixed(1) + '%';
         }
-        function formatByAxisId(id) {
-            var defaultFormat = function (v) { return isValue(v) ? +v : ""; }, axisId = getAxisId(id), format = defaultFormat;
+        function formatByAxisId(axisId) {
+            var format = function (v) { return isValue(v) ? +v : ""; };
             // find format according to axis id
             if (typeof __data_labels.format === 'function') {
                 format = __data_labels.format;
@@ -3710,7 +3712,7 @@
                     .style("fill", color)
                     .style("fill-opacity", 0);
                 mainText
-                    .text(function (d) { return formatByAxisId(d.id)(d.value, d.id); })
+                    .text(function (d) { return formatByAxisId(getAxisId(d.id))(d.value, d.id); })
                     .style("fill-opacity", initialOpacityForText);
                 mainText.exit()
                   .transition().duration(durationForExit)
