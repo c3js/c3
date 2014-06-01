@@ -1403,7 +1403,7 @@
             return xValues;
         }
         function getXValue(id, i) {
-            return id in c3.data.xs && c3.data.xs[id] && c3.data.xs[id][i] ? c3.data.xs[id][i] : i;
+            return id in c3.data.xs && c3.data.xs[id] && (c3.data.xs[id][i] || c3.data.xs[id][i] === 0) ? c3.data.xs[id][i] : i;
         }
         function getOtherTargetXs() {
             var idsForX = Object.keys(c3.data.xs);
