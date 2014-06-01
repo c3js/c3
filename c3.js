@@ -1218,7 +1218,8 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, lengths, diff, ratio,
-                showHorizontalDataLabel = hasDataLabel() && __axis_rotated;
+                showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
+                showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
                 return axisId === 'y2' ? y2.domain() : y.domain();
             }
@@ -1239,7 +1240,7 @@
                 ratio = [lengths[0] / diff, lengths[1] / diff];
                 padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
                 padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
-            } else {
+            } else if (showVerticalDataLabel) {
                 lengths = getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
                 padding_top += lengths[1];
                 padding_bottom += lengths[0];
@@ -1252,8 +1253,8 @@
                 padding_top = getAxisPadding(__axis_y2_padding, 'top', padding, domainLength);
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
-            // Bar chart with only positive values should be 0-based
-            if (hasBarType(yTargets) && !hasNegativeValueInTargets(yTargets)) {
+            // Bar/Area chart with only positive values should be 0-based
+            if ((hasBarType(yTargets) || hasAreaType(yTargets)) && !hasNegativeValueInTargets(yTargets)) {
                 padding_bottom = yDomainMin;
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
@@ -2140,6 +2141,9 @@
             return hasType(targets, 'line');
         }
         */
+        function hasAreaType(targets) {
+            return hasType(targets, 'area') || hasType(targets, 'area-spline') || hasType(targets, 'area-step');
+        }
         function hasBarType(targets) {
             return hasType(targets, 'bar');
         }
