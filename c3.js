@@ -5149,11 +5149,11 @@
 
         c3.legend.show = function (targetIds) {
             showLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: true});
+            updateAndRedraw({withLegend: true});
         };
         c3.legend.hide = function (targetIds) {
             hideLegend(mapToTargetIds(targetIds));
-            redraw({withLegend: true});
+            updateAndRedraw({withLegend: true});
         };
 
         c3.resize = function (size) {
