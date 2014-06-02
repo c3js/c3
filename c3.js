@@ -1316,6 +1316,7 @@
                 x.domain(domain ? domain : brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
+            return x.domain();
         }
         function diffDomain(d) {
             return d[1] - d[0];
@@ -4016,7 +4017,7 @@
                     flowLength = options.flow.length,
                     flowStart = getValueOnIndex(c3.data.targets[0].values, flowIndex),
                     flowEnd = getValueOnIndex(c3.data.targets[0].values, flowIndex + flowLength),
-                    orgDomain = x.domain(),
+                    orgDomain = x.domain(), domain,
                     durationForFlow = options.flow.duration || duration,
                     onend = options.flow.onend || function () {},
                     wait = generateWait();
@@ -4027,26 +4028,30 @@
                 });
 
                 // update x domain to generate axis elements for flow
-                updateXDomain(targetsToShow, true, true);
+                domain = updateXDomain(targetsToShow, true, true);
                 // update elements related to x scale
                 if (flushXGrid) { flushXGrid(true); }
 
                 // generate transform to flow
                 if (!options.flow.orgDataCount) { // if empty
-                    if (isTimeSeries || c3.data.targets[0].values.length !== 1) {
+                    if (isTimeSeries) {
                         flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
                         flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
                         translateX = x(flowStart.x) - x(flowEnd.x);
                     } else {
-                        translateX = x(-0.5) - x(0);
+                        if (c3.data.targets[0].values.length !== 1) {
+                            translateX = (domain[0] - orgDomain[0] >= 1 ? x(orgDomain[0]) : 0) - x(flowEnd.x);
+                        } else {
+                            translateX = diffDomain(domain) / 2;
+                        }
                     }
                 } else if (options.flow.orgDataCount === 1 || flowStart.x === flowEnd.x) {
-                    translateX = x(orgDomain[0]) - x(flowEnd.x);
+                    translateX = x(orgDomain[0]) - x(domain[0]);
                 } else {
                     // TODO: fix 0.9, I don't know why 0.9..
                     translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1);
                 }
-                scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
+                scaleX = (diffDomain(orgDomain) / diffDomain(domain));
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
 
                 d3.transition().ease('linear').duration(durationForFlow).each(function () {

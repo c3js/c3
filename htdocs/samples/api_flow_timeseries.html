@@ -36,10 +36,12 @@
             tick: {
               format: '%m/%d',
             },
+/*
             padding: {
               left: 0,
               right: 0
             }
+*/
           },
           y: {
 /*
@@ -67,6 +69,7 @@
             ['data1', 500],
             ['data3', 200],
           ],
+          duration: 1500
         });
       }, 1000);
 
@@ -79,8 +82,9 @@
             ['data3', 100, 200, 50]
           ],
           length: 1,
+          duration: 1500
         });
-      }, 2000);
+      }, 4000);
 
       setTimeout(function () {
         chart.flow({
@@ -90,9 +94,10 @@
             ['data2', 300, 400],
             ['data3', 400, 200]
           ],
-          to: '2013-02-15'
+          to: '2013-02-15',
+          duration: 1500
         });
-      }, 3000);
+      }, 7000);
 
       setTimeout(function () {
         chart.flow({
@@ -102,13 +107,15 @@
             ['data2', 300, 400],
             ['data3', 400, 200]
           ],
-          length: 0
+          length: 0,
+          duration: 1500
         });
-      }, 4000);
+      }, 10000);
 
+/*
       setTimeout(function () {
         chart = generate();
-      }, 6000);
+      }, 14000);
 
       setTimeout(function () {
         chart.flow({
@@ -117,8 +124,9 @@
             ['data1', 500, 300],
             ['data3', 200, 150],
           ],
+          duration: 1500
         });
-      }, 7000);
+      }, 15000);
 
       setTimeout(function () {
         chart.flow({
@@ -129,8 +137,9 @@
             ['data3', 100]
           ],
           length: 0,
+          duration: 1500
         });
-      }, 8000);
+      }, 18000);
 
       setTimeout(function () {
         chart.flow({
@@ -139,10 +148,11 @@
             ['data1', 200],
             ['data2', 300],
             ['data3', 400]
-          ]
+          ],
+          duration: 1500
         });
-      }, 9000);
-
+      }, 21000);
+*/
     </script>
   </body>
 </html>
