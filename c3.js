@@ -1217,7 +1217,7 @@
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
-                yDomainAbs, lengths, diff, ratio,
+                yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
                 showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
@@ -1226,8 +1226,15 @@
             if (yDomainMin === yDomainMax) {
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
+            isAllPositive = yDomainMin > 0 && yDomainMax > 0;
+            isAllNegative = yDomainMin < 0 && yDomainMax < 0;
+
+            if (isAllPositive) { yDomainMin = 0; }
+            if (isAllNegative) { yDomainMax = 0; }
+
             domainLength = Math.abs(yDomainMax - yDomainMin);
-            padding = padding_top = padding_bottom = showHorizontalDataLabel ? 0 : domainLength * 0.1;
+            padding = padding_top = padding_bottom = domainLength * 0.1;
+
             if (center) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
@@ -1253,9 +1260,10 @@
                 padding_top = getAxisPadding(__axis_y2_padding, 'top', padding, domainLength);
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
-            // Bar/Area chart with only positive values should be 0-based
-            if ((hasBarType(yTargets) || hasAreaType(yTargets)) && !hasNegativeValueInTargets(yTargets)) {
-                padding_bottom = yDomainMin;
+            // Bar/Area chart should be 0-based if all positive|negative
+            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+                if (isAllPositive) { padding_bottom = yDomainMin; }
+                if (isAllNegative) { padding_top = -yDomainMax; }
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
@@ -2563,22 +2571,24 @@
                 return getter(getPoints(d, i), d, this);
             };
         }
-        function getXForText(points, d) {
-            var padding;
+        function getXForText(points, d, textElement) {
+            var box = textElement.getBoundingClientRect(), xPos, padding;
             if (__axis_rotated) {
                 padding = isBarType(d) ? 4 : 6;
-                return points[2][1] + padding * (d.value < 0 ? -1 : 1);
+                xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
             } else {
-                return points[0][0] + (points[2][0] - points[0][0]) / 2;
+                xPos = points[0][0] + (points[2][0] - points[0][0]) / 2;
             }
+            return xPos > width ? width - box.width : xPos;
         }
         function getYForText(points, d, textElement) {
-            var box = textElement.getBoundingClientRect();
+            var box = textElement.getBoundingClientRect(), yPos;
             if (__axis_rotated) {
-                return (points[0][0] + points[2][0] + box.height * 0.6) / 2;
+                yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
             } else {
-                return points[2][1] + (d.value < 0 ? box.height : isBarType(d) ? -3 : -6);
+                yPos = points[2][1] + (d.value < 0 ? box.height : isBarType(d) ? -3 : -6);
             }
+            return yPos < box.height ? box.height : yPos;
         }
 
         function generateGetAreaPoint(areaIndices, isSub) { // partial duplication of generateGetBarPoints
