@@ -3587,7 +3587,7 @@
                 .data(__grid_x_lines);
             // enter
             xgridLine = xgridLines.enter().append('g')
-                .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
+                .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
             xgridLine.append('line')
                 .style("opacity", 0);
             xgridLine.append('text')
@@ -3620,7 +3620,7 @@
                     .data(__grid_y_lines);
                 // enter
                 ygridLine = ygridLines.enter().append('g')
-                    .attr("class", function (d) { return CLASS.ygridLine + (d.class ? d.class : ''); });
+                    .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
                 ygridLine.append('line')
                     .style("opacity", 0);
                 ygridLine.append('text')
