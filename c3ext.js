@@ -35,7 +35,7 @@ c3ext.generate = function (options) {
         refresh();
     }
 
-    var zoom2 = ZoomBehavior.create({ changed: onZoomChanged });
+    var zoom2 = ZoomBehavior.create({ changed: onZoomChanged, bindto:options.bindto });
 
     zoom2.enhance = function () {
         _zoom2_maxItems *= 2;
@@ -49,7 +49,7 @@ c3ext.generate = function (options) {
         refresh();
     }
 
-    zoom2.maxItems = function(){return _zoom2_maxItems;};
+    zoom2.maxItems = function () { return _zoom2_maxItems; };
     function zoomAndReduceData(list, zoomRange, func, maxItems) {
         //var maxItems = 10;//Math.ceil(10 * zoomFactor);
         var list2 = list.slice(zoomRange[0], zoomRange[1]);
@@ -124,7 +124,13 @@ ZoomBehavior.create = function (options) {
     var _left;
     var totalItems;
     var currentZoom;
+    var bindto = options.bindto;
     var _zoomChanged = options.changed || function () { };
+    var element;
+    var mousewheelTimer;
+    var deltaY = 0;
+    var leftRatio = 0;
+
 
     zoom.setOptions = function (options) {
         if (options == null)
@@ -188,7 +194,7 @@ ZoomBehavior.create = function (options) {
         _zoom2_factor = factor;
         if (_zoom2_factor < 1)
             _zoom2_factor = 1;
-        if(skipDraw)
+        if (skipDraw)
             return;
         applyZoomAndPan();
     }
@@ -202,8 +208,8 @@ ZoomBehavior.create = function (options) {
         //_left += pageSize;
         if (_left + pageSize > totalItems)
             _left = totalItems - pageSize;
-        console.log({left:_left, pageSize:pageSize});
-        if(skipDraw)
+        console.log({ left: _left, pageSize: pageSize });
+        if (skipDraw)
             return;
         applyZoomAndPan();
     }
@@ -211,22 +217,22 @@ ZoomBehavior.create = function (options) {
     zoom.zoomAndPanByRatio = function (zoomRatio, panRatio) {
 
         var pageSize = getItemsToShow();
-        var leftOffset = Math.round(pageSize*panRatio);
-        var mouseLeft = _left+leftOffset;
-        zoom.factor(zoom.factor()*zoomRatio, true);
+        var leftOffset = Math.round(pageSize * panRatio);
+        var mouseLeft = _left + leftOffset;
+        zoom.factor(zoom.factor() * zoomRatio, true);
 
         var finalLeft = mouseLeft;
-        if(zoomRatio!=1){
+        if (zoomRatio != 1) {
             var pageSize2 = getItemsToShow();
-            var leftOffset2 = Math.round(pageSize2*panRatio);
-            var finalLeft = mouseLeft-leftOffset2;
+            var leftOffset2 = Math.round(pageSize2 * panRatio);
+            finalLeft = mouseLeft - leftOffset2;
         }
         zoom.left(finalLeft, true);
         applyZoomAndPan();
     }
 
     zoom.zoomIn = function () {
-        zoom.zoomAndPanByRatio(2,0);
+        zoom.zoomAndPanByRatio(2, 0);
     }
 
     zoom.zoomOut = function () {
@@ -245,6 +251,37 @@ ZoomBehavior.create = function (options) {
         _zoom2_factor = 1;
         applyZoomAndPan();
     }
+
+
+
+    function doZoom() {
+        if (deltaY != 0) {
+            var maxDelta = 10;
+            var multiply = (maxDelta + deltaY) / maxDelta;
+            //var factor = chart.zoom2.factor()*multiply;
+            //factor= Math.ceil(factor*100) / 100;
+            console.log({ deltaY: deltaY, multiply: multiply });
+            zoom.zoomAndPanByRatio(multiply, leftRatio);//0.5);//leftRatio);
+            deltaY = 0;
+        }
+    }
+
+    function element_mousewheel(e) {
+        deltaY += e.deltaY;
+        leftRatio = (e.offsetX - 70) / (e.currentTarget.offsetWidth - 70);
+        //console.log({ "e.offsetX": e.offsetX, "e.currentTarget.offsetWidth": e.currentTarget.offsetWidth, leftRatio: leftRatio });
+        mousewheelTimer.set(150);
+        e.preventDefault();
+    }
+
+    if (bindto != null) {
+        element = $(options.bindto);
+        if (element.mousewheel) {
+            mousewheelTimer = new Timer(doZoom);
+            element.mousewheel(element_mousewheel);
+        }
+    }
+
     return zoom;
 
 }
