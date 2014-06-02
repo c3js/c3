@@ -4655,15 +4655,20 @@
         function isArc(d) {
             return 'data' in d && hasTarget(c3.data.targets, d.data.id);
         }
-        function getGridFilter(params) {
-            params = params || {};
-            return function (line) {
-                return !(('value' in params && line.value === params.value) || ('class' in params && line.class === params.class));
-            };
+        function getGridFilterToRemove(params) {
+            return params ? function (line) {
+                var found = false;
+                [].concat(params).forEach(function (param) {
+                    if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
+                        found = true;
+                    }
+                });
+                return found;
+            } : function () { return true; };
         }
         function removeGridLines(params, forX) {
-            var toShow = getGridFilter(params),
-                toRemove = function (line) { return !toShow(line); },
+            var toRemove = getGridFilterToRemove(params),
+                toShow = function (line) { return !toRemove(line); },
                 classLines = forX ? CLASS.xgridLines : CLASS.ygridLines,
                 classLine = forX ? CLASS.xgridLine : CLASS.ygridLine;
             main.select('.' + classLines).selectAll('.' + classLine).filter(toRemove)

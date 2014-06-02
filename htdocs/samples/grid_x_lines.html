@@ -44,6 +44,19 @@
       setTimeout(function () {
         chart.xgrids.remove({class:'hoge'});
       }, 5000);
+
+      setTimeout(function () {
+        chart.xgrids.remove([{value: 1}, {value: 4}]);
+      }, 6000);
+
+      setTimeout(function () {
+        chart.xgrids([{value: 1, text:'Label 1'}, {value: 4, text: 'Label 4'}]);
+      }, 7000);
+
+      setTimeout(function () {
+        chart.xgrids.remove();
+      }, 8000);
+
     </script>
   </body>
 </html>
