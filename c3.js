@@ -1803,10 +1803,6 @@
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
         }
-        function initialOpacityForText(d) {
-            var targetOpacity = opacityForText(d);
-            return initialOpacity(d) * targetOpacity;
-        }
         function opacityForCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
@@ -4011,7 +4007,7 @@
                     .attr('x', xForText)
                     .attr('y', yForText)
                     .style("fill", color)
-                    .style("fill-opacity", options.flow ? 0 : initialOpacityForText));
+                    .style("fill-opacity", options.flow ? 0 : opacityForText));
                 waitForDraw.add(mainRegion.selectAll('rect').transition()
                     .attr("x", regionX)
                     .attr("y", regionY)
