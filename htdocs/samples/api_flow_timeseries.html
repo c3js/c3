@@ -9,7 +9,7 @@
     <script src="/js/c3.js"></script>
     <script>
 
-      var padding = {};
+      var padding = {}, types = {};
 
       var generate = function () { return c3.generate({
         data: {
@@ -23,10 +23,7 @@
 //            ['data2', 310, 400, 200, 100, 450, 150],
 //            ['data3', 310, 400, 200, 100, null, 150],
           ],
-          types: {
-            data2: 'area',
-            data3: 'bar',
-          },
+          types: types,
 //          labels: true
         },
         bar: {
@@ -162,6 +159,14 @@
       padding = {left: 0, right: 0};
       run();
     }, 25000);
+
+    setTimeout(function () {
+      types = {
+        data2: 'area',
+        data3: 'bar',
+      }
+      run();
+    }, 50000);
 
     </script>
   </body>

@@ -15,16 +15,13 @@
     <script src="/js/c3.js"></script>
     <script>
 
-      var padding = {}, chart, generate = function () { return c3.generate({
+      var padding = {}, types = {}, chart, generate = function () { return c3.generate({
         data: {
           columns: [
             ['data1'],
             ['data2'],
           ],
-          types: {
-            data2: 'area',
-            data3: 'bar',
-          },
+          types: types,
           labels: true
         },
         bar: {
@@ -205,10 +202,20 @@
 
     run();
 
+    // Test for no padding
     setTimeout(function () {
       padding = {left: 0, right: 0};
       run();
     }, 22000);
+
+    // Test for other chart types
+    setTimeout(function () {
+      types = {
+        data2: 'area',
+        data3: 'bar',
+      };
+      run();
+    }, 45000);
 
     </script>
   </body>

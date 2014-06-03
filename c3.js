@@ -4053,17 +4053,13 @@
 
                 // generate transform to flow
                 if (!options.flow.orgDataCount) { // if empty
-                    if (isTimeSeries) {
-                        if (c3.data.targets[0].values.length !== 1) {
-                            translateX = x(orgDomain[0]) - x(domain[0]);
-                        } else {
+                    if (c3.data.targets[0].values.length !== 1) {
+                        translateX = x(orgDomain[0]) - x(domain[0]);
+                    } else {
+                        if (isTimeSeries) {
                             flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
                             flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
                             translateX = x(flowStart.x) - x(flowEnd.x);
-                        }
-                    } else {
-                        if (c3.data.targets[0].values.length !== 1) {
-                            translateX = (domain[0] - orgDomain[0] >= 1 ? x(orgDomain[0]) : 0) - x(flowEnd.x);
                         } else {
                             translateX = diffDomain(domain) / 2;
                         }
