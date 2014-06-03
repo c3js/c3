@@ -1227,8 +1227,8 @@
             if (yDomainMin === yDomainMax) {
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
-            isAllPositive = yDomainMin > 0 && yDomainMax > 0;
-            isAllNegative = yDomainMin < 0 && yDomainMax < 0;
+            isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
+            isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
             if (isAllPositive) { yDomainMin = 0; }
             if (isAllNegative) { yDomainMax = 0; }
