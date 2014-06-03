@@ -4,23 +4,28 @@
 <style type="text/css">
 <!--
 .c3 svg {
-    font-size: 13px;
+/*    font-size: 13px;*/
 }
 -->
 </style>
   </head>
   <body>
-    <div id="chart"></div>
+    <div id="chart1"></div>
+    <div id="chart2"></div>
+    <div id="chart3"></div>
+    <div id="chart4"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
+
       var chart = c3.generate({
-        bindto: '#chart',
+        bindto: '#chart1',
         padding: {
-          top: 20,
-//          left: 60
-          bottom: 20
+          top: 50,
+          right: 200,
+          bottom: 50,
+          left: 200,
         },
         data: {
           columns: [
@@ -30,12 +35,6 @@
           axes: {
             data2: 'y2'
           },
-        },
-        legend: {
-//          position: 'right'
-        },
-        subchart: {
-//          show: true
         },
         axis: {
           rotated: true,
@@ -54,6 +53,124 @@
           }
         }
       });
+
+      var chart = c3.generate({
+        bindto: '#chart2',
+        padding: {
+          top: 50,
+          right: 200,
+          bottom: 50,
+          left: 200,
+        },
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 200, 100, 150, 150]
+          ],
+          axes: {
+            data2: 'y2'
+          },
+        },
+        legend: {
+          position: 'right'
+        },
+        axis: {
+          rotated: true,
+          y: {
+            label: {
+              text: 'Y Label', 
+              position: 'outer-center'
+            }
+          },
+          y2: {
+            show: true,
+            label: {
+              text: 'Y2 Label',
+              position: 'outer-center'
+            }
+          }
+        }
+      });
+
+      var chart = c3.generate({
+        bindto: '#chart3',
+        padding: {
+          top: 50,
+          right: 200,
+          bottom: 50,
+          left: 200,
+        },
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 200, 100, 150, 150]
+          ],
+          axes: {
+            data2: 'y2'
+          },
+        },
+        subchart: {
+          show: true
+        },
+        axis: {
+          rotated: true,
+          y: {
+            label: {
+              text: 'Y Label', 
+              position: 'outer-center'
+            }
+          },
+          y2: {
+            show: true,
+            label: {
+              text: 'Y2 Label',
+              position: 'outer-center'
+            }
+          }
+        }
+      });
+
+      var chart = c3.generate({
+        bindto: '#chart4',
+        padding: {
+          top: 50,
+          right: 200,
+          bottom: 50,
+          left: 200,
+        },
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 200, 100, 150, 150]
+          ],
+          axes: {
+            data2: 'y2'
+          },
+        },
+        legend: {
+          position: 'right'
+        },
+        subchart: {
+          show: true
+        },
+        axis: {
+          rotated: true,
+          y: {
+            label: {
+              text: 'Y Label', 
+              position: 'outer-center'
+            }
+          },
+          y2: {
+            show: true,
+            label: {
+              text: 'Y2 Label',
+              position: 'outer-center'
+            }
+          }
+        }
+      });
+
     </script>
   </body>
 </html>
