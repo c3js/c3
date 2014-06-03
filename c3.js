@@ -286,6 +286,7 @@
 
         // tooltip - show when mouseover on each data
         var __tooltip_show = getConfig(['tooltip', 'show'], true),
+            __tooltip_grouped = getConfig(['tooltip', 'grouped'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title']),
             __tooltip_format_name = getConfig(['tooltip', 'format', 'name']),
             __tooltip_format_value = getConfig(['tooltip', 'format', 'value']),
@@ -3128,7 +3129,7 @@
                     });
                     selectedData = newData.concat(selectedData); // Add remained
 
-                    // Expand shapes if needed
+                    // Expand shapes for selection
                     if (__point_focus_expand_enabled) { expandCircles(index); }
                     expandBars(index);
 
@@ -3151,7 +3152,7 @@
                     });
                 })
                 .on('mousemove', function (d) {
-                    var selectedData, index = d.index;
+                    var selectedData, index = d.index, eventRect = svg.select('.' + CLASS.eventRect + '-' + index);
 
                     if (dragging) { return; } // do nothing when dragging
                     if (hasArcType(c3.data.targets)) { return; }
@@ -3160,20 +3161,30 @@
                     selectedData = filterTargetsToShow(c3.data.targets).map(function (t) {
                         return addName(getValueOnIndex(t.values, index));
                     });
-                    showTooltip(selectedData, d3.mouse(this));
 
-                    // Show xgrid focus line
-                    showXGridFocus(selectedData);
+                    if (__tooltip_grouped) {
+                        showTooltip(selectedData, d3.mouse(this));
+                        showXGridFocus(selectedData);
+                    }
 
-                    if (! __data_selection_enabled) { return; }
-                    if (__data_selection_grouped) { return; } // nothing to do when grouped
+                    if (__tooltip_grouped && (!__data_selection_enabled || __data_selection_grouped)) {
+                        return;
+                    }
 
                     main.selectAll('.' + CLASS.shape + '-' + index)
-                        .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
-                            var _this = d3.select(this).classed(CLASS.EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', pointExpandedR); }
-                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', null);
+                            d3.select(this).classed(CLASS.EXPANDED, true);
+                            if (__data_selection_enabled) {
+                                eventRect.style('cursor', __data_selection_grouped ? 'pointer' : null);
+                            }
+                            if (!__tooltip_grouped) {
+                                hideXGridFocus();
+                                hideTooltip();
+                                if (!__data_selection_grouped) {
+                                    unexpandCircles(index);
+                                    unexpandBars();
+                                }
+                            }
                         })
                         .filter(function (d) {
                             if (this.nodeName === 'circle') {
@@ -3183,13 +3194,16 @@
                                 return isWithinBar(this);
                             }
                         })
-                        .each(function () {
-                            var _this = d3.select(this);
-                            if (! _this.classed(CLASS.EXPANDED)) {
-                                _this.classed(CLASS.EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', pointSelectR); }
+                        .each(function (d) {
+                            if (__data_selection_enabled && (__data_selection_grouped || __data_selection_isselectable(d))) {
+                                eventRect.style('cursor', 'pointer');
                             }
-                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', 'pointer');
+                            if (!__tooltip_grouped) {
+                                showTooltip([d], d3.mouse(this));
+                                showXGridFocus([d]);
+                                if (__point_focus_expand_enabled) { expandCircles(index, d.id); }
+                                expandBars(index, d.id);
+                            }
                         });
                 })
                 .on('click', function (d) {
