@@ -4050,7 +4050,7 @@
                     flowEnd = getValueOnIndex(c3.data.targets[0].values, flowIndex + flowLength),
                     orgDomain = x.domain(), domain,
                     durationForFlow = options.flow.duration || duration,
-                    onend = options.flow.onend || function () {},
+                    done = options.flow.done || function () {},
                     wait = generateWait();
 
                 // remove head data after rendered
@@ -4157,7 +4157,7 @@
                         .attr("height", __axis_rotated ? rectW : height);
 
                     // callback for end of flow
-                    onend();
+                    done();
                 });
             } : null);
 
@@ -4983,7 +4983,7 @@
                     index: baseValue.index,
                     length: length,
                     duration: isValue(args.duration) ? args.duration : __transition_duration,
-                    onend: args.onend,
+                    done: args.done,
                     orgDataCount: orgDataCount,
                 },
                 withLegend: true,
