@@ -2755,6 +2755,12 @@
             return this;
         };
 
+        function updateZoom() {
+            var z = __zoom_enabled ? zoom : function () {};
+            main.select('.' + CLASS.zoomRect).call(z);
+            main.selectAll('.' + CLASS.eventRect).call(z);
+        }
+
         /*-- Draw Chart --*/
 
         // for svg elements
@@ -2989,7 +2995,7 @@
                 .attr('height', height)
                 .style('opacity', 0)
                 .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
-                .call(zoom).on("dblclick.zoom", null);
+                .on("dblclick.zoom", null);
 
             // Set default extent if defined
             if (__axis_x_default) {
@@ -3217,7 +3223,7 @@
                         .on('dragstart', function () { dragstart(d3.mouse(this)); })
                         .on('dragend', function () { dragend(); })
                 )
-                .call(zoom).on("dblclick.zoom", null);
+                .on("dblclick.zoom", null);
         }
 
         function generateEventRectsForMultipleXs(eventRectEnter) {
@@ -3303,7 +3309,7 @@
                         .on('dragstart', function () { dragstart(d3.mouse(this)); })
                         .on('dragend', function () { dragend(); })
                 )
-                .call(zoom).on("dblclick.zoom", null);
+                .on("dblclick.zoom", null);
         }
 
         function toggleShape(that, d, i) {
@@ -4149,6 +4155,8 @@
             mapToIds(c3.data.targets).forEach(function (id) {
                 withoutFadeIn[id] = true;
             });
+
+            updateZoom();
         }
         function redrawForBrush() {
             redraw({
