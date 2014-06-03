@@ -2742,23 +2742,21 @@
             return __axis_rotated ? this.y(scale) : this.x(scale);
         };
 
-        if (__zoom_enabled) {
-            zoom = d3.behavior.zoom()
-                .on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; })
-                .on("zoom", __zoom_enabled ? redrawForZoom : null);
-            zoom.scale = function (scale) {
-                return __axis_rotated ? this.y(scale) : this.x(scale);
-            };
-            zoom.orgScaleExtent = function () {
-                var extent = __zoom_extent ? __zoom_extent : [1, 10];
-                return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
-            };
-            zoom.updateScaleExtent = function () {
-                var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
-                this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
-                return this;
-            };
-        }
+        zoom = d3.behavior.zoom()
+            .on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; })
+            .on("zoom", redrawForZoom);
+        zoom.scale = function (scale) {
+            return __axis_rotated ? this.y(scale) : this.x(scale);
+        };
+        zoom.orgScaleExtent = function () {
+            var extent = __zoom_extent ? __zoom_extent : [1, 10];
+            return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
+        };
+        zoom.updateScaleExtent = function () {
+            var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
+            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
+            return this;
+        };
 
         /*-- Draw Chart --*/
 
@@ -2933,8 +2931,7 @@
             // Cover whole with rects for events
             eventRect = main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.eventRects)
-                .style('fill-opacity', 0)
-                .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
+                .style('fill-opacity', 0);
 
             // Define g for bar chart area
             main.select('.' + CLASS.chart).append("g")
@@ -2988,16 +2985,14 @@
             main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.chartTexts);
 
-            if (__zoom_enabled) { // TODO: __zoom_privileged here?
-                // if zoom privileged, insert rect to forefront
-                main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
-                    .attr('class', CLASS.zoomRect)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .style('opacity', 0)
-                    .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
-                    .call(zoom).on("dblclick.zoom", null);
-            }
+            // if zoom privileged, insert rect to forefront
+            main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
+                .attr('class', CLASS.zoomRect)
+                .attr('width', width)
+                .attr('height', height)
+                .style('opacity', 0)
+                .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
+                .call(zoom).on("dblclick.zoom", null);
 
             // Set default extent if defined
             if (__axis_x_default) {
@@ -3914,7 +3909,8 @@
 
             if (__interaction_enabled) {
                 // rect for mouseover
-                eventRect = main.select('.' + CLASS.eventRects);
+                eventRect = main.select('.' + CLASS.eventRects)
+                    .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
                 if (notEmpty(__data_xs) && !isSingleX(__data_xs)) {
 
                     if (!eventRect.classed(CLASS.eventRectsMultiple)) {
@@ -4150,6 +4146,9 @@
             });
         }
         function redrawForZoom() {
+            if (!__zoom_enabled) {
+                return;
+            }
             if (filterTargetsToShow(c3.data.targets).length === 0) {
                 return;
             }
@@ -4789,6 +4788,12 @@
         c3.unzoom = function () {
             brush.clear().update();
             redraw({withUpdateXDomain: true});
+        };
+        c3.zoom = function () {
+        };
+        c3.zoom.enable = function (enabled) {
+            __zoom_enabled = enabled;
+            updateAndRedraw();
         };
 
         c3.load = function (args) {
