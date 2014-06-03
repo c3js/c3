@@ -1464,7 +1464,17 @@
         function generateTargetX(rawX, id, index) {
             var x;
             if (isTimeSeries) {
-                x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : parseDate(getXValue(id, index));
+                if (rawX) {
+                    if (typeof rawX === 'number') {
+                        x = new Date(rawX);
+                    } else if (rawX instanceof Date) {
+                        x = rawX;
+                    } else {
+                        x = parseDate(rawX);
+                    }
+                } else {
+                    x = parseDate(getXValue(id, index));
+                }
             }
             else if (isCustomX() && !isCategorized) {
                 x = isValue(rawX) ? +rawX : getXValue(id, index);
