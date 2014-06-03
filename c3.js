@@ -129,8 +129,8 @@
 
         var __interaction_enabled = getConfig(['interaction', 'enabled'], true);
 
-        var __onenter = getConfig(['onenter'], function () {}),
-            __onleave = getConfig(['onleave'], function () {}),
+        var __onmouseover = getConfig(['onmouseover'], function () {}),
+            __onmouseout = getConfig(['onmouseout'], function () {}),
             __onresize = getConfig(['onresize'], function () {}),
             __onresized = getConfig(['onresized'], function () {});
 
@@ -161,8 +161,8 @@
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
             __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true),
             __data_onclick = getConfig(['data', 'onclick'], function () {}),
-            __data_onenter = getConfig(['data', 'onenter'], function () {}),
-            __data_onleave = getConfig(['data', 'onleave'], function () {}),
+            __data_onmouseover = getConfig(['data', 'onmouseover'], function () {}),
+            __data_onmouseout = getConfig(['data', 'onmouseout'], function () {}),
             __data_onselected = getConfig(['data', 'onselected'], function () {}),
             __data_onunselected = getConfig(['data', 'onunselected'], function () {}),
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
@@ -2863,8 +2863,8 @@
             // Define svgs
             svg = selectChart.append("svg")
                 .style("overflow", "hidden")
-                .on('mouseenter', __onenter)
-                .on('mouseleave', __onleave);
+                .on('mouseenter', __onmouseover)
+                .on('mouseleave', __onmouseout);
 
             // Define defs
             defs = svg.append("defs");
@@ -3147,7 +3147,7 @@
 
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onenter(d);
+                        __data_onmouseover(d);
                     });
                 })
                 .on('mouseout', function (d) {
@@ -3160,7 +3160,7 @@
                     unexpandBars();
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onleave(d);
+                        __data_onmouseout(d);
                     });
                 })
                 .on('mousemove', function (d) {
@@ -3286,12 +3286,12 @@
                     if (dist(closest, mouse) < 100) {
                         svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                         if (!mouseover) {
-                            __data_onenter(closest);
+                            __data_onmouseover(closest);
                             mouseover = true;
                         }
                     } else {
                         svg.select('.' + CLASS.eventRect).style('cursor', null);
-                        __data_onleave(closest);
+                        __data_onmouseout(closest);
                         mouseover = false;
                     }
                 })
