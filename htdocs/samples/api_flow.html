@@ -15,7 +15,7 @@
     <script src="/js/c3.js"></script>
     <script>
 
-      var chart, generate = function () { return c3.generate({
+      var padding = {}, chart, generate = function () { return c3.generate({
         data: {
           columns: [
             ['data1'],
@@ -32,12 +32,7 @@
         },
         axis: {
           x: {
-/*
-            padding: {
-              left: 0,
-              right: 0,
-            }
-*/
+            padding: padding
           },
           y: {
 /*
@@ -61,6 +56,8 @@
         ],
       });
       };
+
+    function run() {
 
       chart = generate();
 
@@ -192,7 +189,7 @@
           ],
           to: 1,
         });
-      }, 17000);
+      }, 18000);
 
       setTimeout(function () {
         chart.flow({
@@ -202,7 +199,16 @@
             ['data3', 400]
           ]
         });
-      }, 18000);
+      }, 19000);
+
+    }
+
+    run();
+
+    setTimeout(function () {
+      padding = {left: 0, right: 0};
+      run();
+    }, 22000);
 
     </script>
   </body>

@@ -3740,8 +3740,7 @@
                     .style("fill", color)
                     .style("fill-opacity", 0);
                 mainText
-                    .text(function (d) { return formatByAxisId(getAxisId(d.id))(d.value, d.id); })
-                    .style("fill-opacity", initialOpacityForText);
+                    .text(function (d) { return formatByAxisId(getAxisId(d.id))(d.value, d.id); });
                 mainText.exit()
                   .transition().duration(durationForExit)
                     .style('fill-opacity', 0)
@@ -4012,7 +4011,7 @@
                     .attr('x', xForText)
                     .attr('y', yForText)
                     .style("fill", color)
-                    .style("fill-opacity", opacityForText));
+                    .style("fill-opacity", options.flow ? 0 : initialOpacityForText));
                 waitForDraw.add(mainRegion.selectAll('rect').transition()
                     .attr("x", regionX)
                     .attr("y", regionY)
@@ -4055,9 +4054,13 @@
                 // generate transform to flow
                 if (!options.flow.orgDataCount) { // if empty
                     if (isTimeSeries) {
-                        flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
-                        flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
-                        translateX = x(flowStart.x) - x(flowEnd.x);
+                        if (c3.data.targets[0].values.length !== 1) {
+                            translateX = x(orgDomain[0]) - x(domain[0]);
+                        } else {
+                            flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
+                            flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
+                            translateX = x(flowStart.x) - x(flowEnd.x);
+                        }
                     } else {
                         if (c3.data.targets[0].values.length !== 1) {
                             translateX = (domain[0] - orgDomain[0] >= 1 ? x(orgDomain[0]) : 0) - x(flowEnd.x);
@@ -4068,8 +4071,11 @@
                 } else if (options.flow.orgDataCount === 1 || flowStart.x === flowEnd.x) {
                     translateX = x(orgDomain[0]) - x(domain[0]);
                 } else {
-                    // TODO: fix 0.9, I don't know why 0.9..
-                    translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1);
+                    if (isTimeSeries) {
+                        translateX = (x(orgDomain[0]) - x(domain[0]));
+                    } else {
+                        translateX = (x(flowStart.x) - x(flowEnd.x));
+                    }
                 }
                 scaleX = (diffDomain(orgDomain) / diffDomain(domain));
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
@@ -4129,7 +4135,8 @@
                     mainText
                         .attr('transform', null)
                         .attr('x', xForText)
-                        .attr('y', yForText);
+                        .attr('y', yForText)
+                        .style('fill-opacity', opacityForText);
                     mainRegion
                         .attr('transform', null);
                     mainRegion.select('rect').filter(isRegionOnX)
