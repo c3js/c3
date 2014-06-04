@@ -378,6 +378,7 @@
 
         var isLegendRight = __legend_position === 'right';
         var legendStep = 0, legendItemWidth = 0, legendItemHeight = 0, legendOpacityForHidden = 0.15;
+        var currentMaxTickWidth = 0;
 
         /*-- Define Functions --*/
 
@@ -951,11 +952,14 @@
         }
         function getMaxTickWidth(id) {
             var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
-            d3.selectAll('.' + axisClass + ' .tick text').each(function () {
-                var box = this.getBoundingClientRect();
-                if (maxWidth < box.width) { maxWidth = box.width; }
-            });
-            return maxWidth < 0 ? 0 : maxWidth;
+            if (svg) {
+                svg.selectAll('.' + axisClass + ' .tick text').each(function () {
+                    var box = this.getBoundingClientRect();
+                    if (maxWidth < box.width) { maxWidth = box.width; }
+                });
+            }
+            currentMaxTickWidth = maxWidth <= 0 ? currentMaxTickWidth : maxWidth;
+            return currentMaxTickWidth;
         }
         function updateAxisLabels(withTransition) {
             var axisXLabel = main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
