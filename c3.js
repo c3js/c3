@@ -1062,7 +1062,7 @@
             updated = updateAngle(d);
             value = updated ? updated.value : null;
             ratio = getArcRatio(updated);
-            if (! meetsArcLabelThreshold(ratio)) { return ""; }
+            if (! hasGaugeType(c3.data.targets) && ! meetsArcLabelThreshold(ratio)) { return ""; }
             format = getArcLabelFormat();
             return format ? format(value, ratio) : defaultArcValueFormat(value, ratio);
         }
