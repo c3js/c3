@@ -1619,6 +1619,10 @@
                 t.values.forEach(function (v) {
                     v.index = i++;
                 });
+                // this needs to be sorted because its index and value.index is identical
+                c3.data.xs[t.id].sort(function (v1, v2) {
+                    return v1 - v2;
+                });
             });
 
             // set target types
@@ -3964,8 +3968,9 @@
 
                     if ((isCustomX() || isTimeSeries) && !isCategorized) {
                         rectW = function (d) {
-                            var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index];
-                            return (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
+                            var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index],
+                                w = (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
+                            return w < 0 ? 0 : w;
                         };
                         rectX = function (d) {
                             var prevX = getPrevX(d.index), dx = c3.data.xs[d.id][d.index];
