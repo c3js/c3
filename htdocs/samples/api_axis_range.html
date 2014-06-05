@@ -49,12 +49,6 @@
       });
 
       setTimeout(function () {
-        chart.axis.min({x: -10})
-        chart.axis.max({x: 10})
-      }, 1000);
-
-/*
-      setTimeout(function () {
         chart.axis.max(500);
       }, 1000);
 
@@ -75,9 +69,13 @@
       }, 5000);
 
       setTimeout(function () {
-        chart.axis.range({max: {y: 600, y2: 100}, min: {y: -100, y2: 0}});
+        chart.axis.range({min: {y: 1000}, max: {y: 2000}});
       }, 6000);
-*/
+
+      setTimeout(function () {
+        chart.axis.range({max: {y: 600, y2: 100}, min: {y: -100, y2: 0}});
+      }, 7000);
+
     </script>
   </body>
 </html>

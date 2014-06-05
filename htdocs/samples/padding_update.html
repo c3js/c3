@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+
+    var chart = c3.generate({
+      data: {
+        x: 'x',
+        columns: [
+            ['x', '2014-01-01', '2014-02-01', '2014-03-01', '2014-04-01'],
+            ['data1', 190, 200, 190, null],
+        ],
+        type: 'bar',
+        labels: {
+            format: function (v, id) {
+                if (v === null) {
+                    return 'Not Applicable';
+                }
+                return d3.format('$')(v);
+            }
+        }
+      },
+      axis: {
+        x: {
+            type: 'categorized'
+        },
+        rotated: true
+      },
+    });
+
+    setTimeout(function () {
+      chart.hide();
+    }, 1000);
+
+    setTimeout(function () {
+      chart.show();
+    }, 2000);
+
+    </script>
+  </body>
+</html>
