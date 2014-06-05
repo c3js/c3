@@ -1234,9 +1234,6 @@
             isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
             isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
-            if (isAllPositive) { yDomainMin = 0; }
-            if (isAllNegative) { yDomainMax = 0; }
-
             domainLength = Math.abs(yDomainMax - yDomainMin);
             padding = padding_top = padding_bottom = domainLength * 0.1;
 
