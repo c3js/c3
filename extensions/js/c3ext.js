@@ -35,7 +35,7 @@ c3ext.generate = function (options) {
         refresh();
     }
 
-    var zoom2 = ZoomBehavior.create({ changed: onZoomChanged, bindto:options.bindto });
+    var zoom2 = c3ext.ZoomBehavior({ changed: onZoomChanged, bindto: options.bindto });
 
     zoom2.enhance = function () {
         _zoom2_maxItems *= 2;
@@ -57,11 +57,13 @@ c3ext.generate = function (options) {
         var list3 = list2;
         if (list3.length > maxItems) {
             var chunkSize = Math.ceil(list2.length / maxItems);
-            list3 = list3.splitIntoChunksOf(chunkSize).select(func);
+            list3 = list3.splitIntoChunksOf(chunkSize).map(func);
         }
         //console.log("x" + getCurrentZoomLevel() + ", maxItems=" + maxItems + " chunkSize=" + chunkSize + " totalBefore=" + list2.length + ", totalAfter=" + list3.length);
         return list3;
     }
+
+    function first(t) { return t[0]; }
 
     var getDataForZoom = function (data) {
         if (data.columns == null || data.columns.length == 0)
@@ -72,9 +74,9 @@ c3ext.generate = function (options) {
             zoom2.setOptions({ totalItems: data.columns[0].length - 1 });
             zoomInfo = zoom2.getZoom();
         }
-        data.columns = originalData.columns.select(function (column) {
+        data.columns = originalData.columns.map(function (column) {
             var name = column[0];
-            var reducer = zoom2_reducers[name] || "t=>t[0]".toLambda(); //by default take the first
+            var reducer = zoom2_reducers[name] || first; //by default take the first
 
             var values = column.slice(1);
             var newValues = zoomAndReduceData(values, zoomInfo.currentZoom, reducer, _zoom2_maxItems);
@@ -115,9 +117,7 @@ c3ext.generate = function (options) {
     return chart;
 }
 
-
-var ZoomBehavior = {};
-ZoomBehavior.create = function (options) {
+c3ext.ZoomBehavior = function (options) {
     var zoom = { __type: "ZoomBehavior" };
 
     var _zoom2_factor;
@@ -185,7 +185,7 @@ ZoomBehavior.create = function (options) {
 
 
     zoom.getZoom = function () {
-        return { totalItems: totalItems, currentZoom: currentZoom.toArray() };
+        return { totalItems: totalItems, currentZoom: currentZoom.slice() };
     }
 
     zoom.factor = function (factor, skipDraw) {
@@ -252,8 +252,6 @@ ZoomBehavior.create = function (options) {
         applyZoomAndPan();
     }
 
-
-
     function doZoom() {
         if (deltaY != 0) {
             var maxDelta = 10;
@@ -284,4 +282,99 @@ ZoomBehavior.create = function (options) {
 
     return zoom;
 
+}
+
+if (typeof (Q) == "undefined") {
+    var Q = function () {
+    };
+
+    Q.copy = function (src, target, options, depth) {
+        ///<summary>Copies an object into a target object, recursively cloning any object or array in the way, overwrite=true will overwrite a primitive field value even if exists</summary>
+        ///<param name="src" />
+        ///<param name="target" />
+        ///<param name="options" type="Object">{ overwrite:false }</param>
+        ///<returns type="Object">The copied object</returns>
+        if (depth == null)
+            depth = 0;
+        if (depth == 100) {
+            console.warn("Q.copy is in depth of 100 - possible circular reference")
+        }
+        options = options || { overwrite: false };
+        if (src == target || src == null)
+            return target;
+        if (typeof (src) != "object") {
+            if (options.overwrite || target == null)
+                return src;
+            return target;
+        }
+        if (typeof (src.clone) == "function") {
+            if (options.overwrite || target == null)
+                return src.clone();
+            return target;
+        }
+        if (target == null) {
+            if (src instanceof Array)
+                target = [];
+            else
+                target = {};
+        }
+
+        if (src instanceof Array) {
+            for (var i = 0; i < src.length; i++) {
+                var item = src[i];
+                var item2 = target[i];
+                item2 = Q.copy(item, item2, options, depth + 1);
+                target[i] = item2;
+            }
+            target.splice(src.length, target.length - src.length);
+            return target;
+        }
+        for (var p in src) {
+            var value = src[p];
+            var value2 = target[p];
+            value2 = Q.copy(value, value2, options, depth + 1);
+            target[p] = value2;
+        }
+        return target;
+    }
+}
+if (typeof (Timer) == "undefined") {
+    var Timer = function (action, ms) {
+        this.action = action;
+        if (ms != null)
+            this.set(ms);
+    }
+
+    Timer.prototype.set = function (ms) {
+        if (ms == null)
+            ms = this._ms;
+        else
+            this._ms = ms;
+        this.clear();
+        if (ms == null)
+            return;
+        this.timeout = window.setTimeout(this.onTick.bind(this), ms);
+    }
+
+    Timer.prototype.onTick = function () {
+        this.clear();
+        this.action();
+    }
+
+    Timer.prototype.clear = function (ms) {
+        if (this.timeout == null)
+            return;
+        window.clearTimeout(this.timeout);
+        this.timeout = null;
+    }
+}
+if (typeof(Array.prototype.splitIntoChunksOf)=="undefined") {
+    Array.prototype.splitIntoChunksOf = function (countInEachChunk) {
+        var chunks = Math.ceil(this.length / countInEachChunk);
+        var list = [];
+        for (var i = 0; i < this.length; i += countInEachChunk) {
+            list.push(this.slice(i, i + countInEachChunk));
+        }
+        return list;
+    }
 }

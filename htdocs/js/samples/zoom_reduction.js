@@ -30,8 +30,8 @@ function main() {
             type: "line",
             x: "x"
         },
-        zoom2: { 
-            enabled: true, 
+        zoom2: {
+            enabled: true,
         }
     };
     chart = c3ext.generate(options);
@@ -41,9 +41,9 @@ function main() {
     function refreshStatus() {
         var zoomInfo = chart.zoom2.getZoom();
         var info = {
-            reduced:chart.zoom2.maxItems(), 
-            actual:(zoomInfo.currentZoom[1]-zoomInfo.currentZoom[0]),
-            range:zoomInfo.currentZoom[0] + "-" + zoomInfo.currentZoom[1],
+            reduced: chart.zoom2.maxItems(),
+            actual: (zoomInfo.currentZoom[1] - zoomInfo.currentZoom[0]),
+            range: zoomInfo.currentZoom[0] + "-" + zoomInfo.currentZoom[1],
             total: zoomInfo.totalItems
         };
         $("#status").text(JSON.stringify(info, null, " "));
@@ -51,4 +51,31 @@ function main() {
 
 };
 
-
+if (typeof (Array.generate) == "undefined") {
+    Array.generate = function (length, generator) {
+        var list = new Array(length);
+        for (var i = 0; i < length; i++) {
+            list[i] = generator(i);
+        }
+        return list;
+    }
+}
+if (typeof (Math.randomInt) == "undefined") {
+    Math.randomInt = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+}
+if (typeof (Array.generateNumbers) == "undefined") {
+    Array.generateNumbers = function (from, until) {
+        if (arguments.length == 1) {
+            until = from;
+            from = 0;
+        }
+        var length = until - from;
+        var list = new Array(length);
+        for (var i = 0; i < length; i++) {
+            list[i] = i + from;
+        }
+        return list;
+    }
+}
