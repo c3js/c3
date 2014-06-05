@@ -1,134 +1,393 @@
 <html>
   <head>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/index.css" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <div class="section">
-        <a href="#basic" name="basic"><h2># <span>Basic</span></h2></a>
+        <h2># <span>Chart Type</span></h2>
         <div>
           <div class="row">
             <div class="col-md-4">
-              <h3>Simple Line Chart</h3>
-              <p>Simple line chart for getting started.</p>
-              <p><a class="btn btn-default" href="./samples/simple.html" role="button">View details &raquo;</a></p>
+              <h3>Line Chart</h3>
+              <a href="./samples/simple.html" target="_blank">
+                Line chart with ordinary data
+              </a>
+              <a href="./samples/chart_spline.html" target="_blank">
+                Spline chart with ordinary data
+              </a>
+              <a href="./samples/chart_step.html" target="_blank">
+                Step chart with ordinary data
+              </a>
             </div>
-            <div class="col-md-4">
-              <h3>Multiple Line Chart</h3>
-              <p>Multiple line chart with multiple data.</p>
-              <p><a class="btn btn-default" href="./samples/simple_multiple.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Timeseries Chart</h3>
-              <p>Simple line chart with timeseries data.</p>
-              <p><a class="btn btn-default" href="./samples/timeseries.html" role="button">View details &raquo;</a></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="section">
-        <a href="#axes" name="axes"><h2># <span>Axes</span></h2></a>
-        <div>
-          <div class="row">
-            <div class="col-md-4">
-              <h3>Categorized Axis</h3>
-              <p>Axis with ticks categorizing each data.</p>
-              <p><a class="btn btn-default" href="./samples/categorized.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Additional Axis</h3>
-              <p>Additional y axis can be added.</p>
-              <p><a class="btn btn-default" href="./samples/axes_y2.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Specify Axis Min/Max Values</h3>
-              <p>You can specify your own min/max values for each axis.</p>
-              <p><a class="btn btn-default" href="./samples/axes_minmax.html" role="button">View details &raquo;</a></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="section">
-        <a href="#data" name="data"><h2># <span>Data</span></h2></a>
-        <div>
-          <div class="row">
-            <div class="col-md-4">
-              <h3>Column Oriented Data</h3>
-              <p>Column-oriented data can be used as input.</p>
-              <p><a class="btn btn-default" href="./samples/data_columned.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Row Oriented Data</h3>
-              <p>Row-oriented data can be used as input.</p>
-              <p><a class="btn btn-default" href="./samples/data_rowed.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Data from URL</h3>
-              <p>Data from URL can be used as input.</p>
-              <p><a class="btn btn-default" href="./samples/data_url.html" role="button">View details &raquo;</a></p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4">
-              <h3>Load Data</h3>
-              <p>Load data dynamically.</p>
-              <p><a class="btn btn-default" href="./samples/data_load.html" role="button">View details &raquo;</a></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="section">
-        <a href="#chart_type" name="chart_type"><h2># <span>Chart Type</span></h2></a>
-        <div>
-          <div class="row">
-            <div class="col-md-4">
-              <h3>Bar Chart</h3>
-              <p>Display as Bar Chart</p>
-              <p><a class="btn btn-default" href="./samples/chart_bar.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Stacked Bar Chart</h3>
-              <p>Display as Stacked Bar Chart</p>
-              <p><a class="btn btn-default" href="./samples/chart_bar_stacked.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Spline Chart</h3>
-              <p>Display as Spline Chart</p>
-              <p><a class="btn btn-default" href="./samples/chart_spline.html" role="button">View details &raquo;</a></p>
-            </div>
-          </div>
-          <div class="row">
             <div class="col-md-4">
               <h3>Area Chart</h3>
-              <p>Display as Filled Area Chart</p>
-              <p><a class="btn btn-default" href="./samples/chart_area.html" role="button">View details &raquo;</a></p>
+              <a href="./samples/chart_area.html" target="_blank">
+                Area chart with ordinary data
+              </a>
+              <a class="btn btn-danger" href="./samples/chart_area_spline.html" target="_blank">
+                Area-spline chart with ordinary data
+              </a>
+              <a class="btn btn-danger" href="./samples/chart_area_step.html" target="_blank">
+                Area-step chart with ordinary data
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Bar Chart</h3>
+              <a href="./samples/chart_bar.html" target="_blank">
+                Bar chart with ordinary data
+              </a>
+              <a href="./samples/chart_bar_stacked.html" target="_blank">
+                Stacked Bar chart with ordinary data
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Pie Chart</h3>
+              <a href="./samples/chart_pie.html" target="_blank">
+                Pie chart with ordinary data
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Donut Chart</h3>
+              <a href="./samples/chart_donut.html" target="_blank">
+                Donut chart with ordinary data
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Gauge Chart</h3>
+              <a href="./samples/chart_gauge.html" target="_blank">
+                Gauge chart with ordinary data
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Scatter Chart</h3>
+              <a href="./samples/chart_scatter.html" target="_blank">
+                Pie chart with ordinary data
+              </a>
             </div>
             <div class="col-md-4">
               <h3>Combination Chart</h3>
-              <p>Display as Bar Chart</p>
-              <p><a class="btn btn-default" href="./samples/chart_combination.html" role="button">View details &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-              <h3>Arc Gauge</h3>
-              <p>Display as Arc Gauge</p>
-              <p><a class="btn btn-default" href="./samples/chart_arc_gauge.html" role="button">View details &raquo;</a></p>
+              <a href="./samples/chart_combination.html" target="_blank">
+                Combination chart with ordinary data
+              </a>
             </div>
           </div>
         </div>
       </div>
+
       <div class="section">
-        <a href="#interaction" name="interaction"><h2># <span>Interaction</span></h2></a>
+        <h2># <span>Axes</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Timeseries Axis</h3>
+              <a href="./samples/timeseries.html" target="_blank">
+                Line chart with timeseries data
+              </a>
+              <a href="./samples/timeseries_descendent.html" target="_blank">
+                Line chart with descendent timeseries data
+              </a>
+              <a href="./samples/timeseries_raw.html" target="_blank">
+                Line chart with timeseries data as Number
+              </a>
+              <a href="./samples/timeseries_date.html" target="_blank">
+                Line chart with timeseries data as Date object
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Category Axis</h3>
+              <a href="./samples/categorized.html" target="_blank">
+                Chart with category axis
+              </a>
+              <a href="./samples/custom_x_categorized.html" target="_blank">
+                Chart with category data on category axis
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Additional Axis</h3>
+              <a href="./samples/axes_y2.html" target="_blank">
+                Add y2 axis
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Axis Range</h3>
+              <a href="./samples/axes_range.html" target="_blank">
+                Set range of axis
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Axis Padding</h3>
+              <a href="./samples/axes_padding.html" target="_blank">
+                Set padding of axis
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>X Axis Tick</h3>
+              <a href="./samples/axes_x_tick_culling.html" target="_blank">
+                Set culling for x axis
+              </a>
+              <a href="./samples/axes_x_tick_fit.html" target="_blank">
+                Set fitting for x axis
+              </a>
+              <a href="./samples/axes_x_tick_rotate.html" target="_blank">
+                Set rotation for x axis
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Y Domain</h3>
+              <a href="./samples/domain_y.html" target="_blank">
+                Update y domain automatically
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2># <span>Data</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Input Data</h3>
+              <a href="./samples/data_columned.html" target="_blank">
+                Columned data
+              </a>
+              <a href="./samples/data_rowed.html" target="_blank">
+                Rowed data
+              </a>
+              <a href="./samples/data_json.html" target="_blank">
+                JSON data
+              </a>
+              <a href="./samples/data_url.html" target="_blank">
+                Data from URL
+              </a>
+              <a href="./samples/data_hide.html" target="_blank">
+                Hide data when init
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Load Data</h3>
+              <a href="./samples/data_load.html" target="_blank">
+                Load ordinary data
+              </a>
+              <a href="./samples/data_load_timeseries.html" target="_blank">
+                Load timeseries data
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Custom X</h3>
+              <a href="./samples/custom_x_scale.html" target="_blank">
+                Custom x for all data
+              </a>
+              <a href="./samples/custom_xs_scale.html" target="_blank">
+                Custom x for each data
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Data Label</h3>
+              <a href="./samples/data_label.html" target="_blank">
+                Show label on data
+              </a>
+              <a href="./samples/data_label_format.html" target="_blank">
+                Show label on data with format
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Data Region</h3>
+              <a href="./samples/data_region.html" target="_blank">
+                Set region of data
+              </a>
+              <a href="./samples/data_region_timeseries.html" target="_blank">
+                Set region of timeseries data
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2># <span>Components</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Grid</h3>
+              <a href="./samples/grids.html" target="_blank">
+                 Show x/y grids
+              </a>
+              <a href="./samples/grids_timeseries.html" target="_blank">
+                 Show x/y grids with timeseries&raquo;
+              </a>
+              <a href="./samples/grid_x_lines.html" target="_blank">
+                 Show optional x grids
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Region</h3>
+              <a href="./samples/region.html" target="_blank">
+                 Show regions
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Legend</h3>
+              <a href="./samples/legend.html" target="_blank">
+                 Show legend
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Tooltip</h3>
+              <a href="./samples/tooltip_show.html" target="_blank">
+                Show tooltip
+              </a>
+              <a href="./samples/tooltip_grouped.html" target="_blank">
+                Show tooltip as each data
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2># <span>Chart Option</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Bind</h3>
+              <a href="./samples/bindto.html" target="_blank">
+                Specify the element binded
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Padding</h3>
+              <a href="./samples/padding.html" target="_blank">
+                Change padding of chart
+              </a>
+              <a href="./samples/padding_update.html" target="_blank">
+                Auto padding when chart updated
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Empty Data</h3>
+              <a href="./samples/emptydata.html" target="_blank">
+                Show text when empty data
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Point</h3>
+              <a href="./samples/point_r.html" target="_blank">
+                Change radius of data point
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2># <span>Interaction</span></h2>
         <div>
           <div class="row">
             <div class="col-md-4">
               <h3>Zoom</h3>
-              <p>Zoom by mouse wheel event and slide by drag.</p>
-              <p><a class="btn btn-default" href="./samples/interaction_zoom.html" role="button">View details &raquo;</a></p>
+              <a href="./samples/zoom.html" target="_blank">
+                Enable zoom
+              </a>
+              <a href="./samples/zoom_reduction.html" target="_blank">
+                Zoom with reduction
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Selection</h3>
+              <a href="./samples/selection.html" target="_blank">
+                Select data
+              </a>
             </div>
           </div>
         </div>
-
       </div>
+
+      <div class="section">
+        <h2># <span>API</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Flow</h3>
+              <a href="./samples/api_flow.html" target="_blank">
+                Flow ordinary data
+              </a>
+              <a href="./samples/api_flow_timeseries.html" target="_blank">
+                Flow timeseries data
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Axis</h3>
+              <a href="./samples/api_axis_range.html" target="_blank">
+                Update axis range
+              </a>
+              <a href="./samples/api_axis_label.html" target="_blank">
+                Update axis label
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>grid</h3>
+              <a href="./samples/api_xgrid_lines.html" target="_blank">
+                Update x grid lines
+              </a>
+              <a href="./samples/api_ygrid_lines.html" target="_blank">
+                Update y grid lines
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>Legend</h3>
+              <a href="./samples/api_legend.html" target="_blank">
+                Update legend
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Transform</h3>
+              <a href="./samples/api_transform.html" target="_blank">
+                Transform chart
+              </a>
+            </div>
+            <div class="col-md-4">
+              <h3>Element</h3>
+              <a href="./samples/element.html" target="_blank">
+                Access svg element of chart
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2># <span>Other Library</span></h2>
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <h3>RequireJS</h3>
+              <a href="./samples/requirejs.html" target="_blank">
+                Load by RequireJS
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>
