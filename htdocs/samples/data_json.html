@@ -5,6 +5,7 @@
   <body>
     <div id="chart1"></div>
     <div id="chart2"></div>
+    <div id="chart3"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
@@ -39,6 +40,33 @@
         axis: {
           x: {
             type: 'categorized'
+          }
+        }
+      });
+
+      var chart3 = c3.generate({
+        bindto: '#chart3',
+        data: {
+          json: [{
+            "date": "2014-06-03",
+             "443": "3000",
+             "995": "500"
+          }, {
+            "date": "2014-06-04",
+             "443": "1000",
+          }, {
+            "date": "2014-06-05",
+             "443": "5000",
+             "995": "1000"
+          }],
+          keys: {
+            x: 'date',
+            value: [ "443", "995" ]
+          }
+        },
+        axis: {
+          x: {
+            type: "category"
           }
         }
       });

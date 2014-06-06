@@ -1499,7 +1499,9 @@
                 json.forEach(function (o) {
                     var new_row = [];
                     targetKeys.forEach(function (key) {
-                        new_row.push(o[key]);
+                        // convert undefined to null becuase undefined data will be removed in convertDataToTargets()
+                        var v = typeof o[key] === 'undefined' ? null : o[key];
+                        new_row.push(v);
                     });
                     new_rows.push(new_row);
                 });
