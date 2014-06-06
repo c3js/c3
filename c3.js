@@ -69,6 +69,7 @@
         axisYLabel: 'c3-axis-y-label',
         axisY2: 'c3-axis-y2',
         axisY2Label: 'c3-axis-y2-label',
+        legendBackground: 'c3-legend-background',
         legendItem: 'c3-legend-item',
         legendItemEvent: 'c3-legend-item-event',
         legendItemTile: 'c3-legend-item-tile',
@@ -182,6 +183,9 @@
         // legend
         var __legend_show = getConfig(['legend', 'show'], true),
             __legend_position = getConfig(['legend', 'position'], 'bottom'),
+            __legend_inset_anchor = getConfig(['legend', 'inset', 'anchor'], 'top-left'),
+            __legend_inset_x = getConfig(['legend', 'inset', 'x'], 0),
+            __legend_inset_y = getConfig(['legend', 'inset', 'y'], 0),
             __legend_item_onclick = getConfig(['legend', 'item', 'onclick']),
             __legend_item_onmouseover = getConfig(['legend', 'item', 'onmouseover']),
             __legend_item_onmouseout = getConfig(['legend', 'item', 'onmouseout']),
@@ -377,6 +381,9 @@
         };
 
         var isLegendRight = __legend_position === 'right';
+        var isLegendInset = __legend_position === 'inset';
+        var isLegendTop = __legend_inset_anchor === 'top-left' || __legend_inset_anchor === 'top-right';
+        var isLegendLeft = __legend_inset_anchor === 'top-left' || __legend_inset_anchor === 'bottom-left';
         var legendStep = 0, legendItemWidth = 0, legendItemHeight = 0, legendOpacityForHidden = 0.15;
         var currentMaxTickWidth = 0;
 
@@ -445,7 +452,7 @@
         // MEMO: each value should be int to avoid disabling antialiasing
         function updateSizes() {
             var legendHeight = getLegendHeight(), legendWidth = getLegendWidth(),
-                legendHeightForBottom = isLegendRight ? 0 : legendHeight,
+                legendHeightForBottom = isLegendRight || isLegendInset ? 0 : legendHeight,
                 hasArc = hasArcType(c3.data.targets),
                 xAxisHeight = __axis_rotated || hasArc ? 0 : getHorizontalAxisHeight('x'),
                 subchartHeight = __subchart_show && !hasArc ? (__subchart_size_height + xAxisHeight) : 0;
@@ -482,11 +489,15 @@
                 };
             }
             // for legend
+            var insetLegendPosition = {
+              top: isLegendTop ? getCurrentPaddingTop() + __legend_inset_y + 5.5 : currentHeight - legendHeight - getCurrentPaddingBottom() - __legend_inset_y,
+              left: isLegendLeft ? getCurrentPaddingLeft() + __legend_inset_x + 0.5 : currentWidth - legendWidth - getCurrentPaddingRight() - __legend_inset_x + 0.5
+            };
             margin3 = {
-                top: isLegendRight ? 0 : currentHeight - legendHeight,
+                top: isLegendRight ? 0 : isLegendInset ? insetLegendPosition.top : currentHeight - legendHeight,
                 right: NaN,
                 bottom: 0,
-                left: isLegendRight ? currentWidth - legendWidth : 0
+                left: isLegendRight ? currentWidth - legendWidth : isLegendInset ? insetLegendPosition.left : 0
             };
 
             width = currentWidth - margin.left - margin.right;
@@ -570,7 +581,7 @@
         function getHorizontalAxisHeight(axisId) {
             if (axisId === 'x' && !__axis_x_show) { return 0; }
             if (axisId === 'x' && __axis_x_height) { return __axis_x_height; }
-            if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight ? 10 : 1; }
+            if (axisId === 'y' && !__axis_y_show) { return __legend_show && !isLegendRight && !isLegendInset ? 10 : 1; }
             if (axisId === 'y2' && !__axis_y2_show) { return rotated_padding_top; }
             return (getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
         }
@@ -656,10 +667,10 @@
             legendItemHeight = h;
         }
         function getLegendWidth() {
-            return __legend_show ? isLegendRight ? legendItemWidth * (legendStep + 1) : currentWidth : 0;
+            return __legend_show ? isLegendRight || isLegendInset ? legendItemWidth * (legendStep + 1) : currentWidth : 0;
         }
         function getLegendHeight() {
-            return __legend_show ? isLegendRight ? currentHeight : Math.max(20, legendItemHeight) * (legendStep + 1) : 0;
+            return __legend_show ? isLegendRight ? currentHeight : isLegendInset ? (c3.data.targets.length * Math.max(20, legendItemHeight)) + 20 : Math.max(20, legendItemHeight) * (legendStep + 1) : 0;
         }
 
         //-- Scales --//
@@ -4530,8 +4541,8 @@
                 var box = getTextRect(textElement.textContent, CLASS.legendItem),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
-                    itemLength = isLegendRight ? itemHeight : itemWidth,
-                    areaLength = isLegendRight ? getLegendHeight() : getLegendWidth(),
+                    itemLength = isLegendRight || isLegendInset ? itemHeight : itemWidth,
+                    areaLength = isLegendRight || isLegendInset ? getLegendHeight() : getLegendWidth(),
                     margin, maxLength;
 
                 // MEMO: care about condifion of step, totalLength
@@ -4567,7 +4578,7 @@
 
                 if (!maxWidth || itemWidth >= maxWidth) { maxWidth = itemWidth; }
                 if (!maxHeight || itemHeight >= maxHeight) { maxHeight = itemHeight; }
-                maxLength = isLegendRight ? maxHeight : maxWidth;
+                maxLength = isLegendRight || isLegendInset ? maxHeight : maxWidth;
 
                 if (__legend_equally) {
                     Object.keys(widths).forEach(function (id) { widths[id] = maxWidth; });
@@ -4588,6 +4599,9 @@
 
             if (isLegendRight) {
                 xForLegend = function (id) { return maxWidth * steps[id]; };
+                yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
+            } else if (isLegendInset) {
+                xForLegend = function (id) { return maxWidth * steps[id] + 10; };
                 yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
             } else {
                 xForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
@@ -4630,21 +4644,32 @@
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
                 .each(function (id, i) { updatePositions(this, id, i === 0); })
                 .style("pointer-events", "none")
-                .attr('x', isLegendRight ? xForLegendText : -200)
-                .attr('y', isLegendRight ? -200 : yForLegendText);
+                .attr('x', isLegendRight || isLegendInset ? xForLegendText : -200)
+                .attr('y', isLegendRight || isLegendInset ? -200 : yForLegendText);
             l.append('rect')
                 .attr("class", CLASS.legendItemEvent)
                 .style('fill-opacity', 0)
-                .attr('x', isLegendRight ? xForLegendRect : -200)
-                .attr('y', isLegendRight ? -200 : yForLegendRect);
+                .attr('x', isLegendRight || isLegendInset ? xForLegendRect : -200)
+                .attr('y', isLegendRight || isLegendInset ? -200 : yForLegendRect);
             l.append('rect')
                 .attr("class", CLASS.legendItemTile)
                 .style("pointer-events", "none")
                 .style('fill', color)
-                .attr('x', isLegendRight ? xForLegendText : -200)
-                .attr('y', isLegendRight ? -200 : yForLegend)
+                .attr('x', isLegendRight || isLegendInset ? xForLegendText : -200)
+                .attr('y', isLegendRight || isLegendInset ? -200 : yForLegend)
                 .attr('width', 10)
                 .attr('height', 10);
+            // Set background for inset legend
+            if (isLegendInset && maxWidth != 0) {
+              legend.insert('g', '.' + CLASS.legendItem)
+                .attr("class", CLASS.legendBackground).append('rect')
+                .style('opacity', 0.75)
+                .style('fill', 'white')
+                .style('stroke', 'lightgray')
+                .style('stroke-width', 1)
+                .attr('height', getLegendHeight()-10)
+                .attr('width', maxWidth);
+            }
 
             texts = legend.selectAll('text')
                 .data(targetIds)
