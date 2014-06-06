@@ -5144,7 +5144,7 @@
             Object.keys(colors).forEach(function (id) {
                 __data_colors[id] = colors[id];
             });
-            redraw({withLegend: true});
+            redraw({withLegend: true, withUpdateXDomain: true});
             return __data_colors;
         };
 
