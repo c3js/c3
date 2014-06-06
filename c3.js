@@ -1465,17 +1465,7 @@
         function generateTargetX(rawX, id, index) {
             var x;
             if (isTimeSeries) {
-                if (rawX) {
-                    if (typeof rawX === 'number') {
-                        x = new Date(rawX);
-                    } else if (rawX instanceof Date) {
-                        x = rawX;
-                    } else {
-                        x = parseDate(rawX);
-                    }
-                } else {
-                    x = parseDate(getXValue(id, index));
-                }
+                x = rawX ? parseDate(rawX) : parseDate(getXValue(id, index));
             }
             else if (isCustomX() && !isCategorized) {
                 x = isValue(rawX) ? +rawX : getXValue(id, index);
@@ -2293,10 +2283,14 @@
 
         function parseDate(date) {
             var parsedDate;
-            try {
-                parsedDate = date instanceof Date ? new Date(date) : d3.time.format(__data_x_format).parse(date);
-            } catch (e) {
-                window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
+            if (date instanceof Date) {
+                parsedDate = date;
+            } else {
+                try {
+                    parsedDate = typeof date === 'number' ? new Date(date) : d3.time.format(__data_x_format).parse(date);
+                } catch (e) {
+                    window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
+                }
             }
             return parsedDate;
         }
