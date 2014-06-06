@@ -2103,7 +2103,7 @@
                     y0 = scale(0), offset = y0;
                 targets.forEach(function (t) {
                     if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
-                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
+                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value >= 0) {
                         offset += scale(t.values[i].value) - y0;
                     }
                 });
