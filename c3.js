@@ -490,8 +490,8 @@
             }
             // for legend
             var insetLegendPosition = {
-              top: isLegendTop ? getCurrentPaddingTop() + __legend_inset_y + 5.5 : currentHeight - legendHeight - getCurrentPaddingBottom() - __legend_inset_y,
-              left: isLegendLeft ? getCurrentPaddingLeft() + __legend_inset_x + 0.5 : currentWidth - legendWidth - getCurrentPaddingRight() - __legend_inset_x + 0.5
+                top: isLegendTop ? getCurrentPaddingTop() + __legend_inset_y + 5.5 : currentHeight - legendHeight - getCurrentPaddingBottom() - __legend_inset_y,
+                left: isLegendLeft ? getCurrentPaddingLeft() + __legend_inset_x + 0.5 : currentWidth - legendWidth - getCurrentPaddingRight() - __legend_inset_x + 0.5
             };
             margin3 = {
                 top: isLegendRight ? 0 : isLegendInset ? insetLegendPosition.top : currentHeight - legendHeight,
@@ -4661,7 +4661,7 @@
                 .attr('height', 10);
             // Set background for inset legend
             if (isLegendInset && maxWidth !== 0) {
-              legend.insert('g', '.' + CLASS.legendItem)
+                legend.insert('g', '.' + CLASS.legendItem)
                 .attr("class", CLASS.legendBackground).append('rect')
                 .style('opacity', 0.75)
                 .style('fill', 'white')
