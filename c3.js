@@ -1234,6 +1234,12 @@
             isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
             isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
+            // Bar/Area chart should be 0-based if all positive|negative
+            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+                if (isAllPositive) { yDomainMin = 0; }
+                if (isAllNegative) { yDomainMax = 0; }
+            }
+
             domainLength = Math.abs(yDomainMax - yDomainMin);
             padding = padding_top = padding_bottom = domainLength * 0.1;
 
