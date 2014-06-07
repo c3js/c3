@@ -234,12 +234,12 @@
             // not used
             // __grid_y_type = getConfig(['grid', 'y', 'type'], 'tick'),
             __grid_y_lines = getConfig(['grid', 'y', 'lines'], []),
-            __grid_y_ticks = getConfig(['grid', 'y', 'ticks'], 10);
+            __grid_y_ticks = getConfig(['grid', 'y', 'ticks'], 10),
+            __grid_focus_show = getConfig(['grid', 'focus', 'show'], true);
 
         // point - point of each data
         var __point_show = getConfig(['point', 'show'], true),
             __point_r = getConfig(['point', 'r'], 2.5),
-            __point_focus_line_enabled = getConfig(['point', 'focus', 'line', 'enabled'], true),
             __point_focus_expand_enabled = getConfig(['point', 'focus', 'expand', 'enabled'], true),
             __point_focus_expand_r = getConfig(['point', 'focus', 'expand', 'r']),
             __point_select_r = getConfig(['point', 'focus', 'select', 'r']);
@@ -2918,7 +2918,7 @@
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
-            if (__point_focus_line_enabled) {
+            if (__grid_focus_show) {
                 grid.append('g')
                     .attr("class", CLASS.xgridFocus)
                   .append('line')
