@@ -9,7 +9,9 @@
     <script src="/js/c3.js"></script>
     <script>
 
-    var chart = c3.generate({
+    var axis_rotated = true;
+
+    var generate = function () { return c3.generate({
       data: {
         x: 'x',
         columns: [
@@ -30,9 +32,9 @@
         x: {
             type: 'categorized'
         },
-        rotated: true
+        rotated: axis_rotated
       },
-    });
+    }); }, chart = generate();
 
     setTimeout(function () {
       chart.hide();
@@ -41,6 +43,45 @@
     setTimeout(function () {
       chart.show();
     }, 2000);
+
+    setTimeout(function () {
+      chart.load({
+        columns: [
+          ['data1', 300, 350, 100]
+        ],
+        categories: ['2014-01-01 10:10:10', '2014-02-01 12:30:00', '2014-03-01 16:30:00']
+      });
+    }, 3000);
+
+    setTimeout(function () {
+      chart.load({
+        columns: [
+          ['data1', 50, 100, 150]
+        ],
+        categories: ['2014', '2015', '2016']
+      });
+    }, 4000);
+
+    setTimeout(function () {
+      axis_rotated = false;
+      chart = generate();
+    }, 5000);
+
+    setTimeout(function () {
+      chart.load({
+        columns: [
+          ['data1', 300, 350, 100000]
+        ],
+      });
+    }, 6000);
+
+    setTimeout(function () {
+      chart.load({
+        columns: [
+          ['data1', 50, 100, 150]
+        ],
+      });
+    }, 7000);
 
     </script>
   </body>

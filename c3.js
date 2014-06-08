@@ -411,7 +411,7 @@
                 y2Axis = main.select('.' + CLASS.axisY2);
                 if (withTransition) { y2Axis = y2Axis.transition(); }
             }
-            main.attr("transform", translate.main);
+            (withTransition ? main.transition() : main).attr("transform", translate.main);
             xAxis.attr("transform", translate.x);
             yAxis.attr("transform", translate.y);
             y2Axis.attr("transform", translate.y2);
@@ -706,7 +706,7 @@
             return (forTimeseries ? d3.time.scale() : d3.scale.linear()).range([min, max]);
         }
         function getX(min, max, domain, offset) {
-            var scale = getScale(min, max, isTimeSeries),//(isTimeSeries ? d3.time.scale() : d3.scale.linear()).range([min, max]),
+            var scale = getScale(min, max, isTimeSeries),
                 _scale = domain ? scale.domain(domain) : scale, key;
             // Define customized scale if categorized axis
             if (isCategorized) {
@@ -2789,6 +2789,20 @@
         // for save value
         var orgAreaOpacity, withoutFadeIn = {};
 
+        function updateDimension() {
+            if (__axis_rotated) {
+                axes.x.call(xAxis);
+                axes.subx.call(subXAxis);
+            } else {
+                axes.y.call(yAxis);
+                axes.y2.call(y2Axis);
+            }
+            updateSizes();
+            updateScales();
+            updateSvgSize();
+            transformAll(false);
+        }
+
         function observeInserted(selection) {
             var observer = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
@@ -2799,8 +2813,8 @@
                             // parentNode will NOT be null when completed
                             if (selection.node().parentNode) {
                                 window.clearInterval(interval);
+                                updateDimension();
                                 redraw({
-                                    withUpdateTranslate: true,
                                     withTransform: true,
                                     withUpdateXDomain: true,
                                     withUpdateOrgXDomain: true,
@@ -3085,7 +3099,13 @@
 
             // Draw with targets
             if (binding) {
-                redraw({withUpdateTranslate: true, withTransform: true, withUpdateXDomain: true, withUpdateOrgXDomain: true, withTransitionForAxis: false});
+                updateDimension();
+                redraw({
+                    withTransform: true,
+                    withUpdateXDomain: true,
+                    withUpdateOrgXDomain: true,
+                    withTransitionForAxis: false,
+                });
             }
 
             // Show tooltip if needed
@@ -3463,7 +3483,7 @@
             var mainLine, mainArea, mainCircle, mainBar, mainArc, mainRegion, mainText, contextLine,  contextArea, contextBar, eventRect, eventRectUpdate;
             var areaIndices = getShapeIndices(isAreaType), barIndices = getShapeIndices(isBarType), lineIndices = getShapeIndices(isLineType), maxDataCountTarget, tickOffset;
             var rectX, rectW;
-            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend, withUpdateTranslate;
+            var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
             var duration, durationForExit, durationForAxis, waitForDraw = generateWait();
@@ -3478,7 +3498,6 @@
             withTransform = getOption(options, "withTransform", false);
             withUpdateXDomain = getOption(options, "withUpdateXDomain", false);
             withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
-            withUpdateTranslate = getOption(options, "withUpdateTranslate", false);
             withLegend = getOption(options, "withLegend", false);
             withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
             withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
@@ -3488,21 +3507,6 @@
             durationForAxis = withTransitionForAxis ? duration : 0;
 
             transitions = transitions || generateAxisTransitions(durationForAxis);
-
-            // MEMO: call axis to generate ticks and get those length, then update translate with them
-            if (withUpdateTranslate) {
-                if (__axis_rotated) {
-                    axes.x.call(xAxis);
-                    axes.subx.call(subXAxis);
-                } else {
-                    axes.y.call(yAxis);
-                    axes.y2.call(y2Axis);
-                }
-                updateSizes();
-                updateScales();
-                updateSvgSize();
-                transformAll(false);
-            }
 
             // update legend and transform each g
             if (withLegend && __legend_show) {
@@ -3539,6 +3543,21 @@
             transitions.axisY.call(yAxis);
             transitions.axisY2.call(y2Axis);
             transitions.axisSubX.call(subXAxis);
+
+            if (targetsToShow.length) {
+                // Update dimensions according to the width of ticks, etc
+                updateSizes();
+                updateScales();
+                updateSvgSize();
+                transformAll(true, transitions);
+                // x changes above, so need to update domain too
+                updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
+                // Update axis again because the length can be updated because of update of max tick width and generate tickOffset
+                transitions.axisX.call(xAxis);
+                transitions.axisSubX.call(subXAxis);
+                transitions.axisY.call(yAxis);
+                transitions.axisY2.call(y2Axis);
+            }
 
             // Update axis label
             updateAxisLabels(withTransition);
@@ -5059,7 +5078,7 @@
         c3.groups = function (groups) {
             if (isUndefined(groups)) { return __data_groups; }
             __data_groups = groups;
-            redraw();
+            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
             return __data_groups;
         };
 
@@ -5344,7 +5363,8 @@
                 var ticks = tickValues ? tickValues : generateTicks(scale1),
                     tick = g.selectAll(".tick").data(ticks, scale1),
                     tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
-                    tickExit = d3.transition(tick.exit()).style("opacity", 1e-6).remove(),
+                    // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
+                    tickExit = tick.exit().remove(),
                     tickUpdate = d3.transition(tick).style("opacity", 1),
                     tickTransform, tickX;
 
