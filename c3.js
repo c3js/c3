@@ -1259,6 +1259,7 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
+                isZeroBased = (hasBarType(yTargets) && __bar_zerobased) || hasAreaType(yTargets),
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
                 showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
@@ -1271,7 +1272,7 @@
             isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
             // Bar/Area chart should be 0-based if all positive|negative
-            if ((hasBarType(yTargets) && isBarZerobased()) || hasAreaType(yTargets)) {
+            if (isZeroBased) {
                 if (isAllPositive) { yDomainMin = 0; }
                 if (isAllNegative) { yDomainMax = 0; }
             }
@@ -1305,7 +1306,7 @@
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
             // Bar/Area chart should be 0-based if all positive|negative
-            if ((hasBarType(yTargets) && isBarZerobased()) || hasAreaType(yTargets)) {
+            if (isZeroBased) {
                 if (isAllPositive) { padding_bottom = yDomainMin; }
                 if (isAllNegative) { padding_top = -yDomainMax; }
             }
@@ -2236,10 +2237,6 @@
         function isBarType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'bar';
-        }
-        function isBarZerobased()
-        {
-            return __bar_zerobased;
         }
         function isScatterType(d) {
             var id = (typeof d === 'string') ? d : d.id;
