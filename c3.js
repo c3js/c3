@@ -4698,13 +4698,10 @@
             // Set background for inset legend
             if (isLegendInset && maxWidth !== 0) {
                 legend.insert('g', '.' + CLASS.legendItem)
-                .attr("class", CLASS.legendBackground).append('rect')
-                .style('opacity', 0.75)
-                .style('fill', 'white')
-                .style('stroke', 'lightgray')
-                .style('stroke-width', 1)
-                .attr('height', getLegendHeight() - 10)
-                .attr('width', maxWidth * (step + 1) + 10);
+                    .attr("class", CLASS.legendBackground)
+                  .append('rect')
+                    .attr('height', getLegendHeight() - 10)
+                    .attr('width', maxWidth * (step + 1) + 10);
             }
 
             texts = legend.selectAll('text')
