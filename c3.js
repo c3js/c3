@@ -253,7 +253,8 @@
 
         // bar
         var __bar_width = getConfig(['bar', 'width']),
-            __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6);
+            __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6),
+            __bar_zerobased = getConfig(['bar', 'zerobased'], true);
 
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
@@ -1270,7 +1271,7 @@
             isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
             // Bar/Area chart should be 0-based if all positive|negative
-            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+            if ((hasBarType(yTargets) && isBarZerobased()) || hasAreaType(yTargets)) {
                 if (isAllPositive) { yDomainMin = 0; }
                 if (isAllNegative) { yDomainMax = 0; }
             }
@@ -1304,7 +1305,7 @@
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
             // Bar/Area chart should be 0-based if all positive|negative
-            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+            if ((hasBarType(yTargets) && isBarZerobased()) || hasAreaType(yTargets)) {
                 if (isAllPositive) { padding_bottom = yDomainMin; }
                 if (isAllNegative) { padding_top = -yDomainMax; }
             }
@@ -2235,6 +2236,10 @@
         function isBarType(d) {
             var id = (typeof d === 'string') ? d : d.id;
             return __data_types[id] === 'bar';
+        }
+        function isBarZerobased()
+        {
+            return __bar_zerobased;
         }
         function isScatterType(d) {
             var id = (typeof d === 'string') ? d : d.id;
