@@ -3523,7 +3523,7 @@
             var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
             var hideAxis = hasArcType(c3.data.targets);
             var drawArea, drawAreaOnSub, drawBar, drawBarOnSub, drawLine, drawLineOnSub, xForText, yForText;
-            var duration, durationForExit, durationForAxis, waitForDraw = generateWait();
+            var duration, durationForExit, durationForAxis, waitForDraw;
             var targetsToShow = filterTargetsToShow(c3.data.targets), tickValues, i, intervalForCulling;
 
             xgrid = xgridLines = mainCircle = mainText = getEmptySelection();
@@ -4048,50 +4048,59 @@
 
             // transition should be derived from one transition
             d3.transition().duration(duration).each(function () {
-                waitForDraw.add(mainBar.transition()
+                var transitions = [];
+
+                transitions.push(mainBar.transition()
                     .attr('d', drawBar)
                     .style("fill", color)
                     .style("opacity", 1));
-                waitForDraw.add(mainLine.transition()
+                transitions.push(mainLine.transition()
                     .attr("d", drawLine)
                     .style("stroke", color)
                     .style("opacity", 1));
-                waitForDraw.add(mainArea.transition()
+                transitions.push(mainArea.transition()
                     .attr("d", drawArea)
                     .style("fill", color)
                     .style("opacity", orgAreaOpacity));
-                waitForDraw.add(mainCircle.transition()
+                transitions.push(mainCircle.transition()
                     .style('opacity', opacityForCircle)
                     .style("fill", color)
                     .attr("cx", __axis_rotated ? circleY : circleX)
                     .attr("cy", __axis_rotated ? circleX : circleY));
-                waitForDraw.add(main.selectAll('.' + CLASS.selectedCircle).transition()
+                transitions.push(main.selectAll('.' + CLASS.selectedCircle).transition()
                     .attr("cx", __axis_rotated ? circleY : circleX)
                     .attr("cy", __axis_rotated ? circleX : circleY));
-                waitForDraw.add(mainText.transition()
+                transitions.push(mainText.transition()
                     .attr('x', xForText)
                     .attr('y', yForText)
                     .style("fill", color)
                     .style("fill-opacity", options.flow ? 0 : opacityForText));
-                waitForDraw.add(mainRegion.selectAll('rect').transition()
+                transitions.push(mainRegion.selectAll('rect').transition()
                     .attr("x", regionX)
                     .attr("y", regionY)
                     .attr("width", regionWidth)
                     .attr("height", regionHeight)
                     .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
-                waitForDraw.add(xgridLines.select('line').transition()
+                transitions.push(xgridLines.select('line').transition()
                     .attr("x1", __axis_rotated ? 0 : xv)
                     .attr("x2", __axis_rotated ? width : xv)
                     .attr("y1", __axis_rotated ? xv : margin.top)
                     .attr("y2", __axis_rotated ? xv : height)
                     .style("opacity", 1));
-                waitForDraw.add(xgridLines.select('text').transition()
+                transitions.push(xgridLines.select('text').transition()
                     .attr("x", __axis_rotated ? width : 0)
                     .attr("y", xv)
                     .text(function (d) { return d.text; })
                     .style("opacity", 1));
+                // Wait for end of transitions if called from flow API
+                if (options.flow) {
+                    waitForDraw = generateWait();
+                    transitions.forEach(function (t) {
+                        waitForDraw.add(t);
+                    });
+                }
             })
-            .call(waitForDraw, options.flow ? function () { // only for flow
+            .call(waitForDraw ? waitForDraw : function () {}, function () { // only for flow
                 var translateX, scaleX = 1, transform,
                     flowIndex = options.flow.index,
                     flowLength = options.flow.length,
@@ -4208,7 +4217,7 @@
                     // callback for end of flow
                     done();
                 });
-            } : null);
+            });
 
             // update fadein condition
             mapToIds(c3.data.targets).forEach(function (id) {
