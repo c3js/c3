@@ -259,6 +259,7 @@
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
             __pie_label_format = getConfig(['pie', 'label', 'format']),
             __pie_label_threshold = getConfig(['pie', 'label', 'threshold'], 0.05),
+            __pie_sort = getConfig(['pie', 'sort'], true),
             __pie_expand = getConfig(['pie', 'expand'], true),
             __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
             __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
@@ -280,6 +281,7 @@
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
             __donut_label_threshold = getConfig(['donut', 'label', 'threshold'], 0.05),
+            __donut_sort = getConfig(['donut', 'sort'], true),
             __donut_expand = getConfig(['donut', 'expand'], true),
             __donut_title = getConfig(['donut', 'title'], ""),
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
@@ -1010,6 +1012,9 @@
         pie = d3.layout.pie().value(function (d) {
             return d.values.reduce(function (a, b) { return a + b.value; }, 0);
         });
+        if (!__pie_sort || !__donut_sort) { // TODO: this needs to be called by each type
+            pie.sort(null);
+        }
 
         function updateAngle(d) {
             var found = false;
