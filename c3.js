@@ -2956,7 +2956,7 @@
 
             // MEMO: call here to update legend box and tranlate for all
             // MEMO: translate will be upated by this, so transform not needed in updateLegend()
-            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
+            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
 
             /*-- Main Region --*/
 
