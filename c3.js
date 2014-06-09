@@ -700,7 +700,7 @@
             subYMin = __axis_rotated ? 0 : height2;
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
-            x = getX(xMin, xMax, forInit ? undefined : x.domain(), function () { return xAxis.tickOffset(); });
+            x = getX(xMin, xMax, forInit ? undefined : x.orgDomain(), function () { return xAxis.tickOffset(); });
             y = getY(yMin, yMax, forInit ? undefined : y.domain());
             y2 = getY(yMin, yMax, forInit ? undefined : y2.domain());
             subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
@@ -750,11 +750,7 @@
                 scale[key] = _scale[key];
             }
             scale.orgDomain = function () {
-                var domain = _scale.domain();
-                if (orgXDomain && orgXDomain[0] === domain[0] && orgXDomain[1] < domain[1]) {
-                    domain[1] = orgXDomain[1];
-                }
-                return domain;
+                return _scale.domain();
             };
             // define custom domain() for categorized axis
             if (isCategorized) {
@@ -763,7 +759,6 @@
                         domain = this.orgDomain();
                         return [domain[0], domain[1] + 1];
                     }
-                    orgXDomain = domain;
                     _scale.domain(domain);
                     return scale;
                 };
