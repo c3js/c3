@@ -7,13 +7,15 @@
     <div id="chart2"></div>
     <div id="chart3"></div>
     <div id="chart4"></div>
+    <div id="chart5"></div>
+    <div id="chart6"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
 
       var columns = [];
-      for (var i = 0; i < 30; i++ ) {
+      for (var i = 0; i < 28; i++ ) {
         columns[i] = ['datahogehogeohgeohoge' + i, 10 * i, 20 * i];
       }
 
@@ -39,13 +41,23 @@
         data: {
           columns: columns,
         },
+        legend: {
+          position: 'inset',
+        },
+      });
+
+      c3.generate({
+        bindto: '#chart4',
+        data: {
+          columns: columns,
+        },
         axis: {
           rotated: true,
         },
       });
 
       c3.generate({
-        bindto: '#chart4',
+        bindto: '#chart5',
         data: {
           columns: columns,
         },
@@ -56,6 +68,20 @@
           rotated: true,
         },
       });
+
+      c3.generate({
+        bindto: '#chart6',
+        data: {
+          columns: columns,
+        },
+        legend: {
+          position: 'inset'
+        },
+        axis: {
+          rotated: true,
+        },
+      });
+
     </script>
   </body>
 </html>
