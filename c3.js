@@ -2302,6 +2302,7 @@
                 else {
                     if (ids.indexOf(id) < 0) { ids.push(id); }
                     color = pattern[ids.indexOf(id) % pattern.length];
+                    colors[id] = color;
                 }
                 return callback instanceof Function ? callback(color, d) : color;
             };
