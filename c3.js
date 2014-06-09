@@ -975,12 +975,25 @@
             return textAnchorForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
         }
         function getMaxTickWidth(id) {
-            var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
+            var maxWidth = 0, targetsToShow, scale, axis;
             if (svg) {
-                svg.selectAll('.' + axisClass + ' .tick text').each(function () {
-                    var box = this.getBoundingClientRect();
-                    if (maxWidth < box.width) { maxWidth = box.width; }
-                });
+                targetsToShow = filterTargetsToShow(c3.data.targets);
+                if (id === 'y') {
+                    scale = y.copy().domain(getYDomain(targetsToShow, 'y'));
+                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks);
+                } else if (id === 'y2') {
+                    scale = y2.copy().domain(getYDomain(targetsToShow, 'y2'));
+                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+                } else {
+                    scale = x.copy().domain(getXDomain(targetsToShow));
+                    axis = getXAxis(scale, xOrient, getXAxisTickFormat(), __axis_x_tick_values ? __axis_x_tick_values : xAxis.tickValues());
+                }
+                main.append("g").call(axis).each(function () {
+                    d3.select(this).selectAll('text').each(function () {
+                        var box = this.getBoundingClientRect();
+                        if (maxWidth < box.width) { maxWidth = box.width; }
+                    });
+                }).remove();
             }
             currentMaxTickWidth = maxWidth <= 0 ? currentMaxTickWidth : maxWidth;
             return currentMaxTickWidth;
@@ -3571,21 +3584,6 @@
             transitions.axisY2.call(y2Axis);
             transitions.axisSubX.call(subXAxis);
 
-            if (targetsToShow.length) {
-                // Update dimensions according to the width of ticks, etc
-                updateSizes();
-                updateScales();
-                updateSvgSize();
-                transformAll(true, transitions);
-                // x changes above, so need to update domain too
-                updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
-                // Update axis again because the length can be updated because of update of max tick width and generate tickOffset
-                transitions.axisX.call(xAxis);
-                transitions.axisSubX.call(subXAxis);
-                transitions.axisY.call(yAxis);
-                transitions.axisY2.call(y2Axis);
-            }
-
             // Update axis label
             updateAxisLabels(withTransition);
 
@@ -5116,7 +5114,7 @@
         c3.groups = function (groups) {
             if (isUndefined(groups)) { return __data_groups; }
             __data_groups = groups;
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            redraw();
             return __data_groups;
         };
 
