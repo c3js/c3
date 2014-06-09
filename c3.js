@@ -184,8 +184,9 @@
         var __legend_show = getConfig(['legend', 'show'], true),
             __legend_position = getConfig(['legend', 'position'], 'bottom'),
             __legend_inset_anchor = getConfig(['legend', 'inset', 'anchor'], 'top-left'),
-            __legend_inset_x = getConfig(['legend', 'inset', 'x'], 0),
+            __legend_inset_x = getConfig(['legend', 'inset', 'x'], 10),
             __legend_inset_y = getConfig(['legend', 'inset', 'y'], 0),
+            __legend_inset_step = getConfig(['legend', 'inset', 'step']),
             __legend_item_onclick = getConfig(['legend', 'item', 'onclick']),
             __legend_item_onmouseover = getConfig(['legend', 'item', 'onmouseover']),
             __legend_item_onmouseout = getConfig(['legend', 'item', 'onmouseout']),
@@ -670,7 +671,17 @@
             return __legend_show ? isLegendRight || isLegendInset ? legendItemWidth * (legendStep + 1) : currentWidth : 0;
         }
         function getLegendHeight() {
-            return __legend_show ? isLegendRight ? currentHeight : isLegendInset ? (c3.data.targets.length * Math.max(20, legendItemHeight)) + 20 : Math.max(20, legendItemHeight) * (legendStep + 1) : 0;
+            var h = 0;
+            if (__legend_show) {
+                if (isLegendRight) {
+                    h = currentHeight;
+                } else if (isLegendInset) {
+                    h = __legend_inset_step ? Math.max(20, legendItemHeight) * (__legend_inset_step + 1) : height;
+                } else {
+                    h = Math.max(20, legendItemHeight) * (legendStep + 1);
+                }
+            }
+            return h;
         }
 
         //-- Scales --//
@@ -4581,7 +4592,7 @@
                         }
                     }
                     steps[id] = step;
-                    margins[step] = margin;
+                    margins[step] = isLegendInset ? 10 : margin;
                     offsets[id] = totalLength;
                     totalLength += itemLength;
                 }
@@ -4693,7 +4704,7 @@
                 .style('stroke', 'lightgray')
                 .style('stroke-width', 1)
                 .attr('height', getLegendHeight() - 10)
-                .attr('width', maxWidth);
+                .attr('width', maxWidth * (step + 1) + 10);
             }
 
             texts = legend.selectAll('text')
