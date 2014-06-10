@@ -253,7 +253,8 @@
 
         // bar
         var __bar_width = getConfig(['bar', 'width']),
-            __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6);
+            __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6),
+            __bar_zerobased = getConfig(['bar', 'zerobased'], true);
 
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
@@ -700,7 +701,7 @@
             subYMin = __axis_rotated ? 0 : height2;
             subYMax = __axis_rotated ? width2 : 1;
             // update scales
-            x = getX(xMin, xMax, forInit ? undefined : x.domain(), function () { return xAxis.tickOffset(); });
+            x = getX(xMin, xMax, forInit ? undefined : x.orgDomain(), function () { return xAxis.tickOffset(); });
             y = getY(yMin, yMax, forInit ? undefined : y.domain());
             y2 = getY(yMin, yMax, forInit ? undefined : y2.domain());
             subX = getX(xMin, xMax, orgXDomain, function (d) { return d % 1 ? 0 : subXAxis.tickOffset(); });
@@ -750,11 +751,7 @@
                 scale[key] = _scale[key];
             }
             scale.orgDomain = function () {
-                var domain = _scale.domain();
-                if (orgXDomain && orgXDomain[0] === domain[0] && orgXDomain[1] < domain[1]) {
-                    domain[1] = orgXDomain[1];
-                }
-                return domain;
+                return _scale.domain();
             };
             // define custom domain() for categorized axis
             if (isCategorized) {
@@ -763,7 +760,6 @@
                         domain = this.orgDomain();
                         return [domain[0], domain[1] + 1];
                     }
-                    orgXDomain = domain;
                     _scale.domain(domain);
                     return scale;
                 };
@@ -975,12 +971,25 @@
             return textAnchorForAxisLabel(__axis_rotated, getY2AxisLabelPosition());
         }
         function getMaxTickWidth(id) {
-            var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
+            var maxWidth = 0, targetsToShow, scale, axis;
             if (svg) {
-                svg.selectAll('.' + axisClass + ' .tick text').each(function () {
-                    var box = this.getBoundingClientRect();
-                    if (maxWidth < box.width) { maxWidth = box.width; }
-                });
+                targetsToShow = filterTargetsToShow(c3.data.targets);
+                if (id === 'y') {
+                    scale = y.copy().domain(getYDomain(targetsToShow, 'y'));
+                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks);
+                } else if (id === 'y2') {
+                    scale = y2.copy().domain(getYDomain(targetsToShow, 'y2'));
+                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+                } else {
+                    scale = x.copy().domain(getXDomain(targetsToShow));
+                    axis = getXAxis(scale, xOrient, getXAxisTickFormat(), __axis_x_tick_values ? __axis_x_tick_values : xAxis.tickValues());
+                }
+                main.append("g").call(axis).each(function () {
+                    d3.select(this).selectAll('text').each(function () {
+                        var box = this.getBoundingClientRect();
+                        if (maxWidth < box.width) { maxWidth = box.width; }
+                    });
+                }).remove();
             }
             currentMaxTickWidth = maxWidth <= 0 ? currentMaxTickWidth : maxWidth;
             return currentMaxTickWidth;
@@ -1250,6 +1259,7 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
+                isZeroBased = (hasBarType(yTargets) && __bar_zerobased) || hasAreaType(yTargets),
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
                 showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
@@ -1262,7 +1272,7 @@
             isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
             // Bar/Area chart should be 0-based if all positive|negative
-            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+            if (isZeroBased) {
                 if (isAllPositive) { yDomainMin = 0; }
                 if (isAllNegative) { yDomainMax = 0; }
             }
@@ -1296,7 +1306,7 @@
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
             // Bar/Area chart should be 0-based if all positive|negative
-            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+            if (isZeroBased) {
                 if (isAllPositive) { padding_bottom = yDomainMin; }
                 if (isAllNegative) { padding_top = -yDomainMax; }
             }
@@ -2292,6 +2302,7 @@
                 else {
                     if (ids.indexOf(id) < 0) { ids.push(id); }
                     color = pattern[ids.indexOf(id) % pattern.length];
+                    colors[id] = color;
                 }
                 return callback instanceof Function ? callback(color, d) : color;
             };
@@ -2946,7 +2957,7 @@
 
             // MEMO: call here to update legend box and tranlate for all
             // MEMO: translate will be upated by this, so transform not needed in updateLegend()
-            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false});
+            updateLegend(mapToIds(c3.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
 
             /*-- Main Region --*/
 
@@ -3570,21 +3581,6 @@
             transitions.axisY.call(yAxis);
             transitions.axisY2.call(y2Axis);
             transitions.axisSubX.call(subXAxis);
-
-            if (targetsToShow.length) {
-                // Update dimensions according to the width of ticks, etc
-                updateSizes();
-                updateScales();
-                updateSvgSize();
-                transformAll(true, transitions);
-                // x changes above, so need to update domain too
-                updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
-                // Update axis again because the length can be updated because of update of max tick width and generate tickOffset
-                transitions.axisX.call(xAxis);
-                transitions.axisSubX.call(subXAxis);
-                transitions.axisY.call(yAxis);
-                transitions.axisY2.call(y2Axis);
-            }
 
             // Update axis label
             updateAxisLabels(withTransition);
@@ -5116,7 +5112,7 @@
         c3.groups = function (groups) {
             if (isUndefined(groups)) { return __data_groups; }
             __data_groups = groups;
-            redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+            redraw();
             return __data_groups;
         };
 

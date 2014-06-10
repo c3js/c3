@@ -8,6 +8,7 @@
     <div id="chart3"></div>
     <div id="chart4"></div>
     <div id="chart5"></div>
+    <div id="chart6"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
@@ -74,6 +75,26 @@
         bindto: '#chart5',
         data: {
           columns: bigData
+        },
+        grid: {
+          x: {
+            show: true
+          },
+          y: {
+            show: true
+          }
+        }
+      });
+
+      c3.generate({
+        bindto: '#chart6',
+        data: {
+          columns: bigData
+        },
+        axis: {
+          x: {
+            type: 'category'
+          }
         },
         grid: {
           x: {
