@@ -2967,6 +2967,11 @@
                 .attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
                 .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
+            // Regions
+            main.append('g')
+                .attr("clip-path", clipPath)
+                .attr("class", CLASS.regions);
+
             // Grids
             grid = main.append('g')
                 .attr("clip-path", clipPath)
@@ -2989,11 +2994,6 @@
                 grid.append('g').attr('class', CLASS.ygrids);
             }
             grid.append('g').attr('class', CLASS.ygridLines);
-
-            // Regions
-            main.append('g')
-                .attr("clip-path", clipPath)
-                .attr("class", CLASS.regions);
 
             // Define g for chart area
             main.append('g')
@@ -3058,7 +3058,7 @@
                 .attr("class", CLASS.chartTexts);
 
             // if zoom privileged, insert rect to forefront
-            main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
+            main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.regions)
                 .attr('class', CLASS.zoomRect)
                 .attr('width', width)
                 .attr('height', height)
