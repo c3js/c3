@@ -143,6 +143,7 @@
         var __data_x = getConfig(['data', 'x']),
             __data_xs = getConfig(['data', 'xs'], {}),
             __data_x_format = getConfig(['data', 'x_format'], '%Y-%m-%d'),
+            __data_x_localtime = getConfig(['data', 'x_localtime'], true),
             __data_id_converter = getConfig(['data', 'id_converter'], function (id) { return id; }),
             __data_names = getConfig(['data', 'names'], {}),
             __data_classes = getConfig(['data', 'classes'], {}),
@@ -346,8 +347,9 @@
             color = generateColor(__data_colors, notEmpty(__color_pattern) ? __color_pattern : defaultColorPattern, __data_color),
             levelColor = notEmpty(__color_threshold) ? generateLevelColor(__color_pattern, __color_threshold) : null;
 
-        var timeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
-            defaultTimeFormat = timeFormat.multi([
+        var dataTimeFormat = __data_x_localtime ? d3.time.format : d3.time.format.utc,
+            axisTimeFormat = __axis_x_localtime ? d3.time.format : d3.time.format.utc,
+            defaultAxisTimeFormat = axisTimeFormat.multi([
                 [".%L", function (d) { return d.getMilliseconds(); }],
                 [":%S", function (d) { return d.getSeconds(); }],
                 ["%I:%M", function (d) { return d.getMinutes(); }],
@@ -808,13 +810,13 @@
             return id in __data_axes ? __data_axes[id] : 'y';
         }
         function getXAxisTickFormat() {
-            var format = isTimeSeries ? defaultTimeFormat : isCategorized ? categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
+            var format = isTimeSeries ? defaultAxisTimeFormat : isCategorized ? categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
             if (__axis_x_tick_format) {
                 if (typeof __axis_x_tick_format === 'function') {
                     format = __axis_x_tick_format;
                 } else if (isTimeSeries) {
                     format = function (date) {
-                        return date ? timeFormat(__axis_x_tick_format)(date) : "";
+                        return date ? axisTimeFormat(__axis_x_tick_format)(date) : "";
                     };
                 }
             }
@@ -2333,7 +2335,7 @@
                 parsedDate = date;
             } else {
                 try {
-                    parsedDate = typeof date === 'number' ? new Date(date) : d3.time.format(__data_x_format).parse(date);
+                    parsedDate = typeof date === 'number' ? new Date(date) : dataTimeFormat(__data_x_format).parse(date);
                 } catch (e) {
                     window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
                 }
