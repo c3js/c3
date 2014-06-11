@@ -2333,12 +2333,13 @@
             var parsedDate;
             if (date instanceof Date) {
                 parsedDate = date;
+            } else if (typeof date === 'number') {
+                parsedDate = new Date(date);
             } else {
-                try {
-                    parsedDate = typeof date === 'number' ? new Date(date) : dataTimeFormat(__data_x_format).parse(date);
-                } catch (e) {
-                    window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
-                }
+                parsedDate = dataTimeFormat(__data_x_format).parse(date);
+            }
+            if (!parsedDate || isNaN(+parsedDate)) {
+                window.console.error("Failed to parse x '" + date + "' to Date object");
             }
             return parsedDate;
         }
