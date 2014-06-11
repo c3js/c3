@@ -591,8 +591,14 @@
         }
         function getParentRectValue(key) {
             var parent = selectChart.node(), v;
-            while (parent && parent.tagName !== 'BODY') {
-                v = parent.getBoundingClientRect()[key];
+            while (parent && parent.tagName !== 'BOD
+                var box = null;
+                try {
+                   box = parent.getBoundingClientRect();
+                } catch(e) {
+                   box = { top : parent.offsetTop, left : parent.offsetLeft }
+                };
+                v = box[key];
                 if (v) {
                     break;
                 }
