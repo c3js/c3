@@ -4476,23 +4476,22 @@
             }
         }
         function loadFromArgs(args) {
-            // load data
-            if ('data' in args) {
+            if (args.data) {
                 load(convertDataToTargets(args.data), args);
             }
-            else if ('url' in args) {
+            else if (args.url) {
                 d3.csv(args.url, function (error, data) {
                     load(convertDataToTargets(data), args);
                 });
             }
-            else if ('rows' in args) {
+            else if (args.json) {
+                load(convertDataToTargets(convertJsonToData(args.json, args.keys)), args);
+            }
+            else if (args.rows) {
                 load(convertDataToTargets(convertRowsToData(args.rows)), args);
             }
-            else if ('columns' in args) {
+            else if (args.columns) {
                 load(convertDataToTargets(convertColumnsToData(args.columns)), args);
-            }
-            else {
-                throw Error('url or rows or columns is required.');
             }
         }
 
