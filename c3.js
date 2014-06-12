@@ -4446,27 +4446,29 @@
         }
 
         function load(targets, args) {
-            // filter loading targets if needed
-            if (args.filter) {
-                targets = targets.filter(args.filter);
-            }
-            // set type if args.types || args.type specified
-            if (args.type || args.types) {
-                targets.forEach(function (t) {
-                    args.types ? setTargetType(t.id, args.types[t.id]) : setTargetType(t.id, args.type);
-                });
-            }
-            // Update/Add data
-            c3.data.targets.forEach(function (d) {
-                for (var i = 0; i < targets.length; i++) {
-                    if (d.id === targets[i].id) {
-                        d.values = targets[i].values;
-                        targets.splice(i, 1);
-                        break;
-                    }
+            if (targets) {
+                // filter loading targets if needed
+                if (args.filter) {
+                    targets = targets.filter(args.filter);
                 }
-            });
-            c3.data.targets = c3.data.targets.concat(targets); // add remained
+                // set type if args.types || args.type specified
+                if (args.type || args.types) {
+                    targets.forEach(function (t) {
+                        args.types ? setTargetType(t.id, args.types[t.id]) : setTargetType(t.id, args.type);
+                    });
+                }
+                // Update/Add data
+                c3.data.targets.forEach(function (d) {
+                    for (var i = 0; i < targets.length; i++) {
+                        if (d.id === targets[i].id) {
+                            d.values = targets[i].values;
+                            targets.splice(i, 1);
+                            break;
+                        }
+                    }
+                });
+                c3.data.targets = c3.data.targets.concat(targets); // add remained
+            }
 
             // Set targets
             updateTargets(c3.data.targets);
@@ -4495,6 +4497,9 @@
             }
             else if (args.columns) {
                 load(convertDataToTargets(convertColumnsToData(args.columns)), args);
+            }
+            else {
+                load(null, args);
             }
         }
 
