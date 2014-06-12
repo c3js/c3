@@ -2455,7 +2455,7 @@
         //-- Selection --//
 
         function selectPoint(target, d, i) {
-            __data_onselected(d, target.node());
+            __data_onselected.call(c3, d, target.node());
             // add selected-circle on low layer g
             main.select('.' + CLASS.selectedCircles + getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
                 .data([d])
@@ -2469,7 +2469,7 @@
                 .attr("r", pointSelectR);
         }
         function unselectPoint(target, d, i) {
-            __data_onunselected(d, target.node());
+            __data_onunselected.call(c3, d, target.node());
             // remove selected-circle from low layer g
             main.select('.' + CLASS.selectedCircles + getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
               .transition().duration(100).attr('r', 0)
@@ -2480,11 +2480,11 @@
         }
 
         function selectBar(target, d) {
-            __data_onselected(d, target.node());
+            __data_onselected.call(c3, d, target.node());
             target.transition().duration(100).style("fill", function () { return d3.rgb(color(d)).brighter(0.75); });
         }
         function unselectBar(target, d) {
-            __data_onunselected(d, target.node());
+            __data_onunselected.call(c3, d, target.node());
             target.transition().duration(100).style("fill", function () { return color(d); });
         }
         function toggleBar(selected, target, d, i) {
@@ -2925,8 +2925,8 @@
             // Define svgs
             svg = selectChart.append("svg")
                 .style("overflow", "hidden")
-                .on('mouseenter', __onmouseover)
-                .on('mouseleave', __onmouseout);
+                .on('mouseenter', function () { return __onmouseover.call(c3); })
+                .on('mouseleave', function () { return __onmouseout.call(c3); });
 
             // Define defs
             defs = svg.append("defs");
@@ -3171,11 +3171,15 @@
                 window.onresize = generateResize();
             }
             if (window.onresize.add) {
-                window.onresize.add(__onresize);
+                window.onresize.add(function () {
+                    __onresize.call(c3);
+                });
                 window.onresize.add(function () {
                     c3.flush();
                 });
-                window.onresize.add(__onresized);
+                window.onresize.add(function () {
+                    __onresized.call(c3);
+                });
             }
 
             // export element of the chart
@@ -3215,7 +3219,7 @@
 
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onmouseover(d);
+                        __data_onmouseover.call(c3, d);
                     });
                 })
                 .on('mouseout', function (d) {
@@ -3228,7 +3232,7 @@
                     unexpandBars();
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onmouseout(d);
+                        __data_onmouseout.call(c3, d);
                     });
                 })
                 .on('mousemove', function (d) {
@@ -3354,12 +3358,12 @@
                     if (dist(closest, mouse) < 100) {
                         svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                         if (!mouseover) {
-                            __data_onmouseover(closest);
+                            __data_onmouseover.call(c3, closest);
                             mouseover = true;
                         }
                     } else {
                         svg.select('.' + CLASS.eventRect).style('cursor', null);
-                        __data_onmouseout(closest);
+                        __data_onmouseout.call(c3, closest);
                         mouseover = false;
                     }
                 })
@@ -3416,7 +3420,7 @@
                     shape.classed(CLASS.SELECTED, !isSelected);
                     toggle(!isSelected, shape, d, i);
                 }
-                __data_onclick(d, that);
+                __data_onclick.call(c3, d, that);
             }
         }
 
@@ -3485,7 +3489,7 @@
                 .attr('class', CLASS.dragarea)
                 .style('opacity', 0.1);
             dragging = true;
-            __data_ondragstart();
+            __data_ondragstart.call(c3);
         }
 
         function dragend() {
@@ -3498,7 +3502,7 @@
             main.selectAll('.' + CLASS.shape)
                 .classed(CLASS.INCLUDED, false);
             dragging = false;
-            __data_ondragend();
+            __data_ondragend.call(c3);
         }
 
         function smoothLines(el, type) {
@@ -3836,7 +3840,7 @@
                     // transitions
                     expandArc(updated.data.id);
                     toggleFocusLegend(updated.data.id, true);
-                    callback(arcData, i);
+                    callback.call(c3, arcData, i);
                 })
                 .on('mousemove', function (d) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
@@ -3854,12 +3858,12 @@
                     unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
-                    callback(arcData, i);
+                    callback.call(c3, arcData, i);
                 })
                 .on('click', function (d, i) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
                     toggleShape(this, d, i);
-                    callback(arcData, i);
+                    callback.call(c3, arcData, i);
                 });
             mainArc
                 .attr("transform", function (d) { return !isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
@@ -4673,7 +4677,7 @@
                 .style('visibility', function (id) { return isLegendToShow(id) ? 'visible' : 'hidden'; })
                 .style('cursor', 'pointer')
                 .on('click', function (id) {
-                    typeof __legend_item_onclick === 'function' ? __legend_item_onclick(id) : c3.toggle(id);
+                    typeof __legend_item_onclick === 'function' ? __legend_item_onclick.call(c3, id) : c3.toggle(id);
                 })
                 .on('mouseover', function (id) {
                     d3.select(this).classed(CLASS.legendItemFocused, true);
@@ -4681,7 +4685,7 @@
                         c3.focus(id);
                     }
                     if (typeof __legend_item_onmouseover === 'function') {
-                        __legend_item_onmouseover(id);
+                        __legend_item_onmouseover.call(c3, id);
                     }
                 })
                 .on('mouseout', function (id) {
@@ -4690,7 +4694,7 @@
                         c3.revert();
                     }
                     if (typeof __legend_item_onmouseout === 'function') {
-                        __legend_item_onmouseout(id);
+                        __legend_item_onmouseout.call(c3, id);
                     }
                 });
             l.append('text')
