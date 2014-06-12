@@ -5227,6 +5227,20 @@
             return __data_colors;
         };
 
+        c3.category = function (i, category) {
+            if (arguments.length > 1) {
+                __axis_x_categories[i] = category;
+                redraw();
+            }
+            return __axis_x_categories[i];
+        };
+        c3.categories = function (categories) {
+            if (!arguments.length) { return __axis_x_categories; }
+            __axis_x_categories = categories;
+            redraw();
+            return __axis_x_categories;
+        };
+
         c3.color = color;
 
         c3.x = function (x) {
