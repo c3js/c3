@@ -4325,6 +4325,7 @@
             options.withUpdateXDomain = true;
             options.withUpdateOrgXDomain = true;
             options.withTransitionForExit = false;
+            options.withTransitionForTransform = getOption(options, "withTransitionForTransform", options.withTransition);
             // MEMO: this needs to be called before updateLegend and it means this ALWAYS needs to be called)
             updateSizes();
             // MEMO: called in updateLegend in redraw if withLegend
@@ -4334,7 +4335,7 @@
                 updateScales();
                 updateSvgSize();
                 // Update g positions
-                transformAll(options.withTransition, transitions);
+                transformAll(options.withTransitionForTransform, transitions);
             }
             // Draw with new sizes & scales
             redraw(options, transitions);
@@ -4810,10 +4811,12 @@
             }
         }
         function transformTo(targetIds, type, optionsForRedraw) {
-            var withTransitionForAxis = !hasArcType(c3.data.targets);
+            var withTransitionForAxis = !hasArcType(c3.data.targets),
+                options = optionsForRedraw || {withTransitionForAxis: withTransitionForAxis};
+            options.withTransitionForTransform = false;
             transiting = false;
             setTargetType(targetIds, type);
-            updateAndRedraw(optionsForRedraw || {withTransitionForAxis: withTransitionForAxis});
+            updateAndRedraw(options);
         }
 
         c3.focus = function (targetId) {
