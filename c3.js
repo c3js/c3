@@ -257,6 +257,9 @@
             __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6),
             __bar_zerobased = getConfig(['bar', 'zerobased'], true);
 
+        // area
+        var __area_zerobased = getConfig(['area', 'zerobased'], true);
+
         // pie
         var __pie_label_show = getConfig(['pie', 'label', 'show'], true),
             __pie_label_format = getConfig(['pie', 'label', 'format']),
@@ -1261,7 +1264,7 @@
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
                 yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
-                isZeroBased = (hasBarType(yTargets) && __bar_zerobased) || hasAreaType(yTargets),
+                isZeroBased = (hasBarType(yTargets) && __bar_zerobased) || (hasAreaType(yTargets) && __area_zerobased),
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
                 showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
