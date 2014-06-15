@@ -556,13 +556,13 @@
             return h > 0 ? h : 320;
         }
         function getCurrentPaddingTop() {
-            return __padding_top ? __padding_top : 0;
+            return isValue(__padding_top) ? __padding_top : 0;
         }
         function getCurrentPaddingBottom() {
-            return __padding_bottom ? __padding_bottom : 0;
+            return isValue(__padding_bottom) ? __padding_bottom : 0;
         }
         function getCurrentPaddingLeft() {
-            if (__padding_left) {
+            if (isValue(__padding_left)) {
                 return __padding_left;
             } else if (__axis_rotated) {
                 return !__axis_x_show ? 1 : Math.max(ceil10(getAxisWidthByAxisId('x')), 40);
@@ -572,8 +572,8 @@
         }
         function getCurrentPaddingRight() {
             var defaultPadding = 10, legendWidthOnRight = isLegendRight ? getLegendWidth() + 20 : 0;
-            if (__padding_right) {
-                return __padding_right;
+            if (isValue(__padding_right)) {
+                return __padding_right + 1; // 1 is needed not to hide tick line
             } else if (__axis_rotated) {
                 return defaultPadding + legendWidthOnRight;
             } else {

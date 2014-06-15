@@ -14,12 +14,13 @@
     <div id="chart2"></div>
     <div id="chart3"></div>
     <div id="chart4"></div>
+    <div id="chart5"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
 
-      var chart = c3.generate({
+      var chart1 = c3.generate({
         bindto: '#chart1',
         padding: {
           top: 50,
@@ -54,7 +55,7 @@
         }
       });
 
-      var chart = c3.generate({
+      var chart2 = c3.generate({
         bindto: '#chart2',
         padding: {
           top: 50,
@@ -92,7 +93,7 @@
         }
       });
 
-      var chart = c3.generate({
+      var chart3 = c3.generate({
         bindto: '#chart3',
         padding: {
           top: 50,
@@ -130,7 +131,7 @@
         }
       });
 
-      var chart = c3.generate({
+      var chart4 = c3.generate({
         bindto: '#chart4',
         padding: {
           top: 50,
@@ -152,6 +153,41 @@
         },
         subchart: {
           show: true
+        },
+        axis: {
+          rotated: true,
+          y: {
+            label: {
+              text: 'Y Label', 
+              position: 'outer-center'
+            }
+          },
+          y2: {
+            show: true,
+            label: {
+              text: 'Y2 Label',
+              position: 'outer-center'
+            }
+          }
+        }
+      });
+
+      var chart5 = c3.generate({
+        bindto: '#chart5',
+        padding: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 200, 100, 150, 150]
+          ],
+          axes: {
+            data2: 'y2'
+          },
         },
         axis: {
           rotated: true,
