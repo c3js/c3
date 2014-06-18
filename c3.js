@@ -2964,13 +2964,15 @@
                   .append('line')
                     .attr('class', CLASS.xgridFocus);
             }
-            grid.append('g').attr("class", CLASS.xgridLines);
 
             // Y-Grid
             if (__grid_y_show) {
                 grid.append('g').attr('class', CLASS.ygrids);
             }
             grid.append('g').attr('class', CLASS.ygridLines);
+			
+			// Append the xgridLine here so it does not get overlapped by y-grids
+            grid.append('g').attr("class", CLASS.xgridLines);
 
             // Define g for chart area
             main.append('g')
