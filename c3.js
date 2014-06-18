@@ -3655,7 +3655,7 @@
             xgridLine.append('text')
                 .attr("text-anchor", "end")
                 .attr("transform", __axis_rotated ? "" : "rotate(-90)")
-                .attr('dx', __axis_rotated ? 0 : -margin.top)
+                .attr('dx', __axis_rotated ? 0 : 0)
                 .attr('dy', -5)
                 .style("opacity", 0);
             // udpate
@@ -4063,7 +4063,7 @@
                 transitions.push(xgridLines.select('line').transition()
                     .attr("x1", __axis_rotated ? 0 : xv)
                     .attr("x2", __axis_rotated ? width : xv)
-                    .attr("y1", __axis_rotated ? xv : margin.top)
+                    .attr("y1", __axis_rotated ? xv : 0)
                     .attr("y2", __axis_rotated ? xv : height)
                     .style("opacity", 1));
                 transitions.push(xgridLines.select('text').transition()
