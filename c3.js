@@ -523,7 +523,7 @@
             main.select('line.' + CLASS.xgridFocus)
                 .attr("x1", __axis_rotated ? 0 : -10)
                 .attr("x2", __axis_rotated ? width : -10)
-                .attr("y1", __axis_rotated ? -10 : margin.top)
+                .attr("y1", __axis_rotated ? -10 : 0)
                 .attr("y2", __axis_rotated ? -10 : height);
         }
         function updateRadius() {
@@ -3627,7 +3627,7 @@
                 } : {
                     'x1': function (d) { return x(d) + tickOffset; },
                     'x2': function (d) { return x(d) + tickOffset; },
-                    'y1': margin.top,
+                    'y1': 0,
                     'y2': height
                 };
                 // this is used to flow
