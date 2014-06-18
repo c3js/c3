@@ -13,7 +13,10 @@
           columns: [
             [ 'data', 91.4 ]
           ],
-          type: 'gauge'
+          type: 'gauge',
+          onmouseover: function (d, i) { console.log("onmouseover", d, i, this); },
+          onmouseout: function (d, i) { console.log("onmouseout", d, i, this); },
+          onclick: function (d, i) { console.log("onclick", d, i, this); },
         },
         gauge: {
           label: {

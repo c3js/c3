@@ -265,10 +265,7 @@
             __pie_label_format = getConfig(['pie', 'label', 'format']),
             __pie_label_threshold = getConfig(['pie', 'label', 'threshold'], 0.05),
             __pie_sort = getConfig(['pie', 'sort'], true),
-            __pie_expand = getConfig(['pie', 'expand'], true),
-            __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
-            __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
-            __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
+            __pie_expand = getConfig(['pie', 'expand'], true);
 
         // gauge
         var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
@@ -276,9 +273,6 @@
             __gauge_expand = getConfig(['gauge', 'expand'], true),
             __gauge_min = getConfig(['gauge', 'min'], 0),
             __gauge_max = getConfig(['gauge', 'max'], 100),
-            __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
-            __gauge_onmouseover = getConfig(['gauge', 'onmouseover'], function () {}),
-            __gauge_onmouseout = getConfig(['gauge', 'onmouseout'], function () {}),
             __gauge_units = getConfig(['gauge', 'units']),
             __gauge_width = getConfig(['gauge', 'width']);
 
@@ -288,10 +282,7 @@
             __donut_label_threshold = getConfig(['donut', 'label', 'threshold'], 0.05),
             __donut_sort = getConfig(['donut', 'sort'], true),
             __donut_expand = getConfig(['donut', 'expand'], true),
-            __donut_title = getConfig(['donut', 'title'], ""),
-            __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
-            __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
-            __donut_onmouseout = getConfig(['donut', 'onmouseout'], function () {});
+            __donut_title = getConfig(['donut', 'title'], "");
 
         // region - region to change style
         var __regions = getConfig(['regions'], []);
@@ -1030,13 +1021,19 @@
             pie.sort(null);
         }
 
+        function descByStartAngle(a, b) {
+            return a.startAngle - b.startAngle;
+        }
+
         function updateAngle(d) {
-            var found = false;
-            pie(filterTargetsToShow(c3.data.targets)).forEach(function (t) {
+            var found = false, index = 0;
+            pie(filterTargetsToShow(c3.data.targets)).sort(descByStartAngle).forEach(function (t) {
                 if (! found && t.data.id === d.data.id) {
                     found = true;
                     d = t;
+                    d.index = index;
                 }
+                index++;
             });
             if (isNaN(d.endAngle)) {
                 d.endAngle = d.startAngle;
@@ -1094,7 +1091,8 @@
             return addName({
                 id: d.data.id,
                 value: d.value,
-                ratio: getArcRatio(d)
+                ratio: getArcRatio(d),
+                index: d.index,
             });
         }
         function textForArcLabel(d) {
@@ -1161,33 +1159,6 @@
         }
         function getArcTitle() {
             return hasDonutType(c3.data.targets) ? __donut_title : "";
-        }
-        function getArcOnClick() {
-            var callback = __pie_onclick;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onclick;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onclick;
-            }
-            return typeof callback === 'function' ? callback : function () {};
-        }
-        function getArcOnMouseOver() {
-            var callback = __pie_onmouseover;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onmouseover;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onmouseover;
-            }
-            return typeof callback === 'function' ? callback : function () {};
-        }
-        function getArcOnMouseOut() {
-            var callback = __pie_onmouseout;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onmouseout;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onmouseout;
-            }
-            return typeof callback === 'function' ? callback : function () {};
         }
 
         //-- Domain --//
@@ -3832,41 +3803,38 @@
                     }
                     this._current = d;
                 })
-                .on('mouseover', function (d, i) {
-                    var updated, arcData, callback;
+                .on('mouseover', function (d) {
+                    var updated, arcData;
                     if (transiting) { // skip while transiting
                         return;
                     }
                     updated = updateAngle(d);
                     arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOver();
                     // transitions
                     expandArc(updated.data.id);
                     toggleFocusLegend(updated.data.id, true);
-                    callback.call(c3, arcData, i);
+                    __data_onmouseover.call(c3, arcData, this);
                 })
                 .on('mousemove', function (d) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
                     showTooltip(selectedData, d3.mouse(this));
                 })
-                .on('mouseout', function (d, i) {
-                    var updated, arcData, callback;
+                .on('mouseout', function (d) {
+                    var updated, arcData;
                     if (transiting) { // skip while transiting
                         return;
                     }
                     updated = updateAngle(d);
                     arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOut();
                     // transitions
                     unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
-                    callback.call(c3, arcData, i);
+                    __data_onmouseout.call(c3, arcData, this);
                 })
                 .on('click', function (d, i) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
-                    toggleShape(this, d, i);
-                    callback.call(c3, arcData, i);
+                    var updated = updateAngle(d), arcData = convertToArcData(updated);
+                    toggleShape(this, arcData, i); // onclick called in toogleShape()
                 });
             mainArc
                 .attr("transform", function (d) { return !isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })

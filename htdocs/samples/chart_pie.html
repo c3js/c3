@@ -19,6 +19,9 @@
 //            ["virginica", 50],
           ],
           type : 'pie',
+          onmouseover: function (d, i) { console.log("onmouseover", d, i, this); },
+          onmouseout: function (d, i) { console.log("onmouseout", d, i, this); },
+          onclick: function (d, i) { console.log("onclick", d, i, this); },
         },
         axis: {
           x: {
@@ -27,11 +30,6 @@
           y: {
             label: 'Petal.Width'
           }
-        },
-        pie: {
-          onmouseover: function (d, i) { console.log(d, i); },
-          onmouseout: function (d, i) { console.log(d, i); },
-          onclick: function (d, i) { console.log(d, i); },
         }
       });
 
