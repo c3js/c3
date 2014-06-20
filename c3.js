@@ -2953,24 +2953,20 @@
             grid = main.append('g')
                 .attr("clip-path", clipPath)
                 .attr('class', CLASS.grid);
-
-            // X-Grid
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
+            if (__grid_y_show) {
+                grid.append('g').attr('class', CLASS.ygrids);
+            }
+            grid.append('g').attr("class", CLASS.xgridLines);
+            grid.append('g').attr('class', CLASS.ygridLines);
             if (__grid_focus_show) {
                 grid.append('g')
                     .attr("class", CLASS.xgridFocus)
                   .append('line')
                     .attr('class', CLASS.xgridFocus);
             }
-            grid.append('g').attr("class", CLASS.xgridLines);
-
-            // Y-Grid
-            if (__grid_y_show) {
-                grid.append('g').attr('class', CLASS.ygrids);
-            }
-            grid.append('g').attr('class', CLASS.ygridLines);
 
             // Define g for chart area
             main.append('g')
