@@ -23,3 +23,5 @@ $ python -m SimpleHTTPServer 8080
 Now you can ask anything in this forum:
 + [https://groups.google.com/forum/#!forum/c3js](https://groups.google.com/forum/#!forum/c3js)
 
+## License
+MIT
