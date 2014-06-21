@@ -3,16 +3,13 @@
     <link href="/css/c3.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <div id="chart1"></div>
-    <div id="chart2"></div>
-    <div id="chart3"></div>
+    <div id="chart"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
 
-      var chart1 = c3.generate({
-        bindto: '#chart1',
+      var chart = c3.generate({
         data: {
           json: {
             data1: [30, 20, 50, 40, 60, 50],
@@ -22,30 +19,8 @@
         }
       });
 
-      var chart2 = c3.generate({
-        bindto: '#chart2',
-        data: {
-//          x: 'name',
-          json: [
-            { id: 1, name: 'abc', visits: 200 },
-            { id: 2, name: 'efg', visits: 400 },
-            { id: 3, name: 'pqr', visits: 150 },
-            { id: 4, name: 'xyz', visits: 420 },
-          ],
-          keys: {
-            x: 'name',
-            value: ['visits'],
-          }
-        },
-        axis: {
-          x: {
-            type: 'categorized'
-          }
-        }
-      });
-
-      var chart3 = c3.generate({
-        bindto: '#chart3',
+    setTimeout(function () {
+      chart = c3.generate({
         data: {
           json: [{
             "date": "2014-06-03",
@@ -70,6 +45,45 @@
           }
         }
       });
+    }, 1000);
+
+    setTimeout(function () {
+      chart = c3.generate({
+        data: {
+//          x: 'name',
+          json: [
+            { id: 1, name: 'abc', visits: 200 },
+            { id: 2, name: 'efg', visits: 400 },
+            { id: 3, name: 'pqr', visits: 150 },
+            { id: 4, name: 'xyz', visits: 420 },
+          ],
+          keys: {
+            x: 'name',
+            value: ['visits'],
+          }
+        },
+        axis: {
+          x: {
+            type: 'categorized'
+          }
+        }
+      });
+    }, 2000);
+
+    setTimeout(function () {
+      chart.load({
+          json: [
+            { id: 1, name: 'abc', visits: 1200 },
+            { id: 2, name: 'efg', visits: 900 },
+            { id: 3, name: 'pqr', visits: 1150 },
+            { id: 4, name: 'xyz', visits: 1020 },
+          ],
+          keys: {
+            x: 'name',
+            value: ['visits'],
+          }
+      });
+    }, 3000);
 
     </script>
   </body>
