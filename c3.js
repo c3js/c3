@@ -1494,6 +1494,18 @@
             }
             return x;
         }
+        function convertUrlToData(url, mimeType, keys, done) {
+            var type = mimeType ? mimeType : 'csv';
+            d3.xhr(url, function (error, data) {
+                var d;
+                if (type === 'json') {
+                    d = convertJsonToData(JSON.parse(data.response), keys);
+                } else {
+                    d = convertCsvToData(data.response);
+                }
+                done(d);
+            });
+        }
         function convertCsvToData(csv) {
             var rows = d3.csv.parseRows(csv), d;
             if (rows.length === 1) {
@@ -4457,7 +4469,7 @@
                 load(convertDataToTargets(args.data), args);
             }
             else if (args.url) {
-                d3.csv(args.url, function (error, data) {
+                convertUrlToData(args.url, args.mimeType, args.keys, function (data) {
                     load(convertDataToTargets(data), args);
                 });
             }
@@ -5296,21 +5308,8 @@
 
         /*-- Load data and init chart with defined functions --*/
 
-        function initWithUrl(args) {
-            var type = args.mimeType ? args.mimeType : 'csv';
-            d3.xhr(args.url, function (error, data) {
-                var d;
-                if (type === 'json') {
-                    d = convertJsonToData(JSON.parse(data.response), args.keys);
-                } else {
-                    d = convertCsvToData(data.response);
-                }
-                init(d);
-            });
-        }
-
         if (config.data.url) {
-            initWithUrl(config.data);
+            convertUrlToData(config.data.url, config.data.mimeType, config.data.keys, init);
         }
         else if (config.data.json) {
             init(convertJsonToData(config.data.json, config.data.keys));
