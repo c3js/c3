@@ -4921,10 +4921,11 @@
             }
         };
 
-        c3.unload = function (targetIds, done) {
-            unload(mapToTargetIds(targetIds), function () {
+        c3.unload = function (args) {
+            args = args || {};
+            unload(mapToTargetIds(args.ids), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-                if (typeof done === 'function') { done(); }
+                if (typeof args.done === 'function') { args.done(); }
             });
         };
 

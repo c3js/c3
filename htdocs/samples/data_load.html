@@ -52,10 +52,14 @@
         });
       },
       function () {
-        chart.unload(['data4', 'data5']);
+        chart.unload({
+          ids: ['data4', 'data5']
+        });
       },
       function () {
-        chart.unload('data6');
+        chart.unload({
+          ids: 'data6'
+        });
       },
       function () {
         chart.load({
@@ -111,7 +115,9 @@
         });
       },
       function () {
-        chart.unload(['data2', 'data3']);
+        chart.unload({
+          ids: ['data2', 'data3']
+        });
       },
     ];
 
