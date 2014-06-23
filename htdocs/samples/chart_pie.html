@@ -42,7 +42,9 @@
       }, 1000);
 
       setTimeout(function () {
-        chart.unload('virginica');
+        chart.unload({
+          ids: 'virginica'
+        });
       }, 2000);
 
     </script>
