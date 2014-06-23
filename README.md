@@ -23,5 +23,9 @@ $ python -m SimpleHTTPServer 8080
 Now you can ask anything in this forum:
 + [https://groups.google.com/forum/#!forum/c3js](https://groups.google.com/forum/#!forum/c3js)
 
+## Playground
+Please fork this fiddle:
++ [http://jsfiddle.net/masayuki0812/7kYJu/](http://jsfiddle.net/masayuki0812/7kYJu/)
+
 ## License
 MIT
