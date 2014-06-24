@@ -37,6 +37,16 @@
         });
       }, 3000);
 
+      setTimeout(function () {
+        chart.load({
+          url: '/data/c3_test_3.json',
+          mimeType: 'json',
+          keys: {
+            value: ['data1', 'data2']
+          }
+        });
+      }, 4000);
+
     </script>
   </body>
 </html>
