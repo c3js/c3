@@ -89,7 +89,9 @@
         var d3 = window.d3 ? window.d3 : 'undefined' !== typeof require ? require("d3") : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
-            cache = {};
+            cache = {},
+            timeoutId = {},
+            timeoutDelay = 20;
 
         /*-- Handle Config --*/
 
@@ -2014,6 +2016,12 @@
 
         //-- Tooltip --//
 
+        function showTooltipDelay(selectedData, mouse) {
+            timeoutId['showTooltip'] = window.setTimeout(function () {
+                showTooltip(selectedData, mouse);
+            }, timeoutDelay);
+        }
+
         function showTooltip(selectedData, mouse) {
             var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             var forArc = hasArcType(c3.data.targets),
@@ -2057,8 +2065,21 @@
                 .style("top", tooltipTop + "px")
                 .style("left", tooltipLeft + 'px');
         }
+
+        function hideTooltipDelay() {
+            timeoutId['hideTooltip'] = window.setTimeout(function () {
+                hideTooltip();
+            }, timeoutDelay);
+        }
+
         function hideTooltip() {
             tooltip.style("display", "none");
+        }
+
+        function showXGridFocusDelay(selectedData) {
+            timeoutId['showXGridFocus'] = window.setTimeout(function () {
+                showXGridFocus(selectedData);
+            }, timeoutDelay);
         }
 
         function showXGridFocus(selectedData) {
@@ -2073,6 +2094,11 @@
                 .attr(__axis_rotated ? 'y1' : 'x1', xx)
                 .attr(__axis_rotated ? 'y2' : 'x2', xx);
             smoothLines(focusEl, 'grid');
+        }
+        function hideXGridFocusDelay() {
+            timeoutId['hideXGridFocus'] = window.setTimeout(function () {
+                hideXGridFocus();
+            }, timeoutDelay);
         }
         function hideXGridFocus() {
             main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
@@ -3206,8 +3232,8 @@
                 .on('mouseout', function (d) {
                     var index = d.index;
                     if (hasArcType(c3.data.targets)) { return; }
-                    hideXGridFocus();
-                    hideTooltip();
+                    hideXGridFocusDelay();
+                    hideTooltipDelay();
                     // Undo expanded shapes
                     unexpandCircles(index);
                     unexpandBars();
@@ -3228,8 +3254,8 @@
                     });
 
                     if (__tooltip_grouped) {
-                        showTooltip(selectedData, d3.mouse(this));
-                        showXGridFocus(selectedData);
+                        showTooltipDelay(selectedData, d3.mouse(this));
+                        showXGridFocusDelay(selectedData);
                     }
 
                     if (__tooltip_grouped && (!__data_selection_enabled || __data_selection_grouped)) {
@@ -3243,8 +3269,8 @@
                                 eventRect.style('cursor', __data_selection_grouped ? 'pointer' : null);
                             }
                             if (!__tooltip_grouped) {
-                                hideXGridFocus();
-                                hideTooltip();
+                                hideXGridFocusDelay();
+                                hideTooltipDelay();
                                 if (!__data_selection_grouped) {
                                     unexpandCircles(index);
                                     unexpandBars();
@@ -3298,8 +3324,8 @@
                 .attr('class', CLASS.eventRect)
                 .on('mouseout', function () {
                     if (hasArcType(c3.data.targets)) { return; }
-                    hideXGridFocus();
-                    hideTooltip();
+                    hideXGridFocusDelay();
+                    hideTooltipDelay();
                     unexpandCircles();
                 })
                 .on('mousemove', function () {
