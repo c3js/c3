@@ -3048,7 +3048,6 @@
                 .attr('width', width)
                 .attr('height', height)
                 .style('opacity', 0)
-                .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
                 .on("dblclick.zoom", null);
 
             // Set default extent if defined
