@@ -174,7 +174,7 @@
 
         // configuration for no plot-able data supplied.
         var __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], "");
-        
+
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
             __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
@@ -2017,7 +2017,7 @@
         //-- Tooltip --//
 
         function showTooltipDelay(selectedData, mouse) {
-            timeoutId['showTooltip'] = window.setTimeout(function () {
+            timeoutId.showTooltip = window.setTimeout(function () {
                 showTooltip(selectedData, mouse);
             }, timeoutDelay);
         }
@@ -2067,7 +2067,7 @@
         }
 
         function hideTooltipDelay() {
-            timeoutId['hideTooltip'] = window.setTimeout(function () {
+            timeoutId.hideTooltip = window.setTimeout(function () {
                 hideTooltip();
             }, timeoutDelay);
         }
@@ -2077,7 +2077,7 @@
         }
 
         function showXGridFocusDelay(selectedData) {
-            timeoutId['showXGridFocus'] = window.setTimeout(function () {
+            timeoutId.showXGridFocus = window.setTimeout(function () {
                 showXGridFocus(selectedData);
             }, timeoutDelay);
         }
@@ -2096,7 +2096,7 @@
             smoothLines(focusEl, 'grid');
         }
         function hideXGridFocusDelay() {
-            timeoutId['hideXGridFocus'] = window.setTimeout(function () {
+            timeoutId.hideXGridFocus = window.setTimeout(function () {
                 hideXGridFocus();
             }, timeoutDelay);
         }
