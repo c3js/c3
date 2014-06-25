@@ -1530,7 +1530,7 @@
                 json.forEach(function (o) {
                     var new_row = [];
                     targetKeys.forEach(function (key) {
-                        // convert undefined to null becuase undefined data will be removed in convertDataToTargets()
+                        // convert undefined to null because undefined data will be removed in convertDataToTargets()
                         var v = typeof o[key] === 'undefined' ? null : o[key];
                         new_row.push(v);
                     });
@@ -3411,7 +3411,7 @@
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
-            if (!__data_selection_multiple) { return; } // skip when single selection becuase drag is used for multiple selection
+            if (!__data_selection_multiple) { return; } // skip when single selection because drag is used for multiple selection
 
             sx = dragStart[0];
             sy = dragStart[1];
@@ -3987,7 +3987,7 @@
                         .attr('y', 0)
                         .attr('width', width)
                         .attr('height', height);
-                    // exit : not needed becuase always only one rect exists
+                    // exit : not needed because always only one rect exists
                 } else {
 
                     if (!eventRect.classed(CLASS.eventRectsSingle)) {
@@ -5000,7 +5000,7 @@
             }
             c3.data.targets = c3.data.targets.concat(targets); // add remained
 
-            // check data count becuase behavior needs to change when it's only one
+            // check data count because behavior needs to change when it's only one
             dataCount = getMaxDataCount();
             baseTarget = c3.data.targets[0];
             baseValue = baseTarget.values[0];
