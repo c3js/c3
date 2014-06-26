@@ -126,7 +126,8 @@
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent']),
-            __zoom_privileged = getConfig(['zoom', 'privileged'], false);
+            __zoom_privileged = getConfig(['zoom', 'privileged'], false),
+            __zoom_onzoom = getConfig(['zoom', 'onzoom'], function () {});
 
         var __interaction_enabled = getConfig(['interaction', 'enabled'], true);
 
@@ -175,7 +176,8 @@
         
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
-            __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
+            __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60),
+            __subchart_onbrush = getConfig(['subchart', 'onbrush'], function () {});
 
         // color
         var __color_pattern = getConfig(['color', 'pattern'], []),
@@ -4219,6 +4221,7 @@
                 withSubchart: false,
                 withUpdateXDomain: true
             });
+            __subchart_onbrush.call(c3, x.orgDomain());
         }
         function redrawForZoom() {
             if (!__zoom_enabled) {
@@ -4243,6 +4246,7 @@
             if (d3.event.sourceEvent.type === 'mousemove') {
                 cancelClick = true;
             }
+            __zoom_onzoom.call(c3, x.orgDomain());
         }
 
         function generateResize() {
