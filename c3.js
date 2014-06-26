@@ -2067,6 +2067,9 @@
         }
 
         function hideTooltipDelay() {
+            if (timeoutId.hideTooltip) {
+                window.clearTimeout(timeoutId.hideTooltip);
+            }
             timeoutId.hideTooltip = window.setTimeout(function () {
                 hideTooltip();
             }, timeoutDelay);
@@ -2077,8 +2080,12 @@
         }
 
         function showXGridFocusDelay(selectedData) {
+            if (timeoutId.showXGridFocus) {
+                window.clearTimeout(timeoutId.showXGridFocus);
+            }
             timeoutId.showXGridFocus = window.setTimeout(function () {
                 showXGridFocus(selectedData);
+                console.log('show X');
             }, timeoutDelay);
         }
 
@@ -2096,6 +2103,9 @@
             smoothLines(focusEl, 'grid');
         }
         function hideXGridFocusDelay() {
+            if (timeoutId.hideXGridFocus) {
+                window.clearTimeout(timeoutId.hideXGridFocus);
+            }
             timeoutId.hideXGridFocus = window.setTimeout(function () {
                 hideXGridFocus();
             }, timeoutDelay);
