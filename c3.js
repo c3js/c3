@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.2.4"
+        version: "0.2.4.1"
     };
 
     var CLASS = {
@@ -2085,7 +2085,6 @@
             }
             timeoutId.showXGridFocus = window.setTimeout(function () {
                 showXGridFocus(selectedData);
-                console.log('show X');
             }, timeoutDelay);
         }
 
