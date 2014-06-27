@@ -492,7 +492,11 @@
             return svgLeft > 0 ? svgLeft : 0;
         }
         function getCurrentWidth() {
-            return __size_width ? __size_width : getParentWidth();
+            var result = __size_width ? __size_width : getParentWidth();
+            if (isNaN(result)) {
+              return 0;
+            }
+            return result;
         }
         function getCurrentHeight() {
             var h = __size_height ? __size_height : getParentHeight();
@@ -1932,10 +1936,16 @@
         }
 
         function getPathBox(path) {
-            var box = path.getBoundingClientRect(),
-                items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
-                minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
-            return {x: minX, y: minY, width: box.width, height: box.height};
+            var box = path.getBoundingClientRect();
+
+            if (path.pathSegList.length >= 2) {
+                var items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
+                    minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
+                return {x: minX, y: minY, width: box.width, height: box.height};
+            } else {
+                //Some sort of fallback
+                return {x: 0, y: 0, width: 0, height: 0};
+            }
         }
 
         function isOrderDesc() {
