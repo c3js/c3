@@ -494,7 +494,7 @@
         function getCurrentWidth() {
             var result = __size_width ? __size_width : getParentWidth();
             if (isNaN(result)) {
-              return 0;
+                return 0;
             }
             return result;
         }
