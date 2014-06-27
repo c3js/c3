@@ -1100,6 +1100,11 @@
 
         function updateAngle(d) {
             var found = false;
+
+            if (isNaN(d)) {
+                return null;
+            }
+
             pie(filterTargetsToShow(c3.data.targets)).forEach(function (t) {
                 if (! found && t.data.id === d.data.id) {
                     found = true;
