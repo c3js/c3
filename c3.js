@@ -1552,6 +1552,8 @@
             for (i = 1; i < rows.length; i++) {
                 new_row = {};
                 for (j = 0; j < rows[i].length; j++) {
+                    if (isUndefined(rows[i][j]))
+                        throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
                     new_row[keys[j]] = rows[i][j];
                 }
                 new_rows.push(new_row);
@@ -1566,6 +1568,8 @@
                     if (isUndefined(new_rows[j - 1])) {
                         new_rows[j - 1] = {};
                     }
+                    if (isUndefined(columns[i][j]))
+                        throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
                     new_rows[j - 1][key] = columns[i][j];
                 }
             }
