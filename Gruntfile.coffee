@@ -2,6 +2,23 @@ module.exports = (grunt) ->
     require('load-grunt-tasks') grunt, pattern: 'grunt-contrib-*'
 
     grunt.initConfig
+        watch:
+          concat:
+            tasks: 'concat'
+            files: ['src/*.js']
+
+        concat:
+          dist:
+            src: [
+              'src/head.js',
+              'src/c3.core.js',
+              'src/c3.render.bar.js',
+              'src/c3.draw.bar.js',
+              'src/c3.axis.js',
+              'src/tail.js'
+            ]
+            dest: 'dist/c3.js'
+
         jshint:
           c3: 'c3.js'
           spec: 'spec/*.js'
