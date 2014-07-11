@@ -114,7 +114,7 @@
         }
 
         // bindto - id to bind the chart
-        var __bindto = getConfig(['bindto'], '#chart');
+        var __bindto = getConfig(['bindto'], config.target);
 
         var __size_width = getConfig(['size', 'width']),
             __size_height = getConfig(['size', 'height']);
