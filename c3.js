@@ -1020,7 +1020,7 @@
         pie = d3.layout.pie().value(function (d) {
             return d.values.reduce(function (a, b) { return a + b.value; }, 0);
         });
-        if (!__pie_sort || !__donut_sort) { // TODO: this needs to be called by each type
+        if (!__data_order || !__pie_sort || !__donut_sort) {
             pie.sort(null);
         }
 
