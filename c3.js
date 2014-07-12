@@ -282,6 +282,7 @@
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
             __donut_label_threshold = getConfig(['donut', 'label', 'threshold'], 0.05),
+            __donut_radius_inner = getConfig(['donut', 'radius', 'inner']),
             __donut_sort = getConfig(['donut', 'sort'], true),
             __donut_expand = getConfig(['donut', 'expand'], true),
             __donut_title = getConfig(['donut', 'title'], "");
@@ -533,7 +534,17 @@
             radiusExpanded = Math.min(arcWidth, arcHeight) / 2;
             radius = radiusExpanded * 0.95;
             innerRadiusRatio = __gauge_width ? (radius - __gauge_width) / radius : 0.6;
-            innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * innerRadiusRatio : 0;
+            if (hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets)) {
+                if (typeof __donut_radius_inner === 'function') {
+                    innerRadius = __donut_radius_inner(radius, innerRadiusRatio);
+                } else if (__donut_radius_inner) {
+                    innerRadius = __donut_radius_inner;
+                } else {
+                    innerRadius = radius * innerRadiusRatio;
+                }
+            } else {
+                innerRadius = 0;
+            }
         }
         function getSvgLeft() {
             var leftAxisClass = __axis_rotated ? CLASS.axisX : CLASS.axisY,
