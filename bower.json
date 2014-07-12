@@ -1,6 +1,6 @@
 {
   "name": "c3",
-  "main": "c3.min.js",
+  "main": "c3.js",
   "version": "0.2.4",
   "homepage": "https://github.com/masayuki0812/c3",
   "authors": [
