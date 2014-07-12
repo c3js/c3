@@ -257,6 +257,7 @@
         // bar
         var __bar_width = getConfig(['bar', 'width']),
             __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6),
+            __bar_width_max = getConfig(['bar', 'width', 'max']),
             __bar_zerobased = getConfig(['bar', 'zerobased'], true);
 
         // area
@@ -2166,7 +2167,8 @@
         //-- Bar --//
 
         function getBarW(axis, barTargetsNum) {
-            return typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
+            var w = typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
+            return __bar_width_ratio && w > __bar_width_max ? __bar_width_max : w;
         }
 
         //-- Type --//
