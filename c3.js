@@ -153,7 +153,7 @@
             __data_type = getConfig(['data', 'type']),
             __data_types = getConfig(['data', 'types'], {}),
             __data_labels = getConfig(['data', 'labels'], {}),
-            __data_order = getConfig(['data', 'order']),
+            __data_order = getConfig(['data', 'order'], 'desc'),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
