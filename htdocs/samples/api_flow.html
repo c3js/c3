@@ -61,10 +61,11 @@
       setTimeout(function () {
         // Load only one data
         chart.flow({
-          columns: [
-            ['data1', 500, 200, 100],
-            ['data2', 100, null, 50],
-            ['data3', 200, null, null],
+          rows: [
+            ['data1', 'data2', 'data3'],
+            [500, 100, 200],
+            [200, null, null],
+            [100, 50, null] 
           ],
           duration: 1500,
 

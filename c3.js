@@ -4942,8 +4942,22 @@
         };
 
         c3.flow = function (args) {
-            var targets = convertDataToTargets(convertColumnsToData(args.columns), true), notfoundIds = [],
+            var targets, data, notfoundIds = [],
                 orgDataCount = getMaxDataCount(), dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
+
+            if (args.json) {
+                data = convertJsonToData(args.json, args.keys);
+            }
+            else if (args.rows) {
+                data = convertRowsToData(args.rows);
+            }
+            else if (args.columns) {
+                data = convertColumnsToData(args.columns);
+            }
+            else {
+                return;
+            }
+            targets = convertDataToTargets(data, true);
 
             // Update/Add data
             c3.data.targets.forEach(function (t) {
