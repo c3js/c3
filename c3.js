@@ -209,6 +209,7 @@
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], true),
             __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
             __axis_x_tick_rotate = getConfig(['axis', 'x', 'tick', 'rotate']),
+            __axis_x_tick_outer = getConfig(['axis', 'x', 'tick', 'outer'], true),
             __axis_x_max = getConfig(['axis', 'x', 'max'], null),
             __axis_x_min = getConfig(['axis', 'x', 'min'], null),
             __axis_x_padding = getConfig(['axis', 'x', 'padding'], {}),
@@ -222,6 +223,7 @@
             __axis_y_label = getConfig(['axis', 'y', 'label'], {}),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format']),
+            __axis_y_tick_outer = getConfig(['axis', 'y', 'tick', 'outer'], true),
             __axis_y_padding = getConfig(['axis', 'y', 'padding']),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
@@ -231,6 +233,7 @@
             __axis_y2_label = getConfig(['axis', 'y2', 'label'], {}),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
+            __axis_y2_tick_outer = getConfig(['axis', 'y2', 'tick', 'outer'], true),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
@@ -712,8 +715,8 @@
             xAxisTickValues = __axis_x_tick_values ? __axis_x_tick_values : (forInit ? undefined : xAxis.tickValues());
             xAxis = getXAxis(x, xOrient, xAxisTickFormat, xAxisTickValues);
             subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTickValues);
-            yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
-            y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+            yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks, __axis_y_tick_outer);
+            y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks, __axis_y2_tick_outer);
             // Set initialized scales to brush and zoom
             if (!forInit) {
                 brush.scale(subX);
@@ -781,7 +784,8 @@
         //-- Axes --//
 
         function getXAxis(scale, orient, tickFormat, tickValues) {
-            var axis = c3_axis(d3, isCategorized).scale(scale).orient(orient);
+            var axisParams = {isCategory: isCategorized, withOuterTick: __axis_x_tick_outer},
+                axis = c3_axis(d3, axisParams).scale(scale).orient(orient);
 
             // Set tick
             axis.tickFormat(tickFormat).tickValues(tickValues);
@@ -801,8 +805,9 @@
 
             return axis;
         }
-        function getYAxis(scale, orient, tickFormat, ticks) {
-            return c3_axis(d3).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
+        function getYAxis(scale, orient, tickFormat, ticks, withOuterTick) {
+            var axisParams = {withOuterTick: withOuterTick};
+            return c3_axis(d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -976,10 +981,10 @@
                 targetsToShow = filterTargetsToShow(c3.data.targets);
                 if (id === 'y') {
                     scale = y.copy().domain(getYDomain(targetsToShow, 'y'));
-                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks);
+                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks, __axis_y_tick_outer);
                 } else if (id === 'y2') {
                     scale = y2.copy().domain(getYDomain(targetsToShow, 'y2'));
-                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks, __axis_y2_tick_outer);
                 } else {
                     scale = x.copy().domain(getXDomain(targetsToShow));
                     axis = getXAxis(scale, xOrient, getXAxisTickFormat(), __axis_x_tick_values ? __axis_x_tick_values : xAxis.tickValues());
@@ -5375,10 +5380,13 @@
     // Features:
     // 1. category axis
     // 2. ceil values of translate/x/y to int for half pixel antialiasing
-    function c3_axis(d3, isCategory) {
-        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+    function c3_axis(d3, params) {
+        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
         var tickOffset = 0, tickCulling = true, tickCentered;
+
+        params = params || {};
+        outerTickSize = params.withOuterTick ? 6 : 0;
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
@@ -5410,7 +5418,7 @@
         }
         function copyScale() {
             var newScale = scale.copy(), domain;
-            if (isCategory) {
+            if (params.isCategory) {
                 domain = scale.domain();
                 newScale.domain([domain[0], domain[1] - 1]);
             }
@@ -5444,7 +5452,7 @@
                     textEnter = tickEnter.select("text"),
                     textUpdate = tickUpdate.select("text");
 
-                if (isCategory) {
+                if (params.isCategory) {
                     tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
