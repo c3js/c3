@@ -3358,7 +3358,7 @@
                             __data_onmouseover.call(c3, closest);
                             mouseover = true;
                         }
-                    } else {
+                    } else if (mouseover) {
                         svg.select('.' + CLASS.eventRect).style('cursor', null);
                         __data_onmouseout.call(c3, closest);
                         mouseover = false;
@@ -3377,7 +3377,7 @@
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
-                        main.select('.' + CLASS.circles + '-' + getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
+                        main.select('.' + CLASS.circles + getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
                             toggleShape(this, closest, closest.index);
                         });
                     }
