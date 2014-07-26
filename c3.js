@@ -8,153 +8,22 @@
 
     var c3 = { version: "0.3.0" };
 
+    var c3_chart_fn, c3_chart_internal_fn;
+
     function Chart(config) {
-
-        var $$ = this.internal = new Chart.Internal(),
-            d3 = $$.d3 = window.d3 ? window.d3 : 'undefined' !== typeof require ? require("d3") : undefined;
-
-        $$.chart = this;
-        $$.data = {};
-        $$.cache = {};
-
-        /*-- Handle Config --*/
-
-        $$.readConfig(config);
-
-        /*-- Init Variables --*/
-
-        // TODO: some of these should be a function and defined in prototype
-
-        // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
-        $$.clipId = "c3-" + (+new Date()) + '-clip',
-        $$.clipIdForXAxis = $$.clipId + '-xaxis',
-        $$.clipIdForYAxis = $$.clipId + '-yaxis',
-        $$.clipPath = $$.getClipPath($$.clipId),
-        $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
-        $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
-
-        $$.isTimeSeries = ($$.config.axis_x_type === 'timeseries');
-        $$.isCategorized = ($$.config.axis_x_type.indexOf('categor') >= 0);
-        $$.isCustomX = function () { return !$$.isTimeSeries && ($$.config.data_x || $$.notEmpty($$.config.data_xs)); };
-
-        $$.dragStart = null;
-        $$.dragging = false;
-        $$.cancelClick = false;
-        $$.mouseover = false;
-        $$.transiting = false;
-
-        $$.defaultColorPattern = d3.scale.category10().range();
-        $$.color = $$.generateColor($$.config.data_colors, $$.notEmpty($$.config.color_pattern) ? $$.config.color_pattern : $$.defaultColorPattern, $$.config.data_color);
-        $$.levelColor = $$.notEmpty($$.config.color_threshold) ? $$.generateLevelColor($$.config.color_pattern, $$.config.color_threshold) : null;
-
-        $$.dataTimeFormat = $$.config.data_x_localtime ? d3.time.format : d3.time.format.utc;
-        $$.axisTimeFormat = $$.config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
-        $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
-            [".%L", function (d) { return d.getMilliseconds(); }],
-            [":%S", function (d) { return d.getSeconds(); }],
-            ["%I:%M", function (d) { return d.getMinutes(); }],
-            ["%I %p", function (d) { return d.getHours(); }],
-            ["%-m/%-d", function (d) { return d.getDay() && d.getDate() !== 1; }],
-            ["%-m/%-d", function (d) { return d.getDate() !== 1; }],
-            ["%-m/%-d", function (d) { return d.getMonth(); }],
-            ["%Y/%-m/%-d", function () { return true; }]
-        ]);
-
-        $$.hiddenTargetIds = [];
-        $$.hiddenLegendIds = [];
-
-        $$.axes = {};
-
-        $$.xOrient = $$.config.axis_rotated ? "left" : "bottom";
-        $$.yOrient = $$.config.axis_rotated ? ($$.config.axis_y_inner ? "top" : "bottom") : ($$.config.axis_y_inner ? "right" : "left");
-        $$.y2Orient = $$.config.axis_rotated ? ($$.config.axis_y2_inner ? "bottom" : "top") : ($$.config.axis_y2_inner ? "left" : "right");
-        $$.subXOrient = $$.config.axis_rotated ? "left" : "bottom";
-
-        $$.translate = {
-            main : function () { return "translate(" + $$.asHalfPixel($$.margin.left) + "," + $$.asHalfPixel($$.margin.top) + ")"; },
-            context : function () { return "translate(" + $$.asHalfPixel($$.margin2.left) + "," + $$.asHalfPixel($$.margin2.top) + ")"; },
-            legend : function () { return "translate(" + $$.margin3.left + "," + $$.margin3.top + ")"; },
-            x : function () { return "translate(0," + ($$.config.axis_rotated ? 0 : $$.height) + ")"; },
-            y : function () { return "translate(0," + ($$.config.axis_rotated ? $$.height : 0) + ")"; },
-            y2 : function () { return "translate(" + ($$.config.axis_rotated ? 0 : $$.width) + "," + ($$.config.axis_rotated ? 1 : 0) + ")"; },
-            subx : function () { return "translate(0," + ($$.config.axis_rotated ? 0 : $$.height2) + ")"; },
-            arc: function () { return "translate(" + ($$.arcWidth / 2) + "," + ($$.arcHeight / 2) + ")"; }
-        };
-
-        $$.isLegendRight = $$.config.legend_position === 'right';
-        $$.isLegendInset = $$.config.legend_position === 'inset';
-        $$.isLegendTop = $$.config.legend_inset_anchor === 'top-left' || $$.config.legend_inset_anchor === 'top-right';
-        $$.isLegendLeft = $$.config.legend_inset_anchor === 'top-left' || $$.config.legend_inset_anchor === 'bottom-left';
-        $$.legendStep = 0;
-        $$.legendItemWidth = 0;
-        $$.legendItemHeight = 0;
-        $$.legendOpacityForHidden = 0.15;
-
-        $$.currentMaxTickWidth = 0;
-
-        $$.rotated_padding_left = 30;
-        $$.rotated_padding_right = $$.config.axis_rotated && !$$.config.axis_x_show ? 0 : 30;
-        $$.rotated_padding_top = 5;
-
-        $$.withoutFadeIn = {};
-
-        // TODO: this should be pluggable
-        $$.pie = d3.layout.pie().value(function (d) {
-            return d.values.reduce(function (a, b) { return a + b.value; }, 0);
-        });
-        if (!$$.config.pie_sort || !$$.config.donut_sort) { // TODO: this needs to be called by each type
-            $$.pie.sort(null);
-        }
-
-        // TODO: this should be pluggable
-        $$.brush = d3.svg.brush().on("brush", $$.redrawForBrush);
-        $$.brush.update = function () {
-            if ($$.context) { $$.context.select('.' + this.CLASS.brush).call(this); }
-            return this;
-        };
-        $$.brush.scale = function (scale) {
-            return $$.config.axis_rotated ? this.y(scale) : this.x(scale);
-        };
-
-        // TODO: this should be pluggable
-        $$.zoom = d3.behavior.zoom()
-            .on("zoomstart", function () {
-                $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
-            })
-            .on("zoom", $$.redrawForZoom);
-        $$.zoom.scale = function (scale) {
-            return $$.config.axis_rotated ? this.y(scale) : this.x(scale);
-        };
-        $$.zoom.orgScaleExtent = function () {
-            var extent = $$.config.zoom_extent ? $$.config.zoom_extent : [1, 10];
-            return [extent[0], Math.max(this.getMaxDataCount() / extent[1], extent[1])];
-        };
-        $$.zoom.updateScaleExtent = function () {
-            var ratio = this.diffDomain($$.x.orgDomain()) / this.diffDomain(this.orgXDomain), extent = this.orgScaleExtent();
-            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
-            return this;
-        };
-
-        /*-- Load data and init chart with defined functions --*/
-
-        if (config.data.url) {
-            $$.convertUrlToData(config.data.url, config.data.mimeType, config.data.keys, $$.init);
-        }
-        else if (config.data.json) {
-            $$.init($$.convertJsonToData(config.data.json, config.data.keys));
-        }
-        else if (config.data.rows) {
-            $$.init($$.convertRowsToData(config.data.rows));
-        }
-        else if (config.data.columns) {
-            $$.init($$.convertColumnsToData(config.data.columns));
-        }
-        else {
-            throw Error('url or json or rows or columns is required.');
-        }
+        this.internal = new ChartInternal(config, this);
+        this.internal.loadConfig(config);
+        this.internal.init();
     }
 
-    Chart.Internal = function () {};
+    function ChartInternal(config, api) {
+        var $$ = this;
+        $$.d3 = window.d3 ? window.d3 : 'undefined' !== typeof require ? require("d3") : undefined;
+        $$.api = api;
+        $$.data = {};
+        $$.cache = {};
+        $$.axes = {};
+    };
 
     c3.generate = function (config) {
         return new Chart(config);
@@ -163,25 +32,12 @@
     c3.chart = {
         fn: Chart.prototype,
         internal: {
-            fn: Chart.Internal.prototype
+            fn: ChartInternal.prototype
         }
     };
+    c3_chart_fn = c3.chart.fn;
+    c3_chart_internal_fn = c3.chart.internal.fn;
 
-    if (typeof define === "function" && define.amd) {
-        define("c3", ["d3"], c3);
-    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
-        module.exports = c3;
-    } else {
-        window.c3 = c3;
-    }
-
-})(window);
-
-
-
-// TODO: these should be separated into each file
-(function (c3) {
-    'use strict';
 
     /**
      *  c3.config.js
@@ -239,10 +95,12 @@
         data_onunselected: function () {},
         data_ondragstart: function () {},
         data_ondragend: function () {},
-        data_url: {},
-        data_json: {},
-        data_rows: {},
-        data_columns: {},
+        data_url: undefined,
+        data_json: undefined,
+        data_rows: undefined,
+        data_columns: undefined,
+        data_mimeType: undefined,
+        data_keys: undefined,
 
         // configuration for no plot-able data supplied.
         data_empty_label_text: "",
@@ -402,7 +260,7 @@
         tooltip_init_position: {top: '0px', left: '50px'}
     };
 
-    c3.chart.internal.fn.readConfig = function (config) {
+    c3.chart.internal.fn.loadConfig = function (config) {
         var this_config = this.config, target, keys, read;
         function find() {
             var key = keys.shift();
@@ -429,9 +287,155 @@
         });
     };
 
-    c3.chart.internal.fn.init = function (data) {
+
+
+
+    // should be define in c3.arc.js
+    c3.chart.internal.fn.initPie = function () {
+        var $$ = this, d3 = $$.d3;
+        $$.pie = d3.layout.pie().value(function (d) {
+            return d.values.reduce(function (a, b) { return a + b.value; }, 0);
+        });
+        if (!$$.config.pie_sort || !$$.config.donut_sort) { // TODO: this needs to be called by each type
+            $$.pie.sort(null);
+        }
+    };
+
+    // should be define in c3.brush.js (c3.subchart.js?)
+    c3.chart.internal.fn.initBrush = function () {
+        var $$ = this, d3 = $$.d3;
+        // TODO: this should be pluggable
+        $$.brush = d3.svg.brush().on("brush", $$.redrawForBrush);
+        $$.brush.update = function () {
+            if ($$.context) { $$.context.select('.' + this.CLASS.brush).call(this); }
+            return this;
+        };
+        $$.brush.scale = function (scale) {
+            return $$.config.axis_rotated ? this.y(scale) : this.x(scale);
+        };
+    };
+
+    // should be define in c3.zoom.js
+    c3.chart.internal.fn.initZoom = function () {
+        var $$ = this, d3 = $$.d3;
+        $$.zoom = d3.behavior.zoom()
+            .on("zoomstart", function () {
+                $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
+            })
+            .on("zoom", $$.redrawForZoom);
+        $$.zoom.scale = function (scale) {
+            return $$.config.axis_rotated ? this.y(scale) : this.x(scale);
+        };
+        $$.zoom.orgScaleExtent = function () {
+            var extent = $$.config.zoom_extent ? $$.config.zoom_extent : [1, 10];
+            return [extent[0], Math.max(this.getMaxDataCount() / extent[1], extent[1])];
+        };
+        $$.zoom.updateScaleExtent = function () {
+            var ratio = this.diffDomain($$.x.orgDomain()) / this.diffDomain(this.orgXDomain),
+                extent = this.orgScaleExtent();
+            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
+            return this;
+        };
+    };
+
+
+    c3.chart.internal.fn.init = function () {
+        var $$ = this;
+        if ($$.config.data_url) {
+            $$.convertUrlToData($$.config.data_url, $$.config.data_mimeType, $$.config.data_keys, $$.initWithData);
+        }
+        else if ($$.config.data_json) {
+            $$.initWithData($$.convertJsonToData($$.config.data_json, $$.config.data_keys));
+        }
+        else if ($$.config.data_rows) {
+            $$.initWithData($$.convertRowsToData($$.config.data_rows));
+        }
+        else if ($$.config.data_columns) {
+            $$.initWithData($$.convertColumnsToData($$.config.data_columns));
+        }
+        else {
+            throw Error('url or json or rows or columns is required.');
+        }
+    };
+
+    c3.chart.internal.fn.initWithData = function (data) {
         var $$ = this, d3 = this.d3;
         var arcs, eventRect, grid, i, binding = true;
+
+        // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
+        $$.clipId = "c3-" + (+new Date()) + '-clip',
+        $$.clipIdForXAxis = $$.clipId + '-xaxis',
+        $$.clipIdForYAxis = $$.clipId + '-yaxis',
+        $$.clipPath = $$.getClipPath($$.clipId),
+        $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
+        $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
+
+        $$.isTimeSeries = ($$.config.axis_x_type === 'timeseries');
+        $$.isCategorized = ($$.config.axis_x_type.indexOf('categor') >= 0);
+        $$.isCustomX = function () { return !$$.isTimeSeries && ($$.config.data_x || $$.notEmpty($$.config.data_xs)); };
+
+        $$.dragStart = null;
+        $$.dragging = false;
+        $$.cancelClick = false;
+        $$.mouseover = false;
+        $$.transiting = false;
+
+        $$.defaultColorPattern = d3.scale.category10().range();
+        $$.color = $$.generateColor($$.config.data_colors, $$.notEmpty($$.config.color_pattern) ? $$.config.color_pattern : $$.defaultColorPattern, $$.config.data_color);
+        $$.levelColor = $$.notEmpty($$.config.color_threshold) ? $$.generateLevelColor($$.config.color_pattern, $$.config.color_threshold) : null;
+
+        $$.dataTimeFormat = $$.config.data_x_localtime ? d3.time.format : d3.time.format.utc;
+        $$.axisTimeFormat = $$.config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
+        $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
+            [".%L", function (d) { return d.getMilliseconds(); }],
+            [":%S", function (d) { return d.getSeconds(); }],
+            ["%I:%M", function (d) { return d.getMinutes(); }],
+            ["%I %p", function (d) { return d.getHours(); }],
+            ["%-m/%-d", function (d) { return d.getDay() && d.getDate() !== 1; }],
+            ["%-m/%-d", function (d) { return d.getDate() !== 1; }],
+            ["%-m/%-d", function (d) { return d.getMonth(); }],
+            ["%Y/%-m/%-d", function () { return true; }]
+        ]);
+
+        $$.hiddenTargetIds = [];
+        $$.hiddenLegendIds = [];
+
+        $$.xOrient = $$.config.axis_rotated ? "left" : "bottom";
+        $$.yOrient = $$.config.axis_rotated ? ($$.config.axis_y_inner ? "top" : "bottom") : ($$.config.axis_y_inner ? "right" : "left");
+        $$.y2Orient = $$.config.axis_rotated ? ($$.config.axis_y2_inner ? "bottom" : "top") : ($$.config.axis_y2_inner ? "left" : "right");
+        $$.subXOrient = $$.config.axis_rotated ? "left" : "bottom";
+
+        $$.translate = {
+            main : function () { return "translate(" + $$.asHalfPixel($$.margin.left) + "," + $$.asHalfPixel($$.margin.top) + ")"; },
+            context : function () { return "translate(" + $$.asHalfPixel($$.margin2.left) + "," + $$.asHalfPixel($$.margin2.top) + ")"; },
+            legend : function () { return "translate(" + $$.margin3.left + "," + $$.margin3.top + ")"; },
+            x : function () { return "translate(0," + ($$.config.axis_rotated ? 0 : $$.height) + ")"; },
+            y : function () { return "translate(0," + ($$.config.axis_rotated ? $$.height : 0) + ")"; },
+            y2 : function () { return "translate(" + ($$.config.axis_rotated ? 0 : $$.width) + "," + ($$.config.axis_rotated ? 1 : 0) + ")"; },
+            subx : function () { return "translate(0," + ($$.config.axis_rotated ? 0 : $$.height2) + ")"; },
+            arc: function () { return "translate(" + ($$.arcWidth / 2) + "," + ($$.arcHeight / 2) + ")"; }
+        };
+
+        $$.isLegendRight = $$.config.legend_position === 'right';
+        $$.isLegendInset = $$.config.legend_position === 'inset';
+        $$.isLegendTop = $$.config.legend_inset_anchor === 'top-left' || $$.config.legend_inset_anchor === 'top-right';
+        $$.isLegendLeft = $$.config.legend_inset_anchor === 'top-left' || $$.config.legend_inset_anchor === 'bottom-left';
+        $$.legendStep = 0;
+        $$.legendItemWidth = 0;
+        $$.legendItemHeight = 0;
+        $$.legendOpacityForHidden = 0.15;
+
+        $$.currentMaxTickWidth = 0;
+
+        $$.rotated_padding_left = 30;
+        $$.rotated_padding_right = $$.config.axis_rotated && !$$.config.axis_x_show ? 0 : 30;
+        $$.rotated_padding_top = 5;
+
+        $$.withoutFadeIn = {};
+
+        if ($$.initPie) { $$.initPie(); }
+        if ($$.initBrush) { $$.initBrush(); }
+        if ($$.initZoom) { $$.initZoom(); }
 
         $$.selectChart = d3.select($$.config.bindto);
         if ($$.selectChart.empty()) {
@@ -728,7 +732,7 @@
                 $$.config.onresize.call(c3);
             });
             window.onresize.add(function () {
-                $$.chart.flush();
+                $$.api.flush();
             });
             window.onresize.add(function () {
                 $$.config.onresized.call(c3);
@@ -736,7 +740,7 @@
         }
 
         // export element of the chart
-        $$.chart.element = $$.selectChart.node();
+        $$.api.element = $$.selectChart.node();
     };
 
 
@@ -2515,12 +2519,12 @@
             .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
             .style('cursor', 'pointer')
             .on('click', function (id) {
-                typeof $$.config.legend_item_onclick === 'function' ? $$.config.legend_item_onclick.call(c3, id) : $$.chart.toggle(id);
+                typeof $$.config.legend_item_onclick === 'function' ? $$.config.legend_item_onclick.call(c3, id) : $$.api.toggle(id);
             })
             .on('mouseover', function (id) {
                 $$.d3.select(this).classed($$.CLASS.legendItemFocused, true);
                 if (!$$.transiting) {
-                    $$.chart.focus(id);
+                    $$.api.focus(id);
                 }
                 if (typeof $$.config.legend_item_onmouseover === 'function') {
                     $$.config.legend_item_onmouseover.call(c3, id);
@@ -2529,7 +2533,7 @@
             .on('mouseout', function (id) {
                 $$.d3.select(this).classed($$.CLASS.legendItemFocused, false);
                 if (!$$.transiting) {
-                    $$.chart.revert();
+                    $$.api.revert();
                 }
                 if (typeof $$.config.legend_item_onmouseout === 'function') {
                     $$.config.legend_item_onmouseout.call(c3, id);
@@ -5904,9 +5908,25 @@
         return axis;
     }
 
+    if (typeof define === "function" && define.amd) {
+        define("c3", ["d3"], c3);
+    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
+        module.exports = c3;
+    } else {
+        window.c3 = c3;
+    }
 
-    c3.chart.fn.hoge = function () {
-        console.log(this, this.internal.isTimeSeries);
+})(window);
+
+
+/**
+ *  c3.plugin.js
+ */
+(function(fn) {
+
+    fn.myapi = function () {
+        // we can do something with internal variables
+        // e.g. this.internal.isTimeseries, this.internal.svg, this.focus, etc
     };
 
-})(window.c3);
+})(window.c3.chart.fn);
