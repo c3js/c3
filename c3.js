@@ -294,7 +294,7 @@
         $$.pie = d3.layout.pie().value(function (d) {
             return d.values.reduce(function (a, b) { return a + b.value; }, 0);
         });
-        if (!$$.config.pie_sort || !$$.config.donut_sort) { // TODO: this needs to be called by each type
+        if (!$$.config.data_order || !$$.config.pie_sort || !$$.config.donut_sort) {
             $$.pie.sort(null);
         }
     };
@@ -833,14 +833,12 @@
         }
     };
     c3_chart_internal_fn.updateRadius = function () {
-        var $$ = this;
+        var $$ = this,
+            w = $$.config.gauge_width || $$.config.donut_width;
         $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
         $$.radius = $$.radiusExpanded * 0.95;
-        if ($$.hasDonutType($$.data.targets) || $$.hasGaugeType($$.data.targets)) {
-            $$.innerRadius = $$.radius * ($$.config.gauge_width ? ($$.radius - $$.config.gauge_width) / $$.radius : 0.6);
-        } else {
-            $$.innerRadius = 0;
-        }
+        $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
+        $$.innerRadius = $$.hasDonutType($$.data.targets) || $$.hasGaugeType($$.data.targets) ? $$.radius * $$.innerRadiusRatio : 0;
     };
 
     c3_chart_internal_fn.updateTargets = function (targets) {
@@ -1911,7 +1909,7 @@
                         $$.config.data_onmouseover.call(c3, closest);
                         $$.mouseover = true;
                     }
-                } else {
+                } else if ($$.mouseover) {
                     $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
                     $$.config.data_onmouseout.call(c3, closest);
                     $$.mouseover = false;
@@ -1930,7 +1928,7 @@
 
                 // select if selection enabled
                 if ($$.dist(closest, mouse) < 100) {
-                    $$.main.select('.' + CLASS.circles + '-' + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
+                    $$.main.select('.' + CLASS.circles + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
                         $$.toggleShape(this, closest, closest.index);
                     });
                 }
@@ -2990,6 +2988,9 @@
         for (i = 1; i < rows.length; i++) {
             new_row = {};
             for (j = 0; j < rows[i].length; j++) {
+                if (typeof rows[i][j] === 'undefined') {
+                    throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
+                }
                 new_row[keys[j]] = rows[i][j];
             }
             new_rows.push(new_row);
@@ -3003,6 +3004,9 @@
             for (j = 1; j < columns[i].length; j++) {
                 if (typeof new_rows[j - 1] === 'undefined') {
                     new_rows[j - 1] = {};
+                }
+                if (typeof columns[i][j] === 'undefined') {
+                    throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
                 }
                 new_rows[j - 1][key] = columns[i][j];
             }
@@ -3304,8 +3308,9 @@
 
 
     c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
-        var $$ = this, c = $$.config;
-        return typeof c.bar_width === 'number' ? c.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * c.bar_width_ratio) / barTargetsNum : 0;
+        var $$ = this, c = $$.config,
+            w = typeof c.bar_width === 'number' ? c.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * c.bar_width_ratio) / barTargetsNum : 0;
+        return c.bar_width_ratio && w > c.bar_width_max ? c.bar_width_max : w;
     };
     c3_chart_internal_fn.getBars = function (i) {
         var $$ = this;
@@ -5322,9 +5327,22 @@
 
     c3_chart_fn.flow = function (args) {
         var $$ = this.internal,
-            targets = $$.convertDataToTargets($$.convertColumnsToData(args.columns), true),
-            notfoundIds = [], orgDataCount = $$.getMaxDataCount(),
+            targets, data, notfoundIds = [], orgDataCount = $$.getMaxDataCount(),
             dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
+
+        if (args.json) {
+            data = $$.convertJsonToData(args.json, args.keys);
+        }
+        else if (args.rows) {
+            data = $$.convertRowsToData(args.rows);
+        }
+        else if (args.columns) {
+            data = $$.convertColumnsToData(args.columns);
+        }
+        else {
+            return;
+        }
+        targets = $$.convertDataToTargets(data, true);
 
         // Update/Add data
         $$.data.targets.forEach(function (t) {
