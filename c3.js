@@ -132,7 +132,6 @@
         __axis_y_min = 'axis_y_min',
         __axis_y_center = 'axis_y_center',
         __axis_y_label = 'axis_y_label',
-        __axis_y_inner = 'axis_y_inner',
         __axis_y_tick_format = 'axis_y_tick_format',
         __axis_y_tick_outer = 'axis_y_tick_outer',
         __axis_y_padding = 'axis_y_padding',
@@ -142,7 +141,6 @@
         __axis_y2_min = 'axis_y2_min',
         __axis_y2_center = 'axis_y2_center',
         __axis_y2_label = 'axis_y2_label',
-        __axis_y2_inner = 'axis_y2_inner',
         __axis_y2_tick_format = 'axis_y2_tick_format',
         __axis_y2_tick_outer = 'axis_y2_tick_outer',
         __axis_y2_padding = 'axis_y2_padding',
@@ -305,7 +303,6 @@
     config[__axis_y_min] = undefined;
     config[__axis_y_center] = undefined;
     config[__axis_y_label] = {};
-    config[__axis_y_inner] = false;
     config[__axis_y_tick_format] = undefined;
     config[__axis_y_tick_outer] = true;
     config[__axis_y_padding] = undefined;
@@ -315,7 +312,6 @@
     config[__axis_y2_min] = undefined;
     config[__axis_y2_center] = undefined;
     config[__axis_y2_label] = {};
-    config[__axis_y2_inner] = false;
     config[__axis_y2_tick_format] = undefined;
     config[__axis_y2_tick_outer] = true;
     config[__axis_y2_padding] = undefined;
@@ -500,8 +496,8 @@
         $$.hiddenLegendIds = [];
 
         $$.xOrient = config[__axis_rotated] ? "left" : "bottom";
-        $$.yOrient = config[__axis_rotated] ? (config[__axis_y_inner] ? "top" : "bottom") : (config[__axis_y_inner] ? "right" : "left");
-        $$.y2Orient = config[__axis_rotated] ? (config[__axis_y2_inner] ? "bottom" : "top") : (config[__axis_y2_inner] ? "left" : "right");
+        $$.yOrient = config[__axis_rotated] ? "bottom" : "left";
+        $$.y2Orient = config[__axis_rotated] ? "top" : "right";
         $$.subXOrient = config[__axis_rotated] ? "left" : "bottom";
 
         $$.isLegendRight = config[__legend_position] === 'right';
@@ -1983,7 +1979,7 @@
         } else if (config[__axis_rotated]) {
             return !config[__axis_x_show] ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x')), 40);
         } else {
-            return !config[__axis_y_show] || config[__axis_y_inner] ? 1 : ceil10($$.getAxisWidthByAxisId('y'));
+            return !config[__axis_y_show] ? 1 : ceil10($$.getAxisWidthByAxisId('y'));
         }
     };
     c3_chart_internal_fn.getCurrentPaddingRight = function () {
@@ -1994,7 +1990,7 @@
         } else if (config[__axis_rotated]) {
             return defaultPadding + legendWidthOnRight;
         } else {
-            return (!config[__axis_y2_show] || config[__axis_y2_inner] ? defaultPadding : ceil10($$.getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
+            return (!config[__axis_y2_show] ? defaultPadding : ceil10($$.getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
         }
     };
 
