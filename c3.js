@@ -648,7 +648,7 @@
         }
 
         // when gauge, hide legend // TODO: fix
-        if ($$[hasType](TYPE_GAUGE)) {
+        if ($$[hasType]($$.data.targets, TYPE_GAUGE)) {
             config[__legend_show] = false;
         }
 
@@ -842,7 +842,7 @@
             }
             $$.tooltip.html(config[__tooltip_contents].call($$, $$.data.targets.map(function (d) {
                 return $$[addName](d.values[config[__tooltip_init_x]]);
-            }), $$[getXAxisTickFormat](), $$[getYFormat]($$[hasArcType]()), $$.color));
+            }), $$[getXAxisTickFormat](), $$[getYFormat]($$[hasArcType]($$.data.targets)), $$.color));
             $$.tooltip.style("top", config[__tooltip_init_position].top)
                 .style("left", config[__tooltip_init_position].left)
                 .style("display", "block");
@@ -895,7 +895,7 @@
         var $$ = this, config = $$.config;
         var legendHeight = $$[getLegendHeight](), legendWidth = $$[getLegendWidth](),
             legendHeightForBottom = $$[isLegendRight] || $$[isLegendInset] ? 0 : legendHeight,
-            hasArc = $$[hasArcType](),
+            hasArc = $$[hasArcType]($$.data.targets),
             xAxisHeight = config[__axis_rotated] || hasArc ? 0 : $$[getHorizontalAxisHeight]('x'),
             subchartHeight = config[__subchart_show] && !hasArc ? (config[__subchart_size_height] + xAxisHeight) : 0;
 
@@ -1047,7 +1047,7 @@
         var areaIndices = $$[getShapeIndices]($$.isAreaType), barIndices = $$[getShapeIndices]($$.isBarType), lineIndices = $$[getShapeIndices]($$.isLineType), maxDataCountTarget, tickOffset;
         var rectX, rectW;
         var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
-        var hideAxis = $$[hasArcType]();
+        var hideAxis = $$[hasArcType]($$.data.targets);
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis, waitForDraw;
         var targetsToShow = $$[filterTargetsToShow]($$.data.targets), tickValues, i, intervalForCulling;
@@ -1666,7 +1666,7 @@
                 var index = d.index, selectedData, newData;
 
                 if ($$[dragging]) { return; } // do nothing if dragging
-                if ($$[hasArcType]()) { return; }
+                if ($$[hasArcType]($$.data.targets)) { return; }
 
                 selectedData = $$.data.targets.map(function (t) {
                     return $$[addName]($$[getValueOnIndex](t.values, index));
@@ -1696,7 +1696,7 @@
             })
             .on('mouseout', function (d) {
                 var index = d.index;
-                if ($$[hasArcType]()) { return; }
+                if ($$[hasArcType]($$.data.targets)) { return; }
                 $$[hideXGridFocus]();
                 $$[hideTooltip]();
                 // Undo expanded shapes
@@ -1712,7 +1712,7 @@
                     eventRect = $$.svg.select('.' + CLASS[eventRect] + '-' + index);
 
                 if ($$[dragging]) { return; } // do nothing when dragging
-                if ($$[hasArcType]()) { return; }
+                if ($$[hasArcType]($$.data.targets)) { return; }
 
                 // Show tooltip
                 selectedData = $$[filterTargetsToShow]($$.data.targets).map(function (t) {
@@ -1765,7 +1765,7 @@
             })
             .on('click', function (d) {
                 var index = d.index;
-                if ($$[hasArcType]()) { return; }
+                if ($$[hasArcType]($$.data.targets)) { return; }
                 if ($$[cancelClick]) {
                     $$[cancelClick] = false;
                     return;
@@ -1791,7 +1791,7 @@
             .attr('height', $$.height)
             .attr(CSS_CLASS, CLASS[eventRect])
             .on('mouseout', function () {
-                if ($$[hasArcType]()) { return; }
+                if ($$[hasArcType]($$.data.targets)) { return; }
                 $$[hideXGridFocus]();
                 $$[hideTooltip]();
                 $$[unexpandCircles]();
@@ -2115,7 +2115,7 @@
             leftAxis = $$.main.select('.' + leftAxisClass).node(),
             svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
             chartRect = $$.selectChart.node().getBoundingClientRect(),
-            hasArc = $$[hasArcType](),
+            hasArc = $$[hasArcType]($$.data.targets),
             svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : $$[getCurrentPaddingLeft]());
         return svgLeft > 0 ? svgLeft : 0;
     };
@@ -2150,7 +2150,7 @@
             return $$.config[__axis_rotated] ? $$.height : $$.width;
         }
         maxDataCount = $$[getMaxDataCount]();
-        ratio = ($$[hasType](TYPE_BAR) ? (maxDataCount - ($$[isCategorized] ? 0.25 : 1)) / maxDataCount : 1);
+        ratio = ($$[hasType]($$.data.targets, TYPE_BAR) ? (maxDataCount - ($$[isCategorized] ? 0.25 : 1)) / maxDataCount : 1);
         w = maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
         return w < 1 ? 1 : w;
     };
@@ -2163,7 +2163,7 @@
     c3_chart_internal_fn[showTooltip] = function (selectedData, mouse) {
         var $$ = this, config = $$.config;
         var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
-        var forArc = $$[hasArcType](),
+        var forArc = $$[hasArcType]($$.data.targets),
             dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
         if (dataToShow.length === 0 || !config[__tooltip_show]) {
             return;
@@ -2218,7 +2218,7 @@
         var $$ = this, dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
         if (! config[__tooltip_show]) { return; }
         // Hide when scatter plot exists
-        if ($$[hasType](TYPE_SCATTER) || $$[hasArcType]()) { return; }
+        if ($$[hasType]($$.data.targets, TYPE_SCATTER) || $$[hasArcType]($$.data.targets)) { return; }
         var focusEl = $$.main.selectAll('line.' + CLASS[xgridFocus]);
         focusEl
             .style(CSS_VISIBILITY, "visible")
@@ -3755,9 +3755,9 @@
         }
     };
     var hasType = 'hasType';
-    c3_chart_internal_fn[hasType] = function (type, targets) {
+    c3_chart_internal_fn[hasType] = function (targets, type) {
         var $$ = this, config = $$.config, has = false;
-        (targets || $$.data.targets).forEach(function (t) {
+        targets.forEach(function (t) {
             if (config[__data_types][t.id] === type) { has = true; }
             if (!(t.id in config[__data_types]) && type === 'line') { has = true; }
         });
@@ -3765,7 +3765,7 @@
     };
     var hasArcType = 'hasArcType';
     c3_chart_internal_fn[hasArcType] = function (targets) {
-        return this[hasType](TYPE_PIE, targets) || this[hasType](TYPE_DONUT, targets) || this[hasType](TYPE_GAUGE, targets);
+        return this[hasType](targets, TYPE_PIE) || this[hasType](targets, TYPE_DONUT) || this[hasType](targets, TYPE_GAUGE);
     };
 
     var isLineType = 'isLineType';
@@ -4087,7 +4087,7 @@
             domainLength, padding, padding_top, padding_bottom,
             center = axisId === 'y2' ? config[__axis_y2_center] : config[__axis_y_center],
             yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
-            isZeroBased = ($$[hasType](TYPE_BAR, yTargets) && config[__bar_zerobased]) || ($$[hasType](TYPE_AREA, yTargets) && config[__area_zerobased]),
+            isZeroBased = ($$[hasType](yTargets, TYPE_BAR) && config[__bar_zerobased]) || ($$[hasType](yTargets, TYPE_AREA) && config[__area_zerobased]),
             showHorizontalDataLabel = $$[hasDataLabel]() && config[__axis_rotated],
             showVerticalDataLabel = $$[hasDataLabel]() && !config[__axis_rotated];
         if (yTargets.length === 0) { // use current domain if target of axisId is none
@@ -4161,7 +4161,7 @@
             maxDataCount, padding, paddingLeft, paddingRight;
         if ($$[isCategorized]) {
             padding = 0;
-        } else if ($$[hasType](TYPE_BAR, targets)) {
+        } else if ($$[hasType](targets, TYPE_BAR)) {
             maxDataCount = $$[getMaxDataCount]();
             padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
         } else {
@@ -4614,7 +4614,7 @@
         $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
         $$.radius = $$.radiusExpanded * 0.95;
         $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
-        $$.innerRadius = $$[hasType](TYPE_DONUT) || $$[hasType](TYPE_GAUGE) ? $$.radius * $$.innerRadiusRatio : 0;
+        $$.innerRadius = $$[hasType]($$.data.targets, TYPE_DONUT) || $$[hasType]($$.data.targets, TYPE_GAUGE) ? $$.radius * $$.innerRadiusRatio : 0;
     };
 
     var updateArc = 'updateArc', svgArc = 'svgArc', svgArcExpanded = 'svgArcExpanded', svgArcExpandedSub = 'svgArcExpandedSub';
@@ -4685,7 +4685,7 @@
     c3_chart_internal_fn[transformForArcLabel] = function (d) {
         var $$ = this,
             updated = $$[updateAngle](d), c, x, y, h, ratio, translate = "";
-        if (updated && !$$[hasType](TYPE_GAUGE)) {
+        if (updated && !$$[hasType]($$.data.targets, TYPE_GAUGE)) {
             c = this.svgArc.centroid(updated);
             x = isNaN(c[0]) ? 0 : c[0];
             y = isNaN(c[1]) ? 0 : c[1];
@@ -4700,7 +4700,7 @@
     var getArcRatio = 'getArcRatio';
     c3_chart_internal_fn[getArcRatio] = function (d) {
         var $$ = this,
-            whole = $$[hasType](TYPE_GAUGE) ? Math.PI : (Math.PI * 2);
+            whole = $$[hasType]($$.data.targets, TYPE_GAUGE) ? Math.PI : (Math.PI * 2);
         return d ? (d.endAngle - d.startAngle) / whole : null;
     };
 
@@ -4722,7 +4722,7 @@
         updated = $$[updateAngle](d);
         value = updated ? updated.value : null;
         ratio = $$[getArcRatio](updated);
-        if (! $$[hasType](TYPE_GAUGE) && ! $$[meetsArcLabelThreshold](ratio)) { return ""; }
+        if (! $$[hasType]($$.data.targets, TYPE_GAUGE) && ! $$[meetsArcLabelThreshold](ratio)) { return ""; }
         format = $$[getArcLabelFormat]();
         return format ? format(value, ratio) : $$[defaultArcValueFormat](value, ratio);
     };
@@ -4770,9 +4770,9 @@
     var shouldShowArcLabel = 'shouldShowArcLabel';
     c3_chart_internal_fn[shouldShowArcLabel] = function () {
         var $$ = this, config = $$.config, shouldShow = true;
-        if ($$[hasType](TYPE_DONUT)) {
+        if ($$[hasType]($$.data.targets, TYPE_DONUT)) {
             shouldShow = config[__donut_label_show];
-        } else if ($$[hasType](TYPE_PIE)) {
+        } else if ($$[hasType]($$.data.targets, TYPE_PIE)) {
             shouldShow = config[__pie_label_show];
         }
         // when gauge, always true
@@ -4782,7 +4782,7 @@
     var meetsArcLabelThreshold = 'meetsArcLabelThreshold';
     c3_chart_internal_fn[meetsArcLabelThreshold] = function (ratio) {
         var $$ = this, config = $$.config,
-            threshold = $$[hasType](TYPE_DONUT) ? config[__donut_label_threshold] : config[__pie_label_threshold];
+            threshold = $$[hasType]($$.data.targets, TYPE_DONUT) ? config[__donut_label_threshold] : config[__pie_label_threshold];
         return ratio >= threshold;
     };
 
@@ -4790,9 +4790,9 @@
     c3_chart_internal_fn[getArcLabelFormat] = function () {
         var $$ = this, config = $$.config,
             format = config[__pie_label_format];
-        if ($$[hasType](TYPE_GAUGE)) {
+        if ($$[hasType]($$.data.targets, TYPE_GAUGE)) {
             format = config[__gauge_label_format];
-        } else if ($$[hasType](TYPE_DONUT)) {
+        } else if ($$[hasType]($$.data.targets, TYPE_DONUT)) {
             format = config[__donut_label_format];
         }
         return format;
@@ -4801,7 +4801,7 @@
     var getArcTitle = 'getArcTitle';
     c3_chart_internal_fn[getArcTitle] = function () {
         var $$ = this;
-        return $$[hasType](TYPE_DONUT) ? $$.config[__donut_title] : "";
+        return $$[hasType]($$.data.targets, TYPE_DONUT) ? $$.config[__donut_title] : "";
     };
 
     var descByStartAngle = 'descByStartAngle';
@@ -4820,7 +4820,7 @@
         mainPieEnter.append('g')
             .attr(CSS_CLASS, generateCall($$[classArcs], $$));
         mainPieEnter.append("text")
-            .attr("dy", $$[hasType](TYPE_GAUGE) ? "-0.35em" : ".35em")
+            .attr("dy", $$[hasType]($$.data.targets, TYPE_GAUGE) ? "-0.35em" : ".35em")
             .style(CSS_OPACITY, 0)
             .style(CSS_TEXT_ANCHOR, "middle")
             .style(CSS_POINTER_EVENTS, "none");
@@ -4935,7 +4935,7 @@
           .transition().duration(duration)
             .style(CSS_OPACITY, function (d) { return $$[isTargetToShow](d.data.id) && $$[isArcType](d.data) ? 1 : 0; });
         main.select('.' + CLASS[chartArcsTitle])
-            .style(CSS_OPACITY, $$[hasType](TYPE_DONUT) || $$[hasType](TYPE_GAUGE) ? 1 : 0);
+            .style(CSS_OPACITY, $$[hasType]($$.data.targets, TYPE_DONUT) || $$[hasType]($$.data.targets, TYPE_GAUGE) ? 1 : 0);
 
     };
 
@@ -4944,7 +4944,7 @@
     var initGauge = 'initGauge';
     c3_chart_internal_fn[initGauge] = function () {
         var $$ = this, config = $$.config, arcs;
-        if ($$[hasType](TYPE_GAUGE)) {
+        if ($$[hasType]($$.data.targets, TYPE_GAUGE)) {
             arcs.append('path')
                 .attr(CSS_CLASS, CLASS[chartArcsBackground])
                 .attr("d", function () {
@@ -5413,7 +5413,7 @@
     var transformTo = 'transformTo';
     c3_chart_internal_fn[transformTo] = function (targetIds, type, optionsForRedraw) {
         var $$ = this,
-            withTransitionForAxis = !$$[hasArcType](),
+            withTransitionForAxis = !$$[hasArcType]($$.data.targets),
             options = optionsForRedraw || {withTransitionForAxis: withTransitionForAxis};
         options.withTransitionForTransform = false;
         $$[transiting] = false;
@@ -5694,8 +5694,8 @@
     var getYFormat = 'getYFormat';
     c3_chart_internal_fn[getYFormat] = function (forArc) {
         var $$ = this,
-            formatForY = forArc && !$$[hasType](TYPE_GAUGE) ? $$.defaultArcValueFormat : $$.yFormat,
-            formatForY2 = forArc && !$$[hasType](TYPE_GAUGE) ? $$.defaultArcValueFormat : $$.y2Format;
+            formatForY = forArc && !$$[hasType]($$.data.targets, TYPE_GAUGE) ? $$.defaultArcValueFormat : $$.yFormat,
+            formatForY2 = forArc && !$$[hasType]($$.data.targets, TYPE_GAUGE) ? $$.defaultArcValueFormat : $$.y2Format;
         return function (v, ratio, id) {
             var format = $$[getAxisId](id) === 'y2' ? formatForY2 : formatForY;
             return format.call($$, v, ratio);
@@ -5746,7 +5746,7 @@
         var $$ = this, config = $$.config, main = $$.main, d3 = $$.d3;
         var sx, sy, mx, my, minX, maxX, minY, maxY;
 
-        if ($$[hasArcType]()) { return; }
+        if ($$[hasArcType]($$.data.targets)) { return; }
         if (! config[__data_selection_enabled]) { return; } // do nothing if not selectable
         if (config[__zoom_enabled] && ! $$.zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
         if (!config[__data_selection_multiple]) { return; } // skip when single selection because drag is used for multiple selection
@@ -5803,7 +5803,7 @@
     var dragstart = 'dragstart';
     c3_chart_internal_fn[dragstart] = function (mouse) {
         var $$ = this, config = $$.config;
-        if ($$[hasArcType]()) { return; }
+        if ($$[hasArcType]($$.data.targets)) { return; }
         if (! config[__data_selection_enabled]) { return; } // do nothing if not selectable
         $$[dragStart] = mouse;
         $$.main.select('.' + CLASS[chart]).append('rect')
@@ -5816,7 +5816,7 @@
     var dragend = 'dragend';
     c3_chart_internal_fn[dragend] = function () {
         var $$ = this, config = $$.config;
-        if ($$[hasArcType]()) { return; }
+        if ($$[hasArcType]($$.data.targets)) { return; }
         if (! config[__data_selection_enabled]) { return; } // do nothing if not selectable
         $$.main.select('.' + CLASS[dragarea])
             .transition().duration(100)
@@ -5847,7 +5847,7 @@
         this.defocus();
         focus(candidatesForNoneArc.classed(CLASS[focused], true));
         focus(candidatesForArc);
-        if ($$[hasArcType]()) {
+        if ($$[hasArcType]($$.data.targets)) {
             $$[expandArc](targetId, true);
         }
         $$[toggleFocusLegend](targetId, true);
@@ -5864,7 +5864,7 @@
         this.revert();
         defocus(candidatesForNoneArc.classed(CLASS[focused], false));
         defocus(candidatesForArc);
-        if ($$[hasArcType]()) {
+        if ($$[hasArcType]($$.data.targets)) {
             $$[unexpandArc](targetId);
         }
         $$[toggleFocusLegend](targetId, false);
@@ -5880,7 +5880,7 @@
         }
         revert(candidatesForNoneArc.classed(CLASS[focused], false));
         revert(candidatesForArc);
-        if ($$[hasArcType]()) {
+        if ($$[hasArcType]($$.data.targets)) {
             $$[unexpandArc](targetId);
         }
         $$[revertLegend]();
