@@ -1885,15 +1885,15 @@
             .attr('width', $$.width)
             .attr('height', $$.height);
         $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
-            .attr('x', function () { return $$.getXAxisClipX(); })
-            .attr('y', function () { return $$.getXAxisClipY(); })
-            .attr('width', function () { return $$.getXAxisClipWidth(); })
-            .attr('height', function () { return $$.getXAxisClipHeight(); });
+            .attr('x', generateCall($$.getXAxisClipX, $$))
+            .attr('y', generateCall($$.getXAxisClipY, $$))
+            .attr('width', generateCall($$.getXAxisClipWidth, $$))
+            .attr('height', generateCall($$.getXAxisClipHeight, $$));
         $$.svg.select('#' + $$.clipIdForYAxis).select('rect')
-            .attr('x', function () { return $$.getYAxisClipX(); })
-            .attr('y', function () { return $$.getYAxisClipY(); })
-            .attr('width', function () { return $$.getYAxisClipWidth(); })
-            .attr('height', function () { return $$.getYAxisClipHeight(); });
+            .attr('x', generateCall($$.getYAxisClipX, $$))
+            .attr('y', generateCall($$.getYAxisClipY, $$))
+            .attr('width', generateCall($$.getYAxisClipWidth, $$))
+            .attr('height', generateCall($$.getYAxisClipHeight, $$));
         $$.svg.select('.' + CLASS[zoomRect])
             .attr('width', $$.width)
             .attr('height', $$.height);
