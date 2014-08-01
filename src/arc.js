@@ -211,11 +211,11 @@ c3_chart_internal_fn.updateTargetsForArc = function (targets) {
 };
 
 c3_chart_internal_fn.initArc = function () {
-    var $$ = this, arcs;
-    arcs = $$.main.select('.' + CLASS[_chart]).append("g")
+    var $$ = this;
+    $$.arcs = $$.main.select('.' + CLASS[_chart]).append("g")
         .attr("class", CLASS[_chartArcs])
         .attr("transform", $$.getTranslate('arc'));
-    arcs.append('text')
+    $$.arcs.append('text')
         .attr('class', CLASS[_chartArcsTitle])
         .style("text-anchor", "middle")
         .text($$.getArcTitle());
@@ -323,7 +323,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
 
 };
 c3_chart_internal_fn.initGauge = function () {
-    var $$ = this, config = $$.config, arcs;
+    var $$ = this, config = $$.config, arcs = $$.arcs;
     if ($$.hasType('gauge')) {
         arcs.append('path')
             .attr("class", CLASS[_chartArcsBackground])
