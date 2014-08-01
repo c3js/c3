@@ -9,15 +9,48 @@ module.exports = (grunt) ->
 
         concat:
           dist:
+            options:
+              process: (src, filepath) ->
+                if filepath != 'src/head.js' && filepath != 'src/tail.js'
+                  lines = []
+                  src.split('\n').forEach (line) ->
+                    lines.push( (if line.length > 0 then '    ' else '') + line)
+                  src = lines.join('\n')
+                return src
             src: [
               'src/head.js',
-              'src/c3.core.js',
-              'src/c3.render.bar.js',
-              'src/c3.draw.bar.js',
+              'src/core.js',
+              'src/config.js',
+              'src/scale.js',
+              'src/domain.js',
+              'src/data.js',
+              'src/data.convert.js',
+              'src/data.load.js',
+              'src/category.js',
+              'src/size.js',
+              'src/shape.js',
+              'src/text.js',
+              'src/type.js',
+              'src/grid.js',
+              'src/tooltip.js',
+              'src/legend.js',
+              'src/axis.js',
+              'src/clip.js',
+              'src/arc.js',
+              'src/region.js',
+              'src/drag.js',
+              'src/subchart.js',
+              'src/zoom.js',
+              'src/color.js',
+              'src/format.js',
+              'src/cache.js',
+              'src/class.js',
+              'src/util.js',
+              'src/api.js',
               'src/c3.axis.js',
               'src/tail.js'
             ]
-            dest: 'dist/c3.js'
+            dest: 'c3.js'
 
         jshint:
           c3: 'c3.js'
@@ -36,4 +69,4 @@ module.exports = (grunt) ->
             files:
               'c3.min.js': 'c3.js'
 
-    grunt.registerTask 'default', ['jshint', 'jasmine', 'uglify']
+    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'uglify']
