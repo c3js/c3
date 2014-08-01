@@ -381,30 +381,8 @@
     config[__tooltip_format_name] = undefined;
     config[__tooltip_format_value] = undefined;
     config[__tooltip_contents] = function (d, defaultTitleFormat, defaultValueFormat, color) {
-        var $$ = this, config = $$.config,
-            titleFormat = config[__tooltip_format_title] || defaultTitleFormat,
-            nameFormat = config[__tooltip_format_name] || function (name) { return name; },
-            valueFormat = config[__tooltip_format_value] || defaultValueFormat,
-            text, i, title, value, name, bgcolor;
-        for (i = 0; i < d.length; i++) {
-            if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
-
-            if (! text) {
-                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
-                text = "<table class='" + CLASS[_tooltip] + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
-            }
-
-            name = nameFormat(d[i].name);
-            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
-            bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
-
-            text += "<tr class='" + CLASS[_tooltipName] + "-" + d[i].id + "'>";
-            text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
-            text += "<td class='value'>" + value + "</td>";
-            text += "</tr>";
-        }
-        return text + "</table>";
-    };
+        return this.getTooltipContent ? this.getTooltipContent(d, defaultValueFormat, defaultValueFormat, color) : '';
+    },
     config[__tooltip_init_show] = false;
     config[__tooltip_init_x] = 0;
     config[__tooltip_init_position] = {top: '0px', left: '50px'};
@@ -522,7 +500,7 @@
 
     c3_chart_internal_fn.initWithData = function (data) {
         var $$ = this, d3 = $$.d3, config = $$.config;
-        var main, legend, eventRect, i, binding = true;
+        var main, eventRect, binding = true;
 
         if (isFunction($$.initPie)) { $$.initPie(); }
         if (isFunction($$.initBrush)) { $$.initBrush(); }
@@ -590,29 +568,10 @@
 
         // Define regions
         main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
-        legend = $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
 
-        if (isFunction($$.initSubchart)) {
-            $$.initSubchart();
-        }
-
-        if (!config[__legend_show]) {
-            $$.legend.style('visibility', 'hidden');
-            $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
-        }
-
-        // Define tooltip
-        $$.tooltip = $$.selectChart
-            .style("position", "relative")
-          .append("div")
-            .style("position", "absolute")
-            .style("pointer-events", "none")
-            .style("z-index", "10")
-            .style("display", "none");
-
-        // MEMO: call here to update legend box and tranlate for all
-        // MEMO: translate will be upated by this, so transform not needed in updateLegend()
-        $$.updateLegend($$.mapToIds($$.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
+        if (isFunction($$.initSubchart)) { $$.initSubchart(); }
+        if (isFunction($$.initTooltip)) { $$.initTooltip(); }
+        if (isFunction($$.initLegend)) { $$.initLegend(); }
 
         /*-- Main Region --*/
 
@@ -733,23 +692,6 @@
             });
         }
 
-        // Show tooltip if needed
-        if (config[__tooltip_init_show]) {
-            if ($$.isTimeSeries() && isString(config[__tooltip_init_x])) {
-                config[__tooltip_init_x] = $$.parseDate(config[__tooltip_init_x]);
-                for (i = 0; i < $$.data.targets[0].values.length; i++) {
-                    if (($$.data.targets[0].values[i].x - config[__tooltip_init_x]) === 0) { break; }
-                }
-                config[__tooltip_init_x] = i;
-            }
-            $$.tooltip.html(config[__tooltip_contents].call($$, $$.data.targets.map(function (d) {
-                return $$.addName(d.values[config[__tooltip_init_x]]);
-            }), $$.getXAxisTickFormat(), $$.getYFormat($$.hasArcType()), $$.color));
-            $$.tooltip.style("top", config[__tooltip_init_position].top)
-                .style("left", config[__tooltip_init_position].left)
-                .style("display", "block");
-        }
-
         // Bind resize event
         if (window.onresize == null) {
             window.onresize = $$.generateResize();
@@ -793,7 +735,8 @@
 
     c3_chart_internal_fn.updateSizes = function () {
         var $$ = this, config = $$.config;
-        var legendHeight = $$.getLegendHeight(), legendWidth = $$.getLegendWidth(),
+        var legendHeight = $$.legend ? $$.getLegendHeight() : 0,
+            legendWidth = $$.legend ? $$.getLegendWidth() : 0,
             legendHeightForBottom = $$.isLegendRight || $$.isLegendInset ? 0 : legendHeight,
             hasArc = $$.hasArcType(),
             xAxisHeight = config[__axis_rotated] || hasArc ? 0 : $$.getHorizontalAxisHeight('x'),
@@ -830,17 +773,9 @@
                 left: $$.margin.left
             };
         }
+
         // for legend
-        var insetLegendPosition = {
-            top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config[__legend_inset_y] + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config[__legend_inset_y],
-            left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config[__legend_inset_x] + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config[__legend_inset_x] + 0.5
-        };
-        $$.margin3 = {
-            top: $$.isLegendRight ? 0 : $$.isLegendInset ? insetLegendPosition.top : $$.currentHeight - legendHeight,
-            right: NaN,
-            bottom: 0,
-            left: $$.isLegendRight ? $$.currentWidth - legendWidth : $$.isLegendInset ? insetLegendPosition.left : 0
-        };
+        if (isFunction($$.updateSizeForLegend)) { $$.updateSizeForLegend(legendHeight, legendWidth); }
 
         $$.width = $$.currentWidth - $$.margin.left - $$.margin.right;
         $$.height = $$.currentHeight - $$.margin.top - $$.margin.bottom;
@@ -1860,15 +1795,11 @@
         y2Axis.attr("transform", $$.getTranslate('y2'));
         $$.main.select('.' + CLASS[_chartArcs]).attr("transform", $$.getTranslate('arc'));
     };
-    c3_chart_internal_fn.transformLegend = function (withTransition) {
-        var $$ = this;
-        (withTransition ? $$.legend.transition() : $$.legend).attr("transform", $$.getTranslate('legend'));
-    };
     c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
         var $$ = this;
         $$.transformMain(withTransition, transitions);
         if (config[__subchart_show]) { $$.transformContext(withTransition, transitions); }
-        $$.transformLegend(withTransition);
+        if ($$.legend) { $$.transformLegend(withTransition); }
     };
 
 
@@ -2061,6 +1992,57 @@
     /**
      *  c3.tooltip.js
      */
+    c3_chart_internal_fn.initTooltip = function () {
+        var $$ = this, config = $$.config, i;
+        $$.tooltip = $$.selectChart
+            .style("position", "relative")
+          .append("div")
+            .style("position", "absolute")
+            .style("pointer-events", "none")
+            .style("z-index", "10")
+            .style("display", "none");
+        // Show tooltip if needed
+        if (config[__tooltip_init_show]) {
+            if ($$.isTimeSeries() && isString(config[__tooltip_init_x])) {
+                config[__tooltip_init_x] = $$.parseDate(config[__tooltip_init_x]);
+                for (i = 0; i < $$.data.targets[0].values.length; i++) {
+                    if (($$.data.targets[0].values[i].x - config[__tooltip_init_x]) === 0) { break; }
+                }
+                config[__tooltip_init_x] = i;
+            }
+            $$.tooltip.html(config[__tooltip_contents].call($$, $$.data.targets.map(function (d) {
+                return $$.addName(d.values[config[__tooltip_init_x]]);
+            }), $$.getXAxisTickFormat(), $$.getYFormat($$.hasArcType()), $$.color));
+            $$.tooltip.style("top", config[__tooltip_init_position].top)
+                .style("left", config[__tooltip_init_position].left)
+                .style("display", "block");
+        }
+    };
+    c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
+        var $$ = this, config = $$.config,
+            titleFormat = config[__tooltip_format_title] || defaultTitleFormat,
+            nameFormat = config[__tooltip_format_name] || function (name) { return name; },
+            valueFormat = config[__tooltip_format_value] || defaultValueFormat,
+            text, i, title, value, name, bgcolor;
+        for (i = 0; i < d.length; i++) {
+            if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
+
+            if (! text) {
+                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+                text = "<table class='" + CLASS[_tooltip] + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+            }
+
+            name = nameFormat(d[i].name);
+            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+            bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
+
+            text += "<tr class='" + CLASS[_tooltipName] + "-" + d[i].id + "'>";
+            text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
+            text += "<td class='value'>" + value + "</td>";
+            text += "</tr>";
+        }
+        return text + "</table>";
+    };
     c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         var $$ = this, config = $$.config;
         var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
@@ -2187,6 +2169,33 @@
     /**
      *  c3.legend.js
      */
+    c3_chart_internal_fn.initLegend = function () {
+        var $$ = this;
+        $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
+        if (!config[__legend_show]) {
+            $$.legend.style('visibility', 'hidden');
+            $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
+        }
+        // MEMO: call here to update legend box and tranlate for all
+        // MEMO: translate will be upated by this, so transform not needed in updateLegend()
+        $$.updateLegend($$.mapToIds($$.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
+    };
+    c3_chart_internal_fn.updateSizeForLegend = function (legendHeight, legendWidth) {
+        var $$ = this, insetLegendPosition = {
+            top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config[__legend_inset_y] + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config[__legend_inset_y],
+            left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config[__legend_inset_x] + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config[__legend_inset_x] + 0.5
+        };
+        $$.margin3 = {
+            top: $$.isLegendRight ? 0 : $$.isLegendInset ? insetLegendPosition.top : $$.currentHeight - legendHeight,
+            right: NaN,
+            bottom: 0,
+            left: $$.isLegendRight ? $$.currentWidth - legendWidth : $$.isLegendInset ? insetLegendPosition.left : 0
+        };
+    };
+    c3_chart_internal_fn.transformLegend = function (withTransition) {
+        var $$ = this;
+        (withTransition ? $$.legend.transition() : $$.legend).attr("transform", $$.getTranslate('legend'));
+    };
     c3_chart_internal_fn.updateLegendStep = function (step) {
         this.legendStep = step;
     };
@@ -2454,8 +2463,6 @@
         // Update g positions
         $$.transformAll(withTransitionForTransform, transitions);
     };
-
-
 
 
     c3_chart_internal_fn.getClipPath = function (id) {
@@ -3035,7 +3042,9 @@
             // Reset fadein for future load
             $$.withoutFadeIn[id] = false;
             // Remove target's elements
-            $$.legend.selectAll('.' + CLASS[_legendItem] + $$.getTargetSelectorSuffix(id)).remove();
+            if ($$.legend) {
+                $$.legend.selectAll('.' + CLASS[_legendItem] + $$.getTargetSelectorSuffix(id)).remove();
+            }
             // Remove target
             $$.data.targets = $$.data.targets.filter(function (t) {
                 return t.id !== id;
