@@ -377,7 +377,7 @@ c3_chart_fn.ygrids = function (grids) {
 };
 c3_chart_fn.ygrids.add = function (grids) {
     var $$ = this.internal;
-    return c3.ygrids($$.config[__grid_y_lines].concat(grids ? grids : []));
+    return this.ygrids($$.config[__grid_y_lines].concat(grids ? grids : []));
 };
 c3_chart_fn.ygrids.remove = function (params) { // TODO: multiple
     var $$ = this.internal;
@@ -425,8 +425,7 @@ c3_chart_fn.regions.remove = function (options) {
     return config[__regions];
 };
 
-c3_chart_fn.data = function () {
-};
+c3_chart_fn.data = function () {};
 c3_chart_fn.data.get = function (targetId) {
     var target = this.data.getAsTarget(targetId);
     return isDefined(target) ? target.values.map(function (d) { return d.value; }) : undefined;
@@ -493,8 +492,7 @@ c3_chart_fn.xs = function (xs) {
 };
 
 
-c3_chart_fn.axis = function () {
-};
+c3_chart_fn.axis = function () {};
 c3_chart_fn.axis.labels = function (labels) {
     var $$ = this.internal;
     if (arguments.length) {
@@ -539,8 +537,7 @@ c3_chart_fn.axis.range = function (range) {
 };
 
 
-c3_chart_fn.legend = function () {
-};
+c3_chart_fn.legend = function () {};
 c3_chart_fn.legend.show = function (targetIds) {
     var $$ = this.internal;
     $$.showLegend($$.mapToTargetIds(targetIds));

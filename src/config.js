@@ -17,9 +17,9 @@ var __bindto = 'bindto',
     __transition_duration = 'transition_duration',
     __data_x = 'data_x',
     __data_xs = 'data_xs',
-    __data_x_format = 'data_x_format',
-    __data_x_localtime = 'data_x_localtime',
-    __data_id_converter = 'data_id_converter',
+    __data_xFormat = 'data_xFormat',
+    __data_xLocaltime = 'data_xLocaltime',
+    __data_idConverter = 'data_idConverter',
     __data_names = 'data_names',
     __data_classes = 'data_classes',
     __data_groups = 'data_groups',
@@ -152,185 +152,189 @@ var __bindto = 'bindto',
     __tooltip_init_x = 'tooltip_init_x',
     __tooltip_init_position = 'tooltip_init_position';
 
-var config = c3_chart_internal_fn.config = {};
-config[__bindto] = '#chart';
-config[__size_width] = undefined;
-config[__size_height] = undefined;
-config[__padding_left] = undefined;
-config[__padding_right] = undefined;
-config[__padding_top] = undefined;
-config[__padding_bottom] = undefined;
-config[__zoom_enabled] = false;
-config[__zoom_extent] = undefined;
-config[__zoom_privileged] = false;
-config[__zoom_onzoom] = function () {};
-config[__interaction_enabled] = true;
-config[__onmouseover] = function () {};
-config[__onmouseout] = function () {};
-config[__onresize] = function () {};
-config[__onresized] = function () {};
-config[__transition_duration] = 350;
-config[__data_x] = undefined;
-config[__data_xs] = {};
-config[__data_x_format] = '%Y-%m-%d';
-config[__data_x_localtime] = true;
-config[__data_id_converter] = function (id) { return id; };
-config[__data_names] = {};
-config[__data_classes] = {};
-config[__data_groups] = [];
-config[__data_axes] = {};
-config[__data_type] = undefined;
-config[__data_types] = {};
-config[__data_labels] = {};
-config[__data_order] = 'desc';
-config[__data_regions] = {};
-config[__data_color] = undefined;
-config[__data_colors] = {};
-config[__data_hide] = false;
-config[__data_filter] = undefined;
-config[__data_selection_enabled] = false;
-config[__data_selection_grouped] = false;
-config[__data_selection_isselectable] = function () { return true; };
-config[__data_selection_multiple] = true;
-config[__data_onclick] = function () {};
-config[__data_onmouseover] = function () {};
-config[__data_onmouseout] = function () {};
-config[__data_onselected] = function () {};
-config[__data_onunselected] = function () {};
-config[__data_ondragstart] = function () {};
-config[__data_ondragend] = function () {};
-config[__data_url] = undefined;
-config[__data_json] = undefined;
-config[__data_rows] = undefined;
-config[__data_columns] = undefined;
-config[__data_mimeType] = undefined;
-config[__data_keys] = undefined;
-// configuration for no plot-able data supplied.
-config[__data_empty_label_text] = "";
-// subchart
-config[__subchart_show] = false;
-config[__subchart_size_height] = 60;
-config[__subchart_onbrush] = function () {};
-// color
-config[__color_pattern] = [];
-config[__color_threshold] = {};
-// legend
-config[__legend_show] = true;
-config[__legend_position] = 'bottom';
-config[__legend_inset_anchor] = 'top-left';
-config[__legend_inset_x] = 10;
-config[__legend_inset_y] = 0;
-config[__legend_inset_step] = undefined;
-config[__legend_item_onclick] = undefined;
-config[__legend_item_onmouseover] = undefined;
-config[__legend_item_onmouseout] = undefined;
-config[__legend_equally] = false;
-// axis
-config[__axis_rotated] = false;
-config[__axis_x_show] = true;
-config[__axis_x_type] = 'indexed';
-config[__axis_x_localtime] = true;
-config[__axis_x_categories] = [];
-config[__axis_x_tick_centered] = false;
-config[__axis_x_tick_format] = undefined;
-config[__axis_x_tick_culling] = {};
-config[__axis_x_tick_culling_max] = 10;
-config[__axis_x_tick_count] = undefined;
-config[__axis_x_tick_fit] = true;
-config[__axis_x_tick_values] = null;
-config[__axis_x_tick_rotate] = undefined;
-config[__axis_x_tick_outer] = true;
-config[__axis_x_max] = null;
-config[__axis_x_min] = null;
-config[__axis_x_padding] = {};
-config[__axis_x_height] = undefined;
-config[__axis_x_default] = undefined;
-config[__axis_x_label] = {};
-config[__axis_y_show] = true;
-config[__axis_y_max] = undefined;
-config[__axis_y_min] = undefined;
-config[__axis_y_center] = undefined;
-config[__axis_y_label] = {};
-config[__axis_y_tick_format] = undefined;
-config[__axis_y_tick_outer] = true;
-config[__axis_y_padding] = undefined;
-config[__axis_y_ticks] = 10;
-config[__axis_y2_show] = false;
-config[__axis_y2_max] = undefined;
-config[__axis_y2_min] = undefined;
-config[__axis_y2_center] = undefined;
-config[__axis_y2_label] = {};
-config[__axis_y2_tick_format] = undefined;
-config[__axis_y2_tick_outer] = true;
-config[__axis_y2_padding] = undefined;
-config[__axis_y2_ticks] = 10;
-// grid
-config[__grid_x_show] = false;
-config[__grid_x_type] = 'tick';
-config[__grid_x_lines] = [];
-config[__grid_y_show] = false;
-// not used
-// grid_y_type: {}, 'tick'),
-config[__grid_y_lines] = [];
-config[__grid_y_ticks] = 10;
-config[__grid_focus_show] = true;
-// point - point of each data
-config[__point_show] = true;
-config[__point_r] = 2.5;
-config[__point_focus_expand_enabled] = true;
-config[__point_focus_expand_r] = undefined;
-config[__point_select_r] = undefined;
-config[__line_connect_null] = false;
-// bar
-config[__bar_width] = undefined;
-config[__bar_width_ratio] = 0.6;
-config[__bar_width_max] = undefined;
-config[__bar_zerobased] = true;
-// area
-config[__area_zerobased] = true;
-// pie
-config[__pie_label_show] = true;
-config[__pie_label_format] = undefined;
-config[__pie_label_threshold] = 0.05;
-config[__pie_sort] = true;
-config[__pie_expand] = true;
-// gauge
-config[__gauge_label_show] = true;
-config[__gauge_label_format] = undefined;
-config[__gauge_expand] = true;
-config[__gauge_min] = 0;
-config[__gauge_max] = 100;
-config[__gauge_units] = undefined;
-config[__gauge_width] = undefined;
-// donut
-config[__donut_label_show] = true;
-config[__donut_label_format] = undefined;
-config[__donut_label_threshold] = 0.05;
-config[__donut_width] = undefined;
-config[__donut_sort] = true;
-config[__donut_expand] = true;
-config[__donut_title] = "";
-// region - region to change style
-config[__regions] = [];
-// tooltip - show when mouseover on each data
-config[__tooltip_show] = true;
-config[__tooltip_grouped] = true;
-config[__tooltip_format_title] = undefined;
-config[__tooltip_format_name] = undefined;
-config[__tooltip_format_value] = undefined;
-config[__tooltip_contents] = function (d, defaultTitleFormat, defaultValueFormat, color) {
-    return this.getTooltipContent ? this.getTooltipContent(d, defaultValueFormat, defaultValueFormat, color) : '';
-},
-config[__tooltip_init_show] = false;
-config[__tooltip_init_x] = 0;
-config[__tooltip_init_position] = {top: '0px', left: '50px'};
+c3_chart_internal_fn.getDefaultConfig = function () {
+    var config = {};
+    config[__bindto] = '#chart';
+    config[__size_width] = undefined;
+    config[__size_height] = undefined;
+    config[__padding_left] = undefined;
+    config[__padding_right] = undefined;
+    config[__padding_top] = undefined;
+    config[__padding_bottom] = undefined;
+    config[__zoom_enabled] = false;
+    config[__zoom_extent] = undefined;
+    config[__zoom_privileged] = false;
+    config[__zoom_onzoom] = function () {};
+    config[__interaction_enabled] = true;
+    config[__onmouseover] = function () {};
+    config[__onmouseout] = function () {};
+    config[__onresize] = function () {};
+    config[__onresized] = function () {};
+    config[__transition_duration] = 350;
+    config[__data_x] = undefined;
+    config[__data_xs] = {};
+    config[__data_xFormat] = '%Y-%m-%d';
+    config[__data_xLocaltime] = true;
+    config[__data_idConverter] = function (id) { return id; };
+    config[__data_names] = {};
+    config[__data_classes] = {};
+    config[__data_groups] = [];
+    config[__data_axes] = {};
+    config[__data_type] = undefined;
+    config[__data_types] = {};
+    config[__data_labels] = {};
+    config[__data_order] = 'desc';
+    config[__data_regions] = {};
+    config[__data_color] = undefined;
+    config[__data_colors] = {};
+    config[__data_hide] = false;
+    config[__data_filter] = undefined;
+    config[__data_selection_enabled] = false;
+    config[__data_selection_grouped] = false;
+    config[__data_selection_isselectable] = function () { return true; };
+    config[__data_selection_multiple] = true;
+    config[__data_onclick] = function () {};
+    config[__data_onmouseover] = function () {};
+    config[__data_onmouseout] = function () {};
+    config[__data_onselected] = function () {};
+    config[__data_onunselected] = function () {};
+    config[__data_ondragstart] = function () {};
+    config[__data_ondragend] = function () {};
+    config[__data_url] = undefined;
+    config[__data_json] = undefined;
+    config[__data_rows] = undefined;
+    config[__data_columns] = undefined;
+    config[__data_mimeType] = undefined;
+    config[__data_keys] = undefined;
+    // configuration for no plot-able data supplied.
+    config[__data_empty_label_text] = "";
+    // subchart
+    config[__subchart_show] = false;
+    config[__subchart_size_height] = 60;
+    config[__subchart_onbrush] = function () {};
+    // color
+    config[__color_pattern] = [];
+    config[__color_threshold] = {};
+    // legend
+    config[__legend_show] = true;
+    config[__legend_position] = 'bottom';
+    config[__legend_inset_anchor] = 'top-left';
+    config[__legend_inset_x] = 10;
+    config[__legend_inset_y] = 0;
+    config[__legend_inset_step] = undefined;
+    config[__legend_item_onclick] = undefined;
+    config[__legend_item_onmouseover] = undefined;
+    config[__legend_item_onmouseout] = undefined;
+    config[__legend_equally] = false;
+    // axis
+    config[__axis_rotated] = false;
+    config[__axis_x_show] = true;
+    config[__axis_x_type] = 'indexed';
+    config[__axis_x_localtime] = true;
+    config[__axis_x_categories] = [];
+    config[__axis_x_tick_centered] = false;
+    config[__axis_x_tick_format] = undefined;
+    config[__axis_x_tick_culling] = {};
+    config[__axis_x_tick_culling_max] = 10;
+    config[__axis_x_tick_count] = undefined;
+    config[__axis_x_tick_fit] = true;
+    config[__axis_x_tick_values] = null;
+    config[__axis_x_tick_rotate] = undefined;
+    config[__axis_x_tick_outer] = true;
+    config[__axis_x_max] = null;
+    config[__axis_x_min] = null;
+    config[__axis_x_padding] = {};
+    config[__axis_x_height] = undefined;
+    config[__axis_x_default] = undefined;
+    config[__axis_x_label] = {};
+    config[__axis_y_show] = true;
+    config[__axis_y_max] = undefined;
+    config[__axis_y_min] = undefined;
+    config[__axis_y_center] = undefined;
+    config[__axis_y_label] = {};
+    config[__axis_y_tick_format] = undefined;
+    config[__axis_y_tick_outer] = true;
+    config[__axis_y_padding] = undefined;
+    config[__axis_y_ticks] = 10;
+    config[__axis_y2_show] = false;
+    config[__axis_y2_max] = undefined;
+    config[__axis_y2_min] = undefined;
+    config[__axis_y2_center] = undefined;
+    config[__axis_y2_label] = {};
+    config[__axis_y2_tick_format] = undefined;
+    config[__axis_y2_tick_outer] = true;
+    config[__axis_y2_padding] = undefined;
+    config[__axis_y2_ticks] = 10;
+    // grid
+    config[__grid_x_show] = false;
+    config[__grid_x_type] = 'tick';
+    config[__grid_x_lines] = [];
+    config[__grid_y_show] = false;
+    // not used
+    // grid_y_type: {}, 'tick'),
+    config[__grid_y_lines] = [];
+    config[__grid_y_ticks] = 10;
+    config[__grid_focus_show] = true;
+    // point - point of each data
+    config[__point_show] = true;
+    config[__point_r] = 2.5;
+    config[__point_focus_expand_enabled] = true;
+    config[__point_focus_expand_r] = undefined;
+    config[__point_select_r] = undefined;
+    config[__line_connect_null] = false;
+    // bar
+    config[__bar_width] = undefined;
+    config[__bar_width_ratio] = 0.6;
+    config[__bar_width_max] = undefined;
+    config[__bar_zerobased] = true;
+    // area
+    config[__area_zerobased] = true;
+    // pie
+    config[__pie_label_show] = true;
+    config[__pie_label_format] = undefined;
+    config[__pie_label_threshold] = 0.05;
+    config[__pie_sort] = true;
+    config[__pie_expand] = true;
+    // gauge
+    config[__gauge_label_show] = true;
+    config[__gauge_label_format] = undefined;
+    config[__gauge_expand] = true;
+    config[__gauge_min] = 0;
+    config[__gauge_max] = 100;
+    config[__gauge_units] = undefined;
+    config[__gauge_width] = undefined;
+    // donut
+    config[__donut_label_show] = true;
+    config[__donut_label_format] = undefined;
+    config[__donut_label_threshold] = 0.05;
+    config[__donut_width] = undefined;
+    config[__donut_sort] = true;
+    config[__donut_expand] = true;
+    config[__donut_title] = "";
+    // region - region to change style
+    config[__regions] = [];
+    // tooltip - show when mouseover on each data
+    config[__tooltip_show] = true;
+    config[__tooltip_grouped] = true;
+    config[__tooltip_format_title] = undefined;
+    config[__tooltip_format_name] = undefined;
+    config[__tooltip_format_value] = undefined;
+    config[__tooltip_contents] = function (d, defaultTitleFormat, defaultValueFormat, color) {
+        return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
+    },
+    config[__tooltip_init_show] = false;
+    config[__tooltip_init_x] = 0;
+    config[__tooltip_init_position] = {top: '0px', left: '50px'};
+
+    return config;
+};
 
 c3_chart_internal_fn.loadConfig = function (config) {
     var this_config = this.config, target, keys, read;
     function find() {
         var key = keys.shift();
-//            console.log("key =>", key, ", target =>", target);
-        if (key && target && key in target) {
+//        console.log("key =>", key, ", target =>", target);
+        if (key && target && typeof target === 'object' && key in target) {
             target = target[key];
             return find();
         }
@@ -345,7 +349,7 @@ c3_chart_internal_fn.loadConfig = function (config) {
         target = config;
         keys = key.split('_');
         read = find();
-//                console.log("CONFIG : ", key, read);
+//        console.log("CONFIG : ", key, read);
         if (isDefined(read)) {
             this_config[key] = read;
         }

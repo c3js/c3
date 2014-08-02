@@ -39,6 +39,7 @@ module.exports = (grunt) ->
               'src/arc.js',
               'src/region.js',
               'src/drag.js',
+              'src/selection.js',
               'src/subchart.js',
               'src/zoom.js',
               'src/color.js',

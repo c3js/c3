@@ -222,13 +222,13 @@ c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
         getPoints = $$.generateGetBarPoints(barIndices, false),
         getter = forX ? $$.getXForText : $$.getYForText;
     return function (d, i) {
-        return getter(getPoints(d, i), d, this);
+        return getter.call($$, getPoints(d, i), d, this);
     };
 };
 c3_chart_internal_fn.getXForText = function (points, d, textElement) {
     var $$ = this,
         box = textElement.getBoundingClientRect(), xPos, padding;
-    if (config[__axis_rotated]) {
+    if ($$.config[__axis_rotated]) {
         padding = $$.isBarType(d) ? 4 : 6;
         xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
     } else {
@@ -239,7 +239,7 @@ c3_chart_internal_fn.getXForText = function (points, d, textElement) {
 c3_chart_internal_fn.getYForText = function (points, d, textElement) {
     var $$ = this,
         box = textElement.getBoundingClientRect(), yPos;
-    if (config[__axis_rotated]) {
+    if ($$.config[__axis_rotated]) {
         yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
     } else {
         yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);

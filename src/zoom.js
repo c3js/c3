@@ -4,7 +4,7 @@ c3_chart_internal_fn.initZoom = function () {
         .on("zoomstart", function () {
             $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
         })
-        .on("zoom", $$.redrawForZoom);
+        .on("zoom", function () { $$.redrawForZoom.call($$); });
     $$.zoom.scale = function (scale) {
         return config[__axis_rotated] ? this.y(scale) : this.x(scale);
     };
@@ -14,8 +14,8 @@ c3_chart_internal_fn.initZoom = function () {
     };
     $$.zoom.updateScaleExtent = function () {
         var ratio = diffDomain($$.x.orgDomain()) / diffDomain($$.orgXDomain),
-            extent = $$.orgScaleExtent();
-        $$.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
+            extent = this.orgScaleExtent();
+        this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
         return this;
     };
 };
@@ -48,5 +48,5 @@ c3_chart_internal_fn.redrawForZoom = function () {
     if (d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
-    config[__zoom_onzoom].call(c3, x.orgDomain());
+    config[__zoom_onzoom].call($$.api, x.orgDomain());
 };

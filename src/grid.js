@@ -1,5 +1,6 @@
 c3_chart_internal_fn.showXGridFocus = function (selectedData) {
-    var $$ = this, dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
+    var $$ = this, config = $$.config,
+        dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
     if (! config[__tooltip_show]) { return; }
     // Hide when scatter plot exists
     if ($$.hasType('scatter') || $$.hasArcType()) { return; }

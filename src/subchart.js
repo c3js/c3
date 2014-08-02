@@ -158,7 +158,7 @@ c3_chart_internal_fn.redrawForBrush = function () {
         withSubchart: false,
         withUpdateXDomain: true
     });
-    $$.config[__subchart_onbrush].call($$, x.orgDomain());
+    $$.config[__subchart_onbrush].call($$.api, x.orgDomain());
 };
 c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
     var $$ = this, subXAxis;

@@ -3,15 +3,26 @@ var c3 = { version: "0.3.0" };
 var c3_chart_fn, c3_chart_internal_fn;
 
 function Chart(config) {
-    var $$ = this.internal = new ChartInternal(config, this);
+    var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
     $$.init();
+
+    // bind "this" to nested API
+    (function bindThis(fn, target, argThis) {
+        for (var key in fn) {
+            target[key] = fn[key].bind(argThis);
+            if (Object.keys(fn[key]).length > 0) {
+                bindThis(fn[key], target[key], argThis);
+            }
+        }
+    })(c3_chart_fn, this, this);
 }
 
-function ChartInternal(config, api) {
+function ChartInternal(api) {
     var $$ = this;
     $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
     $$.api = api;
+    $$.config = $$.getDefaultConfig();
     $$.data = {};
     $$.cache = {};
     $$.axes = {};
@@ -54,7 +65,7 @@ c3_chart_internal_fn.init = function () {
 };
 
 c3_chart_internal_fn.initParams = function () {
-    var $$ = this, d3 = $$.d3;
+    var $$ = this, d3 = $$.d3, config = $$.config;
 
     // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
     $$.clipId = "c3-" + (+new Date()) + '-clip',
@@ -73,7 +84,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
 
-    $$.dataTimeFormat = config[__data_x_localtime] ? d3.time.format : d3.time.format.utc;
+    $$.dataTimeFormat = config[__data_xLocaltime] ? d3.time.format : d3.time.format.utc;
     $$.axisTimeFormat = config[__axis_x_localtime] ? d3.time.format : d3.time.format.utc;
     $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
         [".%L", function (d) { return d.getMilliseconds(); }],
@@ -500,6 +511,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis, waitForDraw;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
+    var xv, cx, cy;
 
     xgrid = xgridLines = mainCircle = mainText = d3.selectAll([]);
 
@@ -865,13 +877,13 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         }
     }
 
-    var xv_ = generateCall($$.xv, $$);
+    xv = generateCall($$.xv, $$);
+    cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$);
+    cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
 
     // transition should be derived from one transition
     d3.transition().duration(duration).each(function () {
-        var transitions = [],
-            cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
-            cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
+        var transitions = [];
 
         transitions.push(mainBar.transition()
                          .attr('d', drawBar)
@@ -899,20 +911,20 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                          .style("fill", $$.color)
                          .style("fill-opacity", options.flow ? 0 : generateCall($$.opacityForText, $$)));
         transitions.push(mainRegion.selectAll('rect').transition()
-                         .attr("x", $$.regionX)
-                         .attr("y", $$.regionY)
-                         .attr("width", $$.regionWidth)
-                         .attr("height", $$.regionHeight)
+                         .attr("x", generateCall($$.regionX, $$))
+                         .attr("y", generateCall($$.regionY, $$))
+                         .attr("width", generateCall($$.regionWidth, $$))
+                         .attr("height", generateCall($$.regionHeight, $$))
                          .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
         transitions.push(xgridLines.select('line').transition()
-                         .attr("x1", config[__axis_rotated] ? 0 : xv_)
-                         .attr("x2", config[__axis_rotated] ? $$.width : xv_)
-                         .attr("y1", config[__axis_rotated] ? xv_ : $$.margin.top)
-                         .attr("y2", config[__axis_rotated] ? xv_ : $$.height)
+                         .attr("x1", config[__axis_rotated] ? 0 : xv)
+                         .attr("x2", config[__axis_rotated] ? $$.width : xv)
+                         .attr("y1", config[__axis_rotated] ? xv : $$.margin.top)
+                         .attr("y2", config[__axis_rotated] ? xv : $$.height)
                          .style("opacity", 1));
         transitions.push(xgridLines.select('text').transition()
                          .attr("x", config[__axis_rotated] ? $$.width : 0)
-                         .attr("y", xv_)
+                         .attr("y", xv)
                          .text(function (d) { return d.text; })
                          .style("opacity", 1));
         // Wait for end of transitions if called from flow API
@@ -1003,11 +1015,11 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             xgridLines
                 .attr('transform', null);
             xgridLines.select('line')
-                .attr("x1", config[__axis_rotated] ? 0 : xv_)
-                .attr("x2", config[__axis_rotated] ? $$.width : xv_);
+                .attr("x1", config[__axis_rotated] ? 0 : xv)
+                .attr("x2", config[__axis_rotated] ? $$.width : xv);
             xgridLines.select('text')
                 .attr("x", config[__axis_rotated] ? $$.width : 0)
-                .attr("y", xv_);
+                .attr("y", xv);
             mainBar
                 .attr('transform', null)
                 .attr("d", drawBar);
@@ -1019,8 +1031,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                 .attr("d", drawArea);
             mainCircle
                 .attr('transform', null)
-                .attr("cx", config[__axis_rotated] ? $$.circleY : $$.circleX)
-                .attr("cy", config[__axis_rotated] ? $$.circleX : $$.circleY);
+                .attr("cx", cx)
+                .attr("cy", cy);
             mainText
                 .attr('transform', null)
                 .attr('x', xForText)
@@ -1029,8 +1041,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             mainRegion
                 .attr('transform', null);
             mainRegion.select('rect').filter($$.isRegionOnX)
-                .attr("x", $$.regionX)
-                .attr("width", $$.regionWidth);
+                .attr("x", generateCall($$.regionX, $$))
+                .attr("width", generateCall($$.regionWidth, $$));
             eventRectUpdate
                 .attr("x", config[__axis_rotated] ? 0 : rectX)
                 .attr("y", config[__axis_rotated] ? rectX : 0)
@@ -1386,7 +1398,7 @@ c3_chart_internal_fn.transformMain = function (withTransition, transitions) {
 c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
     var $$ = this;
     $$.transformMain(withTransition, transitions);
-    if (config[__subchart_show]) { $$.transformContext(withTransition, transitions); }
+    if ($$.config[__subchart_show]) { $$.transformContext(withTransition, transitions); }
     if ($$.legend) { $$.transformLegend(withTransition); }
 };
 
@@ -1533,7 +1545,7 @@ c3_chart_internal_fn.parseDate = function (date) {
     } else if (typeof date === 'number') {
         parsedDate = new Date(date);
     } else {
-        parsedDate = $$.dataTimeFormat(config[__data_x_format]).parse(date);
+        parsedDate = $$.dataTimeFormat($$.config[__data_xFormat]).parse(date);
     }
     if (!parsedDate || isNaN(+parsedDate)) {
         window.console.error("Failed to parse x '" + date + "' to Date object");

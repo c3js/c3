@@ -51,7 +51,7 @@ c3_chart_internal_fn.drag = function (mouse) {
                 shape.classed(CLASS[_INCLUDED], !isIncluded);
                 // TODO: included/unincluded callback here
                 shape.classed(CLASS[_SELECTED], !isSelected);
-                $$.toggle(!isSelected, shape, d, i);
+                toggle.call($$, !isSelected, shape, d, i);
             }
         });
 };

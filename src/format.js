@@ -24,7 +24,7 @@ c3_chart_internal_fn.defaultArcValueFormat = function (v, ratio) {
     return (ratio * 100).toFixed(1) + '%';
 };
 c3_chart_internal_fn.formatByAxisId = function (axisId) {
-    var $$ = this.internal, data_labels = $$.config[__data_labels],
+    var $$ = this, data_labels = $$.config[__data_labels],
         format = function (v) { return isValue(v) ? +v : ""; };
     // find format according to axis id
     if (isFunction(data_labels.format)) {

@@ -7,7 +7,7 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
         } else {
             d = $$.convertCsvToData(data.response);
         }
-        done(d);
+        done.call($$, d);
     });
 };
 c3_chart_internal_fn.convertCsvToData = function (csv) {
@@ -113,6 +113,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
         }
     });
 
+
     // check x is defined
     ids.forEach(function (id) {
         if (!$$.data.xs[id]) {
@@ -122,7 +123,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
 
     // convert to target
     targets = ids.map(function (id, index) {
-        var convertedId = config[__data_id_converter](id);
+        var convertedId = config[__data_idConverter](id);
         return {
             id: convertedId,
             id_org: id,

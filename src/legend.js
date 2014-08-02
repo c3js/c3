@@ -1,7 +1,7 @@
 c3_chart_internal_fn.initLegend = function () {
     var $$ = this;
     $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
-    if (!config[__legend_show]) {
+    if (!$$.config[__legend_show]) {
         $$.legend.style('visibility', 'hidden');
         $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
     }
@@ -10,7 +10,7 @@ c3_chart_internal_fn.initLegend = function () {
     $$.updateLegend($$.mapToIds($$.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
 };
 c3_chart_internal_fn.updateSizeForLegend = function (legendHeight, legendWidth) {
-    var $$ = this, insetLegendPosition = {
+    var $$ = this, config = $$.config, insetLegendPosition = {
         top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config[__legend_inset_y] + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config[__legend_inset_y],
         left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config[__legend_inset_x] + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config[__legend_inset_x] + 0.5
     };
@@ -197,7 +197,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
         .style('cursor', 'pointer')
         .on('click', function (id) {
-            isFunction(config[__legend_item_onclick]) ? config[__legend_item_onclick].call(c3, id) : $$.api.toggle(id);
+            isFunction(config[__legend_item_onclick]) ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
         })
         .on('mouseover', function (id) {
             $$.d3.select(this).classed(CLASS[_legendItemFocused], true);
