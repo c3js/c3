@@ -5561,7 +5561,7 @@
             if (typeof x === 'function') {
                 tickValues = function () {
                     return x(scale.domain());
-                }
+                };
             }
             else {
                 if (!arguments.length) { return tickValues; }
