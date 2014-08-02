@@ -5558,8 +5558,15 @@
             return axis;
         };
         axis.tickValues = function (x) {
-            if (!arguments.length) { return tickValues; }
-            tickValues = x;
+            if (typeof x === 'function') {
+                tickValues = function() {
+                    return x(scale.domain());
+                }
+            }
+            else {
+                if (!arguments.length) { return tickValues; }
+                tickValues = x;
+            }
             return axis;
         };
         return axis;
