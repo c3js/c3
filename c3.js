@@ -5559,7 +5559,7 @@
         };
         axis.tickValues = function (x) {
             if (typeof x === 'function') {
-                tickValues = function() {
+                tickValues = function () {
                     return x(scale.domain());
                 }
             }
