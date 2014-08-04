@@ -511,7 +511,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis, waitForDraw;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
-    var xv, cx, cy;
+    var yv, xv, cx, cy;
 
     xgrid = xgridLines = mainCircle = mainText = d3.selectAll([]);
 
@@ -697,18 +697,18 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             .attr('dy', -5)
             .style("opacity", 0);
         // update
-        var yv_ = generateCall($$.yv, $$);
+        yv = generateCall($$.yv, $$);
         ygridLines.select('line')
           .transition().duration(duration)
-            .attr("x1", config[__axis_rotated] ? yv_ : 0)
-            .attr("x2", config[__axis_rotated] ? yv_ : $$.width)
-            .attr("y1", config[__axis_rotated] ? 0 : yv_)
-            .attr("y2", config[__axis_rotated] ? $$.height : yv_)
+            .attr("x1", config[__axis_rotated] ? yv : 0)
+            .attr("x2", config[__axis_rotated] ? yv : $$.width)
+            .attr("y1", config[__axis_rotated] ? 0 : yv)
+            .attr("y2", config[__axis_rotated] ? $$.height : yv)
             .style("opacity", 1);
         ygridLines.select('text')
           .transition().duration(duration)
             .attr("x", config[__axis_rotated] ? 0 : $$.width)
-            .attr("y", yv_)
+            .attr("y", yv)
             .text(function (d) { return d.text; })
             .style("opacity", 1);
         // exit
