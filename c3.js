@@ -2554,9 +2554,10 @@
                 };
 
             area = __axis_rotated ? area.x0(value0).x1(value1).y(xx) : area.x(xx).y0(value0).y1(value1);
-
+            if (!__line_connect_null) { area = area.defined(function (d) { return d.value !== null; }); }
+            
             return function (d) {
-                var data = filterRemoveNull(d.values), x0 = 0, y0 = 0, path;
+                var data = __line_connect_null ? filterRemoveNull(d.values):d.values, x0 = 0, y0 = 0, path;
 
                 if (isAreaType(d)) {
                     path = area.interpolate(getInterpolate(d))(data);
