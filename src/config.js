@@ -326,8 +326,13 @@ c3_chart_internal_fn.getDefaultConfig = function () {
     config[__tooltip_init_x] = 0;
     config[__tooltip_init_position] = {top: '0px', left: '50px'};
 
+    Object.keys(this.additionalConfig).forEach(function (key) {
+        config[key] = this.additionalConfig[key];
+    }, this);
+
     return config;
 };
+c3_chart_internal_fn.additionalConfig = {};
 
 c3_chart_internal_fn.loadConfig = function (config) {
     var this_config = this.config, target, keys, read;
