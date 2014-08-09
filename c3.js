@@ -516,7 +516,7 @@
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis, waitForDraw;
         var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
-        var xv, cx, cy;
+        var yv, xv, cx, cy;
 
         xgrid = xgridLines = mainCircle = mainText = d3.selectAll([]);
 
@@ -702,18 +702,18 @@
                 .attr('dy', -5)
                 .style("opacity", 0);
             // update
-            var yv_ = generateCall($$.yv, $$);
+            yv = generateCall($$.yv, $$);
             ygridLines.select('line')
               .transition().duration(duration)
-                .attr("x1", config[__axis_rotated] ? yv_ : 0)
-                .attr("x2", config[__axis_rotated] ? yv_ : $$.width)
-                .attr("y1", config[__axis_rotated] ? 0 : yv_)
-                .attr("y2", config[__axis_rotated] ? $$.height : yv_)
+                .attr("x1", config[__axis_rotated] ? yv : 0)
+                .attr("x2", config[__axis_rotated] ? yv : $$.width)
+                .attr("y1", config[__axis_rotated] ? 0 : yv)
+                .attr("y2", config[__axis_rotated] ? $$.height : yv)
                 .style("opacity", 1);
             ygridLines.select('text')
               .transition().duration(duration)
                 .attr("x", config[__axis_rotated] ? 0 : $$.width)
-                .attr("y", yv_)
+                .attr("y", yv)
                 .text(function (d) { return d.text; })
                 .style("opacity", 1);
             // exit
@@ -1886,8 +1886,13 @@
         config[__tooltip_init_x] = 0;
         config[__tooltip_init_position] = {top: '0px', left: '50px'};
 
+        Object.keys(this.additionalConfig).forEach(function (key) {
+            config[key] = this.additionalConfig[key];
+        }, this);
+
         return config;
     };
+    c3_chart_internal_fn.additionalConfig = {};
 
     c3_chart_internal_fn.loadConfig = function (config) {
         var this_config = this.config, target, keys, read;
@@ -3072,9 +3077,12 @@
             };
 
         area = config[__axis_rotated] ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+        if (!config[__line_connect_null]) {
+            area = area.defined(function (d) { return d.value !== null; });
+        }
 
         return function (d) {
-            var data = $$.filterRemoveNull(d.values), x0 = 0, y0 = 0, path;
+            var data = config[__line_connect_null] ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
             if ($$.isAreaType(d)) {
                 path = area.interpolate($$.getInterpolate(d))(data);
             } else {
@@ -3539,7 +3547,7 @@
             if (tooltipRight > chartRight) {
                 tooltipLeft -= tooltipRight - chartRight;
             }
-            if (tooltipTop + tHeight > $$.getCurrentHeight()) {
+            if (tooltipTop + tHeight > $$.getCurrentHeight() && tooltipTop > tHeight + 30) {
                 tooltipTop -= tHeight + 30;
             }
         }
@@ -6119,8 +6127,15 @@
             return axis;
         };
         axis.tickValues = function (x) {
-            if (!arguments.length) { return tickValues; }
-            tickValues = x;
+            if (typeof x === 'function') {
+                tickValues = function () {
+                    return x(scale.domain());
+                };
+            }
+            else {
+                if (!arguments.length) { return tickValues; }
+                tickValues = x;
+            }
             return axis;
         };
         return axis;
