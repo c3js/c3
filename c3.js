@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.2.4"
+        version: "0.2.5"
     };
 
     var CLASS = {
@@ -2063,7 +2063,7 @@
                 if (tooltipRight > chartRight) {
                     tooltipLeft -= tooltipRight - chartRight;
                 }
-                if (tooltipTop + tHeight > getCurrentHeight()) {
+                if (tooltipTop + tHeight > getCurrentHeight() && tooltipTop > tHeight + 30) {
                     tooltipTop -= tHeight + 30;
                 }
             }
@@ -5559,8 +5559,15 @@
             return axis;
         };
         axis.tickValues = function (x) {
-            if (!arguments.length) { return tickValues; }
-            tickValues = x;
+            if (typeof x === 'function') {
+                tickValues = function () {
+                    return x(scale.domain());
+                };
+            }
+            else {
+                if (!arguments.length) { return tickValues; }
+                tickValues = x;
+            }
             return axis;
         };
         return axis;
