@@ -3069,7 +3069,7 @@
 
             // Set default extent if defined
             if (__axis_x_default) {
-                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain()));
+                brush.extent(typeof __axis_x_default !== 'function' ? __axis_x_default : __axis_x_default(getXDomain(c3.data.targets)));
             }
 
             // Add Axis
