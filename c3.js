@@ -281,35 +281,7 @@
         }
 
         // Add Axis
-        $$.axes.x = main.append("g")
-            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisX])
-            .attr("clip-path", $$.clipPathForXAxis)
-            .attr("transform", $$.getTranslate('x'))
-            .style("visibility", config[__axis_x_show] ? 'visible' : 'hidden');
-        $$.axes.x.append("text")
-            .attr("class", CLASS[_axisXLabel])
-            .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
-            .style("text-anchor", generateCall($$.textAnchorForXAxisLabel, $$));
-
-        $$.axes.y = main.append("g")
-            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
-            .attr("clip-path", $$.clipPathForYAxis)
-            .attr("transform", $$.getTranslate('y'))
-            .style("visibility", config[__axis_y_show] ? 'visible' : 'hidden');
-        $$.axes.y.append("text")
-            .attr("class", CLASS[_axisYLabel])
-            .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-            .style("text-anchor", generateCall($$.textAnchorForYAxisLabel, $$));
-
-        $$.axes.y2 = main.append("g")
-            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
-            // clip-path?
-            .attr("transform", $$.getTranslate('y2'))
-            .style("visibility", config[__axis_y2_show] ? 'visible' : 'hidden');
-        $$.axes.y2.append("text")
-            .attr("class", CLASS[_axisY2Label])
-            .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-            .style("text-anchor", generateCall($$.textAnchorForY2AxisLabel, $$));
+        $$.initAxis();
 
         // Set targets
         $$.updateTargets($$.data.targets);
@@ -564,14 +536,7 @@
         $$.y2.domain($$.getYDomain(targetsToShow, 'y2'));
 
         // axes
-        $$.axes.x.style("opacity", hideAxis ? 0 : 1);
-        $$.axes.y.style("opacity", hideAxis ? 0 : 1);
-        $$.axes.y2.style("opacity", hideAxis ? 0 : 1);
-        $$.axes.subx.style("opacity", hideAxis ? 0 : 1);
-        transitions.axisX.call($$.xAxis);
-        transitions.axisY.call($$.yAxis);
-        transitions.axisY2.call($$.y2Axis);
-        transitions.axisSubX.call($$.subXAxis);
+        $$.redrawAxis(transitions, hideAxis);
 
         // Update axis label
         $$.updateAxisLabels(withTransition);
@@ -1498,15 +1463,6 @@
         $$.updateAndRedraw(options);
     };
 
-    c3_chart_internal_fn.generateAxisTransitions = function (duration) {
-        var $$ = this, axes = $$.axes;
-        return {
-            axisX: duration ? axes.x.transition().duration(duration) : axes.x,
-            axisY: duration ? axes.y.transition().duration(duration) : axes.y,
-            axisY2: duration ? axes.y2.transition().duration(duration) : axes.y2,
-            axisSubX: duration ? axes.subx.transition().duration(duration) : axes.subx
-        };
-    };
     c3_chart_internal_fn.endall = function (transition, callback) {
         var n = 0;
         transition
@@ -3855,6 +3811,38 @@
         $$.transformAll(withTransitionForTransform, transitions);
     };
 
+    c3_chart_internal_fn.initAxis = function () {
+        var $$ = this, config = $$.config, main = $$.main, CLASS = $$.CLASS;
+        $$.axes.x = main.append("g")
+            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisX])
+            .attr("clip-path", $$.clipPathForXAxis)
+            .attr("transform", $$.getTranslate('x'))
+            .style("visibility", config[__axis_x_show] ? 'visible' : 'hidden');
+        $$.axes.x.append("text")
+            .attr("class", CLASS[_axisXLabel])
+            .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
+            .style("text-anchor", generateCall($$.textAnchorForXAxisLabel, $$));
+
+        $$.axes.y = main.append("g")
+            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
+            .attr("clip-path", $$.clipPathForYAxis)
+            .attr("transform", $$.getTranslate('y'))
+            .style("visibility", config[__axis_y_show] ? 'visible' : 'hidden');
+        $$.axes.y.append("text")
+            .attr("class", CLASS[_axisYLabel])
+            .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
+            .style("text-anchor", generateCall($$.textAnchorForYAxisLabel, $$));
+
+        $$.axes.y2 = main.append("g")
+            .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
+            // clip-path?
+            .attr("transform", $$.getTranslate('y2'))
+            .style("visibility", config[__axis_y2_show] ? 'visible' : 'hidden');
+        $$.axes.y2.append("text")
+            .attr("class", CLASS[_axisY2Label])
+            .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
+            .style("text-anchor", generateCall($$.textAnchorForY2AxisLabel, $$));
+    };
     c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
         var $$ = this, config = $$.config,
             axis = c3_axis($$.d3, $$.isCategorized()).scale(scale).orient(orient);
@@ -4137,6 +4125,26 @@
         }
         if (!$$.isTimeSeries()) { tickValues = tickValues.sort(function (a, b) { return a - b; }); }
         return tickValues;
+    };
+    c3_chart_internal_fn.generateAxisTransitions = function (duration) {
+        var $$ = this, axes = $$.axes;
+        return {
+            axisX: duration ? axes.x.transition().duration(duration) : axes.x,
+            axisY: duration ? axes.y.transition().duration(duration) : axes.y,
+            axisY2: duration ? axes.y2.transition().duration(duration) : axes.y2,
+            axisSubX: duration ? axes.subx.transition().duration(duration) : axes.subx
+        };
+    };
+    c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
+        var $$ = this;
+        $$.axes.x.style("opacity", isHidden ? 0 : 1);
+        $$.axes.y.style("opacity", isHidden ? 0 : 1);
+        $$.axes.y2.style("opacity", isHidden ? 0 : 1);
+        $$.axes.subx.style("opacity", isHidden ? 0 : 1);
+        transitions.axisX.call($$.xAxis);
+        transitions.axisY.call($$.yAxis);
+        transitions.axisY2.call($$.y2Axis);
+        transitions.axisSubX.call($$.subXAxis);
     };
 
     c3_chart_internal_fn.getClipPath = function (id) {
