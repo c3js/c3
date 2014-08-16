@@ -236,8 +236,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     if ($$.initArc) { $$.initArc(); }
     if ($$.initGauge) { $$.initGauge(); }
 
-    main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartTexts]);
+    // Define g for text area
+    if ($$.initText) { $$.initText(); }
 
     // if zoom privileged, insert rect to forefront
     // TODO: is this needed?
@@ -375,21 +375,13 @@ c3_chart_internal_fn.updateSizes = function () {
 };
 
 c3_chart_internal_fn.updateTargets = function (targets) {
-    var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate, mainTextUpdate, mainTextEnter;
+    var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
     var $$ = this, config = $$.config, main = $$.main;
 
     /*-- Main --*/
 
     //-- Text --//
-    mainTextUpdate = main.select('.' + CLASS[_chartTexts]).selectAll('.' + CLASS[_chartText])
-        .data(targets)
-        .attr('class', generateCall($$.classChartText, $$));
-    mainTextEnter = mainTextUpdate.enter().append('g')
-        .attr('class', generateCall($$.classChartText, $$))
-        .style('opacity', 0)
-        .style("pointer-events", "none");
-    mainTextEnter.append('g')
-        .attr('class', generateCall($$.classTexts, $$));
+    $$.updateTargetsForText(targets);
 
     //-- Bar --//
     mainBarUpdate = main.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
@@ -446,7 +438,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var mainLine, mainArea, mainCircle, mainBar, mainText, eventRect, eventRectUpdate;
+    var mainLine, mainArea, mainCircle, mainBar, eventRect, eventRectUpdate;
     var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
     var rectX, rectW;
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -458,7 +450,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
         cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
 
-    mainCircle = mainText = d3.selectAll([]);
+    mainCircle = d3.selectAll([]);
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -616,20 +608,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     if ($$.hasDataLabel()) {
-        mainText = main.selectAll('.' + CLASS[_texts]).selectAll('.' + CLASS[_text])
-            .data(generateCall($$.barOrLineData, $$));
-        mainText.enter().append('text')
-            .attr("class", generateCall($$.classText, $$))
-            .attr('text-anchor', function (d) { return config[__axis_rotated] ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
-            .style("stroke", 'none')
-            .style("fill", function (d) { return $$.color(d); })
-            .style("fill-opacity", 0);
-        mainText
-            .text(function (d) { return $$.formatByAxisId($$.getAxisId(d.id))(d.value, d.id); });
-        mainText.exit()
-            .transition().duration(durationForExit)
-            .style('fill-opacity', 0)
-            .remove();
+        $$.redrawText(durationForExit);
     }
 
     // arc
@@ -736,11 +715,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         transitions.push(main.selectAll('.' + CLASS[_selectedCircle]).transition()
                          .attr("cx", cx)
                          .attr("cy", cy));
-        transitions.push(mainText.transition()
-                         .attr('x', xForText)
-                         .attr('y', yForText)
-                         .style("fill", $$.color)
-                         .style("fill-opacity", options.flow ? 0 : generateCall($$.opacityForText, $$)));
+        $$.addTransitionForText(transitions, xForText, yForText, options.flow);
         $$.addTransitionForRegion(transitions);
         $$.addTransitionForGrid(transitions);
 
@@ -765,7 +740,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
         var xgrid = $$.xgrid || d3.selectAll([]),
             xgridLines = $$.xgridLines || d3.selectAll([]),
-            mainRegion = $$.mainRegion || d3.selectAll([]);
+            mainRegion = $$.mainRegion || d3.selectAll([]),
+            mainText = $$.mainText || d3.selectAll([]);
 
         // remove head data after rendered
         $$.data.targets.forEach(function (d) {
