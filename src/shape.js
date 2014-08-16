@@ -235,7 +235,7 @@ c3_chart_internal_fn.getXForText = function (points, d, textElement) {
         padding = $$.isBarType(d) ? 4 : 6;
         xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
     } else {
-        xPos = points[0][0] + (points[2][0] - points[0][0]) / 2;
+        xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
     }
     return xPos > $$.width ? $$.width - box.width : xPos;
 };
