@@ -214,23 +214,7 @@ c3_chart_internal_fn.initWithData = function (data) {
         .attr("class", CLASS[_regions]);
 
     // Grids
-    $$.grid = main.append('g')
-        .attr("clip-path", $$.clipPath)
-        .attr('class', CLASS[_grid]);
-    if (config[__grid_x_show]) {
-        $$.grid.append("g").attr("class", CLASS[_xgrids]);
-    }
-    if (config[__grid_y_show]) {
-        $$.grid.append('g').attr('class', CLASS[_ygrids]);
-    }
-    $$.grid.append('g').attr("class", CLASS[_xgridLines]);
-    $$.grid.append('g').attr('class', CLASS[_ygridLines]);
-    if (config[__grid_focus_show]) {
-        $$.grid.append('g')
-            .attr("class", CLASS[_xgridFocus])
-            .append('line')
-            .attr('class', CLASS[_xgridFocus]);
-    }
+    $$.initGrid();
 
     // Define g for chart area
     main.append('g')
@@ -474,18 +458,19 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var xgrid, xgridAttr, xgridData, xgridLines, xgridLine, ygrid, ygridLines, ygridLine, flushXGrid;
     var mainLine, mainArea, mainCircle, mainBar, mainRegion, mainText, eventRect, eventRectUpdate;
-    var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget, tickOffset;
+    var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
     var rectX, rectW;
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
     var hideAxis = $$.hasArcType();
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis, waitForDraw;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
-    var yv, xv, cx, cy;
+    var xv = generateCall($$.xv, $$),
+        cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
+        cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
 
-    xgrid = xgridLines = mainCircle = mainText = d3.selectAll([]);
+    mainCircle = mainText = d3.selectAll([]);
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -587,100 +572,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .style('opacity', targetsToShow.length ? 0 : 1);
 
     // grid
-    main.select('line.' + CLASS[_xgridFocus]).style("visibility", "hidden");
-    if (config[__grid_x_show]) {
-        xgridAttr = config[__axis_rotated] ? {
-            'x1': 0,
-            'x2': $$.width,
-            'y1': function (d) { return $$.x(d) - tickOffset; },
-            'y2': function (d) { return $$.x(d) - tickOffset; }
-        } : {
-            'x1': function (d) { return $$.x(d) + tickOffset; },
-            'x2': function (d) { return $$.x(d) + tickOffset; },
-            'y1': 0,
-            'y2': $$.height
-        };
-        // this is used to flow
-        flushXGrid = function (withoutUpdate) {
-            xgridData = $$.generateGridData(config[__grid_x_type], $$.x);
-            tickOffset = $$.isCategorized() ? $$.xAxis.tickOffset() : 0;
-            xgrid = main.select('.' + CLASS[_xgrids]).selectAll('.' + CLASS[_xgrid])
-                .data(xgridData);
-            xgrid.enter().append('line').attr("class", CLASS[_xgrid]);
-            if (!withoutUpdate) {
-                xgrid.attr(xgridAttr)
-                    .style("opacity", function () { return +d3.select(this).attr(config[__axis_rotated] ? 'y1' : 'x1') === (config[__axis_rotated] ? $$.height : 0) ? 0 : 1; });
-            }
-            xgrid.exit().remove();
-        };
-        flushXGrid();
-    }
-    xgridLines = main.select('.' + CLASS[_xgridLines]).selectAll('.' + CLASS[_xgridLine])
-        .data(config[__grid_x_lines]);
-    // enter
-    xgridLine = xgridLines.enter().append('g')
-        .attr("class", function (d) { return CLASS[_xgridLine] + (d.class ? ' ' + d.class : ''); });
-    xgridLine.append('line')
-        .style("opacity", 0);
-    xgridLine.append('text')
-        .attr("text-anchor", "end")
-        .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-        .attr('dx', config[__axis_rotated] ? 0 : -$$.margin.top)
-        .attr('dy', -5)
-        .style("opacity", 0);
-    // udpate
-    // done in d3.transition() of the end of this function
-    // exit
-    xgridLines.exit().transition().duration(duration)
-        .style("opacity", 0)
-        .remove();
-    // Y-Grid
-    if (withY && config[__grid_y_show]) {
-        ygrid = main.select('.' + CLASS[_ygrids]).selectAll('.' + CLASS[_ygrid])
-            .data($$.y.ticks(config[__grid_y_ticks]));
-        ygrid.enter().append('line')
-            .attr('class', CLASS[_ygrid]);
-        ygrid.attr("x1", config[__axis_rotated] ? $$.y : 0)
-            .attr("x2", config[__axis_rotated] ? $$.y : $$.width)
-            .attr("y1", config[__axis_rotated] ? 0 : $$.y)
-            .attr("y2", config[__axis_rotated] ? $$.height : $$.y);
-        ygrid.exit().remove();
-        $$.smoothLines(ygrid, 'grid');
-    }
-    if (withY) {
-        ygridLines = main.select('.' + CLASS[_ygridLines]).selectAll('.' + CLASS[_ygridLine])
-            .data(config[__grid_y_lines]);
-        // enter
-        ygridLine = ygridLines.enter().append('g')
-            .attr("class", function (d) { return CLASS[_ygridLine] + (d.class ? ' ' + d.class : ''); });
-        ygridLine.append('line')
-            .style("opacity", 0);
-        ygridLine.append('text')
-            .attr("text-anchor", "end")
-            .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
-            .attr('dx', config[__axis_rotated] ? 0 : -$$.margin.top)
-            .attr('dy', -5)
-            .style("opacity", 0);
-        // update
-        yv = generateCall($$.yv, $$);
-        ygridLines.select('line')
-          .transition().duration(duration)
-            .attr("x1", config[__axis_rotated] ? yv : 0)
-            .attr("x2", config[__axis_rotated] ? yv : $$.width)
-            .attr("y1", config[__axis_rotated] ? 0 : yv)
-            .attr("y2", config[__axis_rotated] ? $$.height : yv)
-            .style("opacity", 1);
-        ygridLines.select('text')
-          .transition().duration(duration)
-            .attr("x", config[__axis_rotated] ? 0 : $$.width)
-            .attr("y", yv)
-            .text(function (d) { return d.text; })
-            .style("opacity", 1);
-        // exit
-        ygridLines.exit().transition().duration(duration)
-            .style("opacity", 0)
-            .remove();
-    }
+    $$.redrawGrid(duration, withY);
 
     // rect for regions
     mainRegion = main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
@@ -842,10 +734,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         }
     }
 
-    xv = generateCall($$.xv, $$);
-    cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$);
-    cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
-
     // transition should be derived from one transition
     d3.transition().duration(duration).each(function () {
         var transitions = [];
@@ -881,17 +769,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                          .attr("width", generateCall($$.regionWidth, $$))
                          .attr("height", generateCall($$.regionHeight, $$))
                          .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
-        transitions.push(xgridLines.select('line').transition()
-                         .attr("x1", config[__axis_rotated] ? 0 : xv)
-                         .attr("x2", config[__axis_rotated] ? $$.width : xv)
-                         .attr("y1", config[__axis_rotated] ? xv : $$.margin.top)
-                         .attr("y2", config[__axis_rotated] ? xv : $$.height)
-                         .style("opacity", 1));
-        transitions.push(xgridLines.select('text').transition()
-                         .attr("x", config[__axis_rotated] ? $$.width : 0)
-                         .attr("y", xv)
-                         .text(function (d) { return d.text; })
-                         .style("opacity", 1));
+        $$.addTransitionForGrid(transitions);
+
         // Wait for end of transitions if called from flow API
         if (options.flow) {
             waitForDraw = $$.generateWait();
@@ -911,6 +790,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             done = options.flow.done || function () {},
             wait = $$.generateWait();
 
+        var xgrid = $$.xgrid || d3.selectAll([]),
+            xgridLines = $$.xgridLines || d3.selectAll([]);
+
         // remove head data after rendered
         $$.data.targets.forEach(function (d) {
             d.values.splice(0, flowLength);
@@ -919,7 +801,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         // update x domain to generate axis elements for flow
         domain = $$.updateXDomain(targetsToShow, true, true);
         // update elements related to x scale
-        if (flushXGrid) { flushXGrid(true); }
+        if ($$.updateXGrid) { $$.updateXGrid(true); }
 
         // generate transform to flow
         if (!options.flow.orgDataCount) { // if empty
@@ -976,7 +858,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             // draw again for removing flowed elements and reverting attr
             xgrid
                 .attr('transform', null)
-                .attr(xgridAttr);
+                .attr($$.xgridAttr);
             xgridLines
                 .attr('transform', null);
             xgridLines.select('line')
