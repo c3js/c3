@@ -81,7 +81,5 @@ c3_chart_internal_fn.updateScales = function () {
         if (config[__zoom_enabled]) { $$.zoom.scale($$.x); }
     }
     // update for arc
-    if (isFunction($$.updateArc)) {
-        $$.updateArc();
-    }
+    if ($$.updateArc) { $$.updateArc(); }
 };

@@ -134,9 +134,9 @@
         var $$ = this, d3 = $$.d3, config = $$.config;
         var main, eventRect, binding = true;
 
-        if (isFunction($$.initPie)) { $$.initPie(); }
-        if (isFunction($$.initBrush)) { $$.initBrush(); }
-        if (isFunction($$.initZoom)) { $$.initZoom(); }
+        if ($$.initPie) { $$.initPie(); }
+        if ($$.initBrush) { $$.initBrush(); }
+        if ($$.initZoom) { $$.initZoom(); }
 
         $$.selectChart = d3.select(config[__bindto]);
         if ($$.selectChart.empty()) {
@@ -201,9 +201,9 @@
         // Define regions
         main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
 
-        if (isFunction($$.initSubchart)) { $$.initSubchart(); }
-        if (isFunction($$.initTooltip)) { $$.initTooltip(); }
-        if (isFunction($$.initLegend)) { $$.initLegend(); }
+        if ($$.initSubchart) { $$.initSubchart(); }
+        if ($$.initTooltip) { $$.initTooltip(); }
+        if ($$.initLegend) { $$.initLegend(); }
 
         /*-- Main Region --*/
 
@@ -240,12 +240,8 @@
             .attr("class", CLASS[_chartLines]);
 
         // Define g for arc chart area
-        if (isFunction($$.initArc)) {
-            $$.initArc();
-        }
-        if (isFunction($$.initGauge)) {
-            $$.initGauge();
-        }
+        if ($$.initArc) { $$.initArc(); }
+        if ($$.initGauge) { $$.initGauge(); }
 
         main.select('.' + CLASS[_chart]).append("g")
             .attr("class", CLASS[_chartTexts]);
@@ -261,7 +257,7 @@
 
         // Set default extent if defined
         if (config[__axis_x_default]) {
-            $$.brush.extent(!isFunction(config[__axis_x_default]) ? config[__axis_x_default] : config[__axis_x_default]($$.getXDomain()));
+            $$.brush.extent(isFunction(config[__axis_x_default]) ? config[__axis_x_default]($$.getXDomain()) : config[__axis_x_default]);
         }
 
         // Add Axis
@@ -363,7 +359,7 @@
         }
 
         // for legend
-        if (isFunction($$.updateSizeForLegend)) { $$.updateSizeForLegend(legendHeight, legendWidth); }
+        if ($$.updateSizeForLegend) { $$.updateSizeForLegend(legendHeight, legendWidth); }
 
         $$.width = $$.currentWidth - $$.margin.left - $$.margin.right;
         $$.height = $$.currentHeight - $$.margin.top - $$.margin.bottom;
@@ -378,9 +374,7 @@
         // for arc
         $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
         $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
-        if (isFunction($$.updateRadius)) {
-            $$.updateRadius();
-        }
+        if ($$.updateRadius) { $$.updateRadius(); }
 
         if ($$.isLegendRight && hasArc) {
             $$.margin3.left = $$.arcWidth / 2 + $$.radiusExpanded * 1.1;
@@ -446,12 +440,8 @@
         // MEMO: can not keep same color...
         //mainLineUpdate.exit().remove();
 
-        if (isFunction($$.updateTargetsForArc)) {
-            $$.updateTargetsForArc(targets);
-        }
-        if (isFunction($$.updateTargetsForSubchart)) {
-            $$.updateTargetsForSubchart(targets);
-        }
+        if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+        if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
         /*-- Show --*/
 
@@ -658,12 +648,10 @@
         }
 
         // arc
-        if (isFunction($$.redrawArc)) {
-            $$.redrawArc(duration, durationForExit, withTransform);
-        }
+        if ($$.redrawArc) { $$.redrawArc(duration, durationForExit, withTransform); }
 
         // subchart
-        if (isFunction($$.redrawSubchart)) {
+        if ($$.redrawSubchart) {
             $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
         }
 
@@ -911,7 +899,7 @@
             $$.withoutFadeIn[id] = true;
         });
 
-        if (isFunction($$.updateZoom)) { $$.updateZoom(); }
+        if ($$.updateZoom) { $$.updateZoom(); }
     };
 
     c3_chart_internal_fn.updateAndRedraw = function (options) {
@@ -1842,9 +1830,7 @@
             if (config[__zoom_enabled]) { $$.zoom.scale($$.x); }
         }
         // update for arc
-        if (isFunction($$.updateArc)) {
-            $$.updateArc();
-        }
+        if ($$.updateArc) { $$.updateArc(); }
     };
 
     c3_chart_internal_fn.getYDomainMin = function (targets) {
@@ -2579,9 +2565,7 @@
         // Redraw with new targets
         $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 
-        if (isFunction(args.done)) {
-            args.done();
-        }
+        if (args.done) { args.done(); }
     };
     c3_chart_internal_fn.loadFromArgs = function (args) {
         var $$ = this;
@@ -2608,7 +2592,7 @@
     };
     c3_chart_internal_fn.unload = function (targetIds, done) {
         var $$ = this;
-        if (!isFunction(done)) {
+        if (!done) {
             done = function () {};
         }
         // filter existing target
@@ -3742,14 +3726,14 @@
             .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
             .style('cursor', 'pointer')
             .on('click', function (id) {
-                isFunction(config[__legend_item_onclick]) ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
+                config[__legend_item_onclick] ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
             })
             .on('mouseover', function (id) {
                 $$.d3.select(this).classed(CLASS[_legendItemFocused], true);
                 if (!$$.transiting) {
                     $$.api.focus(id);
                 }
-                if (isFunction(config[__legend_item_onmouseover])) {
+                if (config[__legend_item_onmouseover]) {
                     config[__legend_item_onmouseover].call($$, id);
                 }
             })
@@ -3758,7 +3742,7 @@
                 if (!$$.transiting) {
                     $$.api.revert();
                 }
-                if (isFunction(config[__legend_item_onmouseout])) {
+                if (config[__legend_item_onmouseout]) {
                     config[__legend_item_onmouseout].call($$, id);
                 }
             });
@@ -3903,7 +3887,7 @@
         var $$ = this, config = $$.config,
             format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
         if (config[__axis_x_tick_format]) {
-            if (isFunction(config[__axis_x_tick_format])) {
+            if (config[__axis_x_tick_format]) {
                 format = config[__axis_x_tick_format];
             } else if ($$.isTimeSeries()) {
                 format = function (date) {
@@ -5102,10 +5086,10 @@
         var $$ = this, data_labels = $$.config[__data_labels],
             format = function (v) { return isValue(v) ? +v : ""; };
         // find format according to axis id
-        if (isFunction(data_labels.format)) {
+        if (data_labels.format) {
             format = data_labels.format;
         } else if (typeof data_labels.format === 'object') {
-            if (isFunction(data_labels.format[axisId])) {
+            if (data_labels.format[axisId]) {
                 format = data_labels.format[axisId];
             }
         }
@@ -5555,7 +5539,7 @@
         args = args || {};
         $$.unload($$.mapToTargetIds(args.ids), function () {
             $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-            if (isFunction(args.done)) { args.done(); }
+            if (args.done) { args.done(); }
         });
     };
 

@@ -63,7 +63,7 @@ c3_chart_internal_fn.getXAxisTickFormat = function () {
     var $$ = this, config = $$.config,
         format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
     if (config[__axis_x_tick_format]) {
-        if (isFunction(config[__axis_x_tick_format])) {
+        if (config[__axis_x_tick_format]) {
             format = config[__axis_x_tick_format];
         } else if ($$.isTimeSeries()) {
             format = function (date) {

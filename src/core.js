@@ -129,9 +129,9 @@ c3_chart_internal_fn.initWithData = function (data) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     var main, eventRect, binding = true;
 
-    if (isFunction($$.initPie)) { $$.initPie(); }
-    if (isFunction($$.initBrush)) { $$.initBrush(); }
-    if (isFunction($$.initZoom)) { $$.initZoom(); }
+    if ($$.initPie) { $$.initPie(); }
+    if ($$.initBrush) { $$.initBrush(); }
+    if ($$.initZoom) { $$.initZoom(); }
 
     $$.selectChart = d3.select(config[__bindto]);
     if ($$.selectChart.empty()) {
@@ -196,9 +196,9 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define regions
     main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
 
-    if (isFunction($$.initSubchart)) { $$.initSubchart(); }
-    if (isFunction($$.initTooltip)) { $$.initTooltip(); }
-    if (isFunction($$.initLegend)) { $$.initLegend(); }
+    if ($$.initSubchart) { $$.initSubchart(); }
+    if ($$.initTooltip) { $$.initTooltip(); }
+    if ($$.initLegend) { $$.initLegend(); }
 
     /*-- Main Region --*/
 
@@ -235,12 +235,8 @@ c3_chart_internal_fn.initWithData = function (data) {
         .attr("class", CLASS[_chartLines]);
 
     // Define g for arc chart area
-    if (isFunction($$.initArc)) {
-        $$.initArc();
-    }
-    if (isFunction($$.initGauge)) {
-        $$.initGauge();
-    }
+    if ($$.initArc) { $$.initArc(); }
+    if ($$.initGauge) { $$.initGauge(); }
 
     main.select('.' + CLASS[_chart]).append("g")
         .attr("class", CLASS[_chartTexts]);
@@ -256,7 +252,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Set default extent if defined
     if (config[__axis_x_default]) {
-        $$.brush.extent(!isFunction(config[__axis_x_default]) ? config[__axis_x_default] : config[__axis_x_default]($$.getXDomain()));
+        $$.brush.extent(isFunction(config[__axis_x_default]) ? config[__axis_x_default]($$.getXDomain()) : config[__axis_x_default]);
     }
 
     // Add Axis
@@ -358,7 +354,7 @@ c3_chart_internal_fn.updateSizes = function () {
     }
 
     // for legend
-    if (isFunction($$.updateSizeForLegend)) { $$.updateSizeForLegend(legendHeight, legendWidth); }
+    if ($$.updateSizeForLegend) { $$.updateSizeForLegend(legendHeight, legendWidth); }
 
     $$.width = $$.currentWidth - $$.margin.left - $$.margin.right;
     $$.height = $$.currentHeight - $$.margin.top - $$.margin.bottom;
@@ -373,9 +369,7 @@ c3_chart_internal_fn.updateSizes = function () {
     // for arc
     $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
     $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
-    if (isFunction($$.updateRadius)) {
-        $$.updateRadius();
-    }
+    if ($$.updateRadius) { $$.updateRadius(); }
 
     if ($$.isLegendRight && hasArc) {
         $$.margin3.left = $$.arcWidth / 2 + $$.radiusExpanded * 1.1;
@@ -441,12 +435,8 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     // MEMO: can not keep same color...
     //mainLineUpdate.exit().remove();
 
-    if (isFunction($$.updateTargetsForArc)) {
-        $$.updateTargetsForArc(targets);
-    }
-    if (isFunction($$.updateTargetsForSubchart)) {
-        $$.updateTargetsForSubchart(targets);
-    }
+    if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+    if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
     /*-- Show --*/
 
@@ -653,12 +643,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // arc
-    if (isFunction($$.redrawArc)) {
-        $$.redrawArc(duration, durationForExit, withTransform);
-    }
+    if ($$.redrawArc) { $$.redrawArc(duration, durationForExit, withTransform); }
 
     // subchart
-    if (isFunction($$.redrawSubchart)) {
+    if ($$.redrawSubchart) {
         $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
     }
 
@@ -906,7 +894,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.withoutFadeIn[id] = true;
     });
 
-    if (isFunction($$.updateZoom)) { $$.updateZoom(); }
+    if ($$.updateZoom) { $$.updateZoom(); }
 };
 
 c3_chart_internal_fn.updateAndRedraw = function (options) {

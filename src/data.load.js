@@ -30,9 +30,7 @@ c3_chart_internal_fn.load = function (targets, args) {
     // Redraw with new targets
     $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 
-    if (isFunction(args.done)) {
-        args.done();
-    }
+    if (args.done) { args.done(); }
 };
 c3_chart_internal_fn.loadFromArgs = function (args) {
     var $$ = this;
@@ -59,7 +57,7 @@ c3_chart_internal_fn.loadFromArgs = function (args) {
 };
 c3_chart_internal_fn.unload = function (targetIds, done) {
     var $$ = this;
-    if (!isFunction(done)) {
+    if (!done) {
         done = function () {};
     }
     // filter existing target

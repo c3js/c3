@@ -197,14 +197,14 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
         .style('cursor', 'pointer')
         .on('click', function (id) {
-            isFunction(config[__legend_item_onclick]) ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
+            config[__legend_item_onclick] ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
         })
         .on('mouseover', function (id) {
             $$.d3.select(this).classed(CLASS[_legendItemFocused], true);
             if (!$$.transiting) {
                 $$.api.focus(id);
             }
-            if (isFunction(config[__legend_item_onmouseover])) {
+            if (config[__legend_item_onmouseover]) {
                 config[__legend_item_onmouseover].call($$, id);
             }
         })
@@ -213,7 +213,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             if (!$$.transiting) {
                 $$.api.revert();
             }
-            if (isFunction(config[__legend_item_onmouseout])) {
+            if (config[__legend_item_onmouseout]) {
                 config[__legend_item_onmouseout].call($$, id);
             }
         });

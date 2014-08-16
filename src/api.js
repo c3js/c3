@@ -140,7 +140,7 @@ c3_chart_fn.unload = function (args) {
     args = args || {};
     $$.unload($$.mapToTargetIds(args.ids), function () {
         $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-        if (isFunction(args.done)) { args.done(); }
+        if (args.done) { args.done(); }
     });
 };
 
