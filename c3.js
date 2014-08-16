@@ -230,8 +230,7 @@
             .style('fill-opacity', 0);
 
         // Define g for bar chart area
-        main.select('.' + CLASS[_chart]).append("g")
-            .attr("class", CLASS[_chartBars]);
+        if ($$.initBar) { $$.initBar(); }
 
         // Define g for line chart area
         main.select('.' + CLASS[_chart]).append("g")
@@ -380,7 +379,7 @@
     };
 
     c3_chart_internal_fn.updateTargets = function (targets) {
-        var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
+        var mainLineEnter, mainLineUpdate;
         var $$ = this, config = $$.config, main = $$.main;
 
         /*-- Main --*/
@@ -389,17 +388,7 @@
         $$.updateTargetsForText(targets);
 
         //-- Bar --//
-        mainBarUpdate = main.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
-            .data(targets)
-            .attr('class', generateCall($$.classChartBar, $$));
-        mainBarEnter = mainBarUpdate.enter().append('g')
-            .attr('class', generateCall($$.classChartBar, $$))
-            .style('opacity', 0)
-            .style("pointer-events", "none");
-        // Bars for each data
-        mainBarEnter.append('g')
-            .attr("class", generateCall($$.classBars, $$))
-            .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+        $$.updateTargetsForBar(targets);
 
         //-- Line --//
         mainLineUpdate = main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
@@ -443,7 +432,7 @@
 
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-        var mainLine, mainArea, mainCircle, mainBar, eventRect, eventRectUpdate;
+        var mainLine, mainArea, mainCircle, eventRect, eventRectUpdate;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
         var rectX, rectW;
         var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -533,7 +522,7 @@
 
         // setup drawer - MEMO: these must be called after axis updated
         drawArea = $$.generateDrawArea(areaIndices, false);
-        drawBar = $$.generateDrawBar(barIndices);
+        drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
         drawLine = $$.generateDrawLine(lineIndices, false);
         xForText = $$.generateXYForText(barIndices, true);
         yForText = $$.generateXYForText(barIndices, false);
@@ -563,17 +552,7 @@
         $$.redrawRegion(duration);
 
         // bars
-        mainBar = main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
-            .data(generateCall($$.barData, $$));
-        mainBar.enter().append('path')
-            .attr("class", generateCall($$.classBar, $$))
-            .style("stroke", function (d) { return $$.color(d.id); })
-            .style("fill", function (d) { return $$.color(d.id); });
-        mainBar
-            .style("opacity", generateCall($$.initialOpacity, $$));
-        mainBar.exit().transition().duration(durationForExit)
-            .style('opacity', 0)
-            .remove();
+        $$.redrawBar(durationForExit);
 
         // lines, areas and cricles
         mainLine = main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
@@ -700,10 +679,7 @@
         d3.transition().duration(duration).each(function () {
             var transitions = [];
 
-            transitions.push(mainBar.transition()
-                             .attr('d', drawBar)
-                             .style("fill", $$.color)
-                             .style("opacity", 1));
+            $$.addTransitionForBar(transitions, drawBar);
             transitions.push(mainLine.transition()
                              .attr("d", drawLine)
                              .style("stroke", $$.color)
@@ -746,7 +722,8 @@
             var xgrid = $$.xgrid || d3.selectAll([]),
                 xgridLines = $$.xgridLines || d3.selectAll([]),
                 mainRegion = $$.mainRegion || d3.selectAll([]),
-                mainText = $$.mainText || d3.selectAll([]);
+                mainText = $$.mainText || d3.selectAll([]),
+                mainBar = $$.mainBar || d3.selectAll([]);
 
             // remove head data after rendered
             $$.data.targets.forEach(function (d) {
@@ -2785,68 +2762,6 @@
 
 
 
-    c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
-        var $$ = this, config = $$.config,
-            w = typeof config[__bar_width] === 'number' ? config[__bar_width] : barTargetsNum ? (axis.tickOffset() * 2 * config[__bar_width_ratio]) / barTargetsNum : 0;
-        return config[__bar_width_max] && w > config[__bar_width_max] ? config[__bar_width_max] : w;
-    };
-    c3_chart_internal_fn.getBars = function (i) {
-        var $$ = this;
-        return $$.main.selectAll('.' + CLASS[_bar] + (isValue(i) ? '-' + i : ''));
-    };
-    c3_chart_internal_fn.expandBars = function (i) {
-        var $$ = this;
-        $$.getBars(i).classed(CLASS[_EXPANDED], true);
-    };
-    c3_chart_internal_fn.unexpandBars = function (i) {
-        var $$ = this;
-        $$.getBars(i).classed(CLASS[_EXPANDED], false);
-    };
-    c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
-        var $$ = this, config = $$.config,
-            getPoints = $$.generateGetBarPoints(barIndices, isSub);
-        return function (d, i) {
-            // 4 points that make a bar
-            var points = getPoints(d, i);
-
-            // switch points if axis is rotated, not applicable for sub chart
-            var indexX = config[__axis_rotated] ? 1 : 0;
-            var indexY = config[__axis_rotated] ? 0 : 1;
-
-            var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
-                    'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
-                    'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
-                    'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
-                    'z';
-
-            return path;
-        };
-    };
-    c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
-        var $$ = this,
-            barTargetsNum = barIndices.__max__ + 1,
-            barW = $$.getBarW($$.xAxis, barTargetsNum),
-            barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
-            barY = $$.getShapeY(!!isSub),
-            barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
-            yScale = isSub ? $$.getSubYScale : $$.getYScale;
-        return function (d, i) {
-            var y0 = yScale.call($$, d.id)(0),
-                offset = barOffset(d, i) || y0, // offset is for stacked bar chart
-                posX = barX(d), posY = barY(d);
-            // fix posY not to overflow opposite quadrant
-            if ($$.config[__axis_rotated]) {
-                if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
-            }
-            // 4 points that make a bar
-            return [
-                [posX, offset],
-                [posX, posY - (y0 - offset)],
-                [posX + barW, posY - (y0 - offset)],
-                [posX + barW, offset]
-            ];
-        };
-    };
 
     c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
         var $$ = this, config = $$.config, area = $$.d3.svg.area(),
@@ -3064,6 +2979,120 @@
             cx = d3_this.attr("cx") * 1, cy = d3_this.attr("cy") * 1;
         return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
     };
+    c3_chart_internal_fn.isWithinRegions = function (x, regions) {
+        var i;
+        for (i = 0; i < regions.length; i++) {
+            if (regions[i].start < x && x <= regions[i].end) { return true; }
+        }
+        return false;
+    };
+
+    c3_chart_internal_fn.initBar = function () {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.main.select('.' + CLASS[_chart]).append("g")
+            .attr("class", CLASS[_chartBars]);
+    };
+    c3_chart_internal_fn.updateTargetsForBar = function (targets) {
+        var $$ = this, config = $$.config, CLASS = $$.CLASS,
+            mainBarUpdate, mainBarEnter,
+            classChartBar = $$.classChartBar.bind($$),
+            classBars = $$.classBars.bind($$);
+        mainBarUpdate = $$.main.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
+            .data(targets)
+            .attr('class', classChartBar);
+        mainBarEnter = mainBarUpdate.enter().append('g')
+            .attr('class', classChartBar)
+            .style('opacity', 0)
+            .style("pointer-events", "none");
+        // Bars for each data
+        mainBarEnter.append('g')
+            .attr("class", classBars)
+            .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+
+    };
+    c3_chart_internal_fn.redrawBar = function (durationForExit) {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.mainBar = $$.main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
+            .data(generateCall($$.barData, $$));
+        $$.mainBar.enter().append('path')
+            .attr("class", generateCall($$.classBar, $$))
+            .style("stroke", function (d) { return $$.color(d.id); })
+            .style("fill", function (d) { return $$.color(d.id); });
+        $$.mainBar
+            .style("opacity", generateCall($$.initialOpacity, $$));
+        $$.mainBar.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+    };
+    c3_chart_internal_fn.addTransitionForBar = function (transitions, drawBar) {
+        var $$ = this;
+        transitions.push($$.mainBar.transition()
+                         .attr('d', drawBar)
+                         .style("fill", $$.color)
+                         .style("opacity", 1));
+    };
+    c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
+        var $$ = this, config = $$.config,
+            w = typeof config[__bar_width] === 'number' ? config[__bar_width] : barTargetsNum ? (axis.tickOffset() * 2 * config[__bar_width_ratio]) / barTargetsNum : 0;
+        return config[__bar_width_max] && w > config[__bar_width_max] ? config[__bar_width_max] : w;
+    };
+    c3_chart_internal_fn.getBars = function (i) {
+        var $$ = this;
+        return $$.main.selectAll('.' + CLASS[_bar] + (isValue(i) ? '-' + i : ''));
+    };
+    c3_chart_internal_fn.expandBars = function (i) {
+        var $$ = this;
+        $$.getBars(i).classed(CLASS[_EXPANDED], true);
+    };
+    c3_chart_internal_fn.unexpandBars = function (i) {
+        var $$ = this;
+        $$.getBars(i).classed(CLASS[_EXPANDED], false);
+    };
+    c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
+        var $$ = this, config = $$.config,
+            getPoints = $$.generateGetBarPoints(barIndices, isSub);
+        return function (d, i) {
+            // 4 points that make a bar
+            var points = getPoints(d, i);
+
+            // switch points if axis is rotated, not applicable for sub chart
+            var indexX = config[__axis_rotated] ? 1 : 0;
+            var indexY = config[__axis_rotated] ? 0 : 1;
+
+            var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+                    'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
+                    'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
+                    'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
+                    'z';
+
+            return path;
+        };
+    };
+    c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
+        var $$ = this,
+            barTargetsNum = barIndices.__max__ + 1,
+            barW = $$.getBarW($$.xAxis, barTargetsNum),
+            barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
+            barY = $$.getShapeY(!!isSub),
+            barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
+            yScale = isSub ? $$.getSubYScale : $$.getYScale;
+        return function (d, i) {
+            var y0 = yScale.call($$, d.id)(0),
+                offset = barOffset(d, i) || y0, // offset is for stacked bar chart
+                posX = barX(d), posY = barY(d);
+            // fix posY not to overflow opposite quadrant
+            if ($$.config[__axis_rotated]) {
+                if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
+            }
+            // 4 points that make a bar
+            return [
+                [posX, offset],
+                [posX, posY - (y0 - offset)],
+                [posX + barW, posY - (y0 - offset)],
+                [posX + barW, offset]
+            ];
+        };
+    };
     c3_chart_internal_fn.isWithinBar = function (_this) {
         var d3 = this.d3,
             mouse = d3.mouse(_this), box = _this.getBoundingClientRect(),
@@ -3071,13 +3100,6 @@
             x = seg0.x, y = Math.min(seg0.y, seg1.y), w = box.width, h = box.height, offset = 2,
             sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
         return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
-    };
-    c3_chart_internal_fn.isWithinRegions = function (x, regions) {
-        var i;
-        for (i = 0; i < regions.length; i++) {
-            if (regions[i].start < x && x <= regions[i].end) { return true; }
-        }
-        return false;
     };
 
     c3_chart_internal_fn.initText = function () {

@@ -225,8 +225,7 @@ c3_chart_internal_fn.initWithData = function (data) {
         .style('fill-opacity', 0);
 
     // Define g for bar chart area
-    main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartBars]);
+    if ($$.initBar) { $$.initBar(); }
 
     // Define g for line chart area
     main.select('.' + CLASS[_chart]).append("g")
@@ -375,7 +374,7 @@ c3_chart_internal_fn.updateSizes = function () {
 };
 
 c3_chart_internal_fn.updateTargets = function (targets) {
-    var mainLineEnter, mainLineUpdate, mainBarEnter, mainBarUpdate;
+    var mainLineEnter, mainLineUpdate;
     var $$ = this, config = $$.config, main = $$.main;
 
     /*-- Main --*/
@@ -384,17 +383,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     $$.updateTargetsForText(targets);
 
     //-- Bar --//
-    mainBarUpdate = main.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
-        .data(targets)
-        .attr('class', generateCall($$.classChartBar, $$));
-    mainBarEnter = mainBarUpdate.enter().append('g')
-        .attr('class', generateCall($$.classChartBar, $$))
-        .style('opacity', 0)
-        .style("pointer-events", "none");
-    // Bars for each data
-    mainBarEnter.append('g')
-        .attr("class", generateCall($$.classBars, $$))
-        .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+    $$.updateTargetsForBar(targets);
 
     //-- Line --//
     mainLineUpdate = main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
@@ -438,7 +427,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var mainLine, mainArea, mainCircle, mainBar, eventRect, eventRectUpdate;
+    var mainLine, mainArea, mainCircle, eventRect, eventRectUpdate;
     var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
     var rectX, rectW;
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -528,7 +517,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // setup drawer - MEMO: these must be called after axis updated
     drawArea = $$.generateDrawArea(areaIndices, false);
-    drawBar = $$.generateDrawBar(barIndices);
+    drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
     drawLine = $$.generateDrawLine(lineIndices, false);
     xForText = $$.generateXYForText(barIndices, true);
     yForText = $$.generateXYForText(barIndices, false);
@@ -558,17 +547,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.redrawRegion(duration);
 
     // bars
-    mainBar = main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
-        .data(generateCall($$.barData, $$));
-    mainBar.enter().append('path')
-        .attr("class", generateCall($$.classBar, $$))
-        .style("stroke", function (d) { return $$.color(d.id); })
-        .style("fill", function (d) { return $$.color(d.id); });
-    mainBar
-        .style("opacity", generateCall($$.initialOpacity, $$));
-    mainBar.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    $$.redrawBar(durationForExit);
 
     // lines, areas and cricles
     mainLine = main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
@@ -695,10 +674,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     d3.transition().duration(duration).each(function () {
         var transitions = [];
 
-        transitions.push(mainBar.transition()
-                         .attr('d', drawBar)
-                         .style("fill", $$.color)
-                         .style("opacity", 1));
+        $$.addTransitionForBar(transitions, drawBar);
         transitions.push(mainLine.transition()
                          .attr("d", drawLine)
                          .style("stroke", $$.color)
@@ -741,7 +717,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         var xgrid = $$.xgrid || d3.selectAll([]),
             xgridLines = $$.xgridLines || d3.selectAll([]),
             mainRegion = $$.mainRegion || d3.selectAll([]),
-            mainText = $$.mainText || d3.selectAll([]);
+            mainText = $$.mainText || d3.selectAll([]),
+            mainBar = $$.mainBar || d3.selectAll([]);
 
         // remove head data after rendered
         $$.data.targets.forEach(function (d) {
