@@ -3916,7 +3916,7 @@
         var $$ = this, config = $$.config,
             format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
         if (config[__axis_x_tick_format]) {
-            if (config[__axis_x_tick_format]) {
+            if (isFunction(config[__axis_x_tick_format])) {
                 format = config[__axis_x_tick_format];
             } else if ($$.isTimeSeries()) {
                 format = function (date) {
@@ -3924,7 +3924,7 @@
                 };
             }
         }
-        return function (v) { return format.call($$, v); };
+        return isFunction(format) ? function (v) { return format.call($$, v); } : format;
     };
     c3_chart_internal_fn.getAxisLabelOptionByAxisId = function (axisId) {
         var $$ = this, config = $$.config, option;
