@@ -1,3 +1,30 @@
+c3_chart_internal_fn.initRegion = function () {
+    var $$ = this, CLASS = $$.CLASS;
+    $$.main.append('g')
+        .attr("clip-path", $$.clipPath)
+        .attr("class", CLASS[_regions]);
+};
+c3_chart_internal_fn.redrawRegion = function (duration) {
+    var $$ = this, config = $$.config, CLASS = $$.CLASS;
+    $$.mainRegion = $$.main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
+        .data(config[__regions]);
+    $$.mainRegion.enter().append('g')
+        .attr('class', generateCall($$.classRegion, $$))
+      .append('rect')
+        .style("fill-opacity", 0);
+    $$.mainRegion.exit().transition().duration(duration)
+        .style("opacity", 0)
+        .remove();
+};
+c3_chart_internal_fn.addTransitionForRegion = function (transitions) {
+    var $$ = this;
+    transitions.push($$.mainRegion.selectAll('rect').transition()
+                     .attr("x", generateCall($$.regionX, $$))
+                     .attr("y", generateCall($$.regionY, $$))
+                     .attr("width", generateCall($$.regionWidth, $$))
+                     .attr("height", generateCall($$.regionHeight, $$))
+                     .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
+};
 c3_chart_internal_fn.regionX = function (d) {
     var $$ = this, config = $$.config,
         xPos, yScale = d.axis === 'y' ? $$.y : $$.y2;

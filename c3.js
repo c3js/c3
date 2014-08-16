@@ -214,9 +214,7 @@
             .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
         // Regions
-        main.append('g')
-            .attr("clip-path", $$.clipPath)
-            .attr("class", CLASS[_regions]);
+        $$.initRegion();
 
         // Grids
         $$.initGrid();
@@ -453,7 +451,7 @@
 
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-        var mainLine, mainArea, mainCircle, mainBar, mainRegion, mainText, eventRect, eventRectUpdate;
+        var mainLine, mainArea, mainCircle, mainBar, mainText, eventRect, eventRectUpdate;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
         var rectX, rectW;
         var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -570,15 +568,7 @@
         $$.redrawGrid(duration, withY);
 
         // rect for regions
-        mainRegion = main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
-            .data(config[__regions]);
-        mainRegion.enter().append('g')
-            .attr('class', generateCall($$.classRegion, $$))
-          .append('rect')
-            .style("fill-opacity", 0);
-        mainRegion.exit().transition().duration(duration)
-            .style("opacity", 0)
-            .remove();
+        $$.redrawRegion(duration);
 
         // bars
         mainBar = main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
@@ -756,12 +746,7 @@
                              .attr('y', yForText)
                              .style("fill", $$.color)
                              .style("fill-opacity", options.flow ? 0 : generateCall($$.opacityForText, $$)));
-            transitions.push(mainRegion.selectAll('rect').transition()
-                             .attr("x", generateCall($$.regionX, $$))
-                             .attr("y", generateCall($$.regionY, $$))
-                             .attr("width", generateCall($$.regionWidth, $$))
-                             .attr("height", generateCall($$.regionHeight, $$))
-                             .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
+            $$.addTransitionForRegion(transitions);
             $$.addTransitionForGrid(transitions);
 
             // Wait for end of transitions if called from flow API
@@ -784,7 +769,8 @@
                 wait = $$.generateWait();
 
             var xgrid = $$.xgrid || d3.selectAll([]),
-                xgridLines = $$.xgridLines || d3.selectAll([]);
+                xgridLines = $$.xgridLines || d3.selectAll([]),
+                mainRegion = $$.mainRegion || d3.selectAll([]);
 
             // remove head data after rendered
             $$.data.targets.forEach(function (d) {
@@ -4571,6 +4557,33 @@
         }
     };
 
+    c3_chart_internal_fn.initRegion = function () {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.main.append('g')
+            .attr("clip-path", $$.clipPath)
+            .attr("class", CLASS[_regions]);
+    };
+    c3_chart_internal_fn.redrawRegion = function (duration) {
+        var $$ = this, config = $$.config, CLASS = $$.CLASS;
+        $$.mainRegion = $$.main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
+            .data(config[__regions]);
+        $$.mainRegion.enter().append('g')
+            .attr('class', generateCall($$.classRegion, $$))
+          .append('rect')
+            .style("fill-opacity", 0);
+        $$.mainRegion.exit().transition().duration(duration)
+            .style("opacity", 0)
+            .remove();
+    };
+    c3_chart_internal_fn.addTransitionForRegion = function (transitions) {
+        var $$ = this;
+        transitions.push($$.mainRegion.selectAll('rect').transition()
+                         .attr("x", generateCall($$.regionX, $$))
+                         .attr("y", generateCall($$.regionY, $$))
+                         .attr("width", generateCall($$.regionWidth, $$))
+                         .attr("height", generateCall($$.regionHeight, $$))
+                         .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
+    };
     c3_chart_internal_fn.regionX = function (d) {
         var $$ = this, config = $$.config,
             xPos, yScale = d.axis === 'y' ? $$.y : $$.y2;
