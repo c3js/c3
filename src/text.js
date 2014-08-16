@@ -54,3 +54,32 @@ c3_chart_internal_fn.getTextRect = function (text, cls) {
         .remove();
     return rect;
 };
+c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
+    var $$ = this,
+        getPoints = $$.generateGetBarPoints(barIndices, false),
+        getter = forX ? $$.getXForText : $$.getYForText;
+    return function (d, i) {
+        return getter.call($$, getPoints(d, i), d, this);
+    };
+};
+c3_chart_internal_fn.getXForText = function (points, d, textElement) {
+    var $$ = this,
+        box = textElement.getBoundingClientRect(), xPos, padding;
+    if ($$.config[__axis_rotated]) {
+        padding = $$.isBarType(d) ? 4 : 6;
+        xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
+    } else {
+        xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
+    }
+    return xPos > $$.width ? $$.width - box.width : xPos;
+};
+c3_chart_internal_fn.getYForText = function (points, d, textElement) {
+    var $$ = this,
+        box = textElement.getBoundingClientRect(), yPos;
+    if ($$.config[__axis_rotated]) {
+        yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
+    } else {
+        yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
+    }
+    return yPos < box.height ? box.height : yPos;
+};

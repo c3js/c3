@@ -29,6 +29,7 @@ module.exports = (grunt) ->
               'src/category.js',
               'src/size.js',
               'src/shape.js',
+              'src/shape.line.js',
               'src/shape.bar.js',
               'src/text.js',
               'src/type.js',

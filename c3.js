@@ -233,8 +233,7 @@
         if ($$.initBar) { $$.initBar(); }
 
         // Define g for line chart area
-        main.select('.' + CLASS[_chart]).append("g")
-            .attr("class", CLASS[_chartLines]);
+        if ($$.initLine) { $$.initLine(); }
 
         // Define g for arc chart area
         if ($$.initArc) { $$.initArc(); }
@@ -379,8 +378,7 @@
     };
 
     c3_chart_internal_fn.updateTargets = function (targets) {
-        var mainLineEnter, mainLineUpdate;
-        var $$ = this, config = $$.config, main = $$.main;
+        var $$ = this, config = $$.config;
 
         /*-- Main --*/
 
@@ -391,34 +389,9 @@
         $$.updateTargetsForBar(targets);
 
         //-- Line --//
-        mainLineUpdate = main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
-            .data(targets)
-            .attr('class', generateCall($$.classChartLine, $$));
-        mainLineEnter = mainLineUpdate.enter().append('g')
-            .attr('class', generateCall($$.classChartLine, $$))
-            .style('opacity', 0)
-            .style("pointer-events", "none");
-        // Lines for each data
-        mainLineEnter.append('g')
-            .attr("class", generateCall($$.classLines, $$));
-        // Areas
-        mainLineEnter.append('g')
-            .attr('class', generateCall($$.classAreas, $$));
-        // Circles for each data point on lines
-        mainLineEnter.append('g')
-            .attr("class", function (d) { return $$.generateClass(CLASS[_selectedCircles], d.id); });
-        mainLineEnter.append('g')
-            .attr("class", generateCall($$.classCircles, $$))
-            .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
-        // Update date for selected circles
-        targets.forEach(function (t) {
-            main.selectAll('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS[_selectedCircle]).each(function (d) {
-                d.value = t.values[d.index].value;
-            });
-        });
-        // MEMO: can not keep same color...
-        //mainLineUpdate.exit().remove();
+        $$.updateTargetsForLine(targets);
 
+        //-- Arc --//
         if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
         if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
@@ -432,7 +405,7 @@
 
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-        var mainLine, mainArea, mainCircle, eventRect, eventRectUpdate;
+        var eventRect, eventRectUpdate;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
         var rectX, rectW;
         var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -443,8 +416,6 @@
         var xv = generateCall($$.xv, $$),
             cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
             cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
-
-        mainCircle = d3.selectAll([]);
 
         options = options || {};
         withY = getOption(options, "withY", true);
@@ -521,9 +492,9 @@
         }
 
         // setup drawer - MEMO: these must be called after axis updated
-        drawArea = $$.generateDrawArea(areaIndices, false);
+        drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
         drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
-        drawLine = $$.generateDrawLine(lineIndices, false);
+        drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
         xForText = $$.generateXYForText(barIndices, true);
         yForText = $$.generateXYForText(barIndices, false);
 
@@ -555,42 +526,11 @@
         $$.redrawBar(durationForExit);
 
         // lines, areas and cricles
-        mainLine = main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
-            .data(generateCall($$.lineData, $$));
-        mainLine.enter().append('path')
-            .attr('class', generateCall($$.classLine, $$))
-            .style("stroke", $$.color);
-        mainLine
-            .style("opacity", generateCall($$.initialOpacity, $$))
-            .attr('transform', null);
-        mainLine.exit().transition().duration(durationForExit)
-            .style('opacity', 0)
-            .remove();
+        $$.redrawLine(durationForExit);
+        $$.redrawArea(durationForExit);
+        if (config[__point_show]) { $$.redrawCircle(); }
 
-        mainArea = main.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
-            .data(generateCall($$.lineData, $$));
-        mainArea.enter().append('path')
-            .attr("class", generateCall($$.classArea, $$))
-            .style("fill", $$.color)
-            .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-        mainArea
-            .style("opacity", $$.orgAreaOpacity);
-        mainArea.exit().transition().duration(durationForExit)
-            .style('opacity', 0)
-            .remove();
-
-        if (config[__point_show]) {
-            mainCircle = main.selectAll('.' + CLASS[_circles]).selectAll('.' + CLASS[_circle])
-                .data(generateCall($$.lineOrScatterData, $$));
-            mainCircle.enter().append("circle")
-                .attr("class", generateCall($$.classCircle, $$))
-                .attr("r", generateCall($$.pointR, $$))
-                .style("fill", $$.color);
-            mainCircle
-                .style("opacity", generateCall($$.initialOpacity, $$));
-            mainCircle.exit().remove();
-        }
-
+        // text
         if ($$.hasDataLabel()) {
             $$.redrawText(durationForExit);
         }
@@ -680,14 +620,22 @@
             var transitions = [];
 
             $$.addTransitionForBar(transitions, drawBar);
+            $$.addTransitionForLine(transitions, drawLine);
+    /*
             transitions.push(mainLine.transition()
                              .attr("d", drawLine)
                              .style("stroke", $$.color)
                              .style("opacity", 1));
+    */
+            $$.addTransitionForArea(transitions, drawArea);
+    /*
             transitions.push(mainArea.transition()
                              .attr("d", drawArea)
                              .style("fill", $$.color)
                              .style("opacity", $$.orgAreaOpacity));
+    */
+            $$.addTransitionForCircle(transitions, cx, cy);
+    /*
             transitions.push(mainCircle.transition()
                              .style('opacity', generateCall($$.opacityForCircle, $$))
                              .style("fill", $$.color)
@@ -696,6 +644,7 @@
             transitions.push(main.selectAll('.' + CLASS[_selectedCircle]).transition()
                              .attr("cx", cx)
                              .attr("cy", cy));
+    */
             $$.addTransitionForText(transitions, xForText, yForText, options.flow);
             $$.addTransitionForRegion(transitions);
             $$.addTransitionForGrid(transitions);
@@ -723,7 +672,10 @@
                 xgridLines = $$.xgridLines || d3.selectAll([]),
                 mainRegion = $$.mainRegion || d3.selectAll([]),
                 mainText = $$.mainText || d3.selectAll([]),
-                mainBar = $$.mainBar || d3.selectAll([]);
+                mainBar = $$.mainBar || d3.selectAll([]),
+                mainLine = $$.mainLine || d3.selectAll([]),
+                mainArea = $$.mainArea || d3.selectAll([]),
+                mainCircle = $$.mainCircle || d3.selectAll([]);
 
             // remove head data after rendered
             $$.data.targets.forEach(function (d) {
@@ -2721,80 +2673,67 @@
         return $$.isSplineType(d) ? "cardinal" : $$.isStepType(d) ? "step-after" : "linear";
     };
 
-
-    c3_chart_internal_fn.circleX = function (d) {
-        return d.x || d.x === 0 ? this.x(d.x) : null;
+    c3_chart_internal_fn.initLine = function () {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.main.select('.' + CLASS[_chart]).append("g")
+            .attr("class", CLASS[_chartLines]);
     };
-    c3_chart_internal_fn.circleY = function (d, i) {
-        var $$ = this,
-            lineIndices = $$.getShapeIndices($$.isLineType), getPoint = $$.generateGetLinePoint(lineIndices);
-        return $$.config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : $$.getYScale(d.id)(d.value);
+    c3_chart_internal_fn.updateTargetsForLine = function (targets) {
+        var $$ = this, config = $$.config, CLASS = $$.CLASS,
+            mainLineUpdate, mainLineEnter,
+            classChartLine = $$.classChartLine.bind($$),
+            classLines = $$.classLines.bind($$),
+            classAreas = $$.classAreas.bind($$),
+            classCircles = $$.classCircles.bind($$);
+        mainLineUpdate = $$.main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
+            .data(targets)
+            .attr('class', classChartLine);
+        mainLineEnter = mainLineUpdate.enter().append('g')
+            .attr('class', classChartLine)
+            .style('opacity', 0)
+            .style("pointer-events", "none");
+        // Lines for each data
+        mainLineEnter.append('g')
+            .attr("class", classLines);
+        // Areas
+        mainLineEnter.append('g')
+            .attr('class', classAreas);
+        // Circles for each data point on lines
+        mainLineEnter.append('g')
+            .attr("class", function (d) { return $$.generateClass(CLASS[_selectedCircles], d.id); });
+        mainLineEnter.append('g')
+            .attr("class", classCircles)
+            .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+        // Update date for selected circles
+        targets.forEach(function (t) {
+            $$.main.selectAll('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS[_selectedCircle]).each(function (d) {
+                d.value = t.values[d.index].value;
+            });
+        });
+        // MEMO: can not keep same color...
+        //mainLineUpdate.exit().remove();
     };
-    c3_chart_internal_fn.getCircles = function (i, id) {
+    c3_chart_internal_fn.redrawLine = function (durationForExit) {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.mainLine = $$.main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
+            .data($$.lineData.bind($$));
+        $$.mainLine.enter().append('path')
+            .attr('class', $$.classLine.bind($$))
+            .style("stroke", $$.color);
+        $$.mainLine
+            .style("opacity", $$.initialOpacity.bind($$))
+            .attr('transform', null);
+        $$.mainLine.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+    };
+    c3_chart_internal_fn.addTransitionForLine = function (transitions, drawLine) {
         var $$ = this;
-        return (id ? $$.main.selectAll('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS[_circle] + (isValue(i) ? '-' + i : ''));
+        transitions.push($$.mainLine.transition()
+                         .attr("d", drawLine)
+                         .style("stroke", $$.color)
+                         .style("opacity", 1));
     };
-    c3_chart_internal_fn.expandCircles = function (i, id) {
-        var $$ = this;
-        $$.getCircles(i, id)
-            .classed(CLASS[_EXPANDED], true)
-            .attr('r', generateCall($$.pointExpandedR, $$));
-    };
-    c3_chart_internal_fn.unexpandCircles = function (i) {
-        var $$ = this;
-        $$.getCircles(i)
-            .filter(function () { return $$.d3.select(this).classed(CLASS[_EXPANDED]); })
-            .classed(CLASS[_EXPANDED], false)
-            .attr('r', generateCall($$.pointR, $$));
-    };
-    c3_chart_internal_fn.pointR = function (d) {
-        var $$ = this, config = $$.config;
-        return config[__point_show] && !$$.isStepType(d) ? (isFunction(config[__point_r]) ? config[__point_r](d) : config[__point_r]) : 0;
-    };
-    c3_chart_internal_fn.pointExpandedR = function (d) {
-        var $$ = this, config = $$.config;
-        return config[__point_focus_expand_enabled] ? (config[__point_focus_expand_r] ? config[__point_focus_expand_r] : $$.pointR(d) * 1.75) : $$.pointR(d);
-    };
-    c3_chart_internal_fn.pointSelectR = function (d) {
-        var $$ = this, config = $$.config;
-        return config[__point_select_r] ? config[__point_select_r] : $$.pointR(d) * 4;
-    };
-
-
-
-
-    c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
-        var $$ = this, config = $$.config, area = $$.d3.svg.area(),
-            getPoint = $$.generateGetAreaPoint(areaIndices, isSub),
-            yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
-            xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
-            value0 = function (d, i) {
-                return config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
-            },
-            value1 = function (d, i) {
-                return config[__data_groups].length > 0 ? getPoint(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
-            };
-
-        area = config[__axis_rotated] ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
-        if (!config[__line_connect_null]) {
-            area = area.defined(function (d) { return d.value !== null; });
-        }
-
-        return function (d) {
-            var data = config[__line_connect_null] ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
-            if ($$.isAreaType(d)) {
-                path = area.interpolate($$.getInterpolate(d))(data);
-            } else {
-                if (data[0]) {
-                    x0 = $$.x(data[0].x);
-                    y0 = $$.getYScale(d.id)(data[0].value);
-                }
-                path = config[__axis_rotated] ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
-            }
-            return path ? path : "M 0 0";
-        };
-    };
-
     c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
         var $$ = this, config = $$.config,
             line = $$.d3.svg.line(),
@@ -2826,60 +2765,6 @@
             return path ? path : "M 0 0";
         };
     };
-
-    c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
-        var $$ = this,
-            getPoints = $$.generateGetBarPoints(barIndices, false),
-            getter = forX ? $$.getXForText : $$.getYForText;
-        return function (d, i) {
-            return getter.call($$, getPoints(d, i), d, this);
-        };
-    };
-    c3_chart_internal_fn.getXForText = function (points, d, textElement) {
-        var $$ = this,
-            box = textElement.getBoundingClientRect(), xPos, padding;
-        if ($$.config[__axis_rotated]) {
-            padding = $$.isBarType(d) ? 4 : 6;
-            xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
-        } else {
-            xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
-        }
-        return xPos > $$.width ? $$.width - box.width : xPos;
-    };
-    c3_chart_internal_fn.getYForText = function (points, d, textElement) {
-        var $$ = this,
-            box = textElement.getBoundingClientRect(), yPos;
-        if ($$.config[__axis_rotated]) {
-            yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
-        } else {
-            yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
-        }
-        return yPos < box.height ? box.height : yPos;
-    };
-
-    c3_chart_internal_fn.generateGetAreaPoint = function (areaIndices, isSub) { // partial duplication of generateGetBarPoints
-        var $$ = this, config = $$.config,
-            areaTargetsNum = areaIndices.__max__ + 1,
-            x = $$.getShapeX(0, areaTargetsNum, areaIndices, !!isSub),
-            y = $$.getShapeY(!!isSub),
-            areaOffset = $$.getShapeOffset($$.isAreaType, areaIndices, !!isSub),
-            yScale = isSub ? $$.getSubYScale : $$.getYScale;
-        return function (d, i) {
-            var y0 = yScale.call($$, d.id)(0),
-                offset = areaOffset(d, i) || y0, // offset is for stacked area chart
-                posX = x(d), posY = y(d);
-            // fix posY not to overflow opposite quadrant
-            if (config[__axis_rotated]) {
-                if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
-            }
-            // 1 point that marks the area position
-            return [
-                [posX, offset],
-                [posX, posY - (y0 - offset)]
-            ];
-        };
-    };
-
     c3_chart_internal_fn.generateGetLinePoint = function (lineIndices, isSub) { // partial duplication of generateGetBarPoints
         var $$ = this, config = $$.config,
             lineTargetsNum = lineIndices.__max__ + 1,
@@ -2910,6 +2795,14 @@
             xp, yp, dx, dy, dd, diff, diffx2,
             xValue, yValue,
             regions = [];
+
+        function isWithinRegions(x, regions) {
+            var i;
+            for (i = 0; i < regions.length; i++) {
+                if (regions[i].start < x && x <= regions[i].end) { return true; }
+            }
+            return false;
+        }
 
         // Check start/end of regions
         if (isDefined(_regions)) {
@@ -2950,7 +2843,7 @@
         for (i = 0; i < d.length; i++) {
 
             // Draw as normal
-            if (isUndefined(regions) || ! $$.isWithinRegions(d[i].x, regions)) {
+            if (isUndefined(regions) || ! isWithinRegions(d[i].x, regions)) {
                 s += " " + xValue(d[i]) + " " + yValue(d[i]);
             }
             // Draw with region // TODO: Fix for horizotal charts
@@ -2973,18 +2866,150 @@
 
         return s;
     };
+
+
+    c3_chart_internal_fn.redrawArea = function (durationForExit) {
+        var $$ = this, CLASS = $$.CLASS, d3 = $$.d3;
+        $$.mainArea = $$.main.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
+            .data($$.lineData.bind($$));
+        $$.mainArea.enter().append('path')
+            .attr("class", $$.classArea.bind($$))
+            .style("fill", $$.color)
+            .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+        $$.mainArea
+            .style("opacity", $$.orgAreaOpacity);
+        $$.mainArea.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+    };
+    c3_chart_internal_fn.addTransitionForArea = function (transitions, drawArea) {
+        var $$ = this;
+        transitions.push($$.mainArea.transition()
+                         .attr("d", drawArea)
+                         .style("fill", $$.color)
+                         .style("opacity", $$.orgAreaOpacity));
+    };
+    c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
+        var $$ = this, config = $$.config, area = $$.d3.svg.area(),
+            getPoint = $$.generateGetAreaPoint(areaIndices, isSub),
+            yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
+            xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
+            value0 = function (d, i) {
+                return config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
+            },
+            value1 = function (d, i) {
+                return config[__data_groups].length > 0 ? getPoint(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
+            };
+
+        area = config[__axis_rotated] ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+        if (!config[__line_connect_null]) {
+            area = area.defined(function (d) { return d.value !== null; });
+        }
+
+        return function (d) {
+            var data = config[__line_connect_null] ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
+            if ($$.isAreaType(d)) {
+                path = area.interpolate($$.getInterpolate(d))(data);
+            } else {
+                if (data[0]) {
+                    x0 = $$.x(data[0].x);
+                    y0 = $$.getYScale(d.id)(data[0].value);
+                }
+                path = config[__axis_rotated] ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+            }
+            return path ? path : "M 0 0";
+        };
+    };
+
+    c3_chart_internal_fn.generateGetAreaPoint = function (areaIndices, isSub) { // partial duplication of generateGetBarPoints
+        var $$ = this, config = $$.config,
+            areaTargetsNum = areaIndices.__max__ + 1,
+            x = $$.getShapeX(0, areaTargetsNum, areaIndices, !!isSub),
+            y = $$.getShapeY(!!isSub),
+            areaOffset = $$.getShapeOffset($$.isAreaType, areaIndices, !!isSub),
+            yScale = isSub ? $$.getSubYScale : $$.getYScale;
+        return function (d, i) {
+            var y0 = yScale.call($$, d.id)(0),
+                offset = areaOffset(d, i) || y0, // offset is for stacked area chart
+                posX = x(d), posY = y(d);
+            // fix posY not to overflow opposite quadrant
+            if (config[__axis_rotated]) {
+                if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
+            }
+            // 1 point that marks the area position
+            return [
+                [posX, offset],
+                [posX, posY - (y0 - offset)]
+            ];
+        };
+    };
+
+
+    c3_chart_internal_fn.redrawCircle = function () {
+        var $$ = this, CLASS = $$.CLASS;
+        $$.mainCircle = $$.main.selectAll('.' + CLASS[_circles]).selectAll('.' + CLASS[_circle])
+            .data($$.lineOrScatterData.bind($$));
+        $$.mainCircle.enter().append("circle")
+            .attr("class", $$.classCircle.bind($$))
+            .attr("r", $$.pointR.bind($$))
+            .style("fill", $$.color);
+        $$.mainCircle
+            .style("opacity", $$.initialOpacity.bind($$));
+        $$.mainCircle.exit().remove();
+    };
+    c3_chart_internal_fn.addTransitionForCircle = function (transitions, cx, cy) {
+        var $$ = this;
+        transitions.push($$.mainCircle.transition()
+                         .style('opacity', $$.opacityForCircle.bind($$))
+                         .style("fill", $$.color)
+                         .attr("cx", cx)
+                         .attr("cy", cy));
+        transitions.push($$.main.selectAll('.' + CLASS[_selectedCircle]).transition()
+                         .attr("cx", cx)
+                         .attr("cy", cy));
+    };
+    c3_chart_internal_fn.circleX = function (d) {
+        return d.x || d.x === 0 ? this.x(d.x) : null;
+    };
+    c3_chart_internal_fn.circleY = function (d, i) {
+        var $$ = this,
+            lineIndices = $$.getShapeIndices($$.isLineType), getPoint = $$.generateGetLinePoint(lineIndices);
+        return $$.config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : $$.getYScale(d.id)(d.value);
+    };
+    c3_chart_internal_fn.getCircles = function (i, id) {
+        var $$ = this;
+        return (id ? $$.main.selectAll('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS[_circle] + (isValue(i) ? '-' + i : ''));
+    };
+    c3_chart_internal_fn.expandCircles = function (i, id) {
+        var $$ = this;
+        $$.getCircles(i, id)
+            .classed(CLASS[_EXPANDED], true)
+            .attr('r', generateCall($$.pointExpandedR, $$));
+    };
+    c3_chart_internal_fn.unexpandCircles = function (i) {
+        var $$ = this;
+        $$.getCircles(i)
+            .filter(function () { return $$.d3.select(this).classed(CLASS[_EXPANDED]); })
+            .classed(CLASS[_EXPANDED], false)
+            .attr('r', generateCall($$.pointR, $$));
+    };
+    c3_chart_internal_fn.pointR = function (d) {
+        var $$ = this, config = $$.config;
+        return config[__point_show] && !$$.isStepType(d) ? (isFunction(config[__point_r]) ? config[__point_r](d) : config[__point_r]) : 0;
+    };
+    c3_chart_internal_fn.pointExpandedR = function (d) {
+        var $$ = this, config = $$.config;
+        return config[__point_focus_expand_enabled] ? (config[__point_focus_expand_r] ? config[__point_focus_expand_r] : $$.pointR(d) * 1.75) : $$.pointR(d);
+    };
+    c3_chart_internal_fn.pointSelectR = function (d) {
+        var $$ = this, config = $$.config;
+        return config[__point_select_r] ? config[__point_select_r] : $$.pointR(d) * 4;
+    };
     c3_chart_internal_fn.isWithinCircle = function (_this, _r) {
         var d3 = this.d3,
             mouse = d3.mouse(_this), d3_this = d3.select(_this),
             cx = d3_this.attr("cx") * 1, cy = d3_this.attr("cy") * 1;
         return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
-    };
-    c3_chart_internal_fn.isWithinRegions = function (x, regions) {
-        var i;
-        for (i = 0; i < regions.length; i++) {
-            if (regions[i].start < x && x <= regions[i].end) { return true; }
-        }
-        return false;
     };
 
     c3_chart_internal_fn.initBar = function () {
@@ -3157,6 +3182,35 @@
           .each(function () { rect = this.getBoundingClientRect(); })
             .remove();
         return rect;
+    };
+    c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
+        var $$ = this,
+            getPoints = $$.generateGetBarPoints(barIndices, false),
+            getter = forX ? $$.getXForText : $$.getYForText;
+        return function (d, i) {
+            return getter.call($$, getPoints(d, i), d, this);
+        };
+    };
+    c3_chart_internal_fn.getXForText = function (points, d, textElement) {
+        var $$ = this,
+            box = textElement.getBoundingClientRect(), xPos, padding;
+        if ($$.config[__axis_rotated]) {
+            padding = $$.isBarType(d) ? 4 : 6;
+            xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
+        } else {
+            xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
+        }
+        return xPos > $$.width ? $$.width - box.width : xPos;
+    };
+    c3_chart_internal_fn.getYForText = function (points, d, textElement) {
+        var $$ = this,
+            box = textElement.getBoundingClientRect(), yPos;
+        if ($$.config[__axis_rotated]) {
+            yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
+        } else {
+            yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
+        }
+        return yPos < box.height ? box.height : yPos;
     };
 
     c3_chart_internal_fn.setTargetType = function (targetIds, type) {

@@ -228,8 +228,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     if ($$.initBar) { $$.initBar(); }
 
     // Define g for line chart area
-    main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartLines]);
+    if ($$.initLine) { $$.initLine(); }
 
     // Define g for arc chart area
     if ($$.initArc) { $$.initArc(); }
@@ -374,8 +373,7 @@ c3_chart_internal_fn.updateSizes = function () {
 };
 
 c3_chart_internal_fn.updateTargets = function (targets) {
-    var mainLineEnter, mainLineUpdate;
-    var $$ = this, config = $$.config, main = $$.main;
+    var $$ = this, config = $$.config;
 
     /*-- Main --*/
 
@@ -386,34 +384,9 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     $$.updateTargetsForBar(targets);
 
     //-- Line --//
-    mainLineUpdate = main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
-        .data(targets)
-        .attr('class', generateCall($$.classChartLine, $$));
-    mainLineEnter = mainLineUpdate.enter().append('g')
-        .attr('class', generateCall($$.classChartLine, $$))
-        .style('opacity', 0)
-        .style("pointer-events", "none");
-    // Lines for each data
-    mainLineEnter.append('g')
-        .attr("class", generateCall($$.classLines, $$));
-    // Areas
-    mainLineEnter.append('g')
-        .attr('class', generateCall($$.classAreas, $$));
-    // Circles for each data point on lines
-    mainLineEnter.append('g')
-        .attr("class", function (d) { return $$.generateClass(CLASS[_selectedCircles], d.id); });
-    mainLineEnter.append('g')
-        .attr("class", generateCall($$.classCircles, $$))
-        .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
-    // Update date for selected circles
-    targets.forEach(function (t) {
-        main.selectAll('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS[_selectedCircle]).each(function (d) {
-            d.value = t.values[d.index].value;
-        });
-    });
-    // MEMO: can not keep same color...
-    //mainLineUpdate.exit().remove();
+    $$.updateTargetsForLine(targets);
 
+    //-- Arc --//
     if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
     if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
@@ -427,7 +400,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var mainLine, mainArea, mainCircle, eventRect, eventRectUpdate;
+    var eventRect, eventRectUpdate;
     var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType), maxDataCountTarget;
     var rectX, rectW;
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
@@ -438,8 +411,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var xv = generateCall($$.xv, $$),
         cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
         cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
-
-    mainCircle = d3.selectAll([]);
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -516,9 +487,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // setup drawer - MEMO: these must be called after axis updated
-    drawArea = $$.generateDrawArea(areaIndices, false);
+    drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
     drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
-    drawLine = $$.generateDrawLine(lineIndices, false);
+    drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
     xForText = $$.generateXYForText(barIndices, true);
     yForText = $$.generateXYForText(barIndices, false);
 
@@ -550,42 +521,11 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.redrawBar(durationForExit);
 
     // lines, areas and cricles
-    mainLine = main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
-        .data(generateCall($$.lineData, $$));
-    mainLine.enter().append('path')
-        .attr('class', generateCall($$.classLine, $$))
-        .style("stroke", $$.color);
-    mainLine
-        .style("opacity", generateCall($$.initialOpacity, $$))
-        .attr('transform', null);
-    mainLine.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    $$.redrawLine(durationForExit);
+    $$.redrawArea(durationForExit);
+    if (config[__point_show]) { $$.redrawCircle(); }
 
-    mainArea = main.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
-        .data(generateCall($$.lineData, $$));
-    mainArea.enter().append('path')
-        .attr("class", generateCall($$.classArea, $$))
-        .style("fill", $$.color)
-        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-    mainArea
-        .style("opacity", $$.orgAreaOpacity);
-    mainArea.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
-
-    if (config[__point_show]) {
-        mainCircle = main.selectAll('.' + CLASS[_circles]).selectAll('.' + CLASS[_circle])
-            .data(generateCall($$.lineOrScatterData, $$));
-        mainCircle.enter().append("circle")
-            .attr("class", generateCall($$.classCircle, $$))
-            .attr("r", generateCall($$.pointR, $$))
-            .style("fill", $$.color);
-        mainCircle
-            .style("opacity", generateCall($$.initialOpacity, $$));
-        mainCircle.exit().remove();
-    }
-
+    // text
     if ($$.hasDataLabel()) {
         $$.redrawText(durationForExit);
     }
@@ -675,14 +615,22 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         var transitions = [];
 
         $$.addTransitionForBar(transitions, drawBar);
+        $$.addTransitionForLine(transitions, drawLine);
+/*
         transitions.push(mainLine.transition()
                          .attr("d", drawLine)
                          .style("stroke", $$.color)
                          .style("opacity", 1));
+*/
+        $$.addTransitionForArea(transitions, drawArea);
+/*
         transitions.push(mainArea.transition()
                          .attr("d", drawArea)
                          .style("fill", $$.color)
                          .style("opacity", $$.orgAreaOpacity));
+*/
+        $$.addTransitionForCircle(transitions, cx, cy);
+/*
         transitions.push(mainCircle.transition()
                          .style('opacity', generateCall($$.opacityForCircle, $$))
                          .style("fill", $$.color)
@@ -691,6 +639,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         transitions.push(main.selectAll('.' + CLASS[_selectedCircle]).transition()
                          .attr("cx", cx)
                          .attr("cy", cy));
+*/
         $$.addTransitionForText(transitions, xForText, yForText, options.flow);
         $$.addTransitionForRegion(transitions);
         $$.addTransitionForGrid(transitions);
@@ -718,7 +667,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             xgridLines = $$.xgridLines || d3.selectAll([]),
             mainRegion = $$.mainRegion || d3.selectAll([]),
             mainText = $$.mainText || d3.selectAll([]),
-            mainBar = $$.mainBar || d3.selectAll([]);
+            mainBar = $$.mainBar || d3.selectAll([]),
+            mainLine = $$.mainLine || d3.selectAll([]),
+            mainArea = $$.mainArea || d3.selectAll([]),
+            mainCircle = $$.mainCircle || d3.selectAll([]);
 
         // remove head data after rendered
         $$.data.targets.forEach(function (d) {
