@@ -27,6 +27,7 @@ module.exports = (grunt) ->
               'src/data.convert.js',
               'src/data.load.js',
               'src/category.js',
+              'src/interaction.js',
               'src/size.js',
               'src/shape.js',
               'src/shape.line.js',

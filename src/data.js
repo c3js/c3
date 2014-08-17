@@ -38,8 +38,12 @@ c3_chart_internal_fn.addXs = function (xs) {
         $$.config[__data_xs][id] = xs[id];
     });
 };
-c3_chart_internal_fn.isSingleX = function (xs) {
-    return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() === 1;
+c3_chart_internal_fn.hasMultipleX = function (xs) {
+    return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
+};
+c3_chart_internal_fn.isMultipleX = function () {
+    var $$ = this, config = $$.config;
+    return notEmpty(config[__data_xs]) && $$.hasMultipleX(config[__data_xs]);
 };
 c3_chart_internal_fn.addName = function (data) {
     var $$ = this, name;
