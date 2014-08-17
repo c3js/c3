@@ -43,7 +43,4 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
             items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
             minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
         return {x: minX, y: minY, width: box.width, height: box.height};
-    },
-    generateCall = c3_chart_internal_fn.generateCall = function (f, context) {
-        return function (d, i) { return f.call(context, d, i); };
     };

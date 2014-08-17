@@ -90,7 +90,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     eventRectEnter.append("rect")
-        .attr("class", generateCall($$.classEvent, $$))
+        .attr("class", $$.classEvent.bind($$))
         .style("cursor", config[__data_selection_enabled] && config[__data_selection_grouped] ? "pointer" : null)
         .on('mouseover', function (d) {
             var index = d.index, selectedData, newData;

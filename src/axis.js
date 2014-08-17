@@ -8,7 +8,7 @@ c3_chart_internal_fn.initAxis = function () {
     $$.axes.x.append("text")
         .attr("class", CLASS[_axisXLabel])
         .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
-        .style("text-anchor", generateCall($$.textAnchorForXAxisLabel, $$));
+        .style("text-anchor", $$.textAnchorForXAxisLabel.bind($$));
 
     $$.axes.y = main.append("g")
         .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
@@ -18,7 +18,7 @@ c3_chart_internal_fn.initAxis = function () {
     $$.axes.y.append("text")
         .attr("class", CLASS[_axisYLabel])
         .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-        .style("text-anchor", generateCall($$.textAnchorForYAxisLabel, $$));
+        .style("text-anchor", $$.textAnchorForYAxisLabel.bind($$));
 
     $$.axes.y2 = main.append("g")
         .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
@@ -28,7 +28,7 @@ c3_chart_internal_fn.initAxis = function () {
     $$.axes.y2.append("text")
         .attr("class", CLASS[_axisY2Label])
         .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-        .style("text-anchor", generateCall($$.textAnchorForY2AxisLabel, $$));
+        .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
 };
 c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
     var $$ = this, config = $$.config,
@@ -265,20 +265,20 @@ c3_chart_internal_fn.updateAxisLabels = function (withTransition) {
         axisYLabel = $$.main.select('.' + CLASS[_axisY] + ' .' + CLASS[_axisYLabel]),
         axisY2Label = $$.main.select('.' + CLASS[_axisY2] + ' .' + CLASS[_axisY2Label]);
     (withTransition ? axisXLabel.transition() : axisXLabel)
-        .attr("x", generateCall($$.xForXAxisLabel, $$))
-        .attr("dx", generateCall($$.dxForXAxisLabel, $$))
-        .attr("dy", generateCall($$.dyForXAxisLabel, $$))
-        .text(generateCall($$.textForXAxisLabel, $$));
+        .attr("x", $$.xForXAxisLabel.bind($$))
+        .attr("dx", $$.dxForXAxisLabel.bind($$))
+        .attr("dy", $$.dyForXAxisLabel.bind($$))
+        .text($$.textForXAxisLabel.bind($$));
     (withTransition ? axisYLabel.transition() : axisYLabel)
-        .attr("x", generateCall($$.xForYAxisLabel, $$))
-        .attr("dx", generateCall($$.dxForYAxisLabel, $$))
-        .attr("dy", generateCall($$.dyForYAxisLabel, $$))
-        .text(generateCall($$.textForYAxisLabel, $$));
+        .attr("x", $$.xForYAxisLabel.bind($$))
+        .attr("dx", $$.dxForYAxisLabel.bind($$))
+        .attr("dy", $$.dyForYAxisLabel.bind($$))
+        .text($$.textForYAxisLabel.bind($$));
     (withTransition ? axisY2Label.transition() : axisY2Label)
-        .attr("x", generateCall($$.xForY2AxisLabel, $$))
-        .attr("dx", generateCall($$.dxForY2AxisLabel, $$))
-        .attr("dy", generateCall($$.dyForY2AxisLabel, $$))
-        .text(generateCall($$.textForY2AxisLabel, $$));
+        .attr("x", $$.xForY2AxisLabel.bind($$))
+        .attr("dx", $$.dxForY2AxisLabel.bind($$))
+        .attr("dy", $$.dyForY2AxisLabel.bind($$))
+        .text($$.textForY2AxisLabel.bind($$));
 };
 
 c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, all) {

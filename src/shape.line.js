@@ -306,17 +306,19 @@ c3_chart_internal_fn.getCircles = function (i, id) {
     return (id ? $$.main.selectAll('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS[_circle] + (isValue(i) ? '-' + i : ''));
 };
 c3_chart_internal_fn.expandCircles = function (i, id) {
-    var $$ = this;
+    var $$ = this,
+        r = $$.pointExpandedR.bind($$);
     $$.getCircles(i, id)
         .classed(CLASS[_EXPANDED], true)
-        .attr('r', generateCall($$.pointExpandedR, $$));
+        .attr('r', r);
 };
 c3_chart_internal_fn.unexpandCircles = function (i) {
-    var $$ = this;
+    var $$ = this,
+        r = $$.pointR.bind($$);
     $$.getCircles(i)
         .filter(function () { return $$.d3.select(this).classed(CLASS[_EXPANDED]); })
         .classed(CLASS[_EXPANDED], false)
-        .attr('r', generateCall($$.pointR, $$));
+        .attr('r', r);
 };
 c3_chart_internal_fn.pointR = function (d) {
     var $$ = this, config = $$.config;

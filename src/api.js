@@ -1,8 +1,8 @@
 c3_chart_fn.focus = function (targetId) {
     var $$ = this.internal,
         candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-        candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+        candidatesForArc = candidates.filter($$.isArc.bind($$));
     function focus(targets) {
         $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
     }
@@ -19,8 +19,8 @@ c3_chart_fn.focus = function (targetId) {
 c3_chart_fn.defocus = function (targetId) {
     var $$ = this.internal,
         candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-        candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+        candidatesForArc = candidates.filter($$.isArc.bind($$));
     function defocus(targets) {
         $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 0.3);
     }
@@ -36,8 +36,8 @@ c3_chart_fn.defocus = function (targetId) {
 c3_chart_fn.revert = function (targetId) {
     var $$ = this.internal,
         candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-        candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+        candidatesForArc = candidates.filter($$.isArc.bind($$));
     function revert(targets) {
         $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
     }

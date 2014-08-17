@@ -409,9 +409,9 @@
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis, waitForDraw;
         var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
-        var xv = generateCall($$.xv, $$),
-            cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
-            cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
+        var xv = $$.xv.bind($$),
+            cx = ($$.config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
+            cy = ($$.config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$);
 
         options = options || {};
         withY = getOption(options, "withY", true);
@@ -541,7 +541,7 @@
 
         // circles for select
         main.selectAll('.' + CLASS[_selectedCircles])
-            .filter(generateCall($$.isBarType, $$))
+            .filter($$.isBarType.bind($$))
             .selectAll('circle')
             .remove();
 
@@ -681,12 +681,12 @@
                     .attr('transform', null)
                     .attr('x', xForText)
                     .attr('y', yForText)
-                    .style('fill-opacity', generateCall($$.opacityForText, $$));
+                    .style('fill-opacity', $$.opacityForText.bind($$));
                 mainRegion
                     .attr('transform', null);
                 mainRegion.select('rect').filter($$.isRegionOnX)
-                    .attr("x", generateCall($$.regionX, $$))
-                    .attr("width", generateCall($$.regionWidth, $$));
+                    .attr("x", $$.regionX.bind($$))
+                    .attr("width", $$.regionWidth.bind($$));
                 $$.updateEventRect();
 
                 // callback for end of flow
@@ -836,15 +836,15 @@
             .attr('width', $$.width)
             .attr('height', $$.height);
         $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
-            .attr('x', generateCall($$.getXAxisClipX, $$))
-            .attr('y', generateCall($$.getXAxisClipY, $$))
-            .attr('width', generateCall($$.getXAxisClipWidth, $$))
-            .attr('height', generateCall($$.getXAxisClipHeight, $$));
+            .attr('x', $$.getXAxisClipX.bind($$))
+            .attr('y', $$.getXAxisClipY.bind($$))
+            .attr('width', $$.getXAxisClipWidth.bind($$))
+            .attr('height', $$.getXAxisClipHeight.bind($$));
         $$.svg.select('#' + $$.clipIdForYAxis).select('rect')
-            .attr('x', generateCall($$.getYAxisClipX, $$))
-            .attr('y', generateCall($$.getYAxisClipY, $$))
-            .attr('width', generateCall($$.getYAxisClipWidth, $$))
-            .attr('height', generateCall($$.getYAxisClipHeight, $$));
+            .attr('x', $$.getYAxisClipX.bind($$))
+            .attr('y', $$.getYAxisClipY.bind($$))
+            .attr('width', $$.getYAxisClipWidth.bind($$))
+            .attr('height', $$.getYAxisClipHeight.bind($$));
         $$.svg.select('.' + CLASS[_zoomRect])
             .attr('width', $$.width)
             .attr('height', $$.height);
@@ -2309,7 +2309,7 @@
     c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         var $$ = this, d3 = $$.d3, config = $$.config;
         eventRectEnter.append("rect")
-            .attr("class", generateCall($$.classEvent, $$))
+            .attr("class", $$.classEvent.bind($$))
             .style("cursor", config[__data_selection_enabled] && config[__data_selection_grouped] ? "pointer" : null)
             .on('mouseover', function (d) {
                 var index = d.index, selectedData, newData;
@@ -2983,17 +2983,19 @@
         return (id ? $$.main.selectAll('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS[_circle] + (isValue(i) ? '-' + i : ''));
     };
     c3_chart_internal_fn.expandCircles = function (i, id) {
-        var $$ = this;
+        var $$ = this,
+            r = $$.pointExpandedR.bind($$);
         $$.getCircles(i, id)
             .classed(CLASS[_EXPANDED], true)
-            .attr('r', generateCall($$.pointExpandedR, $$));
+            .attr('r', r);
     };
     c3_chart_internal_fn.unexpandCircles = function (i) {
-        var $$ = this;
+        var $$ = this,
+            r = $$.pointR.bind($$);
         $$.getCircles(i)
             .filter(function () { return $$.d3.select(this).classed(CLASS[_EXPANDED]); })
             .classed(CLASS[_EXPANDED], false)
-            .attr('r', generateCall($$.pointR, $$));
+            .attr('r', r);
     };
     c3_chart_internal_fn.pointR = function (d) {
         var $$ = this, config = $$.config;
@@ -3038,15 +3040,19 @@
 
     };
     c3_chart_internal_fn.redrawBar = function (durationForExit) {
-        var $$ = this, CLASS = $$.CLASS;
+        var $$ = this, CLASS = $$.CLASS,
+            barData = $$.barData.bind($$),
+            classBar = $$.classBar.bind($$),
+            initialOpacity = $$.initialOpacity.bind($$),
+            color = function (d) { return $$.color(d.id); };
         $$.mainBar = $$.main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
-            .data(generateCall($$.barData, $$));
+            .data(barData);
         $$.mainBar.enter().append('path')
-            .attr("class", generateCall($$.classBar, $$))
-            .style("stroke", function (d) { return $$.color(d.id); })
-            .style("fill", function (d) { return $$.color(d.id); });
+            .attr("class", classBar)
+            .style("stroke", color)
+            .style("fill", color);
         $$.mainBar
-            .style("opacity", generateCall($$.initialOpacity, $$));
+            .style("opacity", initialOpacity);
         $$.mainBar.exit().transition().duration(durationForExit)
             .style('opacity', 0)
             .remove();
@@ -3150,11 +3156,13 @@
             .attr('class', classTexts);
     };
     c3_chart_internal_fn.redrawText = function (durationForExit) {
-        var $$ = this, config = $$.config, CLASS = $$.CLASS;
+        var $$ = this, config = $$.config, CLASS = $$.CLASS,
+            barOrLineData = $$.barOrLineData.bind($$),
+            classText = $$.classText.bind($$);
         $$.mainText = $$.main.selectAll('.' + CLASS[_texts]).selectAll('.' + CLASS[_text])
-            .data(generateCall($$.barOrLineData, $$));
+            .data(barOrLineData);
         $$.mainText.enter().append('text')
-            .attr("class", generateCall($$.classText, $$))
+            .attr("class", classText)
             .attr('text-anchor', function (d) { return config[__axis_rotated] ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
             .style("stroke", 'none')
             .style("fill", function (d) { return $$.color(d); })
@@ -3167,12 +3175,13 @@
             .remove();
     };
     c3_chart_internal_fn.addTransitionForText = function (transitions, xForText, yForText, forFlow) {
-        var $$ = this;
+        var $$ = this,
+            opacityForText = forFlow ? 0 : $$.opacityForText.bind($$);
         transitions.push($$.mainText.transition()
                          .attr('x', xForText)
                          .attr('y', yForText)
                          .style("fill", $$.color)
-                         .style("fill-opacity", forFlow ? 0 : generateCall($$.opacityForText, $$)));
+                         .style("fill-opacity", opacityForText));
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
         var rect;
@@ -3408,7 +3417,7 @@
                 .attr('dy', -5)
                 .style("opacity", 0);
             // update
-            yv = generateCall($$.yv, $$);
+            yv = $$.yv.bind($$);
             $$.ygridLines.select('line')
               .transition().duration(duration)
                 .attr("x1", config[__axis_rotated] ? yv : 0)
@@ -3429,7 +3438,7 @@
         }
     };
     c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
-        var $$ = this, config = $$.config, xv = generateCall($$.xv, $$);
+        var $$ = this, config = $$.config, xv = $$.xv.bind($$);
         transitions.push($$.xgridLines.select('line').transition()
                          .attr("x1", config[__axis_rotated] ? 0 : xv)
                          .attr("x2", config[__axis_rotated] ? $$.width : xv)
@@ -3444,16 +3453,17 @@
     };
     c3_chart_internal_fn.showXGridFocus = function (selectedData) {
         var $$ = this, config = $$.config,
-            dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
+            dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
+            focusEl = $$.main.selectAll('line.' + CLASS[_xgridFocus]),
+            xx = $$.xx.bind($$);
         if (! config[__tooltip_show]) { return; }
         // Hide when scatter plot exists
         if ($$.hasType('scatter') || $$.hasArcType()) { return; }
-        var focusEl = $$.main.selectAll('line.' + CLASS[_xgridFocus]);
         focusEl
             .style("visibility", "visible")
             .data([dataToShow[0]])
-            .attr(config[__axis_rotated] ? 'y1' : 'x1', generateCall($$.xx, $$))
-            .attr(config[__axis_rotated] ? 'y2' : 'x2', generateCall($$.xx, $$));
+            .attr(config[__axis_rotated] ? 'y1' : 'x1', xx)
+            .attr(config[__axis_rotated] ? 'y2' : 'x2', xx);
         $$.smoothLines(focusEl, 'grid');
     };
     c3_chart_internal_fn.hideXGridFocus = function () {
@@ -3917,7 +3927,7 @@
         $$.axes.x.append("text")
             .attr("class", CLASS[_axisXLabel])
             .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
-            .style("text-anchor", generateCall($$.textAnchorForXAxisLabel, $$));
+            .style("text-anchor", $$.textAnchorForXAxisLabel.bind($$));
 
         $$.axes.y = main.append("g")
             .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
@@ -3927,7 +3937,7 @@
         $$.axes.y.append("text")
             .attr("class", CLASS[_axisYLabel])
             .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-            .style("text-anchor", generateCall($$.textAnchorForYAxisLabel, $$));
+            .style("text-anchor", $$.textAnchorForYAxisLabel.bind($$));
 
         $$.axes.y2 = main.append("g")
             .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
@@ -3937,7 +3947,7 @@
         $$.axes.y2.append("text")
             .attr("class", CLASS[_axisY2Label])
             .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-            .style("text-anchor", generateCall($$.textAnchorForY2AxisLabel, $$));
+            .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
     };
     c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
         var $$ = this, config = $$.config,
@@ -4174,20 +4184,20 @@
             axisYLabel = $$.main.select('.' + CLASS[_axisY] + ' .' + CLASS[_axisYLabel]),
             axisY2Label = $$.main.select('.' + CLASS[_axisY2] + ' .' + CLASS[_axisY2Label]);
         (withTransition ? axisXLabel.transition() : axisXLabel)
-            .attr("x", generateCall($$.xForXAxisLabel, $$))
-            .attr("dx", generateCall($$.dxForXAxisLabel, $$))
-            .attr("dy", generateCall($$.dyForXAxisLabel, $$))
-            .text(generateCall($$.textForXAxisLabel, $$));
+            .attr("x", $$.xForXAxisLabel.bind($$))
+            .attr("dx", $$.dxForXAxisLabel.bind($$))
+            .attr("dy", $$.dyForXAxisLabel.bind($$))
+            .text($$.textForXAxisLabel.bind($$));
         (withTransition ? axisYLabel.transition() : axisYLabel)
-            .attr("x", generateCall($$.xForYAxisLabel, $$))
-            .attr("dx", generateCall($$.dxForYAxisLabel, $$))
-            .attr("dy", generateCall($$.dyForYAxisLabel, $$))
-            .text(generateCall($$.textForYAxisLabel, $$));
+            .attr("x", $$.xForYAxisLabel.bind($$))
+            .attr("dx", $$.dxForYAxisLabel.bind($$))
+            .attr("dy", $$.dyForYAxisLabel.bind($$))
+            .text($$.textForYAxisLabel.bind($$));
         (withTransition ? axisY2Label.transition() : axisY2Label)
-            .attr("x", generateCall($$.xForY2AxisLabel, $$))
-            .attr("dx", generateCall($$.dxForY2AxisLabel, $$))
-            .attr("dy", generateCall($$.dyForY2AxisLabel, $$))
-            .text(generateCall($$.textForY2AxisLabel, $$));
+            .attr("x", $$.xForY2AxisLabel.bind($$))
+            .attr("dx", $$.dxForY2AxisLabel.bind($$))
+            .attr("dy", $$.dyForY2AxisLabel.bind($$))
+            .text($$.textForY2AxisLabel.bind($$));
     };
 
     c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, all) {
@@ -4491,14 +4501,17 @@
     };
 
     c3_chart_internal_fn.updateTargetsForArc = function (targets) {
-        var $$ = this, main = $$.main, mainPieUpdate, mainPieEnter;
+        var $$ = this, main = $$.main,
+            mainPieUpdate, mainPieEnter,
+            classChartArc = $$.classChartArc.bind($$),
+            classArcs = $$.classArcs.bind($$);
         mainPieUpdate = main.select('.' + CLASS[_chartArcs]).selectAll('.' + CLASS[_chartArc])
             .data($$.pie(targets))
-            .attr("class", generateCall($$.classChartArc, $$));
+            .attr("class", classChartArc);
         mainPieEnter = mainPieUpdate.enter().append("g")
-            .attr("class", generateCall($$.classChartArc, $$));
+            .attr("class", classChartArc);
         mainPieEnter.append('g')
-            .attr('class', generateCall($$.classArcs, $$));
+            .attr('class', classArcs);
         mainPieEnter.append("text")
             .attr("dy", $$.hasType('gauge') ? "-0.35em" : ".35em")
             .style("opacity", 0)
@@ -4523,9 +4536,9 @@
         var $$ = this, d3 = $$.d3, config = $$.config, main = $$.main,
             mainArc;
         mainArc = main.selectAll('.' + CLASS[_arcs]).selectAll('.' + CLASS[_arc])
-            .data(generateCall($$.arcData, $$));
+            .data($$.arcData.bind($$));
         mainArc.enter().append('path')
-            .attr("class", generateCall($$.classArc, $$))
+            .attr("class", $$.classArc.bind($$))
             .style("fill", function (d) { return $$.color(d.data); })
             .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; })
             .style("opacity", 0)
@@ -4612,8 +4625,8 @@
         main.selectAll('.' + CLASS[_chartArc]).select('text')
             .style("opacity", 0)
             .attr('class', function (d) { return $$.isGaugeType(d.data) ? CLASS[_gaugeValue] : ''; })
-            .text(generateCall($$.textForArcLabel, $$))
-            .attr("transform", generateCall($$.transformForArcLabel, $$))
+            .text($$.textForArcLabel.bind($$))
+            .attr("transform", $$.transformForArcLabel.bind($$))
             .transition().duration(duration)
             .style("opacity", function (d) { return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0; });
         main.select('.' + CLASS[_chartArcsTitle])
@@ -4667,7 +4680,7 @@
         $$.mainRegion = $$.main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
             .data(config[__regions]);
         $$.mainRegion.enter().append('g')
-            .attr('class', generateCall($$.classRegion, $$))
+            .attr('class', $$.classRegion.bind($$))
           .append('rect')
             .style("fill-opacity", 0);
         $$.mainRegion.exit().transition().duration(duration)
@@ -4675,12 +4688,16 @@
             .remove();
     };
     c3_chart_internal_fn.addTransitionForRegion = function (transitions) {
-        var $$ = this;
+        var $$ = this,
+            x = $$.regionX.bind($$),
+            y = $$.regionY.bind($$),
+            w = $$.regionWidth.bind($$),
+            h = $$.regionHeight.bind($$);
         transitions.push($$.mainRegion.selectAll('rect').transition()
-                         .attr("x", generateCall($$.regionX, $$))
-                         .attr("y", generateCall($$.regionY, $$))
-                         .attr("width", generateCall($$.regionWidth, $$))
-                         .attr("height", generateCall($$.regionHeight, $$))
+                         .attr("x", x)
+                         .attr("y", y)
+                         .attr("width", w)
+                         .attr("height", h)
                          .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
     };
     c3_chart_internal_fn.regionX = function (d) {
@@ -4814,9 +4831,9 @@
 
     c3_chart_internal_fn.selectPoint = function (target, d, i) {
         var $$ = this, config = $$.config,
-            cx = generateCall(config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
-            cy = generateCall(config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
-        
+            cx = (config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
+            cy = (config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$),
+            r = $$.pointSelectR.bind($$);
         config[__data_onselected].call($$.api, d, target.node());
         // add selected-circle on low layer g
         $$.main.select('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS[_selectedCircle] + '-' + i)
@@ -4828,7 +4845,7 @@
             .attr("stroke", function () { return $$.color(d); })
             .attr("r", function (d) { return $$.pointSelectR(d) * 1.4; })
             .transition().duration(100)
-            .attr("r", generateCall($$.pointSelectR, $$));
+            .attr("r", r);
     };
     c3_chart_internal_fn.unselectPoint = function (target, d, i) {
         var $$ = this;
@@ -4944,38 +4961,48 @@
     };
     c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         var $$ = this, context = $$.context, config = $$.config,
-            contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate;
+            contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate,
+            classChartBar = $$.classChartBar.bind($$),
+            classBars = $$.classBars.bind($$),
+            classChartLine = $$.classChartLine.bind($$),
+            classLines = $$.classLines.bind($$),
+            classAreas = $$.classAreas.bind($$);
 
         if (config[__subchart_show]) {
-
             contextBarUpdate = context.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
                 .data(targets)
-                .attr('class', generateCall($$.classChartBar, $$));
+                .attr('class', classChartBar);
             contextBarEnter = contextBarUpdate.enter().append('g')
                 .style('opacity', 0)
-                .attr('class', generateCall($$.classChartBar, $$));
+                .attr('class', classChartBar);
             // Bars for each data
             contextBarEnter.append('g')
-                .attr("class", generateCall($$.classBars, $$));
+                .attr("class", classBars);
 
             //-- Line --//
             contextLineUpdate = context.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
                 .data(targets)
-                .attr('class', generateCall($$.classChartLine, $$));
+                .attr('class', classChartLine);
             contextLineEnter = contextLineUpdate.enter().append('g')
                 .style('opacity', 0)
-                .attr('class', generateCall($$.classChartLine, $$));
+                .attr('class', classChartLine);
             // Lines for each data
             contextLineEnter.append("g")
-                .attr("class", generateCall($$.classLines, $$));
+                .attr("class", classLines);
             // Area
             contextLineEnter.append("g")
-                .attr("class", generateCall($$.classAreas, $$));
+                .attr("class", classAreas);
         }
     };
     c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
         var $$ = this, d3 = $$.d3, context = $$.context, config = $$.config,
-            contextLine,  contextArea, contextBar, drawAreaOnSub, drawBarOnSub, drawLineOnSub;
+            contextLine,  contextArea, contextBar, drawAreaOnSub, drawBarOnSub, drawLineOnSub,
+            barData = $$.barData.bind($$),
+            lineData = $$.lineData.bind($$),
+            classBar = $$.classBar.bind($$),
+            classLine = $$.classLine.bind($$),
+            classArea = $$.classArea.bind($$),
+            initialOpacity = $$.initialOpacity.bind($$);
 
         // subchart
         if (config[__subchart_show]) {
@@ -5001,13 +5028,13 @@
                 drawLineOnSub = $$.generateDrawLine(lineIndices, true);
                 // bars
                 contextBar = context.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
-                    .data(generateCall($$.barData, $$));
+                    .data(barData);
                 contextBar.enter().append('path')
-                    .attr("class", generateCall($$.classBar, $$))
+                    .attr("class", classBar)
                     .style("stroke", 'none')
                     .style("fill", $$.color);
                 contextBar
-                    .style("opacity", generateCall($$.initialOpacity, $$))
+                    .style("opacity", initialOpacity)
                     .transition().duration(duration)
                     .attr('d', drawBarOnSub)
                     .style('opacity', 1);
@@ -5016,12 +5043,12 @@
                     .remove();
                 // lines
                 contextLine = context.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
-                    .data(generateCall($$.lineData, $$));
+                    .data(lineData);
                 contextLine.enter().append('path')
-                    .attr('class', generateCall($$.classLine, $$))
+                    .attr('class', classLine)
                     .style('stroke', $$.color);
                 contextLine
-                    .style("opacity", generateCall($$.initialOpacity, $$))
+                    .style("opacity", initialOpacity)
                     .transition().duration(duration)
                     .attr("d", drawLineOnSub)
                     .style('opacity', 1);
@@ -5030,9 +5057,9 @@
                     .remove();
                 // area
                 contextArea = context.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
-                    .data(generateCall($$.lineData, $$));
+                    .data(lineData);
                 contextArea.enter().append('path')
-                    .attr("class", generateCall($$.classArea, $$))
+                    .attr("class", classArea)
                     .style("fill", $$.color)
                     .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
                 contextArea
@@ -5504,16 +5531,13 @@
                 items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
                 minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
             return {x: minX, y: minY, width: box.width, height: box.height};
-        },
-        generateCall = c3_chart_internal_fn.generateCall = function (f, context) {
-            return function (d, i) { return f.call(context, d, i); };
         };
 
     c3_chart_fn.focus = function (targetId) {
         var $$ = this.internal,
             candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-            candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-            candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+            candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+            candidatesForArc = candidates.filter($$.isArc.bind($$));
         function focus(targets) {
             $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
         }
@@ -5530,8 +5554,8 @@
     c3_chart_fn.defocus = function (targetId) {
         var $$ = this.internal,
             candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-            candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-            candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+            candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+            candidatesForArc = candidates.filter($$.isArc.bind($$));
         function defocus(targets) {
             $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 0.3);
         }
@@ -5547,8 +5571,8 @@
     c3_chart_fn.revert = function (targetId) {
         var $$ = this.internal,
             candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-            candidatesForNoneArc = candidates.filter(generateCall($$.isNoneArc, $$)),
-            candidatesForArc = candidates.filter(generateCall($$.isArc, $$));
+            candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
+            candidatesForArc = candidates.filter($$.isArc.bind($$));
         function revert(targets) {
             $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
         }

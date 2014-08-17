@@ -1,8 +1,8 @@
 c3_chart_internal_fn.selectPoint = function (target, d, i) {
     var $$ = this, config = $$.config,
-        cx = generateCall(config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
-        cy = generateCall(config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
-    
+        cx = (config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
+        cy = (config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$),
+        r = $$.pointSelectR.bind($$);
     config[__data_onselected].call($$.api, d, target.node());
     // add selected-circle on low layer g
     $$.main.select('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS[_selectedCircle] + '-' + i)
@@ -14,7 +14,7 @@ c3_chart_internal_fn.selectPoint = function (target, d, i) {
         .attr("stroke", function () { return $$.color(d); })
         .attr("r", function (d) { return $$.pointSelectR(d) * 1.4; })
         .transition().duration(100)
-        .attr("r", generateCall($$.pointSelectR, $$));
+        .attr("r", r);
 };
 c3_chart_internal_fn.unselectPoint = function (target, d, i) {
     var $$ = this;

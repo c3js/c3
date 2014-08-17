@@ -404,9 +404,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis, waitForDraw;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
-    var xv = generateCall($$.xv, $$),
-        cx = generateCall($$.config[__axis_rotated] ? $$.circleY : $$.circleX, $$),
-        cy = generateCall($$.config[__axis_rotated] ? $$.circleX : $$.circleY, $$);
+    var xv = $$.xv.bind($$),
+        cx = ($$.config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
+        cy = ($$.config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$);
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -536,7 +536,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // circles for select
     main.selectAll('.' + CLASS[_selectedCircles])
-        .filter(generateCall($$.isBarType, $$))
+        .filter($$.isBarType.bind($$))
         .selectAll('circle')
         .remove();
 
@@ -676,12 +676,12 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                 .attr('transform', null)
                 .attr('x', xForText)
                 .attr('y', yForText)
-                .style('fill-opacity', generateCall($$.opacityForText, $$));
+                .style('fill-opacity', $$.opacityForText.bind($$));
             mainRegion
                 .attr('transform', null);
             mainRegion.select('rect').filter($$.isRegionOnX)
-                .attr("x", generateCall($$.regionX, $$))
-                .attr("width", generateCall($$.regionWidth, $$));
+                .attr("x", $$.regionX.bind($$))
+                .attr("width", $$.regionWidth.bind($$));
             $$.updateEventRect();
 
             // callback for end of flow
@@ -831,15 +831,15 @@ c3_chart_internal_fn.updateSvgSize = function () {
         .attr('width', $$.width)
         .attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
-        .attr('x', generateCall($$.getXAxisClipX, $$))
-        .attr('y', generateCall($$.getXAxisClipY, $$))
-        .attr('width', generateCall($$.getXAxisClipWidth, $$))
-        .attr('height', generateCall($$.getXAxisClipHeight, $$));
+        .attr('x', $$.getXAxisClipX.bind($$))
+        .attr('y', $$.getXAxisClipY.bind($$))
+        .attr('width', $$.getXAxisClipWidth.bind($$))
+        .attr('height', $$.getXAxisClipHeight.bind($$));
     $$.svg.select('#' + $$.clipIdForYAxis).select('rect')
-        .attr('x', generateCall($$.getYAxisClipX, $$))
-        .attr('y', generateCall($$.getYAxisClipY, $$))
-        .attr('width', generateCall($$.getYAxisClipWidth, $$))
-        .attr('height', generateCall($$.getYAxisClipHeight, $$));
+        .attr('x', $$.getYAxisClipX.bind($$))
+        .attr('y', $$.getYAxisClipY.bind($$))
+        .attr('width', $$.getYAxisClipWidth.bind($$))
+        .attr('height', $$.getYAxisClipHeight.bind($$));
     $$.svg.select('.' + CLASS[_zoomRect])
         .attr('width', $$.width)
         .attr('height', $$.height);

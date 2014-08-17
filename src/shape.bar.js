@@ -22,15 +22,19 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
 
 };
 c3_chart_internal_fn.redrawBar = function (durationForExit) {
-    var $$ = this, CLASS = $$.CLASS;
+    var $$ = this, CLASS = $$.CLASS,
+        barData = $$.barData.bind($$),
+        classBar = $$.classBar.bind($$),
+        initialOpacity = $$.initialOpacity.bind($$),
+        color = function (d) { return $$.color(d.id); };
     $$.mainBar = $$.main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
-        .data(generateCall($$.barData, $$));
+        .data(barData);
     $$.mainBar.enter().append('path')
-        .attr("class", generateCall($$.classBar, $$))
-        .style("stroke", function (d) { return $$.color(d.id); })
-        .style("fill", function (d) { return $$.color(d.id); });
+        .attr("class", classBar)
+        .style("stroke", color)
+        .style("fill", color);
     $$.mainBar
-        .style("opacity", generateCall($$.initialOpacity, $$));
+        .style("opacity", initialOpacity);
     $$.mainBar.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();

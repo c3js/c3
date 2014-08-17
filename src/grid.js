@@ -109,7 +109,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
             .attr('dy', -5)
             .style("opacity", 0);
         // update
-        yv = generateCall($$.yv, $$);
+        yv = $$.yv.bind($$);
         $$.ygridLines.select('line')
           .transition().duration(duration)
             .attr("x1", config[__axis_rotated] ? yv : 0)
@@ -130,7 +130,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
     }
 };
 c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
-    var $$ = this, config = $$.config, xv = generateCall($$.xv, $$);
+    var $$ = this, config = $$.config, xv = $$.xv.bind($$);
     transitions.push($$.xgridLines.select('line').transition()
                      .attr("x1", config[__axis_rotated] ? 0 : xv)
                      .attr("x2", config[__axis_rotated] ? $$.width : xv)
@@ -145,16 +145,17 @@ c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
 };
 c3_chart_internal_fn.showXGridFocus = function (selectedData) {
     var $$ = this, config = $$.config,
-        dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
+        dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
+        focusEl = $$.main.selectAll('line.' + CLASS[_xgridFocus]),
+        xx = $$.xx.bind($$);
     if (! config[__tooltip_show]) { return; }
     // Hide when scatter plot exists
     if ($$.hasType('scatter') || $$.hasArcType()) { return; }
-    var focusEl = $$.main.selectAll('line.' + CLASS[_xgridFocus]);
     focusEl
         .style("visibility", "visible")
         .data([dataToShow[0]])
-        .attr(config[__axis_rotated] ? 'y1' : 'x1', generateCall($$.xx, $$))
-        .attr(config[__axis_rotated] ? 'y2' : 'x2', generateCall($$.xx, $$));
+        .attr(config[__axis_rotated] ? 'y1' : 'x1', xx)
+        .attr(config[__axis_rotated] ? 'y2' : 'x2', xx);
     $$.smoothLines(focusEl, 'grid');
 };
 c3_chart_internal_fn.hideXGridFocus = function () {

@@ -193,14 +193,17 @@ c3_chart_internal_fn.descByStartAngle = function (a, b) {
 };
 
 c3_chart_internal_fn.updateTargetsForArc = function (targets) {
-    var $$ = this, main = $$.main, mainPieUpdate, mainPieEnter;
+    var $$ = this, main = $$.main,
+        mainPieUpdate, mainPieEnter,
+        classChartArc = $$.classChartArc.bind($$),
+        classArcs = $$.classArcs.bind($$);
     mainPieUpdate = main.select('.' + CLASS[_chartArcs]).selectAll('.' + CLASS[_chartArc])
         .data($$.pie(targets))
-        .attr("class", generateCall($$.classChartArc, $$));
+        .attr("class", classChartArc);
     mainPieEnter = mainPieUpdate.enter().append("g")
-        .attr("class", generateCall($$.classChartArc, $$));
+        .attr("class", classChartArc);
     mainPieEnter.append('g')
-        .attr('class', generateCall($$.classArcs, $$));
+        .attr('class', classArcs);
     mainPieEnter.append("text")
         .attr("dy", $$.hasType('gauge') ? "-0.35em" : ".35em")
         .style("opacity", 0)
@@ -225,9 +228,9 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     var $$ = this, d3 = $$.d3, config = $$.config, main = $$.main,
         mainArc;
     mainArc = main.selectAll('.' + CLASS[_arcs]).selectAll('.' + CLASS[_arc])
-        .data(generateCall($$.arcData, $$));
+        .data($$.arcData.bind($$));
     mainArc.enter().append('path')
-        .attr("class", generateCall($$.classArc, $$))
+        .attr("class", $$.classArc.bind($$))
         .style("fill", function (d) { return $$.color(d.data); })
         .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; })
         .style("opacity", 0)
@@ -314,8 +317,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     main.selectAll('.' + CLASS[_chartArc]).select('text')
         .style("opacity", 0)
         .attr('class', function (d) { return $$.isGaugeType(d.data) ? CLASS[_gaugeValue] : ''; })
-        .text(generateCall($$.textForArcLabel, $$))
-        .attr("transform", generateCall($$.transformForArcLabel, $$))
+        .text($$.textForArcLabel.bind($$))
+        .attr("transform", $$.transformForArcLabel.bind($$))
         .transition().duration(duration)
         .style("opacity", function (d) { return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0; });
     main.select('.' + CLASS[_chartArcsTitle])

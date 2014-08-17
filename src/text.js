@@ -19,11 +19,13 @@ c3_chart_internal_fn.updateTargetsForText = function (targets) {
         .attr('class', classTexts);
 };
 c3_chart_internal_fn.redrawText = function (durationForExit) {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS;
+    var $$ = this, config = $$.config, CLASS = $$.CLASS,
+        barOrLineData = $$.barOrLineData.bind($$),
+        classText = $$.classText.bind($$);
     $$.mainText = $$.main.selectAll('.' + CLASS[_texts]).selectAll('.' + CLASS[_text])
-        .data(generateCall($$.barOrLineData, $$));
+        .data(barOrLineData);
     $$.mainText.enter().append('text')
-        .attr("class", generateCall($$.classText, $$))
+        .attr("class", classText)
         .attr('text-anchor', function (d) { return config[__axis_rotated] ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
         .style("stroke", 'none')
         .style("fill", function (d) { return $$.color(d); })
@@ -36,12 +38,13 @@ c3_chart_internal_fn.redrawText = function (durationForExit) {
         .remove();
 };
 c3_chart_internal_fn.addTransitionForText = function (transitions, xForText, yForText, forFlow) {
-    var $$ = this;
+    var $$ = this,
+        opacityForText = forFlow ? 0 : $$.opacityForText.bind($$);
     transitions.push($$.mainText.transition()
                      .attr('x', xForText)
                      .attr('y', yForText)
                      .style("fill", $$.color)
-                     .style("fill-opacity", forFlow ? 0 : generateCall($$.opacityForText, $$)));
+                     .style("fill-opacity", opacityForText));
 };
 c3_chart_internal_fn.getTextRect = function (text, cls) {
     var rect;
