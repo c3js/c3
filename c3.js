@@ -5987,6 +5987,7 @@
         $$.redraw({withLegend: true});
         return config[__data_colors];
     };
+
     c3_chart_fn.category = function (i, category) {
         var $$ = this.internal, config = $$.config;
         if (arguments.length > 1) {
@@ -6025,7 +6026,6 @@
         }
         return $$.data.xs;
     };
-
 
     c3_chart_fn.axis = function () {};
     c3_chart_fn.axis.labels = function (labels) {
@@ -6070,7 +6070,6 @@
             if (isDefined(range.min)) { this.axis.min(range.min); }
         }
     };
-
 
     c3_chart_fn.legend = function () {};
     c3_chart_fn.legend.show = function (targetIds) {
