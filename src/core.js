@@ -318,36 +318,39 @@ c3_chart_internal_fn.updateSizes = function () {
     $$.currentWidth = $$.getCurrentWidth();
     $$.currentHeight = $$.getCurrentHeight();
 
-    // for main, context
-    if (config[__axis_rotated]) {
-        $$.margin = {
-            top: $$.getHorizontalAxisHeight('y2') + $$.getCurrentPaddingTop(),
-            right: hasArc ? 0 : $$.getCurrentPaddingRight(),
-            bottom: $$.getHorizontalAxisHeight('y') + legendHeightForBottom + $$.getCurrentPaddingBottom(),
-            left: subchartHeight + (hasArc ? 0 : $$.getCurrentPaddingLeft())
-        };
-        $$.margin2 = {
-            top: $$.margin.top,
-            right: NaN,
-            bottom: 20 + legendHeightForBottom,
-            left: $$.rotated_padding_left
-        };
-    } else {
-        $$.margin = {
-            top: 4 + $$.getCurrentPaddingTop(), // for top tick text
-            right: hasArc ? 0 : $$.getCurrentPaddingRight(),
-            bottom: xAxisHeight + subchartHeight + legendHeightForBottom + $$.getCurrentPaddingBottom(),
-            left: hasArc ? 0 : $$.getCurrentPaddingLeft()
-        };
-        $$.margin2 = {
-            top: $$.currentHeight - subchartHeight - legendHeightForBottom,
-            right: NaN,
-            bottom: xAxisHeight + legendHeightForBottom,
-            left: $$.margin.left
-        };
-    }
+    // for main
+    $$.margin = config[__axis_rotated] ? {
+        top: $$.getHorizontalAxisHeight('y2') + $$.getCurrentPaddingTop(),
+        right: hasArc ? 0 : $$.getCurrentPaddingRight(),
+        bottom: $$.getHorizontalAxisHeight('y') + legendHeightForBottom + $$.getCurrentPaddingBottom(),
+        left: subchartHeight + (hasArc ? 0 : $$.getCurrentPaddingLeft())
+    } : {
+        top: 4 + $$.getCurrentPaddingTop(), // for top tick text
+        right: hasArc ? 0 : $$.getCurrentPaddingRight(),
+        bottom: xAxisHeight + subchartHeight + legendHeightForBottom + $$.getCurrentPaddingBottom(),
+        left: hasArc ? 0 : $$.getCurrentPaddingLeft()
+    };
+
+    // for subchart
+    $$.margin2 = config[__axis_rotated] ? {
+        top: $$.margin.top,
+        right: NaN,
+        bottom: 20 + legendHeightForBottom,
+        left: $$.rotated_padding_left
+    } : {
+        top: $$.currentHeight - subchartHeight - legendHeightForBottom,
+        right: NaN,
+        bottom: xAxisHeight + legendHeightForBottom,
+        left: $$.margin.left
+    };
 
     // for legend
+    $$.margin3 = {
+        top: 0,
+        right: NaN,
+        bottom: 0,
+        left: 0
+    };
     if ($$.updateSizeForLegend) { $$.updateSizeForLegend(legendHeight, legendWidth); }
 
     $$.width = $$.currentWidth - $$.margin.left - $$.margin.right;
