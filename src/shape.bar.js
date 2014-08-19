@@ -18,7 +18,7 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
     // Bars for each data
     mainBarEnter.append('g')
         .attr("class", classBars)
-        .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+        .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; });
 
 };
 c3_chart_internal_fn.redrawBar = function (durationForExit) {
@@ -48,8 +48,8 @@ c3_chart_internal_fn.addTransitionForBar = function (transitions, drawBar) {
 };
 c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
     var $$ = this, config = $$.config,
-        w = typeof config[__bar_width] === 'number' ? config[__bar_width] : barTargetsNum ? (axis.tickOffset() * 2 * config[__bar_width_ratio]) / barTargetsNum : 0;
-    return config[__bar_width_max] && w > config[__bar_width_max] ? config[__bar_width_max] : w;
+        w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * config.bar_width_ratio) / barTargetsNum : 0;
+    return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
 };
 c3_chart_internal_fn.getBars = function (i) {
     var $$ = this;
@@ -71,8 +71,8 @@ c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
         var points = getPoints(d, i);
 
         // switch points if axis is rotated, not applicable for sub chart
-        var indexX = config[__axis_rotated] ? 1 : 0;
-        var indexY = config[__axis_rotated] ? 0 : 1;
+        var indexX = config.axis_rotated ? 1 : 0;
+        var indexY = config.axis_rotated ? 0 : 1;
 
         var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
                 'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
@@ -96,7 +96,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
             offset = barOffset(d, i) || y0, // offset is for stacked bar chart
             posX = barX(d), posY = barY(d);
         // fix posY not to overflow opposite quadrant
-        if ($$.config[__axis_rotated]) {
+        if ($$.config.axis_rotated) {
             if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
         }
         // 4 points that make a bar

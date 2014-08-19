@@ -11,19 +11,19 @@ c3_chart_internal_fn.getAxisClipY = function (forHorizontal) {
 };
 c3_chart_internal_fn.getXAxisClipX = function () {
     var $$ = this;
-    return $$.getAxisClipX(!$$.config[__axis_rotated]);
+    return $$.getAxisClipX(!$$.config.axis_rotated);
 };
 c3_chart_internal_fn.getXAxisClipY = function () {
     var $$ = this;
-    return $$.getAxisClipY(!$$.config[__axis_rotated]);
+    return $$.getAxisClipY(!$$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipX = function () {
     var $$ = this;
-    return $$.getAxisClipX($$.config[__axis_rotated]);
+    return $$.getAxisClipX($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipY = function () {
     var $$ = this;
-    return $$.getAxisClipY($$.config[__axis_rotated]);
+    return $$.getAxisClipY($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getAxisClipWidth = function (forHorizontal) {
     var $$ = this;
@@ -32,21 +32,21 @@ c3_chart_internal_fn.getAxisClipWidth = function (forHorizontal) {
 };
 c3_chart_internal_fn.getAxisClipHeight = function (forHorizontal) {
     var $$ = this, config = $$.config;
-    return forHorizontal ? (config[__axis_x_height] ? config[__axis_x_height] : 0) + 80 : $$.height + 8;
+    return forHorizontal ? (config.axis_x_height ? config.axis_x_height : 0) + 80 : $$.height + 8;
 };
 c3_chart_internal_fn.getXAxisClipWidth = function () {
     var $$ = this;
-    return $$.getAxisClipWidth(!$$.config[__axis_rotated]);
+    return $$.getAxisClipWidth(!$$.config.axis_rotated);
 };
 c3_chart_internal_fn.getXAxisClipHeight = function () {
     var $$ = this;
-    return $$.getAxisClipHeight(!$$.config[__axis_rotated]);
+    return $$.getAxisClipHeight(!$$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipWidth = function () {
     var $$ = this;
-    return $$.getAxisClipWidth($$.config[__axis_rotated]);
+    return $$.getAxisClipWidth($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipHeight = function () {
     var $$ = this;
-    return $$.getAxisClipHeight($$.config[__axis_rotated]);
+    return $$.getAxisClipHeight($$.config.axis_rotated);
 };

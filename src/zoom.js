@@ -6,10 +6,10 @@ c3_chart_internal_fn.initZoom = function () {
         })
         .on("zoom", function () { $$.redrawForZoom.call($$); });
     $$.zoom.scale = function (scale) {
-        return config[__axis_rotated] ? this.y(scale) : this.x(scale);
+        return config.axis_rotated ? this.y(scale) : this.x(scale);
     };
     $$.zoom.orgScaleExtent = function () {
-        var extent = config[__zoom_extent] ? config[__zoom_extent] : [1, 10];
+        var extent = config.zoom_extent ? config.zoom_extent : [1, 10];
         return [extent[0], Math.max($$.getMaxDataCount() / extent[1], extent[1])];
     };
     $$.zoom.updateScaleExtent = function () {
@@ -20,13 +20,13 @@ c3_chart_internal_fn.initZoom = function () {
     };
 };
 c3_chart_internal_fn.updateZoom = function () {
-    var $$ = this, z = $$.config[__zoom_enabled] ? $$.zoom : function () {};
+    var $$ = this, z = $$.config.zoom_enabled ? $$.zoom : function () {};
     $$.main.select('.' + $$.CLASS[_zoomRect]).call(z);
     $$.main.selectAll('.' + $$.CLASS[_eventRect]).call(z);
 };
 c3_chart_internal_fn.redrawForZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x, orgXDomain = $$.orgXDomain;
-    if (!config[__zoom_enabled]) {
+    if (!config.zoom_enabled) {
         return;
     }
     if ($$.filterTargetsToShow($$.data.targets).length === 0) {
@@ -48,5 +48,5 @@ c3_chart_internal_fn.redrawForZoom = function () {
     if (d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
-    config[__zoom_onzoom].call($$.api, x.orgDomain());
+    config.zoom_onzoom.call($$.api, x.orgDomain());
 };

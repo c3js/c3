@@ -7,12 +7,12 @@ c3_chart_fn.load = function (args) {
     // update classes if exists
     if ('classes' in args) {
         Object.keys(args.classes).forEach(function (id) {
-            config[__data_classes][id] = args.classes[id];
+            config.data_classes[id] = args.classes[id];
         });
     }
     // update categories if exists
     if ('categories' in args && $$.isCategorized()) {
-        config[__axis_x_categories] = args.categories;
+        config.axis_x_categories = args.categories;
     }
     // use cache if exists
     if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {

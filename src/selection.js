@@ -1,9 +1,9 @@
 c3_chart_internal_fn.selectPoint = function (target, d, i) {
     var $$ = this, config = $$.config,
-        cx = (config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
-        cy = (config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$),
+        cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
+        cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
         r = $$.pointSelectR.bind($$);
-    config[__data_onselected].call($$.api, d, target.node());
+    config.data_onselected.call($$.api, d, target.node());
     // add selected-circle on low layer g
     $$.main.select('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS[_selectedCircle] + '-' + i)
         .data([d])
@@ -18,7 +18,7 @@ c3_chart_internal_fn.selectPoint = function (target, d, i) {
 };
 c3_chart_internal_fn.unselectPoint = function (target, d, i) {
     var $$ = this;
-    $$.config[__data_onunselected](d, target.node());
+    $$.config.data_onunselected(d, target.node());
     // remove selected-circle from low layer g
     $$.main.select('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS[_selectedCircle] + '-' + i)
         .transition().duration(100).attr('r', 0)
@@ -29,13 +29,13 @@ c3_chart_internal_fn.togglePoint = function (selected, target, d, i) {
 };
 c3_chart_internal_fn.selectBar = function (target, d) {
     var $$ = this;
-    $$.config[__data_onselected].call($$, d, target.node());
+    $$.config.data_onselected.call($$, d, target.node());
     target.transition().duration(100)
         .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
 };
 c3_chart_internal_fn.unselectBar = function (target, d) {
     var $$ = this;
-    $$.config[__data_onunselected].call($$, d, target.node());
+    $$.config.data_onunselected.call($$, d, target.node());
     target.transition().duration(100)
         .style("fill", function () { return $$.color(d); });
 };
@@ -66,10 +66,10 @@ c3_chart_internal_fn.toggleShape = function (that, d, i) {
             toggle = $$.toggleArc;
         }
     }
-    if (config[__data_selection_grouped] || isWithin) {
-        if (config[__data_selection_enabled] && config[__data_selection_isselectable](d)) {
-            if (!config[__data_selection_multiple]) {
-                $$.main.selectAll('.' + CLASS[_shapes] + (config[__data_selection_grouped] ? $$.getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS[_shape]).each(function (d, i) {
+    if (config.data_selection_grouped || isWithin) {
+        if (config.data_selection_enabled && config.data_selection_isselectable(d)) {
+            if (!config.data_selection_multiple) {
+                $$.main.selectAll('.' + CLASS[_shapes] + (config.data_selection_grouped ? $$.getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS[_shape]).each(function (d, i) {
                     var shape = d3.select(this);
                     if (shape.classed(CLASS[_SELECTED])) { toggle.call($$, false, shape.classed(CLASS[_SELECTED], false), d, i); }
                 });
@@ -77,6 +77,6 @@ c3_chart_internal_fn.toggleShape = function (that, d, i) {
             shape.classed(CLASS[_SELECTED], !isSelected);
             toggle.call($$, !isSelected, shape, d, i);
         }
-        $$.config[__data_onclick].call($$.api, d, that);
+        $$.config.data_onclick.call($$.api, d, that);
     }
 };

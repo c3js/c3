@@ -1,13 +1,13 @@
 c3_chart_internal_fn.isX = function (key) {
     var $$ = this, config = $$.config;
-    return (config[__data_x] && key === config[__data_x]) || (notEmpty(config[__data_xs]) && hasValue(config[__data_xs], key));
+    return (config.data_x && key === config.data_x) || (notEmpty(config.data_xs) && hasValue(config.data_xs, key));
 };
 c3_chart_internal_fn.isNotX = function (key) {
     return !this.isX(key);
 };
 c3_chart_internal_fn.getXKey = function (id) {
     var $$ = this, config = $$.config;
-    return config[__data_x] ? config[__data_x] : notEmpty(config[__data_xs]) ? config[__data_xs][id] : null;
+    return config.data_x ? config.data_x : notEmpty(config.data_xs) ? config.data_xs[id] : null;
 };
 c3_chart_internal_fn.getXValuesOfXKey = function (key, targets) {
     var $$ = this,
@@ -35,7 +35,7 @@ c3_chart_internal_fn.getOtherTargetX = function (index) {
 c3_chart_internal_fn.addXs = function (xs) {
     var $$ = this;
     Object.keys(xs).forEach(function (id) {
-        $$.config[__data_xs][id] = xs[id];
+        $$.config.data_xs[id] = xs[id];
     });
 };
 c3_chart_internal_fn.hasMultipleX = function (xs) {
@@ -43,12 +43,12 @@ c3_chart_internal_fn.hasMultipleX = function (xs) {
 };
 c3_chart_internal_fn.isMultipleX = function () {
     var $$ = this, config = $$.config;
-    return notEmpty(config[__data_xs]) && $$.hasMultipleX(config[__data_xs]);
+    return notEmpty(config.data_xs) && $$.hasMultipleX(config.data_xs);
 };
 c3_chart_internal_fn.addName = function (data) {
     var $$ = this, name;
     if (data) {
-        name = $$.config[__data_names][data.id];
+        name = $$.config.data_names[data.id];
         data.name = name ? name : data.id;
     }
     return data;
@@ -203,11 +203,11 @@ c3_chart_internal_fn.hasPositiveValueInTargets = function (targets) {
 };
 c3_chart_internal_fn.isOrderDesc = function () {
     var config = this.config;
-    return config[__data_order] && config[__data_order].toLowerCase() === 'desc';
+    return config.data_order && config.data_order.toLowerCase() === 'desc';
 };
 c3_chart_internal_fn.isOrderAsc = function () {
     var config = this.config;
-    return config[__data_order] && config[__data_order].toLowerCase() === 'asc';
+    return config.data_order && config.data_order.toLowerCase() === 'asc';
 };
 c3_chart_internal_fn.orderTargets = function (targets) {
     var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
@@ -218,8 +218,8 @@ c3_chart_internal_fn.orderTargets = function (targets) {
                 t2Sum = t2.values.reduce(reducer, 0);
             return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
         });
-    } else if (isFunction(config[__data_order])) {
-        targets.sort(config[__data_order]);
+    } else if (isFunction(config.data_order)) {
+        targets.sort(config.data_order);
     } // TODO: accept name array for order
     return targets;
 };
@@ -231,9 +231,9 @@ c3_chart_internal_fn.filterRemoveNull = function (data) {
 };
 c3_chart_internal_fn.hasDataLabel = function () {
     var config = this.config;
-    if (typeof config[__data_labels] === 'boolean' && config[__data_labels]) {
+    if (typeof config.data_labels === 'boolean' && config.data_labels) {
         return true;
-    } else if (typeof config[__data_labels] === 'object' && notEmpty(config[__data_labels])) {
+    } else if (typeof config.data_labels === 'object' && notEmpty(config.data_labels)) {
         return true;
     }
     return false;
@@ -276,7 +276,7 @@ c3_chart_internal_fn.findClosestOfValues = function (values, pos, _min, _max) { 
         max = _max ? _max : values.length - 1,
         med = Math.floor((max - min) / 2) + min,
         value = values[med],
-        diff = $$.x(value.x) - pos[$$.config[__axis_rotated] ? 1 : 0],
+        diff = $$.x(value.x) - pos[$$.config.axis_rotated ? 1 : 0],
         candidates;
 
     // Update range for search
@@ -325,7 +325,7 @@ c3_chart_internal_fn.findClosest = function (values, pos) {
 c3_chart_internal_fn.dist = function (data, pos) {
     var $$ = this, config = $$.config,
         yScale = $$.getAxisId(data.id) === 'y' ? $$.y : $$.y2,
-        xIndex = config[__axis_rotated] ? 1 : 0,
-        yIndex = config[__axis_rotated] ? 0 : 1;
+        xIndex = config.axis_rotated ? 1 : 0,
+        yIndex = config.axis_rotated ? 0 : 1;
     return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
 };

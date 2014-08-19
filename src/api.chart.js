@@ -1,7 +1,7 @@
 c3_chart_fn.resize = function (size) {
     var $$ = this.internal, config = $$.config;
-    config[__size_width] = size ? size.width : null;
-    config[__size_height] = size ? size.height : null;
+    config.size_width = size ? size.width : null;
+    config.size_height = size ? size.height : null;
     this.flush();
 };
 

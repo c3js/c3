@@ -2,11 +2,11 @@ c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
     var $$ = this, config = $$.config,
         indices = {}, i = 0, j, k;
     $$.filterTargetsToShow($$.data.targets.filter(typeFilter, $$)).forEach(function (d) {
-        for (j = 0; j < config[__data_groups].length; j++) {
-            if (config[__data_groups][j].indexOf(d.id) < 0) { continue; }
-            for (k = 0; k < config[__data_groups][j].length; k++) {
-                if (config[__data_groups][j][k] in indices) {
-                    indices[d.id] = indices[config[__data_groups][j][k]];
+        for (j = 0; j < config.data_groups.length; j++) {
+            if (config.data_groups[j].indexOf(d.id) < 0) { continue; }
+            for (k = 0; k < config.data_groups[j].length; k++) {
+                if (config.data_groups[j][k] in indices) {
+                    indices[d.id] = indices[config.data_groups[j][k]];
                     break;
                 }
             }

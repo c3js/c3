@@ -47,17 +47,17 @@ c3_chart_internal_fn.init = function () {
 
     $$.initParams();
 
-    if (config[__data_url]) {
-        $$.convertUrlToData(config[__data_url], config[__data_mimeType], config[__data_keys], $$.initWithData);
+    if (config.data_url) {
+        $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_keys, $$.initWithData);
     }
-    else if (config[__data_json]) {
-        $$.initWithData($$.convertJsonToData(config[__data_json], config[__data_keys]));
+    else if (config.data_json) {
+        $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));
     }
-    else if (config[__data_rows]) {
-        $$.initWithData($$.convertRowsToData(config[__data_rows]));
+    else if (config.data_rows) {
+        $$.initWithData($$.convertRowsToData(config.data_rows));
     }
-    else if (config[__data_columns]) {
-        $$.initWithData($$.convertColumnsToData(config[__data_columns]));
+    else if (config.data_columns) {
+        $$.initWithData($$.convertColumnsToData(config.data_columns));
     }
     else {
         throw Error('url or json or rows or columns is required.');
@@ -84,8 +84,8 @@ c3_chart_internal_fn.initParams = function () {
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
 
-    $$.dataTimeFormat = config[__data_xLocaltime] ? d3.time.format : d3.time.format.utc;
-    $$.axisTimeFormat = config[__axis_x_localtime] ? d3.time.format : d3.time.format.utc;
+    $$.dataTimeFormat = config.data_xLocaltime ? d3.time.format : d3.time.format.utc;
+    $$.axisTimeFormat = config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
     $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
         [".%L", function (d) { return d.getMilliseconds(); }],
         [":%S", function (d) { return d.getSeconds(); }],
@@ -100,15 +100,15 @@ c3_chart_internal_fn.initParams = function () {
     $$.hiddenTargetIds = [];
     $$.hiddenLegendIds = [];
 
-    $$.xOrient = config[__axis_rotated] ? "left" : "bottom";
-    $$.yOrient = config[__axis_rotated] ? "bottom" : "left";
-    $$.y2Orient = config[__axis_rotated] ? "top" : "right";
-    $$.subXOrient = config[__axis_rotated] ? "left" : "bottom";
+    $$.xOrient = config.axis_rotated ? "left" : "bottom";
+    $$.yOrient = config.axis_rotated ? "bottom" : "left";
+    $$.y2Orient = config.axis_rotated ? "top" : "right";
+    $$.subXOrient = config.axis_rotated ? "left" : "bottom";
 
-    $$.isLegendRight = config[__legend_position] === 'right';
-    $$.isLegendInset = config[__legend_position] === 'inset';
-    $$.isLegendTop = config[__legend_inset_anchor] === 'top-left' || config[__legend_inset_anchor] === 'top-right';
-    $$.isLegendLeft = config[__legend_inset_anchor] === 'top-left' || config[__legend_inset_anchor] === 'bottom-left';
+    $$.isLegendRight = config.legend_position === 'right';
+    $$.isLegendInset = config.legend_position === 'inset';
+    $$.isLegendTop = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'top-right';
+    $$.isLegendLeft = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'bottom-left';
     $$.legendStep = 0;
     $$.legendItemWidth = 0;
     $$.legendItemHeight = 0;
@@ -117,7 +117,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.currentMaxTickWidth = 0;
 
     $$.rotated_padding_left = 30;
-    $$.rotated_padding_right = config[__axis_rotated] && !config[__axis_x_show] ? 0 : 30;
+    $$.rotated_padding_right = config.axis_rotated && !config.axis_x_show ? 0 : 30;
     $$.rotated_padding_top = 5;
 
     $$.withoutFadeIn = {};
@@ -133,7 +133,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     if ($$.initBrush) { $$.initBrush(); }
     if ($$.initZoom) { $$.initZoom(); }
 
-    $$.selectChart = d3.select(config[__bindto]);
+    $$.selectChart = d3.select(config.bindto);
     if ($$.selectChart.empty()) {
         $$.selectChart = d3.select(document.createElement('div')).style('opacity', 0);
         $$.observeInserted($$.selectChart);
@@ -145,18 +145,18 @@ c3_chart_internal_fn.initWithData = function (data) {
     $$.data.xs = {};
     $$.data.targets = $$.convertDataToTargets(data);
 
-    if (config[__data_filter]) {
-        $$.data.targets = $$.data.targets.filter(config[__data_filter]);
+    if (config.data_filter) {
+        $$.data.targets = $$.data.targets.filter(config.data_filter);
     }
 
     // Set targets to hide if needed
-    if (config[__data_hide]) {
-        $$.addHiddenTargetIds(config[__data_hide] === true ? $$.mapToIds($$.data.targets) : config[__data_hide]);
+    if (config.data_hide) {
+        $$.addHiddenTargetIds(config.data_hide === true ? $$.mapToIds($$.data.targets) : config.data_hide);
     }
 
     // when gauge, hide legend // TODO: fix
     if ($$.hasType('gauge')) {
-        config[__legend_show] = false;
+        config.legend_show = false;
     }
 
     // Init sizes and scales
@@ -176,15 +176,15 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Set initialized scales to brush and zoom
     if ($$.brush) { $$.brush.scale($$.subX); }
-    if (config[__zoom_enabled]) { $$.zoom.scale($$.x); }
+    if (config.zoom_enabled) { $$.zoom.scale($$.x); }
 
     /*-- Basic Elements --*/
 
     // Define svgs
     $$.svg = $$.selectChart.append("svg")
         .style("overflow", "hidden")
-        .on('mouseenter', function () { return config[__onmouseover].call($$); })
-        .on('mouseleave', function () { return config[__onmouseout].call($$); });
+        .on('mouseenter', function () { return config.onmouseover.call($$); })
+        .on('mouseleave', function () { return config.onmouseout.call($$); });
 
     // Define defs
     $$.defs = $$.svg.append("defs");
@@ -237,7 +237,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // if zoom privileged, insert rect to forefront
     // TODO: is this needed?
-    main.insert('rect', config[__zoom_privileged] ? null : 'g.' + CLASS[_regions])
+    main.insert('rect', config.zoom_privileged ? null : 'g.' + CLASS[_regions])
         .attr('class', CLASS[_zoomRect])
         .attr('width', $$.width)
         .attr('height', $$.height)
@@ -245,8 +245,8 @@ c3_chart_internal_fn.initWithData = function (data) {
         .on("dblclick.zoom", null);
 
     // Set default extent if defined
-    if (config[__axis_x_default]) {
-        $$.brush.extent(isFunction(config[__axis_x_default]) ? config[__axis_x_default]($$.getXDomain()) : config[__axis_x_default]);
+    if (config.axis_x_default) {
+        $$.brush.extent(isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain()) : config.axis_x_default);
     }
 
     // Add Axis
@@ -272,13 +272,13 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
     if (window.onresize.add) {
         window.onresize.add(function () {
-            config[__onresize].call($$);
+            config.onresize.call($$);
         });
         window.onresize.add(function () {
             $$.api.flush();
         });
         window.onresize.add(function () {
-            config[__onresized].call($$);
+            config.onresized.call($$);
         });
     }
 
@@ -312,14 +312,14 @@ c3_chart_internal_fn.updateSizes = function () {
         legendWidth = $$.legend ? $$.getLegendWidth() : 0,
         legendHeightForBottom = $$.isLegendRight || $$.isLegendInset ? 0 : legendHeight,
         hasArc = $$.hasArcType(),
-        xAxisHeight = config[__axis_rotated] || hasArc ? 0 : $$.getHorizontalAxisHeight('x'),
-        subchartHeight = config[__subchart_show] && !hasArc ? (config[__subchart_size_height] + xAxisHeight) : 0;
+        xAxisHeight = config.axis_rotated || hasArc ? 0 : $$.getHorizontalAxisHeight('x'),
+        subchartHeight = config.subchart_show && !hasArc ? (config.subchart_size_height + xAxisHeight) : 0;
 
     $$.currentWidth = $$.getCurrentWidth();
     $$.currentHeight = $$.getCurrentHeight();
 
     // for main
-    $$.margin = config[__axis_rotated] ? {
+    $$.margin = config.axis_rotated ? {
         top: $$.getHorizontalAxisHeight('y2') + $$.getCurrentPaddingTop(),
         right: hasArc ? 0 : $$.getCurrentPaddingRight(),
         bottom: $$.getHorizontalAxisHeight('y') + legendHeightForBottom + $$.getCurrentPaddingBottom(),
@@ -332,7 +332,7 @@ c3_chart_internal_fn.updateSizes = function () {
     };
 
     // for subchart
-    $$.margin2 = config[__axis_rotated] ? {
+    $$.margin2 = config.axis_rotated ? {
         top: $$.margin.top,
         right: NaN,
         bottom: 20 + legendHeightForBottom,
@@ -358,8 +358,8 @@ c3_chart_internal_fn.updateSizes = function () {
     if ($$.width < 0) { $$.width = 0; }
     if ($$.height < 0) { $$.height = 0; }
 
-    $$.width2 = config[__axis_rotated] ? $$.margin.left - $$.rotated_padding_left - $$.rotated_padding_right : $$.width;
-    $$.height2 = config[__axis_rotated] ? $$.height : $$.currentHeight - $$.margin2.top - $$.margin2.bottom;
+    $$.width2 = config.axis_rotated ? $$.margin.left - $$.rotated_padding_left - $$.rotated_padding_right : $$.width;
+    $$.height2 = config.axis_rotated ? $$.height : $$.currentHeight - $$.margin2.top - $$.margin2.bottom;
     if ($$.width2 < 0) { $$.width2 = 0; }
     if ($$.height2 < 0) { $$.height2 = 0; }
 
@@ -395,7 +395,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
     // Fade-in each chart
     $$.svg.selectAll('.' + CLASS[_target]).filter(function (d) { return $$.isTargetToShow(d.id); })
-      .transition().duration(config[__transition_duration])
+      .transition().duration(config.transition_duration)
         .style("opacity", 1);
 };
 
@@ -409,8 +409,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var waitForDraw, flow;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
     var xv = $$.xv.bind($$),
-        cx = ($$.config[__axis_rotated] ? $$.circleY : $$.circleX).bind($$),
-        cy = ($$.config[__axis_rotated] ? $$.circleX : $$.circleY).bind($$);
+        cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
+        cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -423,14 +423,14 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
     withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
 
-    duration = withTransition ? config[__transition_duration] : 0;
+    duration = withTransition ? config.transition_duration : 0;
     durationForExit = withTransitionForExit ? duration : 0;
     durationForAxis = withTransitionForAxis ? duration : 0;
 
     transitions = transitions || $$.generateAxisTransitions(durationForAxis);
 
     // update legend and transform each g
-    if (withLegend && config[__legend_show]) {
+    if (withLegend && config.legend_show) {
         $$.updateLegend($$.mapToIds($$.data.targets), options, transitions);
     }
 
@@ -442,8 +442,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     if (targetsToShow.length) {
         $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
         // update axis tick values according to options
-        if (!config[__axis_x_tick_values] && (config[__axis_x_tick_fit] || config[__axis_x_tick_count])) {
-            tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config[__axis_x_tick_count]);
+        if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
+            tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count);
             $$.xAxis.tickValues(tickValues);
             $$.subXAxis.tickValues(tickValues);
         }
@@ -463,9 +463,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // show/hide if manual culling needed
     if (withUpdateXDomain && targetsToShow.length) {
-        if (config[__axis_x_tick_culling] && tickValues) {
+        if (config.axis_x_tick_culling && tickValues) {
             for (i = 1; i < tickValues.length; i++) {
-                if (tickValues.length / i < config[__axis_x_tick_culling_max]) {
+                if (tickValues.length / i < config.axis_x_tick_culling_max) {
                     intervalForCulling = i;
                     break;
                 }
@@ -482,8 +482,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // rotate tick text if needed
-    if (!config[__axis_rotated] && config[__axis_x_tick_rotate]) {
-        $$.rotateTickText($$.axes.x, transitions.axisX, config[__axis_x_tick_rotate]);
+    if (!config.axis_rotated && config.axis_x_tick_rotate) {
+        $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
     }
 
     // setup drawer - MEMO: these must be called after axis updated
@@ -507,7 +507,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     main.select("text." + CLASS[_text] + '.' + CLASS[_empty])
         .attr("x", $$.width / 2)
         .attr("y", $$.height / 2)
-        .text(config[__data_empty_label_text])
+        .text(config.data_empty_label_text)
       .transition()
         .style('opacity', targetsToShow.length ? 0 : 1);
 
@@ -523,7 +523,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // lines, areas and cricles
     $$.redrawLine(durationForExit);
     $$.redrawArea(durationForExit);
-    if (config[__point_show]) { $$.redrawCircle(); }
+    if (config.point_show) { $$.redrawCircle(); }
 
     // text
     if ($$.hasDataLabel()) {
@@ -545,7 +545,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .remove();
 
     // event rect
-    if (config[__interaction_enabled]) {
+    if (config.interaction_enabled) {
         $$.redrawEventRect();
     }
 
@@ -607,8 +607,8 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     // MEMO: this needs to be called before updateLegend and it means this ALWAYS needs to be called)
     $$.updateSizes();
     // MEMO: called in updateLegend in redraw if withLegend
-    if (!(options.withLegend && config[__legend_show])) {
-        transitions = $$.generateAxisTransitions(options.withTransitionForAxis ? config[__transition_duration] : 0);
+    if (!(options.withLegend && config.legend_show)) {
+        transitions = $$.generateAxisTransitions(options.withTransitionForAxis ? config.transition_duration : 0);
         // Update scales
         $$.updateScales();
         $$.updateSvgSize();
@@ -620,14 +620,14 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
 };
 
 c3_chart_internal_fn.isTimeSeries = function () {
-    return this.config[__axis_x_type] === 'timeseries';
+    return this.config.axis_x_type === 'timeseries';
 };
 c3_chart_internal_fn.isCategorized = function () {
-    return this.config[__axis_x_type].indexOf('categor') >= 0;
+    return this.config.axis_x_type.indexOf('categor') >= 0;
 };
 c3_chart_internal_fn.isCustomX = function () {
     var $$ = this, config = $$.config;
-    return !$$.isTimeSeries() && (config[__data_x] || notEmpty(config[__data_xs]));
+    return !$$.isTimeSeries() && (config.data_x || notEmpty(config.data_xs));
 };
 
 c3_chart_internal_fn.getTranslate = function (target) {
@@ -643,16 +643,16 @@ c3_chart_internal_fn.getTranslate = function (target) {
         y = $$.margin3.top;
     } else if (target === 'x') {
         x = 0;
-        y = config[__axis_rotated] ? 0 : $$.height;
+        y = config.axis_rotated ? 0 : $$.height;
     } else if (target === 'y') {
         x = 0;
-        y = config[__axis_rotated] ? $$.height : 0;
+        y = config.axis_rotated ? $$.height : 0;
     } else if (target === 'y2') {
-        x = config[__axis_rotated] ? 0 : $$.width;
-        y = config[__axis_rotated] ? 1 : 0;
+        x = config.axis_rotated ? 0 : $$.width;
+        y = config.axis_rotated ? 1 : 0;
     } else if (target === 'subx') {
         x = 0;
-        y = config[__axis_rotated] ? 0 : $$.height2;
+        y = config.axis_rotated ? 0 : $$.height2;
     } else if (target === 'arc') {
         x = $$.arcWidth / 2;
         y = $$.arcHeight / 2;
@@ -715,7 +715,7 @@ c3_chart_internal_fn.transformMain = function (withTransition, transitions) {
 c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
     var $$ = this;
     $$.transformMain(withTransition, transitions);
-    if ($$.config[__subchart_show]) { $$.transformContext(withTransition, transitions); }
+    if ($$.config.subchart_show) { $$.transformContext(withTransition, transitions); }
     if ($$.legend) { $$.transformLegend(withTransition); }
 };
 
@@ -745,7 +745,7 @@ c3_chart_internal_fn.updateSvgSize = function () {
 
 c3_chart_internal_fn.updateDimension = function () {
     var $$ = this;
-    if ($$.config[__axis_rotated]) {
+    if ($$.config.axis_rotated) {
         $$.axes.x.call($$.xAxis);
         $$.axes.subx.call($$.subXAxis);
     } else {
@@ -843,7 +843,7 @@ c3_chart_internal_fn.parseDate = function (date) {
     } else if (typeof date === 'number') {
         parsedDate = new Date(date);
     } else {
-        parsedDate = $$.dataTimeFormat($$.config[__data_xFormat]).parse(date);
+        parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
     }
     if (!parsedDate || isNaN(+parsedDate)) {
         window.console.error("Failed to parse x '" + date + "' to Date object");

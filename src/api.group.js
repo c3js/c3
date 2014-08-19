@@ -1,7 +1,7 @@
 c3_chart_fn.groups = function (groups) {
     var $$ = this.internal, config = $$.config;
-    if (isUndefined(groups)) { return config[__data_groups]; }
-    config[__data_groups] = groups;
+    if (isUndefined(groups)) { return config.data_groups; }
+    config.data_groups = groups;
     $$.redraw();
-    return config[__data_groups];
+    return config.data_groups;
 };

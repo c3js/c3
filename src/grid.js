@@ -3,15 +3,15 @@ c3_chart_internal_fn.initGrid = function () {
     $$.grid = $$.main.append('g')
         .attr("clip-path", $$.clipPath)
         .attr('class', CLASS[_grid]);
-    if (config[__grid_x_show]) {
+    if (config.grid_x_show) {
         $$.grid.append("g").attr("class", CLASS[_xgrids]);
     }
-    if (config[__grid_y_show]) {
+    if (config.grid_y_show) {
         $$.grid.append('g').attr('class', CLASS[_ygrids]);
     }
     $$.grid.append('g').attr("class", CLASS[_xgridLines]);
     $$.grid.append('g').attr('class', CLASS[_ygridLines]);
-    if (config[__grid_focus_show]) {
+    if (config.grid_focus_show) {
         $$.grid.append('g')
             .attr("class", CLASS[_xgridFocus])
             .append('line')
@@ -23,10 +23,10 @@ c3_chart_internal_fn.initGrid = function () {
 
 c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
     var $$ = this, config = $$.config, CLASS = $$.CLASS, d3 = $$.d3,
-        xgridData = $$.generateGridData(config[__grid_x_type], $$.x),
+        xgridData = $$.generateGridData(config.grid_x_type, $$.x),
         tickOffset = $$.isCategorized() ? $$.xAxis.tickOffset() : 0;
 
-    $$.xgridAttr = config[__axis_rotated] ? {
+    $$.xgridAttr = config.axis_rotated ? {
         'x1': 0,
         'x2': $$.width,
         'y1': function (d) { return $$.x(d) - tickOffset; },
@@ -43,7 +43,7 @@ c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
     $$.xgrid.enter().append('line').attr("class", CLASS[_xgrid]);
     if (!withoutUpdate) {
         $$.xgrid.attr($$.xgridAttr)
-            .style("opacity", function () { return +d3.select(this).attr(config[__axis_rotated] ? 'y1' : 'x1') === (config[__axis_rotated] ? $$.height : 0) ? 0 : 1; });
+            .style("opacity", function () { return +d3.select(this).attr(config.axis_rotated ? 'y1' : 'x1') === (config.axis_rotated ? $$.height : 0) ? 0 : 1; });
     }
     $$.xgrid.exit().remove();
 };
@@ -51,13 +51,13 @@ c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
 c3_chart_internal_fn.updateYGrid = function () {
     var $$ = this, config = $$.config, CLASS = $$.CLASS;
     $$.ygrid = $$.main.select('.' + CLASS[_ygrids]).selectAll('.' + CLASS[_ygrid])
-        .data($$.y.ticks(config[__grid_y_ticks]));
+        .data($$.y.ticks(config.grid_y_ticks));
     $$.ygrid.enter().append('line')
         .attr('class', CLASS[_ygrid]);
-    $$.ygrid.attr("x1", config[__axis_rotated] ? $$.y : 0)
-        .attr("x2", config[__axis_rotated] ? $$.y : $$.width)
-        .attr("y1", config[__axis_rotated] ? 0 : $$.y)
-        .attr("y2", config[__axis_rotated] ? $$.height : $$.y);
+    $$.ygrid.attr("x1", config.axis_rotated ? $$.y : 0)
+        .attr("x2", config.axis_rotated ? $$.y : $$.width)
+        .attr("y1", config.axis_rotated ? 0 : $$.y)
+        .attr("y2", config.axis_rotated ? $$.height : $$.y);
     $$.ygrid.exit().remove();
     $$.smoothLines($$.ygrid, 'grid');
 };
@@ -67,11 +67,11 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
     var $$ = this, main = $$.main, config = $$.config, CLASS = $$.CLASS,
         xgridLine, ygridLine, yv;
     main.select('line.' + CLASS[_xgridFocus]).style("visibility", "hidden");
-    if (config[__grid_x_show]) {
+    if (config.grid_x_show) {
         $$.updateXGrid();
     }
     $$.xgridLines = main.select('.' + CLASS[_xgridLines]).selectAll('.' + CLASS[_xgridLine])
-        .data(config[__grid_x_lines]);
+        .data(config.grid_x_lines);
     // enter
     xgridLine = $$.xgridLines.enter().append('g')
         .attr("class", function (d) { return CLASS[_xgridLine] + (d.class ? ' ' + d.class : ''); });
@@ -79,8 +79,8 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
         .style("opacity", 0);
     xgridLine.append('text')
         .attr("text-anchor", "end")
-        .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
-        .attr('dx', config[__axis_rotated] ? 0 : -$$.margin.top)
+        .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
+        .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
         .attr('dy', -5)
         .style("opacity", 0);
     // udpate
@@ -91,12 +91,12 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
         .remove();
 
     // Y-Grid
-    if (withY && config[__grid_y_show]) {
+    if (withY && config.grid_y_show) {
         $$.updateYGrid();
     }
     if (withY) {
         $$.ygridLines = main.select('.' + CLASS[_ygridLines]).selectAll('.' + CLASS[_ygridLine])
-            .data(config[__grid_y_lines]);
+            .data(config.grid_y_lines);
         // enter
         ygridLine = $$.ygridLines.enter().append('g')
             .attr("class", function (d) { return CLASS[_ygridLine] + (d.class ? ' ' + d.class : ''); });
@@ -104,22 +104,22 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
             .style("opacity", 0);
         ygridLine.append('text')
             .attr("text-anchor", "end")
-            .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
-            .attr('dx', config[__axis_rotated] ? 0 : -$$.margin.top)
+            .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
+            .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
             .attr('dy', -5)
             .style("opacity", 0);
         // update
         yv = $$.yv.bind($$);
         $$.ygridLines.select('line')
           .transition().duration(duration)
-            .attr("x1", config[__axis_rotated] ? yv : 0)
-            .attr("x2", config[__axis_rotated] ? yv : $$.width)
-            .attr("y1", config[__axis_rotated] ? 0 : yv)
-            .attr("y2", config[__axis_rotated] ? $$.height : yv)
+            .attr("x1", config.axis_rotated ? yv : 0)
+            .attr("x2", config.axis_rotated ? yv : $$.width)
+            .attr("y1", config.axis_rotated ? 0 : yv)
+            .attr("y2", config.axis_rotated ? $$.height : yv)
             .style("opacity", 1);
         $$.ygridLines.select('text')
           .transition().duration(duration)
-            .attr("x", config[__axis_rotated] ? 0 : $$.width)
+            .attr("x", config.axis_rotated ? 0 : $$.width)
             .attr("y", yv)
             .text(function (d) { return d.text; })
             .style("opacity", 1);
@@ -132,13 +132,13 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
 c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
     var $$ = this, config = $$.config, xv = $$.xv.bind($$);
     transitions.push($$.xgridLines.select('line').transition()
-                     .attr("x1", config[__axis_rotated] ? 0 : xv)
-                     .attr("x2", config[__axis_rotated] ? $$.width : xv)
-                     .attr("y1", config[__axis_rotated] ? xv : $$.margin.top)
-                     .attr("y2", config[__axis_rotated] ? xv : $$.height)
+                     .attr("x1", config.axis_rotated ? 0 : xv)
+                     .attr("x2", config.axis_rotated ? $$.width : xv)
+                     .attr("y1", config.axis_rotated ? xv : $$.margin.top)
+                     .attr("y2", config.axis_rotated ? xv : $$.height)
                      .style("opacity", 1));
     transitions.push($$.xgridLines.select('text').transition()
-                     .attr("x", config[__axis_rotated] ? $$.width : 0)
+                     .attr("x", config.axis_rotated ? $$.width : 0)
                      .attr("y", xv)
                      .text(function (d) { return d.text; })
                      .style("opacity", 1));
@@ -148,14 +148,14 @@ c3_chart_internal_fn.showXGridFocus = function (selectedData) {
         dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
         focusEl = $$.main.selectAll('line.' + CLASS[_xgridFocus]),
         xx = $$.xx.bind($$);
-    if (! config[__tooltip_show]) { return; }
+    if (! config.tooltip_show) { return; }
     // Hide when scatter plot exists
     if ($$.hasType('scatter') || $$.hasArcType()) { return; }
     focusEl
         .style("visibility", "visible")
         .data([dataToShow[0]])
-        .attr(config[__axis_rotated] ? 'y1' : 'x1', xx)
-        .attr(config[__axis_rotated] ? 'y2' : 'x2', xx);
+        .attr(config.axis_rotated ? 'y1' : 'x1', xx)
+        .attr(config.axis_rotated ? 'y2' : 'x2', xx);
     $$.smoothLines(focusEl, 'grid');
 };
 c3_chart_internal_fn.hideXGridFocus = function () {
@@ -164,10 +164,10 @@ c3_chart_internal_fn.hideXGridFocus = function () {
 c3_chart_internal_fn.updateXgridFocus = function () {
     var $$ = this, config = $$.config;
     $$.main.select('line.' + CLASS[_xgridFocus])
-        .attr("x1", config[__axis_rotated] ? 0 : -10)
-        .attr("x2", config[__axis_rotated] ? $$.width : -10)
-        .attr("y1", config[__axis_rotated] ? -10 : 0)
-        .attr("y2", config[__axis_rotated] ? -10 : $$.height);
+        .attr("x1", config.axis_rotated ? 0 : -10)
+        .attr("x2", config.axis_rotated ? $$.width : -10)
+        .attr("y1", config.axis_rotated ? -10 : 0)
+        .attr("y2", config.axis_rotated ? -10 : $$.height);
 };
 c3_chart_internal_fn.generateGridData = function (type, scale) {
     var $$ = this,
@@ -206,11 +206,11 @@ c3_chart_internal_fn.removeGridLines = function (params, forX) {
         classLines = forX ? CLASS[_xgridLines] : CLASS[_ygridLines],
         classLine = forX ? CLASS[_xgridLine] : CLASS.ygridLine;
     $$.main.select('.' + classLines).selectAll('.' + classLine).filter(toRemove)
-        .transition().duration(config[__transition_duration])
+        .transition().duration(config.transition_duration)
         .style('opacity', 0).remove();
     if (forX) {
-        config[__grid_x_lines] = config[__grid_x_lines].filter(toShow);
+        config.grid_x_lines = config.grid_x_lines.filter(toShow);
     } else {
-        config[__grid_y_lines] = config[__grid_y_lines].filter(toShow);
+        config.grid_y_lines = config.grid_y_lines.filter(toShow);
     }
 };

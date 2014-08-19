@@ -1,15 +1,15 @@
 c3_chart_internal_fn.setTargetType = function (targetIds, type) {
     var $$ = this, config = $$.config;
     $$.mapToTargetIds(targetIds).forEach(function (id) {
-        $$.withoutFadeIn[id] = (type === config[__data_types][id]);
-        config[__data_types][id] = type;
+        $$.withoutFadeIn[id] = (type === config.data_types[id]);
+        config.data_types[id] = type;
     });
     if (!targetIds) {
-        config[__data_type] = type;
+        config.data_type = type;
     }
 };
 c3_chart_internal_fn.hasType = function (type, targets) {
-    var $$ = this, types = $$.config[__data_types], has = false;
+    var $$ = this, types = $$.config.data_types, has = false;
     (targets || $$.data.targets).forEach(function (t) {
         if ((types[t.id] && types[t.id].indexOf(type) >= 0) || (!(t.id in types) && type === 'line')) {
             has = true;
@@ -22,39 +22,39 @@ c3_chart_internal_fn.hasArcType = function (targets) {
 };
 c3_chart_internal_fn.isLineType = function (d) {
     var config = this.config, id = isString(d) ? d : d.id;
-    return !config[__data_types][id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config[__data_types][id]) >= 0;
+    return !config.data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isStepType = function (d) {
     var id = isString(d) ? d : d.id;
-    return ['step', 'area-step'].indexOf(this.config[__data_types][id]) >= 0;
+    return ['step', 'area-step'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isSplineType = function (d) {
     var id = isString(d) ? d : d.id;
-    return ['spline', 'area-spline'].indexOf(this.config[__data_types][id]) >= 0;
+    return ['spline', 'area-spline'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isAreaType = function (d) {
     var id = isString(d) ? d : d.id;
-    return ['area', 'area-spline', 'area-step'].indexOf(this.config[__data_types][id]) >= 0;
+    return ['area', 'area-spline', 'area-step'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isBarType = function (d) {
     var id = isString(d) ? d : d.id;
-    return this.config[__data_types][id] === 'bar';
+    return this.config.data_types[id] === 'bar';
 };
 c3_chart_internal_fn.isScatterType = function (d) {
     var id = isString(d) ? d : d.id;
-    return this.config[__data_types][id] === 'scatter';
+    return this.config.data_types[id] === 'scatter';
 };
 c3_chart_internal_fn.isPieType = function (d) {
     var id = isString(d) ? d : d.id;
-    return this.config[__data_types][id] === 'pie';
+    return this.config.data_types[id] === 'pie';
 };
 c3_chart_internal_fn.isGaugeType = function (d) {
     var id = isString(d) ? d : d.id;
-    return this.config[__data_types][id] === 'gauge';
+    return this.config.data_types[id] === 'gauge';
 };
 c3_chart_internal_fn.isDonutType = function (d) {
     var id = isString(d) ? d : d.id;
-    return this.config[__data_types][id] === 'donut';
+    return this.config.data_types[id] === 'donut';
 };
 c3_chart_internal_fn.isArcType = function (d) {
     return this.isPieType(d) || this.isDonutType(d) || this.isGaugeType(d);

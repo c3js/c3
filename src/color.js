@@ -1,8 +1,8 @@
 c3_chart_internal_fn.generateColor = function () {
     var $$ = this, config = $$.config, d3 = $$.d3,
-        colors = config[__data_colors],
-        pattern = notEmpty(config[__color_pattern]) ? config[__color_pattern] : d3.scale.category10().range(),
-        callback = config[__data_color],
+        colors = config.data_colors,
+        pattern = notEmpty(config.color_pattern) ? config.color_pattern : d3.scale.category10().range(),
+        callback = config.data_color,
         ids = [];
 
     return function (d) {
@@ -27,12 +27,12 @@ c3_chart_internal_fn.generateColor = function () {
 };
 c3_chart_internal_fn.generateLevelColor = function () {
     var $$ = this, config = $$.config,
-        colors = config[__color_pattern],
-        threshold = config[__color_threshold],
+        colors = config.color_pattern,
+        threshold = config.color_threshold,
         asValue = threshold.unit === 'value',
         values = threshold.values && threshold.values.length ? threshold.values : [],
         max = threshold.max || 100;
-    return notEmpty(config[__color_threshold]) ? function (value) {
+    return notEmpty(config.color_threshold) ? function (value) {
         var i, v, color = colors[colors.length - 1];
         for (i = 0; i < values.length; i++) {
             v = asValue ? value : (value * 100 / max);

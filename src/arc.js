@@ -3,14 +3,14 @@ c3_chart_internal_fn.initPie = function () {
     $$.pie = d3.layout.pie().value(function (d) {
         return d.values.reduce(function (a, b) { return a + b.value; }, 0);
     });
-    if (!config[__data_order] || !config[__pie_sort] || !config[__donut_sort]) {
+    if (!config.data_order || !config.pie_sort || !config.donut_sort) {
         $$.pie.sort(null);
     }
 };
 
 c3_chart_internal_fn.updateRadius = function () {
     var $$ = this, config = $$.config,
-        w = config[__gauge_width] || config[__donut_width];
+        w = config.gauge_width || config.donut_width;
     $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
     $$.radius = $$.radiusExpanded * 0.95;
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
@@ -39,7 +39,7 @@ c3_chart_internal_fn.updateAngle = function (d) {
         d.endAngle = d.startAngle;
     }
     if ($$.isGaugeType(d.data)) {
-        var gMin = config[__gauge_min], gMax = config[__gauge_max],
+        var gMin = config.gauge_min, gMax = config.gauge_max,
             gF = Math.abs(gMin) + gMax,
             aTic = (Math.PI) / gF;
         d.startAngle = (-1 * (Math.PI / 2)) + (aTic * Math.abs(gMin));
@@ -152,15 +152,15 @@ c3_chart_internal_fn.unexpandArc = function (id) {
 
 c3_chart_internal_fn.shouldExpand = function (id) {
     var $$ = this, config = $$.config;
-    return ($$.isDonutType(id) && config[__donut_expand]) || ($$.isGaugeType(id) && config[__gauge_expand]) || ($$.isPieType(id) && config[__pie_expand]);
+    return ($$.isDonutType(id) && config.donut_expand) || ($$.isGaugeType(id) && config.gauge_expand) || ($$.isPieType(id) && config.pie_expand);
 };
 
 c3_chart_internal_fn.shouldShowArcLabel = function () {
     var $$ = this, config = $$.config, shouldShow = true;
     if ($$.hasType('donut')) {
-        shouldShow = config[__donut_label_show];
+        shouldShow = config.donut_label_show;
     } else if ($$.hasType('pie')) {
-        shouldShow = config[__pie_label_show];
+        shouldShow = config.pie_label_show;
     }
     // when gauge, always true
     return shouldShow;
@@ -168,24 +168,24 @@ c3_chart_internal_fn.shouldShowArcLabel = function () {
 
 c3_chart_internal_fn.meetsArcLabelThreshold = function (ratio) {
     var $$ = this, config = $$.config,
-        threshold = $$.hasType('donut') ? config[__donut_label_threshold] : config[__pie_label_threshold];
+        threshold = $$.hasType('donut') ? config.donut_label_threshold : config.pie_label_threshold;
     return ratio >= threshold;
 };
 
 c3_chart_internal_fn.getArcLabelFormat = function () {
     var $$ = this, config = $$.config,
-        format = config[__pie_label_format];
+        format = config.pie_label_format;
     if ($$.hasType('gauge')) {
-        format = config[__gauge_label_format];
+        format = config.gauge_label_format;
     } else if ($$.hasType('donut')) {
-        format = config[__donut_label_format];
+        format = config.donut_label_format;
     }
     return format;
 };
 
 c3_chart_internal_fn.getArcTitle = function () {
     var $$ = this;
-    return $$.hasType('donut') ? $$.config[__donut_title] : "";
+    return $$.hasType('donut') ? $$.config.donut_title : "";
 };
 
 c3_chart_internal_fn.descByStartAngle = function (a, b) {
@@ -232,7 +232,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     mainArc.enter().append('path')
         .attr("class", $$.classArc.bind($$))
         .style("fill", function (d) { return $$.color(d.data); })
-        .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; })
+        .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; })
         .style("opacity", 0)
         .each(function (d) {
             if ($$.isGaugeType(d.data)) {
@@ -250,7 +250,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             // transitions
             $$.expandArc(updated.data.id);
             $$.toggleFocusLegend(updated.data.id, true);
-            $$.config[__data_onmouseover](arcData, this);
+            $$.config.data_onmouseover(arcData, this);
         })
         .on('mousemove', function (d) {
             var updated = $$.updateAngle(d),
@@ -269,7 +269,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             $$.unexpandArc(updated.data.id);
             $$.revertLegend();
             $$.hideTooltip();
-            $$.config[__data_onmouseout](arcData, this);
+            $$.config.data_onmouseout(arcData, this);
         })
         .on('click', function (d, i) {
             var updated, arcData;
@@ -332,7 +332,7 @@ c3_chart_internal_fn.initGauge = function () {
             .attr("class", CLASS[_chartArcsBackground])
             .attr("d", function () {
                 var d = {
-                    data: [{value: config[__gauge_max]}],
+                    data: [{value: config.gauge_max}],
                     startAngle: -1 * (Math.PI / 2),
                     endAngle: Math.PI / 2
                 };
@@ -343,20 +343,20 @@ c3_chart_internal_fn.initGauge = function () {
             .attr("class", CLASS[_chartArcsGaugeUnit])
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
-            .text(config[__gauge_label_show] ? config[__gauge_units] : '');
+            .text(config.gauge_label_show ? config.gauge_units : '');
         arcs.append("text")
             .attr("dx", -1 * ($$.innerRadius + (($$.radius - $$.innerRadius) / 2)) + "px")
             .attr("dy", "1.2em")
             .attr("class", CLASS[_chartArcsGaugeMin])
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
-            .text(config[__gauge_label_show] ? config[__gauge_min] : '');
+            .text(config.gauge_label_show ? config.gauge_min : '');
         arcs.append("text")
             .attr("dx", $$.innerRadius + (($$.radius - $$.innerRadius) / 2) + "px")
             .attr("dy", "1.2em")
             .attr("class", CLASS[_chartArcsGaugeMax])
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
-            .text(config[__gauge_label_show] ? config[__gauge_max] : '');
+            .text(config.gauge_label_show ? config.gauge_max : '');
     }
 };

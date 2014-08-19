@@ -4,30 +4,30 @@ c3_chart_internal_fn.initAxis = function () {
         .attr("class", CLASS[_axis] + ' ' + CLASS[_axisX])
         .attr("clip-path", $$.clipPathForXAxis)
         .attr("transform", $$.getTranslate('x'))
-        .style("visibility", config[__axis_x_show] ? 'visible' : 'hidden');
+        .style("visibility", config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append("text")
         .attr("class", CLASS[_axisXLabel])
-        .attr("transform", config[__axis_rotated] ? "rotate(-90)" : "")
+        .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
         .style("text-anchor", $$.textAnchorForXAxisLabel.bind($$));
 
     $$.axes.y = main.append("g")
         .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
         .attr("clip-path", $$.clipPathForYAxis)
         .attr("transform", $$.getTranslate('y'))
-        .style("visibility", config[__axis_y_show] ? 'visible' : 'hidden');
+        .style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text")
         .attr("class", CLASS[_axisYLabel])
-        .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
+        .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", $$.textAnchorForYAxisLabel.bind($$));
 
     $$.axes.y2 = main.append("g")
         .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
         // clip-path?
         .attr("transform", $$.getTranslate('y2'))
-        .style("visibility", config[__axis_y2_show] ? 'visible' : 'hidden');
+        .style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append("text")
         .attr("class", CLASS[_axisY2Label])
-        .attr("transform", config[__axis_rotated] ? "" : "rotate(-90)")
+        .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
 };
 c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
@@ -37,15 +37,15 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues)
     // Set tick
     axis.tickFormat(tickFormat).tickValues(tickValues);
     if ($$.isCategorized()) {
-        axis.tickCentered(config[__axis_x_tick_centered]);
-        if (isEmpty(config[__axis_x_tick_culling])) {
-            config[__axis_x_tick_culling] = false;
+        axis.tickCentered(config.axis_x_tick_centered);
+        if (isEmpty(config.axis_x_tick_culling)) {
+            config.axis_x_tick_culling = false;
         }
     } else {
         // TODO: move this to c3_axis
         axis.tickOffset = function () {
             var edgeX = $$.getEdgeX($$.data.targets), diff = $$.x(edgeX[1]) - $$.x(edgeX[0]),
-                base = diff ? diff : (config[__axis_rotated] ? $$.height : $$.width);
+                base = diff ? diff : (config.axis_rotated ? $$.height : $$.width);
             return (base / $$.getMaxDataCount()) / 2;
         };
     }
@@ -57,17 +57,17 @@ c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks) {
 };
 c3_chart_internal_fn.getAxisId = function (id) {
     var config = this.config;
-    return id in config[__data_axes] ? config[__data_axes][id] : 'y';
+    return id in config.data_axes ? config.data_axes[id] : 'y';
 };
 c3_chart_internal_fn.getXAxisTickFormat = function () {
     var $$ = this, config = $$.config,
         format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
-    if (config[__axis_x_tick_format]) {
-        if (isFunction(config[__axis_x_tick_format])) {
-            format = config[__axis_x_tick_format];
+    if (config.axis_x_tick_format) {
+        if (isFunction(config.axis_x_tick_format)) {
+            format = config.axis_x_tick_format;
         } else if ($$.isTimeSeries()) {
             format = function (date) {
-                return date ? $$.axisTimeFormat(config[__axis_x_tick_format])(date) : "";
+                return date ? $$.axisTimeFormat(config.axis_x_tick_format)(date) : "";
             };
         }
     }
@@ -76,11 +76,11 @@ c3_chart_internal_fn.getXAxisTickFormat = function () {
 c3_chart_internal_fn.getAxisLabelOptionByAxisId = function (axisId) {
     var $$ = this, config = $$.config, option;
     if (axisId === 'y') {
-        option = config[__axis_y_label];
+        option = config.axis_y_label;
     } else if (axisId === 'y2') {
-        option = config[__axis_y2_label];
+        option = config.axis_y2_label;
     } else if (axisId === 'x') {
-        option = config[__axis_x_label];
+        option = config.axis_x_label;
     }
     return option;
 };
@@ -93,11 +93,11 @@ c3_chart_internal_fn.setAxisLabelText = function (axisId, text) {
         option = $$.getAxisLabelOptionByAxisId(axisId);
     if (isString(option)) {
         if (axisId === 'y') {
-            config[__axis_y_label] = text;
+            config.axis_y_label = text;
         } else if (axisId === 'y2') {
-            config[__axis_y2_label] = text;
+            config.axis_y2_label = text;
         } else if (axisId === 'x') {
-            config[__axis_x_label] = text;
+            config.axis_x_label = text;
         }
     } else if (option) {
         option.text = text;
@@ -118,13 +118,13 @@ c3_chart_internal_fn.getAxisLabelPosition = function (axisId, defaultPosition) {
     };
 };
 c3_chart_internal_fn.getXAxisLabelPosition = function () {
-    return this.getAxisLabelPosition('x', this.config[__axis_rotated] ? 'inner-top' : 'inner-right');
+    return this.getAxisLabelPosition('x', this.config.axis_rotated ? 'inner-top' : 'inner-right');
 };
 c3_chart_internal_fn.getYAxisLabelPosition = function () {
-    return this.getAxisLabelPosition('y', this.config[__axis_rotated] ? 'inner-right' : 'inner-top');
+    return this.getAxisLabelPosition('y', this.config.axis_rotated ? 'inner-right' : 'inner-top');
 };
 c3_chart_internal_fn.getY2AxisLabelPosition = function () {
-    return this.getAxisLabelPosition('y2', this.config[__axis_rotated] ? 'inner-right' : 'inner-top');
+    return this.getAxisLabelPosition('y2', this.config.axis_rotated ? 'inner-right' : 'inner-top');
 };
 c3_chart_internal_fn.getAxisLabelPositionById = function (id) {
     return id === 'y2' ? this.getY2AxisLabelPosition() : id === 'y' ? this.getYAxisLabelPosition() : this.getXAxisLabelPosition();
@@ -161,36 +161,36 @@ c3_chart_internal_fn.textAnchorForAxisLabel = function (forHorizontal, position)
     }
 };
 c3_chart_internal_fn.xForXAxisLabel = function () {
-    return this.xForAxisLabel(!this.config[__axis_rotated], this.getXAxisLabelPosition());
+    return this.xForAxisLabel(!this.config.axis_rotated, this.getXAxisLabelPosition());
 };
 c3_chart_internal_fn.xForYAxisLabel = function () {
-    return this.xForAxisLabel(this.config[__axis_rotated], this.getYAxisLabelPosition());
+    return this.xForAxisLabel(this.config.axis_rotated, this.getYAxisLabelPosition());
 };
 c3_chart_internal_fn.xForY2AxisLabel = function () {
-    return this.xForAxisLabel(this.config[__axis_rotated], this.getY2AxisLabelPosition());
+    return this.xForAxisLabel(this.config.axis_rotated, this.getY2AxisLabelPosition());
 };
 c3_chart_internal_fn.dxForXAxisLabel = function () {
-    return this.dxForAxisLabel(!this.config[__axis_rotated], this.getXAxisLabelPosition());
+    return this.dxForAxisLabel(!this.config.axis_rotated, this.getXAxisLabelPosition());
 };
 c3_chart_internal_fn.dxForYAxisLabel = function () {
-    return this.dxForAxisLabel(this.config[__axis_rotated], this.getYAxisLabelPosition());
+    return this.dxForAxisLabel(this.config.axis_rotated, this.getYAxisLabelPosition());
 };
 c3_chart_internal_fn.dxForY2AxisLabel = function () {
-    return this.dxForAxisLabel(this.config[__axis_rotated], this.getY2AxisLabelPosition());
+    return this.dxForAxisLabel(this.config.axis_rotated, this.getY2AxisLabelPosition());
 };
 c3_chart_internal_fn.dyForXAxisLabel = function () {
     var $$ = this, config = $$.config,
         position = $$.getXAxisLabelPosition();
-    if (config[__axis_rotated]) {
+    if (config.axis_rotated) {
         return position.isInner ? "1.2em" : -25 - $$.getMaxTickWidth('x');
     } else {
-        return position.isInner ? "-0.5em" : config[__axis_x_height] ? config[__axis_x_height] - 10 : "3em";
+        return position.isInner ? "-0.5em" : config.axis_x_height ? config.axis_x_height - 10 : "3em";
     }
 };
 c3_chart_internal_fn.dyForYAxisLabel = function () {
     var $$ = this,
         position = $$.getYAxisLabelPosition();
-    if ($$.config[__axis_rotated]) {
+    if ($$.config.axis_rotated) {
         return position.isInner ? "-0.5em" : "3em";
     } else {
         return position.isInner ? "1.2em" : -20 - $$.getMaxTickWidth('y');
@@ -199,7 +199,7 @@ c3_chart_internal_fn.dyForYAxisLabel = function () {
 c3_chart_internal_fn.dyForY2AxisLabel = function () {
     var $$ = this,
         position = $$.getY2AxisLabelPosition();
-    if ($$.config[__axis_rotated]) {
+    if ($$.config.axis_rotated) {
         return position.isInner ? "1.2em" : "-2.2em";
     } else {
         return position.isInner ? "-0.5em" : 30 + this.getMaxTickWidth('y2');
@@ -207,15 +207,15 @@ c3_chart_internal_fn.dyForY2AxisLabel = function () {
 };
 c3_chart_internal_fn.textAnchorForXAxisLabel = function () {
     var $$ = this;
-    return $$.textAnchorForAxisLabel(!$$.config[__axis_rotated], $$.getXAxisLabelPosition());
+    return $$.textAnchorForAxisLabel(!$$.config.axis_rotated, $$.getXAxisLabelPosition());
 };
 c3_chart_internal_fn.textAnchorForYAxisLabel = function () {
     var $$ = this;
-    return $$.textAnchorForAxisLabel($$.config[__axis_rotated], $$.getYAxisLabelPosition());
+    return $$.textAnchorForAxisLabel($$.config.axis_rotated, $$.getYAxisLabelPosition());
 };
 c3_chart_internal_fn.textAnchorForY2AxisLabel = function () {
     var $$ = this;
-    return $$.textAnchorForAxisLabel($$.config[__axis_rotated], $$.getY2AxisLabelPosition());
+    return $$.textAnchorForAxisLabel($$.config.axis_rotated, $$.getY2AxisLabelPosition());
 };
 
 c3_chart_internal_fn.xForRotatedTickText = function (r) {
@@ -240,13 +240,13 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
         targetsToShow = $$.filterTargetsToShow($$.data.targets);
         if (id === 'y') {
             scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-            axis = $$.getYAxis(scale, $$.yOrient, config[__axis_y_tick_format], config[__axis_y_ticks]);
+            axis = $$.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks);
         } else if (id === 'y2') {
             scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-            axis = $$.getYAxis(scale, $$.y2Orient, config[__axis_y2_tick_format], config[__axis_y2_ticks]);
+            axis = $$.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks);
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-            axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), config[__axis_x_tick_values] ? config[__axis_x_tick_values] : $$.xAxis.tickValues());
+            axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), config.axis_x_tick_values ? config.axis_x_tick_values : $$.xAxis.tickValues());
         }
         $$.main.append("g").call(axis).each(function () {
             $$.d3.select(this).selectAll('text').each(function () {

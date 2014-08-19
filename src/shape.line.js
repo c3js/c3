@@ -28,7 +28,7 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
         .attr("class", function (d) { return $$.generateClass(CLASS[_selectedCircles], d.id); });
     mainLineEnter.append('g')
         .attr("class", classCircles)
-        .style("cursor", function (d) { return config[__data_selection_isselectable](d) ? "pointer" : null; });
+        .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; });
     // Update date for selected circles
     targets.forEach(function (t) {
         $$.main.selectAll('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS[_selectedCircle]).each(function (d) {
@@ -66,17 +66,17 @@ c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
         yValue = function (d, i) {
-            return config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(d.value);
+            return config.data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(d.value);
         };
 
-    line = config[__axis_rotated] ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
-    if (!config[__line_connect_null]) { line = line.defined(function (d) { return d.value != null; }); }
+    line = config.axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
+    if (!config.line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
     return function (d) {
-        var data = config[__line_connect_null] ? $$.filterRemoveNull(d.values) : d.values,
+        var data = config.line_connect_null ? $$.filterRemoveNull(d.values) : d.values,
             x = isSub ? $$.x : $$.subX, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
         if ($$.isLineType(d)) {
-            if (config[__data_regions][d.id]) {
-                path = $$.lineWithRegions(data, x, y, config[__data_regions][d.id]);
+            if (config.data_regions[d.id]) {
+                path = $$.lineWithRegions(data, x, y, config.data_regions[d.id]);
             } else {
                 path = line.interpolate($$.getInterpolate(d))(data);
             }
@@ -85,7 +85,7 @@ c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
                 x0 = x(data[0].x);
                 y0 = y(data[0].value);
             }
-            path = config[__axis_rotated] ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+            path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
         }
         return path ? path : "M 0 0";
     };
@@ -102,7 +102,7 @@ c3_chart_internal_fn.generateGetLinePoint = function (lineIndices, isSub) { // p
             offset = lineOffset(d, i) || y0, // offset is for stacked area chart
             posX = x(d), posY = y(d);
         // fix posY not to overflow opposite quadrant
-        if (config[__axis_rotated]) {
+        if (config.axis_rotated) {
             if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
         }
         // 1 point that marks the line position
@@ -147,8 +147,8 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
     }
 
     // Set scales
-    xValue = config[__axis_rotated] ? function (d) { return y(d.value); } : function (d) { return x(d.x); };
-    yValue = config[__axis_rotated] ? function (d) { return x(d.x); } : function (d) { return y(d.value); };
+    xValue = config.axis_rotated ? function (d) { return y(d.value); } : function (d) { return x(d.x); };
+    yValue = config.axis_rotated ? function (d) { return x(d.x); } : function (d) { return y(d.value); };
 
     // Define svg generator function for region
     if ($$.isTimeSeries()) {
@@ -220,19 +220,19 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
         value0 = function (d, i) {
-            return config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
+            return config.data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
         },
         value1 = function (d, i) {
-            return config[__data_groups].length > 0 ? getPoint(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
+            return config.data_groups.length > 0 ? getPoint(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
         };
 
-    area = config[__axis_rotated] ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
-    if (!config[__line_connect_null]) {
+    area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+    if (!config.line_connect_null) {
         area = area.defined(function (d) { return d.value !== null; });
     }
 
     return function (d) {
-        var data = config[__line_connect_null] ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
+        var data = config.line_connect_null ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
         if ($$.isAreaType(d)) {
             path = area.interpolate($$.getInterpolate(d))(data);
         } else {
@@ -240,7 +240,7 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
                 x0 = $$.x(data[0].x);
                 y0 = $$.getYScale(d.id)(data[0].value);
             }
-            path = config[__axis_rotated] ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
+            path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
         }
         return path ? path : "M 0 0";
     };
@@ -258,7 +258,7 @@ c3_chart_internal_fn.generateGetAreaPoint = function (areaIndices, isSub) { // p
             offset = areaOffset(d, i) || y0, // offset is for stacked area chart
             posX = x(d), posY = y(d);
         // fix posY not to overflow opposite quadrant
-        if (config[__axis_rotated]) {
+        if (config.axis_rotated) {
             if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
         }
         // 1 point that marks the area position
@@ -299,7 +299,7 @@ c3_chart_internal_fn.circleX = function (d) {
 c3_chart_internal_fn.circleY = function (d, i) {
     var $$ = this,
         lineIndices = $$.getShapeIndices($$.isLineType), getPoint = $$.generateGetLinePoint(lineIndices);
-    return $$.config[__data_groups].length > 0 ? getPoint(d, i)[0][1] : $$.getYScale(d.id)(d.value);
+    return $$.config.data_groups.length > 0 ? getPoint(d, i)[0][1] : $$.getYScale(d.id)(d.value);
 };
 c3_chart_internal_fn.getCircles = function (i, id) {
     var $$ = this;
@@ -322,15 +322,15 @@ c3_chart_internal_fn.unexpandCircles = function (i) {
 };
 c3_chart_internal_fn.pointR = function (d) {
     var $$ = this, config = $$.config;
-    return config[__point_show] && !$$.isStepType(d) ? (isFunction(config[__point_r]) ? config[__point_r](d) : config[__point_r]) : 0;
+    return config.point_show && !$$.isStepType(d) ? (isFunction(config.point_r) ? config.point_r(d) : config.point_r) : 0;
 };
 c3_chart_internal_fn.pointExpandedR = function (d) {
     var $$ = this, config = $$.config;
-    return config[__point_focus_expand_enabled] ? (config[__point_focus_expand_r] ? config[__point_focus_expand_r] : $$.pointR(d) * 1.75) : $$.pointR(d);
+    return config.point_focus_expand_enabled ? (config.point_focus_expand_r ? config.point_focus_expand_r : $$.pointR(d) * 1.75) : $$.pointR(d);
 };
 c3_chart_internal_fn.pointSelectR = function (d) {
     var $$ = this, config = $$.config;
-    return config[__point_select_r] ? config[__point_select_r] : $$.pointR(d) * 4;
+    return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
 };
 c3_chart_internal_fn.isWithinCircle = function (_this, _r) {
     var d3 = this.d3,

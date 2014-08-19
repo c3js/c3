@@ -8,10 +8,10 @@ c3_chart_fn.selected = function (targetId) {
 };
 c3_chart_fn.select = function (ids, indices, resetOther) {
     var $$ = this.internal, d3 = $$.d3, config = $$.config;
-    if (! config[__data_selection_enabled]) { return; }
+    if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS[_shapes]).selectAll('.' + CLASS[_shape]).each(function (d, i) {
         var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = $$.getToggle(this),
-            isTargetId = config[__data_selection_grouped] || !ids || ids.indexOf(id) >= 0,
+            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
             isTargetIndex = !indices || indices.indexOf(i) >= 0,
             isSelected = shape.classed(CLASS[_SELECTED]);
         // line/area selection not supported yet
@@ -19,7 +19,7 @@ c3_chart_fn.select = function (ids, indices, resetOther) {
             return;
         }
         if (isTargetId && isTargetIndex) {
-            if (config[__data_selection_isselectable](d) && !isSelected) {
+            if (config.data_selection_isselectable(d) && !isSelected) {
                 toggle(true, shape.classed(CLASS[_SELECTED], true), d, i);
             }
         } else if (isDefined(resetOther) && resetOther) {
@@ -31,10 +31,10 @@ c3_chart_fn.select = function (ids, indices, resetOther) {
 };
 c3_chart_fn.unselect = function (ids, indices) {
     var $$ = this.internal, d3 = $$.d3, config = $$.config;
-    if (! config[__data_selection_enabled]) { return; }
+    if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS[_shapes]).selectAll('.' + CLASS[_shape]).each(function (d, i) {
         var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = $$.getToggle(this),
-            isTargetId = config[__data_selection_grouped] || !ids || ids.indexOf(id) >= 0,
+            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
             isTargetIndex = !indices || indices.indexOf(i) >= 0,
             isSelected = shape.classed(CLASS[_SELECTED]);
         // line/area selection not supported yet
@@ -42,7 +42,7 @@ c3_chart_fn.unselect = function (ids, indices) {
             return;
         }
         if (isTargetId && isTargetIndex) {
-            if (config[__data_selection_isselectable](d)) {
+            if (config.data_selection_isselectable(d)) {
                 if (isSelected) {
                     toggle(false, shape.classed(CLASS[_SELECTED], false), d, i);
                 }

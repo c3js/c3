@@ -130,7 +130,7 @@ c3_chart_fn.flow = function (args) {
         flow: {
             index: baseValue.index,
             length: length,
-            duration: isValue(args.duration) ? args.duration : $$.config[__transition_duration],
+            duration: isValue(args.duration) ? args.duration : $$.config.transition_duration,
             done: args.done,
             orgDataCount: orgDataCount,
         },
@@ -243,10 +243,10 @@ c3_chart_internal_fn.generateFlow = function (args) {
             xgridLines
                 .attr('transform', null);
             xgridLines.select('line')
-                .attr("x1", config[__axis_rotated] ? 0 : xv)
-                .attr("x2", config[__axis_rotated] ? $$.width : xv);
+                .attr("x1", config.axis_rotated ? 0 : xv)
+                .attr("x2", config.axis_rotated ? $$.width : xv);
             xgridLines.select('text')
-                .attr("x", config[__axis_rotated] ? $$.width : 0)
+                .attr("x", config.axis_rotated ? $$.width : 0)
                 .attr("y", xv);
             mainBar
                 .attr('transform', null)

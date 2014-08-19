@@ -8,27 +8,27 @@ c3_chart_internal_fn.initTooltip = function () {
         .style("z-index", "10")
         .style("display", "none");
     // Show tooltip if needed
-    if (config[__tooltip_init_show]) {
-        if ($$.isTimeSeries() && isString(config[__tooltip_init_x])) {
-            config[__tooltip_init_x] = $$.parseDate(config[__tooltip_init_x]);
+    if (config.tooltip_init_show) {
+        if ($$.isTimeSeries() && isString(config.tooltip_init_x)) {
+            config.tooltip_init_x = $$.parseDate(config.tooltip_init_x);
             for (i = 0; i < $$.data.targets[0].values.length; i++) {
-                if (($$.data.targets[0].values[i].x - config[__tooltip_init_x]) === 0) { break; }
+                if (($$.data.targets[0].values[i].x - config.tooltip_init_x) === 0) { break; }
             }
-            config[__tooltip_init_x] = i;
+            config.tooltip_init_x = i;
         }
-        $$.tooltip.html(config[__tooltip_contents].call($$, $$.data.targets.map(function (d) {
-            return $$.addName(d.values[config[__tooltip_init_x]]);
+        $$.tooltip.html(config.tooltip_contents.call($$, $$.data.targets.map(function (d) {
+            return $$.addName(d.values[config.tooltip_init_x]);
         }), $$.getXAxisTickFormat(), $$.getYFormat($$.hasArcType()), $$.color));
-        $$.tooltip.style("top", config[__tooltip_init_position].top)
-            .style("left", config[__tooltip_init_position].left)
+        $$.tooltip.style("top", config.tooltip_init_position.top)
+            .style("left", config.tooltip_init_position.left)
             .style("display", "block");
     }
 };
 c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
     var $$ = this, config = $$.config,
-        titleFormat = config[__tooltip_format_title] || defaultTitleFormat,
-        nameFormat = config[__tooltip_format_name] || function (name) { return name; },
-        valueFormat = config[__tooltip_format_value] || defaultValueFormat,
+        titleFormat = config.tooltip_format_title || defaultTitleFormat,
+        nameFormat = config.tooltip_format_name || function (name) { return name; },
+        valueFormat = config.tooltip_format_value || defaultValueFormat,
         text, i, title, value, name, bgcolor;
     for (i = 0; i < d.length; i++) {
         if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
@@ -54,10 +54,10 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
     var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
     var forArc = $$.hasArcType(),
         dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-    if (dataToShow.length === 0 || !config[__tooltip_show]) {
+    if (dataToShow.length === 0 || !config.tooltip_show) {
         return;
     }
-    $$.tooltip.html(config[__tooltip_contents].call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
 
     // Get tooltip dimensions
     tWidth = $$.tooltip.property('offsetWidth');
@@ -67,7 +67,7 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         tooltipLeft = ($$.width / 2) + mouse[0];
         tooltipTop = ($$.height / 2) + mouse[1] + 20;
     } else {
-        if (config[__axis_rotated]) {
+        if (config.axis_rotated) {
             svgLeft = $$.getSvgLeft();
             tooltipLeft = svgLeft + mouse[0] + 100;
             tooltipRight = tooltipLeft + tWidth;

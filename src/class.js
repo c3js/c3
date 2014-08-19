@@ -196,7 +196,7 @@ c3_chart_internal_fn.classEvent = function (d) {
 };
 c3_chart_internal_fn.classTarget = function (id) {
     var $$ = this;
-    var additionalClassSuffix = $$.config[__data_classes][id], additionalClass = '';
+    var additionalClassSuffix = $$.config.data_classes[id], additionalClass = '';
     if (additionalClassSuffix) {
         additionalClass = ' ' + CLASS[_target] + '-' + additionalClassSuffix;
     }

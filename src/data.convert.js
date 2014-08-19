@@ -29,7 +29,7 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         targetKeys = keys.value;
         if (keys.x) {
             targetKeys.push(keys.x);
-            $$.config[__data_x] = keys.x;
+            $$.config.data_x = keys.x;
         }
         new_rows.push(targetKeys);
         json.forEach(function (o) {
@@ -100,11 +100,11 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                 );
             }
             // if not included in input data, find from preloaded data of other id's x
-            else if (config[__data_x]) {
+            else if (config.data_x) {
                 $$.data.xs[id] = $$.getOtherTargetXs();
             }
             // if not included in input data, find from preloaded data
-            else if (notEmpty(config[__data_xs])) {
+            else if (notEmpty(config.data_xs)) {
                 $$.data.xs[id] = $$.getXValuesOfXKey(xKey, $$.data.targets);
             }
             // MEMO: if no x included, use same x of current will be used
@@ -123,7 +123,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
 
     // convert to target
     targets = ids.map(function (id, index) {
-        var convertedId = config[__data_idConverter](id);
+        var convertedId = config.data_idConverter(id);
         return {
             id: convertedId,
             id_org: id,
@@ -131,8 +131,8 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                 var xKey = $$.getXKey(id), rawX = d[xKey], x = $$.generateTargetX(rawX, id, i);
                 // use x as categories if custom x and categorized
                 if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
-                    if (i === 0) { config[__axis_x_categories] = []; }
-                    config[__axis_x_categories].push(rawX);
+                    if (i === 0) { config.axis_x_categories = []; }
+                    config.axis_x_categories.push(rawX);
                 }
                 // mark as x = undefined if value is undefined and filter to remove after mapped
                 if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
@@ -164,8 +164,8 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     });
 
     // set target types
-    if (config[__data_type]) {
-        $$.setTargetType($$.mapToIds(targets).filter(function (id) { return ! (id in config[__data_types]); }), config[__data_type]);
+    if (config.data_type) {
+        $$.setTargetType($$.mapToIds(targets).filter(function (id) { return ! (id in config.data_types); }), config.data_type);
     }
 
     // cache as original id keyed

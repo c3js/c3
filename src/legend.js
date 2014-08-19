@@ -1,7 +1,7 @@
 c3_chart_internal_fn.initLegend = function () {
     var $$ = this;
     $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
-    if (!$$.config[__legend_show]) {
+    if (!$$.config.legend_show) {
         $$.legend.style('visibility', 'hidden');
         $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
     }
@@ -11,8 +11,8 @@ c3_chart_internal_fn.initLegend = function () {
 };
 c3_chart_internal_fn.updateSizeForLegend = function (legendHeight, legendWidth) {
     var $$ = this, config = $$.config, insetLegendPosition = {
-        top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config[__legend_inset_y] + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config[__legend_inset_y],
-        left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config[__legend_inset_x] + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config[__legend_inset_x] + 0.5
+        top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config.legend_inset_y + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config.legend_inset_y,
+        left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config.legend_inset_x + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config.legend_inset_x + 0.5
     };
     $$.margin3 = {
         top: $$.isLegendRight ? 0 : $$.isLegendInset ? insetLegendPosition.top : $$.currentHeight - legendHeight,
@@ -36,15 +36,15 @@ c3_chart_internal_fn.updateLegendItemHeight = function (h) {
 };
 c3_chart_internal_fn.getLegendWidth = function () {
     var $$ = this;
-    return $$.config[__legend_show] ? $$.isLegendRight || $$.isLegendInset ? $$.legendItemWidth * ($$.legendStep + 1) : $$.currentWidth : 0;
+    return $$.config.legend_show ? $$.isLegendRight || $$.isLegendInset ? $$.legendItemWidth * ($$.legendStep + 1) : $$.currentWidth : 0;
 };
 c3_chart_internal_fn.getLegendHeight = function () {
     var $$ = this, config = $$.config, h = 0;
-    if (config[__legend_show]) {
+    if (config.legend_show) {
         if ($$.isLegendRight) {
             h = $$.currentHeight;
         } else if ($$.isLegendInset) {
-            h = config[__legend_inset_step] ? Math.max(20, $$.legendItemHeight) * (config[__legend_inset_step] + 1) : $$.height;
+            h = config.legend_inset_step ? Math.max(20, $$.legendItemHeight) * (config.legend_inset_step + 1) : $$.height;
         } else {
             h = Math.max(20, $$.legendItemHeight) * ($$.legendStep + 1);
         }
@@ -80,8 +80,8 @@ c3_chart_internal_fn.revertLegend = function () {
 };
 c3_chart_internal_fn.showLegend = function (targetIds) {
     var $$ = this, config = $$.config;
-    if (!config[__legend_show]) {
-        config[__legend_show] = true;
+    if (!config.legend_show) {
+        config.legend_show = true;
         $$.legend.style('visibility', 'visible');
     }
     $$.removeHiddenLegendIds(targetIds);
@@ -92,8 +92,8 @@ c3_chart_internal_fn.showLegend = function (targetIds) {
 };
 c3_chart_internal_fn.hideLegend = function (targetIds) {
     var $$ = this, config = $$.config;
-    if (config[__legend_show] && isEmpty(targetIds)) {
-        config[__legend_show] = false;
+    if (config.legend_show && isEmpty(targetIds)) {
+        config.legend_show = false;
         $$.legend.style('visibility', 'hidden');
     }
     $$.addHiddenLegendIds(targetIds);
@@ -145,7 +145,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             maxHeight = 0;
         }
 
-        if (config[__legend_show] && !$$.isLegendToShow(id)) {
+        if (config.legend_show && !$$.isLegendToShow(id)) {
             widths[id] = heights[id] = steps[id] = offsets[id] = 0;
             return;
         }
@@ -157,7 +157,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         if (!maxHeight || itemHeight >= maxHeight) { maxHeight = itemHeight; }
         maxLength = $$.isLegendRight || $$.isLegendInset ? maxHeight : maxWidth;
 
-        if (config[__legend_equally]) {
+        if (config.legend_equally) {
             Object.keys(widths).forEach(function (id) { widths[id] = maxWidth; });
             Object.keys(heights).forEach(function (id) { heights[id] = maxHeight; });
             margin = (areaLength - maxLength * targetIds.length) / 2;
@@ -197,15 +197,15 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
         .style('cursor', 'pointer')
         .on('click', function (id) {
-            config[__legend_item_onclick] ? config[__legend_item_onclick].call($$, id) : $$.api.toggle(id);
+            config.legend_item_onclick ? config.legend_item_onclick.call($$, id) : $$.api.toggle(id);
         })
         .on('mouseover', function (id) {
             $$.d3.select(this).classed(CLASS[_legendItemFocused], true);
             if (!$$.transiting) {
                 $$.api.focus(id);
             }
-            if (config[__legend_item_onmouseover]) {
-                config[__legend_item_onmouseover].call($$, id);
+            if (config.legend_item_onmouseover) {
+                config.legend_item_onmouseover.call($$, id);
             }
         })
         .on('mouseout', function (id) {
@@ -213,12 +213,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             if (!$$.transiting) {
                 $$.api.revert();
             }
-            if (config[__legend_item_onmouseout]) {
-                config[__legend_item_onmouseout].call($$, id);
+            if (config.legend_item_onmouseout) {
+                config.legend_item_onmouseout.call($$, id);
             }
         });
     l.append('text')
-        .text(function (id) { return isDefined(config[__data_names][id]) ? config[__data_names][id] : id; })
+        .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; })
         .each(function (id, i) { updatePositions(this, id, i === 0); })
         .style("pointer-events", "none")
         .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
@@ -247,7 +247,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     texts = $$.legend.selectAll('text')
         .data(targetIds)
-        .text(function (id) { return isDefined(config[__data_names][id]) ? config[__data_names][id] : id; }) // MEMO: needed for update
+        .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; }) // MEMO: needed for update
         .each(function (id, i) { updatePositions(this, id, i === 0); });
     (withTransition ? texts.transition() : texts)
         .attr('x', xForLegendText)

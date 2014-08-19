@@ -53,14 +53,14 @@ c3_chart_internal_fn.updateScales = function () {
     var $$ = this, config = $$.config,
         forInit = !$$.x;
     // update edges
-    $$.xMin = config[__axis_rotated] ? 1 : 0;
-    $$.xMax = config[__axis_rotated] ? $$.height : $$.width;
-    $$.yMin = config[__axis_rotated] ? 0 : $$.height;
-    $$.yMax = config[__axis_rotated] ? $$.width : 1;
+    $$.xMin = config.axis_rotated ? 1 : 0;
+    $$.xMax = config.axis_rotated ? $$.height : $$.width;
+    $$.yMin = config.axis_rotated ? 0 : $$.height;
+    $$.yMax = config.axis_rotated ? $$.width : 1;
     $$.subXMin = $$.xMin;
     $$.subXMax = $$.xMax;
-    $$.subYMin = config[__axis_rotated] ? 0 : $$.height2;
-    $$.subYMax = config[__axis_rotated] ? $$.width2 : 1;
+    $$.subYMin = config.axis_rotated ? 0 : $$.height2;
+    $$.subYMax = config.axis_rotated ? $$.width2 : 1;
     // update scales
     $$.x = $$.getX($$.xMin, $$.xMax, forInit ? undefined : $$.x.orgDomain(), function () { return $$.xAxis.tickOffset(); });
     $$.y = $$.getY($$.yMin, $$.yMax, forInit ? undefined : $$.y.domain());
@@ -70,15 +70,15 @@ c3_chart_internal_fn.updateScales = function () {
     $$.subY2 = $$.getY($$.subYMin, $$.subYMax, forInit ? undefined : $$.subY2.domain());
     // update axes
     $$.xAxisTickFormat = $$.getXAxisTickFormat();
-    $$.xAxisTickValues = config[__axis_x_tick_values] ? config[__axis_x_tick_values] : (forInit ? undefined : $$.xAxis.tickValues());
+    $$.xAxisTickValues = config.axis_x_tick_values ? config.axis_x_tick_values : (forInit ? undefined : $$.xAxis.tickValues());
     $$.xAxis = $$.getXAxis($$.x, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
     $$.subXAxis = $$.getXAxis($$.subX, $$.subXOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
-    $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config[__axis_y_tick_format], config[__axis_y_ticks]);
-    $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config[__axis_y2_tick_format], config[__axis_y2_ticks]);
+    $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks);
+    $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks);
     // Set initialized scales to brush and zoom
     if (!forInit) {
         if ($$.brush) { $$.brush.scale($$.subX); }
-        if (config[__zoom_enabled]) { $$.zoom.scale($$.x); }
+        if (config.zoom_enabled) { $$.zoom.scale($$.x); }
     }
     // update for arc
     if ($$.updateArc) { $$.updateArc(); }

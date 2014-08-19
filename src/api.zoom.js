@@ -2,7 +2,7 @@ c3_chart_fn.zoom = function () {
 };
 c3_chart_fn.zoom.enable = function (enabled) {
     var $$ = this.internal;
-    $$.config[__zoom_enabled] = enabled;
+    $$.config.zoom_enabled = enabled;
     $$.updateAndRedraw();
 };
 c3_chart_fn.unzoom = function () {
