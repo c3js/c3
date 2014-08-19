@@ -1,12 +1,12 @@
 c3_chart_internal_fn.initRegion = function () {
-    var $$ = this, CLASS = $$.CLASS;
+    var $$ = this;
     $$.main.append('g')
         .attr("clip-path", $$.clipPath)
-        .attr("class", CLASS[_regions]);
+        .attr("class", CLASS.regions);
 };
 c3_chart_internal_fn.redrawRegion = function (duration) {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS;
-    $$.mainRegion = $$.main.select('.' + CLASS[_regions]).selectAll('.' + CLASS[_region])
+    var $$ = this, config = $$.config;
+    $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
     $$.mainRegion.enter().append('g')
         .attr('class', $$.classRegion.bind($$))

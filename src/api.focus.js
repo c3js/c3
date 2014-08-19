@@ -8,7 +8,7 @@ c3_chart_fn.focus = function (targetId) {
     }
     this.revert();
     this.defocus();
-    focus(candidatesForNoneArc.classed(CLASS[_focused], true));
+    focus(candidatesForNoneArc.classed(CLASS.focused, true));
     focus(candidatesForArc);
     if ($$.hasArcType()) {
         $$.expandArc(targetId, true);
@@ -25,7 +25,7 @@ c3_chart_fn.defocus = function (targetId) {
         $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 0.3);
     }
     this.revert();
-    defocus(candidatesForNoneArc.classed(CLASS[_focused], false));
+    defocus(candidatesForNoneArc.classed(CLASS.focused, false));
     defocus(candidatesForArc);
     if ($$.hasArcType()) {
         $$.unexpandArc(targetId);
@@ -41,7 +41,7 @@ c3_chart_fn.revert = function (targetId) {
     function revert(targets) {
         $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
     }
-    revert(candidatesForNoneArc.classed(CLASS[_focused], false));
+    revert(candidatesForNoneArc.classed(CLASS.focused, false));
     revert(candidatesForArc);
     if ($$.hasArcType()) {
         $$.unexpandArc(targetId);

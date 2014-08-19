@@ -77,7 +77,7 @@ c3_chart_internal_fn.unload = function (targetIds, done) {
         $$.withoutFadeIn[id] = false;
         // Remove target's elements
         if ($$.legend) {
-            $$.legend.selectAll('.' + CLASS[_legendItem] + $$.getTargetSelectorSuffix(id)).remove();
+            $$.legend.selectAll('.' + CLASS.legendItem + $$.getTargetSelectorSuffix(id)).remove();
         }
         // Remove target
         $$.data.targets = $$.data.targets.filter(function (t) {

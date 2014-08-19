@@ -1,14 +1,14 @@
 c3_chart_internal_fn.initText = function () {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartTexts]);
+    var $$ = this;
+    $$.main.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.chartTexts);
     $$.mainText = $$.d3.selectAll([]);
 };
 c3_chart_internal_fn.updateTargetsForText = function (targets) {
-    var $$ = this, CLASS = $$.CLASS, mainTextUpdate, mainTextEnter,
+    var $$ = this, mainTextUpdate, mainTextEnter,
         classChartText = $$.classChartText.bind($$),
         classTexts = $$.classTexts.bind($$);
-    mainTextUpdate = $$.main.select('.' + CLASS[_chartTexts]).selectAll('.' + CLASS[_chartText])
+    mainTextUpdate = $$.main.select('.' + CLASS.chartTexts).selectAll('.' + CLASS.chartText)
         .data(targets)
         .attr('class', classChartText);
     mainTextEnter = mainTextUpdate.enter().append('g')
@@ -19,10 +19,10 @@ c3_chart_internal_fn.updateTargetsForText = function (targets) {
         .attr('class', classTexts);
 };
 c3_chart_internal_fn.redrawText = function (durationForExit) {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS,
+    var $$ = this, config = $$.config,
         barOrLineData = $$.barOrLineData.bind($$),
         classText = $$.classText.bind($$);
-    $$.mainText = $$.main.selectAll('.' + CLASS[_texts]).selectAll('.' + CLASS[_text])
+    $$.mainText = $$.main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
         .data(barOrLineData);
     $$.mainText.enter().append('text')
         .attr("class", classText)

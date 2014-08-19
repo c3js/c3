@@ -1,25 +1,25 @@
 c3_chart_internal_fn.initEventRect = function () {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_eventRects])
+    var $$ = this;
+    $$.main.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.eventRects)
         .style('fill-opacity', 0);
 };
 c3_chart_internal_fn.redrawEventRect = function () {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS,
+    var $$ = this, config = $$.config,
         eventRectUpdate, maxDataCountTarget,
         isMultipleX = $$.isMultipleX();
 
     // rects for mouseover
-    var eventRects = $$.main.select('.' + CLASS[_eventRects])
+    var eventRects = $$.main.select('.' + CLASS.eventRects)
             .style('cursor', config.zoom_enabled ? config.axis_rotated ? 'ns-resize' : 'ew-resize' : null)
-            .classed(CLASS[_eventRectsMultiple], isMultipleX)
-            .classed(CLASS[_eventRectsSingle], !isMultipleX);
+            .classed(CLASS.eventRectsMultiple, isMultipleX)
+            .classed(CLASS.eventRectsSingle, !isMultipleX);
 
     // clear old rects
-    eventRects.selectAll('.' + CLASS[_eventRect]).remove();
+    eventRects.selectAll('.' + CLASS.eventRect).remove();
 
     // open as public variable
-    $$.eventRect = eventRects.selectAll('.' + CLASS[_eventRect]);
+    $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect);
 
     if (isMultipleX) {
         eventRectUpdate = $$.eventRect.data([0]);
@@ -33,7 +33,7 @@ c3_chart_internal_fn.redrawEventRect = function () {
         // Set data and update $$.eventRect
         maxDataCountTarget = $$.getMaxDataCountTarget($$.data.targets);
         eventRects.datum(maxDataCountTarget ? maxDataCountTarget.values : []);
-        $$.eventRect = eventRects.selectAll('.' + CLASS[_eventRect]);
+        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect);
         eventRectUpdate = $$.eventRect.data(function (d) { return d; });
         // enter
         $$.generateEventRectsForSingleX(eventRectUpdate.enter());
@@ -120,7 +120,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             $$.expandBars(index);
 
             // Call event handler
-            $$.main.selectAll('.' + CLASS[_shape] + '-' + index).each(function (d) {
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 config.data_onmouseover.call($$, d);
             });
         })
@@ -133,13 +133,13 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             $$.unexpandCircles(index);
             $$.unexpandBars();
             // Call event handler
-            $$.main.selectAll('.' + CLASS[_shape] + '-' + index).each(function (d) {
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 config.data_onmouseout.call($$, d);
             });
         })
         .on('mousemove', function (d) {
             var selectedData, index = d.index,
-                eventRect = $$.svg.select('.' + CLASS[_eventRect] + '-' + index);
+                eventRect = $$.svg.select('.' + CLASS.eventRect + '-' + index);
 
             if ($$.dragging) { return; } // do nothing when dragging
             if ($$.hasArcType()) { return; }
@@ -158,9 +158,9 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 return;
             }
 
-            $$.main.selectAll('.' + CLASS[_shape] + '-' + index)
+            $$.main.selectAll('.' + CLASS.shape + '-' + index)
                 .each(function () {
-                    d3.select(this).classed(CLASS[_EXPANDED], true);
+                    d3.select(this).classed(CLASS.EXPANDED, true);
                     if (config.data_selection_enabled) {
                         eventRect.style('cursor', config.data_selection_grouped ? 'pointer' : null);
                     }
@@ -200,7 +200,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 $$.cancelClick = false;
                 return;
             }
-            $$.main.selectAll('.' + CLASS[_shape] + '-' + index).each(function (d) {
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 $$.toggleShape(this, d, index);
             });
         })
@@ -220,7 +220,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .attr('y', 0)
         .attr('width', $$.width)
         .attr('height', $$.height)
-        .attr('class', CLASS[_eventRect])
+        .attr('class', CLASS.eventRect)
         .on('mouseout', function () {
             if ($$.hasArcType()) { return; }
             $$.hideXGridFocus();
@@ -262,13 +262,13 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
 
             // Show cursor as pointer if point is close to mouse position
             if ($$.dist(closest, mouse) < 100) {
-                $$.svg.select('.' + CLASS[_eventRect]).style('cursor', 'pointer');
+                $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                 if (!$$.mouseover) {
                     config.data_onmouseover.call($$, closest);
                     $$.mouseover = true;
                 }
             } else if ($$.mouseover) {
-                $$.svg.select('.' + CLASS[_eventRect]).style('cursor', null);
+                $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
                 config.data_onmouseout.call($$, closest);
                 $$.mouseover = false;
             }
@@ -286,7 +286,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
 
             // select if selection enabled
             if ($$.dist(closest, mouse) < 100 && $$.toggleShape) {
-                $$.main.select('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS[_circle] + '-' + closest.index).each(function () {
+                $$.main.select('.' + CLASS.circles + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
                     $$.toggleShape(this, closest, closest.index);
                 });
             }

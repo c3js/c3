@@ -53,15 +53,15 @@ c3_chart_internal_fn.getLegendHeight = function () {
 };
 c3_chart_internal_fn.opacityForLegend = function (legendItem) {
     var $$ = this;
-    return legendItem.classed(CLASS[_legendItemHidden]) ? $$.legendOpacityForHidden : 1;
+    return legendItem.classed(CLASS.legendItemHidden) ? $$.legendOpacityForHidden : 1;
 };
 c3_chart_internal_fn.opacityForUnfocusedLegend = function (legendItem) {
     var $$ = this;
-    return legendItem.classed(CLASS[_legendItemHidden]) ? $$.legendOpacityForHidden : 0.3;
+    return legendItem.classed(CLASS.legendItemHidden) ? $$.legendOpacityForHidden : 0.3;
 };
 c3_chart_internal_fn.toggleFocusLegend = function (id, focus) {
     var $$ = this;
-    $$.legend.selectAll('.' + CLASS[_legendItem])
+    $$.legend.selectAll('.' + CLASS.legendItem)
         .transition().duration(100)
         .style('opacity', function (_id) {
             var This = $$.d3.select(this);
@@ -74,7 +74,7 @@ c3_chart_internal_fn.toggleFocusLegend = function (id, focus) {
 };
 c3_chart_internal_fn.revertLegend = function () {
     var $$ = this, d3 = $$.d3;
-    $$.legend.selectAll('.' + CLASS[_legendItem])
+    $$.legend.selectAll('.' + CLASS.legendItem)
         .transition().duration(100)
         .style('opacity', function () { return $$.opacityForLegend(d3.select(this)); });
 };
@@ -107,7 +107,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var paddingTop = 4, paddingRight = 36, maxWidth = 0, maxHeight = 0, posMin = 10;
     var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
     var withTransition, withTransitionForTransform;
-    var hasFocused = $$.legend.selectAll('.' + CLASS[_legendItemFocused]).size();
+    var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
     var texts, rects, tiles;
 
     options = options || {};
@@ -115,7 +115,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
     function updatePositions(textElement, id, reset) {
-        var box = $$.getTextRect(textElement.textContent, CLASS[_legendItem]),
+        var box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
             itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
             itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
             itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
@@ -190,17 +190,17 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     yForLegendRect = function (id, i) { return yForLegend(id, i) - 7; };
 
     // Define g for legend area
-    l = $$.legend.selectAll('.' + CLASS[_legendItem])
+    l = $$.legend.selectAll('.' + CLASS.legendItem)
         .data(targetIds)
         .enter().append('g')
-        .attr('class', function (id) { return $$.generateClass(CLASS[_legendItem], id); })
+        .attr('class', function (id) { return $$.generateClass(CLASS.legendItem, id); })
         .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
         .style('cursor', 'pointer')
         .on('click', function (id) {
             config.legend_item_onclick ? config.legend_item_onclick.call($$, id) : $$.api.toggle(id);
         })
         .on('mouseover', function (id) {
-            $$.d3.select(this).classed(CLASS[_legendItemFocused], true);
+            $$.d3.select(this).classed(CLASS.legendItemFocused, true);
             if (!$$.transiting) {
                 $$.api.focus(id);
             }
@@ -209,7 +209,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             }
         })
         .on('mouseout', function (id) {
-            $$.d3.select(this).classed(CLASS[_legendItemFocused], false);
+            $$.d3.select(this).classed(CLASS.legendItemFocused, false);
             if (!$$.transiting) {
                 $$.api.revert();
             }
@@ -224,12 +224,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
         .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendText);
     l.append('rect')
-        .attr("class", CLASS[_legendItemEvent])
+        .attr("class", CLASS.legendItemEvent)
         .style('fill-opacity', 0)
         .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendRect : -200)
         .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendRect);
     l.append('rect')
-        .attr("class", CLASS[_legendItemTile])
+        .attr("class", CLASS.legendItemTile)
         .style("pointer-events", "none")
         .style('fill', $$.color)
         .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
@@ -238,8 +238,8 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('height', 10);
     // Set background for inset legend
     if ($$.isLegendInset && maxWidth !== 0) {
-        $$.legend.insert('g', '.' + CLASS[_legendItem])
-            .attr("class", CLASS[_legendBackground])
+        $$.legend.insert('g', '.' + CLASS.legendItem)
+            .attr("class", CLASS.legendBackground)
             .append('rect')
             .attr('height', $$.getLegendHeight() - 10)
             .attr('width', maxWidth * (step + 1) + 10);
@@ -253,7 +253,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('x', xForLegendText)
         .attr('y', yForLegendText);
 
-    rects = $$.legend.selectAll('rect.' + CLASS[_legendItemEvent])
+    rects = $$.legend.selectAll('rect.' + CLASS.legendItemEvent)
         .data(targetIds);
     (withTransition ? rects.transition() : rects)
         .attr('width', function (id) { return widths[id]; })
@@ -261,7 +261,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('x', xForLegendRect)
         .attr('y', yForLegendRect);
 
-    tiles = $$.legend.selectAll('rect.' + CLASS[_legendItemTile])
+    tiles = $$.legend.selectAll('rect.' + CLASS.legendItemTile)
         .data(targetIds);
     (withTransition ? tiles.transition() : tiles)
         .style('fill', $$.color)
@@ -269,13 +269,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('y', yForLegend);
 
     // toggle legend state
-    $$.legend.selectAll('.' + CLASS[_legendItem])
-        .classed(CLASS[_legendItemHidden], function (id) { return !$$.isTargetToShow(id); })
+    $$.legend.selectAll('.' + CLASS.legendItem)
+        .classed(CLASS.legendItemHidden, function (id) { return !$$.isTargetToShow(id); })
         .transition()
         .style('opacity', function (id) {
             var This = $$.d3.select(this);
             if ($$.isTargetToShow(id)) {
-                return !hasFocused || This.classed(CLASS[_legendItemFocused]) ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
+                return !hasFocused || This.classed(CLASS.legendItemFocused) ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
             } else {
                 return $$.legendOpacityForHidden;
             }

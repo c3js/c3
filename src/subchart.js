@@ -2,7 +2,7 @@ c3_chart_internal_fn.initBrush = function () {
     var $$ = this, d3 = $$.d3;
     $$.brush = d3.svg.brush().on("brush", function () { $$.redrawForBrush(); });
     $$.brush.update = function () {
-        if ($$.context) { $$.context.select('.' + $$.CLASS[_brush]).call(this); }
+        if ($$.context) { $$.context.select('.' + CLASS.brush).call(this); }
         return this;
     };
     $$.brush.scale = function (scale) {
@@ -20,20 +20,20 @@ c3_chart_internal_fn.initSubchart = function () {
     // Define g for chart area
     context.append('g')
         .attr("clip-path", $$.clipPath)
-        .attr('class', CLASS[_chart]);
+        .attr('class', CLASS.chart);
 
     // Define g for bar chart area
-    context.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartBars]);
+    context.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.chartBars);
 
     // Define g for line chart area
-    context.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartLines]);
+    context.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.chartLines);
 
     // Add extent rect for Brush
     context.append("g")
         .attr("clip-path", $$.clipPath)
-        .attr("class", CLASS[_brush])
+        .attr("class", CLASS.brush)
         .call($$.brush)
         .selectAll("rect")
         .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
@@ -41,7 +41,7 @@ c3_chart_internal_fn.initSubchart = function () {
     // ATTENTION: This must be called AFTER chart added
     // Add Axis
     $$.axes.subx = context.append("g")
-        .attr("class", CLASS[_axisX])
+        .attr("class", CLASS.axisX)
         .attr("transform", $$.getTranslate('subx'))
         .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis);
 };
@@ -55,7 +55,7 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         classAreas = $$.classAreas.bind($$);
 
     if (config.subchart_show) {
-        contextBarUpdate = context.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
+        contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
             .data(targets)
             .attr('class', classChartBar);
         contextBarEnter = contextBarUpdate.enter().append('g')
@@ -66,7 +66,7 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
             .attr("class", classBars);
 
         //-- Line --//
-        contextLineUpdate = context.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
+        contextLineUpdate = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
             .data(targets)
             .attr('class', classChartLine);
         contextLineEnter = contextLineUpdate.enter().append('g')
@@ -113,7 +113,7 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
             drawBarOnSub = $$.generateDrawBar(barIndices, true);
             drawLineOnSub = $$.generateDrawLine(lineIndices, true);
             // bars
-            contextBar = context.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
+            contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
                 .data(barData);
             contextBar.enter().append('path')
                 .attr("class", classBar)
@@ -128,7 +128,7 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
                 .style('opacity', 0)
                 .remove();
             // lines
-            contextLine = context.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
+            contextLine = context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
                 .data(lineData);
             contextLine.enter().append('path')
                 .attr('class', classLine)
@@ -142,7 +142,7 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
                 .style('opacity', 0)
                 .remove();
             // area
-            contextArea = context.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
+            contextArea = context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
                 .data(lineData);
             contextArea.enter().append('path')
                 .attr("class", classArea)
@@ -175,7 +175,7 @@ c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
     if (transitions && transitions.axisSubX) {
         subXAxis = transitions.axisSubX;
     } else {
-        subXAxis = $$.context.select('.' + CLASS[_axisX]);
+        subXAxis = $$.context.select('.' + CLASS.axisX);
         if (withTransition) { subXAxis = subXAxis.transition(); }
     }
     $$.context.attr("transform", $$.getTranslate('context'));

@@ -59,7 +59,7 @@ c3_chart_internal_fn.getParentHeight = function () {
 
 c3_chart_internal_fn.getSvgLeft = function () {
     var $$ = this, config = $$.config,
-        leftAxisClass = config.axis_rotated ? CLASS[_axisX] : CLASS[_axisY],
+        leftAxisClass = config.axis_rotated ? CLASS.axisX : CLASS.axisY,
         leftAxis = $$.main.select('.' + leftAxisClass).node(),
         svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
         chartRect = $$.selectChart.node().getBoundingClientRect(),

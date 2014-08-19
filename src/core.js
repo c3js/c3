@@ -204,7 +204,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // text when empty
     main.append("text")
-        .attr("class", CLASS[_text] + ' ' + CLASS[_empty])
+        .attr("class", CLASS.text + ' ' + CLASS.empty)
         .attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
         .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
@@ -217,7 +217,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define g for chart area
     main.append('g')
         .attr("clip-path", $$.clipPath)
-        .attr('class', CLASS[_chart]);
+        .attr('class', CLASS.chart);
 
     // Cover whole with rects for events
     $$.initEventRect();
@@ -237,8 +237,8 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // if zoom privileged, insert rect to forefront
     // TODO: is this needed?
-    main.insert('rect', config.zoom_privileged ? null : 'g.' + CLASS[_regions])
-        .attr('class', CLASS[_zoomRect])
+    main.insert('rect', config.zoom_privileged ? null : 'g.' + CLASS.regions)
+        .attr('class', CLASS.zoomRect)
         .attr('width', $$.width)
         .attr('height', $$.height)
         .style('opacity', 0)
@@ -394,7 +394,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     /*-- Show --*/
 
     // Fade-in each chart
-    $$.svg.selectAll('.' + CLASS[_target]).filter(function (d) { return $$.isTargetToShow(d.id); })
+    $$.svg.selectAll('.' + CLASS.target).filter(function (d) { return $$.isTargetToShow(d.id); })
       .transition().duration(config.transition_duration)
         .style("opacity", 1);
 };
@@ -470,14 +470,14 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                     break;
                 }
             }
-            $$.svg.selectAll('.' + CLASS[_axisX] + ' .tick text').each(function (e) {
+            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
                 var index = tickValues.indexOf(e);
                 if (index >= 0) {
                     d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
                 }
             });
         } else {
-            $$.svg.selectAll('.' + CLASS[_axisX] + ' .tick text').style('display', 'block');
+            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
         }
     }
 
@@ -504,7 +504,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.updateXgridFocus();
 
     // Data empty label positioning and text.
-    main.select("text." + CLASS[_text] + '.' + CLASS[_empty])
+    main.select("text." + CLASS.text + '.' + CLASS.empty)
         .attr("x", $$.width / 2)
         .attr("y", $$.height / 2)
         .text(config.data_empty_label_text)
@@ -539,7 +539,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // circles for select
-    main.selectAll('.' + CLASS[_selectedCircles])
+    main.selectAll('.' + CLASS.selectedCircles)
         .filter($$.isBarType.bind($$))
         .selectAll('circle')
         .remove();
@@ -691,26 +691,26 @@ c3_chart_internal_fn.transformMain = function (withTransition, transitions) {
     if (transitions && transitions.axisX) {
         xAxis = transitions.axisX;
     } else {
-        xAxis  = $$.main.select('.' + CLASS[_axisX]);
+        xAxis  = $$.main.select('.' + CLASS.axisX);
         if (withTransition) { xAxis = xAxis.transition(); }
     }
     if (transitions && transitions.axisY) {
         yAxis = transitions.axisY;
     } else {
-        yAxis = $$.main.select('.' + CLASS[_axisY]);
+        yAxis = $$.main.select('.' + CLASS.axisY);
         if (withTransition) { yAxis = yAxis.transition(); }
     }
     if (transitions && transitions.axisY2) {
         y2Axis = transitions.axisY2;
     } else {
-        y2Axis = $$.main.select('.' + CLASS[_axisY2]);
+        y2Axis = $$.main.select('.' + CLASS.axisY2);
         if (withTransition) { y2Axis = y2Axis.transition(); }
     }
     (withTransition ? $$.main.transition() : $$.main).attr("transform", $$.getTranslate('main'));
     xAxis.attr("transform", $$.getTranslate('x'));
     yAxis.attr("transform", $$.getTranslate('y'));
     y2Axis.attr("transform", $$.getTranslate('y2'));
-    $$.main.select('.' + CLASS[_chartArcs]).attr("transform", $$.getTranslate('arc'));
+    $$.main.select('.' + CLASS.chartArcs).attr("transform", $$.getTranslate('arc'));
 };
 c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
     var $$ = this;
@@ -735,7 +735,7 @@ c3_chart_internal_fn.updateSvgSize = function () {
         .attr('y', $$.getYAxisClipY.bind($$))
         .attr('width', $$.getYAxisClipWidth.bind($$))
         .attr('height', $$.getYAxisClipHeight.bind($$));
-    $$.svg.select('.' + CLASS[_zoomRect])
+    $$.svg.select('.' + CLASS.zoomRect)
         .attr('width', $$.width)
         .attr('height', $$.height);
     // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>

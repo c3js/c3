@@ -1,32 +1,32 @@
 c3_chart_internal_fn.initAxis = function () {
-    var $$ = this, config = $$.config, main = $$.main, CLASS = $$.CLASS;
+    var $$ = this, config = $$.config, main = $$.main;
     $$.axes.x = main.append("g")
-        .attr("class", CLASS[_axis] + ' ' + CLASS[_axisX])
+        .attr("class", CLASS.axis + ' ' + CLASS.axisX)
         .attr("clip-path", $$.clipPathForXAxis)
         .attr("transform", $$.getTranslate('x'))
         .style("visibility", config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append("text")
-        .attr("class", CLASS[_axisXLabel])
+        .attr("class", CLASS.axisXLabel)
         .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
         .style("text-anchor", $$.textAnchorForXAxisLabel.bind($$));
 
     $$.axes.y = main.append("g")
-        .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY])
+        .attr("class", CLASS.axis + ' ' + CLASS.axisY)
         .attr("clip-path", $$.clipPathForYAxis)
         .attr("transform", $$.getTranslate('y'))
         .style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text")
-        .attr("class", CLASS[_axisYLabel])
+        .attr("class", CLASS.axisYLabel)
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", $$.textAnchorForYAxisLabel.bind($$));
 
     $$.axes.y2 = main.append("g")
-        .attr("class", CLASS[_axis] + ' ' + CLASS[_axisY2])
+        .attr("class", CLASS.axis + ' ' + CLASS.axisY2)
         // clip-path?
         .attr("transform", $$.getTranslate('y2'))
         .style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append("text")
-        .attr("class", CLASS[_axisY2Label])
+        .attr("class", CLASS.axisY2Label)
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
 };
@@ -261,9 +261,9 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
 
 c3_chart_internal_fn.updateAxisLabels = function (withTransition) {
     var $$ = this;
-    var axisXLabel = $$.main.select('.' + CLASS[_axisX] + ' .' + CLASS[_axisXLabel]),
-        axisYLabel = $$.main.select('.' + CLASS[_axisY] + ' .' + CLASS[_axisYLabel]),
-        axisY2Label = $$.main.select('.' + CLASS[_axisY2] + ' .' + CLASS[_axisY2Label]);
+    var axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
+        axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
+        axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
     (withTransition ? axisXLabel.transition() : axisXLabel)
         .attr("x", $$.xForXAxisLabel.bind($$))
         .attr("dx", $$.dxForXAxisLabel.bind($$))

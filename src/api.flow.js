@@ -140,7 +140,7 @@ c3_chart_fn.flow = function (args) {
 };
 
 c3_chart_internal_fn.generateFlow = function (args) {
-    var $$ = this, config = $$.config, d3 = $$.d3, CLASS = $$.CLASS;
+    var $$ = this, config = $$.config, d3 = $$.d3;
 
     return function () {
         var targets = args.targets,
@@ -226,14 +226,14 @@ c3_chart_internal_fn.generateFlow = function (args) {
             // remove flowed elements
             if (flowLength) {
                 for (i = 0; i < flowLength; i++) {
-                    shapes.push('.' + CLASS[_shape] + '-' + (flowIndex + i));
-                    texts.push('.' + CLASS[_text] + '-' + (flowIndex + i));
-                    eventRects.push('.' + CLASS[_eventRect] + '-' + (flowIndex + i));
+                    shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
+                    texts.push('.' + CLASS.text + '-' + (flowIndex + i));
+                    eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
                 }
-                $$.svg.selectAll('.' + CLASS[_shapes]).selectAll(shapes).remove();
-                $$.svg.selectAll('.' + CLASS[_texts]).selectAll(texts).remove();
-                $$.svg.selectAll('.' + CLASS[_eventRects]).selectAll(eventRects).remove();
-                $$.svg.select('.' + CLASS[_xgrid]).remove();
+                $$.svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
+                $$.svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
+                $$.svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
+                $$.svg.select('.' + CLASS.xgrid).remove();
             }
 
             // draw again for removing flowed elements and reverting attr

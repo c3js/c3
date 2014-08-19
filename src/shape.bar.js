@@ -1,14 +1,14 @@
 c3_chart_internal_fn.initBar = function () {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartBars]);
+    var $$ = this;
+    $$.main.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.chartBars);
 };
 c3_chart_internal_fn.updateTargetsForBar = function (targets) {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS,
+    var $$ = this, config = $$.config,
         mainBarUpdate, mainBarEnter,
         classChartBar = $$.classChartBar.bind($$),
         classBars = $$.classBars.bind($$);
-    mainBarUpdate = $$.main.select('.' + CLASS[_chartBars]).selectAll('.' + CLASS[_chartBar])
+    mainBarUpdate = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
         .data(targets)
         .attr('class', classChartBar);
     mainBarEnter = mainBarUpdate.enter().append('g')
@@ -22,12 +22,12 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
 
 };
 c3_chart_internal_fn.redrawBar = function (durationForExit) {
-    var $$ = this, CLASS = $$.CLASS,
+    var $$ = this,
         barData = $$.barData.bind($$),
         classBar = $$.classBar.bind($$),
         initialOpacity = $$.initialOpacity.bind($$),
         color = function (d) { return $$.color(d.id); };
-    $$.mainBar = $$.main.selectAll('.' + CLASS[_bars]).selectAll('.' + CLASS[_bar])
+    $$.mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data(barData);
     $$.mainBar.enter().append('path')
         .attr("class", classBar)
@@ -53,15 +53,15 @@ c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
 };
 c3_chart_internal_fn.getBars = function (i) {
     var $$ = this;
-    return $$.main.selectAll('.' + CLASS[_bar] + (isValue(i) ? '-' + i : ''));
+    return $$.main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
 };
 c3_chart_internal_fn.expandBars = function (i) {
     var $$ = this;
-    $$.getBars(i).classed(CLASS[_EXPANDED], true);
+    $$.getBars(i).classed(CLASS.EXPANDED, true);
 };
 c3_chart_internal_fn.unexpandBars = function (i) {
     var $$ = this;
-    $$.getBars(i).classed(CLASS[_EXPANDED], false);
+    $$.getBars(i).classed(CLASS.EXPANDED, false);
 };
 c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
     var $$ = this, config = $$.config,

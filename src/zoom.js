@@ -21,8 +21,8 @@ c3_chart_internal_fn.initZoom = function () {
 };
 c3_chart_internal_fn.updateZoom = function () {
     var $$ = this, z = $$.config.zoom_enabled ? $$.zoom : function () {};
-    $$.main.select('.' + $$.CLASS[_zoomRect]).call(z);
-    $$.main.selectAll('.' + $$.CLASS[_eventRect]).call(z);
+    $$.main.select('.' + CLASS.zoomRect).call(z);
+    $$.main.selectAll('.' + CLASS.eventRect).call(z);
 };
 c3_chart_internal_fn.redrawForZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x, orgXDomain = $$.orgXDomain;

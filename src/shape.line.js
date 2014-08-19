@@ -1,16 +1,16 @@
 c3_chart_internal_fn.initLine = function () {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.main.select('.' + CLASS[_chart]).append("g")
-        .attr("class", CLASS[_chartLines]);
+    var $$ = this;
+    $$.main.select('.' + CLASS.chart).append("g")
+        .attr("class", CLASS.chartLines);
 };
 c3_chart_internal_fn.updateTargetsForLine = function (targets) {
-    var $$ = this, config = $$.config, CLASS = $$.CLASS,
+    var $$ = this, config = $$.config,
         mainLineUpdate, mainLineEnter,
         classChartLine = $$.classChartLine.bind($$),
         classLines = $$.classLines.bind($$),
         classAreas = $$.classAreas.bind($$),
         classCircles = $$.classCircles.bind($$);
-    mainLineUpdate = $$.main.select('.' + CLASS[_chartLines]).selectAll('.' + CLASS[_chartLine])
+    mainLineUpdate = $$.main.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
         .data(targets)
         .attr('class', classChartLine);
     mainLineEnter = mainLineUpdate.enter().append('g')
@@ -25,13 +25,13 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
         .attr('class', classAreas);
     // Circles for each data point on lines
     mainLineEnter.append('g')
-        .attr("class", function (d) { return $$.generateClass(CLASS[_selectedCircles], d.id); });
+        .attr("class", function (d) { return $$.generateClass(CLASS.selectedCircles, d.id); });
     mainLineEnter.append('g')
         .attr("class", classCircles)
         .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; });
     // Update date for selected circles
     targets.forEach(function (t) {
-        $$.main.selectAll('.' + CLASS[_selectedCircles] + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS[_selectedCircle]).each(function (d) {
+        $$.main.selectAll('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d) {
             d.value = t.values[d.index].value;
         });
     });
@@ -39,8 +39,8 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
     //mainLineUpdate.exit().remove();
 };
 c3_chart_internal_fn.redrawLine = function (durationForExit) {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.mainLine = $$.main.selectAll('.' + CLASS[_lines]).selectAll('.' + CLASS[_line])
+    var $$ = this;
+    $$.mainLine = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
     $$.mainLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
@@ -194,8 +194,8 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
 
 
 c3_chart_internal_fn.redrawArea = function (durationForExit) {
-    var $$ = this, CLASS = $$.CLASS, d3 = $$.d3;
-    $$.mainArea = $$.main.selectAll('.' + CLASS[_areas]).selectAll('.' + CLASS[_area])
+    var $$ = this, d3 = $$.d3;
+    $$.mainArea = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
     $$.mainArea.enter().append('path')
         .attr("class", $$.classArea.bind($$))
@@ -271,8 +271,8 @@ c3_chart_internal_fn.generateGetAreaPoint = function (areaIndices, isSub) { // p
 
 
 c3_chart_internal_fn.redrawCircle = function () {
-    var $$ = this, CLASS = $$.CLASS;
-    $$.mainCircle = $$.main.selectAll('.' + CLASS[_circles]).selectAll('.' + CLASS[_circle])
+    var $$ = this;
+    $$.mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
     $$.mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
@@ -289,7 +289,7 @@ c3_chart_internal_fn.addTransitionForCircle = function (transitions, cx, cy) {
                      .style("fill", $$.color)
                      .attr("cx", cx)
                      .attr("cy", cy));
-    transitions.push($$.main.selectAll('.' + CLASS[_selectedCircle]).transition()
+    transitions.push($$.main.selectAll('.' + CLASS.selectedCircle).transition()
                      .attr("cx", cx)
                      .attr("cy", cy));
 };
@@ -303,21 +303,21 @@ c3_chart_internal_fn.circleY = function (d, i) {
 };
 c3_chart_internal_fn.getCircles = function (i, id) {
     var $$ = this;
-    return (id ? $$.main.selectAll('.' + CLASS[_circles] + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS[_circle] + (isValue(i) ? '-' + i : ''));
+    return (id ? $$.main.selectAll('.' + CLASS.circles + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.circle + (isValue(i) ? '-' + i : ''));
 };
 c3_chart_internal_fn.expandCircles = function (i, id) {
     var $$ = this,
         r = $$.pointExpandedR.bind($$);
     $$.getCircles(i, id)
-        .classed(CLASS[_EXPANDED], true)
+        .classed(CLASS.EXPANDED, true)
         .attr('r', r);
 };
 c3_chart_internal_fn.unexpandCircles = function (i) {
     var $$ = this,
         r = $$.pointR.bind($$);
     $$.getCircles(i)
-        .filter(function () { return $$.d3.select(this).classed(CLASS[_EXPANDED]); })
-        .classed(CLASS[_EXPANDED], false)
+        .filter(function () { return $$.d3.select(this).classed(CLASS.EXPANDED); })
+        .classed(CLASS.EXPANDED, false)
         .attr('r', r);
 };
 c3_chart_internal_fn.pointR = function (d) {
