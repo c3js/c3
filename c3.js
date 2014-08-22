@@ -4957,7 +4957,7 @@
         var $$ = this, data_labels = $$.config.data_labels,
             format = function (v) { return isValue(v) ? +v : ""; };
         // find format according to axis id
-        if (data_labels.format) {
+        if (typeof data_labels.format === 'function') {
             format = data_labels.format;
         } else if (typeof data_labels.format === 'object') {
             if (data_labels.format[axisId]) {
