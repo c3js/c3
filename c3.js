@@ -5632,7 +5632,8 @@
         var $$ = this.internal, d3 = $$.d3, config = $$.config;
         if (! config.data_selection_enabled) { return; }
         $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-            var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = $$.getToggle(this),
+            var shape = d3.select(this), id = d.data ? d.data.id : d.id,
+                toggle = $$.getToggle(this).bind($$),
                 isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                 isTargetIndex = !indices || indices.indexOf(i) >= 0,
                 isSelected = shape.classed(CLASS.SELECTED);
@@ -5655,7 +5656,8 @@
         var $$ = this.internal, d3 = $$.d3, config = $$.config;
         if (! config.data_selection_enabled) { return; }
         $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-            var shape = d3.select(this), id = d.data ? d.data.id : d.id, toggle = $$.getToggle(this),
+            var shape = d3.select(this), id = d.data ? d.data.id : d.id,
+                toggle = $$.getToggle(this).bind($$),
                 isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
                 isTargetIndex = !indices || indices.indexOf(i) >= 0,
                 isSelected = shape.classed(CLASS.SELECTED);
