@@ -556,7 +556,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.addTransitionForBar(transitions, drawBar);
         $$.addTransitionForLine(transitions, drawLine);
         $$.addTransitionForArea(transitions, drawArea);
-        $$.addTransitionForCircle(transitions, cx, cy);
+        if (config.point_show) { $$.addTransitionForCircle(transitions, cx, cy); }
         $$.addTransitionForText(transitions, xForText, yForText, options.flow);
         $$.addTransitionForRegion(transitions);
         $$.addTransitionForGrid(transitions);
