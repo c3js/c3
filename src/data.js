@@ -123,12 +123,11 @@ c3_chart_internal_fn.getMaxDataCountTarget = function (targets) {
     return maxTarget;
 };
 c3_chart_internal_fn.getEdgeX = function (targets) {
-    var target = this.getMaxDataCountTarget(targets), firstData, lastData;
-    if (!target) {
-        return [0, 0];
-    }
-    firstData = target.values[0], lastData = target.values[target.values.length - 1];
-    return [firstData.x, lastData.x];
+    var $$ = this;
+    return !targets.length ? [0, 0] : [
+        $$.d3.min(targets, function (t) { return t.values[0].x; }),
+        $$.d3.max(targets, function (t) { return t.values[t.values.length - 1].x; })
+    ];
 };
 c3_chart_internal_fn.mapToIds = function (targets) {
     return targets.map(function (d) { return d.id; });

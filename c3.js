@@ -945,8 +945,8 @@
             axis_x_tick_values: null,
             axis_x_tick_rotate: undefined,
             axis_x_tick_outer: true,
-            axis_x_max: null,
-            axis_x_min: null,
+            axis_x_max: undefined,
+            axis_x_min: undefined,
             axis_x_padding: {},
             axis_x_height: undefined,
             axis_x_default: undefined,
@@ -1471,12 +1471,11 @@
         return maxTarget;
     };
     c3_chart_internal_fn.getEdgeX = function (targets) {
-        var target = this.getMaxDataCountTarget(targets), firstData, lastData;
-        if (!target) {
-            return [0, 0];
-        }
-        firstData = target.values[0], lastData = target.values[target.values.length - 1];
-        return [firstData.x, lastData.x];
+        var $$ = this;
+        return !targets.length ? [0, 0] : [
+            $$.d3.min(targets, function (t) { return t.values[0].x; }),
+            $$.d3.max(targets, function (t) { return t.values[t.values.length - 1].x; })
+        ];
     };
     c3_chart_internal_fn.mapToIds = function (targets) {
         return targets.map(function (d) { return d.id; });
