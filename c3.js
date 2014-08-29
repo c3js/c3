@@ -1279,13 +1279,13 @@
     };
     c3_chart_internal_fn.getXDomainMin = function (targets) {
         var $$ = this, config = $$.config;
-        return config.axis_x_min ?
+        return isDefined(config.axis_x_min) ?
             ($$.isTimeSeries() ? this.parseDate(config.axis_x_min) : config.axis_x_min) :
         $$.d3.min(targets, function (t) { return $$.d3.min(t.values, function (v) { return v.x; }); });
     };
     c3_chart_internal_fn.getXDomainMax = function (targets) {
         var $$ = this, config = $$.config;
-        return config.axis_x_max ?
+        return isDefined(config.axis_x_max) ?
             ($$.isTimeSeries() ? this.parseDate(config.axis_x_max) : config.axis_x_max) :
         $$.d3.max(targets, function (t) { return $$.d3.max(t.values, function (v) { return v.x; }); });
     };
