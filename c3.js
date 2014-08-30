@@ -964,7 +964,7 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
-            axis_y_padding: undefined,
+            axis_y_padding: {},
             axis_y_ticks: 10,
             axis_y2_show: false,
             axis_y2_max: undefined,
@@ -973,7 +973,7 @@
             axis_y2_label: {},
             axis_y2_tick_format: undefined,
             axis_y2_tick_outer: true,
-            axis_y2_padding: undefined,
+            axis_y2_padding: {},
             axis_y2_ticks: 10,
             // grid
             grid_x_show: false,
@@ -1243,6 +1243,11 @@
         isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
         isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
+        // Cancel zerobased if axis_*_min / axis_*_max specified
+        if ((isValue(yMin) && isAllPositive) || (isValue(yMax) && isAllNegative)) {
+            isZeroBased = false;
+        }
+
         // Bar/Area chart should be 0-based if all positive|negative
         if (isZeroBased) {
             if (isAllPositive) { yDomainMin = 0; }
@@ -1269,11 +1274,11 @@
             padding_top += lengths[1];
             padding_bottom += lengths[0];
         }
-        if (axisId === 'y' && config.axis_y_padding) {
+        if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
             padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);
             padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding, domainLength);
         }
-        if (axisId === 'y2' && config.axis_y2_padding) {
+        if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
             padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding, domainLength);
             padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding, domainLength);
         }

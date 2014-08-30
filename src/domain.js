@@ -82,6 +82,11 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId) {
     isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
     isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
+    // Cancel zerobased if axis_*_min / axis_*_max specified
+    if ((isValue(yMin) && isAllPositive) || (isValue(yMax) && isAllNegative)) {
+        isZeroBased = false;
+    }
+
     // Bar/Area chart should be 0-based if all positive|negative
     if (isZeroBased) {
         if (isAllPositive) { yDomainMin = 0; }
@@ -108,11 +113,11 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId) {
         padding_top += lengths[1];
         padding_bottom += lengths[0];
     }
-    if (axisId === 'y' && config.axis_y_padding) {
+    if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
         padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);
         padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding, domainLength);
     }
-    if (axisId === 'y2' && config.axis_y2_padding) {
+    if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
         padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding, domainLength);
         padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding, domainLength);
     }
