@@ -360,3 +360,6 @@ c3_chart_internal_fn.initGauge = function () {
             .text(config.gauge_label_show ? config.gauge_max : '');
     }
 };
+c3_chart_internal_fn.getGaugeLabelHeight = function () {
+    return this.config.gauge_label_show ? 20 : 0;
+};

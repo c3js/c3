@@ -100,7 +100,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_label: {},
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
-        axis_y_padding: undefined,
+        axis_y_padding: {},
         axis_y_ticks: 10,
         axis_y2_show: false,
         axis_y2_max: undefined,
@@ -109,7 +109,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y2_label: {},
         axis_y2_tick_format: undefined,
         axis_y2_tick_outer: true,
-        axis_y2_padding: undefined,
+        axis_y2_padding: {},
         axis_y2_ticks: 10,
         // grid
         grid_x_show: false,
@@ -121,6 +121,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         grid_y_lines: [],
         grid_y_ticks: 10,
         grid_focus_show: true,
+        grid_lines_front: true,
         // point - point of each data
         point_show: true,
         point_r: 2.5,

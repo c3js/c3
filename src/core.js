@@ -219,6 +219,9 @@ c3_chart_internal_fn.initWithData = function (data) {
         .attr("clip-path", $$.clipPath)
         .attr('class', CLASS.chart);
 
+    // Grid lines
+    if (config.grid_lines_front) { $$.initGridLines(); }
+
     // Cover whole with rects for events
     $$.initEventRect();
 
@@ -366,6 +369,9 @@ c3_chart_internal_fn.updateSizes = function () {
     // for arc
     $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
     $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+    if ($$.hasType('gauge')) {
+        $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
+    }
     if ($$.updateRadius) { $$.updateRadius(); }
 
     if ($$.isLegendRight && hasArc) {

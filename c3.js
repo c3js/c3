@@ -224,6 +224,9 @@
             .attr("clip-path", $$.clipPath)
             .attr('class', CLASS.chart);
 
+        // Grid lines
+        if (config.grid_lines_front) { $$.initGridLines(); }
+
         // Cover whole with rects for events
         $$.initEventRect();
 
@@ -371,6 +374,9 @@
         // for arc
         $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
         $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+        if ($$.hasType('gauge')) {
+            $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
+        }
         if ($$.updateRadius) { $$.updateRadius(); }
 
         if ($$.isLegendRight && hasArc) {
@@ -958,7 +964,7 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
-            axis_y_padding: undefined,
+            axis_y_padding: {},
             axis_y_ticks: 10,
             axis_y2_show: false,
             axis_y2_max: undefined,
@@ -967,7 +973,7 @@
             axis_y2_label: {},
             axis_y2_tick_format: undefined,
             axis_y2_tick_outer: true,
-            axis_y2_padding: undefined,
+            axis_y2_padding: {},
             axis_y2_ticks: 10,
             // grid
             grid_x_show: false,
@@ -979,6 +985,7 @@
             grid_y_lines: [],
             grid_y_ticks: 10,
             grid_focus_show: true,
+            grid_lines_front: true,
             // point - point of each data
             point_show: true,
             point_r: 2.5,
@@ -1236,6 +1243,11 @@
         isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
         isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
 
+        // Cancel zerobased if axis_*_min / axis_*_max specified
+        if ((isValue(yMin) && isAllPositive) || (isValue(yMax) && isAllNegative)) {
+            isZeroBased = false;
+        }
+
         // Bar/Area chart should be 0-based if all positive|negative
         if (isZeroBased) {
             if (isAllPositive) { yDomainMin = 0; }
@@ -1262,11 +1274,11 @@
             padding_top += lengths[1];
             padding_bottom += lengths[0];
         }
-        if (axisId === 'y' && config.axis_y_padding) {
+        if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
             padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);
             padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding, domainLength);
         }
-        if (axisId === 'y2' && config.axis_y2_padding) {
+        if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
             padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding, domainLength);
             padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding, domainLength);
         }
@@ -2271,7 +2283,7 @@
     c3_chart_internal_fn.getCurrentHeight = function () {
         var $$ = this, config = $$.config,
             h = config.size_height ? config.size_height : $$.getParentHeight();
-        return h > 0 ? h : 320;
+        return h > 0 ? h : 320 / ($$.hasType('gauge') ? 2 : 1);
     };
     c3_chart_internal_fn.getCurrentPaddingTop = function () {
         var config = this.config;
@@ -3062,8 +3074,6 @@
         if (config.grid_y_show) {
             $$.grid.append('g').attr('class', CLASS.ygrids);
         }
-        $$.grid.append('g').attr("class", CLASS.xgridLines);
-        $$.grid.append('g').attr('class', CLASS.ygridLines);
         if (config.grid_focus_show) {
             $$.grid.append('g')
                 .attr("class", CLASS.xgridFocus)
@@ -3071,9 +3081,17 @@
                 .attr('class', CLASS.xgridFocus);
         }
         $$.xgrid = d3.selectAll([]);
+        if (!config.grid_lines_front) { $$.initGridLines(); }
+    };
+    c3_chart_internal_fn.initGridLines = function () {
+        var $$ = this, d3 = $$.d3;
+        $$.gridLines = $$.main.append('g')
+            .attr("clip-path", $$.clipPath)
+            .attr('class', CLASS.grid + ' ' + CLASS.gridLines);
+        $$.gridLines.append('g').attr("class", CLASS.xgridLines);
+        $$.gridLines.append('g').attr('class', CLASS.ygridLines);
         $$.xgridLines = d3.selectAll([]);
     };
-
     c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
         var $$ = this, config = $$.config, d3 = $$.d3,
             xgridData = $$.generateGridData(config.grid_x_type, $$.x),
@@ -4413,6 +4431,9 @@
                 .text(config.gauge_label_show ? config.gauge_max : '');
         }
     };
+    c3_chart_internal_fn.getGaugeLabelHeight = function () {
+        return this.config.gauge_label_show ? 20 : 0;
+    };
 
     c3_chart_internal_fn.initRegion = function () {
         var $$ = this;
@@ -5043,6 +5064,7 @@
         texts: 'c3-texts',
         gaugeValue: 'c3-gauge-value',
         grid: 'c3-grid',
+        gridLines: 'c3-grid-lines',
         xgrid: 'c3-xgrid',
         xgrids: 'c3-xgrids',
         xgridLine: 'c3-xgrid-line',
