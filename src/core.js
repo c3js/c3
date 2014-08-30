@@ -366,6 +366,9 @@ c3_chart_internal_fn.updateSizes = function () {
     // for arc
     $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
     $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+    if ($$.hasType('gauge')) {
+        $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
+    }
     if ($$.updateRadius) { $$.updateRadius(); }
 
     if ($$.isLegendRight && hasArc) {

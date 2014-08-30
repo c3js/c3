@@ -371,6 +371,9 @@
         // for arc
         $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
         $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+        if ($$.hasType('gauge')) {
+            $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
+        }
         if ($$.updateRadius) { $$.updateRadius(); }
 
         if ($$.isLegendRight && hasArc) {
@@ -2257,7 +2260,7 @@
     c3_chart_internal_fn.getCurrentHeight = function () {
         var $$ = this, config = $$.config,
             h = config.size_height ? config.size_height : $$.getParentHeight();
-        return h > 0 ? h : 320;
+        return h > 0 ? h : 320 / ($$.hasType('gauge') ? 2 : 1);
     };
     c3_chart_internal_fn.getCurrentPaddingTop = function () {
         var config = this.config;
@@ -4398,6 +4401,9 @@
                 .style("pointer-events", "none")
                 .text(config.gauge_label_show ? config.gauge_max : '');
         }
+    };
+    c3_chart_internal_fn.getGaugeLabelHeight = function () {
+        return this.config.gauge_label_show ? 20 : 0;
     };
 
     c3_chart_internal_fn.initRegion = function () {
