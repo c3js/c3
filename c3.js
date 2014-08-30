@@ -224,6 +224,9 @@
             .attr("clip-path", $$.clipPath)
             .attr('class', CLASS.chart);
 
+        // Grid lines
+        if (config.grid_lines_front) { $$.initGridLines(); }
+
         // Cover whole with rects for events
         $$.initEventRect();
 
@@ -982,6 +985,7 @@
             grid_y_lines: [],
             grid_y_ticks: 10,
             grid_focus_show: true,
+            grid_lines_front: true,
             // point - point of each data
             point_show: true,
             point_r: 2.5,
@@ -3051,8 +3055,6 @@
         if (config.grid_y_show) {
             $$.grid.append('g').attr('class', CLASS.ygrids);
         }
-        $$.grid.append('g').attr("class", CLASS.xgridLines);
-        $$.grid.append('g').attr('class', CLASS.ygridLines);
         if (config.grid_focus_show) {
             $$.grid.append('g')
                 .attr("class", CLASS.xgridFocus)
@@ -3060,9 +3062,17 @@
                 .attr('class', CLASS.xgridFocus);
         }
         $$.xgrid = d3.selectAll([]);
+        if (!config.grid_lines_front) { $$.initGridLines(); }
+    };
+    c3_chart_internal_fn.initGridLines = function () {
+        var $$ = this, d3 = $$.d3;
+        $$.gridLines = $$.main.append('g')
+            .attr("clip-path", $$.clipPath)
+            .attr('class', CLASS.grid + ' ' + CLASS.gridLines);
+        $$.gridLines.append('g').attr("class", CLASS.xgridLines);
+        $$.gridLines.append('g').attr('class', CLASS.ygridLines);
         $$.xgridLines = d3.selectAll([]);
     };
-
     c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
         var $$ = this, config = $$.config, d3 = $$.d3,
             xgridData = $$.generateGridData(config.grid_x_type, $$.x),
@@ -5035,6 +5045,7 @@
         texts: 'c3-texts',
         gaugeValue: 'c3-gauge-value',
         grid: 'c3-grid',
+        gridLines: 'c3-grid-lines',
         xgrid: 'c3-xgrid',
         xgrids: 'c3-xgrids',
         xgridLine: 'c3-xgrid-line',

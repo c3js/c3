@@ -219,6 +219,9 @@ c3_chart_internal_fn.initWithData = function (data) {
         .attr("clip-path", $$.clipPath)
         .attr('class', CLASS.chart);
 
+    // Grid lines
+    if (config.grid_lines_front) { $$.initGridLines(); }
+
     // Cover whole with rects for events
     $$.initEventRect();
 

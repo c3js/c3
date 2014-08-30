@@ -44,6 +44,7 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     texts: 'c3-texts',
     gaugeValue: 'c3-gauge-value',
     grid: 'c3-grid',
+    gridLines: 'c3-grid-lines',
     xgrid: 'c3-xgrid',
     xgrids: 'c3-xgrids',
     xgridLine: 'c3-xgrid-line',
