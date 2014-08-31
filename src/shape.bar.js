@@ -55,8 +55,9 @@ c3_chart_internal_fn.getBars = function (i) {
     var $$ = this;
     return $$.main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
 };
-c3_chart_internal_fn.expandBars = function (i) {
+c3_chart_internal_fn.expandBars = function (i, id, reset) {
     var $$ = this;
+    if (reset) { $$.unexpandBars(); }
     $$.getBars(i).classed(CLASS.EXPANDED, true);
 };
 c3_chart_internal_fn.unexpandBars = function (i) {

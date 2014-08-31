@@ -19,6 +19,11 @@ c3_chart_internal_fn.getXValuesOfXKey = function (key, targets) {
     });
     return xValues;
 };
+c3_chart_internal_fn.getIndexByX = function (x) {
+    var $$ = this,
+        data = $$.filterByX($$.data.targets, x);
+    return data.length ? data[0].index : null;
+};
 c3_chart_internal_fn.getXValue = function (id, i) {
     var $$ = this;
     return id in $$.data.xs && $$.data.xs[id] && isValue($$.data.xs[id][i]) ? $$.data.xs[id][i] : i;
@@ -222,7 +227,7 @@ c3_chart_internal_fn.orderTargets = function (targets) {
     } // TODO: accept name array for order
     return targets;
 };
-c3_chart_internal_fn.filterSameX = function (targets, x) {
+c3_chart_internal_fn.filterByX = function (targets, x) {
     return this.d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x - x === 0; });
 };
 c3_chart_internal_fn.filterRemoveNull = function (data) {

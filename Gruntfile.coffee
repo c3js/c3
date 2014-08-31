@@ -67,6 +67,7 @@ module.exports = (grunt) ->
               'src/api.axis.js',
               'src/api.legend.js',
               'src/api.chart.js',
+              'src/api.tooltip.js',
               'src/c3.axis.js',
               'src/tail.js'
             ]

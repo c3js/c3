@@ -305,9 +305,10 @@ c3_chart_internal_fn.getCircles = function (i, id) {
     var $$ = this;
     return (id ? $$.main.selectAll('.' + CLASS.circles + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.circle + (isValue(i) ? '-' + i : ''));
 };
-c3_chart_internal_fn.expandCircles = function (i, id) {
+c3_chart_internal_fn.expandCircles = function (i, id, reset) {
     var $$ = this,
         r = $$.pointExpandedR.bind($$);
+    if (reset) { $$.unexpandCircles(); }
     $$.getCircles(i, id)
         .classed(CLASS.EXPANDED, true)
         .attr('r', r);
