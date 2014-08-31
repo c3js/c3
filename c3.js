@@ -3935,7 +3935,7 @@
                 scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
                 axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), config.axis_x_tick_values ? config.axis_x_tick_values : $$.xAxis.tickValues());
             }
-            $$.main.append("g").call(axis).each(function () {
+            $$.d3.select('body').append("g").style('visibility', 'hidden').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
                     var box = this.getBoundingClientRect();
                     if (maxWidth < box.width) { maxWidth = box.width; }
