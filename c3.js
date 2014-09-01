@@ -501,8 +501,8 @@
         drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
         drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
         drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
-        xForText = $$.generateXYForText(barIndices, true);
-        yForText = $$.generateXYForText(barIndices, false);
+        xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
+        yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
 
         // Update sub domain
         $$.subY.domain($$.y.domain());
@@ -2501,11 +2501,11 @@
     c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
         var $$ = this, config = $$.config,
             line = $$.d3.svg.line(),
-            getPoint = $$.generateGetLinePoint(lineIndices, isSub),
+            getPoints = $$.generateGetLinePoints(lineIndices, isSub),
             yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
             xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
             yValue = function (d, i) {
-                return config.data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(d.value);
+                return config.data_groups.length > 0 ? getPoints(d, i)[0][1] : yScaleGetter.call($$, d.id)(d.value);
             };
 
         line = config.axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
@@ -2529,7 +2529,7 @@
             return path ? path : "M 0 0";
         };
     };
-    c3_chart_internal_fn.generateGetLinePoint = function (lineIndices, isSub) { // partial duplication of generateGetBarPoints
+    c3_chart_internal_fn.generateGetLinePoints = function (lineIndices, isSub) { // partial duplication of generateGetBarPoints
         var $$ = this, config = $$.config,
             lineTargetsNum = lineIndices.__max__ + 1,
             x = $$.getShapeX(0, lineTargetsNum, lineIndices, !!isSub),
@@ -2546,7 +2546,10 @@
             }
             // 1 point that marks the line position
             return [
-                [posX, posY - (y0 - offset)]
+                [posX, posY - (y0 - offset)],
+                [posX, posY - (y0 - offset)], // needed for compatibility
+                [posX, posY - (y0 - offset)], // needed for compatibility
+                [posX, posY - (y0 - offset)]  // needed for compatibility
             ];
         };
     };
@@ -2655,14 +2658,14 @@
     };
     c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
         var $$ = this, config = $$.config, area = $$.d3.svg.area(),
-            getPoint = $$.generateGetAreaPoint(areaIndices, isSub),
+            getPoints = $$.generateGetAreaPoints(areaIndices, isSub),
             yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
             xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
             value0 = function (d, i) {
-                return config.data_groups.length > 0 ? getPoint(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
+                return config.data_groups.length > 0 ? getPoints(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
             },
             value1 = function (d, i) {
-                return config.data_groups.length > 0 ? getPoint(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
+                return config.data_groups.length > 0 ? getPoints(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
             };
 
         area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
@@ -2685,7 +2688,7 @@
         };
     };
 
-    c3_chart_internal_fn.generateGetAreaPoint = function (areaIndices, isSub) { // partial duplication of generateGetBarPoints
+    c3_chart_internal_fn.generateGetAreaPoints = function (areaIndices, isSub) { // partial duplication of generateGetBarPoints
         var $$ = this, config = $$.config,
             areaTargetsNum = areaIndices.__max__ + 1,
             x = $$.getShapeX(0, areaTargetsNum, areaIndices, !!isSub),
@@ -2703,7 +2706,9 @@
             // 1 point that marks the area position
             return [
                 [posX, offset],
-                [posX, posY - (y0 - offset)]
+                [posX, posY - (y0 - offset)],
+                [posX, posY - (y0 - offset)], // needed for compatibility
+                [posX, offset] // needed for compatibility
             ];
         };
     };
@@ -2737,8 +2742,8 @@
     };
     c3_chart_internal_fn.circleY = function (d, i) {
         var $$ = this,
-            lineIndices = $$.getShapeIndices($$.isLineType), getPoint = $$.generateGetLinePoint(lineIndices);
-        return $$.config.data_groups.length > 0 ? getPoint(d, i)[0][1] : $$.getYScale(d.id)(d.value);
+            lineIndices = $$.getShapeIndices($$.isLineType), getPoints = $$.generateGetLinePoints(lineIndices);
+        return $$.config.data_groups.length > 0 ? getPoints(d, i)[0][1] : $$.getYScale(d.id)(d.value);
     };
     c3_chart_internal_fn.getCircles = function (i, id) {
         var $$ = this;
@@ -2958,11 +2963,14 @@
             .remove();
         return rect;
     };
-    c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
+    c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
         var $$ = this,
-            getPoints = $$.generateGetBarPoints(barIndices, false),
+            getAreaPoints = $$.generateGetAreaPoints(barIndices, false),
+            getBarPoints = $$.generateGetBarPoints(barIndices, false),
+            getLinePoints = $$.generateGetLinePoints(lineIndices, false),
             getter = forX ? $$.getXForText : $$.getYForText;
         return function (d, i) {
+            var getPoints = $$.isAreaType(d) ? getAreaPoints : $$.isBarType(d) ? getBarPoints : getLinePoints;
             return getter.call($$, getPoints(d, i), d, this);
         };
     };

@@ -57,11 +57,14 @@ c3_chart_internal_fn.getTextRect = function (text, cls) {
         .remove();
     return rect;
 };
-c3_chart_internal_fn.generateXYForText = function (barIndices, forX) {
+c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
     var $$ = this,
-        getPoints = $$.generateGetBarPoints(barIndices, false),
+        getAreaPoints = $$.generateGetAreaPoints(barIndices, false),
+        getBarPoints = $$.generateGetBarPoints(barIndices, false),
+        getLinePoints = $$.generateGetLinePoints(lineIndices, false),
         getter = forX ? $$.getXForText : $$.getYForText;
     return function (d, i) {
+        var getPoints = $$.isAreaType(d) ? getAreaPoints : $$.isBarType(d) ? getBarPoints : getLinePoints;
         return getter.call($$, getPoints(d, i), d, this);
     };
 };

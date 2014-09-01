@@ -496,8 +496,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
     drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
     drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
-    xForText = $$.generateXYForText(barIndices, true);
-    yForText = $$.generateXYForText(barIndices, false);
+    xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
+    yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
 
     // Update sub domain
     $$.subY.domain($$.y.domain());

@@ -12,6 +12,8 @@
     <div id="chart7"></div>
     <div id="chart8"></div>
     <div id="chart9" style="width:33%;"></div>
+    <div id="chart10"></div>
+    <div id="chart11"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
@@ -186,6 +188,35 @@
         },
         axis: {
           rotated: true
+        }
+      });
+
+      var chart10 = c3.generate({
+        bindto: '#chart10',
+        data: {
+          columns: [
+            ['data1', 300, 350, 300, 0, 0, 100],
+            ['data2', 130, 0, 140, 200, 0, 50],
+            ['data3', 130, 0, 140, 200, 0, 50],
+            ['data4', 130, 0, 140, 200, 0, 50],
+          ],
+          type: 'area',
+          groups: [['data1', 'data2', 'data3', 'data4']],
+          labels: true
+        }
+      });
+
+      var chart11 = c3.generate({
+        bindto: '#chart11',
+        data: {
+          columns: [
+            ['data1', 300, 350, 300, 0, 0, 100],
+            ['data2', 130, 0, 140, 200, 0, 50],
+            ['data3', 130, 0, 140, 200, 0, 50],
+            ['data4', 130, 0, 140, 200, 0, 50],
+          ],
+          groups: [['data1', 'data2', 'data3', 'data4']],
+          labels: true
         }
       });
 
