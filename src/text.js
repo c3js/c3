@@ -77,7 +77,7 @@ c3_chart_internal_fn.getXForText = function (points, d, textElement) {
     } else {
         xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
     }
-    return xPos > $$.width ? $$.width - box.width : xPos;
+    return d.value !== null ? xPos : xPos > $$.width ? $$.width - box.width : xPos;
 };
 c3_chart_internal_fn.getYForText = function (points, d, textElement) {
     var $$ = this,
@@ -87,5 +87,5 @@ c3_chart_internal_fn.getYForText = function (points, d, textElement) {
     } else {
         yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
     }
-    return yPos < box.height ? box.height : yPos;
+    return d.value !== null ? yPos : yPos < box.height ? box.height : yPos;
 };
