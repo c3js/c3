@@ -102,6 +102,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_tick_outer: true,
         axis_y_padding: {},
         axis_y_ticks: 10,
+        axis_y_default: undefined,
         axis_y2_show: false,
         axis_y2_max: undefined,
         axis_y2_min: undefined,
@@ -111,6 +112,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y2_tick_outer: true,
         axis_y2_padding: {},
         axis_y2_ticks: 10,
+        axis_y2_default: undefined,
         // grid
         grid_x_show: false,
         grid_x_type: 'tick',
