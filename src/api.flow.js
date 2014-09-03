@@ -31,7 +31,7 @@ c3_chart_fn.flow = function (args) {
 
                 for (j = 0; j < length; j++) {
                     targets[i].values[j].index = tail + j;
-                    if (!$$.isTimeSeries()) {
+                    if (!$$.isTimeSeries() && !$$.isCustomX()) {
                         targets[i].values[j].x = tail + j;
                     }
                 }
