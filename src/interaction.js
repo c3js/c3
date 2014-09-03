@@ -144,6 +144,10 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             if ($$.dragging) { return; } // do nothing when dragging
             if ($$.hasArcType()) { return; }
 
+            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                index -= 1;
+            }
+
             // Show tooltip
             selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
                 return $$.addName($$.getValueOnIndex(t.values, index));
@@ -199,6 +203,9 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             if ($$.cancelClick) {
                 $$.cancelClick = false;
                 return;
+            }
+            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                index -= 1;
             }
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 $$.toggleShape(this, d, index);

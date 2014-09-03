@@ -54,8 +54,14 @@ c3_chart_internal_fn.toggleShape = function (that, d, i) {
     var $$ = this, d3 = $$.d3, config = $$.config,
         shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED), isWithin, toggle;
     if (that.nodeName === 'circle') {
-        isWithin = $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
-        toggle = $$.togglePoint;
+        if ($$.isStepType(d)) {
+            // circle is hidden in step chart, so treat as within the click area
+            isWithin = true;
+            toggle = function () {}; // TODO: how to select step chart?
+        } else {
+            isWithin = $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
+            toggle = $$.togglePoint;
+        }
     }
     else if (that.nodeName === 'path') {
         if (shape.classed(CLASS.bar)) {

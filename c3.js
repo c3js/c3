@@ -2119,6 +2119,10 @@
                 if ($$.dragging) { return; } // do nothing when dragging
                 if ($$.hasArcType()) { return; }
 
+                if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                    index -= 1;
+                }
+
                 // Show tooltip
                 selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
                     return $$.addName($$.getValueOnIndex(t.values, index));
@@ -2174,6 +2178,9 @@
                 if ($$.cancelClick) {
                     $$.cancelClick = false;
                     return;
+                }
+                if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                    index -= 1;
                 }
                 $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                     $$.toggleShape(this, d, index);
@@ -4672,8 +4679,14 @@
         var $$ = this, d3 = $$.d3, config = $$.config,
             shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED), isWithin, toggle;
         if (that.nodeName === 'circle') {
-            isWithin = $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
-            toggle = $$.togglePoint;
+            if ($$.isStepType(d)) {
+                // circle is hidden in step chart, so treat as within the click area
+                isWithin = true;
+                toggle = function () {}; // TODO: how to select step chart?
+            } else {
+                isWithin = $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
+                toggle = $$.togglePoint;
+            }
         }
         else if (that.nodeName === 'path') {
             if (shape.classed(CLASS.bar)) {
