@@ -3744,6 +3744,10 @@
         var $$ = this, config = $$.config,
             axis = c3_axis($$.d3, $$.isCategorized()).scale(scale).orient(orient);
 
+        if ($$.isTimeSeries() && tickValues) {
+            tickValues = tickValues.map(function (v) { return $$.parseDate(v); });
+        }
+
         // Set tick
         axis.tickFormat(tickFormat).tickValues(tickValues);
         if ($$.isCategorized()) {
