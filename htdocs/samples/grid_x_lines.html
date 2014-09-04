@@ -3,47 +3,64 @@
     <link rel="stylesheet" type="text/css" href="/css/c3.css">
   </head>
   <body>
-    <div id="chart"></div>
+    <div id="chart1"></div>
+    <div id="chart2"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
+
       var chart = c3.generate({
-        bindto: '#chart',
+        bindto: '#chart1',
         data: {
           columns: [
-            ['sample', 30, 200, 100, 400, 150, 250]
-          ]
-        },
-        axis: {
-//          rotated: true,
+            ['data1', 30, 200, 100, 400, 150, 250]
+          ],
+          type: 'bar'
         },
         grid: {
           x: {
-            lines: [{value: 3, text:'Lable 3'}, {value: 4.5, text: 'Lable 4.5'}]
+            show: true,
+            lines: [{
+               value: 2,
+               text: 'Label 2',
+               class: 'lineFor2'
+            }]
+          },
+          y: {
+            show: true,
           }
         }
       });
 
-      setTimeout(function () {
-        chart.xgrids([{value: 1, text:'Lable 1'}, {value: 4, text: 'Lable 4'}]);
-      }, 1000);
+      var chart2 = c3.generate({
+        bindto: '#chart2',
+        data: {
+          x : 'x',
+          columns: [
+            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05'],
+            ['sample', 30, 200, 100, 400, 150]
+          ],
+        },
+        axis : {
+          x : {
+            type : 'timeseries'
+          }
+        },
+        grid: {
+          x: {
+            lines: [{
+               value: '2013-01-04',
+               text: '2013/01/04',
+               class: 'lineFor20130104'
+            }]
+          },
+          lines: {
+            front: false
+          }
+        }
+      });
 
-      setTimeout(function () {
-        chart.xgrids([{value: 2, text:'Lable 2'}]);
-      }, 2000);
-
-      setTimeout(function () {
-        chart.xgrids.add([{value: 3, text:'Lable 3', class:'hoge'}]);
-      }, 3000);
-
-      setTimeout(function () {
-        chart.xgrids.remove({value:2});
-      }, 4000);
-
-      setTimeout(function () {
-        chart.xgrids.remove({class:'hoge'});
-      }, 5000);
     </script>
   </body>
 </html>

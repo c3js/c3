@@ -24,26 +24,41 @@
           selection: {
             enabled: true
           },
-          onenter: function (d) { console.log("onenter", d); },
-          onleave: function (d) { console.log("onleave", d); }
-        },
+          onclick: function (d) { console.log("onclick", d); },
+          onmouseover: function (d) { console.log("onmouseover", d); },
+          onmouseout: function (d) { console.log("onmouseout", d); }
+        }
       });
 
       setTimeout(function () {
         chart.load({
           columns: [
-            ['data1', 100, 210, 150, 200, null, 150],
+            ['data1', 100, 210, 150, null, 200, 150],
             ['data2', 200, 310, 50, 400, 120, 250, 10],
           ]
         });
       }, 1000);
 
       setTimeout(function () {
-        chart.xs({
-          'data1': [200, 210, 350, 400, 600, 750]
-//          'data2': [200, 210, 350, 400, 550, 750, 900]
+        chart.load({
+          columns: [
+            ['x2', 150, 220, 230, 400, 540, 600, 800],
+            ['data2', 200, 310, 50, 400, 120, 250, 10],
+            ['data3', 300, 410, 350, 600, 420, 550, 310],
+          ],
+          xs: {
+            data3: 'x2'
+          }
         });
       }, 2000);
+
+      setTimeout(function () {
+        chart.xs({
+          'data1': [200, 210, 350, 400, 600, 750],
+          'data2': [200, 210, 350, 400, 550, 750, 900]
+        });
+      }, 3000);
+
     </script>
   </body>
 </html>
