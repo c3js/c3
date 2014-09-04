@@ -4,7 +4,9 @@
   "description": "A D3-based reusable chart library",
   "version": "0.0.1",
   "keywords": [],
-  "dependencies": {},
+  "dependencies": {
+    "mbostock/d3": "master"
+  },
   "development": {},
   "license": "MIT",
   "main": "c3.js",

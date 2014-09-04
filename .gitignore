@@ -3,3 +3,5 @@ node_modules
 bower_components
 d3.js
 d3.min.js
+components
+build
