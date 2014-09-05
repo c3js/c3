@@ -3950,11 +3950,11 @@
         return 10 * Math.sin(Math.PI * (r / 180));
     };
     c3_chart_internal_fn.yForRotatedTickText = function (r) {
-        return 11.5 - 2.5 * (r / 15);
+        return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
     };
     c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {
         axis.selectAll('.tick text')
-            .style("text-anchor", "start");
+            .style("text-anchor", rotate > 0 ? "start" : "end");
         transition.selectAll('.tick text')
             .attr("y", this.yForRotatedTickText(rotate))
             .attr("x", this.xForRotatedTickText(rotate))
