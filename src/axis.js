@@ -48,7 +48,8 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues)
     } else {
         // TODO: move this to c3_axis
         axis.tickOffset = function () {
-            var edgeX = $$.getEdgeX($$.data.targets), diff = $$.x(edgeX[1]) - $$.x(edgeX[0]),
+            var scale = this.scale(),
+                edgeX = $$.getEdgeX($$.data.targets), diff = scale(edgeX[1]) - scale(edgeX[0]),
                 base = diff ? diff : (config.axis_rotated ? $$.height : $$.width);
             return (base / $$.getMaxDataCount()) / 2;
         };

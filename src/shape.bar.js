@@ -86,8 +86,9 @@ c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
 };
 c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
     var $$ = this,
+        axis = isSub ? $$.subXAxis : $$.xAxis,
         barTargetsNum = barIndices.__max__ + 1,
-        barW = $$.getBarW($$.xAxis, barTargetsNum),
+        barW = $$.getBarW(axis, barTargetsNum),
         barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
         barY = $$.getShapeY(!!isSub),
         barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),

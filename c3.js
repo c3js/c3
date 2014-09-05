@@ -2885,8 +2885,9 @@
     };
     c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         var $$ = this,
+            axis = isSub ? $$.subXAxis : $$.xAxis,
             barTargetsNum = barIndices.__max__ + 1,
-            barW = $$.getBarW($$.xAxis, barTargetsNum),
+            barW = $$.getBarW(axis, barTargetsNum),
             barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
             barY = $$.getShapeY(!!isSub),
             barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
@@ -3758,7 +3759,8 @@
         } else {
             // TODO: move this to c3_axis
             axis.tickOffset = function () {
-                var edgeX = $$.getEdgeX($$.data.targets), diff = $$.x(edgeX[1]) - $$.x(edgeX[0]),
+                var scale = this.scale(),
+                    edgeX = $$.getEdgeX($$.data.targets), diff = scale(edgeX[1]) - scale(edgeX[0]),
                     base = diff ? diff : (config.axis_rotated ? $$.height : $$.width);
                 return (base / $$.getMaxDataCount()) / 2;
             };
