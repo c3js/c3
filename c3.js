@@ -253,9 +253,7 @@
             .on("dblclick.zoom", null);
 
         // Set default extent if defined
-        if (config.axis_x_default) {
-            $$.brush.extent(isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain($$.data.targets)) : config.axis_x_default);
-        }
+        if (config.axis_x_default) { $$.brush.extent($$.getDefaultExtent()); }
 
         // Add Axis
         $$.initAxis();
@@ -4914,6 +4912,14 @@
         }
         $$.context.attr("transform", $$.getTranslate('context'));
         subXAxis.attr("transform", $$.getTranslate('subx'));
+    };
+    c3_chart_internal_fn.getDefaultExtent = function () {
+        var $$ = this, config = $$.config,
+            extent = isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain($$.data.targets)) : config.axis_x_default;
+        if ($$.isTimeSeries()) {
+            extent = [$$.parseDate(extent[0]), $$.parseDate(extent[1])];
+        }
+        return extent;
     };
 
     c3_chart_internal_fn.initZoom = function () {
