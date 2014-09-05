@@ -254,7 +254,7 @@
 
         // Set default extent if defined
         if (config.axis_x_default) {
-            $$.brush.extent(isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain()) : config.axis_x_default);
+            $$.brush.extent(isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain($$.data.targets)) : config.axis_x_default);
         }
 
         // Add Axis
