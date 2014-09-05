@@ -2037,11 +2037,25 @@
                 rectW = function (d) {
                     var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index), dx = $$.data.xs[d.id][d.index],
                         w = ($$.x(nextX ? nextX : dx) - $$.x(prevX ? prevX : dx)) / 2;
-                    return w < 0 ? 0 : w;
+
+                    // if there this is a single data point make the eventRect full width (or height)
+                    if (prevX === null && nextX === null) {
+                        return config.axis_rotated ? $$.height : $$.width;
+                    }
+                    else {
+                        return w < 0 ? 0 : w;
+                    }
                 };
                 rectX = function (d) {
-                    var prevX = $$.getPrevX(d.index), dx = $$.data.xs[d.id][d.index];
-                    return ($$.x(dx) + $$.x(prevX ? prevX : dx)) / 2;
+                    var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index), dx = $$.data.xs[d.id][d.index];
+                    
+                    // if there this is a single data point position the eventRect at 0
+                    if (prevX === null && nextX === null) {
+                        return 0;
+                    }
+                    else {
+                        return ($$.x(dx) + $$.x(prevX ? prevX : dx)) / 2;
+                    }
                 };
             } else {
                 rectW = $$.getEventRectWidth();
