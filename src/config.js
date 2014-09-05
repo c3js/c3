@@ -16,6 +16,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         onmouseout: function () {},
         onresize: function () {},
         onresized: function () {},
+        oninit: function () {},
         transition_duration: 350,
         data_x: undefined,
         data_xs: {},

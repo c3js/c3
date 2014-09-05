@@ -264,6 +264,7 @@
         // Draw with targets
         if (binding) {
             $$.updateDimension();
+            $$.config.oninit.call($$);
             $$.redraw({
                 withTransform: true,
                 withUpdateXDomain: true,
@@ -778,6 +779,7 @@
                         if (selection.node().parentNode) {
                             window.clearInterval(interval);
                             $$.updateDimension();
+                            $$.config.oninit.call($$);
                             $$.redraw({
                                 withTransform: true,
                                 withUpdateXDomain: true,
@@ -878,6 +880,7 @@
             onmouseout: function () {},
             onresize: function () {},
             onresized: function () {},
+            oninit: function () {},
             transition_duration: 350,
             data_x: undefined,
             data_xs: {},

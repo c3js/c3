@@ -259,6 +259,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Draw with targets
     if (binding) {
         $$.updateDimension();
+        $$.config.oninit.call($$);
         $$.redraw({
             withTransform: true,
             withUpdateXDomain: true,
@@ -773,6 +774,7 @@ c3_chart_internal_fn.observeInserted = function (selection) {
                     if (selection.node().parentNode) {
                         window.clearInterval(interval);
                         $$.updateDimension();
+                        $$.config.oninit.call($$);
                         $$.redraw({
                             withTransform: true,
                             withUpdateXDomain: true,
