@@ -92,7 +92,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_x_min: undefined,
         axis_x_padding: {},
         axis_x_height: undefined,
-        axis_x_default: undefined,
+        axis_x_extent: undefined,
         axis_x_label: {},
         axis_y_show: true,
         axis_y_max: undefined,

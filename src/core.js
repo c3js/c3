@@ -248,7 +248,7 @@ c3_chart_internal_fn.initWithData = function (data) {
         .on("dblclick.zoom", null);
 
     // Set default extent if defined
-    if (config.axis_x_default) { $$.brush.extent($$.getDefaultExtent()); }
+    if (config.axis_x_extent) { $$.brush.extent($$.getDefaultExtent()); }
 
     // Add Axis
     $$.initAxis();

@@ -183,7 +183,7 @@ c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
 };
 c3_chart_internal_fn.getDefaultExtent = function () {
     var $$ = this, config = $$.config,
-        extent = isFunction(config.axis_x_default) ? config.axis_x_default($$.getXDomain($$.data.targets)) : config.axis_x_default;
+        extent = isFunction(config.axis_x_extent) ? config.axis_x_extent($$.getXDomain($$.data.targets)) : config.axis_x_extent;
     if ($$.isTimeSeries()) {
         extent = [$$.parseDate(extent[0]), $$.parseDate(extent[1])];
     }
