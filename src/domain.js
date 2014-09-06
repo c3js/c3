@@ -189,6 +189,7 @@ c3_chart_internal_fn.getXDomain = function (targets) {
 };
 c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, domain) {
     var $$ = this, config = $$.config;
+
     if (withUpdateOrgXDomain) {
         $$.x.domain(domain ? domain : $$.d3.extent($$.getXDomain(targets)));
         $$.orgXDomain = $$.x.domain();
@@ -200,5 +201,21 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
         $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.extent());
         if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
     }
+
+    // Trim domain when too big by zoom mousemove event
+    $$.x.domain($$.trimXDomain($$.x.orgDomain()));
+
     return $$.x.domain();
+};
+c3_chart_internal_fn.trimXDomain = function (domain) {
+    var $$ = this;
+    if (domain[0] <= $$.orgXDomain[0]) {
+        domain[1] += $$.orgXDomain[0] - domain[0];
+        domain[0] = $$.orgXDomain[0];
+    }
+    if ($$.orgXDomain[1] <= domain[1]) {
+        domain[0] -= domain[1] - $$.orgXDomain[1];
+        domain[1] = $$.orgXDomain[1];
+    }
+    return domain;
 };

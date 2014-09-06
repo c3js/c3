@@ -1353,6 +1353,7 @@
     };
     c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, domain) {
         var $$ = this, config = $$.config;
+
         if (withUpdateOrgXDomain) {
             $$.x.domain(domain ? domain : $$.d3.extent($$.getXDomain(targets)));
             $$.orgXDomain = $$.x.domain();
@@ -1364,7 +1365,23 @@
             $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.extent());
             if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
         }
+
+        // Trim domain when too big by zoom mousemove event
+        $$.x.domain($$.trimXDomain($$.x.orgDomain()));
+
         return $$.x.domain();
+    };
+    c3_chart_internal_fn.trimXDomain = function (domain) {
+        var $$ = this;
+        if (domain[0] <= $$.orgXDomain[0]) {
+            domain[1] += $$.orgXDomain[0] - domain[0];
+            domain[0] = $$.orgXDomain[0];
+        }
+        if ($$.orgXDomain[1] <= domain[1]) {
+            domain[0] -= domain[1] - $$.orgXDomain[1];
+            domain[1] = $$.orgXDomain[1];
+        }
+        return domain;
     };
 
     c3_chart_internal_fn.isX = function (key) {
@@ -4926,12 +4943,21 @@
     };
 
     c3_chart_internal_fn.initZoom = function () {
-        var $$ = this, d3 = $$.d3, config = $$.config;
+        var $$ = this, d3 = $$.d3, config = $$.config,
+            prevZoomTranslate, wheeled = false;
         $$.zoom = d3.behavior.zoom()
             .on("zoomstart", function () {
                 $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
             })
-            .on("zoom", function () { $$.redrawForZoom.call($$); });
+            .on("zoom", function () {
+                // prevZoomTranslate is needed for the fix of unexpected zoom.translate after remaining zoom
+                if (prevZoomTranslate && wheeled) {
+                    $$.zoom.translate(prevZoomTranslate);
+                }
+                $$.redrawForZoom.call($$);
+                prevZoomTranslate = $$.zoom.translate();
+                wheeled = d3.event.sourceEvent.type === 'wheel';
+            });
         $$.zoom.scale = function (scale) {
             return config.axis_rotated ? this.y(scale) : this.x(scale);
         };

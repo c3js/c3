@@ -1,10 +1,19 @@
 c3_chart_internal_fn.initZoom = function () {
-    var $$ = this, d3 = $$.d3, config = $$.config;
+    var $$ = this, d3 = $$.d3, config = $$.config,
+        prevZoomTranslate, wheeled = false;
     $$.zoom = d3.behavior.zoom()
         .on("zoomstart", function () {
             $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
         })
-        .on("zoom", function () { $$.redrawForZoom.call($$); });
+        .on("zoom", function () {
+            // prevZoomTranslate is needed for the fix of unexpected zoom.translate after remaining zoom
+            if (prevZoomTranslate && wheeled) {
+                $$.zoom.translate(prevZoomTranslate);
+            }
+            $$.redrawForZoom.call($$);
+            prevZoomTranslate = $$.zoom.translate();
+            wheeled = d3.event.sourceEvent.type === 'wheel';
+        });
     $$.zoom.scale = function (scale) {
         return config.axis_rotated ? this.y(scale) : this.x(scale);
     };
