@@ -6059,10 +6059,10 @@
                 index = isValue(args.data.index) ? args.data.index : $$.getIndexByX(args.data.x);
             }
         }
-        else if (args.x) {
+        else if (typeof args.x !== 'undefined') {
             index = $$.getIndexByX(args.x);
         }
-        else if (args.index) {
+        else if (typeof args.index !== 'undefined') {
             index = args.index;
         }
 
