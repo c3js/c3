@@ -3000,7 +3000,7 @@
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
         var rect;
-        this.d3.select('body').selectAll('.dummy')
+        this.svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')
             .classed(cls ? cls : "", true)
@@ -3462,6 +3462,7 @@
             top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config.legend_inset_y + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config.legend_inset_y,
             left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config.legend_inset_x + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config.legend_inset_x + 0.5
         };
+
         $$.margin3 = {
             top: $$.isLegendRight ? 0 : $$.isLegendInset ? insetLegendPosition.top : $$.currentHeight - legendHeight,
             right: NaN,
@@ -3552,7 +3553,7 @@
     c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         var $$ = this, config = $$.config;
         var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
-        var paddingTop = 4, paddingRight = 36, maxWidth = 0, maxHeight = 0, posMin = 10;
+        var paddingTop = 4, paddingRight = 10, maxWidth = 0, maxHeight = 0, posMin = 10, tileWidth = 15;
         var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
         var withTransition, withTransitionForTransform;
         var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
@@ -3562,10 +3563,11 @@
         withTransition = getOption(options, "withTransition", true);
         withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
-        function updatePositions(textElement, id, reset) {
-            var box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
-                itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
-                itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
+        function updatePositions(textElement, id, index) {
+            var reset = index === 0, isLast = index === targetIds.length - 1,
+                box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
+                itemWidth = box.width + tileWidth + (isLast && !$$.isLegendRight ? 0 : paddingRight),
+                itemHeight = box.height + paddingTop,
                 itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
                 areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
                 margin, maxLength;
@@ -3634,8 +3636,8 @@
         }
         xForLegendText = function (id, i) { return xForLegend(id, i) + 14; };
         yForLegendText = function (id, i) { return yForLegend(id, i) + 9; };
-        xForLegendRect = function (id, i) { return xForLegend(id, i) - 4; };
-        yForLegendRect = function (id, i) { return yForLegend(id, i) - 7; };
+        xForLegendRect = function (id, i) { return xForLegend(id, i); };
+        yForLegendRect = function (id, i) { return yForLegend(id, i) - 5; };
 
         // Define g for legend area
         l = $$.legend.selectAll('.' + CLASS.legendItem)
@@ -3667,7 +3669,7 @@
             });
         l.append('text')
             .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; })
-            .each(function (id, i) { updatePositions(this, id, i === 0); })
+            .each(function (id, i) { updatePositions(this, id, i); })
             .style("pointer-events", "none")
             .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
             .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendText);
@@ -3696,7 +3698,7 @@
         texts = $$.legend.selectAll('text')
             .data(targetIds)
             .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; }) // MEMO: needed for update
-            .each(function (id, i) { updatePositions(this, id, i === 0); });
+            .each(function (id, i) { updatePositions(this, id, i); });
         (withTransition ? texts.transition() : texts)
             .attr('x', xForLegendText)
             .attr('y', yForLegendText);

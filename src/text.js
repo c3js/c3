@@ -48,7 +48,7 @@ c3_chart_internal_fn.addTransitionForText = function (transitions, xForText, yFo
 };
 c3_chart_internal_fn.getTextRect = function (text, cls) {
     var rect;
-    this.d3.select('body').selectAll('.dummy')
+    this.svg.selectAll('.dummy')
         .data([text])
       .enter().append('text')
         .classed(cls ? cls : "", true)
