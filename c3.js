@@ -1436,7 +1436,7 @@
     };
     c3_chart_internal_fn.isMultipleX = function () {
         var $$ = this, config = $$.config;
-        return notEmpty(config.data_xs) && $$.hasMultipleX(config.data_xs);
+        return notEmpty(config.data_xs);
     };
     c3_chart_internal_fn.addName = function (data) {
         var $$ = this, name;
