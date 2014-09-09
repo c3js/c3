@@ -203,7 +203,9 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     }
 
     // Trim domain when too big by zoom mousemove event
-    $$.x.domain($$.trimXDomain($$.x.orgDomain()));
+    if (!domain) {
+        $$.x.domain($$.trimXDomain($$.x.orgDomain()));
+    }
 
     return $$.x.domain();
 };
