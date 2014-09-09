@@ -1,11 +1,15 @@
 c3_chart_internal_fn.initRegion = function () {
     var $$ = this;
-    $$.main.append('g')
+    $$.region = $$.main.append('g')
         .attr("clip-path", $$.clipPath)
         .attr("class", CLASS.regions);
 };
 c3_chart_internal_fn.redrawRegion = function (duration) {
     var $$ = this, config = $$.config;
+
+    // hide if arc type
+    $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+
     $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
     $$.mainRegion.enter().append('g')

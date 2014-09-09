@@ -72,6 +72,10 @@ c3_chart_internal_fn.updateYGrid = function () {
 c3_chart_internal_fn.redrawGrid = function (duration, withY) {
     var $$ = this, main = $$.main, config = $$.config,
         xgridLine, ygridLine, yv;
+
+    // hide if arc type
+    $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+
     main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
     if (config.grid_x_show) {
         $$.updateXGrid();

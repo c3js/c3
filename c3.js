@@ -3217,6 +3217,10 @@
     c3_chart_internal_fn.redrawGrid = function (duration, withY) {
         var $$ = this, main = $$.main, config = $$.config,
             xgridLine, ygridLine, yv;
+
+        // hide if arc type
+        $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+
         main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
         if (config.grid_x_show) {
             $$.updateXGrid();
@@ -4521,12 +4525,16 @@
 
     c3_chart_internal_fn.initRegion = function () {
         var $$ = this;
-        $$.main.append('g')
+        $$.region = $$.main.append('g')
             .attr("clip-path", $$.clipPath)
             .attr("class", CLASS.regions);
     };
     c3_chart_internal_fn.redrawRegion = function (duration) {
         var $$ = this, config = $$.config;
+
+        // hide if arc type
+        $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
         $$.mainRegion.enter().append('g')
