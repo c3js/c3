@@ -77,6 +77,7 @@ c3_chart_internal_fn.initParams = function () {
 
     $$.dragStart = null;
     $$.dragging = false;
+    $$.flowing = false;
     $$.cancelClick = false;
     $$.mouseover = false;
     $$.transiting = false;
@@ -550,8 +551,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .selectAll('circle')
         .remove();
 
-    // event rect
-    if (config.interaction_enabled) {
+    // event rects will redrawn when flow called
+    if (config.interaction_enabled && !options.flow) {
         $$.redrawEventRect();
     }
 

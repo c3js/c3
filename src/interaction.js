@@ -109,7 +109,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         .on('mouseover', function (d) {
             var index = d.index, selectedData, newData;
 
-            if ($$.dragging) { return; } // do nothing if dragging
+            if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
             if ($$.hasArcType()) { return; }
 
             selectedData = $$.data.targets.map(function (t) {
@@ -155,7 +155,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             var selectedData, index = d.index,
                 eventRect = $$.svg.select('.' + CLASS.eventRect + '-' + index);
 
-            if ($$.dragging) { return; } // do nothing when dragging
+            if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
             if ($$.hasArcType()) { return; }
 
             if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {

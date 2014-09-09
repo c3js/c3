@@ -82,6 +82,7 @@
 
         $$.dragStart = null;
         $$.dragging = false;
+        $$.flowing = false;
         $$.cancelClick = false;
         $$.mouseover = false;
         $$.transiting = false;
@@ -555,8 +556,8 @@
             .selectAll('circle')
             .remove();
 
-        // event rect
-        if (config.interaction_enabled) {
+        // event rects will redrawn when flow called
+        if (config.interaction_enabled && !options.flow) {
             $$.redrawEventRect();
         }
 
@@ -2103,7 +2104,7 @@
             .on('mouseover', function (d) {
                 var index = d.index, selectedData, newData;
 
-                if ($$.dragging) { return; } // do nothing if dragging
+                if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
                 if ($$.hasArcType()) { return; }
 
                 selectedData = $$.data.targets.map(function (t) {
@@ -2149,7 +2150,7 @@
                 var selectedData, index = d.index,
                     eventRect = $$.svg.select('.' + CLASS.eventRect + '-' + index);
 
-                if ($$.dragging) { return; } // do nothing when dragging
+                if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
                 if ($$.hasArcType()) { return; }
 
                 if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
@@ -5662,6 +5663,9 @@
                 mainArea = $$.mainArea || d3.selectAll([]),
                 mainCircle = $$.mainCircle || d3.selectAll([]);
 
+            // set flag
+            $$.flowing = true;
+
             // remove head data after rendered
             $$.data.targets.forEach(function (d) {
                 d.values.splice(0, flowLength);
@@ -5696,6 +5700,10 @@
             }
             scaleX = (diffDomain(orgDomain) / diffDomain(domain));
             transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
+
+            // hide tooltip
+            $$.hideXGridFocus();
+            $$.hideTooltip();
 
             d3.transition().ease('linear').duration(durationForFlow).each(function () {
                 wait.add($$.axes.x.transition().call($$.xAxis));
@@ -5759,10 +5767,15 @@
                 mainRegion.select('rect').filter($$.isRegionOnX)
                     .attr("x", $$.regionX.bind($$))
                     .attr("width", $$.regionWidth.bind($$));
-                $$.updateEventRect();
+
+                if (config.interaction_enabled) {
+                    $$.redrawEventRect();
+                }
 
                 // callback for end of flow
                 done();
+
+                $$.flowing = false;
             });
         };
     };

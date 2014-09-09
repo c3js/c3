@@ -175,6 +175,9 @@ c3_chart_internal_fn.generateFlow = function (args) {
             mainArea = $$.mainArea || d3.selectAll([]),
             mainCircle = $$.mainCircle || d3.selectAll([]);
 
+        // set flag
+        $$.flowing = true;
+
         // remove head data after rendered
         $$.data.targets.forEach(function (d) {
             d.values.splice(0, flowLength);
@@ -209,6 +212,10 @@ c3_chart_internal_fn.generateFlow = function (args) {
         }
         scaleX = (diffDomain(orgDomain) / diffDomain(domain));
         transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
+
+        // hide tooltip
+        $$.hideXGridFocus();
+        $$.hideTooltip();
 
         d3.transition().ease('linear').duration(durationForFlow).each(function () {
             wait.add($$.axes.x.transition().call($$.xAxis));
@@ -272,10 +279,15 @@ c3_chart_internal_fn.generateFlow = function (args) {
             mainRegion.select('rect').filter($$.isRegionOnX)
                 .attr("x", $$.regionX.bind($$))
                 .attr("width", $$.regionWidth.bind($$));
-            $$.updateEventRect();
+
+            if (config.interaction_enabled) {
+                $$.redrawEventRect();
+            }
 
             // callback for end of flow
             done();
+
+            $$.flowing = false;
         });
     };
 };
