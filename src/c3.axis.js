@@ -1,10 +1,13 @@
 // Features:
 // 1. category axis
 // 2. ceil values of translate/x/y to int for half pixel antialiasing
-function c3_axis(d3, isCategory) {
-    var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+function c3_axis(d3, params) {
+    var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
     var tickOffset = 0, tickCulling = true, tickCentered;
+
+    params = params || {};
+    outerTickSize = params.withOuterTick ? 6 : 0;
 
     function axisX(selection, x) {
         selection.attr("transform", function (d) {
@@ -36,7 +39,7 @@ function c3_axis(d3, isCategory) {
     }
     function copyScale() {
         var newScale = scale.copy(), domain;
-        if (isCategory) {
+        if (params.isCategory) {
             domain = scale.domain();
             newScale.domain([domain[0], domain[1] - 1]);
         }
@@ -70,7 +73,7 @@ function c3_axis(d3, isCategory) {
                 textEnter = tickEnter.select("text"),
                 textUpdate = tickUpdate.select("text");
 
-            if (isCategory) {
+            if (params.isCategory) {
                 tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                 tickX = tickCentered ? 0 : tickOffset;
             } else {

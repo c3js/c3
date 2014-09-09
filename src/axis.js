@@ -30,9 +30,10 @@ c3_chart_internal_fn.initAxis = function () {
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
 };
-c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
+c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
     var $$ = this, config = $$.config,
-        axis = c3_axis($$.d3, $$.isCategorized()).scale(scale).orient(orient);
+        axisParams = {isCategory: $$.isCategorized(), withOuterTick: withOuterTick},
+        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
     if ($$.isTimeSeries() && tickValues) {
         tickValues = tickValues.map(function (v) { return $$.parseDate(v); });
@@ -57,8 +58,9 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues)
 
     return axis;
 };
-c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks) {
-    return c3_axis(this.d3).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
+c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks, withOuterTick) {
+    var axisParams = {withOuterTick: withOuterTick};
+    return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
 };
 c3_chart_internal_fn.getAxisId = function (id) {
     var config = this.config;

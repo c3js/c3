@@ -1151,10 +1151,10 @@
         // update axes
         $$.xAxisTickFormat = $$.getXAxisTickFormat();
         $$.xAxisTickValues = config.axis_x_tick_values ? config.axis_x_tick_values : (forInit ? undefined : $$.xAxis.tickValues());
-        $$.xAxis = $$.getXAxis($$.x, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
-        $$.subXAxis = $$.getXAxis($$.subX, $$.subXOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
-        $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks);
-        $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks);
+        $$.xAxis = $$.getXAxis($$.x, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
+        $$.subXAxis = $$.getXAxis($$.subX, $$.subXOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
+        $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks, config.axis_y_tick_outer);
+        $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks, config.axis_y2_tick_outer);
         // Set initialized scales to brush and zoom
         if (!forInit) {
             if ($$.brush) { $$.brush.scale($$.subX); }
@@ -3800,9 +3800,10 @@
             .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
             .style("text-anchor", $$.textAnchorForY2AxisLabel.bind($$));
     };
-    c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues) {
+    c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
         var $$ = this, config = $$.config,
-            axis = c3_axis($$.d3, $$.isCategorized()).scale(scale).orient(orient);
+            axisParams = {isCategory: $$.isCategorized(), withOuterTick: withOuterTick},
+            axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
         if ($$.isTimeSeries() && tickValues) {
             tickValues = tickValues.map(function (v) { return $$.parseDate(v); });
@@ -3827,8 +3828,9 @@
 
         return axis;
     };
-    c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks) {
-        return c3_axis(this.d3).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
+    c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks, withOuterTick) {
+        var axisParams = {withOuterTick: withOuterTick};
+        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
     };
     c3_chart_internal_fn.getAxisId = function (id) {
         var config = this.config;
@@ -6114,10 +6116,13 @@
     // Features:
     // 1. category axis
     // 2. ceil values of translate/x/y to int for half pixel antialiasing
-    function c3_axis(d3, isCategory) {
-        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+    function c3_axis(d3, params) {
+        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
         var tickOffset = 0, tickCulling = true, tickCentered;
+
+        params = params || {};
+        outerTickSize = params.withOuterTick ? 6 : 0;
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
@@ -6149,7 +6154,7 @@
         }
         function copyScale() {
             var newScale = scale.copy(), domain;
-            if (isCategory) {
+            if (params.isCategory) {
                 domain = scale.domain();
                 newScale.domain([domain[0], domain[1] - 1]);
             }
@@ -6183,7 +6188,7 @@
                     textEnter = tickEnter.select("text"),
                     textUpdate = tickUpdate.select("text");
 
-                if (isCategory) {
+                if (params.isCategory) {
                     tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
