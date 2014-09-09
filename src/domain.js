@@ -187,7 +187,7 @@ c3_chart_internal_fn.getXDomain = function (targets) {
     }
     return [min, max];
 };
-c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, domain) {
+c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, withTrim, domain) {
     var $$ = this, config = $$.config;
 
     if (withUpdateOrgXDomain) {
@@ -203,9 +203,7 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     }
 
     // Trim domain when too big by zoom mousemove event
-    if (!domain) {
-        $$.x.domain($$.trimXDomain($$.x.orgDomain()));
-    }
+    if (withTrim) { $$.x.domain($$.trimXDomain($$.x.orgDomain())); }
 
     return $$.x.domain();
 };

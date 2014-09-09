@@ -113,12 +113,12 @@ c3_chart_fn.flow = function (args) {
             diff = 1;
         }
         domain = [baseValue.x - diff, baseValue.x];
-        $$.updateXDomain(null, true, true, domain);
+        $$.updateXDomain(null, true, true, false, domain);
     } else if (orgDataCount === 1) {
         if ($$.isTimeSeries()) {
             diff = (baseTarget.values[baseTarget.values.length - 1].x - baseValue.x) / 2;
             domain = [new Date(+baseValue.x - diff), new Date(+baseValue.x + diff)];
-            $$.updateXDomain(null, true, true, domain);
+            $$.updateXDomain(null, true, true, false, domain);
         }
     }
 
@@ -136,6 +136,7 @@ c3_chart_fn.flow = function (args) {
         },
         withLegend: true,
         withTransition: orgDataCount > 1,
+        withTrimXDomain: false
     });
 };
 

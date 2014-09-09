@@ -412,7 +412,7 @@
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
-        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withLegend;
+        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend;
         var hideAxis = $$.hasArcType();
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis;
@@ -429,6 +429,7 @@
         withTransform = getOption(options, "withTransform", false);
         withUpdateXDomain = getOption(options, "withUpdateXDomain", false);
         withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
+        withTrimXDomain = getOption(options, "withTrimXDomain", true);
         withLegend = getOption(options, "withLegend", false);
         withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
         withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
@@ -450,7 +451,7 @@
         }
 
         if (targetsToShow.length) {
-            $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain);
+            $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
             // update axis tick values according to options
             if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
                 tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count);
@@ -1351,7 +1352,7 @@
         }
         return [min, max];
     };
-    c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, domain) {
+    c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, withTrim, domain) {
         var $$ = this, config = $$.config;
 
         if (withUpdateOrgXDomain) {
@@ -1367,9 +1368,7 @@
         }
 
         // Trim domain when too big by zoom mousemove event
-        if (!domain) {
-            $$.x.domain($$.trimXDomain($$.x.orgDomain()));
-        }
+        if (withTrim) { $$.x.domain($$.trimXDomain($$.x.orgDomain())); }
 
         return $$.x.domain();
     };
@@ -5601,12 +5600,12 @@
                 diff = 1;
             }
             domain = [baseValue.x - diff, baseValue.x];
-            $$.updateXDomain(null, true, true, domain);
+            $$.updateXDomain(null, true, true, false, domain);
         } else if (orgDataCount === 1) {
             if ($$.isTimeSeries()) {
                 diff = (baseTarget.values[baseTarget.values.length - 1].x - baseValue.x) / 2;
                 domain = [new Date(+baseValue.x - diff), new Date(+baseValue.x + diff)];
-                $$.updateXDomain(null, true, true, domain);
+                $$.updateXDomain(null, true, true, false, domain);
             }
         }
 
@@ -5624,6 +5623,7 @@
             },
             withLegend: true,
             withTransition: orgDataCount > 1,
+            withTrimXDomain: false
         });
     };
 
