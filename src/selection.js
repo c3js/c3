@@ -43,7 +43,7 @@ c3_chart_internal_fn.toggleBar = function (selected, target, d, i) {
     selected ? this.selectBar(target, d, i) : this.unselectBar(target, d, i);
 };
 c3_chart_internal_fn.toggleArc = function (selected, target, d, i) {
-    this.toggleBar(selected, target, d.data, i);
+    this.toggleBar(selected, target, d, i);
 };
 c3_chart_internal_fn.getToggle = function (that, d) {
     var $$ = this,
