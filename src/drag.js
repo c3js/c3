@@ -41,7 +41,7 @@ c3_chart_internal_fn.drag = function (mouse) {
                 _y = box.y;
                 _w = box.width;
                 _h = box.height;
-                toggle = $$.toggleBar;
+                toggle = $$.togglePath;
                 isWithin = !(maxX < _x || _x + _w < minX) && !(maxY < _y || _y + _h < minY);
             } else {
                 // line/area selection not supported yet

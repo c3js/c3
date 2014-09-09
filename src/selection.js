@@ -27,27 +27,23 @@ c3_chart_internal_fn.unselectPoint = function (target, d, i) {
 c3_chart_internal_fn.togglePoint = function (selected, target, d, i) {
     selected ? this.selectPoint(target, d, i) : this.unselectPoint(target, d, i);
 };
-c3_chart_internal_fn.selectBar = function (target, d) {
+c3_chart_internal_fn.selectPath = function (target, d) {
     var $$ = this;
     $$.config.data_onselected.call($$, d, target.node());
     target.transition().duration(100)
         .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
 };
-c3_chart_internal_fn.unselectBar = function (target, d) {
+c3_chart_internal_fn.unselectPath = function (target, d) {
     var $$ = this;
     $$.config.data_onunselected.call($$, d, target.node());
     target.transition().duration(100)
         .style("fill", function () { return $$.color(d); });
 };
-c3_chart_internal_fn.toggleBar = function (selected, target, d, i) {
-    selected ? this.selectBar(target, d, i) : this.unselectBar(target, d, i);
-};
-c3_chart_internal_fn.toggleArc = function (selected, target, d, i) {
-    this.toggleBar(selected, target, d, i);
+c3_chart_internal_fn.togglePath = function (selected, target, d, i) {
+    selected ? this.selectPath(target, d, i) : this.unselectPath(target, d, i);
 };
 c3_chart_internal_fn.getToggle = function (that, d) {
-    var $$ = this,
-        shape = $$.d3.select(that), toggle;
+    var $$ = this, toggle;
     if (that.nodeName === 'circle') {
         if ($$.isStepType(d)) {
             // circle is hidden in step chart, so treat as within the click area
@@ -57,11 +53,7 @@ c3_chart_internal_fn.getToggle = function (that, d) {
         }
     }
     else if (that.nodeName === 'path') {
-        if (shape.classed(CLASS.bar)) {
-            toggle = $$.toggleBar;
-        } else { // would be arc
-            toggle = $$.toggleArc;
-        }
+        toggle = $$.togglePath;
     }
     return toggle;
 };
