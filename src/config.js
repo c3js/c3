@@ -22,6 +22,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_xs: {},
         data_xFormat: '%Y-%m-%d',
         data_xLocaltime: true,
+        data_xSort: true,
         data_idConverter: function (id) { return id; },
         data_names: {},
         data_classes: {},

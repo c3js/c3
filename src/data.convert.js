@@ -147,11 +147,13 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     targets.forEach(function (t) {
         var i;
         // sort values by its x
-        t.values = t.values.sort(function (v1, v2) {
-            var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
-                x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
-            return x1 - x2;
-        });
+        if (config.data_xSort) {
+            t.values = t.values.sort(function (v1, v2) {
+                var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+                    x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
+                return x1 - x2;
+            });
+        }
         // indexing each value
         i = 0;
         t.values.forEach(function (v) {

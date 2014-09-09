@@ -888,6 +888,7 @@
             data_xs: {},
             data_xFormat: '%Y-%m-%d',
             data_xLocaltime: true,
+            data_xSort: true,
             data_idConverter: function (id) { return id; },
             data_names: {},
             data_classes: {},
@@ -1435,8 +1436,7 @@
         return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
     };
     c3_chart_internal_fn.isMultipleX = function () {
-        var $$ = this, config = $$.config;
-        return notEmpty(config.data_xs);
+        return notEmpty(this.config.data_xs) || !this.config.data_xSort;
     };
     c3_chart_internal_fn.addName = function (data) {
         var $$ = this, name;
@@ -1662,42 +1662,12 @@
         return sames;
     };
 
-    c3_chart_internal_fn.findClosestOfValues = function (values, pos, _min, _max) { // MEMO: values must be sorted by x
-        var $$ = this,
-            min = _min ? _min : 0,
-            max = _max ? _max : values.length - 1,
-            med = Math.floor((max - min) / 2) + min,
-            value = values[med],
-            diff = $$.x(value.x) - pos[$$.config.axis_rotated ? 1 : 0],
-            candidates;
-
-        // Update range for search
-        diff > 0 ? max = med : min = med;
-
-        // if candidates are two closest min and max, stop recursive call
-        if ((max - min) === 1 || (min === 0 && max === 0)) {
-
-            // Get candidates that has same min and max index
-            candidates = [];
-            if (values[min].x || values[min].x === 0) {
-                candidates = candidates.concat($$.findSameXOfValues(values, min));
-            }
-            if (values[max].x || values[max].x === 0) {
-                candidates = candidates.concat($$.findSameXOfValues(values, max));
-            }
-
-            // Determine the closest and return
-            return $$.findClosest(candidates, pos);
-        }
-
-        return $$.findClosestOfValues(values, pos, min, max);
-    };
     c3_chart_internal_fn.findClosestFromTargets = function (targets, pos) {
         var $$ = this, candidates;
 
         // map to array of closest points of each target
         candidates = targets.map(function (target) {
-            return $$.findClosestOfValues(target.values, pos);
+            return $$.findClosest(target.values, pos);
         });
 
         // decide closest point and return
@@ -1871,11 +1841,13 @@
         targets.forEach(function (t) {
             var i;
             // sort values by its x
-            t.values = t.values.sort(function (v1, v2) {
-                var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
-                    x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
-                return x1 - x2;
-            });
+            if (config.data_xSort) {
+                t.values = t.values.sort(function (v1, v2) {
+                    var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+                        x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
+                    return x1 - x2;
+                });
+            }
             // indexing each value
             i = 0;
             t.values.forEach(function (v) {
