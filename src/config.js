@@ -131,7 +131,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         point_focus_expand_enabled: true,
         point_focus_expand_r: undefined,
         point_select_r: undefined,
-        line_connect_null: false,
+        line_connectNull: false,
         // bar
         bar_width: undefined,
         bar_width_ratio: 0.6,

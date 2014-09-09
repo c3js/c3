@@ -997,7 +997,7 @@
             point_focus_expand_enabled: true,
             point_focus_expand_r: undefined,
             point_select_r: undefined,
-            line_connect_null: false,
+            line_connectNull: false,
             // bar
             bar_width: undefined,
             bar_width_ratio: 0.6,
@@ -2575,9 +2575,9 @@
             };
 
         line = config.axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
-        if (!config.line_connect_null) { line = line.defined(function (d) { return d.value != null; }); }
+        if (!config.line_connectNull) { line = line.defined(function (d) { return d.value != null; }); }
         return function (d) {
-            var data = config.line_connect_null ? $$.filterRemoveNull(d.values) : d.values,
+            var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
                 x = isSub ? $$.x : $$.subX, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
             if ($$.isLineType(d)) {
                 if (config.data_regions[d.id]) {
@@ -2735,12 +2735,12 @@
             };
 
         area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
-        if (!config.line_connect_null) {
+        if (!config.line_connectNull) {
             area = area.defined(function (d) { return d.value !== null; });
         }
 
         return function (d) {
-            var data = config.line_connect_null ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
+            var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
             if ($$.isAreaType(d)) {
                 path = area.interpolate($$.getInterpolate(d))(data);
             } else {
