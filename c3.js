@@ -1436,7 +1436,7 @@
         return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
     };
     c3_chart_internal_fn.isMultipleX = function () {
-        return notEmpty(this.config.data_xs) || !this.config.data_xSort;
+        return notEmpty(this.config.data_xs) || !this.config.data_xSort || this.hasType('scatter');
     };
     c3_chart_internal_fn.addName = function (data) {
         var $$ = this, name;
