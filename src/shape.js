@@ -46,6 +46,19 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
         return offset;
     };
 };
+c3_chart_internal_fn.isWithinShape = function (that, d) {
+    var $$ = this,
+        shape = $$.d3.select(that), isWithin;
+    if (that.nodeName === 'circle') {
+        // circle is hidden in step chart, so treat as within the click area
+        isWithin = $$.isStepType(d) ? true : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
+    }
+    else if (that.nodeName === 'path') {
+        isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar(that) : true;
+    }
+    return isWithin;
+};
+
 
 c3_chart_internal_fn.getInterpolate = function (d) {
     var $$ = this;

@@ -222,7 +222,10 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 index -= 1;
             }
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                $$.toggleShape(this, d, index);
+                if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                    $$.toggleShape(this, d, index);
+                    $$.config.data_onclick.call($$.api, d, this);
+                }
             });
         })
         .call(
@@ -307,7 +310,10 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             // select if selection enabled
             if ($$.dist(closest, mouse) < 100 && $$.toggleShape) {
                 $$.main.select('.' + CLASS.circles + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
-                    $$.toggleShape(this, closest, closest.index);
+                    if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
+                        $$.toggleShape(this, closest, closest.index);
+                        $$.config.data_onclick.call($$.api, closest, this);
+                    }
                 });
             }
         })

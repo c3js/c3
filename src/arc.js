@@ -272,13 +272,10 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             $$.config.data_onmouseout(arcData, this);
         })
         .on('click', function (d, i) {
-            var updated, arcData;
-            if (!$$.toggleShape) {
-                return;
-            }
-            updated = $$.updateAngle(d);
-            arcData = $$.convertToArcData(updated);
-            $$.toggleShape(this, arcData, i); // onclick called in toogleShape()
+            var updated = $$.updateAngle(d),
+                arcData = $$.convertToArcData(updated);
+            if ($$.toggleShape) { $$.toggleShape(this, arcData, i); }
+            $$.config.data_onclick.call($$.api, arcData, this);
         });
     mainArc
         .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })

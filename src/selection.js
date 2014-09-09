@@ -45,44 +45,39 @@ c3_chart_internal_fn.toggleBar = function (selected, target, d, i) {
 c3_chart_internal_fn.toggleArc = function (selected, target, d, i) {
     this.toggleBar(selected, target, d.data, i);
 };
-c3_chart_internal_fn.getToggle = function (that) {
-    var $$ = this;
-    // path selection not supported yet
-    return that.nodeName === 'circle' ? $$.togglePoint : ($$.d3.select(that).classed(CLASS.bar) ? $$.toggleBar : $$.toggleArc);
-};
-c3_chart_internal_fn.toggleShape = function (that, d, i) {
-    var $$ = this, d3 = $$.d3, config = $$.config,
-        shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED), isWithin, toggle;
+c3_chart_internal_fn.getToggle = function (that, d) {
+    var $$ = this,
+        shape = $$.d3.select(that), toggle;
     if (that.nodeName === 'circle') {
         if ($$.isStepType(d)) {
             // circle is hidden in step chart, so treat as within the click area
-            isWithin = true;
             toggle = function () {}; // TODO: how to select step chart?
         } else {
-            isWithin = $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
             toggle = $$.togglePoint;
         }
     }
     else if (that.nodeName === 'path') {
         if (shape.classed(CLASS.bar)) {
-            isWithin = $$.isWithinBar(that);
             toggle = $$.toggleBar;
         } else { // would be arc
-            isWithin = true;
             toggle = $$.toggleArc;
         }
     }
-    if (config.data_selection_grouped || isWithin) {
-        if (config.data_selection_enabled && config.data_selection_isselectable(d)) {
-            if (!config.data_selection_multiple) {
-                $$.main.selectAll('.' + CLASS.shapes + (config.data_selection_grouped ? $$.getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS.shape).each(function (d, i) {
-                    var shape = d3.select(this);
-                    if (shape.classed(CLASS.SELECTED)) { toggle.call($$, false, shape.classed(CLASS.SELECTED, false), d, i); }
-                });
-            }
-            shape.classed(CLASS.SELECTED, !isSelected);
-            toggle.call($$, !isSelected, shape, d, i);
+    return toggle;
+};
+c3_chart_internal_fn.toggleShape = function (that, d, i) {
+    var $$ = this, d3 = $$.d3, config = $$.config,
+        shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED),
+        toggle = $$.getToggle(that, d).bind($$);
+
+    if (config.data_selection_enabled && config.data_selection_isselectable(d)) {
+        if (!config.data_selection_multiple) {
+            $$.main.selectAll('.' + CLASS.shapes + (config.data_selection_grouped ? $$.getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS.shape).each(function (d, i) {
+                var shape = d3.select(this);
+                if (shape.classed(CLASS.SELECTED)) { toggle(false, shape.classed(CLASS.SELECTED, false), d, i); }
+            });
         }
-        $$.config.data_onclick.call($$.api, d, that);
+        shape.classed(CLASS.SELECTED, !isSelected);
+        toggle(!isSelected, shape, d, i);
     }
 };

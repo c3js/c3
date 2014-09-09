@@ -11,7 +11,7 @@ c3_chart_fn.select = function (ids, indices, resetOther) {
     if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
         var shape = d3.select(this), id = d.data ? d.data.id : d.id,
-            toggle = $$.getToggle(this).bind($$),
+            toggle = $$.getToggle(this, d).bind($$),
             isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
             isTargetIndex = !indices || indices.indexOf(i) >= 0,
             isSelected = shape.classed(CLASS.SELECTED);
@@ -35,7 +35,7 @@ c3_chart_fn.unselect = function (ids, indices) {
     if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
         var shape = d3.select(this), id = d.data ? d.data.id : d.id,
-            toggle = $$.getToggle(this).bind($$),
+            toggle = $$.getToggle(this, d).bind($$),
             isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
             isTargetIndex = !indices || indices.indexOf(i) >= 0,
             isSelected = shape.classed(CLASS.SELECTED);
