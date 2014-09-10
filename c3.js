@@ -1377,11 +1377,11 @@
     c3_chart_internal_fn.trimXDomain = function (domain) {
         var $$ = this;
         if (domain[0] <= $$.orgXDomain[0]) {
-            domain[1] += $$.orgXDomain[0] - domain[0];
+            domain[1] = +domain[1] + ($$.orgXDomain[0] - domain[0]);
             domain[0] = $$.orgXDomain[0];
         }
         if ($$.orgXDomain[1] <= domain[1]) {
-            domain[0] -= domain[1] - $$.orgXDomain[1];
+            domain[0] = +domain[0] - (domain[1] - $$.orgXDomain[1]);
             domain[1] = $$.orgXDomain[1];
         }
         return domain;
