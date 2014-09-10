@@ -20,6 +20,12 @@ c3_chart_fn.axis.max = function (max) {
             config.axis_y_max = config.axis_y2_max = max;
         }
         $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+    } else {
+        return {
+            x: config.axis_x_max,
+            y: config.axis_y_max,
+            y2: config.axis_y2_max
+        };
     }
 };
 c3_chart_fn.axis.min = function (min) {
@@ -33,11 +39,22 @@ c3_chart_fn.axis.min = function (min) {
             config.axis_y_min = config.axis_y2_min = min;
         }
         $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true});
+    } else {
+        return {
+            x: config.axis_x_min,
+            y: config.axis_y_min,
+            y2: config.axis_y2_min
+        };
     }
 };
 c3_chart_fn.axis.range = function (range) {
     if (arguments.length) {
         if (isDefined(range.max)) { this.axis.max(range.max); }
         if (isDefined(range.min)) { this.axis.min(range.min); }
+    } else {
+        return {
+            max: this.axis.max(),
+            min: this.axis.min()
+        };
     }
 };
