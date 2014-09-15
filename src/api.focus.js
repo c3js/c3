@@ -1,50 +1,54 @@
-c3_chart_fn.focus = function (targetId) {
-    var $$ = this.internal,
-        candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
-        candidatesForArc = candidates.filter($$.isArc.bind($$));
-    function focus(targets) {
-        $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
-    }
+c3_chart_fn.focus = function (targetIds) {
+    var $$ = this.internal, candidates;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
+
     this.revert();
     this.defocus();
-    focus(candidatesForNoneArc.classed(CLASS.focused, true));
-    focus(candidatesForArc);
+    candidates.classed(CLASS.focused, true).classed(CLASS.defocused, false);
     if ($$.hasArcType()) {
-        $$.expandArc(targetId, true);
+        $$.expandArc(targetIds, true);
     }
-    $$.toggleFocusLegend(targetId, true);
+    $$.toggleFocusLegend(targetIds, true);
+
+    $$.focusedTargetIds = targetIds;
+    $$.defocusedTargetIds = $$.defocusedTargetIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
+    });
 };
 
-c3_chart_fn.defocus = function (targetId) {
-    var $$ = this.internal,
-        candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
-        candidatesForArc = candidates.filter($$.isArc.bind($$));
-    function defocus(targets) {
-        $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 0.3);
-    }
+c3_chart_fn.defocus = function (targetIds) {
+    var $$ = this.internal, candidates;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
+
     this.revert();
-    defocus(candidatesForNoneArc.classed(CLASS.focused, false));
-    defocus(candidatesForArc);
+    candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
     if ($$.hasArcType()) {
-        $$.unexpandArc(targetId);
+        $$.unexpandArc(targetIds);
     }
-    $$.toggleFocusLegend(targetId, false);
+    $$.toggleFocusLegend(targetIds, false);
+
+    $$.focusedTargetIds = $$.focusedTargetIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
+    });
+    $$.defocusedTargetIds = targetIds;
 };
 
-c3_chart_fn.revert = function (targetId) {
-    var $$ = this.internal,
-        candidates = $$.svg.selectAll($$.selectorTarget(targetId)),
-        candidatesForNoneArc = candidates.filter($$.isNoneArc.bind($$)),
-        candidatesForArc = candidates.filter($$.isArc.bind($$));
-    function revert(targets) {
-        $$.filterTargetsToShow(targets).transition().duration(100).style('opacity', 1);
-    }
-    revert(candidatesForNoneArc.classed(CLASS.focused, false));
-    revert(candidatesForArc);
+c3_chart_fn.revert = function (targetIds) {
+    var $$ = this.internal, candidates;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+    candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
     if ($$.hasArcType()) {
-        $$.unexpandArc(targetId);
+        $$.unexpandArc(targetIds);
     }
     $$.revertLegend();
+
+    $$.focusedTargetIds = [];
+    $$.defocusedTargetIds = [];
 };

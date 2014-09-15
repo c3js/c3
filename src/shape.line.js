@@ -9,10 +9,11 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
         classChartLine = $$.classChartLine.bind($$),
         classLines = $$.classLines.bind($$),
         classAreas = $$.classAreas.bind($$),
-        classCircles = $$.classCircles.bind($$);
+        classCircles = $$.classCircles.bind($$),
+        classFocus = $$.classFocus.bind($$);
     mainLineUpdate = $$.main.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
         .data(targets)
-        .attr('class', classChartLine);
+        .attr('class', function (d) { return classChartLine(d) + classFocus(d); });
     mainLineEnter = mainLineUpdate.enter().append('g')
         .attr('class', classChartLine)
         .style('opacity', 0)

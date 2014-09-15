@@ -7,10 +7,11 @@ c3_chart_internal_fn.initText = function () {
 c3_chart_internal_fn.updateTargetsForText = function (targets) {
     var $$ = this, mainTextUpdate, mainTextEnter,
         classChartText = $$.classChartText.bind($$),
-        classTexts = $$.classTexts.bind($$);
+        classTexts = $$.classTexts.bind($$),
+        classFocus = $$.classFocus.bind($$);
     mainTextUpdate = $$.main.select('.' + CLASS.chartTexts).selectAll('.' + CLASS.chartText)
         .data(targets)
-        .attr('class', classChartText);
+        .attr('class', function (d) { return classChartText(d) + classFocus(d); });
     mainTextEnter = mainTextUpdate.enter().append('g')
         .attr('class', classChartText)
         .style('opacity', 0)

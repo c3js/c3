@@ -7,10 +7,11 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
     var $$ = this, config = $$.config,
         mainBarUpdate, mainBarEnter,
         classChartBar = $$.classChartBar.bind($$),
-        classBars = $$.classBars.bind($$);
+        classBars = $$.classBars.bind($$),
+        classFocus = $$.classFocus.bind($$);
     mainBarUpdate = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
         .data(targets)
-        .attr('class', classChartBar);
+        .attr('class', function (d) { return classChartBar(d) + classFocus(d); });
     mainBarEnter = mainBarUpdate.enter().append('g')
         .attr('class', classChartBar)
         .style('opacity', 0)

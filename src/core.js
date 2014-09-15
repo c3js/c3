@@ -100,6 +100,8 @@ c3_chart_internal_fn.initParams = function () {
 
     $$.hiddenTargetIds = [];
     $$.hiddenLegendIds = [];
+    $$.focusedTargetIds = [];
+    $$.defocusedTargetIds = [];
 
     $$.xOrient = config.axis_rotated ? "left" : "bottom";
     $$.yOrient = config.axis_rotated ? "bottom" : "left";
@@ -670,8 +672,7 @@ c3_chart_internal_fn.initialOpacity = function (d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? 1 : 0;
 };
 c3_chart_internal_fn.opacityForCircle = function (d) {
-    var $$ = this;
-    return isValue(d.value) ? $$.isScatterType(d) ? 0.5 : 1 : 0;
+    return isValue(d.value) ? this.isScatterType(d) ? 0.5 : 1 : 0;
 };
 c3_chart_internal_fn.opacityForText = function () {
     return this.hasDataLabel() ? 1 : 0;

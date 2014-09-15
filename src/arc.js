@@ -118,13 +118,19 @@ c3_chart_internal_fn.textForArcLabel = function (d) {
     return format ? format(value, ratio) : $$.defaultArcValueFormat(value, ratio);
 };
 
-c3_chart_internal_fn.expandArc = function (id, withoutFadeOut) {
-    var $$ = this,
-        target = $$.svg.selectAll('.' + CLASS.chartArc + $$.selectorTarget(id)),
-        noneTargets = $$.svg.selectAll('.' + CLASS.arc).filter(function (data) { return data.data.id !== id; });
+c3_chart_internal_fn.expandArc = function (targetIds, withoutFadeOut) {
+    var $$ = this, targets, noneTargets;
 
-    if ($$.shouldExpand(id)) {
-        target.selectAll('path')
+    targetIds = $$.mapToTargetIds(targetIds);
+
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)),
+    noneTargets = $$.svg.selectAll('.' + CLASS.arc).filter(function (data) {
+        return targetIds.indexOf(data.data.id) < 0;
+    });
+
+    targets.each(function (d) {
+        if (! $$.shouldExpand(d.data.id)) { return; }
+        $$.d3.select(this).selectAll('path')
             .transition().duration(50)
             .attr("d", $$.svgArcExpanded)
             .transition().duration(100)
@@ -134,16 +140,19 @@ c3_chart_internal_fn.expandArc = function (id, withoutFadeOut) {
                     // callback here
                 }
             });
-    }
+    });
     if (!withoutFadeOut) {
         noneTargets.style("opacity", 0.3);
     }
 };
 
-c3_chart_internal_fn.unexpandArc = function (id) {
-    var $$ = this,
-        target = $$.svg.selectAll('.' + CLASS.chartArc + $$.selectorTarget(id));
-    target.selectAll('path.' + CLASS.arc)
+c3_chart_internal_fn.unexpandArc = function (targetIds) {
+    var $$ = this, targets;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc));
+
+    targets.selectAll('path.' + CLASS.arc)
         .transition().duration(50)
         .attr("d", $$.svgArc);
     $$.svg.selectAll('.' + CLASS.arc)
@@ -196,10 +205,11 @@ c3_chart_internal_fn.updateTargetsForArc = function (targets) {
     var $$ = this, main = $$.main,
         mainPieUpdate, mainPieEnter,
         classChartArc = $$.classChartArc.bind($$),
-        classArcs = $$.classArcs.bind($$);
+        classArcs = $$.classArcs.bind($$),
+        classFocus = $$.classFocus.bind($$);
     mainPieUpdate = main.select('.' + CLASS.chartArcs).selectAll('.' + CLASS.chartArc)
         .data($$.pie(targets))
-        .attr("class", classChartArc);
+        .attr("class", function (d) { return classChartArc(d) + classFocus(d.data); });
     mainPieEnter = mainPieUpdate.enter().append("g")
         .attr("class", classChartArc);
     mainPieEnter.append('g')
