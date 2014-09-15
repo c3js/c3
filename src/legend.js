@@ -63,14 +63,11 @@ c3_chart_internal_fn.opacityForUnfocusedLegend = function (legendItem) {
 c3_chart_internal_fn.toggleFocusLegend = function (id, focus) {
     var $$ = this;
     $$.legend.selectAll('.' + CLASS.legendItem)
+        .classed(CLASS.legendItemFocused, function (_id) { return id === _id && focus; })
         .transition().duration(100)
         .style('opacity', function (_id) {
-            var This = $$.d3.select(this);
-            if (id && _id !== id) {
-                return focus ? $$.opacityForUnfocusedLegend(This) : $$.opacityForLegend(This);
-            } else {
-                return focus ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
-            }
+            var opacity = id === _id && focus ? $$.opacityForLegend : $$.opacityForUnfocusedLegend;
+            return opacity($$.d3.select(this));
         });
 };
 c3_chart_internal_fn.revertLegend = function () {
