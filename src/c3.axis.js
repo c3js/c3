@@ -59,7 +59,7 @@ function c3_axis(d3, params) {
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
                 tickUpdate = d3.transition(tick).style("opacity", 1),
-                tickTransform, tickX;
+                tickTransform, tickX, tickY;
 
             var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                 path = g.selectAll(".domain").data([ 0 ]),
@@ -76,6 +76,7 @@ function c3_axis(d3, params) {
             if (params.isCategory) {
                 tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                 tickX = tickCentered ? 0 : tickOffset;
+                tickY = tickCentered ? tickOffset : 0;
             } else {
                 tickOffset = tickX = 0;
             }
@@ -113,7 +114,7 @@ function c3_axis(d3, params) {
                     tickTransform = axisY;
                     lineEnter.attr("x2", -innerTickSize);
                     textEnter.attr("x", -(Math.max(innerTickSize, 0) + tickPadding));
-                    lineUpdate.attr("x2", -innerTickSize).attr("y2", 0);
+                    lineUpdate.attr("x2", -innerTickSize).attr("y1", tickY).attr("y2", tickY);
                     textUpdate.attr("x", -(Math.max(innerTickSize, 0) + tickPadding)).attr("y", tickOffset);
                     text.attr("dy", ".32em").style("text-anchor", "end");
                     pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);

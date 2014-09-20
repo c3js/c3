@@ -3213,7 +3213,7 @@
             .data(config.grid_x_lines);
         // enter
         xgridLine = $$.xgridLines.enter().append('g')
-            .attr("class", function (d) { return CLASS.xgridLine + (d["class"] ? ' ' + d["class"] : ''); });
+            .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
         xgridLine.append('line')
             .style("opacity", 0);
         xgridLine.append('text')
@@ -3238,7 +3238,7 @@
                 .data(config.grid_y_lines);
             // enter
             ygridLine = $$.ygridLines.enter().append('g')
-                .attr("class", function (d) { return CLASS.ygridLine + (d["class"] ? ' ' + d["class"] : ''); });
+                .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
             ygridLine.append('line')
                 .style("opacity", 0);
             ygridLine.append('text')
@@ -3331,7 +3331,7 @@
         return params ? function (line) {
             var found = false;
             [].concat(params).forEach(function (param) {
-                if ((('value' in param && line.value === params.value) || ('class' in param && line["class"]=== params["class"]))) {
+                if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
                     found = true;
                 }
             });
@@ -5233,7 +5233,7 @@
         return this.classShapes(d) + this.generateClass(CLASS.areas, d.id);
     };
     c3_chart_internal_fn.classRegion = function (d, i) {
-        return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d["class"] : '');
+        return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : '');
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
@@ -5917,10 +5917,10 @@
 
         config.regions = config.regions.filter(function (region) {
             var found = false;
-            if (!region["class"]) {
+            if (!region.class) {
                 return true;
             }
-            region["class"].split(' ').forEach(function (c) {
+            region.class.split(' ').forEach(function (c) {
                 if (classes.indexOf(c) >= 0) { found = true; }
             });
             return !found;
@@ -6186,7 +6186,7 @@
                     // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                     tickExit = tick.exit().remove(),
                     tickUpdate = d3.transition(tick).style("opacity", 1),
-                    tickTransform, tickX;
+                    tickTransform, tickX, tickY;
 
                 var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                     path = g.selectAll(".domain").data([ 0 ]),
@@ -6203,6 +6203,7 @@
                 if (params.isCategory) {
                     tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
+                    tickY = tickCentered ? tickOffset : 0;
                 } else {
                     tickOffset = tickX = 0;
                 }
@@ -6240,7 +6241,7 @@
                         tickTransform = axisY;
                         lineEnter.attr("x2", -innerTickSize);
                         textEnter.attr("x", -(Math.max(innerTickSize, 0) + tickPadding));
-                        lineUpdate.attr("x2", -innerTickSize).attr("y2", 0);
+                        lineUpdate.attr("x2", -innerTickSize).attr("y1", tickY).attr("y2", tickY);
                         textUpdate.attr("x", -(Math.max(innerTickSize, 0) + tickPadding)).attr("y", tickOffset);
                         text.attr("dy", ".32em").style("text-anchor", "end");
                         pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);
