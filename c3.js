@@ -1699,23 +1699,31 @@
             var d;
             if (type === 'json') {
                 d = $$.convertJsonToData(JSON.parse(data.response), keys);
+            } else if (type === 'tsv') {
+                d = $$.convertTsvToData(data.response);
             } else {
                 d = $$.convertCsvToData(data.response);
             }
             done.call($$, d);
         });
     };
-    c3_chart_internal_fn.convertCsvToData = function (csv) {
-        var d3 = this.d3, rows = d3.csv.parseRows(csv), d;
+    c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
+        var rows = parser.parseRows(xsv), d;
         if (rows.length === 1) {
             d = [{}];
             rows[0].forEach(function (id) {
                 d[0][id] = null;
             });
         } else {
-            d = d3.csv.parse(csv);
+            d = parser.parse(xsv);
         }
         return d;
+    };
+    c3_chart_internal_fn.convertCsvToData = function (csv) {
+        return this.convertXsvToData(csv, this.d3.csv);
+    };
+    c3_chart_internal_fn.convertTsvToData = function (tsv) {
+        return this.convertXsvToData(tsv, this.d3.tsv);
     };
     c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         var $$ = this,
