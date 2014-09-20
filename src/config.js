@@ -144,7 +144,6 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_label_show: true,
         pie_label_format: undefined,
         pie_label_threshold: 0.05,
-        pie_sort: true,
         pie_expand: true,
         // gauge
         gauge_label_show: true,
@@ -159,7 +158,6 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_label_format: undefined,
         donut_label_threshold: 0.05,
         donut_width: undefined,
-        donut_sort: true,
         donut_expand: true,
         donut_title: "",
         // region - region to change style

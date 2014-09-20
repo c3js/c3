@@ -1011,7 +1011,6 @@
             pie_label_show: true,
             pie_label_format: undefined,
             pie_label_threshold: 0.05,
-            pie_sort: true,
             pie_expand: true,
             // gauge
             gauge_label_show: true,
@@ -1026,7 +1025,6 @@
             donut_label_format: undefined,
             donut_label_threshold: 0.05,
             donut_width: undefined,
-            donut_sort: true,
             donut_expand: true,
             donut_title: "",
             // region - region to change style
@@ -4153,7 +4151,7 @@
         $$.pie = d3.layout.pie().value(function (d) {
             return d.values.reduce(function (a, b) { return a + b.value; }, 0);
         });
-        if (!config.data_order || !config.pie_sort || !config.donut_sort) {
+        if (!config.data_order) {
             $$.pie.sort(null);
         }
     };
@@ -4177,7 +4175,7 @@
     c3_chart_internal_fn.updateAngle = function (d) {
         var $$ = this, config = $$.config,
             found = false, index = 0;
-        $$.pie($$.filterTargetsToShow($$.data.targets)).sort($$.descByStartAngle).forEach(function (t) {
+        $$.pie($$.filterTargetsToShow($$.data.targets)).forEach(function (t) {
             if (! found && t.data.id === d.data.id) {
                 found = true;
                 d = t;
@@ -4345,10 +4343,6 @@
     c3_chart_internal_fn.getArcTitle = function () {
         var $$ = this;
         return $$.hasType('donut') ? $$.config.donut_title : "";
-    };
-
-    c3_chart_internal_fn.descByStartAngle = function (a, b) {
-        return a.startAngle - b.startAngle;
     };
 
     c3_chart_internal_fn.updateTargetsForArc = function (targets) {
