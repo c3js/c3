@@ -71,9 +71,11 @@ c3_chart_internal_fn.initParams = function () {
     $$.clipId = "c3-" + (+new Date()) + '-clip',
     $$.clipIdForXAxis = $$.clipId + '-xaxis',
     $$.clipIdForYAxis = $$.clipId + '-yaxis',
+    $$.clipIdForGrid = $$.clipId + '-grid',
     $$.clipPath = $$.getClipPath($$.clipId),
     $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
     $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
+    $$.clipPathForGrid = $$.getClipPath($$.clipIdForGrid),
 
     $$.dragStart = null;
     $$.dragging = false;
@@ -130,7 +132,7 @@ c3_chart_internal_fn.initParams = function () {
 
 c3_chart_internal_fn.initWithData = function (data) {
     var $$ = this, d3 = $$.d3, config = $$.config;
-    var main, binding = true;
+    var defs, main, binding = true;
 
     if ($$.initPie) { $$.initPie(); }
     if ($$.initBrush) { $$.initBrush(); }
@@ -190,10 +192,11 @@ c3_chart_internal_fn.initWithData = function (data) {
         .on('mouseleave', function () { return config.onmouseout.call($$); });
 
     // Define defs
-    $$.defs = $$.svg.append("defs");
-    $$.defs.append("clipPath").attr("id", $$.clipId).append("rect");
-    $$.defs.append("clipPath").attr("id", $$.clipIdForXAxis).append("rect");
-    $$.defs.append("clipPath").attr("id", $$.clipIdForYAxis).append("rect");
+    defs = $$.svg.append("defs");
+    $$.clipChart = $$.appendClip(defs, $$.clipId);
+    $$.clipXAxis = $$.appendClip(defs, $$.clipIdForXAxis);
+    $$.clipYAxis = $$.appendClip(defs, $$.clipIdForYAxis);
+    $$.clipGrid = $$.appendClip(defs, $$.clipIdForGrid);
     $$.updateSvgSize();
 
     // Define regions
@@ -730,7 +733,7 @@ c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
 c3_chart_internal_fn.updateSvgSize = function () {
     var $$ = this;
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
-    $$.svg.select('#' + $$.clipId).select('rect')
+    $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect')
         .attr('width', $$.width)
         .attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect')

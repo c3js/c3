@@ -76,9 +76,11 @@
         $$.clipId = "c3-" + (+new Date()) + '-clip',
         $$.clipIdForXAxis = $$.clipId + '-xaxis',
         $$.clipIdForYAxis = $$.clipId + '-yaxis',
+        $$.clipIdForGrid = $$.clipId + '-grid',
         $$.clipPath = $$.getClipPath($$.clipId),
         $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
         $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
+        $$.clipPathForGrid = $$.getClipPath($$.clipIdForGrid),
 
         $$.dragStart = null;
         $$.dragging = false;
@@ -135,7 +137,7 @@
 
     c3_chart_internal_fn.initWithData = function (data) {
         var $$ = this, d3 = $$.d3, config = $$.config;
-        var main, binding = true;
+        var defs, main, binding = true;
 
         if ($$.initPie) { $$.initPie(); }
         if ($$.initBrush) { $$.initBrush(); }
@@ -195,10 +197,11 @@
             .on('mouseleave', function () { return config.onmouseout.call($$); });
 
         // Define defs
-        $$.defs = $$.svg.append("defs");
-        $$.defs.append("clipPath").attr("id", $$.clipId).append("rect");
-        $$.defs.append("clipPath").attr("id", $$.clipIdForXAxis).append("rect");
-        $$.defs.append("clipPath").attr("id", $$.clipIdForYAxis).append("rect");
+        defs = $$.svg.append("defs");
+        $$.clipChart = $$.appendClip(defs, $$.clipId);
+        $$.clipXAxis = $$.appendClip(defs, $$.clipIdForXAxis);
+        $$.clipYAxis = $$.appendClip(defs, $$.clipIdForYAxis);
+        $$.clipGrid = $$.appendClip(defs, $$.clipIdForGrid);
         $$.updateSvgSize();
 
         // Define regions
@@ -735,7 +738,7 @@
     c3_chart_internal_fn.updateSvgSize = function () {
         var $$ = this;
         $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
-        $$.svg.select('#' + $$.clipId).select('rect')
+        $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect')
             .attr('width', $$.width)
             .attr('height', $$.height);
         $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
@@ -3130,7 +3133,7 @@
     c3_chart_internal_fn.initGrid = function () {
         var $$ = this, config = $$.config, d3 = $$.d3;
         $$.grid = $$.main.append('g')
-            .attr("clip-path", $$.clipPath)
+            .attr("clip-path", $$.clipPathForGrid)
             .attr('class', CLASS.grid);
         if (config.grid_x_show) {
             $$.grid.append("g").attr("class", CLASS.xgrids);
@@ -3150,7 +3153,7 @@
     c3_chart_internal_fn.initGridLines = function () {
         var $$ = this, d3 = $$.d3;
         $$.gridLines = $$.main.append('g')
-            .attr("clip-path", $$.clipPath)
+            .attr("clip-path", $$.clipPathForGrid)
             .attr('class', CLASS.grid + ' ' + CLASS.gridLines);
         $$.gridLines.append('g').attr("class", CLASS.xgridLines);
         $$.gridLines.append('g').attr('class', CLASS.ygridLines);
@@ -4096,6 +4099,9 @@
     c3_chart_internal_fn.getClipPath = function (id) {
         var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
         return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";
+    };
+    c3_chart_internal_fn.appendClip = function (parent, id) {
+        return parent.append("clipPath").attr("id", id).append("rect");
     };
     c3_chart_internal_fn.getAxisClipX = function (forHorizontal) {
         // axis line width + padding for left

@@ -1,7 +1,7 @@
 c3_chart_internal_fn.initGrid = function () {
     var $$ = this, config = $$.config, d3 = $$.d3;
     $$.grid = $$.main.append('g')
-        .attr("clip-path", $$.clipPath)
+        .attr("clip-path", $$.clipPathForGrid)
         .attr('class', CLASS.grid);
     if (config.grid_x_show) {
         $$.grid.append("g").attr("class", CLASS.xgrids);
@@ -21,7 +21,7 @@ c3_chart_internal_fn.initGrid = function () {
 c3_chart_internal_fn.initGridLines = function () {
     var $$ = this, d3 = $$.d3;
     $$.gridLines = $$.main.append('g')
-        .attr("clip-path", $$.clipPath)
+        .attr("clip-path", $$.clipPathForGrid)
         .attr('class', CLASS.grid + ' ' + CLASS.gridLines);
     $$.gridLines.append('g').attr("class", CLASS.xgridLines);
     $$.gridLines.append('g').attr('class', CLASS.ygridLines);
