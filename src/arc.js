@@ -26,7 +26,8 @@ c3_chart_internal_fn.updateArc = function () {
 
 c3_chart_internal_fn.updateAngle = function (d) {
     var $$ = this, config = $$.config,
-        found = false, index = 0;
+        found = false, index = 0,
+        gMin = config.gauge_min, gMax = config.gauge_max, gTic, gValue;
     $$.pie($$.filterTargetsToShow($$.data.targets)).forEach(function (t) {
         if (! found && t.data.id === d.data.id) {
             found = true;
@@ -39,11 +40,10 @@ c3_chart_internal_fn.updateAngle = function (d) {
         d.endAngle = d.startAngle;
     }
     if ($$.isGaugeType(d.data)) {
-        var gMin = config.gauge_min, gMax = config.gauge_max,
-            gF = Math.abs(gMin) + gMax,
-            aTic = (Math.PI) / gF;
-        d.startAngle = (-1 * (Math.PI / 2)) + (aTic * Math.abs(gMin));
-        d.endAngle = d.startAngle + (aTic * ((d.value > gMax) ? gMax : d.value));
+        gTic = (Math.PI) / (gMax - gMin);
+        gValue = d.value < gMin ? 0 : d.value < gMax ? d.value - gMin : (gMax - gMin);
+        d.startAngle = -1 * (Math.PI / 2);
+        d.endAngle = d.startAngle + gTic * gValue;
     }
     return found ? d : null;
 };
