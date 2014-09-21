@@ -327,12 +327,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     main.select('.' + CLASS.chartArcsTitle)
         .style("opacity", $$.hasType('donut') || $$.hasType('gauge') ? 1 : 0);
 
-};
-c3_chart_internal_fn.initGauge = function () {
-    var $$ = this, config = $$.config, arcs = $$.arcs;
     if ($$.hasType('gauge')) {
-        arcs.append('path')
-            .attr("class", CLASS.chartArcsBackground)
+        $$.arcs.select('.' + CLASS.chartArcsBackground)
             .attr("d", function () {
                 var d = {
                     data: [{value: config.gauge_max}],
@@ -341,26 +337,36 @@ c3_chart_internal_fn.initGauge = function () {
                 };
                 return $$.getArc(d, true, true);
             });
-        arcs.append("text")
+        $$.arcs.select('.' + CLASS.chartArcsGaugeUnit)
             .attr("dy", ".75em")
-            .attr("class", CLASS.chartArcsGaugeUnit)
-            .style("text-anchor", "middle")
-            .style("pointer-events", "none")
             .text(config.gauge_label_show ? config.gauge_units : '');
-        arcs.append("text")
+        $$.arcs.select('.' + CLASS.chartArcsGaugeMin)
             .attr("dx", -1 * ($$.innerRadius + (($$.radius - $$.innerRadius) / 2)) + "px")
             .attr("dy", "1.2em")
-            .attr("class", CLASS.chartArcsGaugeMin)
-            .style("text-anchor", "middle")
-            .style("pointer-events", "none")
             .text(config.gauge_label_show ? config.gauge_min : '');
-        arcs.append("text")
+        $$.arcs.select('.' + CLASS.chartArcsGaugeMax)
             .attr("dx", $$.innerRadius + (($$.radius - $$.innerRadius) / 2) + "px")
             .attr("dy", "1.2em")
+            .text(config.gauge_label_show ? config.gauge_max : '');
+    }
+};
+c3_chart_internal_fn.initGauge = function () {
+    var arcs = this.arcs;
+    if (this.hasType('gauge')) {
+        arcs.append('path')
+            .attr("class", CLASS.chartArcsBackground);
+        arcs.append("text")
+            .attr("class", CLASS.chartArcsGaugeUnit)
+            .style("text-anchor", "middle")
+            .style("pointer-events", "none");
+        arcs.append("text")
+            .attr("class", CLASS.chartArcsGaugeMin)
+            .style("text-anchor", "middle")
+            .style("pointer-events", "none");
+        arcs.append("text")
             .attr("class", CLASS.chartArcsGaugeMax)
             .style("text-anchor", "middle")
-            .style("pointer-events", "none")
-            .text(config.gauge_label_show ? config.gauge_max : '');
+            .style("pointer-events", "none");
     }
 };
 c3_chart_internal_fn.getGaugeLabelHeight = function () {
