@@ -3662,7 +3662,16 @@
             .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
             .style('cursor', 'pointer')
             .on('click', function (id) {
-                config.legend_item_onclick ? config.legend_item_onclick.call($$, id) : $$.api.toggle(id);
+                if (config.legend_item_onclick) {
+                    config.legend_item_onclick.call($$, id);
+                } else {
+                    if ($$.d3.event.altKey) {
+                        $$.api.hide();
+                        $$.api.show(id);
+                    } else {
+                        $$.api.toggle(id);
+                    }
+                }
             })
             .on('mouseover', function (id) {
                 $$.d3.select(this).classed(CLASS.legendItemFocused, true);
@@ -5353,8 +5362,8 @@
     c3_chart_fn.focus = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
-        candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
+        targetIds = $$.mapToTargetIds(targetIds);
+        candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))),
 
         this.revert();
         this.defocus();
@@ -5373,8 +5382,8 @@
     c3_chart_fn.defocus = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
-        candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
+        targetIds = $$.mapToTargetIds(targetIds);
+        candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))),
 
         this.revert();
         candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
@@ -5392,8 +5401,8 @@
     c3_chart_fn.revert = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
-        candidates = $$.svg.selectAll($$.selectorTargets(targetIds));
+        targetIds = $$.mapToTargetIds(targetIds);
+        candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$)));
 
         candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
         if ($$.hasArcType()) {

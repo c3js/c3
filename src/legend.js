@@ -199,7 +199,16 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
         .style('cursor', 'pointer')
         .on('click', function (id) {
-            config.legend_item_onclick ? config.legend_item_onclick.call($$, id) : $$.api.toggle(id);
+            if (config.legend_item_onclick) {
+                config.legend_item_onclick.call($$, id);
+            } else {
+                if ($$.d3.event.altKey) {
+                    $$.api.hide();
+                    $$.api.show(id);
+                } else {
+                    $$.api.toggle(id);
+                }
+            }
         })
         .on('mouseover', function (id) {
             $$.d3.select(this).classed(CLASS.legendItemFocused, true);
