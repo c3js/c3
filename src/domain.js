@@ -176,8 +176,13 @@ c3_chart_internal_fn.getXDomain = function (targets) {
         min = 0, max = 0;
     // show center of x domain if min and max are the same
     if ((firstX - lastX) === 0 && !$$.isCategorized()) {
-        firstX = $$.isTimeSeries() ? new Date(firstX.getTime() * 0.5) : -0.5;
-        lastX = $$.isTimeSeries() ? new Date(lastX.getTime() * 1.5) : 0.5;
+        if ($$.isTimeSeries()) {
+            firstX = new Date(firstX.getTime() * 0.5);
+            lastX = new Date(lastX.getTime() * 1.5);
+        } else {
+            firstX = firstX === 0 ? 1 : (firstX * 0.5);
+            lastX = lastX === 0 ? -1 : (lastX * 1.5);
+        }
     }
     if (firstX || firstX === 0) {
         min = $$.isTimeSeries() ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;
