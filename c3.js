@@ -5353,7 +5353,7 @@
     c3_chart_fn.focus = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds);
+        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
         candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
 
         this.revert();
@@ -5373,7 +5373,7 @@
     c3_chart_fn.defocus = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds);
+        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
         candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
 
         this.revert();
@@ -5392,7 +5392,7 @@
     c3_chart_fn.revert = function (targetIds) {
         var $$ = this.internal, candidates;
 
-        targetIds = $$.mapToTargetIds(targetIds);
+        targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
         candidates = $$.svg.selectAll($$.selectorTargets(targetIds));
 
         candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
@@ -5406,15 +5406,21 @@
     };
 
     c3_chart_fn.show = function (targetIds, options) {
-        var $$ = this.internal;
+        var $$ = this.internal, targets;
 
         targetIds = $$.mapToTargetIds(targetIds);
         options = options || {};
 
         $$.removeHiddenTargetIds(targetIds);
-        $$.svg.selectAll($$.selectorTargets(targetIds))
-            .transition()
-            .style('opacity', 1);
+        targets = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+        targets.transition()
+            .style('opacity', 1, 'important')
+            .call($$.endall, function () {
+                targets.style('opacity', null).style('opacity', 1)
+                    .classed(CLASS.focused, false)
+                    .classed(CLASS.defocused, false);
+            });
 
         if (options.withLegend) {
             $$.showLegend(targetIds);
@@ -5424,15 +5430,21 @@
     };
 
     c3_chart_fn.hide = function (targetIds, options) {
-        var $$ = this.internal;
+        var $$ = this.internal, targets;
 
         targetIds = $$.mapToTargetIds(targetIds);
         options = options || {};
 
         $$.addHiddenTargetIds(targetIds);
-        $$.svg.selectAll($$.selectorTargets(targetIds))
-            .transition()
-            .style('opacity', 0);
+        targets = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+        targets.transition()
+            .style('opacity', 0, 'important')
+            .call($$.endall, function () {
+                targets.style('opacity', null).style('opacity', 0)
+                    .classed(CLASS.focused, false)
+                    .classed(CLASS.defocused, false);
+            });
 
         if (options.withLegend) {
             $$.hideLegend(targetIds);

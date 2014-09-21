@@ -1,7 +1,7 @@
 c3_chart_fn.focus = function (targetIds) {
     var $$ = this.internal, candidates;
 
-    targetIds = $$.mapToTargetIds(targetIds);
+    targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
     candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
 
     this.revert();
@@ -21,7 +21,7 @@ c3_chart_fn.focus = function (targetIds) {
 c3_chart_fn.defocus = function (targetIds) {
     var $$ = this.internal, candidates;
 
-    targetIds = $$.mapToTargetIds(targetIds);
+    targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
     candidates = $$.svg.selectAll($$.selectorTargets(targetIds)),
 
     this.revert();
@@ -40,7 +40,7 @@ c3_chart_fn.defocus = function (targetIds) {
 c3_chart_fn.revert = function (targetIds) {
     var $$ = this.internal, candidates;
 
-    targetIds = $$.mapToTargetIds(targetIds);
+    targetIds = $$.mapToTargetIds(targetIds).filter($$.isTargetToShow, $$);
     candidates = $$.svg.selectAll($$.selectorTargets(targetIds));
 
     candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
