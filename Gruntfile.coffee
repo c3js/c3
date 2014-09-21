@@ -83,7 +83,9 @@ module.exports = (grunt) ->
           c3:
             src: 'c3.js'
             options:
-              specs: 'spec/*.js'
+              specs: 'spec/*-spec.js'
+              helpers: 'spec/*-helper.js'
+              vendor: 'http://d3js.org/d3.v3.min.js'
 
         uglify:
           c3:
