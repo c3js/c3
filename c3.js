@@ -3010,14 +3010,14 @@
                          .style("fill-opacity", opacityForText));
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
-        var rect;
-        this.svg.selectAll('.dummy')
+        var svg = this.d3.select('body').append("svg").style('visibility', 'hidden'), rect;
+        svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')
             .classed(cls ? cls : "", true)
             .text(text)
-          .each(function () { rect = this.getBoundingClientRect(); })
-            .remove();
+          .each(function () { rect = this.getBoundingClientRect(); });
+        svg.remove();
         return rect;
     };
     c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
