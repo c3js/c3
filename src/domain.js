@@ -146,13 +146,13 @@ c3_chart_internal_fn.getXDomainMax = function (targets) {
         ($$.isTimeSeries() ? this.parseDate(config.axis_x_max) : config.axis_x_max) :
     $$.d3.max(targets, function (t) { return $$.d3.max(t.values, function (v) { return v.x; }); });
 };
-c3_chart_internal_fn.getXDomainPadding = function (targets) {
+c3_chart_internal_fn.getXDomainPadding = function (domain) {
     var $$ = this, config = $$.config,
-        edgeX = this.getEdgeX(targets), diff = edgeX[1] - edgeX[0],
+        diff = domain[1] - domain[0],
         maxDataCount, padding, paddingLeft, paddingRight;
     if ($$.isCategorized()) {
         padding = 0;
-    } else if ($$.hasType('bar', targets)) {
+    } else if ($$.hasType('bar')) {
         maxDataCount = $$.getMaxDataCount();
         padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
     } else {
@@ -172,7 +172,7 @@ c3_chart_internal_fn.getXDomain = function (targets) {
     var $$ = this,
         xDomain = [$$.getXDomainMin(targets), $$.getXDomainMax(targets)],
         firstX = xDomain[0], lastX = xDomain[1],
-        padding = $$.getXDomainPadding(targets),
+        padding = $$.getXDomainPadding(xDomain),
         min = 0, max = 0;
     // show center of x domain if min and max are the same
     if ((firstX - lastX) === 0 && !$$.isCategorized()) {
