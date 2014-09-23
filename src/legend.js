@@ -207,12 +207,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
                     $$.api.show(id);
                 } else {
                     $$.api.toggle(id);
+                    $$.isTargetToShow(id) ? $$.api.focus(id) : $$.api.revert();
                 }
             }
         })
         .on('mouseover', function (id) {
             $$.d3.select(this).classed(CLASS.legendItemFocused, true);
-            if (!$$.transiting) {
+            if (!$$.transiting && $$.isTargetToShow(id)) {
                 $$.api.focus(id);
             }
             if (config.legend_item_onmouseover) {

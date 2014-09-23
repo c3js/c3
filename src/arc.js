@@ -118,17 +118,23 @@ c3_chart_internal_fn.textForArcLabel = function (d) {
     return format ? format(value, ratio) : $$.defaultArcValueFormat(value, ratio);
 };
 
-c3_chart_internal_fn.expandArc = function (targetIds, withoutFadeOut) {
-    var $$ = this, targets, noneTargets;
+c3_chart_internal_fn.expandArc = function (targetIds) {
+    var $$ = this, interval;
+
+    // MEMO: avoid to cancel transition
+    if ($$.transiting) {
+        interval = window.setInterval(function () {
+            if (!$$.transiting) {
+                window.clearInterval(interval);
+                $$.expandArc(targetIds);
+            }
+        }, 10);
+        return;
+    }
 
     targetIds = $$.mapToTargetIds(targetIds);
 
-    targets = $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)),
-    noneTargets = $$.svg.selectAll('.' + CLASS.arc).filter(function (data) {
-        return targetIds.indexOf(data.data.id) < 0;
-    });
-
-    targets.each(function (d) {
+    $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).each(function (d) {
         if (! $$.shouldExpand(d.data.id)) { return; }
         $$.d3.select(this).selectAll('path')
             .transition().duration(50)
@@ -141,18 +147,16 @@ c3_chart_internal_fn.expandArc = function (targetIds, withoutFadeOut) {
                 }
             });
     });
-    if (!withoutFadeOut) {
-        noneTargets.style("opacity", 0.3);
-    }
 };
 
 c3_chart_internal_fn.unexpandArc = function (targetIds) {
-    var $$ = this, targets;
+    var $$ = this;
+
+    if ($$.transiting) { return; }
 
     targetIds = $$.mapToTargetIds(targetIds);
-    targets = $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc));
 
-    targets.selectAll('path.' + CLASS.arc)
+    $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).selectAll('path')
         .transition().duration(50)
         .attr("d", $$.svgArc);
     $$.svg.selectAll('.' + CLASS.arc)

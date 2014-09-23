@@ -10,9 +10,7 @@ c3_chart_fn.show = function (targetIds, options) {
     targets.transition()
         .style('opacity', 1, 'important')
         .call($$.endall, function () {
-            targets.style('opacity', null).style('opacity', 1)
-                .classed(CLASS.focused, false)
-                .classed(CLASS.defocused, false);
+            targets.style('opacity', null).style('opacity', 1);
         });
 
     if (options.withLegend) {
@@ -34,9 +32,7 @@ c3_chart_fn.hide = function (targetIds, options) {
     targets.transition()
         .style('opacity', 0, 'important')
         .call($$.endall, function () {
-            targets.style('opacity', null).style('opacity', 0)
-                .classed(CLASS.focused, false)
-                .classed(CLASS.defocused, false);
+            targets.style('opacity', null).style('opacity', 0);
         });
 
     if (options.withLegend) {

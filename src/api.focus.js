@@ -8,7 +8,7 @@ c3_chart_fn.focus = function (targetIds) {
     this.defocus();
     candidates.classed(CLASS.focused, true).classed(CLASS.defocused, false);
     if ($$.hasArcType()) {
-        $$.expandArc(targetIds, true);
+        $$.expandArc(targetIds);
     }
     $$.toggleFocusLegend(targetIds, true);
 
@@ -41,7 +41,7 @@ c3_chart_fn.revert = function (targetIds) {
     var $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
-    candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$)));
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds)); // should be for all targets
 
     candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
     if ($$.hasArcType()) {
