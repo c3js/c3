@@ -3221,7 +3221,7 @@
             .data(config.grid_x_lines);
         // enter
         xgridLine = $$.xgridLines.enter().append('g')
-            .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
+            .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
         xgridLine.append('line')
             .style("opacity", 0);
         xgridLine.append('text')
@@ -3246,7 +3246,7 @@
                 .data(config.grid_y_lines);
             // enter
             ygridLine = $$.ygridLines.enter().append('g')
-                .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
+                .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
             ygridLine.append('line')
                 .style("opacity", 0);
             ygridLine.append('text')
@@ -3339,7 +3339,7 @@
         return params ? function (line) {
             var found = false;
             [].concat(params).forEach(function (param) {
-                if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
+                if ((('value' in param && line.value === params.value) || ('class' in param && line['class'] === params['class']))) {
                     found = true;
                 }
             });
@@ -5259,7 +5259,7 @@
         return this.classShapes(d) + this.generateClass(CLASS.areas, d.id);
     };
     c3_chart_internal_fn.classRegion = function (d, i) {
-        return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : '');
+        return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
@@ -5955,10 +5955,10 @@
 
         config.regions = config.regions.filter(function (region) {
             var found = false;
-            if (!region.class) {
+            if (!region['class']) {
                 return true;
             }
-            region.class.split(' ').forEach(function (c) {
+            region['class'].split(' ').forEach(function (c) {
                 if (classes.indexOf(c) >= 0) { found = true; }
             });
             return !found;

@@ -84,7 +84,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
         .data(config.grid_x_lines);
     // enter
     xgridLine = $$.xgridLines.enter().append('g')
-        .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
+        .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
     xgridLine.append('line')
         .style("opacity", 0);
     xgridLine.append('text')
@@ -109,7 +109,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
             .data(config.grid_y_lines);
         // enter
         ygridLine = $$.ygridLines.enter().append('g')
-            .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
+            .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
         ygridLine.append('line')
             .style("opacity", 0);
         ygridLine.append('text')
@@ -202,7 +202,7 @@ c3_chart_internal_fn.getGridFilterToRemove = function (params) {
     return params ? function (line) {
         var found = false;
         [].concat(params).forEach(function (param) {
-            if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
+            if ((('value' in param && line.value === params.value) || ('class' in param && line['class'] === params['class']))) {
                 found = true;
             }
         });
