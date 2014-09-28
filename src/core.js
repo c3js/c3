@@ -455,7 +455,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
         // update axis tick values according to options
         if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
-            tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count);
+            tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
             $$.xAxis.tickValues(tickValues);
             $$.subXAxis.tickValues(tickValues);
         }
@@ -466,6 +466,15 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     $$.y.domain($$.getYDomain(targetsToShow, 'y'));
     $$.y2.domain($$.getYDomain(targetsToShow, 'y2'));
+
+    if (!config.axis_y_tick_values && config.axis_y_tick_count) {
+        tickValues = $$.generateTickValues($$.y.domain(), config.axis_y_tick_count);
+        $$.yAxis.tickValues(tickValues);
+    }
+    if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
+        tickValues = $$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count);
+        $$.y2Axis.tickValues(tickValues);
+    }
 
     // axes
     $$.redrawAxis(transitions, hideAxis);

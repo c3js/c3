@@ -460,7 +460,7 @@
             $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
             // update axis tick values according to options
             if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
-                tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count);
+                tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
                 $$.xAxis.tickValues(tickValues);
                 $$.subXAxis.tickValues(tickValues);
             }
@@ -471,6 +471,15 @@
 
         $$.y.domain($$.getYDomain(targetsToShow, 'y'));
         $$.y2.domain($$.getYDomain(targetsToShow, 'y2'));
+
+        if (!config.axis_y_tick_values && config.axis_y_tick_count) {
+            tickValues = $$.generateTickValues($$.y.domain(), config.axis_y_tick_count);
+            $$.yAxis.tickValues(tickValues);
+        }
+        if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
+            tickValues = $$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count);
+            $$.y2Axis.tickValues(tickValues);
+        }
 
         // axes
         $$.redrawAxis(transitions, hideAxis);
@@ -972,8 +981,9 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
+            axis_y_tick_values: null,
+            axis_y_tick_count: undefined,
             axis_y_padding: {},
-            axis_y_ticks: 10,
             axis_y_default: undefined,
             axis_y2_show: false,
             axis_y2_max: undefined,
@@ -982,8 +992,9 @@
             axis_y2_label: {},
             axis_y2_tick_format: undefined,
             axis_y2_tick_outer: true,
+            axis_y2_tick_values: null,
+            axis_y2_tick_count: undefined,
             axis_y2_padding: {},
-            axis_y2_ticks: 10,
             axis_y2_default: undefined,
             // grid
             grid_x_show: false,
@@ -1153,11 +1164,15 @@
         $$.subY2 = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y2_default : $$.subY2.domain());
         // update axes
         $$.xAxisTickFormat = $$.getXAxisTickFormat();
-        $$.xAxisTickValues = config.axis_x_tick_values ? config.axis_x_tick_values : (forInit ? undefined : $$.xAxis.tickValues());
+        $$.xAxisTickValues = $$.getXAxisTickValues();
+        $$.yAxisTickValues = $$.getYAxisTickValues();
+        $$.y2AxisTickValues = $$.getY2AxisTickValues();
+
         $$.xAxis = $$.getXAxis($$.x, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
         $$.subXAxis = $$.getXAxis($$.subX, $$.subXOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
-        $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks, config.axis_y_tick_outer);
-        $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks, config.axis_y2_tick_outer);
+        $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, config.axis_y_tick_outer);
+        $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, config.axis_y2_tick_outer);
+
         // Set initialized scales to brush and zoom
         if (!forInit) {
             if ($$.brush) { $$.brush.scale($$.subX); }
@@ -3828,9 +3843,9 @@
 
         return axis;
     };
-    c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, ticks, withOuterTick) {
+    c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
         var axisParams = {withOuterTick: withOuterTick};
-        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
+        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
     };
     c3_chart_internal_fn.getAxisId = function (id) {
         var config = this.config;
@@ -3849,6 +3864,18 @@
             }
         }
         return isFunction(format) ? function (v) { return format.call($$, v); } : format;
+    };
+    c3_chart_internal_fn.getAxisTickValues = function (tickValues, axis) {
+        return tickValues ? tickValues : axis ? axis.tickValues() : undefined;
+    };
+    c3_chart_internal_fn.getXAxisTickValues = function () {
+        return this.getAxisTickValues(this.config.axis_x_tick_values, this.xAxis);
+    };
+    c3_chart_internal_fn.getYAxisTickValues = function () {
+        return this.getAxisTickValues(this.config.axis_y_tick_values, this.yAxis);
+    };
+    c3_chart_internal_fn.getY2AxisTickValues = function () {
+        return this.getAxisTickValues(this.config.axis_y2_tick_values, this.y2Axis);
     };
     c3_chart_internal_fn.getAxisLabelOptionByAxisId = function (axisId) {
         var $$ = this, config = $$.config, option;
@@ -4017,13 +4044,13 @@
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
             if (id === 'y') {
                 scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-                axis = $$.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks);
+                axis = $$.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.getYAxisTickValues());
             } else if (id === 'y2') {
                 scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-                axis = $$.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks);
+                axis = $$.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.getY2AxisTickValues());
             } else {
                 scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-                axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), config.axis_x_tick_values ? config.axis_x_tick_values : $$.xAxis.tickValues());
+                axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), $$.getXAxisTickValues());
             }
             $$.d3.select('body').append("g").style('visibility', 'hidden').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
@@ -4063,31 +4090,30 @@
         return isValue(padding[key]) ? padding[key] * ratio : defaultValue;
     };
 
-    c3_chart_internal_fn.generateTickValues = function (xs, tickCount) {
-        var $$ = this;
-        var tickValues = xs, targetCount, start, end, count, interval, i, tickValue;
+    c3_chart_internal_fn.generateTickValues = function (values, tickCount, forTimeSeries) {
+        var tickValues = values, targetCount, start, end, count, interval, i, tickValue;
         if (tickCount) {
             targetCount = isFunction(tickCount) ? tickCount() : tickCount;
-            // compute ticks according to $$.config.axis_x_tick_count
+            // compute ticks according to tickCount
             if (targetCount === 1) {
-                tickValues = [xs[0]];
+                tickValues = [values[0]];
             } else if (targetCount === 2) {
-                tickValues = [xs[0], xs[xs.length - 1]];
+                tickValues = [values[0], values[values.length - 1]];
             } else if (targetCount > 2) {
                 count = targetCount - 2;
-                start = xs[0];
-                end = xs[xs.length - 1];
+                start = values[0];
+                end = values[values.length - 1];
                 interval = (end - start) / (count + 1);
-                // re-construct uniqueXs
+                // re-construct unique values
                 tickValues = [start];
                 for (i = 0; i < count; i++) {
                     tickValue = +start + interval * (i + 1);
-                    tickValues.push($$.isTimeSeries() ? new Date(tickValue) : tickValue);
+                    tickValues.push(forTimeSeries ? new Date(tickValue) : tickValue);
                 }
                 tickValues.push(end);
             }
         }
-        if (!$$.isTimeSeries()) { tickValues = tickValues.sort(function (a, b) { return a - b; }); }
+        if (!forTimeSeries) { tickValues = tickValues.sort(function (a, b) { return a - b; }); }
         return tickValues;
     };
     c3_chart_internal_fn.generateAxisTransitions = function (duration) {
