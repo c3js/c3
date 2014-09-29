@@ -3,34 +3,34 @@ var describe = window.describe,
     it = window.it,
     beforeEach = window.beforeEach;
 
-var args = {
-    data: {
-        columns: [
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 50, 20, 10, 40, 15, 25],
-            ['data3', 150, 120, 110, 140, 115, 125]
-        ]
-    },
-    axis: {
-        y: {
-            tick: {
-                values: null,
-                count: undefined
-            }
-        },
-        y2: {
-            tick: {
-                values: null,
-                count: undefined
-            }
-        }
-    }
-};
-
 describe('c3 chart axis', function () {
     'use strict';
 
     var chart, d3;
+
+    var args = {
+        data: {
+            columns: [
+                ['data1', 30, 200, 100, 400, 150, 250],
+                ['data2', 50, 20, 10, 40, 15, 25],
+                ['data3', 150, 120, 110, 140, 115, 125]
+            ]
+        },
+        axis: {
+            y: {
+                tick: {
+                    values: null,
+                    count: undefined
+                }
+            },
+            y2: {
+                tick: {
+                    values: null,
+                    count: undefined
+                }
+            }
+        }
+    };
 
     beforeEach(function () {
         window.initDom();
