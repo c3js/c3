@@ -65,6 +65,7 @@ module.exports = (grunt) ->
               'src/api.color.js',
               'src/api.x.js',
               'src/api.axis.js',
+              'src/api.domain.js',
               'src/api.legend.js',
               'src/api.chart.js',
               'src/api.tooltip.js',
