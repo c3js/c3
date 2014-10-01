@@ -4304,14 +4304,15 @@
 
     c3_chart_internal_fn.textForArcLabel = function (d) {
         var $$ = this,
-            updated, value, ratio, format;
+            updated, value, ratio, id, format;
         if (! $$.shouldShowArcLabel()) { return ""; }
         updated = $$.updateAngle(d);
         value = updated ? updated.value : null;
         ratio = $$.getArcRatio(updated);
+        id = d.data.id;
         if (! $$.hasType('gauge') && ! $$.meetsArcLabelThreshold(ratio)) { return ""; }
         format = $$.getArcLabelFormat();
-        return format ? format(value, ratio) : $$.defaultArcValueFormat(value, ratio);
+        return format ? format(value, ratio, id) : $$.defaultArcValueFormat(value, ratio);
     };
 
     c3_chart_internal_fn.expandArc = function (targetIds) {
