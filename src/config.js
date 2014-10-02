@@ -80,6 +80,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_x_type: 'indexed',
         axis_x_localtime: true,
         axis_x_categories: [],
+        axis_x_tick_automatic: false,
         axis_x_tick_centered: false,
         axis_x_tick_format: undefined,
         axis_x_tick_culling: {},

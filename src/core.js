@@ -454,7 +454,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     if (targetsToShow.length) {
         $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
         // update axis tick values according to options
-        if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
+        if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count) && ($$.isTimeSeries() && !config.axis_x_tick_automatic)) {
             tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
             $$.xAxis.tickValues(tickValues);
             $$.subXAxis.tickValues(tickValues);
