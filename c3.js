@@ -459,7 +459,7 @@
         if (targetsToShow.length) {
             $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
             // update axis tick values according to options
-            if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count)) {
+            if (!config.axis_x_tick_values && (config.axis_x_tick_fit || config.axis_x_tick_count) && ($$.isTimeSeries() && !config.axis_x_tick_automatic)) {
                 tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
                 $$.xAxis.tickValues(tickValues);
                 $$.subXAxis.tickValues(tickValues);
@@ -959,6 +959,7 @@
             axis_x_type: 'indexed',
             axis_x_localtime: true,
             axis_x_categories: [],
+            axis_x_tick_automatic: false,
             axis_x_tick_centered: false,
             axis_x_tick_format: undefined,
             axis_x_tick_culling: {},
