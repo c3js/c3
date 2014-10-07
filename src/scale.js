@@ -70,11 +70,15 @@ c3_chart_internal_fn.updateScales = function () {
     $$.subY2 = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y2_default : $$.subY2.domain());
     // update axes
     $$.xAxisTickFormat = $$.getXAxisTickFormat();
-    $$.xAxisTickValues = config.axis_x_tick_values ? config.axis_x_tick_values : (forInit ? undefined : $$.xAxis.tickValues());
+    $$.xAxisTickValues = $$.getXAxisTickValues();
+    $$.yAxisTickValues = $$.getYAxisTickValues();
+    $$.y2AxisTickValues = $$.getY2AxisTickValues();
+
     $$.xAxis = $$.getXAxis($$.x, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
     $$.subXAxis = $$.getXAxis($$.subX, $$.subXOrient, $$.xAxisTickFormat, $$.xAxisTickValues, config.axis_x_tick_outer);
-    $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, config.axis_y_ticks, config.axis_y_tick_outer);
-    $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, config.axis_y2_ticks, config.axis_y2_tick_outer);
+    $$.yAxis = $$.getYAxis($$.y, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, config.axis_y_tick_outer);
+    $$.y2Axis = $$.getYAxis($$.y2, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, config.axis_y2_tick_outer);
+
     // Set initialized scales to brush and zoom
     if (!forInit) {
         if ($$.brush) { $$.brush.scale($$.subX); }
