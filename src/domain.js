@@ -73,6 +73,15 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId) {
         isZeroBased = ($$.hasType('bar', yTargets) && config.bar_zerobased) || ($$.hasType('area', yTargets) && config.area_zerobased),
         showHorizontalDataLabel = $$.hasDataLabel() && config.axis_rotated,
         showVerticalDataLabel = $$.hasDataLabel() && !config.axis_rotated;
+
+    if (yDomainMax < yDomainMin) {
+        if (isValue(yMin)) {
+            yDomainMax = yDomainMin + 10; // TODO: introduce axis.y.maxMin
+        } else {
+            yDomainMin = yDomainMax - 10; // TODO: introduce axis.y.minMax
+        }
+    }
+
     if (yTargets.length === 0) { // use current domain if target of axisId is none
         return axisId === 'y2' ? $$.y2.domain() : $$.y.domain();
     }
