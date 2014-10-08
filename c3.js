@@ -3391,10 +3391,10 @@
         var $$ = this, config = $$.config, i;
         $$.tooltip = $$.selectChart
             .style("position", "relative")
-            .append("div")
+          .append("div")
+            .attr('class', CLASS.tooltipContainer)
             .style("position", "absolute")
             .style("pointer-events", "none")
-            .style("z-index", "10")
             .style("display", "none");
         // Show tooltip if needed
         if (config.tooltip_init_show) {
@@ -5207,6 +5207,7 @@
         defocused: 'c3-defocused',
         region: 'c3-region',
         regions: 'c3-regions',
+        tooltipContainer: 'c3-tooltip-container',
         tooltip: 'c3-tooltip',
         tooltipName: 'c3-tooltip-name',
         shape: 'c3-shape',

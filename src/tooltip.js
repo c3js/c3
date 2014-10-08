@@ -2,10 +2,10 @@ c3_chart_internal_fn.initTooltip = function () {
     var $$ = this, config = $$.config, i;
     $$.tooltip = $$.selectChart
         .style("position", "relative")
-        .append("div")
+      .append("div")
+        .attr('class', CLASS.tooltipContainer)
         .style("position", "absolute")
         .style("pointer-events", "none")
-        .style("z-index", "10")
         .style("display", "none");
     // Show tooltip if needed
     if (config.tooltip_init_show) {

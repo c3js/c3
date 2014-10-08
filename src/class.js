@@ -26,6 +26,7 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     defocused: 'c3-defocused',
     region: 'c3-region',
     regions: 'c3-regions',
+    tooltipContainer: 'c3-tooltip-container',
     tooltip: 'c3-tooltip',
     tooltipName: 'c3-tooltip-name',
     shape: 'c3-shape',
