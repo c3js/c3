@@ -158,7 +158,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
             if ($$.hasArcType()) { return; }
 
-            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+            if ($$.isStepType(d) && $$.config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                 index -= 1;
             }
 
@@ -218,7 +218,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 $$.cancelClick = false;
                 return;
             }
-            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+            if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                 index -= 1;
             }
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {

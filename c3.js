@@ -1013,7 +1013,9 @@
             point_focus_expand_enabled: true,
             point_focus_expand_r: undefined,
             point_select_r: undefined,
+            // line
             line_connectNull: false,
+            line_step_type: 'step',
             // bar
             bar_width: undefined,
             bar_width_ratio: 0.6,
@@ -2164,7 +2166,7 @@
                 if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
                 if ($$.hasArcType()) { return; }
 
-                if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                if ($$.isStepType(d) && $$.config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                     index -= 1;
                 }
 
@@ -2224,7 +2226,7 @@
                     $$.cancelClick = false;
                     return;
                 }
-                if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                     index -= 1;
                 }
                 $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
@@ -2511,7 +2513,7 @@
 
     c3_chart_internal_fn.getInterpolate = function (d) {
         var $$ = this;
-        return $$.isSplineType(d) ? "cardinal" : $$.isStepType(d) ? "step-after" : "linear";
+        return $$.isSplineType(d) ? "cardinal" : $$.isStepType(d) ? $$.config.line_step_type : "linear";
     };
 
     c3_chart_internal_fn.initLine = function () {
