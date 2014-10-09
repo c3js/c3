@@ -10,7 +10,7 @@ More information is here: [http://c3js.org](http://c3js.org/)
 + [Getting Started](http://c3js.org/gettingstarted.html)
 + [Examples](http://c3js.org/examples.html)
 
-Another samples are included in this repository:
+Additional samples are included in this repository:
 + [https://github.com/masayuki0812/c3/tree/master/htdocs/samples](https://github.com/masayuki0812/c3/tree/master/htdocs/samples)
 
 And you can run these samples as:
