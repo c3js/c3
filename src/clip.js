@@ -7,7 +7,8 @@ c3_chart_internal_fn.appendClip = function (parent, id) {
 };
 c3_chart_internal_fn.getAxisClipX = function (forHorizontal) {
     // axis line width + padding for left
-    return forHorizontal ? -(1 + 30) : -(this.margin.left - 1);
+    var left = Math.max(30, this.margin.left);
+    return forHorizontal ? -(1 + left) : -(left - 1);
 };
 c3_chart_internal_fn.getAxisClipY = function (forHorizontal) {
     return forHorizontal ? -20 : -4;
@@ -29,9 +30,11 @@ c3_chart_internal_fn.getYAxisClipY = function () {
     return $$.getAxisClipY($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getAxisClipWidth = function (forHorizontal) {
-    var $$ = this;
+    var $$ = this,
+        left = Math.max(30, $$.margin.left),
+        right = Math.max(30, $$.margin.right);
     // width + axis line width + padding for left/right
-    return forHorizontal ? $$.width + 2 + 30 + 30 : $$.margin.left + 20;
+    return forHorizontal ? $$.width + 2 + left + right : $$.margin.left + 20;
 };
 c3_chart_internal_fn.getAxisClipHeight = function (forHorizontal) {
     var $$ = this, config = $$.config;
