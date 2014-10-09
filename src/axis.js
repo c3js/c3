@@ -270,7 +270,7 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
         $$.d3.select('body').append("g").style('visibility', 'hidden').call(axis).each(function () {
             $$.d3.select(this).selectAll('text').each(function () {
                 var box = this.getBoundingClientRect();
-                if (maxWidth < box.width) { maxWidth = box.width; }
+                if (box.left > 0 && maxWidth < box.width) { maxWidth = box.width; }
             });
         }).remove();
     }
