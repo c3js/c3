@@ -23,7 +23,15 @@
             default: [30, 60]
           }
         },
-        zoom: { enabled: true },
+        zoom: {
+          enabled: true,
+          onzoomstart: function (event) {
+            console.log("onzoomstart", event);
+          },
+          onzoomend: function (domain) {
+            console.log("onzoomend", domain);
+          },
+        },
         subchart: { show: true }
       });
 
