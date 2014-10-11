@@ -11,6 +11,8 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_extent: undefined,
         zoom_privileged: false,
         zoom_onzoom: function () {},
+        zoom_onzoomstart: function () {},
+        zoom_onzoomend: function () {},
         interaction_enabled: true,
         onmouseover: function () {},
         onmouseout: function () {},
