@@ -890,6 +890,8 @@
             zoom_extent: undefined,
             zoom_privileged: false,
             zoom_onzoom: function () {},
+            zoom_onzoomstart: function () {},
+            zoom_onzoomend: function () {},
             interaction_enabled: true,
             onmouseover: function () {},
             onmouseout: function () {},
@@ -5025,6 +5027,7 @@
         $$.zoom = d3.behavior.zoom()
             .on("zoomstart", function () {
                 $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
+                config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
             })
             .on("zoom", function () {
                 // prevZoomTranslate is needed for the fix of unexpected zoom.translate after remaining zoom
@@ -5034,6 +5037,9 @@
                 $$.redrawForZoom.call($$);
                 prevZoomTranslate = $$.zoom.translate();
                 wheeled = d3.event.sourceEvent.type === 'wheel';
+            })
+            .on('zoomend', function () {
+                config.zoom_onzoomend.call($$.api, $$.x.orgDomain());
             });
         $$.zoom.scale = function (scale) {
             return config.axis_rotated ? this.y(scale) : this.x(scale);
