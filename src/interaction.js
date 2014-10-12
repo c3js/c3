@@ -192,12 +192,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                     }
                 })
                 .filter(function (d) {
-                    if (this.nodeName === 'circle') {
-                        return $$.isWithinCircle(this, $$.pointSelectR(d));
-                    }
-                    else if (this.nodeName === 'path') {
-                        return $$.isWithinBar(this);
-                    }
+                    return $$.isWithinShape(this, d);
                 })
                 .each(function (d) {
                     if (config.data_selection_enabled && (config.data_selection_grouped || config.data_selection_isselectable(d))) {

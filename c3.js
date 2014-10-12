@@ -2202,12 +2202,7 @@
                         }
                     })
                     .filter(function (d) {
-                        if (this.nodeName === 'circle') {
-                            return $$.isWithinCircle(this, $$.pointSelectR(d));
-                        }
-                        else if (this.nodeName === 'path') {
-                            return $$.isWithinBar(this);
-                        }
+                        return $$.isWithinShape(this, d);
                     })
                     .each(function (d) {
                         if (config.data_selection_enabled && (config.data_selection_grouped || config.data_selection_isselectable(d))) {
@@ -2502,7 +2497,10 @@
     c3_chart_internal_fn.isWithinShape = function (that, d) {
         var $$ = this,
             shape = $$.d3.select(that), isWithin;
-        if (that.nodeName === 'circle') {
+        if (!$$.isTargetToShow(d.id)) {
+            isWithin = false;
+        }
+        else if (that.nodeName === 'circle') {
             // circle is hidden in step chart, so treat as within the click area
             isWithin = $$.isStepType(d) ? true : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
         }
