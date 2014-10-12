@@ -259,6 +259,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             arcData = $$.convertToArcData(updated);
             // transitions
             $$.expandArc(updated.data.id);
+            $$.api.focus(updated.data.id);
             $$.toggleFocusLegend(updated.data.id, true);
             $$.config.data_onmouseover(arcData, this);
         })
@@ -277,6 +278,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             arcData = $$.convertToArcData(updated);
             // transitions
             $$.unexpandArc(updated.data.id);
+            $$.api.revert();
             $$.revertLegend();
             $$.hideTooltip();
             $$.config.data_onmouseout(arcData, this);
