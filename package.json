@@ -19,6 +19,9 @@
   "license": "MIT",
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
+  "dependencies": {
+    "d3": "~3.4.4"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.5.0",
