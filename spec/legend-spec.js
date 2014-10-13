@@ -19,7 +19,7 @@ describe('c3 chart legend', function () {
 
     beforeEach(function (done) {
         if (typeof chart === 'undefined') {
-            initDom();
+            window.initDom();
         }
         chart = window.c3.generate(args);
         d3 = chart.internal.d3;
