@@ -2012,7 +2012,7 @@
         var $$ = this;
         $$.main.select('.' + CLASS.chart).append("g")
             .attr("class", CLASS.eventRects)
-            .style('fill-opacity', 0.1);
+            .style('fill-opacity', 0);
     };
     c3_chart_internal_fn.redrawEventRect = function () {
         var $$ = this, config = $$.config,
