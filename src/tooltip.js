@@ -38,7 +38,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
-        name = nameFormat(d[i].name);
+        name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
         value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
         bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
