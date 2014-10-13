@@ -14,6 +14,12 @@ c3_chart_fn.load = function (args) {
     if ('categories' in args && $$.isCategorized()) {
         config.axis_x_categories = args.categories;
     }
+    // update axes if exists
+    if ('axes' in args) {
+        Object.keys(args.axes).forEach(function (id) {
+            config.data_axes[id] = args.axes[id];
+        });
+    }
     // use cache if exists
     if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {
         $$.load($$.getCaches(args.cacheIds), args.done);
