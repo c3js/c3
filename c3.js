@@ -549,7 +549,7 @@
         // lines, areas and cricles
         $$.redrawLine(durationForExit);
         $$.redrawArea(durationForExit);
-        if (config.point_show) { $$.redrawCircle(); }
+        $$.redrawCircle();
 
         // text
         if ($$.hasDataLabel()) {
@@ -582,7 +582,7 @@
             $$.addTransitionForBar(transitions, drawBar);
             $$.addTransitionForLine(transitions, drawLine);
             $$.addTransitionForArea(transitions, drawArea);
-            if (config.point_show) { $$.addTransitionForCircle(transitions, cx, cy); }
+            $$.addTransitionForCircle(transitions, cx, cy);
             $$.addTransitionForText(transitions, xForText, yForText, options.flow);
             $$.addTransitionForRegion(transitions);
             $$.addTransitionForGrid(transitions);
@@ -689,7 +689,7 @@
         return d.value !== null && this.withoutFadeIn[d.id] ? 1 : 0;
     };
     c3_chart_internal_fn.opacityForCircle = function (d) {
-        return isValue(d.value) ? this.isScatterType(d) ? 0.5 : 1 : 0;
+        return isValue(d.value) && this.config.point_show ? (this.isScatterType(d) ? 0.5 : 1) : 0;
     };
     c3_chart_internal_fn.opacityForText = function () {
         return this.hasDataLabel() ? 1 : 0;
@@ -2847,7 +2847,7 @@
     };
     c3_chart_internal_fn.pointR = function (d) {
         var $$ = this, config = $$.config;
-        return config.point_show && !$$.isStepType(d) ? (isFunction(config.point_r) ? config.point_r(d) : config.point_r) : 0;
+        return $$.isStepType(d) ? 0 : (isFunction(config.point_r) ? config.point_r(d) : config.point_r);
     };
     c3_chart_internal_fn.pointExpandedR = function (d) {
         var $$ = this, config = $$.config;

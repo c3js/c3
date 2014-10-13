@@ -329,7 +329,7 @@ c3_chart_internal_fn.unexpandCircles = function (i) {
 };
 c3_chart_internal_fn.pointR = function (d) {
     var $$ = this, config = $$.config;
-    return config.point_show && !$$.isStepType(d) ? (isFunction(config.point_r) ? config.point_r(d) : config.point_r) : 0;
+    return $$.isStepType(d) ? 0 : (isFunction(config.point_r) ? config.point_r(d) : config.point_r);
 };
 c3_chart_internal_fn.pointExpandedR = function (d) {
     var $$ = this, config = $$.config;
