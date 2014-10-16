@@ -2281,15 +2281,23 @@
                 selectedData = sameXData.map(function (d) {
                     return $$.addName(d);
                 });
-                $$.showTooltip(selectedData, mouse);
+
+                if (config.tooltip_grouped) {
+                    $$.showTooltip(selectedData, mouse);
+                }
+                else {
+                    $$.showTooltip([closest], mouse);
+                }
 
                 // expand points
                 if (config.point_focus_expand_enabled) {
                     $$.expandCircles(closest.index, closest.id, true);
                 }
 
-                // Show xgrid focus line
-                $$.showXGridFocus(selectedData);
+                if (config.tooltip_grouped) {
+                    // Show xgrid focus line
+                    $$.showXGridFocus(selectedData);
+                }
 
                 // Show cursor as pointer if point is close to mouse position
                 if ($$.dist(closest, mouse) < 100) {
