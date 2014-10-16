@@ -6068,6 +6068,15 @@
         $$.redraw({withLegend: true});
         return config.data_colors;
     };
+	c3_chart_fn.data.axes = function (axes) {
+        var $$ = this.internal, config = $$.config;
+        if (!arguments.length) { return config.data_axes; }
+        Object.keys(axes).forEach(function (id) {
+            config.data_axes[id] = axes[id];
+        });
+        $$.redraw({withLegend: true});
+        return config.data_axes;
+    };
 
     c3_chart_fn.category = function (i, category) {
         var $$ = this.internal, config = $$.config;
