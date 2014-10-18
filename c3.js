@@ -2504,8 +2504,7 @@
             isWithin = false;
         }
         else if (that.nodeName === 'circle') {
-            // circle is hidden in step chart, so treat as within the click area
-            isWithin = $$.isStepType(d) ? true : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
+            isWithin = $$.isStepType(d) ? $$.isWithinStep(that, $$.getYScale(d.id)(d.value)) : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
         }
         else if (that.nodeName === 'path') {
             isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar(that) : true;
@@ -2860,11 +2859,14 @@
         var $$ = this, config = $$.config;
         return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
     };
-    c3_chart_internal_fn.isWithinCircle = function (_this, _r) {
+    c3_chart_internal_fn.isWithinCircle = function (that, r) {
         var d3 = this.d3,
-            mouse = d3.mouse(_this), d3_this = d3.select(_this),
-            cx = d3_this.attr("cx") * 1, cy = d3_this.attr("cy") * 1;
-        return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
+            mouse = d3.mouse(that), d3_this = d3.select(that),
+            cx = +d3_this.attr("cx"), cy = +d3_this.attr("cy");
+        return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < r;
+    };
+    c3_chart_internal_fn.isWithinStep = function (that, y) {
+        return Math.abs(y - this.d3.mouse(that)[1]) < 30;
     };
 
     c3_chart_internal_fn.initBar = function () {

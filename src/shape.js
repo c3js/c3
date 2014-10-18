@@ -53,8 +53,7 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
         isWithin = false;
     }
     else if (that.nodeName === 'circle') {
-        // circle is hidden in step chart, so treat as within the click area
-        isWithin = $$.isStepType(d) ? true : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
+        isWithin = $$.isStepType(d) ? $$.isWithinStep(that, $$.getYScale(d.id)(d.value)) : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
     }
     else if (that.nodeName === 'path') {
         isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar(that) : true;
