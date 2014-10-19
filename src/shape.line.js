@@ -48,6 +48,7 @@ c3_chart_internal_fn.redrawLine = function (durationForExit) {
         .style("stroke", $$.color);
     $$.mainLine
         .style("opacity", $$.initialOpacity.bind($$))
+        .style('shape-rendering', function (d) { return $$.isStepType(d) ? 'crispEdges' : ''; })
         .attr('transform', null);
     $$.mainLine.exit().transition().duration(durationForExit)
         .style('opacity', 0)
