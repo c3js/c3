@@ -5533,7 +5533,10 @@
         $$.isTargetToShow(targetId) ? this.hide(targetId) : this.show(targetId);
     };
 
-    c3_chart_fn.zoom = function () {
+    c3_chart_fn.zoom = function (domain) {
+        var $$ = this.internal;
+        $$.brush.extent(domain);
+        $$.redraw({withUpdateXDomain: true});
     };
     c3_chart_fn.zoom.enable = function (enabled) {
         var $$ = this.internal;
