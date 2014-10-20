@@ -48,6 +48,7 @@ c3_chart_internal_fn.redrawLine = function (durationForExit) {
         .style("stroke", $$.color);
     $$.mainLine
         .style("opacity", $$.initialOpacity.bind($$))
+        .style('shape-rendering', function (d) { return $$.isStepType(d) ? 'crispEdges' : ''; })
         .attr('transform', null);
     $$.mainLine.exit().transition().duration(durationForExit)
         .style('opacity', 0)
@@ -329,7 +330,7 @@ c3_chart_internal_fn.unexpandCircles = function (i) {
 };
 c3_chart_internal_fn.pointR = function (d) {
     var $$ = this, config = $$.config;
-    return config.point_show && !$$.isStepType(d) ? (isFunction(config.point_r) ? config.point_r(d) : config.point_r) : 0;
+    return $$.isStepType(d) ? 0 : (isFunction(config.point_r) ? config.point_r(d) : config.point_r);
 };
 c3_chart_internal_fn.pointExpandedR = function (d) {
     var $$ = this, config = $$.config;
@@ -339,9 +340,12 @@ c3_chart_internal_fn.pointSelectR = function (d) {
     var $$ = this, config = $$.config;
     return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
 };
-c3_chart_internal_fn.isWithinCircle = function (_this, _r) {
+c3_chart_internal_fn.isWithinCircle = function (that, r) {
     var d3 = this.d3,
-        mouse = d3.mouse(_this), d3_this = d3.select(_this),
-        cx = d3_this.attr("cx") * 1, cy = d3_this.attr("cy") * 1;
-    return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < _r;
+        mouse = d3.mouse(that), d3_this = d3.select(that),
+        cx = +d3_this.attr("cx"), cy = +d3_this.attr("cy");
+    return Math.sqrt(Math.pow(cx - mouse[0], 2) + Math.pow(cy - mouse[1], 2)) < r;
+};
+c3_chart_internal_fn.isWithinStep = function (that, y) {
+    return Math.abs(y - this.d3.mouse(that)[1]) < 30;
 };

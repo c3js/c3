@@ -148,6 +148,9 @@
 
 /*-- Tooltip --*/
 
+.c3-tooltip-container {
+  z-index: 10;
+}
 .c3-tooltip {
   border-collapse:collapse;
   border-spacing:0;

@@ -108,14 +108,15 @@ c3_chart_internal_fn.convertToArcData = function (d) {
 
 c3_chart_internal_fn.textForArcLabel = function (d) {
     var $$ = this,
-        updated, value, ratio, format;
+        updated, value, ratio, id, format;
     if (! $$.shouldShowArcLabel()) { return ""; }
     updated = $$.updateAngle(d);
     value = updated ? updated.value : null;
     ratio = $$.getArcRatio(updated);
+    id = d.data.id;
     if (! $$.hasType('gauge') && ! $$.meetsArcLabelThreshold(ratio)) { return ""; }
     format = $$.getArcLabelFormat();
-    return format ? format(value, ratio) : $$.defaultArcValueFormat(value, ratio);
+    return format ? format(value, ratio, id) : $$.defaultArcValueFormat(value, ratio);
 };
 
 c3_chart_internal_fn.expandArc = function (targetIds) {
@@ -259,6 +260,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             arcData = $$.convertToArcData(updated);
             // transitions
             $$.expandArc(updated.data.id);
+            $$.api.focus(updated.data.id);
             $$.toggleFocusLegend(updated.data.id, true);
             $$.config.data_onmouseover(arcData, this);
         })
@@ -277,6 +279,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             arcData = $$.convertToArcData(updated);
             // transitions
             $$.unexpandArc(updated.data.id);
+            $$.api.revert();
             $$.revertLegend();
             $$.hideTooltip();
             $$.config.data_onmouseout(arcData, this);

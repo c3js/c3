@@ -1,4 +1,13 @@
-c3_chart_fn.zoom = function () {
+c3_chart_fn.zoom = function (domain) {
+    var $$ = this.internal;
+    if (domain) {
+        if ($$.isTimeSeries()) {
+            domain = domain.map(function (x) { return $$.parseDate(x); });
+        }
+        $$.brush.extent(domain);
+        $$.redraw({withUpdateXDomain: true});
+    }
+    return $$.brush.extent();
 };
 c3_chart_fn.zoom.enable = function (enabled) {
     var $$ = this.internal;

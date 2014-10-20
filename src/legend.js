@@ -40,12 +40,10 @@ c3_chart_internal_fn.getLegendWidth = function () {
     return $$.config.legend_show ? $$.isLegendRight || $$.isLegendInset ? $$.legendItemWidth * ($$.legendStep + 1) : $$.currentWidth : 0;
 };
 c3_chart_internal_fn.getLegendHeight = function () {
-    var $$ = this, config = $$.config, h = 0;
-    if (config.legend_show) {
+    var $$ = this, h = 0;
+    if ($$.config.legend_show) {
         if ($$.isLegendRight) {
             h = $$.currentHeight;
-        } else if ($$.isLegendInset) {
-            h = config.legend_inset_step ? Math.max(20, $$.legendItemHeight) * (config.legend_inset_step + 1) : $$.height;
         } else {
             h = Math.max(20, $$.legendItemHeight) * ($$.legendStep + 1);
         }
@@ -176,6 +174,11 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         }
     }
 
+    if ($$.isLegendInset) {
+        step = config.legend_inset_step ? config.legend_inset_step : targetIds.length;
+        $$.updateLegendStep(step);
+    }
+
     if ($$.isLegendRight) {
         xForLegend = function (id) { return maxWidth * steps[id]; };
         yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
@@ -253,7 +256,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         $$.legend.insert('g', '.' + CLASS.legendItem)
             .attr("class", CLASS.legendBackground)
             .append('rect')
-            .attr('height', $$.getLegendHeight() - 10)
+            .attr('height', $$.getLegendHeight() - 12)
             .attr('width', maxWidth * (step + 1) + 10);
     }
 

@@ -161,8 +161,8 @@ c3_chart_internal_fn.filterTargetsToShow = function (targets) {
 };
 c3_chart_internal_fn.mapTargetsToUniqueXs = function (targets) {
     var $$ = this;
-    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return v.x; }); }))).values();
-    return $$.isTimeSeries() ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
+    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return +v.x; }); }))).values();
+    return $$.isTimeSeries() ? xs.map(function (x) { return new Date(+x); }) : xs.map(function (x) { return +x; });
 };
 c3_chart_internal_fn.addHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds);
@@ -206,11 +206,11 @@ c3_chart_internal_fn.hasPositiveValueInTargets = function (targets) {
 };
 c3_chart_internal_fn.isOrderDesc = function () {
     var config = this.config;
-    return config.data_order && config.data_order.toLowerCase() === 'desc';
+    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'desc';
 };
 c3_chart_internal_fn.isOrderAsc = function () {
     var config = this.config;
-    return config.data_order && config.data_order.toLowerCase() === 'asc';
+    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'asc';
 };
 c3_chart_internal_fn.orderTargets = function (targets) {
     var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();

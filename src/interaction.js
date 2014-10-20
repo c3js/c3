@@ -60,27 +60,30 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
     else {
         if (($$.isCustomX() || $$.isTimeSeries()) && !$$.isCategorized()) {
             rectW = function (d) {
-                var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index), dx = $$.data.xs[d.id][d.index],
-                    w = ($$.x(nextX ? nextX : dx) - $$.x(prevX ? prevX : dx)) / 2;
+                var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index);
 
                 // if there this is a single data point make the eventRect full width (or height)
                 if (prevX === null && nextX === null) {
                     return config.axis_rotated ? $$.height : $$.width;
                 }
-                else {
-                    return w < 0 ? 0 : w;
-                }
+
+                if (prevX === null) { prevX = $$.x.domain()[0]; }
+                if (nextX === null) { nextX = $$.x.domain()[1]; }
+
+                return Math.max(0, ($$.x(nextX) - $$.x(prevX)) / 2);
             };
             rectX = function (d) {
-                var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index), dx = $$.data.xs[d.id][d.index];
-                
+                var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index),
+                    thisX = $$.data.xs[d.id][d.index];
+
                 // if there this is a single data point position the eventRect at 0
                 if (prevX === null && nextX === null) {
                     return 0;
                 }
-                else {
-                    return ($$.x(dx) + $$.x(prevX ? prevX : dx)) / 2;
-                }
+
+                if (prevX === null) { prevX = $$.x.domain()[0]; }
+
+                return ($$.x(thisX) + $$.x(prevX)) / 2;
             };
         } else {
             rectW = $$.getEventRectWidth();
@@ -158,7 +161,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
             if ($$.hasArcType()) { return; }
 
-            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+            if ($$.isStepType(d) && $$.config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                 index -= 1;
             }
 
@@ -192,12 +195,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                     }
                 })
                 .filter(function (d) {
-                    if (this.nodeName === 'circle') {
-                        return $$.isWithinCircle(this, $$.pointSelectR(d));
-                    }
-                    else if (this.nodeName === 'path') {
-                        return $$.isWithinBar(this);
-                    }
+                    return $$.isWithinShape(this, d);
                 })
                 .each(function (d) {
                     if (config.data_selection_enabled && (config.data_selection_grouped || config.data_selection_isselectable(d))) {
@@ -218,7 +216,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 $$.cancelClick = false;
                 return;
             }
-            if ($$.isStepType(d) && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+            if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
                 index -= 1;
             }
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {

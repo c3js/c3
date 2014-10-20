@@ -11,6 +11,8 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_extent: undefined,
         zoom_privileged: false,
         zoom_onzoom: function () {},
+        zoom_onzoomstart: function () {},
+        zoom_onzoomend: function () {},
         zoom_x_min: undefined,
         zoom_x_max: undefined,
         interaction_enabled: true,
@@ -136,7 +138,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         point_focus_expand_enabled: true,
         point_focus_expand_r: undefined,
         point_select_r: undefined,
+        // line
         line_connectNull: false,
+        line_step_type: 'step',
         // bar
         bar_width: undefined,
         bar_width_ratio: 0.6,
