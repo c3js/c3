@@ -267,7 +267,7 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
             axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), $$.getXAxisTickValues());
         }
-        $$.d3.select('body').append("g").style('visibility', 'hidden').call(axis).each(function () {
+        $$.svg.append("g").style('visibility', 'hidden').call(axis).each(function () {
             $$.d3.select(this).selectAll('text').each(function () {
                 var box = this.getBoundingClientRect();
                 if (box.left > 0 && maxWidth < box.width) { maxWidth = box.width; }
