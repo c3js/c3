@@ -11,7 +11,7 @@ c3_chart_internal_fn.setTargetType = function (targetIds, type) {
 c3_chart_internal_fn.hasType = function (type, targets) {
     var $$ = this, types = $$.config.data_types, has = false;
     targets = targets || $$.data.targets;
-    if (targets.length) {
+    if (targets && targets.length) {
         targets.forEach(function (target) {
             var t = types[target.id];
             if ((t && t.indexOf(type) >= 0) || (!t && type === 'line')) {
