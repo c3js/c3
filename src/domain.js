@@ -60,9 +60,10 @@ c3_chart_internal_fn.getYDomainMax = function (targets) {
     }
     return $$.d3.max(Object.keys(ys).map(function (key) { return $$.d3.max(ys[key]); }));
 };
-c3_chart_internal_fn.getYDomain = function (targets, axisId) {
+c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
     var $$ = this, config = $$.config,
-        yTargets = targets.filter(function (d) { return $$.getAxisId(d.id) === axisId; }),
+        targetsByAxisId = targets.filter(function (t) { return $$.getAxisId(t.id) === axisId; }),
+        yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
         yDomainMin = isValue(yMin) ? yMin : $$.getYDomainMin(yTargets),

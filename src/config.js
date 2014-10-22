@@ -10,6 +10,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_enabled: false,
         zoom_extent: undefined,
         zoom_privileged: false,
+        zoom_rescale: false,
         zoom_onzoom: function () {},
         zoom_onzoomstart: function () {},
         zoom_onzoomend: function () {},

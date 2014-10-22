@@ -232,6 +232,17 @@ c3_chart_internal_fn.filterByX = function (targets, x) {
 c3_chart_internal_fn.filterRemoveNull = function (data) {
     return data.filter(function (d) { return isValue(d.value); });
 };
+c3_chart_internal_fn.filterByXDomain = function (targets, xDomain) {
+    return targets.map(function (t) {
+        return {
+            id: t.id,
+            id_org: t.id_org,
+            values: t.values.filter(function (v) {
+                return xDomain[0] <= v.x && v.x <= xDomain[1];
+            })
+        };
+    });
+};
 c3_chart_internal_fn.hasDataLabel = function () {
     var config = this.config;
     if (typeof config.data_labels === 'boolean' && config.data_labels) {

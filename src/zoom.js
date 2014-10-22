@@ -55,7 +55,7 @@ c3_chart_internal_fn.redrawForZoom = function () {
     }
     $$.redraw({
         withTransition: false,
-        withY: false,
+        withY: config.zoom_rescale,
         withSubchart: false
     });
     if (d3.event.sourceEvent.type === 'mousemove') {

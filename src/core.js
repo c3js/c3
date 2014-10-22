@@ -418,7 +418,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
     var waitForDraw, flow;
-    var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
+    var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
     var xv = $$.xv.bind($$),
         cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
         cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
@@ -464,8 +464,12 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.subXAxis.tickValues([]);
     }
 
-    $$.y.domain($$.getYDomain(targetsToShow, 'y'));
-    $$.y2.domain($$.getYDomain(targetsToShow, 'y2'));
+    if (withY) {
+        xDomainForZoom = $$.x.orgDomain();
+    }
+
+    $$.y.domain($$.getYDomain(targetsToShow, 'y', xDomainForZoom));
+    $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
     if (!config.axis_y_tick_values && config.axis_y_tick_count) {
         tickValues = $$.generateTickValues($$.y.domain(), config.axis_y_tick_count);

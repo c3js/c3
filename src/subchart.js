@@ -164,7 +164,7 @@ c3_chart_internal_fn.redrawForBrush = function () {
     var $$ = this, x = $$.x;
     $$.redraw({
         withTransition: false,
-        withY: false,
+        withY: $$.config.zoom_rescale,
         withSubchart: false,
         withUpdateXDomain: true
     });

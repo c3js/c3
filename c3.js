@@ -423,7 +423,7 @@
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis;
         var waitForDraw, flow;
-        var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling;
+        var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
         var xv = $$.xv.bind($$),
             cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
             cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
@@ -469,8 +469,12 @@
             $$.subXAxis.tickValues([]);
         }
 
-        $$.y.domain($$.getYDomain(targetsToShow, 'y'));
-        $$.y2.domain($$.getYDomain(targetsToShow, 'y2'));
+        if (withY) {
+            xDomainForZoom = $$.x.orgDomain();
+        }
+
+        $$.y.domain($$.getYDomain(targetsToShow, 'y', xDomainForZoom));
+        $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
         if (!config.axis_y_tick_values && config.axis_y_tick_count) {
             tickValues = $$.generateTickValues($$.y.domain(), config.axis_y_tick_count);
@@ -889,6 +893,7 @@
             zoom_enabled: false,
             zoom_extent: undefined,
             zoom_privileged: false,
+            zoom_rescale: false,
             zoom_onzoom: function () {},
             zoom_onzoomstart: function () {},
             zoom_onzoomend: function () {},
@@ -1248,9 +1253,10 @@
         }
         return $$.d3.max(Object.keys(ys).map(function (key) { return $$.d3.max(ys[key]); }));
     };
-    c3_chart_internal_fn.getYDomain = function (targets, axisId) {
+    c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         var $$ = this, config = $$.config,
-            yTargets = targets.filter(function (d) { return $$.getAxisId(d.id) === axisId; }),
+            targetsByAxisId = targets.filter(function (t) { return $$.getAxisId(t.id) === axisId; }),
+            yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
             yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
             yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
             yDomainMin = isValue(yMin) ? yMin : $$.getYDomainMin(yTargets),
@@ -1655,6 +1661,17 @@
     };
     c3_chart_internal_fn.filterRemoveNull = function (data) {
         return data.filter(function (d) { return isValue(d.value); });
+    };
+    c3_chart_internal_fn.filterByXDomain = function (targets, xDomain) {
+        return targets.map(function (t) {
+            return {
+                id: t.id,
+                id_org: t.id_org,
+                values: t.values.filter(function (v) {
+                    return xDomain[0] <= v.x && v.x <= xDomain[1];
+                })
+            };
+        });
     };
     c3_chart_internal_fn.hasDataLabel = function () {
         var config = this.config;
@@ -5043,7 +5060,7 @@
         var $$ = this, x = $$.x;
         $$.redraw({
             withTransition: false,
-            withY: false,
+            withY: $$.config.zoom_rescale,
             withSubchart: false,
             withUpdateXDomain: true
         });
@@ -5126,7 +5143,7 @@
         }
         $$.redraw({
             withTransition: false,
-            withY: false,
+            withY: config.zoom_rescale,
             withSubchart: false
         });
         if (d3.event.sourceEvent.type === 'mousemove') {
