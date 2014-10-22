@@ -1726,6 +1726,30 @@
             yIndex = config.axis_rotated ? 0 : 1;
         return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
     };
+    c3_chart_internal_fn.convertValuesToStep = function (values) {
+        var converted = [].concat(values), i;
+
+        if (!this.isCategorized()) {
+            return values;
+        }
+
+        for (i = values.length + 1; 0 < i; i--) {
+            converted[i] = converted[i - 1];
+        }
+
+        converted[0] = {
+            x: converted[0].x - 1,
+            value: converted[0].value,
+            id: converted[0].id
+        };
+        converted[values.length + 1] = {
+            x: converted[values.length].x + 1,
+            value: converted[values.length].value,
+            id: converted[values.length].id
+        };
+
+        return converted;
+    };
 
     c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
         var $$ = this, type = mimeType ? mimeType : 'csv';
@@ -2489,9 +2513,12 @@
             var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
                 y0 = scale(0), offset = y0;
             targets.forEach(function (t) {
+                var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
                 if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
-                if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value >= 0) {
-                    offset += scale(t.values[i].value) - y0;
+                if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
+                    if (values[i].value * d.value >= 0) {
+                        offset += scale(values[i].value) - y0;
+                    }
                 }
             });
             return offset;
@@ -2594,18 +2621,19 @@
         line = config.axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
         if (!config.line_connectNull) { line = line.defined(function (d) { return d.value != null; }); }
         return function (d) {
-            var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
+            var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
                 x = isSub ? $$.x : $$.subX, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
             if ($$.isLineType(d)) {
                 if (config.data_regions[d.id]) {
-                    path = $$.lineWithRegions(data, x, y, config.data_regions[d.id]);
+                    path = $$.lineWithRegions(values, x, y, config.data_regions[d.id]);
                 } else {
-                    path = line.interpolate($$.getInterpolate(d))(data);
+                    if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
+                    path = line.interpolate($$.getInterpolate(d))(values);
                 }
             } else {
-                if (data[0]) {
-                    x0 = x(data[0].x);
-                    y0 = y(data[0].value);
+                if (values[0]) {
+                    x0 = x(values[0].x);
+                    y0 = y(values[0].value);
                 }
                 path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
             }
@@ -2757,13 +2785,15 @@
         }
 
         return function (d) {
-            var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
+            var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
+                x0 = 0, y0 = 0, path;
             if ($$.isAreaType(d)) {
-                path = area.interpolate($$.getInterpolate(d))(data);
+                if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
+                path = area.interpolate($$.getInterpolate(d))(values);
             } else {
-                if (data[0]) {
-                    x0 = $$.x(data[0].x);
-                    y0 = $$.getYScale(d.id)(data[0].value);
+                if (values[0]) {
+                    x0 = $$.x(values[0].x);
+                    y0 = $$.getYScale(d.id)(values[0].value);
                 }
                 path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
             }

@@ -38,9 +38,12 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
         var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
             y0 = scale(0), offset = y0;
         targets.forEach(function (t) {
+            var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
-            if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value >= 0) {
-                offset += scale(t.values[i].value) - y0;
+            if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
+                if (values[i].value * d.value >= 0) {
+                    offset += scale(values[i].value) - y0;
+                }
             }
         });
         return offset;

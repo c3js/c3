@@ -302,3 +302,27 @@ c3_chart_internal_fn.dist = function (data, pos) {
         yIndex = config.axis_rotated ? 0 : 1;
     return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
 };
+c3_chart_internal_fn.convertValuesToStep = function (values) {
+    var converted = [].concat(values), i;
+
+    if (!this.isCategorized()) {
+        return values;
+    }
+
+    for (i = values.length + 1; 0 < i; i--) {
+        converted[i] = converted[i - 1];
+    }
+
+    converted[0] = {
+        x: converted[0].x - 1,
+        value: converted[0].value,
+        id: converted[0].id
+    };
+    converted[values.length + 1] = {
+        x: converted[values.length].x + 1,
+        value: converted[values.length].value,
+        id: converted[values.length].id
+    };
+
+    return converted;
+};

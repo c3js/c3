@@ -74,18 +74,19 @@ c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
     line = config.axis_rotated ? line.x(yValue).y(xValue) : line.x(xValue).y(yValue);
     if (!config.line_connectNull) { line = line.defined(function (d) { return d.value != null; }); }
     return function (d) {
-        var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
+        var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
             x = isSub ? $$.x : $$.subX, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
         if ($$.isLineType(d)) {
             if (config.data_regions[d.id]) {
-                path = $$.lineWithRegions(data, x, y, config.data_regions[d.id]);
+                path = $$.lineWithRegions(values, x, y, config.data_regions[d.id]);
             } else {
-                path = line.interpolate($$.getInterpolate(d))(data);
+                if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
+                path = line.interpolate($$.getInterpolate(d))(values);
             }
         } else {
-            if (data[0]) {
-                x0 = x(data[0].x);
-                y0 = y(data[0].value);
+            if (values[0]) {
+                x0 = x(values[0].x);
+                y0 = y(values[0].value);
             }
             path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
         }
@@ -237,13 +238,15 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
     }
 
     return function (d) {
-        var data = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values, x0 = 0, y0 = 0, path;
+        var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
+            x0 = 0, y0 = 0, path;
         if ($$.isAreaType(d)) {
-            path = area.interpolate($$.getInterpolate(d))(data);
+            if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
+            path = area.interpolate($$.getInterpolate(d))(values);
         } else {
-            if (data[0]) {
-                x0 = $$.x(data[0].x);
-                y0 = $$.getYScale(d.id)(data[0].value);
+            if (values[0]) {
+                x0 = $$.x(values[0].x);
+                y0 = $$.getYScale(d.id)(values[0].value);
             }
             path = config.axis_rotated ? "M " + y0 + " " + x0 : "M " + x0 + " " + y0;
         }
