@@ -1647,7 +1647,17 @@
             });
         } else if (isFunction(config.data_order)) {
             targets.sort(config.data_order);
-        } // TODO: accept name array for order
+        } else if (Object.prototype.toString.call(config.data_order) === '[object Array]' ) {
+            targets.sort(function (t1, t2)) {
+                var t1Pos = config.data_order.indexOf(t1.id);
+                if(t1Pos == -1) { t1Pos = config.data_order.length; }
+
+                var t2Pos = config.data_order.indexOf(t2.id);
+                if(t2Pos == -1) { t2Pos = config.data_order.length; }
+
+                return t1Pos - t2Pos;
+            }
+        }
         return targets;
     };
     c3_chart_internal_fn.filterByX = function (targets, x) {
