@@ -1,21 +1,17 @@
 c3_chart_internal_fn.initZoom = function () {
-    var $$ = this, d3 = $$.d3, config = $$.config,
-        prevZoomTranslate, wheeled = false;
+    var $$ = this, d3 = $$.d3, config = $$.config;
+
     $$.zoom = d3.behavior.zoom()
         .on("zoomstart", function () {
             $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
             config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
         })
         .on("zoom", function () {
-            // prevZoomTranslate is needed for the fix of unexpected zoom.translate after remaining zoom
-            if (prevZoomTranslate && wheeled) {
-                $$.zoom.translate(prevZoomTranslate);
-            }
             $$.redrawForZoom.call($$);
-            prevZoomTranslate = $$.zoom.translate();
-            wheeled = d3.event.sourceEvent.type === 'wheel';
         })
         .on('zoomend', function () {
+            $$.redrawEventRect();
+            $$.updateZoom();
             config.zoom_onzoomend.call($$.api, $$.x.orgDomain());
         });
     $$.zoom.scale = function (scale) {
@@ -38,7 +34,7 @@ c3_chart_internal_fn.updateZoom = function () {
     $$.main.selectAll('.' + CLASS.eventRect).call(z);
 };
 c3_chart_internal_fn.redrawForZoom = function () {
-    var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x, orgXDomain = $$.orgXDomain;
+    var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
     if (!config.zoom_enabled) {
         return;
     }
@@ -50,13 +46,14 @@ c3_chart_internal_fn.redrawForZoom = function () {
         zoom.scale(x).updateScaleExtent();
         return;
     }
-    if ($$.isCategorized() && x.orgDomain()[0] === orgXDomain[0]) {
-        x.domain([orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
+    if ($$.isCategorized() && x.orgDomain()[0] === $$.orgXDomain[0]) {
+        x.domain([$$.orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
     }
     $$.redraw({
         withTransition: false,
         withY: config.zoom_rescale,
-        withSubchart: false
+        withSubchart: false,
+        withEventRect: false
     });
     if (d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;

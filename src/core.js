@@ -413,7 +413,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
     var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
-    var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend;
+    var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend, withEventRect;
     var hideAxis = $$.hasArcType();
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
@@ -432,6 +432,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
     withTrimXDomain = getOption(options, "withTrimXDomain", true);
     withLegend = getOption(options, "withLegend", false);
+    withEventRect = getOption(options, "withEventRect", true);
     withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
     withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
 
@@ -570,8 +571,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .remove();
 
     // event rects will redrawn when flow called
-    if (config.interaction_enabled && !options.flow) {
+    if (config.interaction_enabled && !options.flow && withEventRect) {
         $$.redrawEventRect();
+        if ($$.updateZoom) { $$.updateZoom(); }
     }
 
     // transition should be derived from one transition
@@ -613,8 +615,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.mapToIds($$.data.targets).forEach(function (id) {
         $$.withoutFadeIn[id] = true;
     });
-
-    if ($$.updateZoom) { $$.updateZoom(); }
 };
 
 c3_chart_internal_fn.updateAndRedraw = function (options) {

@@ -418,7 +418,7 @@
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
-        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend;
+        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend, withEventRect;
         var hideAxis = $$.hasArcType();
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis;
@@ -437,6 +437,7 @@
         withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
         withTrimXDomain = getOption(options, "withTrimXDomain", true);
         withLegend = getOption(options, "withLegend", false);
+        withEventRect = getOption(options, "withEventRect", true);
         withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
         withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
 
@@ -575,8 +576,9 @@
             .remove();
 
         // event rects will redrawn when flow called
-        if (config.interaction_enabled && !options.flow) {
+        if (config.interaction_enabled && !options.flow && withEventRect) {
             $$.redrawEventRect();
+            if ($$.updateZoom) { $$.updateZoom(); }
         }
 
         // transition should be derived from one transition
@@ -618,8 +620,6 @@
         $$.mapToIds($$.data.targets).forEach(function (id) {
             $$.withoutFadeIn[id] = true;
         });
-
-        if ($$.updateZoom) { $$.updateZoom(); }
     };
 
     c3_chart_internal_fn.updateAndRedraw = function (options) {
@@ -5087,23 +5087,19 @@
     };
 
     c3_chart_internal_fn.initZoom = function () {
-        var $$ = this, d3 = $$.d3, config = $$.config,
-            prevZoomTranslate, wheeled = false;
+        var $$ = this, d3 = $$.d3, config = $$.config;
+
         $$.zoom = d3.behavior.zoom()
             .on("zoomstart", function () {
                 $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
                 config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
             })
             .on("zoom", function () {
-                // prevZoomTranslate is needed for the fix of unexpected zoom.translate after remaining zoom
-                if (prevZoomTranslate && wheeled) {
-                    $$.zoom.translate(prevZoomTranslate);
-                }
                 $$.redrawForZoom.call($$);
-                prevZoomTranslate = $$.zoom.translate();
-                wheeled = d3.event.sourceEvent.type === 'wheel';
             })
             .on('zoomend', function () {
+                $$.redrawEventRect();
+                $$.updateZoom();
                 config.zoom_onzoomend.call($$.api, $$.x.orgDomain());
             });
         $$.zoom.scale = function (scale) {
@@ -5126,7 +5122,7 @@
         $$.main.selectAll('.' + CLASS.eventRect).call(z);
     };
     c3_chart_internal_fn.redrawForZoom = function () {
-        var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x, orgXDomain = $$.orgXDomain;
+        var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
         if (!config.zoom_enabled) {
             return;
         }
@@ -5138,13 +5134,14 @@
             zoom.scale(x).updateScaleExtent();
             return;
         }
-        if ($$.isCategorized() && x.orgDomain()[0] === orgXDomain[0]) {
-            x.domain([orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
+        if ($$.isCategorized() && x.orgDomain()[0] === $$.orgXDomain[0]) {
+            x.domain([$$.orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
         }
         $$.redraw({
             withTransition: false,
             withY: config.zoom_rescale,
-            withSubchart: false
+            withSubchart: false,
+            withEventRect: false
         });
         if (d3.event.sourceEvent.type === 'mousemove') {
             $$.cancelClick = true;
