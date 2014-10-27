@@ -3091,7 +3091,7 @@
                          .style("fill-opacity", opacityForText));
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
-        var svg = this.d3.select('body').append("svg").style('visibility', 'hidden'), rect;
+        var svg = this.d3.select('body').attr('class', 'c3').append("svg").style('visibility', 'hidden'), rect;
         svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')

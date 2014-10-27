@@ -23,7 +23,9 @@ describe('c3 chart legend', function () {
         }
         chart = window.c3.generate(args);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
+        chart.internal.d3.select('.jasmine_html-reporter')
+            .style('position', 'absolute')
+            .style('right', 0);
 
         window.setTimeout(function () {
             done();
@@ -34,7 +36,7 @@ describe('c3 chart legend', function () {
 
         it('should be located on the center of chart', function () {
             var box = chart.internal.legend.node().getBoundingClientRect();
-            expect(box.left + box.right).toBe(645);
+            expect(box.left + box.right).toBe(640);
         });
 
     });
