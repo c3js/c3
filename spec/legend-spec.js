@@ -34,7 +34,7 @@ describe('c3 chart legend', function () {
 
         it('should be located on the center of chart', function () {
             var box = chart.internal.legend.node().getBoundingClientRect();
-            expect(box.left + box.right).toBe(640);
+            expect(box.left + box.right).toBe(645);
         });
 
     });

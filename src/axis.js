@@ -32,7 +32,11 @@ c3_chart_internal_fn.initAxis = function () {
 };
 c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
     var $$ = this, config = $$.config,
-        axisParams = {isCategory: $$.isCategorized(), withOuterTick: withOuterTick},
+        axisParams = {
+            isCategory: $$.isCategorized(),
+            withOuterTick: withOuterTick,
+            tickWidth: $$.isCategorized() ? config.axis_x_tick_width : undefined
+        },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
     if ($$.isTimeSeries() && tickValues) {
@@ -268,7 +272,7 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
             axis = $$.getXAxis(scale, $$.xOrient, $$.getXAxisTickFormat(), $$.getXAxisTickValues());
         }
         $$.d3.select('body').append("g").style('visibility', 'hidden').call(axis).each(function () {
-            $$.d3.select(this).selectAll('text').each(function () {
+            $$.d3.select(this).selectAll('text tspan').each(function () {
                 var box = this.getBoundingClientRect();
                 if (box.left > 0 && maxWidth < box.width) { maxWidth = box.width; }
             });
