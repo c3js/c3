@@ -3145,7 +3145,7 @@
         }
     };
     c3_chart_internal_fn.hasType = function (type, targets) {
-        var $$ = this, types = $$.config.data_types, has = false;
+        var $$ = this, types = $$.config.data_types, has = (targets || $$.data.targets).length === 0 && $$.config.data_type === 'donut' ? true : false;
         targets = targets || $$.data.targets;
         if (targets && targets.length) {
             targets.forEach(function (target) {
