@@ -48,7 +48,8 @@ c3_chart_internal_fn.addTransitionForText = function (transitions, xForText, yFo
                      .style("fill-opacity", opacityForText));
 };
 c3_chart_internal_fn.getTextRect = function (text, cls) {
-    var svg = this.d3.select('body').attr('class', 'c3').append("svg").style('visibility', 'hidden'), rect;
+    var body = this.d3.select('body').classed('c3', true),
+        svg = body.append("svg").style('visibility', 'hidden'), rect;
     svg.selectAll('.dummy')
         .data([text])
       .enter().append('text')
@@ -56,6 +57,7 @@ c3_chart_internal_fn.getTextRect = function (text, cls) {
         .text(text)
       .each(function () { rect = this.getBoundingClientRect(); });
     svg.remove();
+    body.classed('c3', false);
     return rect;
 };
 c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
