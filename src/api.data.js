@@ -12,29 +12,11 @@ c3_chart_fn.data.values = function (targetId) {
     return target ? target.values.map(function (d) { return d.value; }) : null;
 };
 c3_chart_fn.data.names = function (names) {
-    var $$ = this.internal, config = $$.config;
-    if (!arguments.length) { return config.data_names; }
-    Object.keys(names).forEach(function (id) {
-        config.data_names[id] = names[id];
-    });
-    $$.redraw({withLegend: true});
-    return config.data_names;
+    return this.internal.updateDataAttributes('names', names);
 };
 c3_chart_fn.data.colors = function (colors) {
-    var $$ = this.internal, config = $$.config;
-    if (!arguments.length) { return config.data_colors; }
-    Object.keys(colors).forEach(function (id) {
-        config.data_colors[id] = colors[id];
-    });
-    $$.redraw({withLegend: true});
-    return config.data_colors;
+    return this.internal.updateDataAttributes('colors', colors);
 };
 c3_chart_fn.data.axes = function (axes) {
-    var $$ = this.internal, config = $$.config;
-    if (!arguments.length) { return config.data_axes; }
-    Object.keys(axes).forEach(function (id) {
-        config.data_axes[id] = axes[id];
-    });
-    $$.redraw({withLegend: true});
-    return config.data_axes;
+    return this.internal.updateDataAttributes('axes', axes);
 };

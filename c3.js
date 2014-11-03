@@ -1768,6 +1768,15 @@
 
         return converted;
     };
+    c3_chart_internal_fn.updateDataAttributes = function (name, attrs) {
+        var $$ = this, config = $$.config, current = config['data_' + name];
+        if (typeof attrs === 'undefined') { return current; }
+        Object.keys(attrs).forEach(function (id) {
+            current[id] = attrs[id];
+        });
+        $$.redraw({withLegend: true});
+        return current;
+    };
 
     c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
         var $$ = this, type = mimeType ? mimeType : 'csv';
@@ -6119,31 +6128,13 @@
         return target ? target.values.map(function (d) { return d.value; }) : null;
     };
     c3_chart_fn.data.names = function (names) {
-        var $$ = this.internal, config = $$.config;
-        if (!arguments.length) { return config.data_names; }
-        Object.keys(names).forEach(function (id) {
-            config.data_names[id] = names[id];
-        });
-        $$.redraw({withLegend: true});
-        return config.data_names;
+        return this.internal.updateDataAttributes('names', names);
     };
     c3_chart_fn.data.colors = function (colors) {
-        var $$ = this.internal, config = $$.config;
-        if (!arguments.length) { return config.data_colors; }
-        Object.keys(colors).forEach(function (id) {
-            config.data_colors[id] = colors[id];
-        });
-        $$.redraw({withLegend: true});
-        return config.data_colors;
+        return this.internal.updateDataAttributes('colors', colors);
     };
     c3_chart_fn.data.axes = function (axes) {
-        var $$ = this.internal, config = $$.config;
-        if (!arguments.length) { return config.data_axes; }
-        Object.keys(axes).forEach(function (id) {
-            config.data_axes[id] = axes[id];
-        });
-        $$.redraw({withLegend: true});
-        return config.data_axes;
+        return this.internal.updateDataAttributes('axes', axes);
     };
 
     c3_chart_fn.category = function (i, category) {
