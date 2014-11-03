@@ -20,7 +20,7 @@ describe('c3 chart axis', function () {
 
         window.setTimeout(function () {
             done();
-        }, 10);
+        }, 50);
     });
 
     describe('show pie chart', function () {
