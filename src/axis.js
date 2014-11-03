@@ -346,7 +346,7 @@ c3_chart_internal_fn.generateAxisTransitions = function (duration) {
     };
 };
 c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
-    var $$ = this;
+    var $$ = this, config = $$.config;
     $$.axes.x.style("opacity", isHidden ? 0 : 1);
     $$.axes.y.style("opacity", isHidden ? 0 : 1);
     $$.axes.y2.style("opacity", isHidden ? 0 : 1);
@@ -355,4 +355,8 @@ c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
     transitions.axisY.call($$.yAxis);
     transitions.axisY2.call($$.y2Axis);
     transitions.axisSubX.call($$.subXAxis);
+    // rotate tick text if needed
+    if (!config.axis_rotated && config.axis_x_tick_rotate) {
+        $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
+    }
 };

@@ -507,11 +507,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         }
     }
 
-    // rotate tick text if needed
-    if (!config.axis_rotated && config.axis_x_tick_rotate) {
-        $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
-    }
-
     // setup drawer - MEMO: these must be called after axis updated
     drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
     drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
