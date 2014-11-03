@@ -2294,8 +2294,7 @@
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
-            )
-            .on("dblclick.zoom", null);
+            );
     };
 
     c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
@@ -2383,8 +2382,7 @@
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
-            )
-            .on("dblclick.zoom", null);
+            );
     };
     c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
         var $$ = this,
@@ -5120,10 +5118,11 @@
     };
 
     c3_chart_internal_fn.initZoom = function () {
-        var $$ = this, d3 = $$.d3, config = $$.config;
+        var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
 
         $$.zoom = d3.behavior.zoom()
             .on("zoomstart", function () {
+                startEvent = d3.event.sourceEvent;
                 $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;
                 config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
             })
@@ -5131,6 +5130,11 @@
                 $$.redrawForZoom.call($$);
             })
             .on('zoomend', function () {
+                var event = d3.event.sourceEvent;
+                // if click, do nothing. otherwise, click interaction will be canceled.
+                if (event && startEvent.x === event.x && startEvent.y === event.y) {
+                    return;
+                }
                 $$.redrawEventRect();
                 $$.updateZoom();
                 config.zoom_onzoomend.call($$.api, $$.x.orgDomain());
@@ -5151,8 +5155,8 @@
     };
     c3_chart_internal_fn.updateZoom = function () {
         var $$ = this, z = $$.config.zoom_enabled ? $$.zoom : function () {};
-        $$.main.select('.' + CLASS.zoomRect).call(z);
-        $$.main.selectAll('.' + CLASS.eventRect).call(z);
+        $$.main.select('.' + CLASS.zoomRect).call(z).on("dblclick.zoom", null);
+        $$.main.selectAll('.' + CLASS.eventRect).call(z).on("dblclick.zoom", null);
     };
     c3_chart_internal_fn.redrawForZoom = function () {
         var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;

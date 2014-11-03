@@ -231,8 +231,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 .on('drag', function () { $$.drag(d3.mouse(this)); })
                 .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                 .on('dragend', function () { $$.dragend(); })
-        )
-        .on("dblclick.zoom", null);
+        );
 };
 
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
@@ -320,8 +319,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
                 .on('drag', function () { $$.drag(d3.mouse(this)); })
                 .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                 .on('dragend', function () { $$.dragend(); })
-        )
-        .on("dblclick.zoom", null);
+        );
 };
 c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
     var $$ = this,
