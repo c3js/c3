@@ -3797,9 +3797,7 @@
             })
             .on('mouseout', function (id) {
                 $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-                if (!$$.transiting) {
-                    $$.api.revert();
-                }
+                $$.api.revert();
                 if (config.legend_item_onmouseout) {
                     config.legend_item_onmouseout.call($$, id);
                 }
@@ -4430,7 +4428,9 @@
             interval = window.setInterval(function () {
                 if (!$$.transiting) {
                     window.clearInterval(interval);
-                    $$.expandArc(targetIds);
+                    if ($$.legend.selectAll('.c3-legend-item-focused').size() > 0) {
+                        $$.expandArc(targetIds);
+                    }
                 }
             }, 10);
             return;

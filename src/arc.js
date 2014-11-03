@@ -127,7 +127,9 @@ c3_chart_internal_fn.expandArc = function (targetIds) {
         interval = window.setInterval(function () {
             if (!$$.transiting) {
                 window.clearInterval(interval);
-                $$.expandArc(targetIds);
+                if ($$.legend.selectAll('.c3-legend-item-focused').size() > 0) {
+                    $$.expandArc(targetIds);
+                }
             }
         }, 10);
         return;

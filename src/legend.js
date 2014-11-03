@@ -225,9 +225,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         })
         .on('mouseout', function (id) {
             $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-            if (!$$.transiting) {
-                $$.api.revert();
-            }
+            $$.api.revert();
             if (config.legend_item_onmouseout) {
                 config.legend_item_onmouseout.call($$, id);
             }
