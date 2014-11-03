@@ -242,7 +242,7 @@ c3_chart_internal_fn.textAnchorForY2AxisLabel = function () {
 };
 
 c3_chart_internal_fn.xForRotatedTickText = function (r) {
-    return 10 * Math.sin(Math.PI * (r / 180));
+    return 8 * Math.sin(Math.PI * (r / 180));
 };
 c3_chart_internal_fn.yForRotatedTickText = function (r) {
     return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
@@ -252,8 +252,9 @@ c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {
         .style("text-anchor", rotate > 0 ? "start" : "end");
     transition.selectAll('.tick text')
         .attr("y", this.yForRotatedTickText(rotate))
-        .attr("x", this.xForRotatedTickText(rotate))
-        .attr("transform", "rotate(" + rotate + ")");
+        .attr("transform", "rotate(" + rotate + ")")
+      .selectAll('tspan')
+        .attr('dx', this.xForRotatedTickText(rotate));
 };
 
 c3_chart_internal_fn.getMaxTickWidth = function (id) {
