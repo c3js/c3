@@ -261,7 +261,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
 
             if (! closest) { return; }
 
-            if ($$.isScatterType(closest)) {
+            if ($$.isScatterType(closest) || !config.tooltip_grouped) {
                 sameXData = [closest];
             } else {
                 sameXData = $$.filterByX(targetsToShow, closest.x);
