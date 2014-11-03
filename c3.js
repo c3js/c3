@@ -2313,7 +2313,7 @@
 
                 if (! closest) { return; }
 
-                if ($$.isScatterType(closest)) {
+                if ($$.isScatterType(closest) || !config.tooltip_grouped) {
                     sameXData = [closest];
                 } else {
                     sameXData = $$.filterByX(targetsToShow, closest.x);
