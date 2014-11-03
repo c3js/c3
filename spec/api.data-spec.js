@@ -12,8 +12,17 @@ describe('c3 api data', function () {
         data: {
             columns: [
                 ['data1', 30, 200, 100, 400, 150, 250],
-                ['data2', 50, 20, 10, 40, 15, 25]
-            ]
+                ['data2', 5000, 2000, 1000, 4000, 1500, 2500]
+            ],
+            axes: {
+                data1: 'y',
+                data2: 'y2'
+            }
+        },
+        axis: {
+            y2: {
+                show: true
+            }
         }
     };
 
@@ -65,6 +74,29 @@ describe('c3 api data', function () {
             results = chart.data.shown();
             expect(results.length).toBe(1);
             expect(results[0].id).toBe('data2');
+        });
+
+    });
+
+    describe('data.axes()', function () {
+
+        it('should return data.axes specified as argument', function () {
+            var results = chart.data.axes();
+            expect(results.data1).toBe('y');
+            expect(results.data2).toBe('y2');
+            expect(d3.select('.c3-axis-y g.tick text').text()).toBe('0');
+            expect(d3.select('.c3-axis-y2 g.tick text').text()).toBe('1000');
+        });
+
+        it('should return data.axes specified as api', function () {
+            var results = chart.data.axes({
+                data1: 'y2',
+                data2: 'y'
+            });
+            expect(results.data1).toBe('y2');
+            expect(results.data2).toBe('y');
+            expect(d3.select('.c3-axis-y g.tick text').text()).toBe('1000');
+            expect(d3.select('.c3-axis-y2 g.tick text').text()).toBe('0');
         });
 
     });
