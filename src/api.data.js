@@ -1,6 +1,11 @@
-c3_chart_fn.data = function (targetId) {
-    var targets = this.internal.data.targets.filter(function (t) { return t.id === targetId; });
-    return targets.length > 0 ? targets[0] : null;
+c3_chart_fn.data = function (targetIds) {
+    var targets = this.internal.data.targets;
+    return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {
+        return [].concat(targetIds).indexOf(t.id) >= 0;
+    });
+};
+c3_chart_fn.data.shown = function (targetId) {
+    return this.internal.filterTargetsToShow(this.data(targetId));
 };
 c3_chart_fn.data.values = function (targetId) {
     var target = this.data(targetId);
