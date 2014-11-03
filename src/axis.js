@@ -279,8 +279,8 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
             });
         }).remove();
     }
-    $$.currentMaxTickWidth = maxWidth <= 0 ? $$.currentMaxTickWidth : maxWidth;
-    return $$.currentMaxTickWidth;
+    $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
+    return $$.currentMaxTickWidths[id];
 };
 
 c3_chart_internal_fn.updateAxisLabels = function (withTransition) {

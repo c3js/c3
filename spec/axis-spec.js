@@ -441,4 +441,50 @@ describe('c3 chart axis', function () {
 
     });
 
+    describe('axis.x.tick.rotate', function () {
+
+        describe('not rotated', function () {
+
+            it('should update args successfully', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', 'category 1', 'category 2', 'category 3', 'category 4', 'category 5', 'category 6'],
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            tick: {
+                                rotate: 60
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should rotate tick texts', function () {
+                chart.internal.main.selectAll('.c3-axis-x g.tick').each(function () {
+                    var tick = d3.select(this),
+                        text = tick.select('text'),
+                        tspan = text.select('tspan');
+                    expect(text.attr('transform')).toBe('rotate(60)');
+                    expect(text.attr('y')).toBe('1.5');
+                    expect(tspan.attr('dx')).toBe('6.928203230275509');
+                });
+            });
+
+            it('should have automatically calculated x axis height', function () {
+                var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect();
+                expect(box.height).toBeGreaterThan(50);
+            });
+
+        });
+
+    });
+
 });

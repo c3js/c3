@@ -124,7 +124,11 @@
         $$.legendItemHeight = 0;
         $$.legendOpacityForHidden = 0.15;
 
-        $$.currentMaxTickWidth = 0;
+        $$.currentMaxTickWidths = {
+            x: 0,
+            y: 0,
+            y2: 0
+        };
 
         $$.rotated_padding_left = 30;
         $$.rotated_padding_right = config.axis_rotated && !config.axis_x_show ? 0 : 30;
@@ -2469,12 +2473,16 @@
         return position.isInner ? 20 + $$.getMaxTickWidth(id) : 40 + $$.getMaxTickWidth(id);
     };
     c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
-        var $$ = this, config = $$.config;
+        var $$ = this, config = $$.config, h = 30;
         if (axisId === 'x' && !config.axis_x_show) { return 8; }
         if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }
         if (axisId === 'y' && !config.axis_y_show) { return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; }
         if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
-        return ($$.getAxisLabelPositionById(axisId).isInner ? 30 : 40) + (axisId === 'y2' ? -10 : 0);
+        // Calculate x axis height when tick rotated
+        if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
+            h = $$.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+        }
+        return h + ($$.getAxisLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
     };
 
     c3_chart_internal_fn.getEventRectWidth = function () {
@@ -4147,8 +4155,8 @@
                 });
             }).remove();
         }
-        $$.currentMaxTickWidth = maxWidth <= 0 ? $$.currentMaxTickWidth : maxWidth;
-        return $$.currentMaxTickWidth;
+        $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
+        return $$.currentMaxTickWidths[id];
     };
 
     c3_chart_internal_fn.updateAxisLabels = function (withTransition) {
@@ -4268,8 +4276,7 @@
         return forHorizontal ? $$.width + 2 + left + right : $$.margin.left + 20;
     };
     c3_chart_internal_fn.getAxisClipHeight = function (forHorizontal) {
-        var $$ = this, config = $$.config;
-        return forHorizontal ? (config.axis_x_height ? config.axis_x_height : 0) + 80 : $$.height + 8;
+        return forHorizontal ? this.margin.bottom : this.height + 8;
     };
     c3_chart_internal_fn.getXAxisClipWidth = function () {
         var $$ = this;

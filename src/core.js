@@ -119,7 +119,11 @@ c3_chart_internal_fn.initParams = function () {
     $$.legendItemHeight = 0;
     $$.legendOpacityForHidden = 0.15;
 
-    $$.currentMaxTickWidth = 0;
+    $$.currentMaxTickWidths = {
+        x: 0,
+        y: 0,
+        y2: 0
+    };
 
     $$.rotated_padding_left = 30;
     $$.rotated_padding_right = config.axis_rotated && !config.axis_x_show ? 0 : 30;

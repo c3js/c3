@@ -37,8 +37,7 @@ c3_chart_internal_fn.getAxisClipWidth = function (forHorizontal) {
     return forHorizontal ? $$.width + 2 + left + right : $$.margin.left + 20;
 };
 c3_chart_internal_fn.getAxisClipHeight = function (forHorizontal) {
-    var $$ = this, config = $$.config;
-    return forHorizontal ? (config.axis_x_height ? config.axis_x_height : 0) + 80 : $$.height + 8;
+    return forHorizontal ? this.margin.bottom : this.height + 8;
 };
 c3_chart_internal_fn.getXAxisClipWidth = function () {
     var $$ = this;
