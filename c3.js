@@ -77,10 +77,12 @@
         $$.clipIdForXAxis = $$.clipId + '-xaxis',
         $$.clipIdForYAxis = $$.clipId + '-yaxis',
         $$.clipIdForGrid = $$.clipId + '-grid',
+        $$.clipIdForSubchart = $$.clipId + '-subchart',
         $$.clipPath = $$.getClipPath($$.clipId),
         $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
         $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
         $$.clipPathForGrid = $$.getClipPath($$.clipIdForGrid),
+        $$.clipPathForSubchart = $$.getClipPath($$.clipIdForSubchart),
 
         $$.dragStart = null;
         $$.dragging = false;
@@ -206,6 +208,7 @@
         $$.clipXAxis = $$.appendClip(defs, $$.clipIdForXAxis);
         $$.clipYAxis = $$.appendClip(defs, $$.clipIdForYAxis);
         $$.clipGrid = $$.appendClip(defs, $$.clipIdForGrid);
+        $$.clipSubchart = $$.appendClip(defs, $$.clipIdForSubchart);
         $$.updateSvgSize();
 
         // Define regions
@@ -751,7 +754,8 @@
     };
 
     c3_chart_internal_fn.updateSvgSize = function () {
-        var $$ = this;
+        var $$ = this,
+            brush = $$.svg.select(".c3-brush .background");
         $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
         $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect')
             .attr('width', $$.width)
@@ -766,6 +770,9 @@
             .attr('y', $$.getYAxisClipY.bind($$))
             .attr('width', $$.getYAxisClipWidth.bind($$))
             .attr('height', $$.getYAxisClipHeight.bind($$));
+        $$.svg.select('#' + $$.clipIdForSubchart).select('rect')
+            .attr('width', $$.width)
+            .attr('height', brush.size() ? brush.attr('height') : 0);
         $$.svg.select('.' + CLASS.zoomRect)
             .attr('width', $$.width)
             .attr('height', $$.height);
@@ -4946,7 +4953,7 @@
 
         // Define g for chart area
         context.append('g')
-            .attr("clip-path", $$.clipPath)
+            .attr("clip-path", $$.clipPathForSubchart)
             .attr('class', CLASS.chart);
 
         // Define g for bar chart area
