@@ -46,7 +46,7 @@ describe('c3 chart axis', function () {
             done();
         }, 10);
     });
-
+/*
     describe('axis.y.tick.count', function () {
 
         var i = 1;
@@ -481,6 +481,114 @@ describe('c3 chart axis', function () {
             it('should have automatically calculated x axis height', function () {
                 var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect();
                 expect(box.height).toBeGreaterThan(50);
+            });
+
+        });
+
+    });
+
+*/
+    describe('axis.x.tick.fit', function () {
+
+        describe('axis.x.tick.fit = true', function () {
+
+            it('should set args for indexed data', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
+            });
+
+            it('should set args for x-based data', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', 10, 20, 100, 110, 200, 1000],
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
+            });
+
+            it('should show fitted ticks after hide and show', function () {
+                chart.hide();
+                chart.show();
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
+            });
+
+        });
+
+        describe('axis.x.tick.fit = false', function () {
+
+            it('should set args for indexed data', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            tick: {
+                                fit: false
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(11);
+            });
+
+            it('should set args for x-based data', function () {
+                args.data = {
+                    x: 'x',
+                    columns: [
+                        ['x', 10, 20, 100, 110, 200, 1000],
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', 150, 120, 110, 140, 115, 125]
+                    ]
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(10);
+            });
+
+            it('should show fitted ticks after hide and show', function () {
+                chart.hide();
+                chart.show();
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(10);
             });
 
         });
