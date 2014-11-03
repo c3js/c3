@@ -311,7 +311,11 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             }
             interpolate = d3.interpolate(this._current, updated);
             this._current = interpolate(0);
-            return function (t) { return $$.getArc(interpolate(t), true); };
+            return function (t) {
+                var interpolated = interpolate(t);
+                interpolated.data = d.data; // data.id will be updated by interporator
+                return $$.getArc(interpolated, true);
+            };
         })
         .attr("transform", withTransform ? "scale(1)" : "")
         .style("fill", function (d) {
