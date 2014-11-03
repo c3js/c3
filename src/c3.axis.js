@@ -149,7 +149,7 @@ function c3_axis(d3, params) {
             text = tick.select("text");
             tspan = text.selectAll('tspan')
                 .data(function (d, i) {
-                    var splitted = params.tickWidth ? splitTickText(d) : [textFormatted(d)];
+                    var splitted = params.tickWidth ? splitTickText(d) : [].concat(textFormatted(d));
                     counts[i] = splitted.length;
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };
