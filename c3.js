@@ -559,7 +559,7 @@
         // lines, areas and cricles
         $$.redrawLine(durationForExit);
         $$.redrawArea(durationForExit);
-        $$.redrawCircle();
+        if ( config.point_show ) { $$.redrawCircle(); }
 
         // text
         if ($$.hasDataLabel()) {
@@ -594,7 +594,7 @@
             $$.addTransitionForLine(transitions, drawLine);
             $$.addTransitionForArea(transitions, drawArea);
             $$.addTransitionForCircle(transitions, cx, cy);
-            $$.addTransitionForText(transitions, xForText, yForText, options.flow);
+            if ( config.point_show ) { $$.addTransitionForCircle(transitions, cx, cy); }
             $$.addTransitionForRegion(transitions);
             $$.addTransitionForGrid(transitions);
 
