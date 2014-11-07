@@ -21,3 +21,22 @@ function setEvent(chart, x, y) {
     chart.internal.d3.event = evt;
 }
 typeof setEvent !== 'undefined';
+
+function initChart(chart, args, done) {
+    'use strict';
+
+    if (typeof chart === 'undefined') {
+        window.initDom();
+    }
+    chart = window.c3.generate(args);
+    chart.internal.d3.select('.jasmine_html-reporter')
+        .style('position', 'absolute')
+        .style('right', 0);
+
+    window.setTimeout(function () {
+        done();
+    }, 10);
+
+    return chart;
+}
+typeof initChart !== 'undefined';
