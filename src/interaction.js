@@ -236,6 +236,15 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
 
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
+
+    function mouseout() {
+        $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
+        $$.hideXGridFocus();
+        $$.hideTooltip();
+        $$.unexpandCircles();
+        $$.unexpandBars();
+    }
+
     eventRectEnter.append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -244,9 +253,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .attr('class', CLASS.eventRect)
         .on('mouseout', function () {
             if ($$.hasArcType()) { return; }
-            $$.hideXGridFocus();
-            $$.hideTooltip();
-            $$.unexpandCircles();
+            mouseout();
         })
         .on('mousemove', function () {
             var targetsToShow = $$.filterTargetsToShow($$.data.targets);
@@ -258,7 +265,15 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
 
-            if (! closest) { return; }
+            if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
+                config.data_onmouseout.call($$, $$.mouseover);
+                $$.mouseover = undefined;
+            }
+
+            if (! closest) {
+                mouseout();
+                return;
+            }
 
             if ($$.isScatterType(closest) || !config.tooltip_grouped) {
                 sameXData = [closest];
@@ -276,21 +291,18 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             if (config.point_focus_expand_enabled) {
                 $$.expandCircles(closest.index, closest.id, true);
             }
+            $$.expandBars(closest.index, closest.id, true);
 
             // Show xgrid focus line
             $$.showXGridFocus(selectedData);
 
             // Show cursor as pointer if point is close to mouse position
-            if ($$.dist(closest, mouse) < 100) {
+            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
                 $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                 if (!$$.mouseover) {
                     config.data_onmouseover.call($$, closest);
-                    $$.mouseover = true;
+                    $$.mouseover = closest;
                 }
-            } else if ($$.mouseover) {
-                $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
-                config.data_onmouseout.call($$, closest);
-                $$.mouseover = false;
             }
         })
         .on('click', function () {
@@ -305,8 +317,8 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             if (! closest) { return; }
 
             // select if selection enabled
-            if ($$.dist(closest, mouse) < 100 && $$.toggleShape) {
-                $$.main.select('.' + CLASS.circles + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
+            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index).each(function () {
                     if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                         $$.toggleShape(this, closest, closest.index);
                         $$.config.data_onclick.call($$.api, closest, this);

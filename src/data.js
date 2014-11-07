@@ -296,14 +296,25 @@ c3_chart_internal_fn.findClosestFromTargets = function (targets, pos) {
     return $$.findClosest(candidates, pos);
 };
 c3_chart_internal_fn.findClosest = function (values, pos) {
-    var $$ = this, minDist, closest;
-    values.forEach(function (v) {
+    var $$ = this, minDist = 100, closest;
+
+    // find mouseovering bar
+    values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
+        var shape = $$.d3.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+        if ($$.isWithinBar(shape)) {
+            closest = v;
+        }
+    });
+
+    // find closest point from non-bar
+    values.filter(function (v) { return v && !$$.isBarType(v.id); }).forEach(function (v) {
         var d = $$.dist(v, pos);
-        if (d < minDist || ! minDist) {
+        if (d < minDist) {
             minDist = d;
             closest = v;
         }
     });
+
     return closest;
 };
 c3_chart_internal_fn.dist = function (data, pos) {

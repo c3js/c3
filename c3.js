@@ -1736,14 +1736,25 @@
         return $$.findClosest(candidates, pos);
     };
     c3_chart_internal_fn.findClosest = function (values, pos) {
-        var $$ = this, minDist, closest;
-        values.forEach(function (v) {
+        var $$ = this, minDist = 100, closest;
+
+        // find mouseovering bar
+        values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
+            var shape = $$.d3.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+            if ($$.isWithinBar(shape)) {
+                closest = v;
+            }
+        });
+
+        // find closest point from non-bar
+        values.filter(function (v) { return v && !$$.isBarType(v.id); }).forEach(function (v) {
             var d = $$.dist(v, pos);
-            if (d < minDist || ! minDist) {
+            if (d < minDist) {
                 minDist = d;
                 closest = v;
             }
         });
+
         return closest;
     };
     c3_chart_internal_fn.dist = function (data, pos) {
@@ -2306,6 +2317,15 @@
 
     c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
         var $$ = this, d3 = $$.d3, config = $$.config;
+
+        function mouseout() {
+            $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
+            $$.hideXGridFocus();
+            $$.hideTooltip();
+            $$.unexpandCircles();
+            $$.unexpandBars();
+        }
+
         eventRectEnter.append('rect')
             .attr('x', 0)
             .attr('y', 0)
@@ -2314,9 +2334,7 @@
             .attr('class', CLASS.eventRect)
             .on('mouseout', function () {
                 if ($$.hasArcType()) { return; }
-                $$.hideXGridFocus();
-                $$.hideTooltip();
-                $$.unexpandCircles();
+                mouseout();
             })
             .on('mousemove', function () {
                 var targetsToShow = $$.filterTargetsToShow($$.data.targets);
@@ -2328,7 +2346,15 @@
                 mouse = d3.mouse(this);
                 closest = $$.findClosestFromTargets(targetsToShow, mouse);
 
-                if (! closest) { return; }
+                if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
+                    config.data_onmouseout.call($$, $$.mouseover);
+                    $$.mouseover = undefined;
+                }
+
+                if (! closest) {
+                    mouseout();
+                    return;
+                }
 
                 if ($$.isScatterType(closest) || !config.tooltip_grouped) {
                     sameXData = [closest];
@@ -2346,21 +2372,18 @@
                 if (config.point_focus_expand_enabled) {
                     $$.expandCircles(closest.index, closest.id, true);
                 }
+                $$.expandBars(closest.index, closest.id, true);
 
                 // Show xgrid focus line
                 $$.showXGridFocus(selectedData);
 
                 // Show cursor as pointer if point is close to mouse position
-                if ($$.dist(closest, mouse) < 100) {
+                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
                     $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                     if (!$$.mouseover) {
                         config.data_onmouseover.call($$, closest);
-                        $$.mouseover = true;
+                        $$.mouseover = closest;
                     }
-                } else if ($$.mouseover) {
-                    $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
-                    config.data_onmouseout.call($$, closest);
-                    $$.mouseover = false;
                 }
             })
             .on('click', function () {
@@ -2375,8 +2398,8 @@
                 if (! closest) { return; }
 
                 // select if selection enabled
-                if ($$.dist(closest, mouse) < 100 && $$.toggleShape) {
-                    $$.main.select('.' + CLASS.circles + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
+                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+                    $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index).each(function () {
                         if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                             $$.toggleShape(this, closest, closest.index);
                             $$.config.data_onclick.call($$.api, closest, this);
@@ -2996,14 +3019,14 @@
             w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * config.bar_width_ratio) / barTargetsNum : 0;
         return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
     };
-    c3_chart_internal_fn.getBars = function (i) {
+    c3_chart_internal_fn.getBars = function (i, id) {
         var $$ = this;
-        return $$.main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
+        return (id ? $$.main.selectAll('.' + CLASS.bars + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
     };
     c3_chart_internal_fn.expandBars = function (i, id, reset) {
         var $$ = this;
         if (reset) { $$.unexpandBars(); }
-        $$.getBars(i).classed(CLASS.EXPANDED, true);
+        $$.getBars(i, id).classed(CLASS.EXPANDED, true);
     };
     c3_chart_internal_fn.unexpandBars = function (i) {
         var $$ = this;
@@ -3056,8 +3079,7 @@
         };
     };
     c3_chart_internal_fn.isWithinBar = function (that) {
-        var d3 = this.d3,
-            mouse = d3.mouse(that), box = that.getBoundingClientRect(),
+        var mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
             seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
             x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
             w = box.width, h = box.height, offset = 2,
