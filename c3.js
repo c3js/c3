@@ -985,7 +985,7 @@
             axis_x_tick_count: undefined,
             axis_x_tick_fit: true,
             axis_x_tick_values: null,
-            axis_x_tick_rotate: undefined,
+            axis_x_tick_rotate: 0,
             axis_x_tick_outer: true,
             axis_x_tick_width: 80,
             axis_x_max: undefined,
