@@ -4758,7 +4758,7 @@
         if (d.axis === 'y' || d.axis === 'y2') {
             xPos = config.axis_rotated ? ('start' in d ? yScale(d.start) : 0) : 0;
         } else {
-            xPos = config.axis_rotated ? 0 : ('start' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.start) : d.start) : 0);
+            xPos = config.axis_rotated ? 0 : ('start' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.start).valueOf() : d.start) : 0);
         }
         return xPos;
     };
@@ -4768,7 +4768,7 @@
         if (d.axis === 'y' || d.axis === 'y2') {
             yPos = config.axis_rotated ? 0 : ('end' in d ? yScale(d.end) : 0);
         } else {
-            yPos = config.axis_rotated ? ('start' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.start) : d.start) : 0) : 0;
+            yPos = config.axis_rotated ? ('start' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.start).valueOf() : d.start) : 0) : 0;
         }
         return yPos;
     };
@@ -4778,7 +4778,7 @@
         if (d.axis === 'y' || d.axis === 'y2') {
             end = config.axis_rotated ? ('end' in d ? yScale(d.end) : $$.width) : $$.width;
         } else {
-            end = config.axis_rotated ? $$.width : ('end' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.end) : d.end) : $$.width);
+            end = config.axis_rotated ? $$.width : ('end' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.end).valueOf() : d.end) : $$.width);
         }
         return end < start ? 0 : end - start;
     };
@@ -4788,7 +4788,7 @@
         if (d.axis === 'y' || d.axis === 'y2') {
             end = config.axis_rotated ? $$.height : ('start' in d ? yScale(d.start) : $$.height);
         } else {
-            end = config.axis_rotated ? ('end' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.end) : d.end) : $$.height) : $$.height;
+            end = config.axis_rotated ? ('end' in d ? $$.x($$.isTimeSeries() ? $$.parseDate(d.end).valueOf() : d.end) : $$.height) : $$.height;
         }
         return end < start ? 0 : end - start;
     };
