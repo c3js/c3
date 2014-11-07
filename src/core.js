@@ -692,6 +692,9 @@ c3_chart_internal_fn.getTranslate = function (target) {
 c3_chart_internal_fn.initialOpacity = function (d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? 1 : 0;
 };
+c3_chart_internal_fn.initialOpacityForCircle = function (d) {
+    return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
+};
 c3_chart_internal_fn.opacityForCircle = function (d) {
     return isValue(d.value) && this.config.point_show ? (this.isScatterType(d) ? 0.5 : 1) : 0;
 };

@@ -697,6 +697,9 @@
     c3_chart_internal_fn.initialOpacity = function (d) {
         return d.value !== null && this.withoutFadeIn[d.id] ? 1 : 0;
     };
+    c3_chart_internal_fn.initialOpacityForCircle = function (d) {
+        return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
+    };
     c3_chart_internal_fn.opacityForCircle = function (d) {
         return isValue(d.value) && this.config.point_show ? (this.isScatterType(d) ? 0.5 : 1) : 0;
     };
@@ -2901,7 +2904,7 @@
             .attr("r", $$.pointR.bind($$))
             .style("fill", $$.color);
         $$.mainCircle
-            .style("opacity", $$.initialOpacity.bind($$));
+            .style("opacity", $$.initialOpacityForCircle.bind($$));
         $$.mainCircle.exit().remove();
     };
     c3_chart_internal_fn.addTransitionForCircle = function (transitions, cx, cy) {
