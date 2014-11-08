@@ -435,6 +435,28 @@ describe('c3 chart axis', function () {
                 });
             });
         });
+
+        describe('with axis.x.tick.format', function () {
+
+            it('should update args to use axis.x.tick.format', function () {
+                args.axis.x.tick.format = function () {
+                    return ['this is a very long tick text', 'on category axis'];
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should have multiline tick text', function () {
+                var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
+                    tspans = tick.selectAll('tspan'),
+                    expectedTickTexts = ['this is a very long tick text', 'on category axis'];
+                expect(tspans.size()).toBe(2);
+                tspans.each(function (d, i) {
+                    var tspan = d3.select(this);
+                    expect(tspan.text()).toBe(expectedTickTexts[i]);
+                });
+            });
+
+        });
     });
 
     describe('axis.x.tick.rotate', function () {

@@ -103,8 +103,12 @@ function c3_axis(d3, params) {
 
             // this should be called only when category axis
             function splitTickText(d, maxWidth) {
-                var tickText = textFormatted(d) + "",
+                var tickText = textFormatted(d),
                     subtext, spaceIndex, textWidth, splitted = [];
+
+                if (Object.prototype.toString.call(tickText) === "[object Array]") {
+                    return tickText;
+                }
 
                 if (!maxWidth || maxWidth <= 0) {
                     maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
@@ -129,7 +133,7 @@ function c3_axis(d3, params) {
                     return splitted.concat(text);
                 }
 
-                return split(splitted, tickText);
+                return split(splitted, tickText + "");
             }
 
             function tspanDy(d, i) {
@@ -152,7 +156,7 @@ function c3_axis(d3, params) {
             text = tick.select("text");
             tspan = text.selectAll('tspan')
                 .data(function (d, i) {
-                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [textFormatted(d)];
+                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
                     counts[i] = splitted.length;
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };
