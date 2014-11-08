@@ -33,20 +33,10 @@ describe('c3 chart axis', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter')
-            .style('position', 'absolute')
-            .style('right', 0);
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
-/*
+
     describe('axis.y.tick.count', function () {
 
         var i = 1;
@@ -150,19 +140,23 @@ describe('c3 chart axis', function () {
                     expect(true).toBeTruthy();
                 });
 
-                it('should not split x axis tick text to multiple lines', function () {
+                it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedX = '0',
-                        expectedDy = '.71em';
+                        expectedTexts = ['very long tick text on x', 'axis'],
+                        expectedX = '0';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
                         var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
+                        expect(tspans.size()).toBe(2);
+                        tspans.each(function (d, i) {
                             var tspan = d3.select(this);
-                            expect(tspan.text()).toBe('very long tick text on x axis');
+                            expect(tspan.text()).toBe(expectedTexts[i]);
                             expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
+                            if (i === 0) {
+                                expect(tspan.attr('dy')).toBe('.71em');
+                            } else {
+                                expect(tspan.attr('dy')).toBeGreaterThan(8);
+                            }
                         });
                     });
                 });
@@ -216,6 +210,7 @@ describe('c3 chart axis', function () {
                         expect(tspans.size()).toBe(1);
                     });
                 });
+
             });
 
             describe('rotated', function () {
@@ -225,19 +220,23 @@ describe('c3 chart axis', function () {
                     expect(true).toBeTruthy();
                 });
 
-                it('should not split x axis tick text to multiple lines', function () {
+                it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedX = '-9',
-                        expectedDy = '3';
+                        expectedTexts = ['very long tick text on', 'x axis'],
+                        expectedX = '-9';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
                         var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
+                        expect(tspans.size()).toBe(2);
+                        tspans.each(function (d, i) {
                             var tspan = d3.select(this);
-                            expect(tspan.text()).toBe('very long tick text on x axis');
+                            expect(tspan.text()).toBe(expectedTexts[i]);
                             expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
+                            if (i === 0) {
+                                expect(tspan.attr('dy')).toBeLessThan(0);
+                            } else {
+                                expect(tspan.attr('dy')).toBeGreaterThan(9);
+                            }
                         });
                     });
                 });
@@ -267,6 +266,7 @@ describe('c3 chart axis', function () {
                         });
                     });
                 });
+
             });
         });
 
@@ -362,9 +362,9 @@ describe('c3 chart axis', function () {
                     var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                         tspans = tick.selectAll('tspan'),
                         expectedTickTexts = [
-                            'this is a very',
-                            'long tick text',
-                            'on category axis'
+                            'this is a very long',
+                            'tick text on',
+                            'category axis'
                         ],
                         expectedX = '-9';
                     expect(tspans.size()).toBe(3);
@@ -389,12 +389,12 @@ describe('c3 chart axis', function () {
 
                     it('should update args not to split ticks', function () {
                         args.axis.x.tick = {
-                            width: null
+                            multiline: false
                         };
                         expect(true).toBeTruthy();
                     });
 
-                    it('should not split x tick', function () {
+                    it('should split x tick', function () {
                         var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                             tspans = tick.selectAll('tspan');
                         expect(tspans.size()).toBe(1);
@@ -432,13 +432,9 @@ describe('c3 chart axis', function () {
                             }
                         });
                     });
-
                 });
-
             });
-
         });
-
     });
 
     describe('axis.x.tick.rotate', function () {
@@ -484,10 +480,8 @@ describe('c3 chart axis', function () {
             });
 
         });
-
     });
 
-*/
     describe('axis.x.tick.fit', function () {
 
         describe('axis.x.tick.fit = true', function () {
@@ -592,7 +586,5 @@ describe('c3 chart axis', function () {
             });
 
         });
-
     });
-
 });

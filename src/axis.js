@@ -35,7 +35,8 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues,
         axisParams = {
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
-            tickWidth: $$.isCategorized() ? config.axis_x_tick_width : undefined
+            tickMultiline: config.axis_x_tick_multiline,
+            tickWidth: config.axis_x_tick_width
         },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 

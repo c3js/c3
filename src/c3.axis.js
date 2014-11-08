@@ -102,10 +102,13 @@ function c3_axis(d3, params) {
                 isVertical = orient === 'left' || orient === 'right';
 
             // this should be called only when category axis
-            function splitTickText(d) {
+            function splitTickText(d, maxWidth) {
                 var tickText = textFormatted(d) + "",
-                    maxWidth = isVertical ? params.tickWidth : tickOffset * 2 - 10,
                     subtext, spaceIndex, textWidth, splitted = [];
+
+                if (!maxWidth || maxWidth <= 0) {
+                    maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
+                }
 
                 function split(splitted, text) {
                     spaceIndex = undefined;
@@ -149,7 +152,7 @@ function c3_axis(d3, params) {
             text = tick.select("text");
             tspan = text.selectAll('tspan')
                 .data(function (d, i) {
-                    var splitted = params.tickWidth ? splitTickText(d) : [textFormatted(d)];
+                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [textFormatted(d)];
                     counts[i] = splitted.length;
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };

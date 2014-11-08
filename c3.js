@@ -989,7 +989,8 @@
             axis_x_tick_values: null,
             axis_x_tick_rotate: 0,
             axis_x_tick_outer: true,
-            axis_x_tick_width: 80,
+            axis_x_tick_multiline: true,
+            axis_x_tick_width: null,
             axis_x_max: undefined,
             axis_x_min: undefined,
             axis_x_padding: {},
@@ -3947,7 +3948,8 @@
             axisParams = {
                 isCategory: $$.isCategorized(),
                 withOuterTick: withOuterTick,
-                tickWidth: $$.isCategorized() ? config.axis_x_tick_width : undefined
+                tickMultiline: config.axis_x_tick_multiline,
+                tickWidth: config.axis_x_tick_width
             },
             axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
@@ -6465,10 +6467,13 @@
                     isVertical = orient === 'left' || orient === 'right';
 
                 // this should be called only when category axis
-                function splitTickText(d) {
+                function splitTickText(d, maxWidth) {
                     var tickText = textFormatted(d) + "",
-                        maxWidth = isVertical ? params.tickWidth : tickOffset * 2 - 10,
                         subtext, spaceIndex, textWidth, splitted = [];
+
+                    if (!maxWidth || maxWidth <= 0) {
+                        maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
+                    }
 
                     function split(splitted, text) {
                         spaceIndex = undefined;
@@ -6512,7 +6517,7 @@
                 text = tick.select("text");
                 tspan = text.selectAll('tspan')
                     .data(function (d, i) {
-                        var splitted = params.tickWidth ? splitTickText(d) : [textFormatted(d)];
+                        var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [textFormatted(d)];
                         counts[i] = splitted.length;
                         return splitted.map(function (s) {
                             return { index: i, splitted: s };
