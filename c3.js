@@ -138,6 +138,8 @@
 
         $$.withoutFadeIn = {};
 
+        $$.intervalForObserveInserted = undefined;
+
         $$.axes.subx = d3.selectAll([]); // needs when excluding subchart.js
     };
 
@@ -805,10 +807,10 @@
                 if (mutation.type === 'childList' && mutation.previousSibling) {
                     observer.disconnect();
                     // need to wait for completion of load because size calculation requires the actual sizes determined after that completion
-                    var interval = window.setInterval(function () {
+                    $$.intervalForObserveInserted = window.setInterval(function () {
                         // parentNode will NOT be null when completed
                         if (selection.node().parentNode) {
-                            window.clearInterval(interval);
+                            window.clearInterval($$.intervalForObserveInserted);
                             $$.updateDimension();
                             $$.config.oninit.call($$);
                             $$.redraw({
@@ -6319,6 +6321,7 @@
         $$.data.targets = undefined;
         $$.data.xs = {};
         $$.selectChart.classed('c3', false).html("");
+        window.clearInterval($$.intervalForObserveInserted);
         window.onresize = null;
     };
 
