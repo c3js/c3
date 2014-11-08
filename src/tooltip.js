@@ -67,15 +67,14 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         tooltipLeft = ($$.width / 2) + mouse[0];
         tooltipTop = ($$.height / 2) + mouse[1] + 20;
     } else {
+        svgLeft = $$.getSvgLeft(false);
         if (config.axis_rotated) {
-            svgLeft = $$.getSvgLeft();
             tooltipLeft = svgLeft + mouse[0] + 100;
             tooltipRight = tooltipLeft + tWidth;
             chartRight = $$.getCurrentWidth() - $$.getCurrentPaddingRight();
             tooltipTop = $$.x(dataToShow[0].x) + 20;
         } else {
-            svgLeft = $$.getSvgLeft();
-            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft() + $$.x(dataToShow[0].x) + 20;
+            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft(false) + $$.x(dataToShow[0].x) + 20;
             tooltipRight = tooltipLeft + tWidth;
             chartRight = svgLeft + $$.getCurrentWidth() - $$.getCurrentPaddingRight();
             tooltipTop = mouse[1] + 15;

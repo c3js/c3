@@ -155,7 +155,7 @@ c3_chart_internal_fn.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
 };
 c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
-    return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
+    return targetId || targetId === 0 ? ('-' + targetId).replace(/\s/g, '-') : '';
 };
 c3_chart_internal_fn.selectorTarget = function (id, prefix) {
     return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);

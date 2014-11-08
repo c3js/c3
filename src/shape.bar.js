@@ -52,14 +52,14 @@ c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
         w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * config.bar_width_ratio) / barTargetsNum : 0;
     return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
 };
-c3_chart_internal_fn.getBars = function (i) {
+c3_chart_internal_fn.getBars = function (i, id) {
     var $$ = this;
-    return $$.main.selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
+    return (id ? $$.main.selectAll('.' + CLASS.bars + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
 };
 c3_chart_internal_fn.expandBars = function (i, id, reset) {
     var $$ = this;
     if (reset) { $$.unexpandBars(); }
-    $$.getBars(i).classed(CLASS.EXPANDED, true);
+    $$.getBars(i, id).classed(CLASS.EXPANDED, true);
 };
 c3_chart_internal_fn.unexpandBars = function (i) {
     var $$ = this;
@@ -112,8 +112,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
     };
 };
 c3_chart_internal_fn.isWithinBar = function (that) {
-    var d3 = this.d3,
-        mouse = d3.mouse(that), box = that.getBoundingClientRect(),
+    var mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
         seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
         x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
         w = box.width, h = box.height, offset = 2,

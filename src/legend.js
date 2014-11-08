@@ -107,7 +107,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
     var withTransition, withTransitionForTransform;
     var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
-    var texts, rects, tiles;
+    var texts, rects, tiles, background;
 
     options = options || {};
     withTransition = getOption(options, "withTransition", true);
@@ -225,9 +225,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         })
         .on('mouseout', function (id) {
             $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-            if (!$$.transiting) {
-                $$.api.revert();
-            }
+            $$.api.revert();
             if (config.legend_item_onmouseout) {
                 config.legend_item_onmouseout.call($$, id);
             }
@@ -251,13 +249,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegend)
         .attr('width', 10)
         .attr('height', 10);
+
     // Set background for inset legend
-    if ($$.isLegendInset && maxWidth !== 0) {
-        $$.legend.insert('g', '.' + CLASS.legendItem)
+    background = $$.legend.select('.' + CLASS.legendBackground + ' rect');
+    if ($$.isLegendInset && maxWidth > 0 && background.size() === 0) {
+        background = $$.legend.insert('g', '.' + CLASS.legendItem)
             .attr("class", CLASS.legendBackground)
-            .append('rect')
-            .attr('height', $$.getLegendHeight() - 12)
-            .attr('width', maxWidth * (step + 1) + 10);
+            .append('rect');
     }
 
     texts = $$.legend.selectAll('text')
@@ -282,6 +280,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('fill', $$.color)
         .attr('x', xForLegend)
         .attr('y', yForLegend);
+
+    if (background) {
+        (withTransition ? background.transition() : background)
+            .attr('height', $$.getLegendHeight() - 12)
+            .attr('width', maxWidth * (step + 1) + 10);
+    }
 
     // toggle legend state
     $$.legend.selectAll('.' + CLASS.legendItem)

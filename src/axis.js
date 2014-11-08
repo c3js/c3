@@ -35,7 +35,8 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues,
         axisParams = {
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
-            tickWidth: $$.isCategorized() ? config.axis_x_tick_width : undefined
+            tickMultiline: config.axis_x_tick_multiline,
+            tickWidth: config.axis_x_tick_width
         },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
@@ -242,7 +243,7 @@ c3_chart_internal_fn.textAnchorForY2AxisLabel = function () {
 };
 
 c3_chart_internal_fn.xForRotatedTickText = function (r) {
-    return 10 * Math.sin(Math.PI * (r / 180));
+    return 8 * Math.sin(Math.PI * (r / 180));
 };
 c3_chart_internal_fn.yForRotatedTickText = function (r) {
     return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
@@ -252,8 +253,9 @@ c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {
         .style("text-anchor", rotate > 0 ? "start" : "end");
     transition.selectAll('.tick text')
         .attr("y", this.yForRotatedTickText(rotate))
-        .attr("x", this.xForRotatedTickText(rotate))
-        .attr("transform", "rotate(" + rotate + ")");
+        .attr("transform", "rotate(" + rotate + ")")
+      .selectAll('tspan')
+        .attr('dx', this.xForRotatedTickText(rotate));
 };
 
 c3_chart_internal_fn.getMaxTickWidth = function (id) {
@@ -278,8 +280,8 @@ c3_chart_internal_fn.getMaxTickWidth = function (id) {
             });
         }).remove();
     }
-    $$.currentMaxTickWidth = maxWidth <= 0 ? $$.currentMaxTickWidth : maxWidth;
-    return $$.currentMaxTickWidth;
+    $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
+    return $$.currentMaxTickWidths[id];
 };
 
 c3_chart_internal_fn.updateAxisLabels = function (withTransition) {
@@ -345,7 +347,7 @@ c3_chart_internal_fn.generateAxisTransitions = function (duration) {
     };
 };
 c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
-    var $$ = this;
+    var $$ = this, config = $$.config;
     $$.axes.x.style("opacity", isHidden ? 0 : 1);
     $$.axes.y.style("opacity", isHidden ? 0 : 1);
     $$.axes.y2.style("opacity", isHidden ? 0 : 1);
@@ -354,4 +356,8 @@ c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
     transitions.axisY.call($$.yAxis);
     transitions.axisY2.call($$.y2Axis);
     transitions.axisSubX.call($$.subXAxis);
+    // rotate tick text if needed
+    if (!config.axis_rotated && config.axis_x_tick_rotate) {
+        $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
+    }
 };

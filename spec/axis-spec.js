@@ -33,18 +33,8 @@ describe('c3 chart axis', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter')
-            .style('position', 'absolute')
-            .style('right', 0);
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('axis.y.tick.count', function () {
@@ -150,19 +140,23 @@ describe('c3 chart axis', function () {
                     expect(true).toBeTruthy();
                 });
 
-                it('should not split x axis tick text to multiple lines', function () {
+                it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedX = '0',
-                        expectedDy = '.71em';
+                        expectedTexts = ['very long tick text on x', 'axis'],
+                        expectedX = '0';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
                         var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
+                        expect(tspans.size()).toBe(2);
+                        tspans.each(function (d, i) {
                             var tspan = d3.select(this);
-                            expect(tspan.text()).toBe('very long tick text on x axis');
+                            expect(tspan.text()).toBe(expectedTexts[i]);
                             expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
+                            if (i === 0) {
+                                expect(tspan.attr('dy')).toBe('.71em');
+                            } else {
+                                expect(tspan.attr('dy')).toBeGreaterThan(8);
+                            }
                         });
                     });
                 });
@@ -216,6 +210,7 @@ describe('c3 chart axis', function () {
                         expect(tspans.size()).toBe(1);
                     });
                 });
+
             });
 
             describe('rotated', function () {
@@ -225,19 +220,23 @@ describe('c3 chart axis', function () {
                     expect(true).toBeTruthy();
                 });
 
-                it('should not split x axis tick text to multiple lines', function () {
+                it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedX = '-9',
-                        expectedDy = '3';
+                        expectedTexts = ['very long tick text on', 'x axis'],
+                        expectedX = '-9';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
                         var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
+                        expect(tspans.size()).toBe(2);
+                        tspans.each(function (d, i) {
                             var tspan = d3.select(this);
-                            expect(tspan.text()).toBe('very long tick text on x axis');
+                            expect(tspan.text()).toBe(expectedTexts[i]);
                             expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
+                            if (i === 0) {
+                                expect(tspan.attr('dy')).toBeLessThan(0);
+                            } else {
+                                expect(tspan.attr('dy')).toBeGreaterThan(9);
+                            }
                         });
                     });
                 });
@@ -267,6 +266,7 @@ describe('c3 chart axis', function () {
                         });
                     });
                 });
+
             });
         });
 
@@ -362,9 +362,9 @@ describe('c3 chart axis', function () {
                     var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                         tspans = tick.selectAll('tspan'),
                         expectedTickTexts = [
-                            'this is a very',
-                            'long tick text',
-                            'on category axis'
+                            'this is a very long',
+                            'tick text on',
+                            'category axis'
                         ],
                         expectedX = '-9';
                     expect(tspans.size()).toBe(3);
@@ -389,12 +389,12 @@ describe('c3 chart axis', function () {
 
                     it('should update args not to split ticks', function () {
                         args.axis.x.tick = {
-                            width: null
+                            multiline: false
                         };
                         expect(true).toBeTruthy();
                     });
 
-                    it('should not split x tick', function () {
+                    it('should split x tick', function () {
                         var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                             tspans = tick.selectAll('tspan');
                         expect(tspans.size()).toBe(1);
@@ -432,13 +432,181 @@ describe('c3 chart axis', function () {
                             }
                         });
                     });
-
                 });
+            });
+        });
 
+        describe('with axis.x.tick.format', function () {
+
+            it('should update args to use axis.x.tick.format', function () {
+                args.axis.x.tick.format = function () {
+                    return ['this is a very long tick text', 'on category axis'];
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should have multiline tick text', function () {
+                var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
+                    tspans = tick.selectAll('tspan'),
+                    expectedTickTexts = ['this is a very long tick text', 'on category axis'];
+                expect(tspans.size()).toBe(2);
+                tspans.each(function (d, i) {
+                    var tspan = d3.select(this);
+                    expect(tspan.text()).toBe(expectedTickTexts[i]);
+                });
+            });
+
+        });
+    });
+
+    describe('axis.x.tick.rotate', function () {
+
+        describe('not rotated', function () {
+
+            it('should update args successfully', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', 'category 1', 'category 2', 'category 3', 'category 4', 'category 5', 'category 6'],
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            tick: {
+                                rotate: 60
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should rotate tick texts', function () {
+                chart.internal.main.selectAll('.c3-axis-x g.tick').each(function () {
+                    var tick = d3.select(this),
+                        text = tick.select('text'),
+                        tspan = text.select('tspan');
+                    expect(text.attr('transform')).toBe('rotate(60)');
+                    expect(text.attr('y')).toBe('1.5');
+                    expect(tspan.attr('dx')).toBe('6.928203230275509');
+                });
+            });
+
+            it('should have automatically calculated x axis height', function () {
+                var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect();
+                expect(box.height).toBeGreaterThan(50);
+            });
+
+        });
+    });
+
+    describe('axis.x.tick.fit', function () {
+
+        describe('axis.x.tick.fit = true', function () {
+
+            it('should set args for indexed data', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
+            });
+
+            it('should set args for x-based data', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', 10, 20, 100, 110, 200, 1000],
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
+            });
+
+            it('should show fitted ticks after hide and show', function () {
+                chart.hide();
+                chart.show();
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(6);
             });
 
         });
 
-    });
+        describe('axis.x.tick.fit = false', function () {
 
+            it('should set args for indexed data', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', 150, 120, 110, 140, 115, 125]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            tick: {
+                                fit: false
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(11);
+            });
+
+            it('should set args for x-based data', function () {
+                args.data = {
+                    x: 'x',
+                    columns: [
+                        ['x', 10, 20, 100, 110, 200, 1000],
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', 150, 120, 110, 140, 115, 125]
+                    ]
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show fitted ticks on indexed data', function () {
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(10);
+            });
+
+            it('should show fitted ticks after hide and show', function () {
+                chart.hide();
+                chart.show();
+                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                expect(ticks.size()).toBe(10);
+            });
+
+        });
+    });
 });

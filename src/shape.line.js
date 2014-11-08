@@ -289,7 +289,7 @@ c3_chart_internal_fn.redrawCircle = function () {
         .attr("r", $$.pointR.bind($$))
         .style("fill", $$.color);
     $$.mainCircle
-        .style("opacity", $$.initialOpacity.bind($$));
+        .style("opacity", $$.initialOpacityForCircle.bind($$));
     $$.mainCircle.exit().remove();
 };
 c3_chart_internal_fn.addTransitionForCircle = function (transitions, cx, cy) {
