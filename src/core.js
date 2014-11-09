@@ -9,12 +9,12 @@ function Chart(config) {
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
-        for (var key in fn) {
+        Object.keys(fn).forEach(function (key) {
             target[key] = fn[key].bind(argThis);
             if (Object.keys(fn[key]).length > 0) {
                 bindThis(fn[key], target[key], argThis);
             }
-        }
+        });
     })(c3_chart_fn, this, this);
 }
 
