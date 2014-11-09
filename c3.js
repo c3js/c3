@@ -490,12 +490,10 @@
         $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
         if (!config.axis_y_tick_values && config.axis_y_tick_count) {
-            tickValues = $$.generateTickValues($$.y.domain(), config.axis_y_tick_count);
-            $$.yAxis.tickValues(tickValues);
+            $$.yAxis.tickValues($$.generateTickValues($$.y.domain(), config.axis_y_tick_count));
         }
         if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
-            tickValues = $$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count);
-            $$.y2Axis.tickValues(tickValues);
+            $$.y2Axis.tickValues($$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
         }
 
         // axes
