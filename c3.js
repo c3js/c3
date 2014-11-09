@@ -470,7 +470,9 @@
             $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
             if (!config.axis_x_tick_values) {
                 if (config.axis_x_tick_fit || config.axis_x_tick_count) {
-                    tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
+                    if ( config.axis_x_tick_autoGenerate ){
+                        tickValues = $$.generateTickValues($$.mapTargetsToUniqueXs(targetsToShow), config.axis_x_tick_count, $$.isTimeSeries());
+                    }
                 } else {
                     tickValues = undefined;
                 }
@@ -980,6 +982,7 @@
             axis_x_type: 'indexed',
             axis_x_localtime: true,
             axis_x_categories: [],
+            axis_x_tick_autoGenerate: false,
             axis_x_tick_centered: false,
             axis_x_tick_format: undefined,
             axis_x_tick_culling: {},
