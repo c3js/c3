@@ -3574,23 +3574,23 @@
             tooltipLeft = ($$.width / 2) + mouse[0];
             tooltipTop = ($$.height / 2) + mouse[1] + 20;
         } else {
-            svgLeft = $$.getSvgLeft(false);
+            svgLeft = $$.getSvgLeft(true);
             if (config.axis_rotated) {
                 tooltipLeft = svgLeft + mouse[0] + 100;
                 tooltipRight = tooltipLeft + tWidth;
-                chartRight = $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+                chartRight = $$.currentWidth - $$.getCurrentPaddingRight();
                 tooltipTop = $$.x(dataToShow[0].x) + 20;
             } else {
-                tooltipLeft = svgLeft + $$.getCurrentPaddingLeft(false) + $$.x(dataToShow[0].x) + 20;
+                tooltipLeft = svgLeft + $$.getCurrentPaddingLeft(true) + $$.x(dataToShow[0].x) + 20;
                 tooltipRight = tooltipLeft + tWidth;
-                chartRight = svgLeft + $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+                chartRight = svgLeft + $$.currentWidth - $$.getCurrentPaddingRight();
                 tooltipTop = mouse[1] + 15;
             }
 
             if (tooltipRight > chartRight) {
                 tooltipLeft -= tooltipRight - chartRight;
             }
-            if (tooltipTop + tHeight > $$.getCurrentHeight() && tooltipTop > tHeight + 30) {
+            if (tooltipTop + tHeight > $$.currentHeight && tooltipTop > tHeight + 30) {
                 tooltipTop -= tHeight + 30;
             }
         }
