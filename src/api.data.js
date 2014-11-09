@@ -1,27 +1,22 @@
-c3_chart_fn.data = function () {};
-c3_chart_fn.data.get = function (targetId) {
-    var target = this.data.getAsTarget(targetId);
-    return isDefined(target) ? target.values.map(function (d) { return d.value; }) : undefined;
+c3_chart_fn.data = function (targetIds) {
+    var targets = this.internal.data.targets;
+    return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {
+        return [].concat(targetIds).indexOf(t.id) >= 0;
+    });
 };
-c3_chart_fn.data.getAsTarget = function (targetId) {
-    var targets = this.data.targets.filter(function (t) { return t.id === targetId; });
-    return targets.length > 0 ? targets[0] : undefined;
+c3_chart_fn.data.shown = function (targetId) {
+    return this.internal.filterTargetsToShow(this.data(targetId));
+};
+c3_chart_fn.data.values = function (targetId) {
+    var target = this.data(targetId);
+    return target ? target.values.map(function (d) { return d.value; }) : null;
 };
 c3_chart_fn.data.names = function (names) {
-    var $$ = this.internal, config = $$.config;
-    if (!arguments.length) { return config.data_names; }
-    Object.keys(names).forEach(function (id) {
-        config.data_names[id] = names[id];
-    });
-    $$.redraw({withLegend: true});
-    return config.data_names;
+    return this.internal.updateDataAttributes('names', names);
 };
 c3_chart_fn.data.colors = function (colors) {
-    var $$ = this.internal, config = $$.config;
-    if (!arguments.length) { return config.data_colors; }
-    Object.keys(colors).forEach(function (id) {
-        config.data_colors[id] = colors[id];
-    });
-    $$.redraw({withLegend: true});
-    return config.data_colors;
+    return this.internal.updateDataAttributes('colors', colors);
+};
+c3_chart_fn.data.axes = function (axes) {
+    return this.internal.updateDataAttributes('axes', axes);
 };

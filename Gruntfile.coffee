@@ -83,11 +83,19 @@ module.exports = (grunt) ->
           c3:
             src: 'c3.js'
             options:
-              specs: 'spec/*.js'
+              specs: 'spec/*-spec.js'
+              helpers: 'spec/*-helper.js'
+              styles: 'c3.css'
+              vendor: 'http://d3js.org/d3.v3.min.js'
 
         uglify:
           c3:
             files:
               'c3.min.js': 'c3.js'
 
-    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'uglify']
+        cssmin:
+          c3:
+            src: 'c3.css'
+            dest: 'c3.min.css'
+
+    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'cssmin', 'uglify']

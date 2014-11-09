@@ -10,11 +10,19 @@ c3_chart_internal_fn.setTargetType = function (targetIds, type) {
 };
 c3_chart_internal_fn.hasType = function (type, targets) {
     var $$ = this, types = $$.config.data_types, has = false;
-    (targets || $$.data.targets).forEach(function (t) {
-        if ((types[t.id] && types[t.id].indexOf(type) >= 0) || (!(t.id in types) && type === 'line')) {
-            has = true;
-        }
-    });
+    targets = targets || $$.data.targets;
+    if (targets && targets.length) {
+        targets.forEach(function (target) {
+            var t = types[target.id];
+            if ((t && t.indexOf(type) >= 0) || (!t && type === 'line')) {
+                has = true;
+            }
+        });
+    } else {
+        Object.keys(types).forEach(function (id) {
+            if (types[id] === type) { has = true; }
+        });
+    }
     return has;
 };
 c3_chart_internal_fn.hasArcType = function (targets) {

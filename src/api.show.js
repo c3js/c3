@@ -1,13 +1,17 @@
 c3_chart_fn.show = function (targetIds, options) {
-    var $$ = this.internal;
+    var $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
     options = options || {};
 
     $$.removeHiddenTargetIds(targetIds);
-    $$.svg.selectAll($$.selectorTargets(targetIds))
-        .transition()
-        .style('opacity', 1);
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+    targets.transition()
+        .style('opacity', 1, 'important')
+        .call($$.endall, function () {
+            targets.style('opacity', null).style('opacity', 1);
+        });
 
     if (options.withLegend) {
         $$.showLegend(targetIds);
@@ -17,15 +21,19 @@ c3_chart_fn.show = function (targetIds, options) {
 };
 
 c3_chart_fn.hide = function (targetIds, options) {
-    var $$ = this.internal;
+    var $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
     options = options || {};
 
     $$.addHiddenTargetIds(targetIds);
-    $$.svg.selectAll($$.selectorTargets(targetIds))
-        .transition()
-        .style('opacity', 0);
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+    targets.transition()
+        .style('opacity', 0, 'important')
+        .call($$.endall, function () {
+            targets.style('opacity', null).style('opacity', 0);
+        });
 
     if (options.withLegend) {
         $$.hideLegend(targetIds);

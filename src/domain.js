@@ -60,9 +60,10 @@ c3_chart_internal_fn.getYDomainMax = function (targets) {
     }
     return $$.d3.max(Object.keys(ys).map(function (key) { return $$.d3.max(ys[key]); }));
 };
-c3_chart_internal_fn.getYDomain = function (targets, axisId) {
+c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
     var $$ = this, config = $$.config,
-        yTargets = targets.filter(function (d) { return $$.getAxisId(d.id) === axisId; }),
+        targetsByAxisId = targets.filter(function (t) { return $$.getAxisId(t.id) === axisId; }),
+        yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
         yDomainMin = isValue(yMin) ? yMin : $$.getYDomainMin(yTargets),
@@ -73,6 +74,15 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId) {
         isZeroBased = ($$.hasType('bar', yTargets) && config.bar_zerobased) || ($$.hasType('area', yTargets) && config.area_zerobased),
         showHorizontalDataLabel = $$.hasDataLabel() && config.axis_rotated,
         showVerticalDataLabel = $$.hasDataLabel() && !config.axis_rotated;
+
+    if (yDomainMax < yDomainMin) {
+        if (isValue(yMin)) {
+            yDomainMax = yDomainMin + 10; // TODO: introduce axis.y.maxMin
+        } else {
+            yDomainMin = yDomainMax - 10; // TODO: introduce axis.y.minMax
+        }
+    }
+
     if (yTargets.length === 0) { // use current domain if target of axisId is none
         return axisId === 'y2' ? $$.y2.domain() : $$.y.domain();
     }
@@ -146,13 +156,13 @@ c3_chart_internal_fn.getXDomainMax = function (targets) {
         ($$.isTimeSeries() ? this.parseDate(config.axis_x_max) : config.axis_x_max) :
     $$.d3.max(targets, function (t) { return $$.d3.max(t.values, function (v) { return v.x; }); });
 };
-c3_chart_internal_fn.getXDomainPadding = function (targets) {
+c3_chart_internal_fn.getXDomainPadding = function (domain) {
     var $$ = this, config = $$.config,
-        edgeX = this.getEdgeX(targets), diff = edgeX[1] - edgeX[0],
+        diff = domain[1] - domain[0],
         maxDataCount, padding, paddingLeft, paddingRight;
     if ($$.isCategorized()) {
         padding = 0;
-    } else if ($$.hasType('bar', targets)) {
+    } else if ($$.hasType('bar')) {
         maxDataCount = $$.getMaxDataCount();
         padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
     } else {
@@ -172,12 +182,17 @@ c3_chart_internal_fn.getXDomain = function (targets) {
     var $$ = this,
         xDomain = [$$.getXDomainMin(targets), $$.getXDomainMax(targets)],
         firstX = xDomain[0], lastX = xDomain[1],
-        padding = $$.getXDomainPadding(targets),
+        padding = $$.getXDomainPadding(xDomain),
         min = 0, max = 0;
     // show center of x domain if min and max are the same
     if ((firstX - lastX) === 0 && !$$.isCategorized()) {
-        firstX = $$.isTimeSeries() ? new Date(firstX.getTime() * 0.5) : -0.5;
-        lastX = $$.isTimeSeries() ? new Date(lastX.getTime() * 1.5) : 0.5;
+        if ($$.isTimeSeries()) {
+            firstX = new Date(firstX.getTime() * 0.5);
+            lastX = new Date(lastX.getTime() * 1.5);
+        } else {
+            firstX = firstX === 0 ? 1 : (firstX * 0.5);
+            lastX = lastX === 0 ? -1 : (lastX * 1.5);
+        }
     }
     if (firstX || firstX === 0) {
         min = $$.isTimeSeries() ? new Date(firstX.getTime() - padding.left) : firstX - padding.left;

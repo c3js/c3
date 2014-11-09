@@ -2,12 +2,16 @@ c3_chart_internal_fn.getClipPath = function (id) {
     var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
     return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";
 };
+c3_chart_internal_fn.appendClip = function (parent, id) {
+    return parent.append("clipPath").attr("id", id).append("rect");
+};
 c3_chart_internal_fn.getAxisClipX = function (forHorizontal) {
     // axis line width + padding for left
-    return forHorizontal ? -(1 + 30) : -(this.margin.left - 1);
+    var left = Math.max(30, this.margin.left);
+    return forHorizontal ? -(1 + left) : -(left - 1);
 };
 c3_chart_internal_fn.getAxisClipY = function (forHorizontal) {
-    return forHorizontal ? -20 : -4;
+    return forHorizontal ? -10 : -4;
 };
 c3_chart_internal_fn.getXAxisClipX = function () {
     var $$ = this;
@@ -26,13 +30,14 @@ c3_chart_internal_fn.getYAxisClipY = function () {
     return $$.getAxisClipY($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getAxisClipWidth = function (forHorizontal) {
-    var $$ = this;
+    var $$ = this,
+        left = Math.max(30, $$.margin.left),
+        right = Math.max(30, $$.margin.right);
     // width + axis line width + padding for left/right
-    return forHorizontal ? $$.width + 2 + 30 + 30 : $$.margin.left + 20;
+    return forHorizontal ? $$.width + 2 + left + right : $$.margin.left + 20;
 };
 c3_chart_internal_fn.getAxisClipHeight = function (forHorizontal) {
-    var $$ = this, config = $$.config;
-    return forHorizontal ? (config.axis_x_height ? config.axis_x_height : 0) + 80 : $$.height + 8;
+    return (forHorizontal ? this.margin.bottom : this.height) + 8;
 };
 c3_chart_internal_fn.getXAxisClipWidth = function () {
     var $$ = this;

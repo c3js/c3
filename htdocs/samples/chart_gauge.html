@@ -4,6 +4,9 @@
   </head>
   <body>
     <div id="chart"></div>
+    <div id="chart1"></div>
+    <div id="chart2"></div>
+    <div id="chart3"></div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
@@ -38,6 +41,48 @@
             values: [30, 60, 90] // alternate first value is 'value'
           }
         }
+      });
+
+      var chart1 = c3.generate({
+          bindto: '#chart1',
+          data: {
+              columns: [
+                  ['data', 75.0]
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              min: 50,
+              max: 100
+          }
+      });
+
+      var chart2 = c3.generate({
+          bindto: '#chart2',
+          data: {
+              columns: [
+                  ['data', 0.0]
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              min: -100,
+              max: 100
+          }
+      });
+
+      var chart3 = c3.generate({
+          bindto: '#chart3',
+          data: {
+              columns: [
+                  ['data', -75.0]
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              min: -100,
+              max: -50
+          }
       });
 
       var cycleDemo = function () {

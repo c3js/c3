@@ -23,8 +23,10 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     zoomRect: 'c3-zoom-rect',
     brush: 'c3-brush',
     focused: 'c3-focused',
+    defocused: 'c3-defocused',
     region: 'c3-region',
     regions: 'c3-regions',
+    tooltipContainer: 'c3-tooltip-container',
     tooltip: 'c3-tooltip',
     tooltipName: 'c3-tooltip-name',
     shape: 'c3-shape',
@@ -118,7 +120,7 @@ c3_chart_internal_fn.classAreas = function (d) {
     return this.classShapes(d) + this.generateClass(CLASS.areas, d.id);
 };
 c3_chart_internal_fn.classRegion = function (d, i) {
-    return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : '');
+    return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
 };
 c3_chart_internal_fn.classEvent = function (d) {
     return this.generateClass(CLASS.eventRect, d.index);
@@ -130,6 +132,15 @@ c3_chart_internal_fn.classTarget = function (id) {
         additionalClass = ' ' + CLASS.target + '-' + additionalClassSuffix;
     }
     return $$.generateClass(CLASS.target, id) + additionalClass;
+};
+c3_chart_internal_fn.classFocus = function (d) {
+    return this.classFocused(d) + this.classDefocused(d);
+};
+c3_chart_internal_fn.classFocused = function (d) {
+    return ' ' + (this.focusedTargetIds.indexOf(d.id) >= 0 ? CLASS.focused : '');
+};
+c3_chart_internal_fn.classDefocused = function (d) {
+    return ' ' + (this.defocusedTargetIds.indexOf(d.id) >= 0 ? CLASS.defocused : '');
 };
 c3_chart_internal_fn.classChartText = function (d) {
     return CLASS.chartText + this.classTarget(d.id);
@@ -144,14 +155,15 @@ c3_chart_internal_fn.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
 };
 c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
-    return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
+    return targetId || targetId === 0 ? ('-' + targetId).replace(/\s/g, '-') : '';
 };
-c3_chart_internal_fn.selectorTarget = function (id) {
-    return '.' + CLASS.target + this.getTargetSelectorSuffix(id);
+c3_chart_internal_fn.selectorTarget = function (id, prefix) {
+    return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);
 };
-c3_chart_internal_fn.selectorTargets = function (ids) {
+c3_chart_internal_fn.selectorTargets = function (ids, prefix) {
     var $$ = this;
-    return ids.length ? ids.map(function (id) { return $$.selectorTarget(id); }) : null;
+    ids = ids || [];
+    return ids.length ? ids.map(function (id) { return $$.selectorTarget(id, prefix); }) : null;
 };
 c3_chart_internal_fn.selectorLegend = function (id) {
     return '.' + CLASS.legendItem + this.getTargetSelectorSuffix(id);

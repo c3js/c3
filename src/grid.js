@@ -1,7 +1,7 @@
 c3_chart_internal_fn.initGrid = function () {
     var $$ = this, config = $$.config, d3 = $$.d3;
     $$.grid = $$.main.append('g')
-        .attr("clip-path", $$.clipPath)
+        .attr("clip-path", $$.clipPathForGrid)
         .attr('class', CLASS.grid);
     if (config.grid_x_show) {
         $$.grid.append("g").attr("class", CLASS.xgrids);
@@ -21,7 +21,7 @@ c3_chart_internal_fn.initGrid = function () {
 c3_chart_internal_fn.initGridLines = function () {
     var $$ = this, d3 = $$.d3;
     $$.gridLines = $$.main.append('g')
-        .attr("clip-path", $$.clipPath)
+        .attr("clip-path", $$.clipPathForGrid)
         .attr('class', CLASS.grid + ' ' + CLASS.gridLines);
     $$.gridLines.append('g').attr("class", CLASS.xgridLines);
     $$.gridLines.append('g').attr('class', CLASS.ygridLines);
@@ -55,9 +55,10 @@ c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
 };
 
 c3_chart_internal_fn.updateYGrid = function () {
-    var $$ = this, config = $$.config;
+    var $$ = this, config = $$.config,
+        gridValues = $$.yAxis.tickValues() || $$.y.ticks(config.grid_y_ticks);
     $$.ygrid = $$.main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
-        .data($$.y.ticks(config.grid_y_ticks));
+        .data(gridValues);
     $$.ygrid.enter().append('line')
         .attr('class', CLASS.ygrid);
     $$.ygrid.attr("x1", config.axis_rotated ? $$.y : 0)
@@ -84,7 +85,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
         .data(config.grid_x_lines);
     // enter
     xgridLine = $$.xgridLines.enter().append('g')
-        .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
+        .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
     xgridLine.append('line')
         .style("opacity", 0);
     xgridLine.append('text')
@@ -109,7 +110,7 @@ c3_chart_internal_fn.redrawGrid = function (duration, withY) {
             .data(config.grid_y_lines);
         // enter
         ygridLine = $$.ygridLines.enter().append('g')
-            .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
+            .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
         ygridLine.append('line')
             .style("opacity", 0);
         ygridLine.append('text')
@@ -202,7 +203,7 @@ c3_chart_internal_fn.getGridFilterToRemove = function (params) {
     return params ? function (line) {
         var found = false;
         [].concat(params).forEach(function (param) {
-            if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
+            if ((('value' in param && line.value === params.value) || ('class' in param && line['class'] === params['class']))) {
                 found = true;
             }
         });

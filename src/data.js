@@ -161,8 +161,8 @@ c3_chart_internal_fn.filterTargetsToShow = function (targets) {
 };
 c3_chart_internal_fn.mapTargetsToUniqueXs = function (targets) {
     var $$ = this;
-    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return v.x; }); }))).values();
-    return $$.isTimeSeries() ? xs.map(function (x) { return new Date(x); }) : xs.map(function (x) { return +x; });
+    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return +v.x; }); }))).values();
+    return $$.isTimeSeries() ? xs.map(function (x) { return new Date(+x); }) : xs.map(function (x) { return +x; });
 };
 c3_chart_internal_fn.addHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds);
@@ -206,11 +206,11 @@ c3_chart_internal_fn.hasPositiveValueInTargets = function (targets) {
 };
 c3_chart_internal_fn.isOrderDesc = function () {
     var config = this.config;
-    return config.data_order && config.data_order.toLowerCase() === 'desc';
+    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'desc';
 };
 c3_chart_internal_fn.isOrderAsc = function () {
     var config = this.config;
-    return config.data_order && config.data_order.toLowerCase() === 'asc';
+    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'asc';
 };
 c3_chart_internal_fn.orderTargets = function (targets) {
     var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
@@ -231,6 +231,17 @@ c3_chart_internal_fn.filterByX = function (targets, x) {
 };
 c3_chart_internal_fn.filterRemoveNull = function (data) {
     return data.filter(function (d) { return isValue(d.value); });
+};
+c3_chart_internal_fn.filterByXDomain = function (targets, xDomain) {
+    return targets.map(function (t) {
+        return {
+            id: t.id,
+            id_org: t.id_org,
+            values: t.values.filter(function (v) {
+                return xDomain[0] <= v.x && v.x <= xDomain[1];
+            })
+        };
+    });
 };
 c3_chart_internal_fn.hasDataLabel = function () {
     var config = this.config;
@@ -285,14 +296,25 @@ c3_chart_internal_fn.findClosestFromTargets = function (targets, pos) {
     return $$.findClosest(candidates, pos);
 };
 c3_chart_internal_fn.findClosest = function (values, pos) {
-    var $$ = this, minDist, closest;
-    values.forEach(function (v) {
+    var $$ = this, minDist = 100, closest;
+
+    // find mouseovering bar
+    values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
+        var shape = $$.d3.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+        if ($$.isWithinBar(shape)) {
+            closest = v;
+        }
+    });
+
+    // find closest point from non-bar
+    values.filter(function (v) { return v && !$$.isBarType(v.id); }).forEach(function (v) {
         var d = $$.dist(v, pos);
-        if (d < minDist || ! minDist) {
+        if (d < minDist) {
             minDist = d;
             closest = v;
         }
     });
+
     return closest;
 };
 c3_chart_internal_fn.dist = function (data, pos) {
@@ -301,4 +323,37 @@ c3_chart_internal_fn.dist = function (data, pos) {
         xIndex = config.axis_rotated ? 1 : 0,
         yIndex = config.axis_rotated ? 0 : 1;
     return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
+};
+c3_chart_internal_fn.convertValuesToStep = function (values) {
+    var converted = [].concat(values), i;
+
+    if (!this.isCategorized()) {
+        return values;
+    }
+
+    for (i = values.length + 1; 0 < i; i--) {
+        converted[i] = converted[i - 1];
+    }
+
+    converted[0] = {
+        x: converted[0].x - 1,
+        value: converted[0].value,
+        id: converted[0].id
+    };
+    converted[values.length + 1] = {
+        x: converted[values.length].x + 1,
+        value: converted[values.length].value,
+        id: converted[values.length].id
+    };
+
+    return converted;
+};
+c3_chart_internal_fn.updateDataAttributes = function (name, attrs) {
+    var $$ = this, config = $$.config, current = config['data_' + name];
+    if (typeof attrs === 'undefined') { return current; }
+    Object.keys(attrs).forEach(function (id) {
+        current[id] = attrs[id];
+    });
+    $$.redraw({withLegend: true});
+    return current;
 };

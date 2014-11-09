@@ -2,10 +2,10 @@ c3_chart_internal_fn.initTooltip = function () {
     var $$ = this, config = $$.config, i;
     $$.tooltip = $$.selectChart
         .style("position", "relative")
-        .append("div")
+      .append("div")
+        .attr('class', CLASS.tooltipContainer)
         .style("position", "absolute")
         .style("pointer-events", "none")
-        .style("z-index", "10")
         .style("display", "none");
     // Show tooltip if needed
     if (config.tooltip_init_show) {
@@ -38,7 +38,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
-        name = nameFormat(d[i].name);
+        name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
         value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
         bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
@@ -67,24 +67,23 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         tooltipLeft = ($$.width / 2) + mouse[0];
         tooltipTop = ($$.height / 2) + mouse[1] + 20;
     } else {
+        svgLeft = $$.getSvgLeft(true);
         if (config.axis_rotated) {
-            svgLeft = $$.getSvgLeft();
             tooltipLeft = svgLeft + mouse[0] + 100;
             tooltipRight = tooltipLeft + tWidth;
-            chartRight = $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+            chartRight = $$.currentWidth - $$.getCurrentPaddingRight();
             tooltipTop = $$.x(dataToShow[0].x) + 20;
         } else {
-            svgLeft = $$.getSvgLeft();
-            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft() + $$.x(dataToShow[0].x) + 20;
+            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft(true) + $$.x(dataToShow[0].x) + 20;
             tooltipRight = tooltipLeft + tWidth;
-            chartRight = svgLeft + $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+            chartRight = svgLeft + $$.currentWidth - $$.getCurrentPaddingRight();
             tooltipTop = mouse[1] + 15;
         }
 
         if (tooltipRight > chartRight) {
             tooltipLeft -= tooltipRight - chartRight;
         }
-        if (tooltipTop + tHeight > $$.getCurrentHeight() && tooltipTop > tHeight + 30) {
+        if (tooltipTop + tHeight > $$.currentHeight && tooltipTop > tHeight + 30) {
             tooltipTop -= tHeight + 30;
         }
     }

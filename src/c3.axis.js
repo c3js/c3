@@ -48,6 +48,23 @@ function c3_axis(d3, params) {
     function textFormatted(v) {
         return tickFormat ? tickFormat(v) : v;
     }
+    function getSizeFor1Char(tick) {
+        var size = {
+            h: 11.5,
+            w: 5.5
+        };
+        tick.select('text').text(textFormatted).each(function (d) {
+            var box = this.getBoundingClientRect(),
+                text = textFormatted(d),
+                h = box.height,
+                w = text ? (box.width / text.length) : undefined;
+            if (h && w) {
+                size.h = h;
+                size.w = w;
+            }
+        }).text('');
+        return size;
+    }
     function axis(g) {
         g.each(function () {
             var g = d3.select(this);
@@ -59,7 +76,7 @@ function c3_axis(d3, params) {
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
                 tickUpdate = d3.transition(tick).style("opacity", 1),
-                tickTransform, tickX;
+                tickTransform, tickX, tickY;
 
             var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                 path = g.selectAll(".domain").data([ 0 ]),
@@ -69,15 +86,66 @@ function c3_axis(d3, params) {
 
             var lineEnter = tickEnter.select("line"),
                 lineUpdate = tickUpdate.select("line"),
-                text = tick.select("text").text(textFormatted),
                 textEnter = tickEnter.select("text"),
                 textUpdate = tickUpdate.select("text");
 
             if (params.isCategory) {
                 tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                 tickX = tickCentered ? 0 : tickOffset;
+                tickY = tickCentered ? tickOffset : 0;
             } else {
                 tickOffset = tickX = 0;
+            }
+
+            var text, tspan, sizeFor1Char = getSizeFor1Char(tick), counts = [];
+            var tickLength = Math.max(innerTickSize, 0) + tickPadding,
+                isVertical = orient === 'left' || orient === 'right';
+
+            // this should be called only when category axis
+            function splitTickText(d, maxWidth) {
+                var tickText = textFormatted(d),
+                    subtext, spaceIndex, textWidth, splitted = [];
+
+                if (Object.prototype.toString.call(tickText) === "[object Array]") {
+                    return tickText;
+                }
+
+                if (!maxWidth || maxWidth <= 0) {
+                    maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
+                }
+
+                function split(splitted, text) {
+                    spaceIndex = undefined;
+                    for (var i = 0; i < text.length; i++) {
+                        if (text.charAt(i) === ' ') {
+                            spaceIndex = i;
+                        }
+                        subtext = text.substr(0, i + 1);
+                        textWidth = sizeFor1Char.w * subtext.length;
+                        // if text width gets over tick width, split by space index or crrent index
+                        if (maxWidth < textWidth) {
+                            return split(
+                                splitted.concat(text.substr(0, spaceIndex ? spaceIndex : i)),
+                                text.slice(spaceIndex ? spaceIndex + 1 : i)
+                            );
+                        }
+                    }
+                    return splitted.concat(text);
+                }
+
+                return split(splitted, tickText + "");
+            }
+
+            function tspanDy(d, i) {
+                var dy = sizeFor1Char.h;
+                if (i === 0) {
+                    if (orient === 'left' || orient === 'right') {
+                        dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - (params.isCategory ? 2 : 3));
+                    } else {
+                        dy = params.isCategory ? ".40em" : ".71em";
+                    }
+                }
+                return dy;
             }
 
             function tickSize(d) {
@@ -85,15 +153,28 @@ function c3_axis(d3, params) {
                 return range[0] < tickPosition && tickPosition < range[1] ? innerTickSize : 0;
             }
 
+            text = tick.select("text");
+            tspan = text.selectAll('tspan')
+                .data(function (d, i) {
+                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
+                    counts[i] = splitted.length;
+                    return splitted.map(function (s) {
+                        return { index: i, splitted: s };
+                    });
+                })
+              .enter().append('tspan')
+                .text(function (d) { return d.splitted; });
+
             switch (orient) {
             case "bottom":
                 {
                     tickTransform = axisX;
                     lineEnter.attr("y2", innerTickSize);
-                    textEnter.attr("y", Math.max(innerTickSize, 0) + tickPadding);
+                    textEnter.attr("y", tickLength);
                     lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
-                    textUpdate.attr("x", 0).attr("y", Math.max(innerTickSize, 0) + tickPadding);
-                    text.attr("dy", ".71em").style("text-anchor", "middle");
+                    textUpdate.attr("x", 0).attr("y", tickLength);
+                    text.style("text-anchor", "middle");
+                    tspan.attr('x', 0).attr("dy", tspanDy);
                     pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
                     break;
                 }
@@ -101,10 +182,11 @@ function c3_axis(d3, params) {
                 {
                     tickTransform = axisX;
                     lineEnter.attr("y2", -innerTickSize);
-                    textEnter.attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
+                    textEnter.attr("y", -tickLength);
                     lineUpdate.attr("x2", 0).attr("y2", -innerTickSize);
-                    textUpdate.attr("x", 0).attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
-                    text.attr("dy", "0em").style("text-anchor", "middle");
+                    textUpdate.attr("x", 0).attr("y", -tickLength);
+                    text.style("text-anchor", "middle");
+                    tspan.attr('x', 0).attr("dy", "0em");
                     pathUpdate.attr("d", "M" + range[0] + "," + -outerTickSize + "V0H" + range[1] + "V" + -outerTickSize);
                     break;
                 }
@@ -112,10 +194,11 @@ function c3_axis(d3, params) {
                 {
                     tickTransform = axisY;
                     lineEnter.attr("x2", -innerTickSize);
-                    textEnter.attr("x", -(Math.max(innerTickSize, 0) + tickPadding));
-                    lineUpdate.attr("x2", -innerTickSize).attr("y2", 0);
-                    textUpdate.attr("x", -(Math.max(innerTickSize, 0) + tickPadding)).attr("y", tickOffset);
-                    text.attr("dy", ".32em").style("text-anchor", "end");
+                    textEnter.attr("x", -tickLength);
+                    lineUpdate.attr("x2", -innerTickSize).attr("y1", tickY).attr("y2", tickY);
+                    textUpdate.attr("x", -tickLength).attr("y", tickOffset);
+                    text.style("text-anchor", "end");
+                    tspan.attr('x', -tickLength).attr("dy", tspanDy);
                     pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);
                     break;
                 }
@@ -123,10 +206,11 @@ function c3_axis(d3, params) {
                 {
                     tickTransform = axisY;
                     lineEnter.attr("x2", innerTickSize);
-                    textEnter.attr("x", Math.max(innerTickSize, 0) + tickPadding);
+                    textEnter.attr("x", tickLength);
                     lineUpdate.attr("x2", innerTickSize).attr("y2", 0);
-                    textUpdate.attr("x", Math.max(innerTickSize, 0) + tickPadding).attr("y", 0);
-                    text.attr("dy", ".32em").style("text-anchor", "start");
+                    textUpdate.attr("x", tickLength).attr("y", 0);
+                    text.style("text-anchor", "start");
+                    tspan.attr('x', tickLength).attr("dy", tspanDy);
                     pathUpdate.attr("d", "M" + outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + outerTickSize);
                     break;
                 }
