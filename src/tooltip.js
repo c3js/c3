@@ -83,9 +83,12 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         if (tooltipRight > chartRight) {
             tooltipLeft -= tooltipRight - chartRight;
         }
-        if (tooltipTop + tHeight > $$.currentHeight && tooltipTop > tHeight + 30) {
+        if (tooltipTop + tHeight > $$.currentHeight) {
             tooltipTop -= tHeight + 30;
         }
+    }
+    if (tooltipTop < 0) {
+        tooltipTop = 0;
     }
     // Set tooltip
     $$.tooltip
