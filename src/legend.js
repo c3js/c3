@@ -116,7 +116,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     function updatePositions(textElement, id, index) {
         var reset = index === 0, isLast = index === targetIds.length - 1,
             box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
-            itemWidth = box.width + tileWidth + (isLast && !$$.isLegendRight ? 0 : paddingRight),
+            itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight),
             itemHeight = box.height + paddingTop,
             itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
             areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
