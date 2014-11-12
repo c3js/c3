@@ -258,9 +258,12 @@ c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {
         .attr('dx', this.xForRotatedTickText(rotate));
 };
 
-c3_chart_internal_fn.getMaxTickWidth = function (id) {
+c3_chart_internal_fn.getMaxTickWidth = function (id, withoutRecompute) {
     var $$ = this, config = $$.config,
         maxWidth = 0, targetsToShow, scale, axis;
+    if (withoutRecompute && $$.currentMaxTickWidths[id]) {
+        return $$.currentMaxTickWidths[id];
+    }
     if ($$.svg) {
         targetsToShow = $$.filterTargetsToShow($$.data.targets);
         if (id === 'y') {

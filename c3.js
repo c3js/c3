@@ -2505,11 +2505,7 @@
 
     c3_chart_internal_fn.getAxisWidthByAxisId = function (id, withoutRecompute) {
         var $$ = this, position = $$.getAxisLabelPositionById(id);
-        if (withoutRecompute) {
-            var box = $$.d3.select('.c3-axis-y').node().getBoundingClientRect();
-            return Math.floor(box.left + box.width);
-        }
-        return $$.getMaxTickWidth(id) + (position.isInner ? 20 : 40);
+        return $$.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
     };
     c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
         var $$ = this, config = $$.config, h = 30;
@@ -4179,9 +4175,12 @@
             .attr('dx', this.xForRotatedTickText(rotate));
     };
 
-    c3_chart_internal_fn.getMaxTickWidth = function (id) {
+    c3_chart_internal_fn.getMaxTickWidth = function (id, withoutRecompute) {
         var $$ = this, config = $$.config,
             maxWidth = 0, targetsToShow, scale, axis;
+        if (withoutRecompute && $$.currentMaxTickWidths[id]) {
+            return $$.currentMaxTickWidths[id];
+        }
         if ($$.svg) {
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
             if (id === 'y') {
