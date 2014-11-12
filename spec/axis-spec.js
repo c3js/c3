@@ -86,6 +86,52 @@ describe('c3 chart axis', function () {
 
     });
 
+    describe('axis y timeseries', function () {
+
+        var args = {
+            data: {
+                columns: [
+                    ["times", 60000, 120000, 180000, 240000]
+                ]
+            },
+            axis: {
+                y: {
+                    type : 'timeseries',
+                    tick: {
+                        values: null,
+                        count: undefined,
+                    },
+                    ticks : {
+                        time : {
+                            value : 'seconds',
+                            interval : 30
+                        }
+                    },
+                },
+            }
+        };
+
+        beforeEach(function () {
+            chart = window.c3.generate(args);
+        });
+
+        it('should have 7 ticks on y axis', function () {
+            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+            expect(ticksSize).toBe(7); // the count starts at initial value and increments by the set interval
+        });
+
+        it('should have specified 30 second intervals', function () {
+            var prevValue;
+            d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
+                if (i !== 0) {
+                    var result = d - prevValue;
+                    expect(result).toEqual(30000); // expressed in milliseconds
+                }
+                prevValue = d;
+            });
+        });
+    });
+
     describe('axis.x.tick.width', function () {
 
         describe('indexed x axis and y/y2 axis', function () {

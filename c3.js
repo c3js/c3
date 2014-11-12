@@ -657,6 +657,9 @@
     c3_chart_internal_fn.isTimeSeries = function () {
         return this.config.axis_x_type === 'timeseries';
     };
+    c3_chart_internal_fn.isYaxisTimeSeries = function () {
+        return this.config.axis_y_type === 'timeseries';
+    };
     c3_chart_internal_fn.isCategorized = function () {
         return this.config.axis_x_type.indexOf('categor') >= 0;
     };
@@ -996,6 +999,7 @@
             axis_x_extent: undefined,
             axis_x_label: {},
             axis_y_show: true,
+            axis_y_type: undefined,
             axis_y_max: undefined,
             axis_y_min: undefined,
             axis_y_center: undefined,
@@ -1004,6 +1008,10 @@
             axis_y_tick_outer: true,
             axis_y_tick_values: null,
             axis_y_tick_count: undefined,
+            axis_y_ticks: {},
+            axis_y_ticks_time: {},
+            axis_y_ticks_time_value: undefined,
+            axis_y_ticks_time_interval: undefined,
             axis_y_padding: {},
             axis_y_default: undefined,
             axis_y2_show: false,
@@ -1156,7 +1164,7 @@
         return scale;
     };
     c3_chart_internal_fn.getY = function (min, max, domain) {
-        var scale = this.getScale(min, max);
+        var scale = this.getScale(min, max, this.isYaxisTimeSeries());
         if (domain) { scale.domain(domain); }
         return scale;
     };
@@ -3986,7 +3994,13 @@
     };
     c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
         var axisParams = {withOuterTick: withOuterTick};
-        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
+        if (this.isYaxisTimeSeries()) {
+            var timeValue = this.config.axis_y_ticks_time_value;
+            var timeInterval = this.config.axis_y_ticks_time_interval;
+            return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(this.d3.time[timeValue], timeInterval);
+        } else {
+            return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
+        }
     };
     c3_chart_internal_fn.getAxisId = function (id) {
         var config = this.config;
