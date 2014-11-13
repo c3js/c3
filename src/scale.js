@@ -39,7 +39,7 @@ c3_chart_internal_fn.getX = function (min, max, domain, offset) {
     return scale;
 };
 c3_chart_internal_fn.getY = function (min, max, domain) {
-    var scale = this.getScale(min, max);
+    var scale = this.getScale(min, max, this.isYaxisTimeSeries());
     if (domain) { scale.domain(domain); }
     return scale;
 };

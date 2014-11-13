@@ -652,6 +652,9 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
 c3_chart_internal_fn.isTimeSeries = function () {
     return this.config.axis_x_type === 'timeseries';
 };
+c3_chart_internal_fn.isYaxisTimeSeries = function () {
+    return this.config.axis_y_type === 'timeseries';
+};
 c3_chart_internal_fn.isCategorized = function () {
     return this.config.axis_x_type.indexOf('categor') >= 0;
 };
