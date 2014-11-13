@@ -3,8 +3,7 @@ var describe = window.describe,
     it = window.it,
     beforeEach = window.beforeEach;
 
-var initDom = window.initDom,
-    setMouseEvent = window.setMouseEvent;
+var setMouseEvent = window.setMouseEvent;
 
 describe('c3 chart shape bar', function () {
     'use strict';
