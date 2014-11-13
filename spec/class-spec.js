@@ -47,8 +47,8 @@ describe('c3 chart class', function () {
         });
 
         it('should replace special charactors to "-"', function () {
-            var input = 'data1 !@#$%^&*()_+,.<>"\'',
-                expected = '-data1-------------------',
+            var input = 'data1 !@#$%^&*()_+,.<>"\':;',
+                expected = '-data1---------------------',
                 suffix = chart.internal.getTargetSelectorSuffix(input);
             expect(suffix).toBe(expected);
         });
