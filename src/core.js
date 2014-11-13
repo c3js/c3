@@ -454,6 +454,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // update legend and transform each g
     if (withLegend && config.legend_show) {
         $$.updateLegend($$.mapToIds($$.data.targets), options, transitions);
+    } else if ((!config.axis_rotated && withY) || (config.axis_rotated && withUpdateXDomain)) {
+        // need to update dimension (e.g. axis.y.tick.values) because y tick values should change
+        // no need to update axis in it because they will be updated in redraw()
+        $$.updateDimension(true);
     }
 
     // MEMO: needed for grids calculation
@@ -783,14 +787,16 @@ c3_chart_internal_fn.updateSvgSize = function () {
 };
 
 
-c3_chart_internal_fn.updateDimension = function () {
+c3_chart_internal_fn.updateDimension = function (withoutAxis) {
     var $$ = this;
-    if ($$.config.axis_rotated) {
-        $$.axes.x.call($$.xAxis);
-        $$.axes.subx.call($$.subXAxis);
-    } else {
-        $$.axes.y.call($$.yAxis);
-        $$.axes.y2.call($$.y2Axis);
+    if (!withoutAxis) {
+        if ($$.config.axis_rotated) {
+            $$.axes.x.call($$.xAxis);
+            $$.axes.subx.call($$.subXAxis);
+        } else {
+            $$.axes.y.call($$.yAxis);
+            $$.axes.y2.call($$.y2Axis);
+        }
     }
     $$.updateSizes();
     $$.updateScales();
