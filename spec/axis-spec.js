@@ -98,16 +98,10 @@ describe('c3 chart axis', function () {
                 y: {
                     type : 'timeseries',
                     tick: {
-                        values: null,
-                        count: undefined,
-                    },
-                    ticks : {
-                        time : {
-                            value : 'seconds',
-                            interval : 30
+                        time: {
                         }
-                    },
-                },
+                    }
+                }
             }
         };
 
@@ -126,6 +120,30 @@ describe('c3 chart axis', function () {
                 if (i !== 0) {
                     var result = d - prevValue;
                     expect(result).toEqual(30000); // expressed in milliseconds
+                }
+                prevValue = d;
+            });
+        });
+
+        it('should update args to set axis.y.time', function () {
+            args.axis.y.tick.time = {
+                value : 'seconds',
+                interval : 60
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should have 4 ticks on y axis', function () {
+            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+            expect(ticksSize).toBe(4); // the count starts at initial value and increments by the set interval
+        });
+
+        it('should have specified 60 second intervals', function () {
+            var prevValue;
+            d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
+                if (i !== 0) {
+                    var result = d - prevValue;
+                    expect(result).toEqual(60000); // expressed in milliseconds
                 }
                 prevValue = d;
             });

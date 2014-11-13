@@ -652,15 +652,16 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
 c3_chart_internal_fn.isTimeSeries = function () {
     return this.config.axis_x_type === 'timeseries';
 };
-c3_chart_internal_fn.isYaxisTimeSeries = function () {
-    return this.config.axis_y_type === 'timeseries';
-};
 c3_chart_internal_fn.isCategorized = function () {
     return this.config.axis_x_type.indexOf('categor') >= 0;
 };
 c3_chart_internal_fn.isCustomX = function () {
     var $$ = this, config = $$.config;
     return !$$.isTimeSeries() && (config.data_x || notEmpty(config.data_xs));
+};
+
+c3_chart_internal_fn.isTimeSeriesY = function () {
+    return this.config.axis_y_type === 'timeseries';
 };
 
 c3_chart_internal_fn.getTranslate = function (target) {

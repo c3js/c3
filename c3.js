@@ -657,15 +657,16 @@
     c3_chart_internal_fn.isTimeSeries = function () {
         return this.config.axis_x_type === 'timeseries';
     };
-    c3_chart_internal_fn.isYaxisTimeSeries = function () {
-        return this.config.axis_y_type === 'timeseries';
-    };
     c3_chart_internal_fn.isCategorized = function () {
         return this.config.axis_x_type.indexOf('categor') >= 0;
     };
     c3_chart_internal_fn.isCustomX = function () {
         var $$ = this, config = $$.config;
         return !$$.isTimeSeries() && (config.data_x || notEmpty(config.data_xs));
+    };
+
+    c3_chart_internal_fn.isTimeSeriesY = function () {
+        return this.config.axis_y_type === 'timeseries';
     };
 
     c3_chart_internal_fn.getTranslate = function (target) {
@@ -1008,10 +1009,8 @@
             axis_y_tick_outer: true,
             axis_y_tick_values: null,
             axis_y_tick_count: undefined,
-            axis_y_ticks: {},
-            axis_y_ticks_time: {},
-            axis_y_ticks_time_value: undefined,
-            axis_y_ticks_time_interval: undefined,
+            axis_y_tick_time_value: undefined,
+            axis_y_tick_time_interval: undefined,
             axis_y_padding: {},
             axis_y_default: undefined,
             axis_y2_show: false,
@@ -1164,7 +1163,7 @@
         return scale;
     };
     c3_chart_internal_fn.getY = function (min, max, domain) {
-        var scale = this.getScale(min, max, this.isYaxisTimeSeries());
+        var scale = this.getScale(min, max, this.isTimeSeriesY());
         if (domain) { scale.domain(domain); }
         return scale;
     };
@@ -3989,14 +3988,14 @@
         return axis;
     };
     c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
-        var axisParams = {withOuterTick: withOuterTick};
-        if (this.isYaxisTimeSeries()) {
-            var timeValue = this.config.axis_y_ticks_time_value;
-            var timeInterval = this.config.axis_y_ticks_time_interval;
-            return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(this.d3.time[timeValue], timeInterval);
+        var axisParams = {withOuterTick: withOuterTick},
+            axis = c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
+        if (this.isTimeSeriesY()) {
+            axis.ticks(this.d3.time[this.config.axis_y_tick_time_value], this.config.axis_y_tick_time_interval);
         } else {
-            return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
+            axis.tickValues(tickValues);
         }
+        return axis;
     };
     c3_chart_internal_fn.getAxisId = function (id) {
         var config = this.config;
