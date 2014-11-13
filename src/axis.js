@@ -65,7 +65,13 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues,
 };
 c3_chart_internal_fn.getYAxis = function (scale, orient, tickFormat, tickValues, withOuterTick) {
     var axisParams = {withOuterTick: withOuterTick};
-    return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
+    if (this.isYaxisTimeSeries()) {
+        var timeValue = this.config.axis_y_ticks_time_value;
+        var timeInterval = this.config.axis_y_ticks_time_interval;
+        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(this.d3.time[timeValue], timeInterval);
+    } else {
+        return c3_axis(this.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).tickValues(tickValues);
+    }
 };
 c3_chart_internal_fn.getAxisId = function (id) {
     var config = this.config;
