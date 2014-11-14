@@ -429,8 +429,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var waitForDraw, flow;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
     var xv = $$.xv.bind($$),
-        cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
-        cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
+        cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$),
+        cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
 
     options = options || {};
     withY = getOption(options, "withY", true);

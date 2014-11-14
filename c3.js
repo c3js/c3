@@ -434,8 +434,8 @@
         var waitForDraw, flow;
         var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
         var xv = $$.xv.bind($$),
-            cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
-            cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
+            cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$),
+            cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
 
         options = options || {};
         withY = getOption(options, "withY", true);
@@ -2933,10 +2933,19 @@
     c3_chart_internal_fn.circleX = function (d) {
         return d.x || d.x === 0 ? this.x(d.x) : null;
     };
-    c3_chart_internal_fn.circleY = function (d, i) {
-        var $$ = this,
-            lineIndices = $$.getShapeIndices($$.isLineType), getPoints = $$.generateGetLinePoints(lineIndices);
-        return $$.config.data_groups.length > 0 ? getPoints(d, i)[0][1] : $$.getYScale(d.id)(d.value);
+    c3_chart_internal_fn.generateCircleY = function () {
+        var $$ = this, lineIndices, getPoints;
+        if ($$.config.data_groups.length > 0) {
+            lineIndices = $$.getShapeIndices($$.isLineType),
+            getPoints = $$.generateGetLinePoints(lineIndices);
+            return function (d, i) {
+                return getPoints(d, i)[0][1];
+            };
+        } else {
+            return function (d) {
+                return $$.getYScale(d.id)(d.value);
+            };
+        }
     };
     c3_chart_internal_fn.getCircles = function (i, id) {
         var $$ = this;
@@ -4916,8 +4925,8 @@
 
     c3_chart_internal_fn.selectPoint = function (target, d, i) {
         var $$ = this, config = $$.config,
-            cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
-            cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
+            cx = (config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$),
+            cy = (config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$),
             r = $$.pointSelectR.bind($$);
         config.data_onselected.call($$.api, d, target.node());
         // add selected-circle on low layer g
