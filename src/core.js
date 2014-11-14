@@ -529,8 +529,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
 
     // Update sub domain
-    $$.subY.domain($$.y.domain());
-    $$.subY2.domain($$.y2.domain());
+    if (withY) {
+        $$.subY.domain($$.getYDomain(targetsToShow, 'y'));
+        $$.subY2.domain($$.getYDomain(targetsToShow, 'y2'));
+    }
 
     // tooltip
     $$.tooltip.style("display", "none");
