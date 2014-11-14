@@ -1,6 +1,9 @@
 var isValue = c3_chart_internal_fn.isValue = function (v) {
-    return v || v === 0;
-},
+        return v || v === 0;
+    },
+    isNumber = c3_chart_internal_fn.isNumber = function (v) {
+        return !isNaN(parseFloat(v)) && isFinite(v);
+    },
     isFunction = c3_chart_internal_fn.isFunction = function (o) {
         return typeof o === 'function';
     },

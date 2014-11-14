@@ -66,8 +66,8 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
-        yDomainMin = isValue(yMin) ? yMin : $$.getYDomainMin(yTargets),
-        yDomainMax = isValue(yMax) ? yMax : $$.getYDomainMax(yTargets),
+        yDomainMin = isNumber(yMin) ? yMin : $$.getYDomainMin(yTargets),
+        yDomainMax = isNumber(yMax) ? yMax : $$.getYDomainMax(yTargets),
         domainLength, padding, padding_top, padding_bottom,
         center = axisId === 'y2' ? config.axis_y2_center : config.axis_y_center,
         yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
@@ -142,6 +142,7 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         if (isAllPositive) { padding_bottom = yDomainMin; }
         if (isAllNegative) { padding_top = -yDomainMax; }
     }
+    yDomainMin = yDomainMin === 0 ? yDomainMin : yDomainMin - padding_bottom;
     return [yDomainMin - padding_bottom, yDomainMax + padding_top];
 };
 c3_chart_internal_fn.getXDomainMin = function (targets) {
