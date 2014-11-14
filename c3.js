@@ -1364,7 +1364,8 @@
             if (isAllPositive) { padding_bottom = yDomainMin; }
             if (isAllNegative) { padding_top = -yDomainMax; }
         }
-        return [yDomainMin - padding_bottom, yDomainMax + padding_top];
+        yDomainMin = yDomainMin === 0 ? yDomainMin : yDomainMin - padding_bottom;
+        return [yDomainMin, yDomainMax + padding_top];
     };
     c3_chart_internal_fn.getXDomainMin = function (targets) {
         var $$ = this, config = $$.config;
