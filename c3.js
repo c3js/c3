@@ -486,7 +486,7 @@
             $$.subXAxis.tickValues([]);
         }
 
-        if (withY) {
+        if (withY && !options.flow) {
             xDomainForZoom = $$.x.orgDomain();
         }
 

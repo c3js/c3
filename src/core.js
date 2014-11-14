@@ -481,7 +481,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.subXAxis.tickValues([]);
     }
 
-    if (withY) {
+    if (withY && !options.flow) {
         xDomainForZoom = $$.x.orgDomain();
     }
 
