@@ -4314,7 +4314,7 @@
         return forHorizontal ? -(1 + left) : -(left - 1);
     };
     c3_chart_internal_fn.getAxisClipY = function (forHorizontal) {
-        return forHorizontal ? -10 : -4;
+        return forHorizontal ? -20 : -4;
     };
     c3_chart_internal_fn.getXAxisClipX = function () {
         var $$ = this;
