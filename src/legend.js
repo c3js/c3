@@ -74,6 +74,7 @@ c3_chart_internal_fn.toggleFocusLegend = function (targetIds, focus) {
 c3_chart_internal_fn.revertLegend = function () {
     var $$ = this, d3 = $$.d3;
     $$.legend.selectAll('.' + CLASS.legendItem)
+        .classed(CLASS.legendItemFocused, false)
         .transition().duration(100)
         .style('opacity', function () { return $$.opacityForLegend(d3.select(this)); });
 };
