@@ -116,7 +116,7 @@ function c3_axis(d3, params) {
 
                 function split(splitted, text) {
                     spaceIndex = undefined;
-                    for (var i = 0; i < text.length; i++) {
+                    for (var i = 1; i < text.length; i++) {
                         if (text.charAt(i) === ' ') {
                             spaceIndex = i;
                         }
