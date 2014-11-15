@@ -146,7 +146,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     if ($$.initBrush) { $$.initBrush(); }
     if ($$.initZoom) { $$.initZoom(); }
 
-    $$.selectChart = d3.select(config.bindto);
+    $$.selectChart = typeof config.bindto.node === 'function' ? config.bindto : d3.select(config.bindto);
     if ($$.selectChart.empty()) {
         $$.selectChart = d3.select(document.createElement('div')).style('opacity', 0);
         $$.observeInserted($$.selectChart);

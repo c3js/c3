@@ -56,4 +56,18 @@ describe('c3 chart', function () {
 
     });
 
+    describe('bindto', function () {
+
+        it('should accept d3.selection object', function () {
+            args.bindto = d3.select('#chart');
+            expect(true).toBeTruthy();
+        });
+
+        it('should be created', function () {
+            var svg = d3.select('#chart svg');
+            expect(svg).not.toBeNull();
+        });
+
+    });
+
 });
