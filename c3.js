@@ -3,7 +3,7 @@
 
     /*global define, module, exports, require */
 
-    var c3 = { version: "0.3.0" };
+    var c3 = { version: "0.4.0" };
 
     var c3_chart_fn, c3_chart_internal_fn;
 
