@@ -433,9 +433,7 @@
         var duration, durationForExit, durationForAxis;
         var waitForDraw, flow;
         var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
-        var xv = $$.xv.bind($$),
-            cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$),
-            cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
+        var xv = $$.xv.bind($$), cx, cy;
 
         options = options || {};
         withY = getOption(options, "withY", true);
@@ -591,6 +589,10 @@
             $$.redrawEventRect();
             if ($$.updateZoom) { $$.updateZoom(); }
         }
+
+        // generate circle x/y functions depending on updated params
+        cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$);
+        cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
 
         // transition should be derived from one transition
         d3.transition().duration(duration).each(function () {
