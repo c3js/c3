@@ -11,7 +11,7 @@ describe('c3 chart class', function () {
     var args = {
         data: {
             columns: [
-                ['data1 [0]', 30, 200, 100, 400, 150, 250],
+                ['data1', 30, 200, 100, 400, 150, 250],
                 ['data2 prefix', 50, 20, 10, 40, 15, 25],
                 ['data3 мужчины', 150, 120, 110, 140, 115, 125]
             ]
@@ -47,8 +47,8 @@ describe('c3 chart class', function () {
         });
 
         it('should replace special charactors to "-"', function () {
-            var input = 'data1 !@#$%^&*()_+,.<>"\':;[]',
-                expected = '-data1-----------------------',
+            var input = 'data1 !@#$%^&*()_+,.<>"\':;[]/|?',
+                expected = '-data1--------------------------',
                 suffix = chart.internal.getTargetSelectorSuffix(input);
             expect(suffix).toBe(expected);
         });
