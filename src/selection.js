@@ -1,7 +1,7 @@
 c3_chart_internal_fn.selectPoint = function (target, d, i) {
     var $$ = this, config = $$.config,
-        cx = (config.axis_rotated ? $$.circleY() : $$.circleX).bind($$),
-        cy = (config.axis_rotated ? $$.circleX : $$.circleY()).bind($$),
+        cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
+        cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
         r = $$.pointSelectR.bind($$);
     config.data_onselected.call($$.api, d, target.node());
     // add selected-circle on low layer g
