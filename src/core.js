@@ -585,9 +585,12 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         if ($$.updateZoom) { $$.updateZoom(); }
     }
 
+    // update circleY based on updated parameters
+    $$.updateCircleY();
+
     // generate circle x/y functions depending on updated params
-    cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$);
-    cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
+    cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$);
+    cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
 
     // transition should be derived from one transition
     d3.transition().duration(duration).each(function () {

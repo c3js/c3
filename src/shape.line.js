@@ -306,16 +306,16 @@ c3_chart_internal_fn.addTransitionForCircle = function (transitions, cx, cy) {
 c3_chart_internal_fn.circleX = function (d) {
     return d.x || d.x === 0 ? this.x(d.x) : null;
 };
-c3_chart_internal_fn.generateCircleY = function () {
+c3_chart_internal_fn.updateCircleY = function () {
     var $$ = this, lineIndices, getPoints;
     if ($$.config.data_groups.length > 0) {
         lineIndices = $$.getShapeIndices($$.isLineType),
         getPoints = $$.generateGetLinePoints(lineIndices);
-        return function (d, i) {
+        $$.circleY = function (d, i) {
             return getPoints(d, i)[0][1];
         };
     } else {
-        return function (d) {
+        $$.circleY = function (d) {
             return $$.getYScale(d.id)(d.value);
         };
     }

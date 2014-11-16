@@ -590,9 +590,12 @@
             if ($$.updateZoom) { $$.updateZoom(); }
         }
 
+        // update circleY based on updated parameters
+        $$.updateCircleY();
+
         // generate circle x/y functions depending on updated params
-        cx = ($$.config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$);
-        cy = ($$.config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$);
+        cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$);
+        cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
 
         // transition should be derived from one transition
         d3.transition().duration(duration).each(function () {
@@ -1780,10 +1783,11 @@
     };
     c3_chart_internal_fn.dist = function (data, pos) {
         var $$ = this, config = $$.config,
-            yScale = $$.getAxisId(data.id) === 'y' ? $$.y : $$.y2,
             xIndex = config.axis_rotated ? 1 : 0,
-            yIndex = config.axis_rotated ? 0 : 1;
-        return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
+            yIndex = config.axis_rotated ? 0 : 1,
+            y = $$.circleY(data, data.index),
+            x = $$.x(data.x);
+        return Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2);
     };
     c3_chart_internal_fn.convertValuesToStep = function (values) {
         var converted = [].concat(values), i;
@@ -2935,16 +2939,16 @@
     c3_chart_internal_fn.circleX = function (d) {
         return d.x || d.x === 0 ? this.x(d.x) : null;
     };
-    c3_chart_internal_fn.generateCircleY = function () {
+    c3_chart_internal_fn.updateCircleY = function () {
         var $$ = this, lineIndices, getPoints;
         if ($$.config.data_groups.length > 0) {
             lineIndices = $$.getShapeIndices($$.isLineType),
             getPoints = $$.generateGetLinePoints(lineIndices);
-            return function (d, i) {
+            $$.circleY = function (d, i) {
                 return getPoints(d, i)[0][1];
             };
         } else {
-            return function (d) {
+            $$.circleY = function (d) {
                 return $$.getYScale(d.id)(d.value);
             };
         }
@@ -4928,8 +4932,8 @@
 
     c3_chart_internal_fn.selectPoint = function (target, d, i) {
         var $$ = this, config = $$.config,
-            cx = (config.axis_rotated ? $$.generateCircleY() : $$.circleX).bind($$),
-            cy = (config.axis_rotated ? $$.circleX : $$.generateCircleY()).bind($$),
+            cx = (config.axis_rotated ? $$.circleY() : $$.circleX).bind($$),
+            cy = (config.axis_rotated ? $$.circleX : $$.circleY()).bind($$),
             r = $$.pointSelectR.bind($$);
         config.data_onselected.call($$.api, d, target.node());
         // add selected-circle on low layer g
