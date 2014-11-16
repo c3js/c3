@@ -203,7 +203,7 @@ c3_chart_internal_fn.getGridFilterToRemove = function (params) {
     return params ? function (line) {
         var found = false;
         [].concat(params).forEach(function (param) {
-            if ((('value' in param && line.value === params.value) || ('class' in param && line['class'] === params['class']))) {
+            if ((('value' in param && line.value === param.value) || ('class' in param && line['class'] === param['class']))) {
                 found = true;
             }
         });
