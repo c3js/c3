@@ -479,7 +479,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.subXAxis.tickValues([]);
     }
 
-    if (withY && !options.flow) {
+    if (config.zoom_rescale && !options.flow) {
         xDomainForZoom = $$.x.orgDomain();
     }
 
@@ -547,7 +547,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .style('opacity', targetsToShow.length ? 0 : 1);
 
     // grid
-    $$.redrawGrid(duration, withY);
+    $$.redrawGrid(duration);
 
     // rect for regions
     $$.redrawRegion(duration);
@@ -658,6 +658,14 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     }
     // Draw with new sizes & scales
     $$.redraw(options, transitions);
+};
+c3_chart_internal_fn.redrawWithoutRescale = function () {
+    this.redraw({
+        withY: false,
+        withSubchart: false,
+        withEventRect: false,
+        withTransitionForAxis: false
+    });
 };
 
 c3_chart_internal_fn.isTimeSeries = function () {

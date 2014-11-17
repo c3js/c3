@@ -484,7 +484,7 @@
             $$.subXAxis.tickValues([]);
         }
 
-        if (withY && !options.flow) {
+        if (config.zoom_rescale && !options.flow) {
             xDomainForZoom = $$.x.orgDomain();
         }
 
@@ -552,7 +552,7 @@
             .style('opacity', targetsToShow.length ? 0 : 1);
 
         // grid
-        $$.redrawGrid(duration, withY);
+        $$.redrawGrid(duration);
 
         // rect for regions
         $$.redrawRegion(duration);
@@ -663,6 +663,14 @@
         }
         // Draw with new sizes & scales
         $$.redraw(options, transitions);
+    };
+    c3_chart_internal_fn.redrawWithoutRescale = function () {
+        this.redraw({
+            withY: false,
+            withSubchart: false,
+            withEventRect: false,
+            withTransitionForAxis: false
+        });
     };
 
     c3_chart_internal_fn.isTimeSeries = function () {
@@ -3374,7 +3382,7 @@
     };
 
 
-    c3_chart_internal_fn.redrawGrid = function (duration, withY) {
+    c3_chart_internal_fn.redrawGrid = function (duration) {
         var $$ = this, main = $$.main, config = $$.config,
             xgridLine, ygridLine, yv;
 
@@ -3406,43 +3414,41 @@
             .remove();
 
         // Y-Grid
-        if (withY && config.grid_y_show) {
+        if (config.grid_y_show) {
             $$.updateYGrid();
         }
-        if (withY) {
-            $$.ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
-                .data(config.grid_y_lines);
-            // enter
-            ygridLine = $$.ygridLines.enter().append('g')
-                .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
-            ygridLine.append('line')
-                .style("opacity", 0);
-            ygridLine.append('text')
-                .attr("text-anchor", "end")
-                .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
-                .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
-                .attr('dy', -5)
-                .style("opacity", 0);
-            // update
-            yv = $$.yv.bind($$);
-            $$.ygridLines.select('line')
-              .transition().duration(duration)
-                .attr("x1", config.axis_rotated ? yv : 0)
-                .attr("x2", config.axis_rotated ? yv : $$.width)
-                .attr("y1", config.axis_rotated ? 0 : yv)
-                .attr("y2", config.axis_rotated ? $$.height : yv)
-                .style("opacity", 1);
-            $$.ygridLines.select('text')
-              .transition().duration(duration)
-                .attr("x", config.axis_rotated ? 0 : $$.width)
-                .attr("y", yv)
-                .text(function (d) { return d.text; })
-                .style("opacity", 1);
-            // exit
-            $$.ygridLines.exit().transition().duration(duration)
-                .style("opacity", 0)
-                .remove();
-        }
+        $$.ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
+            .data(config.grid_y_lines);
+        // enter
+        ygridLine = $$.ygridLines.enter().append('g')
+            .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
+        ygridLine.append('line')
+            .style("opacity", 0);
+        ygridLine.append('text')
+            .attr("text-anchor", "end")
+            .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
+            .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
+            .attr('dy', -5)
+            .style("opacity", 0);
+        // update
+        yv = $$.yv.bind($$);
+        $$.ygridLines.select('line')
+          .transition().duration(duration)
+            .attr("x1", config.axis_rotated ? yv : 0)
+            .attr("x2", config.axis_rotated ? yv : $$.width)
+            .attr("y1", config.axis_rotated ? 0 : yv)
+            .attr("y2", config.axis_rotated ? $$.height : yv)
+            .style("opacity", 1);
+        $$.ygridLines.select('text')
+          .transition().duration(duration)
+            .attr("x", config.axis_rotated ? 0 : $$.width)
+            .attr("y", yv)
+            .text(function (d) { return d.text; })
+            .style("opacity", 1);
+        // exit
+        $$.ygridLines.exit().transition().duration(duration)
+            .style("opacity", 0)
+            .remove();
     };
     c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
         var $$ = this, config = $$.config, xv = $$.xv.bind($$);
@@ -5703,7 +5709,8 @@
                 domain = domain.map(function (x) { return $$.parseDate(x); });
             }
             $$.brush.extent(domain);
-            $$.redraw({withUpdateXDomain: true});
+            $$.redraw({withUpdateXDomain: true, withY: $$.config.zoom_rescale});
+            $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
         }
         return $$.brush.extent();
     };
@@ -6147,7 +6154,7 @@
         var $$ = this.internal, config = $$.config;
         if (! grids) { return config.grid_x_lines; }
         config.grid_x_lines = grids;
-        $$.redraw();
+        $$.redrawWithoutRescale();
         return config.grid_x_lines;
     };
     c3_chart_fn.xgrids.add = function (grids) {
@@ -6163,7 +6170,7 @@
         var $$ = this.internal, config = $$.config;
         if (! grids) { return config.grid_y_lines; }
         config.grid_y_lines = grids;
-        $$.redraw();
+        $$.redrawWithoutRescale();
         return config.grid_y_lines;
     };
     c3_chart_fn.ygrids.add = function (grids) {
@@ -6179,14 +6186,14 @@
         var $$ = this.internal, config = $$.config;
         if (!regions) { return config.regions; }
         config.regions = regions;
-        $$.redraw();
+        $$.redrawWithoutRescale();
         return config.regions;
     };
     c3_chart_fn.regions.add = function (regions) {
         var $$ = this.internal, config = $$.config;
         if (!regions) { return config.regions; }
         config.regions = config.regions.concat(regions);
-        $$.redraw();
+        $$.redrawWithoutRescale();
         return config.regions;
     };
     c3_chart_fn.regions.remove = function (options) {

@@ -35,21 +35,39 @@ describe('c3 chart zoom', function () {
 
     describe('default extent', function () {
 
-        it('should have default extent', function () {
-            var yDomain = chart.internal.y.domain(),
-                subYDomain = chart.internal.subY.domain(),
-                brushExtent = chart.internal.brush.extent(),
-                expectedYDomain = [-9, 219],
-                expectedSubYDomain = [-591.5, 6626.5],
-                expectedBrushExtent = [1, 2];
-            expect(yDomain[0]).toBe(expectedYDomain[0]);
-            expect(yDomain[1]).toBe(expectedYDomain[1]);
-            expect(subYDomain[0]).toBe(expectedSubYDomain[0]);
-            expect(subYDomain[1]).toBe(expectedSubYDomain[1]);
-            expect(brushExtent[0]).toBe(expectedBrushExtent[0]);
-            expect(brushExtent[1]).toBe(expectedBrushExtent[1]);
+        describe('main chart domain', function () {
+
+            it('should have original y domain', function () {
+                var yDomain = chart.internal.y.domain(),
+                    expectedYDomain = [-591.5, 6626.5];
+                expect(yDomain[0]).toBe(expectedYDomain[0]);
+                expect(yDomain[1]).toBe(expectedYDomain[1]);
+            });
+
         });
-        
+
+        describe('main chart domain', function () {
+
+            it('should have original y domain in subchart', function () {
+                var yDomain = chart.internal.y.domain(),
+                    subYDomain = chart.internal.subY.domain();
+                expect(subYDomain[0]).toBe(yDomain[0]);
+                expect(subYDomain[1]).toBe(yDomain[1]);
+            });
+
+        });
+
+        describe('main chart domain', function () {
+
+            it('should have specified brush extent', function () {
+                var brushExtent = chart.internal.brush.extent(),
+                    expectedBrushExtent = [1, 2];
+                expect(brushExtent[0]).toBe(expectedBrushExtent[0]);
+                expect(brushExtent[1]).toBe(expectedBrushExtent[1]);
+            });
+
+        });
+
     });
 
 });
