@@ -100,13 +100,20 @@ c3_chart_internal_fn.cloneTarget = function (target) {
         })
     };
 };
+c3_chart_internal_fn.updateXs = function () {
+    var $$ = this;
+    $$.xs = [];
+    $$.data.targets[0].values.forEach(function (v) {
+        $$.xs[v.index] = v.x;
+    });
+};
 c3_chart_internal_fn.getPrevX = function (i) {
-    var $$ = this, value = $$.getValueOnIndex($$.data.targets[0].values, i - 1);
-    return value ? value.x : null;
+    var x = this.xs[i - 1];
+    return typeof x !== 'undefined' ? x : null;
 };
 c3_chart_internal_fn.getNextX = function (i) {
-    var $$ = this, value = $$.getValueOnIndex($$.data.targets[0].values, i + 1);
-    return value ? value.x : null;
+    var x = this.xs[i + 1];
+    return typeof x !== 'undefined' ? x : null;
 };
 c3_chart_internal_fn.getMaxDataCount = function () {
     var $$ = this;

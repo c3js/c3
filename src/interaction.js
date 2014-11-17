@@ -59,6 +59,10 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
     }
     else {
         if (($$.isCustomX() || $$.isTimeSeries()) && !$$.isCategorized()) {
+
+            // update index for x that is used by prevX and nextX
+            $$.updateXs();
+
             rectW = function (d) {
                 var prevX = $$.getPrevX(d.index), nextX = $$.getNextX(d.index);
 
