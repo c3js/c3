@@ -111,7 +111,7 @@ function c3_axis(d3, params) {
                 }
 
                 if (!maxWidth || maxWidth <= 0) {
-                    maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
+                    maxWidth = isVertical ? 95 : params.isCategory ? (Math.ceil(scale1(ticks[1]) - scale1(ticks[0])) - 10) : 110;
                 }
 
                 function split(splitted, text) {
@@ -142,7 +142,7 @@ function c3_axis(d3, params) {
                     if (orient === 'left' || orient === 'right') {
                         dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - (params.isCategory ? 2 : 3));
                     } else {
-                        dy = params.isCategory ? ".40em" : ".71em";
+                        dy = ".71em";
                     }
                 }
                 return dy;

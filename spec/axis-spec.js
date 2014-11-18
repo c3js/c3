@@ -362,7 +362,7 @@ describe('c3 chart axis', function () {
                     ticks.each(function (d, i) {
                         var tspans = d3.select(this).selectAll('tspan'),
                             expectedX = '0',
-                            expectedDy = '.40em';
+                            expectedDy = '.71em';
                         if (i > 0) { // i === 0 should be checked in next test
                             expect(tspans.size()).toBe(1);
                             tspans.each(function () {
@@ -390,7 +390,7 @@ describe('c3 chart axis', function () {
                         expect(tspan.attr('x')).toBe(expectedX);
                         // unable to define pricise number because it differs depends on environment..
                         if (i === 0) {
-                            expect(tspan.attr('dy')).toBe('.40em');
+                            expect(tspan.attr('dy')).toBe('.71em');
                         } else {
                             expect(tspan.attr('dy')).toBeGreaterThan(8);
                         }
