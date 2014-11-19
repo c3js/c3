@@ -35,18 +35,8 @@ describe('c3 api data', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter')
-            .style('position', 'absolute')
-            .style('right', 0);
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('data()', function () {
@@ -82,6 +72,19 @@ describe('c3 api data', function () {
             results = chart.data.shown();
             expect(results.length).toBe(1);
             expect(results[0].id).toBe('data2');
+        });
+
+    });
+
+    describe('data.values()', function () {
+
+        it('should return values for specified target', function () {
+            var values = chart.data.values('data1'),
+                expectedValues = [30, 200, 100, 400, 150, 250];
+            expect(values.length).toBe(6);
+            values.forEach(function (v, i) {
+                expect(v).toBe(expectedValues[i]);
+            });
         });
 
     });
