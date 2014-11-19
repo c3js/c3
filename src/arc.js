@@ -127,7 +127,9 @@ c3_chart_internal_fn.expandArc = function (targetIds) {
         interval = window.setInterval(function () {
             if (!$$.transiting) {
                 window.clearInterval(interval);
-                $$.expandArc(targetIds);
+                if ($$.legend.selectAll('.c3-legend-item-focused').size() > 0) {
+                    $$.expandArc(targetIds);
+                }
             }
         }, 10);
         return;
@@ -216,7 +218,7 @@ c3_chart_internal_fn.updateTargetsForArc = function (targets) {
     mainPieEnter.append('g')
         .attr('class', classArcs);
     mainPieEnter.append("text")
-        .attr("dy", $$.hasType('gauge') ? "-0.35em" : ".35em")
+        .attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em")
         .style("opacity", 0)
         .style("text-anchor", "middle")
         .style("pointer-events", "none");
@@ -311,7 +313,11 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             }
             interpolate = d3.interpolate(this._current, updated);
             this._current = interpolate(0);
-            return function (t) { return $$.getArc(interpolate(t), true); };
+            return function (t) {
+                var interpolated = interpolate(t);
+                interpolated.data = d.data; // data.id will be updated by interporator
+                return $$.getArc(interpolated, true);
+            };
         })
         .attr("transform", withTransform ? "scale(1)" : "")
         .style("fill", function (d) {
@@ -329,7 +335,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .attr('class', function (d) { return $$.isGaugeType(d.data) ? CLASS.gaugeValue : ''; })
         .text($$.textForArcLabel.bind($$))
         .attr("transform", $$.transformForArcLabel.bind($$))
-        .transition().duration(duration)
+        .style('font-size', function (d) { return $$.isGaugeType(d.data) ? Math.round($$.radius / 5) + 'px' : ''; })
+      .transition().duration(duration)
         .style("opacity", function (d) { return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0; });
     main.select('.' + CLASS.chartArcsTitle)
         .style("opacity", $$.hasType('donut') || $$.hasType('gauge') ? 1 : 0);

@@ -67,26 +67,28 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
         tooltipLeft = ($$.width / 2) + mouse[0];
         tooltipTop = ($$.height / 2) + mouse[1] + 20;
     } else {
+        svgLeft = $$.getSvgLeft(true);
         if (config.axis_rotated) {
-            svgLeft = $$.getSvgLeft();
             tooltipLeft = svgLeft + mouse[0] + 100;
             tooltipRight = tooltipLeft + tWidth;
-            chartRight = $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+            chartRight = $$.currentWidth - $$.getCurrentPaddingRight();
             tooltipTop = $$.x(dataToShow[0].x) + 20;
         } else {
-            svgLeft = $$.getSvgLeft();
-            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft() + $$.x(dataToShow[0].x) + 20;
+            tooltipLeft = svgLeft + $$.getCurrentPaddingLeft(true) + $$.x(dataToShow[0].x) + 20;
             tooltipRight = tooltipLeft + tWidth;
-            chartRight = svgLeft + $$.getCurrentWidth() - $$.getCurrentPaddingRight();
+            chartRight = svgLeft + $$.currentWidth - $$.getCurrentPaddingRight();
             tooltipTop = mouse[1] + 15;
         }
 
         if (tooltipRight > chartRight) {
             tooltipLeft -= tooltipRight - chartRight;
         }
-        if (tooltipTop + tHeight > $$.getCurrentHeight() && tooltipTop > tHeight + 30) {
+        if (tooltipTop + tHeight > $$.currentHeight) {
             tooltipTop -= tHeight + 30;
         }
+    }
+    if (tooltipTop < 0) {
+        tooltipTop = 0;
     }
     // Set tooltip
     $$.tooltip

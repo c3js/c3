@@ -114,7 +114,8 @@ describe('c3 chart data', function () {
                         x: {
                             type: 'timeseries',
                             tick: {
-                                format: '%Y-%m-%d %H:%M:%S.%L'
+                                format: '%Y-%m-%d %H:%M:%S.%L',
+                                multiline: false
                             }
                         }
                     }

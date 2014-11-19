@@ -84,6 +84,26 @@ describe('c3 chart legend', function () {
             expect(box.height).toBe(48);
         });
 
+        it('should update args to have only one series', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                    ]
+                },
+                legend: {
+                    position: 'inset'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should locate legend properly', function () {
+            var box = d3.select('.c3-legend-background').node().getBoundingClientRect();
+            expect(box.height).toBe(28);
+            expect(box.width).toBeGreaterThan(64);
+        });
+
     });
 
 });

@@ -29,3 +29,5 @@ Please fork this fiddle:
 
 ## License
 MIT
+
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=masayuki0812&url=https://github.com/masayuki0812/c3&title=c3&language=javascript&tags=github&category=software)

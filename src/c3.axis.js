@@ -97,19 +97,26 @@ function c3_axis(d3, params) {
                 tickOffset = tickX = 0;
             }
 
-            var text, tspan, sizeFor1Char = getSizeFor1Char(tick), counts = [];
+            var text, tspan, sizeFor1Char = getSizeFor1Char(g.select('.tick')), counts = [];
             var tickLength = Math.max(innerTickSize, 0) + tickPadding,
                 isVertical = orient === 'left' || orient === 'right';
 
             // this should be called only when category axis
-            function splitTickText(d) {
-                var tickText = textFormatted(d) + "",
-                    maxWidth = isVertical ? params.tickWidth : tickOffset * 2 - 10,
+            function splitTickText(d, maxWidth) {
+                var tickText = textFormatted(d),
                     subtext, spaceIndex, textWidth, splitted = [];
+
+                if (Object.prototype.toString.call(tickText) === "[object Array]") {
+                    return tickText;
+                }
+
+                if (!maxWidth || maxWidth <= 0) {
+                    maxWidth = isVertical ? 95 : params.isCategory ? (Math.ceil(scale1(ticks[1]) - scale1(ticks[0])) - 12) : 110;
+                }
 
                 function split(splitted, text) {
                     spaceIndex = undefined;
-                    for (var i = 0; i < text.length; i++) {
+                    for (var i = 1; i < text.length; i++) {
                         if (text.charAt(i) === ' ') {
                             spaceIndex = i;
                         }
@@ -126,7 +133,7 @@ function c3_axis(d3, params) {
                     return splitted.concat(text);
                 }
 
-                return split(splitted, tickText);
+                return split(splitted, tickText + "");
             }
 
             function tspanDy(d, i) {
@@ -135,7 +142,7 @@ function c3_axis(d3, params) {
                     if (orient === 'left' || orient === 'right') {
                         dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - (params.isCategory ? 2 : 3));
                     } else {
-                        dy = params.isCategory ? ".40em" : ".71em";
+                        dy = ".71em";
                     }
                 }
                 return dy;
@@ -149,7 +156,7 @@ function c3_axis(d3, params) {
             text = tick.select("text");
             tspan = text.selectAll('tspan')
                 .data(function (d, i) {
-                    var splitted = params.tickWidth ? splitTickText(d) : [].concat(textFormatted(d));
+                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
                     counts[i] = splitted.length;
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };

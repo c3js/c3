@@ -10,14 +10,34 @@ function initDom() {
 }
 typeof initDom !== 'undefined';
 
-function setEvent(chart, x, y) {
+function setMouseEvent(chart, name, x, y, element) {
     'use strict';
 
     var paddingLeft = chart.internal.main.node().transform.baseVal.getItem(0).matrix.e,
-        evt = document.createEvent("MouseEvents");
-    evt.initMouseEvent("click", true, true, window,
+        event = document.createEvent("MouseEvents");
+    event.initMouseEvent(name, true, true, window,
                        0, 0, 0, x + paddingLeft, y + 5,
                        false, false, false, false, 0, null);
-    chart.internal.d3.event = evt;
+    chart.internal.d3.event = event;
+    if (element) { element.dispatchEvent(event); }
 }
-typeof setEvent !== 'undefined';
+typeof setMouseEvent !== 'undefined';
+
+function initChart(chart, args, done) {
+    'use strict';
+
+    if (typeof chart === 'undefined') {
+        window.initDom();
+    }
+    chart = window.c3.generate(args);
+    chart.internal.d3.select('.jasmine_html-reporter')
+        .style('position', 'absolute')
+        .style('right', 0);
+
+    window.setTimeout(function () {
+        done();
+    }, 10);
+
+    return chart;
+}
+typeof initChart !== 'undefined';

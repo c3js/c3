@@ -74,6 +74,7 @@ c3_chart_internal_fn.toggleFocusLegend = function (targetIds, focus) {
 c3_chart_internal_fn.revertLegend = function () {
     var $$ = this, d3 = $$.d3;
     $$.legend.selectAll('.' + CLASS.legendItem)
+        .classed(CLASS.legendItemFocused, false)
         .transition().duration(100)
         .style('opacity', function () { return $$.opacityForLegend(d3.select(this)); });
 };
@@ -107,7 +108,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
     var withTransition, withTransitionForTransform;
     var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
-    var texts, rects, tiles;
+    var texts, rects, tiles, background;
 
     options = options || {};
     withTransition = getOption(options, "withTransition", true);
@@ -116,7 +117,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     function updatePositions(textElement, id, index) {
         var reset = index === 0, isLast = index === targetIds.length - 1,
             box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
-            itemWidth = box.width + tileWidth + (isLast && !$$.isLegendRight ? 0 : paddingRight),
+            itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight),
             itemHeight = box.height + paddingTop,
             itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
             areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
@@ -225,9 +226,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         })
         .on('mouseout', function (id) {
             $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-            if (!$$.transiting) {
-                $$.api.revert();
-            }
+            $$.api.revert();
             if (config.legend_item_onmouseout) {
                 config.legend_item_onmouseout.call($$, id);
             }
@@ -251,13 +250,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegend)
         .attr('width', 10)
         .attr('height', 10);
+
     // Set background for inset legend
-    if ($$.isLegendInset && maxWidth !== 0) {
-        $$.legend.insert('g', '.' + CLASS.legendItem)
+    background = $$.legend.select('.' + CLASS.legendBackground + ' rect');
+    if ($$.isLegendInset && maxWidth > 0 && background.size() === 0) {
+        background = $$.legend.insert('g', '.' + CLASS.legendItem)
             .attr("class", CLASS.legendBackground)
-            .append('rect')
-            .attr('height', $$.getLegendHeight() - 12)
-            .attr('width', maxWidth * (step + 1) + 10);
+            .append('rect');
     }
 
     texts = $$.legend.selectAll('text')
@@ -282,6 +281,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .style('fill', $$.color)
         .attr('x', xForLegend)
         .attr('y', yForLegend);
+
+    if (background) {
+        (withTransition ? background.transition() : background)
+            .attr('height', $$.getLegendHeight() - 12)
+            .attr('width', maxWidth * (step + 1) + 10);
+    }
 
     // toggle legend state
     $$.legend.selectAll('.' + CLASS.legendItem)

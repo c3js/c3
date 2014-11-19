@@ -2,7 +2,7 @@ c3_chart_fn.xgrids = function (grids) {
     var $$ = this.internal, config = $$.config;
     if (! grids) { return config.grid_x_lines; }
     config.grid_x_lines = grids;
-    $$.redraw();
+    $$.redrawWithoutRescale();
     return config.grid_x_lines;
 };
 c3_chart_fn.xgrids.add = function (grids) {
@@ -18,7 +18,7 @@ c3_chart_fn.ygrids = function (grids) {
     var $$ = this.internal, config = $$.config;
     if (! grids) { return config.grid_y_lines; }
     config.grid_y_lines = grids;
-    $$.redraw();
+    $$.redrawWithoutRescale();
     return config.grid_y_lines;
 };
 c3_chart_fn.ygrids.add = function (grids) {
