@@ -87,6 +87,11 @@ describe('c3 api data', function () {
             });
         });
 
+        it('should return null when no args', function () {
+            var values = chart.data.values();
+            expect(values).toBeNull();
+        });
+
     });
 
     describe('data.names()', function () {
