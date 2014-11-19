@@ -3,8 +3,6 @@ var describe = window.describe,
     it = window.it,
     beforeEach = window.beforeEach;
 
-var initDom = window.initDom;
-
 describe('c3 chart shape line', function () {
     'use strict';
 
@@ -22,16 +20,8 @@ describe('c3 chart shape line', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('shape-rendering for line chart', function () {
@@ -53,6 +43,58 @@ describe('c3 chart shape line', function () {
                 var style = d3.select(this).style('shape-rendering');
                 expect(style).toBe('crispedges');
             });
+        });
+
+    });
+
+    describe('point.show option', function () {
+
+        it('should change args to include null data', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, null, 100, 400, -150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', -150, 120, 110, 140, 115, 125]
+                    ],
+                    type: 'line'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should not show the circle for null', function (done) {
+            setTimeout(function () {
+                var target = chart.internal.main.select('.c3-chart-line.c3-target-data1');
+                expect(+target.select('.c3-circle-0').style('opacity')).toBe(1);
+                expect(+target.select('.c3-circle-1').style('opacity')).toBe(0);
+                expect(+target.select('.c3-circle-2').style('opacity')).toBe(1);
+                done();
+            }, 500);
+        });
+
+        it('should change args to include null data on scatter plot', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, null, 100, 400, -150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', -150, 120, 110, 140, 115, 125]
+                    ],
+                    type: 'scatter'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should not show the circle for null', function (done) {
+            setTimeout(function () {
+                var target = chart.internal.main.select('.c3-chart-line.c3-target-data1');
+                expect(+target.select('.c3-circle-0').style('opacity')).toBe(0.5);
+                expect(+target.select('.c3-circle-1').style('opacity')).toBe(0);
+                expect(+target.select('.c3-circle-2').style('opacity')).toBe(0.5);
+                done();
+            }, 500);
         });
 
     });
