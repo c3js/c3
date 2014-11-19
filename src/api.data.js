@@ -9,7 +9,7 @@ c3_chart_fn.data.shown = function (targetId) {
 };
 c3_chart_fn.data.values = function (targetId) {
     var target = this.data(targetId);
-    return target ? target.values.map(function (d) { return d.value; }) : null;
+    return target[0] ? target[0].values.map(function (d) { return d.value; }) : null;
 };
 c3_chart_fn.data.names = function (names) {
     return this.internal.updateDataAttributes('names', names);
