@@ -59,7 +59,8 @@ c3_chart_internal_fn.redrawForZoom = function () {
         withTransition: false,
         withY: config.zoom_rescale,
         withSubchart: false,
-        withEventRect: false
+        withEventRect: false,
+        withDimension: false
     });
     if (d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;

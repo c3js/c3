@@ -422,7 +422,7 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
     var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
-    var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend, withEventRect;
+    var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend, withEventRect, withDimension;
     var hideAxis = $$.hasArcType();
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
@@ -440,6 +440,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     withTrimXDomain = getOption(options, "withTrimXDomain", true);
     withLegend = getOption(options, "withLegend", false);
     withEventRect = getOption(options, "withEventRect", true);
+    withDimension = getOption(options, "withDimension", true);
     withTransitionForExit = getOption(options, "withTransitionForExit", withTransition);
     withTransitionForAxis = getOption(options, "withTransitionForAxis", withTransition);
 
@@ -452,7 +453,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // update legend and transform each g
     if (withLegend && config.legend_show) {
         $$.updateLegend($$.mapToIds($$.data.targets), options, transitions);
-    } else if ((!config.axis_rotated && withY) || (config.axis_rotated && withUpdateXDomain)) {
+    } else if (withDimension) {
         // need to update dimension (e.g. axis.y.tick.values) because y tick values should change
         // no need to update axis in it because they will be updated in redraw()
         $$.updateDimension(true);

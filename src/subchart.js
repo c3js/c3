@@ -166,7 +166,8 @@ c3_chart_internal_fn.redrawForBrush = function () {
         withTransition: false,
         withY: $$.config.zoom_rescale,
         withSubchart: false,
-        withUpdateXDomain: true
+        withUpdateXDomain: true,
+        withDimension: false
     });
     $$.config.subchart_onbrush.call($$.api, x.orgDomain());
 };
