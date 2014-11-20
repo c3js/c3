@@ -70,4 +70,49 @@ describe('c3 chart', function () {
 
     });
 
+    describe('empty data', function () {
+
+        it('should upaate args for empty data', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1'],
+                        ['data2']
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should generate a chart', function () {
+            var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
+            expect(ticks.size()).toBe(0);
+        });
+
+        it('should upaate args for empty data', function () {
+            args = {
+                data: {
+                    x: 'x',
+                    columns: [
+                        ['x'],
+                        ['data1'],
+                        ['data2']
+                    ]
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries'
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should generate a chart', function () {
+            var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
+            expect(ticks.size()).toBe(0);
+        });
+
+    });
+
 });

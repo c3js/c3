@@ -102,10 +102,12 @@ c3_chart_internal_fn.cloneTarget = function (target) {
 };
 c3_chart_internal_fn.updateXs = function () {
     var $$ = this;
-    $$.xs = [];
-    $$.data.targets[0].values.forEach(function (v) {
-        $$.xs[v.index] = v.x;
-    });
+    if ($$.data.targets.length) {
+        $$.xs = [];
+        $$.data.targets[0].values.forEach(function (v) {
+            $$.xs[v.index] = v.x;
+        });
+    }
 };
 c3_chart_internal_fn.getPrevX = function (i) {
     var x = this.xs[i - 1];
