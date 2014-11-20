@@ -68,6 +68,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         color_threshold: {},
         // legend
         legend_show: true,
+        legend_hide: false,
         legend_position: 'bottom',
         legend_inset_anchor: 'top-left',
         legend_inset_x: 10,

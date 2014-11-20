@@ -106,4 +106,49 @@ describe('c3 chart legend', function () {
 
     });
 
+    describe('legend.hide', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    hide: true
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should not show legends', function () {
+            d3.selectAll('.c3-legend-item').each(function () {
+                expect(d3.select(this).style('visibility')).toBe('hidden');
+            });
+        });
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    hide: 'data2'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should not show legends', function () {
+            expect(d3.select('.c3-legend-item-data1').style('visibility')).toBe('visible');
+            expect(d3.select('.c3-legend-item-data2').style('visibility')).toBe('hidden');
+        });
+
+    });
+
 });

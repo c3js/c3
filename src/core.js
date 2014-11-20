@@ -174,6 +174,9 @@ c3_chart_internal_fn.initWithData = function (data) {
     if (config.data_hide) {
         $$.addHiddenTargetIds(config.data_hide === true ? $$.mapToIds($$.data.targets) : config.data_hide);
     }
+    if (config.legend_hide) {
+        $$.addHiddenLegendIds(config.legend_hide === true ? $$.mapToIds($$.data.targets) : config.legend_hide);
+    }
 
     // when gauge, hide legend // TODO: fix
     if ($$.hasType('gauge')) {
