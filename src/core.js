@@ -138,6 +138,14 @@ c3_chart_internal_fn.initParams = function () {
     $$.axes.subx = d3.selectAll([]); // needs when excluding subchart.js
 };
 
+c3_chart_internal_fn.initChartElements = function () {
+    if (this.initBar) { this.initBar(); }
+    if (this.initLine) { this.initLine(); }
+    if (this.initArc) { this.initArc(); }
+    if (this.initGauge) { this.initGauge(); }
+    if (this.initText) { this.initText(); }
+};
+
 c3_chart_internal_fn.initWithData = function (data) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     var defs, main, binding = true;
@@ -240,18 +248,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Cover whole with rects for events
     $$.initEventRect();
 
-    // Define g for bar chart area
-    if ($$.initBar) { $$.initBar(); }
-
-    // Define g for line chart area
-    if ($$.initLine) { $$.initLine(); }
-
-    // Define g for arc chart area
-    if ($$.initArc) { $$.initArc(); }
-    if ($$.initGauge) { $$.initGauge(); }
-
-    // Define g for text area
-    if ($$.initText) { $$.initText(); }
+    // Define g for chart
+    $$.initChartElements();
 
     // if zoom privileged, insert rect to forefront
     // TODO: is this needed?
