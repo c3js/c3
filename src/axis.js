@@ -40,7 +40,7 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues,
         },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
-    if ($$.isTimeSeries() && tickValues) {
+    if ($$.isTimeSeries() && tickValues && typeof tickValues !== "function") {
         tickValues = tickValues.map(function (v) { return $$.parseDate(v); });
     }
 
