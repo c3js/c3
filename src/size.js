@@ -21,8 +21,10 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
         return config.padding_left;
     } else if (config.axis_rotated) {
         return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+    } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
+        return $$.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
-        return !config.axis_y_show ? 1 : ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
+        return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
     }
 };
 c3_chart_internal_fn.getCurrentPaddingRight = function () {
@@ -32,8 +34,10 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
         return config.padding_right + 1; // 1 is needed not to hide tick line
     } else if (config.axis_rotated) {
         return defaultPadding + legendWidthOnRight;
+    } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
+        return defaultPadding + legendWidthOnRight + ($$.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
-        return (!config.axis_y2_show ? defaultPadding : ceil10($$.getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
+        return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
 };
 

@@ -108,8 +108,8 @@ c3_chart_internal_fn.initParams = function () {
     $$.defocusedTargetIds = [];
 
     $$.xOrient = config.axis_rotated ? "left" : "bottom";
-    $$.yOrient = config.axis_rotated ? "bottom" : "left";
-    $$.y2Orient = config.axis_rotated ? "top" : "right";
+    $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
+    $$.y2Orient = config.axis_rotated ? (config.axis_y_inner ? "bottom" : "top") : (config.axis_y_inner ? "left" : "right");
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";
 
     $$.isLegendRight = config.legend_position === 'right';

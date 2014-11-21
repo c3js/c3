@@ -12,7 +12,7 @@ c3_chart_internal_fn.initAxis = function () {
 
     $$.axes.y = main.append("g")
         .attr("class", CLASS.axis + ' ' + CLASS.axisY)
-        .attr("clip-path", $$.clipPathForYAxis)
+        .attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis)
         .attr("transform", $$.getTranslate('y'))
         .style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text")
@@ -223,7 +223,7 @@ c3_chart_internal_fn.dyForYAxisLabel = function () {
     if ($$.config.axis_rotated) {
         return position.isInner ? "-0.5em" : "3em";
     } else {
-        return position.isInner ? "1.2em" : -20 - $$.getMaxTickWidth('y');
+        return position.isInner ? "1.2em" : -10 - ($$.config.axis_y_inner ? 0 : ($$.getMaxTickWidth('y') + 10));
     }
 };
 c3_chart_internal_fn.dyForY2AxisLabel = function () {
@@ -232,7 +232,7 @@ c3_chart_internal_fn.dyForY2AxisLabel = function () {
     if ($$.config.axis_rotated) {
         return position.isInner ? "1.2em" : "-2.2em";
     } else {
-        return position.isInner ? "-0.5em" : 30 + this.getMaxTickWidth('y2');
+        return position.isInner ? "-0.5em" : 15 + ($$.config.axis_y2_inner ? 0 : (this.getMaxTickWidth('y2') + 15));
     }
 };
 c3_chart_internal_fn.textAnchorForXAxisLabel = function () {
