@@ -6455,6 +6455,8 @@
     // Features:
     // 1. category axis
     // 2. ceil values of translate/x/y to int for half pixel antialiasing
+    // 3. multiline tick text
+    var tickTextCharSize;
     function c3_axis(d3, params) {
         var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
@@ -6503,6 +6505,9 @@
             return tickFormat ? tickFormat(v) : v;
         }
         function getSizeFor1Char(tick) {
+            if (tickTextCharSize) {
+                return tickTextCharSize;
+            }
             var size = {
                 h: 11.5,
                 w: 5.5
@@ -6517,6 +6522,7 @@
                     size.w = w;
                 }
             }).text('');
+            tickTextCharSize = size;
             return size;
         }
         function axis(g) {

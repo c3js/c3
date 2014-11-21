@@ -206,7 +206,7 @@ describe('c3 chart axis', function () {
 
                 it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedTexts = ['very long tick text on x', 'axis'],
+                        expectedTexts = ['very long tick text', 'on x axis'],
                         expectedX = '0';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
@@ -286,7 +286,7 @@ describe('c3 chart axis', function () {
 
                 it('should split x axis tick text to multiple lines', function () {
                     var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedTexts = ['very long tick text on', 'x axis'],
+                        expectedTexts = ['very long tick', 'text on x axis'],
                         expectedX = '-9';
                     expect(ticks.size()).toBe(6);
                     ticks.each(function () {
@@ -378,12 +378,13 @@ describe('c3 chart axis', function () {
                     var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                         tspans = tick.selectAll('tspan'),
                         expectedTickTexts = [
-                            'this is a very long',
-                            'tick text on',
-                            'category axis'
+                            'this is a very',
+                            'long tick text',
+                            'on category',
+                            'axis',
                         ],
                         expectedX = '0';
-                    expect(tspans.size()).toBe(3);
+                    expect(tspans.size()).toBe(4);
                     tspans.each(function (d, i) {
                         var tspan = d3.select(this);
                         expect(tspan.text()).toBe(expectedTickTexts[i]);
@@ -426,9 +427,9 @@ describe('c3 chart axis', function () {
                     var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                         tspans = tick.selectAll('tspan'),
                         expectedTickTexts = [
-                            'this is a very long',
-                            'tick text on category',
-                            'axis'
+                            'this is a very',
+                            'long tick text on',
+                            'category axis'
                         ],
                         expectedX = '-9';
                     expect(tspans.size()).toBe(3);
@@ -479,8 +480,8 @@ describe('c3 chart axis', function () {
                         var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                             tspans = tick.selectAll('tspan'),
                             expectedTickTexts = [
-                                'this is a very long tick text on',
-                                'category axis'
+                                'this is a very long tick',
+                                'text on category axis'
                             ],
                             expectedX = '-9';
                         expect(tspans.size()).toBe(2);
