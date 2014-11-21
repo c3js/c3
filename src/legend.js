@@ -101,6 +101,7 @@ c3_chart_internal_fn.hideLegend = function (targetIds) {
         .style('opacity', 0)
         .style('visibility', 'hidden');
 };
+var legendItemTextBox = {};
 c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var $$ = this, config = $$.config;
     var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
@@ -114,9 +115,16 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     withTransition = getOption(options, "withTransition", true);
     withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
+    function getTextBox(textElement, id) {
+        if (!legendItemTextBox[id]) {
+            legendItemTextBox[id] = $$.getTextRect(textElement.textContent, CLASS.legendItem);
+        }
+        return legendItemTextBox[id];
+    }
+
     function updatePositions(textElement, id, index) {
         var reset = index === 0, isLast = index === targetIds.length - 1,
-            box = $$.getTextRect(textElement.textContent, CLASS.legendItem),
+            box = getTextBox(textElement, id),
             itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight),
             itemHeight = box.height + paddingTop,
             itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
