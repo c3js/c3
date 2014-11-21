@@ -113,8 +113,8 @@
         $$.defocusedTargetIds = [];
 
         $$.xOrient = config.axis_rotated ? "left" : "bottom";
-        $$.yOrient = config.axis_rotated ? "bottom" : "left";
-        $$.y2Orient = config.axis_rotated ? "top" : "right";
+        $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
+        $$.y2Orient = config.axis_rotated ? (config.axis_y_inner ? "bottom" : "top") : (config.axis_y_inner ? "left" : "right");
         $$.subXOrient = config.axis_rotated ? "left" : "bottom";
 
         $$.isLegendRight = config.legend_position === 'right';
@@ -1029,6 +1029,7 @@
             axis_y_max: undefined,
             axis_y_min: undefined,
             axis_y_center: undefined,
+            axis_y_inner: undefined,
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
@@ -1042,6 +1043,7 @@
             axis_y2_max: undefined,
             axis_y2_min: undefined,
             axis_y2_center: undefined,
+            axis_y2_inner: undefined,
             axis_y2_label: {},
             axis_y2_tick_format: undefined,
             axis_y2_tick_outer: true,
@@ -2501,8 +2503,10 @@
             return config.padding_left;
         } else if (config.axis_rotated) {
             return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
+            return $$.getYAxisLabelPosition().isOuter ? 30 : 1;
         } else {
-            return !config.axis_y_show ? 1 : ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
+            return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
         }
     };
     c3_chart_internal_fn.getCurrentPaddingRight = function () {
@@ -2512,8 +2516,10 @@
             return config.padding_right + 1; // 1 is needed not to hide tick line
         } else if (config.axis_rotated) {
             return defaultPadding + legendWidthOnRight;
+        } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
+            return defaultPadding + legendWidthOnRight + ($$.getY2AxisLabelPosition().isOuter ? 20 : 0);
         } else {
-            return (!config.axis_y2_show ? defaultPadding : ceil10($$.getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
+            return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
         }
     };
 
@@ -3983,7 +3989,7 @@
 
         $$.axes.y = main.append("g")
             .attr("class", CLASS.axis + ' ' + CLASS.axisY)
-            .attr("clip-path", $$.clipPathForYAxis)
+            .attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis)
             .attr("transform", $$.getTranslate('y'))
             .style("visibility", config.axis_y_show ? 'visible' : 'hidden');
         $$.axes.y.append("text")
@@ -4194,7 +4200,7 @@
         if ($$.config.axis_rotated) {
             return position.isInner ? "-0.5em" : "3em";
         } else {
-            return position.isInner ? "1.2em" : -20 - $$.getMaxTickWidth('y');
+            return position.isInner ? "1.2em" : -10 - ($$.config.axis_y_inner ? 0 : ($$.getMaxTickWidth('y') + 10));
         }
     };
     c3_chart_internal_fn.dyForY2AxisLabel = function () {
@@ -4203,7 +4209,7 @@
         if ($$.config.axis_rotated) {
             return position.isInner ? "1.2em" : "-2.2em";
         } else {
-            return position.isInner ? "-0.5em" : 30 + this.getMaxTickWidth('y2');
+            return position.isInner ? "-0.5em" : 15 + ($$.config.axis_y2_inner ? 0 : (this.getMaxTickWidth('y2') + 15));
         }
     };
     c3_chart_internal_fn.textAnchorForXAxisLabel = function () {
@@ -4367,7 +4373,7 @@
     };
     c3_chart_internal_fn.getYAxisClipX = function () {
         var $$ = this;
-        return $$.getAxisClipX($$.config.axis_rotated);
+        return $$.config.axis_y_inner ? -1 : $$.getAxisClipX($$.config.axis_rotated);
     };
     c3_chart_internal_fn.getYAxisClipY = function () {
         var $$ = this;
@@ -4393,7 +4399,7 @@
     };
     c3_chart_internal_fn.getYAxisClipWidth = function () {
         var $$ = this;
-        return $$.getAxisClipWidth($$.config.axis_rotated);
+        return $$.getAxisClipWidth($$.config.axis_rotated) + ($$.config.axis_y_inner ? 20 : 0);
     };
     c3_chart_internal_fn.getYAxisClipHeight = function () {
         var $$ = this;

@@ -23,7 +23,7 @@ c3_chart_internal_fn.getXAxisClipY = function () {
 };
 c3_chart_internal_fn.getYAxisClipX = function () {
     var $$ = this;
-    return $$.getAxisClipX($$.config.axis_rotated);
+    return $$.config.axis_y_inner ? -1 : $$.getAxisClipX($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipY = function () {
     var $$ = this;
@@ -49,7 +49,7 @@ c3_chart_internal_fn.getXAxisClipHeight = function () {
 };
 c3_chart_internal_fn.getYAxisClipWidth = function () {
     var $$ = this;
-    return $$.getAxisClipWidth($$.config.axis_rotated);
+    return $$.getAxisClipWidth($$.config.axis_rotated) + ($$.config.axis_y_inner ? 20 : 0);
 };
 c3_chart_internal_fn.getYAxisClipHeight = function () {
     var $$ = this;
