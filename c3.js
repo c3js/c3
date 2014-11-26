@@ -5948,7 +5948,8 @@
             },
             withLegend: true,
             withTransition: orgDataCount > 1,
-            withTrimXDomain: false
+            withTrimXDomain: false,
+            withUpdateXDomain: $$.isTimeSeries
         });
     };
 
