@@ -5,11 +5,4 @@ d3.js
 d3.min.js
 components
 build
-.idea/.name
-.idea/c3.iml
-.idea/encodings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/scopes/scope_settings.xml
-.idea/vcs.xml
-.idea/workspace.xml
+.idea
