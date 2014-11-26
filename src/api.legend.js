@@ -9,3 +9,9 @@ c3_chart_fn.legend.hide = function (targetIds) {
     $$.hideLegend($$.mapToTargetIds(targetIds));
     $$.updateAndRedraw({withLegend: true});
 };
+c3_chart_fn.legend.position = function (position) {
+    var $$ = this.internal;
+    $$.config.legend_position = position;
+    $$.isLegendRight = $$.config.legend_position === 'right';
+    $$.updateAndRedraw({withLegend: true});
+};
