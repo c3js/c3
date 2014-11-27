@@ -4353,6 +4353,7 @@
         // rotate tick text if needed
         if (!config.axis_rotated && config.axis_x_tick_rotate) {
             $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
+            $$.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
         }
     };
 
@@ -5143,11 +5144,6 @@
             }
             // update subchart elements if needed
             if (withSubchart) {
-
-                // rotate tick text if needed
-                if (!config.axis_rotated && config.axis_x_tick_rotate) {
-                    $$.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
-                }
 
                 // extent rect
                 if (!$$.brush.empty()) {

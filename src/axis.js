@@ -368,5 +368,6 @@ c3_chart_internal_fn.redrawAxis = function (transitions, isHidden) {
     // rotate tick text if needed
     if (!config.axis_rotated && config.axis_x_tick_rotate) {
         $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
+        $$.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
     }
 };
