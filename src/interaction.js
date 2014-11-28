@@ -142,7 +142,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
 
             // Call event handler
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                config.data_onmouseover.call($$, d);
+                config.data_onmouseover.call($$.api, d);
             });
         })
         .on('mouseout', function (d) {
@@ -155,7 +155,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             $$.unexpandBars();
             // Call event handler
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                config.data_onmouseout.call($$, d);
+                config.data_onmouseout.call($$.api, d);
             });
         })
         .on('mousemove', function (d) {
@@ -270,7 +270,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
 
             if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
-                config.data_onmouseout.call($$, $$.mouseover);
+                config.data_onmouseout.call($$.api, $$.mouseover);
                 $$.mouseover = undefined;
             }
 
@@ -304,7 +304,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
                 $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                 if (!$$.mouseover) {
-                    config.data_onmouseover.call($$, closest);
+                    config.data_onmouseover.call($$.api, closest);
                     $$.mouseover = closest;
                 }
             }
