@@ -3662,13 +3662,19 @@
 
     c3_chart_internal_fn.initLegend = function () {
         var $$ = this;
+        $$.legendHasRendered = false;
         $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
         if (!$$.config.legend_show) {
             $$.legend.style('visibility', 'hidden');
             $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
+            return;
         }
         // MEMO: call here to update legend box and tranlate for all
         // MEMO: translate will be upated by this, so transform not needed in updateLegend()
+        $$.updateLegendWithDefaults();
+    };
+    c3_chart_internal_fn.updateLegendWithDefaults = function () {
+        var $$ = this;
         $$.updateLegend($$.mapToIds($$.data.targets), {withTransform: false, withTransitionForTransform: false, withTransition: false});
     };
     c3_chart_internal_fn.updateSizeForLegend = function (legendHeight, legendWidth) {
@@ -3745,6 +3751,9 @@
         if (!config.legend_show) {
             config.legend_show = true;
             $$.legend.style('visibility', 'visible');
+            if (!$$.legendHasRendered) {
+                $$.updateLegendWithDefaults();
+            }
         }
         $$.removeHiddenLegendIds(targetIds);
         $$.legend.selectAll($$.selectorLegends(targetIds))
@@ -3981,6 +3990,7 @@
         $$.updateSvgSize();
         // Update g positions
         $$.transformAll(withTransitionForTransform, transitions);
+        $$.legendHasRendered = true;
     };
 
     c3_chart_internal_fn.initAxis = function () {
