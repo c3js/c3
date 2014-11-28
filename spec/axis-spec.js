@@ -150,6 +150,34 @@ describe('c3 chart axis', function () {
         });
     });
 
+    describe('axis.x.tick.values', function () {
+        describe('function is provided', function () {
+            var tickGenerator = function (/*domain*/) {
+                var values = [];
+                for (var i = 0; i <= 300; i += 50) {
+                    values.push(i);
+                }
+                return values;
+            };
+            beforeEach(function () {
+                args.axis.x = {
+                    tick: {
+                        values: tickGenerator
+                    }
+                };
+                chart = window.c3.generate(args);
+                window.generatedTicks = tickGenerator();
+            });
+
+            it('should use function to generate ticks', function () {
+                d3.select('.c3-axis-x').selectAll('g.tick').each(function (d, i) {
+                    var tick = d3.select(this).select('text').text();
+                    expect(+tick).toBe(window.generatedTicks[i]);
+                });
+            });
+        });
+    });
+
     describe('axis.x.tick.width', function () {
 
         describe('indexed x axis and y/y2 axis', function () {
