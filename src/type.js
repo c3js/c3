@@ -18,10 +18,12 @@ c3_chart_internal_fn.hasType = function (type, targets) {
                 has = true;
             }
         });
-    } else {
+    } else if (Object.keys(types).length) {
         Object.keys(types).forEach(function (id) {
             if (types[id] === type) { has = true; }
         });
+    } else {
+        has = $$.config.data_type === type;
     }
     return has;
 };
