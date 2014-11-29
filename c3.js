@@ -1787,8 +1787,8 @@
 
         // find mouseovering bar
         values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
-            var shape = $$.d3.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
-            if ($$.isWithinBar(shape)) {
+            var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+            if (!closest && $$.isWithinBar(shape)) {
                 closest = v;
             }
         });
