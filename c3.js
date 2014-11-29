@@ -3715,12 +3715,10 @@
         return h;
     };
     c3_chart_internal_fn.opacityForLegend = function (legendItem) {
-        var $$ = this;
-        return legendItem.classed(CLASS.legendItemHidden) ? $$.legendOpacityForHidden : 1;
+        return legendItem.classed(CLASS.legendItemHidden) ? null : 1;
     };
     c3_chart_internal_fn.opacityForUnfocusedLegend = function (legendItem) {
-        var $$ = this;
-        return legendItem.classed(CLASS.legendItemHidden) ? $$.legendOpacityForHidden : 0.3;
+        return legendItem.classed(CLASS.legendItemHidden) ? null : 0.3;
     };
     c3_chart_internal_fn.toggleFocusLegend = function (targetIds, focus) {
         var $$ = this;
@@ -3969,7 +3967,7 @@
                 if ($$.isTargetToShow(id)) {
                     return !hasFocused || This.classed(CLASS.legendItemFocused) ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
                 } else {
-                    return $$.legendOpacityForHidden;
+                    return null; // c3-legend-item-hidden will be applied
                 }
             });
 
