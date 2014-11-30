@@ -151,4 +151,36 @@ describe('c3 chart legend', function () {
 
     });
 
+    describe('legend.show', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    show: false
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should not initially have rendered any legend items', function () {
+            expect(d3.selectAll('.c3-legend-item').empty()).toBe(true);
+        });
+
+        it('allows us to show the legend on showLegend call', function () {
+            chart.legend.show();
+            d3.selectAll('.c3-legend-item').each(function () {
+                expect(d3.select(this).style('visibility')).toBe('visible');
+                // This selects all the children, but we expect it to be empty
+                expect(d3.select(this).selectAll("*").length).not.toEqual(0);
+            });
+        });
+
+    });
+
 });
