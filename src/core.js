@@ -119,7 +119,6 @@ c3_chart_internal_fn.initParams = function () {
     $$.legendStep = 0;
     $$.legendItemWidth = 0;
     $$.legendItemHeight = 0;
-    $$.legendOpacityForHidden = 0.15;
 
     $$.currentMaxTickWidths = {
         x: 0,
