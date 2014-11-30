@@ -427,7 +427,9 @@
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
         var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
-        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis, withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend, withEventRect, withDimension;
+        var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis,
+            withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend,
+            withEventRect, withDimension, withUpdateXAxis;
         var hideAxis = $$.hasArcType();
         var drawArea, drawBar, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis;
@@ -443,6 +445,7 @@
         withUpdateXDomain = getOption(options, "withUpdateXDomain", false);
         withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", false);
         withTrimXDomain = getOption(options, "withTrimXDomain", true);
+        withUpdateXAxis = getOption(options, "withUpdateXAxis", withUpdateXDomain);
         withLegend = getOption(options, "withLegend", false);
         withEventRect = getOption(options, "withEventRect", true);
         withDimension = getOption(options, "withDimension", true);
@@ -506,7 +509,7 @@
         $$.updateAxisLabels(withTransition);
 
         // show/hide if manual culling needed
-        if (withUpdateXDomain && targetsToShow.length) {
+        if ((withUpdateXDomain || withUpdateXAxis) && targetsToShow.length) {
             if (config.axis_x_tick_culling && tickValues) {
                 for (i = 1; i < tickValues.length; i++) {
                     if (tickValues.length / i < config.axis_x_tick_culling_max) {
@@ -5943,7 +5946,8 @@
             },
             withLegend: true,
             withTransition: orgDataCount > 1,
-            withTrimXDomain: false
+            withTrimXDomain: false,
+            withUpdateXAxis: true,
         });
     };
 

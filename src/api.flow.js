@@ -136,7 +136,8 @@ c3_chart_fn.flow = function (args) {
         },
         withLegend: true,
         withTransition: orgDataCount > 1,
-        withTrimXDomain: false
+        withTrimXDomain: false,
+        withUpdateXAxis: true,
     });
 };
 
