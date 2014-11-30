@@ -167,9 +167,10 @@ function c3_axis(d3, params) {
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };
                     });
-                })
-              .enter().append('tspan')
-                .text(function (d) { return d.splitted; });
+                });
+            tspan.enter().append('tspan');
+            tspan.exit().remove();
+            tspan.text(function (d) { return d.splitted; });
 
             switch (orient) {
             case "bottom":
