@@ -3766,6 +3766,9 @@
             .style('visibility', 'hidden');
     };
     var legendItemTextBox = {};
+    c3_chart_internal_fn.clearLegendItemTextBoxCache = function () {
+        legendItemTextBox = {};
+    };
     c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         var $$ = this, config = $$.config;
         var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
@@ -6273,6 +6276,7 @@
         return values;
     };
     c3_chart_fn.data.names = function (names) {
+        this.internal.clearLegendItemTextBoxCache();
         return this.internal.updateDataAttributes('names', names);
     };
     c3_chart_fn.data.colors = function (colors) {

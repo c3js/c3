@@ -16,6 +16,7 @@ c3_chart_fn.data.values = function (targetId) {
     return values;
 };
 c3_chart_fn.data.names = function (names) {
+    this.internal.clearLegendItemTextBoxCache();
     return this.internal.updateDataAttributes('names', names);
 };
 c3_chart_fn.data.colors = function (colors) {

@@ -100,6 +100,9 @@ c3_chart_internal_fn.hideLegend = function (targetIds) {
         .style('visibility', 'hidden');
 };
 var legendItemTextBox = {};
+c3_chart_internal_fn.clearLegendItemTextBoxCache = function () {
+    legendItemTextBox = {};
+};
 c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var $$ = this, config = $$.config;
     var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect;
