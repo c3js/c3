@@ -1,4 +1,4 @@
-var c3 = { version: "0.4.5" };
+var c3 = { version: "0.4.6" };
 
 var c3_chart_fn, c3_chart_internal_fn;
 
