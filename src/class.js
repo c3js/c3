@@ -170,5 +170,5 @@ c3_chart_internal_fn.selectorLegend = function (id) {
 };
 c3_chart_internal_fn.selectorLegends = function (ids) {
     var $$ = this;
-    return ids.length ? ids.map(function (id) { return $$.selectorLegend(id); }) : null;
+    return ids && ids.length ? ids.map(function (id) { return $$.selectorLegend(id); }) : null;
 };

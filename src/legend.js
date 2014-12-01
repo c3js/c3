@@ -66,12 +66,11 @@ c3_chart_internal_fn.toggleFocusLegend = function (targetIds, focus) {
     var $$ = this;
     targetIds = $$.mapToTargetIds(targetIds);
     $$.legend.selectAll('.' + CLASS.legendItem)
-        .classed(CLASS.legendItemFocused, function (id) {
-            return targetIds.indexOf(id) >= 0 && focus;
-        })
-        .transition().duration(100)
-        .style('opacity', function (id) {
-            var opacity = targetIds.indexOf(id) >= 0 && focus ? $$.opacityForLegend : $$.opacityForUnfocusedLegend;
+        .filter(function (id) { return targetIds.indexOf(id) >= 0; })
+        .classed(CLASS.legendItemFocused, focus)
+      .transition().duration(100)
+        .style('opacity', function () {
+            var opacity = focus ? $$.opacityForLegend : $$.opacityForUnfocusedLegend;
             return opacity.call($$, $$.d3.select(this));
         });
 };

@@ -47,7 +47,7 @@ c3_chart_fn.revert = function (targetIds) {
     if ($$.hasArcType()) {
         $$.unexpandArc(targetIds);
     }
-    $$.revertLegend();
+    $$.showLegend(targetIds);
 
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
