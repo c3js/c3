@@ -5690,7 +5690,9 @@
         if ($$.hasArcType()) {
             $$.unexpandArc(targetIds);
         }
-        $$.showLegend(targetIds);
+        if ($$.config.legend_show) {
+            $$.showLegend(targetIds);
+        }
 
         $$.focusedTargetIds = [];
         $$.defocusedTargetIds = [];

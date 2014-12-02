@@ -368,4 +368,66 @@ describe('c3 api load', function () {
 
     });
 
+    describe('when legend.show = false', function () {
+
+        it('should update args to hide legend', function () {
+            args.legend = {
+                show: false
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should focus all targets without showing legend', function (done) {
+            var main = chart.internal.main,
+                legend = chart.internal.legend;
+            chart.focus();
+            setTimeout(function () {
+                var targets = main.select('.c3-chart-line.c3-target'),
+                    legendItems = legend.select('.c3-legend-item');
+                targets.each(function () {
+                    var line = d3.select(this);
+                    expect(line.classed('c3-focused')).toBeTruthy();
+                });
+                expect(legendItems.size()).toBeCloseTo(0);
+                done();
+            }, 500);
+        });
+
+        it('should defocus all targets without showing legend', function (done) {
+            var main = chart.internal.main,
+                legend = chart.internal.legend;
+            chart.defocus();
+            setTimeout(function () {
+                var targets = main.select('.c3-chart-line.c3-target'),
+                    legendItems = legend.select('.c3-legend-item');
+                targets.each(function () {
+                    var line = d3.select(this);
+                    expect(line.classed('c3-defocused')).toBeTruthy();
+                });
+                expect(legendItems.size()).toBeCloseTo(0);
+                done();
+            }, 500);
+        });
+
+        it('should revert all targets after focus', function (done) {
+            var main = chart.internal.main,
+                legend = chart.internal.legend;
+            chart.focus();
+            setTimeout(function () {
+                chart.revert();
+                setTimeout(function () {
+                    var targets = main.select('.c3-chart-line.c3-target'),
+                        legendItems = legend.select('.c3-legend-item');
+                    targets.each(function () {
+                        var line = d3.select(this);
+                        expect(line.classed('c3-focused')).toBeFalsy();
+                    });
+                    expect(legendItems.size()).toBeCloseTo(0);
+                    done();
+                }, 500);
+            }, 500);
+        });
+
+    });
+
 });
