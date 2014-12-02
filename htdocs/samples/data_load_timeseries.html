@@ -34,7 +34,9 @@
       }, 1000);
 
       setTimeout(function () {
-        chart.unload('data2');
+        chart.unload({
+          ids: 'data2'
+        });
       }, 2000);
 
       setTimeout(function () {

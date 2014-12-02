@@ -20,8 +20,8 @@
           selection: {
             enabled: true
           },
-          onenter: function (d) { console.log("onenter", d); },
-          onleave: function (d) { console.log("onleave", d); }
+          onmouseover: function (d) { console.log("onmouseover", d); },
+          onmouseout: function (d) { console.log("onmouseout", d); }
         },
       });
 
@@ -44,6 +44,15 @@
           ]
         });
       }, 3000);
+
+      setTimeout(function () {
+        chart.load({
+          columns: [
+            ['x', 130, 140, 200, 300, 450, 550],
+            ['sample', 200, 350, 100, 200, 50, 100]
+          ]
+        })
+      }, 4000);
 
     </script>
   </body>

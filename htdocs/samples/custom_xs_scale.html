@@ -24,8 +24,9 @@
           selection: {
             enabled: true
           },
-          onenter: function (d) { console.log("onenter", d); },
-          onleave: function (d) { console.log("onleave", d); }
+          onclick: function (d) { console.log("onclick", d); },
+          onmouseover: function (d) { console.log("onmouseover", d); },
+          onmouseout: function (d) { console.log("onmouseout", d); }
         }
       });
 
