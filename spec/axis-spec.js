@@ -742,7 +742,7 @@ describe('c3 chart axis', function () {
         it('should not have inner y axis', function () {
             var paddingRight = chart.internal.getCurrentPaddingRight(),
                 tickTexts = chart.internal.main.selectAll('.c3-axis-2y g.tick text');
-            expect(paddingRight).toBe(40);
+            expect(paddingRight).toBeGreaterThan(39);
             tickTexts.each(function () {
                 expect(+d3.select(this).attr('x')).toBeGreaterThan(0);
             });

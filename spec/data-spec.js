@@ -199,8 +199,8 @@ describe('c3 chart data', function () {
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -221,8 +221,8 @@ describe('c3 chart data', function () {
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -250,8 +250,8 @@ describe('c3 chart data', function () {
                         expectedXs = [490, 516, 490, 4];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -272,8 +272,8 @@ describe('c3 chart data', function () {
                         expectedXs = [76, 526, 76, 4];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -317,8 +317,8 @@ describe('c3 chart data', function () {
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -339,8 +339,8 @@ describe('c3 chart data', function () {
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -368,8 +368,8 @@ describe('c3 chart data', function () {
                         expectedXs = [103, 78, 103, 526];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -390,8 +390,8 @@ describe('c3 chart data', function () {
                         expectedXs = [511, 67, 511, 526];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -435,8 +435,8 @@ describe('c3 chart data', function () {
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -457,8 +457,8 @@ describe('c3 chart data', function () {
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
             });
@@ -485,8 +485,8 @@ describe('c3 chart data', function () {
                         expectedXs = [69, 525, 513, 295];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -507,8 +507,8 @@ describe('c3 chart data', function () {
                         expectedXs = [67, 527, 515, 297];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
             });
@@ -547,8 +547,8 @@ describe('c3 chart data', function () {
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -569,8 +569,8 @@ describe('c3 chart data', function () {
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -598,8 +598,8 @@ describe('c3 chart data', function () {
                         expectedXs = [57, 150, 77, 363];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -620,8 +620,8 @@ describe('c3 chart data', function () {
                         expectedXs = [107, 192, 125, 386];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
             });
@@ -660,8 +660,8 @@ describe('c3 chart data', function () {
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -682,8 +682,8 @@ describe('c3 chart data', function () {
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -711,8 +711,8 @@ describe('c3 chart data', function () {
                         expectedXs = [533, 440, 513, 230];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
 
@@ -733,8 +733,8 @@ describe('c3 chart data', function () {
                         expectedXs = [480, 397, 462, 205];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
-                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -1);
-                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -1);
+                        expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
+                        expect(+text.attr('x')).toBeCloseTo(expectedXs[i], -2);
                     });
                 });
             });
