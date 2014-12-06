@@ -1369,16 +1369,16 @@
             padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
         } else if (showVerticalDataLabel) {
             lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
-            padding_top += domainLength * (lengths[1] / $$.height);
-            padding_bottom += domainLength * (lengths[0] / $$.height);
+            padding_top += this.convertPixelsToAxisPadding(lengths[1], domainLength);
+            padding_bottom += this.convertPixelsToAxisPadding(lengths[0], domainLength);
         }
         if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
-            padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);
-            padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding, domainLength);
+            padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding_top, domainLength);
+            padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding_bottom, domainLength);
         }
         if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
-            padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding, domainLength);
-            padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding, domainLength);
+            padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding_top, domainLength);
+            padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding_bottom, domainLength);
         }
         // Bar/Area chart should be 0-based if all positive|negative
         if (isZeroBased) {
@@ -3233,7 +3233,15 @@
         } else {
             xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
         }
-        return d.value !== null ? xPos : xPos > $$.width ? $$.width - box.width : xPos;
+        // show labels regardless of the domain if value is null
+        if (d.value === null) {
+            if (xPos > $$.width) {
+                xPos = $$.width - box.width;
+            } else if (xPos < 0) {
+                xPos = 4;
+            }
+        }
+        return xPos;
     };
     c3_chart_internal_fn.getYForText = function (points, d, textElement) {
         var $$ = this,
@@ -3243,7 +3251,15 @@
         } else {
             yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
         }
-        return d.value !== null ? yPos : yPos < box.height ? box.height : yPos;
+        // show labels regardless of the domain if value is null
+        if (d.value === null && !$$.config.axis_rotated) {
+            if (yPos < box.height) {
+                yPos = box.height;
+            } else if (yPos > this.height) {
+                yPos = this.height - 4;
+            }
+        }
+        return yPos;
     };
 
     c3_chart_internal_fn.setTargetType = function (targetIds, type) {
@@ -4315,9 +4331,19 @@
             .text($$.textForY2AxisLabel.bind($$));
     };
 
-    c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, all) {
-        var ratio = padding.unit === 'ratio' ? all : 1;
-        return isValue(padding[key]) ? padding[key] * ratio : defaultValue;
+    c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, domainLength) {
+        if (!isValue(padding[key])) {
+            return defaultValue;
+        }
+        if (padding.unit === 'ratio') {
+            return padding[key] * domainLength;
+        }
+        // assume padding is pixels if unit is not specified
+        return this.convertPixelsToAxisPadding(padding[key], domainLength);
+    };
+    c3_chart_internal_fn.convertPixelsToAxisPadding = function (pixels, domainLength) {
+        var length = this.config.axis_rotated ? this.width : this.height;
+        return domainLength * (pixels / length);
     };
 
     c3_chart_internal_fn.generateTickValues = function (values, tickCount, forTimeSeries) {

@@ -315,9 +315,19 @@ c3_chart_internal_fn.updateAxisLabels = function (withTransition) {
         .text($$.textForY2AxisLabel.bind($$));
 };
 
-c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, all) {
-    var ratio = padding.unit === 'ratio' ? all : 1;
-    return isValue(padding[key]) ? padding[key] * ratio : defaultValue;
+c3_chart_internal_fn.getAxisPadding = function (padding, key, defaultValue, domainLength) {
+    if (!isValue(padding[key])) {
+        return defaultValue;
+    }
+    if (padding.unit === 'ratio') {
+        return padding[key] * domainLength;
+    }
+    // assume padding is pixels if unit is not specified
+    return this.convertPixelsToAxisPadding(padding[key], domainLength);
+};
+c3_chart_internal_fn.convertPixelsToAxisPadding = function (pixels, domainLength) {
+    var length = this.config.axis_rotated ? this.width : this.height;
+    return domainLength * (pixels / length);
 };
 
 c3_chart_internal_fn.generateTickValues = function (values, tickCount, forTimeSeries) {
