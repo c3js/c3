@@ -126,8 +126,8 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
     } else if (showVerticalDataLabel) {
         lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
-        padding_top += lengths[1];
-        padding_bottom += lengths[0];
+        padding_top += domainLength * (lengths[1] / $$.height);
+        padding_bottom += domainLength * (lengths[0] / $$.height);
     }
     if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
         padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);

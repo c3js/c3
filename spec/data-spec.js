@@ -22,16 +22,8 @@ describe('c3 chart data', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('function in data.order', function () {
@@ -147,4 +139,27 @@ describe('c3 chart data', function () {
         });
 
     });
+
+    describe('data.label', function () {
+
+        it('should update args to show data label', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 0.03, 0.2, 0.1, 0.4, 0.15, 0.250]
+                    ],
+                    labels: true
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should have proper y domain', function () {
+            var domain = chart.internal.y.domain();
+            expect(domain[0]).toBeCloseTo(-0.02);
+            expect(domain[1]).toBeCloseTo(0.45);
+        });
+
+    });
+
 });
