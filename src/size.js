@@ -35,7 +35,7 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
     } else if (config.axis_rotated) {
         return defaultPadding + legendWidthOnRight;
     } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
-        return defaultPadding + legendWidthOnRight + ($$.getY2AxisLabelPosition().isOuter ? 20 : 0);
+        return 2 + legendWidthOnRight + ($$.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
         return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
@@ -63,9 +63,10 @@ c3_chart_internal_fn.getParentHeight = function () {
 
 c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
     var $$ = this, config = $$.config,
+        hasLeftAxisRect = config.axis_rotated || (!config.axis_rotated && !config.axis_y_inner),
         leftAxisClass = config.axis_rotated ? CLASS.axisX : CLASS.axisY,
         leftAxis = $$.main.select('.' + leftAxisClass).node(),
-        svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
+        svgRect = leftAxis && hasLeftAxisRect ? leftAxis.getBoundingClientRect() : {right: 0},
         chartRect = $$.selectChart.node().getBoundingClientRect(),
         hasArc = $$.hasArcType(),
         svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : $$.getCurrentPaddingLeft(withoutRecompute));
