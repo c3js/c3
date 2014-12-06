@@ -738,8 +738,14 @@
         return d ? this.x(d.x) : null;
     };
     c3_chart_internal_fn.xv = function (d) {
-        var $$ = this;
-        return Math.ceil($$.x($$.isTimeSeries() ? $$.parseDate(d.value) : d.value));
+        var $$ = this, value = d.value;
+        if ($$.isTimeSeries()) {
+            value = $$.parseDate(d.value);
+        }
+        else if ($$.isCategorized() && typeof d.value === 'string') {
+            value = $$.config.axis_x_categories.indexOf(d.value);
+        }
+        return Math.ceil($$.x(value));
     };
     c3_chart_internal_fn.yv = function (d) {
         var $$ = this,

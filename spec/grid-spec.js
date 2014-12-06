@@ -80,4 +80,52 @@ describe('c3 chart grid', function () {
         });
 
     });
+
+    describe('x grid lines', function () {
+
+        describe('on category axis', function () {
+
+            it('should update args', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', 'a', 'b', 'c', 'd'],
+                            ['data1', 30, 200, 100, 400],
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        }
+                    },
+                    grid: {
+                        x: {
+                            lines: [
+                                {value: 3, text: 'Label 3'},
+                                {value: 'a', text: 'Label a'}
+                            ]
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show x grid lines', function () {
+                var lines = chart.internal.main.selectAll('.c3-xgrid-lines .c3-xgrid-line'),
+                    expectedX1 = [515, 74],
+                    expectedText = ['Label 3', 'Label a'];
+                lines.each(function (id, i) {
+                    var line = d3.select(this),
+                        l = line.select('line'),
+                        t = line.select('text');
+                    expect(+l.attr('x1')).toBeCloseTo(expectedX1[i], -1);
+                    expect(t.text()).toBe(expectedText[i]);
+                });
+            });
+
+        });
+
+    });
+
 });
