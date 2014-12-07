@@ -411,7 +411,7 @@ describe('c3 chart axis', function () {
                     ticks.each(function (d, i) {
                         var tspans = d3.select(this).selectAll('tspan'),
                             expectedX = '-9',
-                            expectedDy = '2';
+                            expectedDy = '3';
                         if (i > 0) { // i === 0 should be checked in next test
                             expect(tspans.size()).toBe(1);
                             tspans.each(function () {
