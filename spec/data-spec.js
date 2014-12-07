@@ -91,49 +91,134 @@ describe('c3 chart data', function () {
         });
 
         describe('milliseconds timeseries x', function () {
-            it('should load timeseries data successfully', function () {
-                args = {
-                    data: {
-                        x : 'date',
-                        xFormat: '%Y-%m-%d %H:%M:%S.%L',
-                        columns: [
-                            ['date', "2014-05-20 17:25:00.123", "2014-05-20 17:30:00.345"],
-                            ['data1', 30, 200],
-                            ['data2', 130, 300]
-                        ]
-                    },
-                    axis: {
-                        x: {
-                            type: 'timeseries',
-                            tick: {
-                                format: '%Y-%m-%d %H:%M:%S.%L',
-                                multiline: false
+
+            describe('as date string', function () {
+
+                it('should update args', function () {
+                    args = {
+                        data: {
+                            x : 'date',
+                            xFormat: '%Y-%m-%d %H:%M:%S.%L',
+                            columns: [
+                                ['date', "2014-05-20 17:25:00.123", "2014-05-20 17:30:00.345"],
+                                ['data1', 30, 200],
+                                ['data2', 130, 300]
+                            ]
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d %H:%M:%S.%L',
+                                    multiline: false
+                                }
                             }
                         }
-                    }
-                };
-                expect(true).toBeTruthy();
-            });
-
-            it('should have correct number of xs', function () {
-                expect(Object.keys(chart.internal.data.xs).length).toBe(2);
-                expect(chart.internal.data.xs.data1.length).toBe(2);
-                expect(chart.internal.data.xs.data2.length).toBe(2);
-            });
-
-            it('should have Date object as x', function () {
-                var xs = chart.internal.data.xs;
-                expect(+xs.data1[0]).toBe(+new Date(2014, 4, 20, 17, 25, 0, 123));
-                expect(+xs.data1[1]).toBe(+new Date(2014, 4, 20, 17, 30, 0, 345));
-                expect(+xs.data2[0]).toBe(+new Date(2014, 4, 20, 17, 25, 0, 123));
-                expect(+xs.data2[1]).toBe(+new Date(2014, 4, 20, 17, 30, 0, 345));
-            });
-
-            it('should have milliseconds tick format', function () {
-                var expected = ["2014-05-20 17:25:00.123", "2014-05-20 17:30:00.345"];
-                chart.internal.main.selectAll('.c3-axis-x g.tick text').each(function (d, i) {
-                    expect(d3.select(this).text()).toBe(expected[i]);
+                    };
+                    expect(true).toBeTruthy();
                 });
+
+                it('should have correct number of xs', function () {
+                    expect(Object.keys(chart.internal.data.xs).length).toBe(2);
+                    expect(chart.internal.data.xs.data1.length).toBe(2);
+                    expect(chart.internal.data.xs.data2.length).toBe(2);
+                });
+
+                it('should have Date object as x', function () {
+                    var xs = chart.internal.data.xs;
+                    expect(+xs.data1[0]).toBe(+new Date(2014, 4, 20, 17, 25, 0, 123));
+                    expect(+xs.data1[1]).toBe(+new Date(2014, 4, 20, 17, 30, 0, 345));
+                    expect(+xs.data2[0]).toBe(+new Date(2014, 4, 20, 17, 25, 0, 123));
+                    expect(+xs.data2[1]).toBe(+new Date(2014, 4, 20, 17, 30, 0, 345));
+                });
+
+                it('should have milliseconds tick format', function () {
+                    var expected = ["2014-05-20 17:25:00.123", "2014-05-20 17:30:00.345"];
+                    chart.internal.main.selectAll('.c3-axis-x g.tick text').each(function (d, i) {
+                        expect(d3.select(this).text()).toBe(expected[i]);
+                    });
+                });
+
+            });
+
+            describe('as unixtime number', function () {
+
+                it('should update args', function () {
+                    args = {
+                        data: {
+                            x : 'date',
+                            columns: [
+                                ['date', 1417622461123, 1417622522345],
+                                ['data1', 30, 200],
+                                ['data2', 130, 300]
+                            ]
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d %H:%M:%S.%L'
+                                }
+                            }
+                        }
+                    };
+                    expect(true).toBeTruthy();
+                });
+
+                it('should have correct number of xs', function () {
+                    expect(Object.keys(chart.internal.data.xs).length).toBe(2);
+                    expect(chart.internal.data.xs.data1.length).toBe(2);
+                    expect(chart.internal.data.xs.data2.length).toBe(2);
+                });
+
+                it('should have Date object as x', function () {
+                    var xs = chart.internal.data.xs;
+                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
+                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
+                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                });
+            });
+
+            describe('as unixtime string', function () {
+
+                it('should upate args', function () {
+                    args = {
+                        data: {
+                            x : 'date',
+                            columns: [
+                                ['date', "1417622461123", "1417622522345"],
+                                ['data1', 30, 200],
+                                ['data2', 130, 300]
+                            ]
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d %H:%M:%S.%L',
+                                    multiline: false
+                                }
+                            }
+                        }
+                    };
+                    expect(true).toBeTruthy();
+                });
+
+                it('should have correct number of xs', function () {
+                    expect(Object.keys(chart.internal.data.xs).length).toBe(2);
+                    expect(chart.internal.data.xs.data1.length).toBe(2);
+                    expect(chart.internal.data.xs.data2.length).toBe(2);
+                });
+
+                it('should have Date object as x', function () {
+                    var xs = chart.internal.data.xs;
+                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
+                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
+                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                });
+
             });
 
         });
