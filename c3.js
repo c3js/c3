@@ -5725,7 +5725,7 @@
             $$.unexpandArc(targetIds);
         }
         if ($$.config.legend_show) {
-            $$.showLegend(targetIds);
+            $$.showLegend(targetIds.filter($$.isLegendToShow.bind($$)));
         }
 
         $$.focusedTargetIds = [];
