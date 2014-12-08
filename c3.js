@@ -3451,9 +3451,9 @@
         xgridLine.append('line')
             .style("opacity", 0);
         xgridLine.append('text')
-            .attr("text-anchor", "end")
+            .attr("text-anchor", function (d) { return d.textAnchor === 'start' ? "start" : "end"; })
             .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
-            .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
+            .attr('dx', config.axis_rotated ? 0 : function (d) { return d.textAnchor === 'start' ? $$.margin.top : -$$.margin.top; })
             .attr('dy', -5)
             .style("opacity", 0);
         // udpate
@@ -3475,9 +3475,9 @@
         ygridLine.append('line')
             .style("opacity", 0);
         ygridLine.append('text')
-            .attr("text-anchor", "end")
+            .attr("text-anchor", function (d) { return d.textAnchor === 'start' ? "start" : "end"; })
             .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
-            .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
+            .attr('dx', config.axis_rotated ? 0 : function (d) { return d.textAnchor === 'start' ? $$.margin.top : -$$.margin.top; })
             .attr('dy', -5)
             .style("opacity", 0);
         // update
@@ -3491,7 +3491,7 @@
             .style("opacity", 1);
         $$.ygridLines.select('text')
           .transition().duration(duration)
-            .attr("x", config.axis_rotated ? 0 : $$.width)
+            .attr("x", config.axis_rotated ? 0 : function (d) { return d.textAnchor === 'start' ? 0 : $$.width; })
             .attr("y", yv)
             .text(function (d) { return d.text; })
             .style("opacity", 1);
@@ -3509,7 +3509,7 @@
                          .attr("y2", config.axis_rotated ? xv : $$.height)
                          .style("opacity", 1));
         transitions.push($$.xgridLines.select('text').transition()
-                         .attr("x", config.axis_rotated ? $$.width : 0)
+                         .attr("x", config.axis_rotated ? $$.width : function (d) { return d.textAnchor === 'start' ? -$$.height : 0; })
                          .attr("y", xv)
                          .text(function (d) { return d.text; })
                          .style("opacity", 1));
