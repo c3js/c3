@@ -175,7 +175,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             });
 
             if (config.tooltip_grouped) {
-                $$.showTooltip(selectedData, d3.mouse(this));
+                $$.showTooltip(selectedData, this);
                 $$.showXGridFocus(selectedData);
             }
 
@@ -206,7 +206,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                         eventRect.style('cursor', 'pointer');
                     }
                     if (!config.tooltip_grouped) {
-                        $$.showTooltip([d], d3.mouse(this));
+                        $$.showTooltip([d], this);
                         $$.showXGridFocus([d]);
                         if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
                         $$.expandBars(index, d.id, true);
@@ -289,7 +289,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             selectedData = sameXData.map(function (d) {
                 return $$.addName(d);
             });
-            $$.showTooltip(selectedData, mouse);
+            $$.showTooltip(selectedData, this);
 
             // expand points
             if (config.point_focus_expand_enabled) {
