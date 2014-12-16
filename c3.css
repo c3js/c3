@@ -160,6 +160,7 @@
   border-spacing:0;
   background-color:#fff;
   empty-cells:show;
+  width:auto;
   -webkit-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
      -moz-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
           box-shadow: 7px 7px 12px -9px rgb(119,119,119);
