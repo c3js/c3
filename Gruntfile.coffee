@@ -6,6 +6,9 @@ module.exports = (grunt) ->
           concat:
             tasks: 'concat'
             files: ['src/*.js']
+          sass:
+            tasks: 'sass'
+            files: ['src/scss/*.scss']
 
         concat:
           dist:
@@ -98,4 +101,11 @@ module.exports = (grunt) ->
             src: 'c3.css'
             dest: 'c3.min.css'
 
-    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'cssmin', 'uglify']
+        sass:
+          options:
+            sourcemap: 'none'
+          c3:
+            files:
+              'c3.css': 'src/scss/main.scss'
+
+    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'sass', 'cssmin', 'uglify']
