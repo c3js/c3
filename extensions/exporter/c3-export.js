@@ -19,14 +19,6 @@ if (!String.prototype.format) {
   };
 }
 
-// required polyfill, and see dicussion https://github.com/masayuki0812/c3/issues/552#issuecomment-55269072
-Function.prototype.bind = Function.prototype.bind || function (thisp) {
-  var fn = this;
-  return function () {
-    return fn.apply(thisp, arguments);
-  };
-};
-
 // defaults
 var page   = require('webpage').create(),
     fs     = require('fs'),
