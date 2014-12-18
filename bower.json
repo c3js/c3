@@ -24,5 +24,8 @@
   ],
   "dependencies": {
     "d3": "~3.4.4"
+  },
+  "devDependencies": {
+    "MutationObserver-shim": "~0.2.8"
   }
 }
