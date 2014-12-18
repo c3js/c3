@@ -11,13 +11,16 @@ module.exports = (grunt) ->
           dist:
             options:
               process: (src, filepath) ->
-                if filepath != 'src/head.js' && filepath != 'src/tail.js'
+                if filepath.match('MutationObserver.js')
+                    return '/* jshint ignore:start */\n' + src + '/* jshint ignore:end */\n'
+                else if filepath != 'src/head.js' && filepath != 'src/tail.js'
                   lines = []
                   src.split('\n').forEach (line) ->
                     lines.push( (if line.length > 0 then '    ' else '') + line)
                   src = lines.join('\n')
                 return src
             src: [
+              'bower_components/MutationObserver-shim/MutationObserver.js',
               'src/head.js',
               'src/core.js',
               'src/config.js',
