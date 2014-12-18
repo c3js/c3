@@ -3,8 +3,6 @@ var describe = window.describe,
     it = window.it,
     beforeEach = window.beforeEach;
 
-var initDom = window.initDom;
-
 describe('c3 chart axis', function () {
     'use strict';
 
@@ -24,16 +22,8 @@ describe('c3 chart axis', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('axis.y.min', function () {
@@ -89,6 +79,36 @@ describe('c3 chart axis', function () {
             var domain = chart.internal.y.domain();
             expect(domain[0]).toBe(-11);
             expect(domain[1]).toBe(1);
+        });
+
+    });
+
+    describe('axis.y.padding', function () {
+
+        it('should change axis.y.max to 1000', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 10, 20, 10, 40, 15, 25],
+                        ['data2', 50, 40, 30, 45, 25, 45]
+                    ]
+                },
+                axis: {
+                    y: {
+                        padding: {
+                            top: 200,
+                            bottom: 200
+                        }
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should be set properly when bigger than min of data', function () {
+            var domain = chart.internal.y.domain();
+            expect(domain[0]).toBeCloseTo(-9, -1);
+            expect(domain[1]).toBeCloseTo(69, -1);
         });
 
     });

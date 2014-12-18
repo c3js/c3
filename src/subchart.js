@@ -99,11 +99,6 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
         // update subchart elements if needed
         if (withSubchart) {
 
-            // rotate tick text if needed
-            if (!config.axis_rotated && config.axis_x_tick_rotate) {
-                $$.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
-            }
-
             // extent rect
             if (!$$.brush.empty()) {
                 $$.brush.extent($$.x.orgDomain()).update();
@@ -166,7 +161,8 @@ c3_chart_internal_fn.redrawForBrush = function () {
         withTransition: false,
         withY: $$.config.zoom_rescale,
         withSubchart: false,
-        withUpdateXDomain: true
+        withUpdateXDomain: true,
+        withDimension: false
     });
     $$.config.subchart_onbrush.call($$.api, x.orgDomain());
 };

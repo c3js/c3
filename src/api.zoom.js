@@ -5,7 +5,8 @@ c3_chart_fn.zoom = function (domain) {
             domain = domain.map(function (x) { return $$.parseDate(x); });
         }
         $$.brush.extent(domain);
-        $$.redraw({withUpdateXDomain: true});
+        $$.redraw({withUpdateXDomain: true, withY: $$.config.zoom_rescale});
+        $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
     }
     return $$.brush.extent();
 };

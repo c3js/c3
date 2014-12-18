@@ -21,8 +21,10 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
         return config.padding_left;
     } else if (config.axis_rotated) {
         return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+    } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
+        return $$.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
-        return !config.axis_y_show ? 1 : ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
+        return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
     }
 };
 c3_chart_internal_fn.getCurrentPaddingRight = function () {
@@ -32,8 +34,10 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
         return config.padding_right + 1; // 1 is needed not to hide tick line
     } else if (config.axis_rotated) {
         return defaultPadding + legendWidthOnRight;
+    } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
+        return 2 + legendWidthOnRight + ($$.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
-        return (!config.axis_y2_show ? defaultPadding : ceil10($$.getAxisWidthByAxisId('y2'))) + legendWidthOnRight;
+        return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
 };
 
@@ -59,9 +63,10 @@ c3_chart_internal_fn.getParentHeight = function () {
 
 c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
     var $$ = this, config = $$.config,
+        hasLeftAxisRect = config.axis_rotated || (!config.axis_rotated && !config.axis_y_inner),
         leftAxisClass = config.axis_rotated ? CLASS.axisX : CLASS.axisY,
         leftAxis = $$.main.select('.' + leftAxisClass).node(),
-        svgRect = leftAxis ? leftAxis.getBoundingClientRect() : {right: 0},
+        svgRect = leftAxis && hasLeftAxisRect ? leftAxis.getBoundingClientRect() : {right: 0},
         chartRect = $$.selectChart.node().getBoundingClientRect(),
         hasArc = $$.hasArcType(),
         svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : $$.getCurrentPaddingLeft(withoutRecompute));
@@ -71,11 +76,7 @@ c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
 
 c3_chart_internal_fn.getAxisWidthByAxisId = function (id, withoutRecompute) {
     var $$ = this, position = $$.getAxisLabelPositionById(id);
-    if (withoutRecompute) {
-        var box = $$.d3.select('.c3-axis-y').node().getBoundingClientRect();
-        return Math.floor(box.left + box.width);
-    }
-    return $$.getMaxTickWidth(id) + (position.isInner ? 20 : 40);
+    return $$.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
 };
 c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;

@@ -20,39 +20,71 @@ describe('c3 chart types', function () {
     };
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
+        chart = window.initChart(chart, args, done);
         d3 = chart.internal.d3;
-        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
     });
 
     describe('internal.hasArcType', function () {
 
-        it('should return true', function () {
-            expect(chart.internal.hasArcType()).toBeTruthy();
+        describe('with data', function () {
+
+            it('should return true', function () {
+                expect(chart.internal.hasArcType()).toBeTruthy();
+            });
+
+            it('should change chart type to "bar"', function () {
+                args.data.type = 'bar';
+                expect(true).toBeTruthy();
+            });
+
+            it('should return false', function () {
+                expect(chart.internal.hasArcType()).toBeFalsy();
+            });
+
         });
 
-        it('should change chart type to "bar" successfully', function () {
-            args.data.type = 'bar';
-            expect(true).toBeTruthy();
-        });
+        describe('with empty data', function () {
 
-        it('should return false', function () {
-            expect(chart.internal.hasArcType()).toBeFalsy();
+            it('should update args to have empty data', function () {
+                args = {
+                    data: {
+                        columns: [],
+                        type: 'pie'
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should return true', function () {
+                expect(chart.internal.hasArcType()).toBeTruthy();
+            });
+
+            it('should change chart type to "bar"', function () {
+                args.data.type = 'bar';
+                expect(true).toBeTruthy();
+            });
+
+            it('should return false', function () {
+                expect(chart.internal.hasArcType()).toBeFalsy();
+            });
+
         });
 
     });
 
     describe('internal.hasType', function () {
 
-        it('should change chart type to "pie" successfully', function () {
-            args.data.type = 'pie';
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', 150, 120, 110, 140, 115, 125]
+                    ],
+                    type: 'pie'
+                }
+            };
             expect(true).toBeTruthy();
         });
 

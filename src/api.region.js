@@ -2,14 +2,14 @@ c3_chart_fn.regions = function (regions) {
     var $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = regions;
-    $$.redraw();
+    $$.redrawWithoutRescale();
     return config.regions;
 };
 c3_chart_fn.regions.add = function (regions) {
     var $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = config.regions.concat(regions);
-    $$.redraw();
+    $$.redrawWithoutRescale();
     return config.regions;
 };
 c3_chart_fn.regions.remove = function (options) {

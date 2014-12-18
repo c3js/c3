@@ -99,6 +99,7 @@
 /*-- Arc --*/
 
 .c3-chart-arcs-title {
+  dominant-baseline: middle;
   font-size: 1.3em;
 }
 
@@ -137,6 +138,9 @@
 
 .c3-legend-item {
   font-size: 12px;
+}
+.c3-legend-item-hidden {
+  opacity: 0.15;
 }
 
 .c3-legend-background {
@@ -209,5 +213,5 @@
 
 .c3-chart-arc .c3-gauge-value {
   fill: #000;
-  font-size: 28px;
+/*  font-size: 28px !important;*/
 }

@@ -13,7 +13,7 @@ c3_chart_internal_fn.initZoom = function () {
         .on('zoomend', function () {
             var event = d3.event.sourceEvent;
             // if click, do nothing. otherwise, click interaction will be canceled.
-            if (event && startEvent.x === event.x && startEvent.y === event.y) {
+            if (event && startEvent.clientX === event.clientX && startEvent.clientY === event.clientY) {
                 return;
             }
             $$.redrawEventRect();
@@ -59,7 +59,8 @@ c3_chart_internal_fn.redrawForZoom = function () {
         withTransition: false,
         withY: config.zoom_rescale,
         withSubchart: false,
-        withEventRect: false
+        withEventRect: false,
+        withDimension: false
     });
     if (d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;

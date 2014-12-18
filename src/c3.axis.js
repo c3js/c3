@@ -1,6 +1,8 @@
 // Features:
 // 1. category axis
 // 2. ceil values of translate/x/y to int for half pixel antialiasing
+// 3. multiline tick text
+var tickTextCharSize;
 function c3_axis(d3, params) {
     var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
@@ -49,6 +51,9 @@ function c3_axis(d3, params) {
         return tickFormat ? tickFormat(v) : v;
     }
     function getSizeFor1Char(tick) {
+        if (tickTextCharSize) {
+            return tickTextCharSize;
+        }
         var size = {
             h: 11.5,
             w: 5.5
@@ -63,6 +68,7 @@ function c3_axis(d3, params) {
                 size.w = w;
             }
         }).text('');
+        tickTextCharSize = size;
         return size;
     }
     function axis(g) {
@@ -97,7 +103,7 @@ function c3_axis(d3, params) {
                 tickOffset = tickX = 0;
             }
 
-            var text, tspan, sizeFor1Char = getSizeFor1Char(tick), counts = [];
+            var text, tspan, sizeFor1Char = getSizeFor1Char(g.select('.tick')), counts = [];
             var tickLength = Math.max(innerTickSize, 0) + tickPadding,
                 isVertical = orient === 'left' || orient === 'right';
 
@@ -111,12 +117,12 @@ function c3_axis(d3, params) {
                 }
 
                 if (!maxWidth || maxWidth <= 0) {
-                    maxWidth = isVertical ? 95 : params.isCategory ? (tickOffset * 2 - 10) : 110;
+                    maxWidth = isVertical ? 95 : params.isCategory ? (Math.ceil(scale1(ticks[1]) - scale1(ticks[0])) - 12) : 110;
                 }
 
                 function split(splitted, text) {
                     spaceIndex = undefined;
-                    for (var i = 0; i < text.length; i++) {
+                    for (var i = 1; i < text.length; i++) {
                         if (text.charAt(i) === ' ') {
                             spaceIndex = i;
                         }
@@ -140,16 +146,16 @@ function c3_axis(d3, params) {
                 var dy = sizeFor1Char.h;
                 if (i === 0) {
                     if (orient === 'left' || orient === 'right') {
-                        dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - (params.isCategory ? 2 : 3));
+                        dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - 3);
                     } else {
-                        dy = params.isCategory ? ".40em" : ".71em";
+                        dy = ".71em";
                     }
                 }
                 return dy;
             }
 
             function tickSize(d) {
-                var tickPosition = scale(d) + tickOffset;
+                var tickPosition = scale(d) + (tickCentered ? 0 : tickOffset);
                 return range[0] < tickPosition && tickPosition < range[1] ? innerTickSize : 0;
             }
 
@@ -161,9 +167,10 @@ function c3_axis(d3, params) {
                     return splitted.map(function (s) {
                         return { index: i, splitted: s };
                     });
-                })
-              .enter().append('tspan')
-                .text(function (d) { return d.splitted; });
+                });
+            tspan.enter().append('tspan');
+            tspan.exit().remove();
+            tspan.text(function (d) { return d.splitted; });
 
             switch (orient) {
             case "bottom":

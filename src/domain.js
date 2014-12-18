@@ -112,9 +112,9 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
     domainLength = Math.abs(yDomainMax - yDomainMin);
     padding = padding_top = padding_bottom = domainLength * 0.1;
 
-    if (center) {
+    if (typeof center !== 'undefined') {
         yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
-        yDomainMax = yDomainAbs - center;
+        yDomainMax = center + yDomainAbs;
         yDomainMin = center - yDomainAbs;
     }
     // add padding for data label
@@ -126,16 +126,16 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
     } else if (showVerticalDataLabel) {
         lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
-        padding_top += lengths[1];
-        padding_bottom += lengths[0];
+        padding_top += this.convertPixelsToAxisPadding(lengths[1], domainLength);
+        padding_bottom += this.convertPixelsToAxisPadding(lengths[0], domainLength);
     }
     if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
-        padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding, domainLength);
-        padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding, domainLength);
+        padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding_top, domainLength);
+        padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding_bottom, domainLength);
     }
     if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
-        padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding, domainLength);
-        padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding, domainLength);
+        padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding_top, domainLength);
+        padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding_bottom, domainLength);
     }
     // Bar/Area chart should be 0-based if all positive|negative
     if (isZeroBased) {

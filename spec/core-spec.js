@@ -56,4 +56,63 @@ describe('c3 chart', function () {
 
     });
 
+    describe('bindto', function () {
+
+        it('should accept d3.selection object', function () {
+            args.bindto = d3.select('#chart');
+            expect(true).toBeTruthy();
+        });
+
+        it('should be created', function () {
+            var svg = d3.select('#chart svg');
+            expect(svg).not.toBeNull();
+        });
+
+    });
+
+    describe('empty data', function () {
+
+        it('should upaate args for empty data', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1'],
+                        ['data2']
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should generate a chart', function () {
+            var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
+            expect(ticks.size()).toBe(0);
+        });
+
+        it('should upaate args for empty data', function () {
+            args = {
+                data: {
+                    x: 'x',
+                    columns: [
+                        ['x'],
+                        ['data1'],
+                        ['data2']
+                    ]
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries'
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should generate a chart', function () {
+            var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
+            expect(ticks.size()).toBe(0);
+        });
+
+    });
+
 });

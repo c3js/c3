@@ -218,7 +218,7 @@ c3_chart_internal_fn.updateTargetsForArc = function (targets) {
     mainPieEnter.append('g')
         .attr('class', classArcs);
     mainPieEnter.append("text")
-        .attr("dy", $$.hasType('gauge') ? "-0.35em" : ".35em")
+        .attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em")
         .style("opacity", 0)
         .style("text-anchor", "middle")
         .style("pointer-events", "none");
@@ -245,15 +245,18 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     mainArc.enter().append('path')
         .attr("class", $$.classArc.bind($$))
         .style("fill", function (d) { return $$.color(d.data); })
-        .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; })
+        .style("cursor", function (d) { return config.interaction_enabled && config.data_selection_isselectable(d) ? "pointer" : null; })
         .style("opacity", 0)
         .each(function (d) {
             if ($$.isGaugeType(d.data)) {
                 d.startAngle = d.endAngle = -1 * (Math.PI / 2);
             }
             this._current = d;
-        })
-        .on('mouseover', function (d) {
+        });
+    mainArc
+        .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
+        .style("opacity", function (d) { return d === this._current ? 0 : 1; })
+        .on('mouseover', config.interaction_enabled ? function (d) {
             var updated, arcData;
             if ($$.transiting) { // skip while transiting
                 return;
@@ -265,14 +268,14 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             $$.api.focus(updated.data.id);
             $$.toggleFocusLegend(updated.data.id, true);
             $$.config.data_onmouseover(arcData, this);
-        })
-        .on('mousemove', function (d) {
+        } : null)
+        .on('mousemove', config.interaction_enabled ? function (d) {
             var updated = $$.updateAngle(d),
                 arcData = $$.convertToArcData(updated),
                 selectedData = [arcData];
             $$.showTooltip(selectedData, d3.mouse(this));
-        })
-        .on('mouseout', function (d) {
+        } : null)
+        .on('mouseout', config.interaction_enabled ? function (d) {
             var updated, arcData;
             if ($$.transiting) { // skip while transiting
                 return;
@@ -285,16 +288,13 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             $$.revertLegend();
             $$.hideTooltip();
             $$.config.data_onmouseout(arcData, this);
-        })
-        .on('click', function (d, i) {
+        } : null)
+        .on('click', config.interaction_enabled ? function (d, i) {
             var updated = $$.updateAngle(d),
                 arcData = $$.convertToArcData(updated);
             if ($$.toggleShape) { $$.toggleShape(this, arcData, i); }
             $$.config.data_onclick.call($$.api, arcData, this);
-        });
-    mainArc
-        .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
-        .style("opacity", function (d) { return d === this._current ? 0 : 1; })
+        } : null)
         .each(function () { $$.transiting = true; })
         .transition().duration(duration)
         .attrTween("d", function (d) {
@@ -335,7 +335,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .attr('class', function (d) { return $$.isGaugeType(d.data) ? CLASS.gaugeValue : ''; })
         .text($$.textForArcLabel.bind($$))
         .attr("transform", $$.transformForArcLabel.bind($$))
-        .transition().duration(duration)
+        .style('font-size', function (d) { return $$.isGaugeType(d.data) ? Math.round($$.radius / 5) + 'px' : ''; })
+      .transition().duration(duration)
         .style("opacity", function (d) { return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0; });
     main.select('.' + CLASS.chartArcsTitle)
         .style("opacity", $$.hasType('donut') || $$.hasType('gauge') ? 1 : 0);

@@ -80,7 +80,15 @@ c3_chart_internal_fn.getXForText = function (points, d, textElement) {
     } else {
         xPos = $$.hasType('bar') ? (points[2][0] + points[0][0]) / 2 : points[0][0];
     }
-    return d.value !== null ? xPos : xPos > $$.width ? $$.width - box.width : xPos;
+    // show labels regardless of the domain if value is null
+    if (d.value === null) {
+        if (xPos > $$.width) {
+            xPos = $$.width - box.width;
+        } else if (xPos < 0) {
+            xPos = 4;
+        }
+    }
+    return xPos;
 };
 c3_chart_internal_fn.getYForText = function (points, d, textElement) {
     var $$ = this,
@@ -90,5 +98,13 @@ c3_chart_internal_fn.getYForText = function (points, d, textElement) {
     } else {
         yPos = points[2][1] + (d.value < 0 ? box.height : $$.isBarType(d) ? -3 : -6);
     }
-    return d.value !== null ? yPos : yPos < box.height ? box.height : yPos;
+    // show labels regardless of the domain if value is null
+    if (d.value === null && !$$.config.axis_rotated) {
+        if (yPos < box.height) {
+            yPos = box.height;
+        } else if (yPos > this.height) {
+            yPos = this.height - 4;
+        }
+    }
+    return yPos;
 };

@@ -155,7 +155,7 @@ c3_chart_internal_fn.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
 };
 c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
-    return targetId || targetId === 0 ? ('-' + targetId).replace(/\s/g, '-') : '';
+    return targetId || targetId === 0 ? ('-' + targetId).replace(/[\s?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\]/g, '-') : '';
 };
 c3_chart_internal_fn.selectorTarget = function (id, prefix) {
     return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);
@@ -170,5 +170,5 @@ c3_chart_internal_fn.selectorLegend = function (id) {
 };
 c3_chart_internal_fn.selectorLegends = function (ids) {
     var $$ = this;
-    return ids.length ? ids.map(function (id) { return $$.selectorLegend(id); }) : null;
+    return ids && ids.length ? ids.map(function (id) { return $$.selectorLegend(id); }) : null;
 };

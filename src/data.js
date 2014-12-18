@@ -100,13 +100,22 @@ c3_chart_internal_fn.cloneTarget = function (target) {
         })
     };
 };
+c3_chart_internal_fn.updateXs = function () {
+    var $$ = this;
+    if ($$.data.targets.length) {
+        $$.xs = [];
+        $$.data.targets[0].values.forEach(function (v) {
+            $$.xs[v.index] = v.x;
+        });
+    }
+};
 c3_chart_internal_fn.getPrevX = function (i) {
-    var $$ = this, value = $$.getValueOnIndex($$.data.targets[0].values, i - 1);
-    return value ? value.x : null;
+    var x = this.xs[i - 1];
+    return typeof x !== 'undefined' ? x : null;
 };
 c3_chart_internal_fn.getNextX = function (i) {
-    var $$ = this, value = $$.getValueOnIndex($$.data.targets[0].values, i + 1);
-    return value ? value.x : null;
+    var x = this.xs[i + 1];
+    return typeof x !== 'undefined' ? x : null;
 };
 c3_chart_internal_fn.getMaxDataCount = function () {
     var $$ = this;
@@ -300,8 +309,8 @@ c3_chart_internal_fn.findClosest = function (values, pos) {
 
     // find mouseovering bar
     values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
-        var shape = $$.d3.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
-        if ($$.isWithinBar(shape)) {
+        var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+        if (!closest && $$.isWithinBar(shape)) {
             closest = v;
         }
     });
@@ -319,10 +328,11 @@ c3_chart_internal_fn.findClosest = function (values, pos) {
 };
 c3_chart_internal_fn.dist = function (data, pos) {
     var $$ = this, config = $$.config,
-        yScale = $$.getAxisId(data.id) === 'y' ? $$.y : $$.y2,
         xIndex = config.axis_rotated ? 1 : 0,
-        yIndex = config.axis_rotated ? 0 : 1;
-    return Math.pow($$.x(data.x) - pos[xIndex], 2) + Math.pow(yScale(data.value) - pos[yIndex], 2);
+        yIndex = config.axis_rotated ? 0 : 1,
+        y = $$.circleY(data, data.index),
+        x = $$.x(data.x);
+    return Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2);
 };
 c3_chart_internal_fn.convertValuesToStep = function (values) {
     var converted = [].concat(values), i;
