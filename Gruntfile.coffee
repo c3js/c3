@@ -69,6 +69,7 @@ module.exports = (grunt) ->
               'src/api.chart.js',
               'src/api.tooltip.js',
               'src/c3.axis.js',
+              'src/polyfill.js',
               'src/tail.js'
             ]
             dest: 'c3.js'

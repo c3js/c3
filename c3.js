@@ -6790,6 +6790,14 @@
         return axis;
     }
 
+    // fix problems using c3 with phantomjs #578
+    Function.prototype.bind = Function.prototype.bind || function (thisp) {
+        var fn = this;
+        return function () {
+            return fn.apply(thisp, arguments);
+        };
+    };
+
     if (typeof define === 'function' && define.amd) {
         define("c3", ["d3"], c3);
     } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
