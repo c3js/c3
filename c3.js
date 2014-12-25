@@ -2899,7 +2899,7 @@
             yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
             xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
             value0 = function (d, i) {
-                return config.data_groups.length > 0 ? getPoints(d, i)[0][1] : yScaleGetter.call($$, d.id)(0);
+                return config.data_groups.length > 0 ? getPoints(d, i)[0][1] : yScaleGetter.call($$, d.id)($$.getAreaBaseValue(d.id));
             },
             value1 = function (d, i) {
                 return config.data_groups.length > 0 ? getPoints(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
@@ -2926,7 +2926,9 @@
             return path ? path : "M 0 0";
         };
     };
-
+    c3_chart_internal_fn.getAreaBaseValue = function () {
+        return 0;
+    };
     c3_chart_internal_fn.generateGetAreaPoints = function (areaIndices, isSub) { // partial duplication of generateGetBarPoints
         var $$ = this, config = $$.config,
             areaTargetsNum = areaIndices.__max__ + 1,
