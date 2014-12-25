@@ -173,10 +173,10 @@ describe('c3 chart data', function () {
 
                 it('should have Date object as x', function () {
                     var xs = chart.internal.data.xs;
-                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
-                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data1[0]).toBe(1417622461123);
+                    expect(+xs.data1[1]).toBe(1417622522345);
+                    expect(+xs.data2[0]).toBe(1417622461123);
+                    expect(+xs.data2[1]).toBe(1417622522345);
                 });
             });
 
@@ -213,10 +213,10 @@ describe('c3 chart data', function () {
 
                 it('should have Date object as x', function () {
                     var xs = chart.internal.data.xs;
-                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
-                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data1[0]).toBe(1417622461123);
+                    expect(+xs.data1[1]).toBe(1417622522345);
+                    expect(+xs.data2[0]).toBe(1417622461123);
+                    expect(+xs.data2[1]).toBe(1417622522345);
                 });
 
             });
