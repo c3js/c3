@@ -1114,6 +1114,7 @@
             tooltip_format_title: undefined,
             tooltip_format_name: undefined,
             tooltip_format_value: undefined,
+            tooltip_position: undefined,
             tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
                 return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
             },
@@ -2312,7 +2313,7 @@
                 });
 
                 if (config.tooltip_grouped) {
-                    $$.showTooltip(selectedData, d3.mouse(this));
+                    $$.showTooltip(selectedData, this);
                     $$.showXGridFocus(selectedData);
                 }
 
@@ -2343,7 +2344,7 @@
                             eventRect.style('cursor', 'pointer');
                         }
                         if (!config.tooltip_grouped) {
-                            $$.showTooltip([d], d3.mouse(this));
+                            $$.showTooltip([d], this);
                             $$.showXGridFocus([d]);
                             if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
                             $$.expandBars(index, d.id, true);
@@ -2426,7 +2427,7 @@
                 selectedData = sameXData.map(function (d) {
                     return $$.addName(d);
                 });
-                $$.showTooltip(selectedData, mouse);
+                $$.showTooltip(selectedData, this);
 
                 // expand points
                 if (config.point_focus_expand_enabled) {
@@ -3639,20 +3640,12 @@
         }
         return text + "</table>";
     };
-    c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
-        var $$ = this, config = $$.config;
-        var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
+    c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, element) {
+        var $$ = this, config = $$.config, d3 = $$.d3;
+        var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
         var forArc = $$.hasArcType(),
-            dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-        if (dataToShow.length === 0 || !config.tooltip_show) {
-            return;
-        }
-        $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
-
-        // Get tooltip dimensions
-        tWidth = $$.tooltip.property('offsetWidth');
-        tHeight = $$.tooltip.property('offsetHeight');
-        // Determin tooltip position
+            mouse = d3.mouse(element);
+      // Determin tooltip position
         if (forArc) {
             tooltipLeft = ($$.width / 2) + mouse[0];
             tooltipTop = ($$.height / 2) + mouse[1] + 20;
@@ -3680,10 +3673,28 @@
         if (tooltipTop < 0) {
             tooltipTop = 0;
         }
+        return {top: tooltipTop, left: tooltipLeft};
+    };
+    c3_chart_internal_fn.showTooltip = function (selectedData, element) {
+        var $$ = this, config = $$.config;
+        var tWidth, tHeight, position;
+        var forArc = $$.hasArcType(),
+            dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
+            positionFunction = config.tooltip_position || c3_chart_internal_fn.tooltipPosition;
+        if (dataToShow.length === 0 || !config.tooltip_show) {
+            return;
+        }
+        $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+
+        // Get tooltip dimensions
+        tWidth = $$.tooltip.property('offsetWidth');
+        tHeight = $$.tooltip.property('offsetHeight');
+
+        position = positionFunction.call(this, dataToShow, tWidth, tHeight, element);
         // Set tooltip
         $$.tooltip
-            .style("top", tooltipTop + "px")
-            .style("left", tooltipLeft + 'px');
+            .style("top", position.top + "px")
+            .style("left", position.left + 'px');
     };
     c3_chart_internal_fn.hideTooltip = function () {
         this.tooltip.style("display", "none");
@@ -4740,7 +4751,7 @@
                 var updated = $$.updateAngle(d),
                     arcData = $$.convertToArcData(updated),
                     selectedData = [arcData];
-                $$.showTooltip(selectedData, d3.mouse(this));
+                $$.showTooltip(selectedData, this);
             } : null)
             .on('mouseout', config.interaction_enabled ? function (d) {
                 var updated, arcData;
