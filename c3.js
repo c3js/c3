@@ -3647,7 +3647,7 @@
             mouse = d3.mouse(element);
       // Determin tooltip position
         if (forArc) {
-            tooltipLeft = ($$.width / 2) + mouse[0];
+            tooltipLeft = (($$.width - ($$.isLegendRight ? $$.getLegendWidth() : 0)) / 2) + mouse[0];
             tooltipTop = ($$.height / 2) + mouse[1] + 20;
         } else {
             svgLeft = $$.getSvgLeft(true);
