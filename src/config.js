@@ -7,6 +7,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         padding_right: undefined,
         padding_top: undefined,
         padding_bottom: undefined,
+        auto_resize: true,
         zoom_enabled: false,
         zoom_extent: undefined,
         zoom_privileged: false,
