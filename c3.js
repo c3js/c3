@@ -1369,13 +1369,13 @@
         }
         // add padding for data label
         if (showHorizontalDataLabel) {
-            lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, axisId, 'width');
+            lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'width');
             diff = diffDomain($$.y.range());
             ratio = [lengths[0] / diff, lengths[1] / diff];
             padding_top += domainLength * (ratio[1] / (1 - ratio[0] - ratio[1]));
             padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
         } else if (showVerticalDataLabel) {
-            lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, axisId, 'height');
+            lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'height');
             padding_top += this.convertPixelsToAxisPadding(lengths[1], domainLength);
             padding_bottom += this.convertPixelsToAxisPadding(lengths[0], domainLength);
         }
@@ -1748,13 +1748,13 @@
         }
         return false;
     };
-    c3_chart_internal_fn.getDataLabelLength = function (min, max, axisId, key) {
+    c3_chart_internal_fn.getDataLabelLength = function (min, max, key) {
         var $$ = this,
             lengths = [0, 0], paddingCoef = 1.3;
         $$.selectChart.select('svg').selectAll('.dummy')
             .data([min, max])
             .enter().append('text')
-            .text(function (d) { return $$.formatByAxisId(axisId)(d); })
+            .text(function (d) { return $$.dataLabelFormat(d.id)(d); })
             .each(function (d, i) {
                 lengths[i] = this.getBoundingClientRect()[key] * paddingCoef;
             })
@@ -3194,7 +3194,7 @@
             .style("fill", function (d) { return $$.color(d); })
             .style("fill-opacity", 0);
         $$.mainText
-            .text(function (d, i, j) { return $$.formatByAxisId($$.getAxisId(d.id))(d.value, d.id, i, j); });
+            .text(function (d, i, j) { return $$.dataLabelFormat(d.id)(d.value, d.id, i, j); });
         $$.mainText.exit()
             .transition().duration(durationForExit)
             .style('fill-opacity', 0)
@@ -5435,16 +5435,20 @@
     c3_chart_internal_fn.defaultArcValueFormat = function (v, ratio) {
         return (ratio * 100).toFixed(1) + '%';
     };
-    c3_chart_internal_fn.formatByAxisId = function (axisId) {
+    c3_chart_internal_fn.dataLabelFormat = function (targetId) {
         var $$ = this, data_labels = $$.config.data_labels,
-            format = function (v) { return isValue(v) ? +v : ""; };
+            format, defaultFormat = function (v) { return isValue(v) ? +v : ""; };
         // find format according to axis id
         if (typeof data_labels.format === 'function') {
             format = data_labels.format;
         } else if (typeof data_labels.format === 'object') {
-            if (data_labels.format[axisId]) {
-                format = data_labels.format[axisId];
+            if (data_labels.format[targetId]) {
+                format = data_labels.format[targetId] === true ? defaultFormat : data_labels.format[targetId];
+            } else {
+                format = function () { return ''; };
             }
+        } else {
+            format = defaultFormat;
         }
         return format;
     };

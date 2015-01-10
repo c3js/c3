@@ -23,16 +23,20 @@ c3_chart_internal_fn.defaultValueFormat = function (v) {
 c3_chart_internal_fn.defaultArcValueFormat = function (v, ratio) {
     return (ratio * 100).toFixed(1) + '%';
 };
-c3_chart_internal_fn.formatByAxisId = function (axisId) {
+c3_chart_internal_fn.dataLabelFormat = function (targetId) {
     var $$ = this, data_labels = $$.config.data_labels,
-        format = function (v) { return isValue(v) ? +v : ""; };
+        format, defaultFormat = function (v) { return isValue(v) ? +v : ""; };
     // find format according to axis id
     if (typeof data_labels.format === 'function') {
         format = data_labels.format;
     } else if (typeof data_labels.format === 'object') {
-        if (data_labels.format[axisId]) {
-            format = data_labels.format[axisId];
+        if (data_labels.format[targetId]) {
+            format = data_labels.format[targetId] === true ? defaultFormat : data_labels.format[targetId];
+        } else {
+            format = function () { return ''; };
         }
+    } else {
+        format = defaultFormat;
     }
     return format;
 };

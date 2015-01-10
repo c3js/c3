@@ -261,13 +261,13 @@ c3_chart_internal_fn.hasDataLabel = function () {
     }
     return false;
 };
-c3_chart_internal_fn.getDataLabelLength = function (min, max, axisId, key) {
+c3_chart_internal_fn.getDataLabelLength = function (min, max, key) {
     var $$ = this,
         lengths = [0, 0], paddingCoef = 1.3;
     $$.selectChart.select('svg').selectAll('.dummy')
         .data([min, max])
         .enter().append('text')
-        .text(function (d) { return $$.formatByAxisId(axisId)(d); })
+        .text(function (d) { return $$.dataLabelFormat(d.id)(d); })
         .each(function (d, i) {
             lengths[i] = this.getBoundingClientRect()[key] * paddingCoef;
         })

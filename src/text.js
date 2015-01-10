@@ -32,7 +32,7 @@ c3_chart_internal_fn.redrawText = function (durationForExit) {
         .style("fill", function (d) { return $$.color(d); })
         .style("fill-opacity", 0);
     $$.mainText
-        .text(function (d, i, j) { return $$.formatByAxisId($$.getAxisId(d.id))(d.value, d.id, i, j); });
+        .text(function (d, i, j) { return $$.dataLabelFormat(d.id)(d.value, d.id, i, j); });
     $$.mainText.exit()
         .transition().duration(durationForExit)
         .style('fill-opacity', 0)
