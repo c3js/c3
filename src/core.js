@@ -408,7 +408,10 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     $$.updateTargetsForLine(targets);
 
     //-- Arc --//
-    if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+    if ($$.hasArcType() && $$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+
+    /*-- Sub --*/
+
     if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
     /*-- Show --*/

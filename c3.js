@@ -413,7 +413,10 @@
         $$.updateTargetsForLine(targets);
 
         //-- Arc --//
-        if ($$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+        if ($$.hasArcType() && $$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
+
+        /*-- Sub --*/
+
         if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
         /*-- Show --*/
@@ -6238,6 +6241,7 @@
         options.withTransitionForTransform = false;
         $$.transiting = false;
         $$.setTargetType(targetIds, type);
+        $$.updateTargets($$.data.targets); // this is needed when transforming to arc
         $$.updateAndRedraw(options);
     };
 
