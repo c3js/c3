@@ -6480,11 +6480,18 @@
 
     c3_chart_fn.destroy = function () {
         var $$ = this.internal;
-        $$.data.targets = undefined;
-        $$.data.xs = {};
-        $$.selectChart.classed('c3', false).html("");
+
         window.clearInterval($$.intervalForObserveInserted);
         window.onresize = null;
+
+        $$.selectChart.classed('c3', false).html("");
+
+        // MEMO: this is needed because the reference of some elements will not be released, then memory leak will happen.
+        Object.keys($$).forEach(function (key) {
+            $$[key] = null;
+        });
+
+        return null;
     };
 
     c3_chart_fn.tooltip = function () {};
