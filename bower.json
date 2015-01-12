@@ -19,8 +19,12 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "htdocs",
+    "spec",
+    "src",
+    "package.json",
+    "component.json",
+    "Gruntfile.*"
   ],
   "dependencies": {
     "d3": "~3.5.3"
