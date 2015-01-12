@@ -56,7 +56,7 @@ describe('c3 chart legend', function () {
         it('should be positioned properly', function () {
             var box = d3.select('.c3-legend-background').node().getBoundingClientRect();
             expect(box.top).toBe(5.5);
-            expect(box.left).toBe(60.5);
+            expect(box.left).toBeGreaterThan(30);
         });
 
         it('should have automatically calculated height', function () {

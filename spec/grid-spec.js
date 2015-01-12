@@ -119,7 +119,7 @@ describe('c3 chart grid', function () {
                     var line = d3.select(this),
                         l = line.select('line'),
                         t = line.select('text');
-                    expect(+l.attr('x1')).toBeCloseTo(expectedX1[i], -1);
+                    expect(+l.attr('x1')).toBeCloseTo(expectedX1[i], -2);
                     expect(t.text()).toBe(expectedText[i]);
                 });
             });
