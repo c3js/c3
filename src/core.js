@@ -292,7 +292,7 @@ c3_chart_internal_fn.initWithData = function (data) {
         window.onresize.add(function () {
             config.onresize.call($$);
         });
-        if (config.auto_resize) {
+        if (config.resize_auto) {
             window.onresize.add(function () {
                 if (timeout !== undefined) {
                     clearTimeout(timeout);
