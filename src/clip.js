@@ -23,7 +23,7 @@ c3_chart_internal_fn.getXAxisClipY = function () {
 };
 c3_chart_internal_fn.getYAxisClipX = function () {
     var $$ = this;
-    return $$.config.axis_y_inner ? -1 : $$.getAxisClipX($$.config.axis_rotated);
+    return $$.config.axis_y_inner || $$.config.axis_y_position === "right" ? -1 : $$.getAxisClipX($$.config.axis_rotated);
 };
 c3_chart_internal_fn.getYAxisClipY = function () {
     var $$ = this;

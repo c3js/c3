@@ -763,4 +763,39 @@ describe('c3 chart axis', function () {
 
     });
 
+
+    describe('axis.y.position', function () {
+        
+        beforeEach(function () {
+            args.axis.y = {
+                position: 'right'
+            };
+
+            chart = window.c3.generate(args);
+        });
+
+        it('should position the y axis on the right', function () {
+            var transformX = d3.select('.c3-axis-y').attr('transform').match(/translate\((.+?),0\)/i)[1]; // There has to be a better way of testing this
+            expect(parseInt(transformX)).toBeCloseTo(630);
+        });
+
+    });
+
+
+    describe('axis.y2.position', function () {
+
+        beforeEach(function () {
+            args.axis.y2 = {
+                position: 'left'
+            };
+
+            chart = window.c3.generate(args);
+        });
+
+        it('should position the y2 axis on the left', function () {
+            var transformX = d3.select('.c3-axis-y').attr('transform').match(/translate\((.+?),0\)/i)[1]; // There has to be a better way of testing this
+            expect(parseInt(transformX)).toBeCloseTo(0);
+        });
+    });
+
 });
