@@ -972,6 +972,7 @@
             data_selection_grouped: false,
             data_selection_isselectable: function () { return true; },
             data_selection_multiple: true,
+            data_selection_draggable: false,
             data_onclick: function () {},
             data_onmouseover: function () {},
             data_onmouseout: function () {},
@@ -2366,10 +2367,12 @@
                 });
             })
             .call(
-                d3.behavior.drag().origin(Object)
-                    .on('drag', function () { $$.drag(d3.mouse(this)); })
-                    .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
-                    .on('dragend', function () { $$.dragend(); })
+                config.data_selection_draggable && $$.drag ? (
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { $$.drag(d3.mouse(this)); })
+                        .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { $$.dragend(); })
+                ) : function () {}
             );
     };
 

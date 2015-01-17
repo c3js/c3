@@ -44,6 +44,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_selection_grouped: false,
         data_selection_isselectable: function () { return true; },
         data_selection_multiple: true,
+        data_selection_draggable: false,
         data_onclick: function () {},
         data_onmouseover: function () {},
         data_onmouseout: function () {},
