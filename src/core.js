@@ -636,8 +636,12 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             });
         })
         .call(waitForDraw, function () {
-            if (flow) { flow(); }
-            // onrendered callback
+            if (flow) {
+                flow();
+            }
+            if (config.onrendered) {
+                config.onrendered.call($$);
+            }
         });
     }
     else {
@@ -645,7 +649,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.redrawLine(drawLine);
         $$.redrawArea(drawArea);
         $$.redrawCircle(cx, cy);
-        // onrendered callback
+        if (config.onrendered) {
+            config.onrendered.call($$);
+        }
     }
 
     // update fadein condition

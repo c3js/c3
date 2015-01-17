@@ -641,8 +641,12 @@
                 });
             })
             .call(waitForDraw, function () {
-                if (flow) { flow(); }
-                // onrendered callback
+                if (flow) {
+                    flow();
+                }
+                if (config.onrendered) {
+                    config.onrendered.call($$);
+                }
             });
         }
         else {
@@ -650,7 +654,9 @@
             $$.redrawLine(drawLine);
             $$.redrawArea(drawArea);
             $$.redrawCircle(cx, cy);
-            // onrendered callback
+            if (config.onrendered) {
+                config.onrendered.call($$);
+            }
         }
 
         // update fadein condition
@@ -968,6 +974,7 @@
             onresize: function () {},
             onresized: function () {},
             oninit: function () {},
+            onrendered: function () {},
             transition_duration: 350,
             data_x: undefined,
             data_xs: {},
