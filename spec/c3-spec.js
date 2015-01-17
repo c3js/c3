@@ -1,6 +1,3 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it;
 
 describe('c3', function () {
     'use strict';
