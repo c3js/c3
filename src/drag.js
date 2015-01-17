@@ -65,7 +65,6 @@ c3_chart_internal_fn.dragstart = function (mouse) {
         .attr('class', CLASS.dragarea)
         .style('opacity', 0.1);
     $$.dragging = true;
-    $$.config.data_ondragstart.call($$.api);
 };
 
 c3_chart_internal_fn.dragend = function () {
@@ -79,6 +78,4 @@ c3_chart_internal_fn.dragend = function () {
     $$.main.selectAll('.' + CLASS.shape)
         .classed(CLASS.INCLUDED, false);
     $$.dragging = false;
-    $$.config.data_ondragend.call($$.api);
 };
-

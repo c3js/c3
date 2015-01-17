@@ -978,8 +978,6 @@
             data_onmouseout: function () {},
             data_onselected: function () {},
             data_onunselected: function () {},
-            data_ondragstart: function () {},
-            data_ondragend: function () {},
             data_url: undefined,
             data_json: undefined,
             data_rows: undefined,
@@ -5033,7 +5031,6 @@
             .attr('class', CLASS.dragarea)
             .style('opacity', 0.1);
         $$.dragging = true;
-        $$.config.data_ondragstart.call($$.api);
     };
 
     c3_chart_internal_fn.dragend = function () {
@@ -5047,9 +5044,7 @@
         $$.main.selectAll('.' + CLASS.shape)
             .classed(CLASS.INCLUDED, false);
         $$.dragging = false;
-        $$.config.data_ondragend.call($$.api);
     };
-
 
     c3_chart_internal_fn.selectPoint = function (target, d, i) {
         var $$ = this, config = $$.config,
