@@ -5388,7 +5388,7 @@
             ids = [];
 
         return function (d) {
-            var id = d.id || d, color;
+            var id = d.id || (d.data && d.data.id) || d, color;
 
             // if callback function is provided
             if (colors[id] instanceof Function) {
