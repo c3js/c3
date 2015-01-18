@@ -66,8 +66,8 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
-        yDomainMin = isValue(yMin) ? yMin : $$.getYDomainMin(yTargets),
-        yDomainMax = isValue(yMax) ? yMax : $$.getYDomainMax(yTargets),
+        yDomainMin = $$.getYDomainMin(yTargets),
+        yDomainMax = $$.getYDomainMax(yTargets),
         domainLength, padding, padding_top, padding_bottom,
         center = axisId === 'y2' ? config.axis_y2_center : config.axis_y_center,
         yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
@@ -75,13 +75,9 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         showHorizontalDataLabel = $$.hasDataLabel() && config.axis_rotated,
         showVerticalDataLabel = $$.hasDataLabel() && !config.axis_rotated;
 
-    if (yDomainMax < yDomainMin) {
-        if (isValue(yMin)) {
-            yDomainMax = yDomainMin + 10; // TODO: introduce axis.y.maxMin
-        } else {
-            yDomainMin = yDomainMax - 10; // TODO: introduce axis.y.minMax
-        }
-    }
+    // MEMO: avoid inverting domain unexpectedly
+    yDomainMin = isValue(yMin) ? yMin : isValue(yMax) ? (yDomainMin < yMax ? yDomainMin : yMax - 10) : yDomainMin;
+    yDomainMax = isValue(yMax) ? yMax : isValue(yMin) ? (yMin < yDomainMax ? yDomainMax : yMin + 10) : yDomainMax;
 
     if (yTargets.length === 0) { // use current domain if target of axisId is none
         return axisId === 'y2' ? $$.y2.domain() : $$.y.domain();
