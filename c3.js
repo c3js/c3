@@ -399,7 +399,7 @@
     };
 
     c3_chart_internal_fn.updateTargets = function (targets) {
-        var $$ = this, config = $$.config;
+        var $$ = this;
 
         /*-- Main --*/
 
@@ -419,11 +419,13 @@
 
         if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
-        /*-- Show --*/
-
         // Fade-in each chart
+        $$.showTargets();
+    };
+    c3_chart_internal_fn.showTargets = function () {
+        var $$ = this;
         $$.svg.selectAll('.' + CLASS.target).filter(function (d) { return $$.isTargetToShow(d.id); })
-          .transition().duration(config.transition_duration)
+          .transition().duration($$.config.transition_duration)
             .style("opacity", 1);
     };
 
@@ -5178,9 +5180,7 @@
         var $$ = this, config = $$.config,
             context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context'));
 
-        if (!config.subchart_show) {
-            context.style('visibility', 'hidden');
-        }
+        context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
         // Define g for chart area
         context.append('g')
@@ -5199,9 +5199,7 @@
         context.append("g")
             .attr("clip-path", $$.clipPath)
             .attr("class", CLASS.brush)
-            .call($$.brush)
-            .selectAll("rect")
-            .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
+            .call($$.brush);
 
         // ATTENTION: This must be called AFTER chart added
         // Add Axis
@@ -5220,6 +5218,7 @@
             classAreas = $$.classAreas.bind($$);
 
         if (config.subchart_show) {
+            //-- Bar --//
             contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
                 .data(targets)
                 .attr('class', classChartBar);
@@ -5243,6 +5242,10 @@
             // Area
             contextLineEnter.append("g")
                 .attr("class", classAreas);
+
+            //-- Brush --//
+            context.selectAll('.' + CLASS.brush + ' rect')
+                .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
         }
     };
     c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
@@ -5305,6 +5308,8 @@
     c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
         var $$ = this, d3 = $$.d3, config = $$.config,
             drawAreaOnSub, drawBarOnSub, drawLineOnSub;
+
+        $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
         // subchart
         if (config.subchart_show) {

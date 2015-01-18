@@ -394,7 +394,7 @@ c3_chart_internal_fn.updateSizes = function () {
 };
 
 c3_chart_internal_fn.updateTargets = function (targets) {
-    var $$ = this, config = $$.config;
+    var $$ = this;
 
     /*-- Main --*/
 
@@ -414,11 +414,13 @@ c3_chart_internal_fn.updateTargets = function (targets) {
 
     if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
 
-    /*-- Show --*/
-
     // Fade-in each chart
+    $$.showTargets();
+};
+c3_chart_internal_fn.showTargets = function () {
+    var $$ = this;
     $$.svg.selectAll('.' + CLASS.target).filter(function (d) { return $$.isTargetToShow(d.id); })
-      .transition().duration(config.transition_duration)
+      .transition().duration($$.config.transition_duration)
         .style("opacity", 1);
 };
 

@@ -13,9 +13,7 @@ c3_chart_internal_fn.initSubchart = function () {
     var $$ = this, config = $$.config,
         context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context'));
 
-    if (!config.subchart_show) {
-        context.style('visibility', 'hidden');
-    }
+    context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
     // Define g for chart area
     context.append('g')
@@ -34,9 +32,7 @@ c3_chart_internal_fn.initSubchart = function () {
     context.append("g")
         .attr("clip-path", $$.clipPath)
         .attr("class", CLASS.brush)
-        .call($$.brush)
-        .selectAll("rect")
-        .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
+        .call($$.brush);
 
     // ATTENTION: This must be called AFTER chart added
     // Add Axis
@@ -55,6 +51,7 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         classAreas = $$.classAreas.bind($$);
 
     if (config.subchart_show) {
+        //-- Bar --//
         contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
             .data(targets)
             .attr('class', classChartBar);
@@ -78,6 +75,10 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         // Area
         contextLineEnter.append("g")
             .attr("class", classAreas);
+
+        //-- Brush --//
+        context.selectAll('.' + CLASS.brush + ' rect')
+            .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
     }
 };
 c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
@@ -140,6 +141,8 @@ c3_chart_internal_fn.redrawAreaForSubchart = function (drawAreaOnSub, withTransi
 c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
     var $$ = this, d3 = $$.d3, config = $$.config,
         drawAreaOnSub, drawBarOnSub, drawLineOnSub;
+
+    $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
     // subchart
     if (config.subchart_show) {
