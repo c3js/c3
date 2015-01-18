@@ -83,6 +83,44 @@ describe('c3 chart grid', function () {
 
     describe('x grid lines', function () {
 
+        describe('with padding.top', function () {
+
+            it('should have correct height', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400],
+                        ]
+                    },
+                    grid: {
+                        x: {
+                            lines: [
+                                {value: 3, text: 'Label 3'}
+                            ]
+                        }
+                    },
+                    padding: {
+                        top: 50
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should show x grid lines', function () {
+                var lines = chart.internal.main.select('.c3-xgrid-lines .c3-xgrid-line'),
+                    expectedX1 = 593,
+                    expectedText = ['Label 3'];
+                lines.each(function (id, i) {
+                    var line = d3.select(this),
+                        l = line.select('line'),
+                        t = line.select('text');
+                    expect(+l.attr('x1')).toBeCloseTo(expectedX1, -2);
+                    expect(t.text()).toBe(expectedText[i]);
+                });
+            });
+
+        });
+
         describe('on category axis', function () {
 
             it('should update args', function () {

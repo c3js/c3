@@ -91,7 +91,7 @@ c3_chart_internal_fn.updateGrid = function (duration) {
     xgridLine.append('text')
         .attr("text-anchor", "end")
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
-        .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
+        .attr('dx', -4)
         .attr('dy', -5)
         .style("opacity", 0);
     // udpate
@@ -146,7 +146,7 @@ c3_chart_internal_fn.redrawGrid = function (withTransition) {
         (withTransition ? lines.transition() : lines)
             .attr("x1", config.axis_rotated ? 0 : xv)
             .attr("x2", config.axis_rotated ? $$.width : xv)
-            .attr("y1", config.axis_rotated ? xv : $$.margin.top)
+            .attr("y1", config.axis_rotated ? xv : 0)
             .attr("y2", config.axis_rotated ? xv : $$.height)
             .style("opacity", 1),
         (withTransition ? texts.transition() : texts)
