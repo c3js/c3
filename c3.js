@@ -1059,6 +1059,7 @@
             axis_y_type: undefined,
             axis_y_max: undefined,
             axis_y_min: undefined,
+            axis_y_inverted: false,
             axis_y_center: undefined,
             axis_y_inner: undefined,
             axis_y_label: {},
@@ -1073,6 +1074,7 @@
             axis_y2_show: false,
             axis_y2_max: undefined,
             axis_y2_min: undefined,
+            axis_y2_inverted: false,
             axis_y2_center: undefined,
             axis_y2_inner: undefined,
             axis_y2_label: {},
@@ -1341,10 +1343,11 @@
             yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
             yDomainMin = $$.getYDomainMin(yTargets),
             yDomainMax = $$.getYDomainMax(yTargets),
-            domainLength, padding, padding_top, padding_bottom,
+            domain, domainLength, padding, padding_top, padding_bottom,
             center = axisId === 'y2' ? config.axis_y2_center : config.axis_y_center,
             yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
             isZeroBased = ($$.hasType('bar', yTargets) && config.bar_zerobased) || ($$.hasType('area', yTargets) && config.area_zerobased),
+            isInverted = axisId === 'y2' ? config.axis_y2_inverted : config.axis_y_inverted,
             showHorizontalDataLabel = $$.hasDataLabel() && config.axis_rotated,
             showVerticalDataLabel = $$.hasDataLabel() && !config.axis_rotated;
 
@@ -1411,7 +1414,8 @@
             if (isAllPositive) { padding_bottom = yDomainMin; }
             if (isAllNegative) { padding_top = -yDomainMax; }
         }
-        return [yDomainMin - padding_bottom, yDomainMax + padding_top];
+        domain = [yDomainMin - padding_bottom, yDomainMax + padding_top];
+        return isInverted ? domain.reverse() : domain;
     };
     c3_chart_internal_fn.getXDomainMin = function (targets) {
         var $$ = this, config = $$.config;
