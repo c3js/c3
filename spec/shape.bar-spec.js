@@ -1,7 +1,3 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it,
-    beforeEach = window.beforeEach;
 
 var setMouseEvent = window.setMouseEvent;
 

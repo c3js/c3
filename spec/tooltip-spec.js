@@ -1,9 +1,5 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it,
-    jasmine = window.jasmine,
-    beforeAll = window.beforeAll,
-    beforeEach = window.beforeEach;
+var jasmine = window.jasmine,
+    beforeAll = window.beforeAll;
 
 describe('c3 chart tooltip', function () {
     'use strict';
