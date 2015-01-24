@@ -611,7 +611,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         });
     }
 
-    if (duration) {
+    if (duration && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
         // transition should be derived from one transition
         d3.transition().duration(duration).each(function () {
             var transitionsToWait = [];
@@ -947,4 +947,19 @@ c3_chart_internal_fn.parseDate = function (date) {
         window.console.error("Failed to parse x '" + date + "' to Date object");
     }
     return parsedDate;
+};
+
+c3_chart_internal_fn.isTabVisible = function () {
+    var hidden;
+    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+        hidden = "hidden";
+    } else if (typeof document.mozHidden !== "undefined") {
+        hidden = "mozHidden";
+    } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+    } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+    }
+
+    return document[hidden] ? false : true;
 };
