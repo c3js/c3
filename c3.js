@@ -656,6 +656,9 @@
             $$.redrawLine(drawLine);
             $$.redrawArea(drawArea);
             $$.redrawCircle(cx, cy);
+            $$.redrawText(xForText, yForText, options.flow);
+            $$.redrawRegion();
+            $$.redrawGrid();
             if (config.onrendered) {
                 config.onrendered.call($$);
             }

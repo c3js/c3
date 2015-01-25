@@ -651,6 +651,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.redrawLine(drawLine);
         $$.redrawArea(drawArea);
         $$.redrawCircle(cx, cy);
+        $$.redrawText(xForText, yForText, options.flow);
+        $$.redrawRegion();
+        $$.redrawGrid();
         if (config.onrendered) {
             config.onrendered.call($$);
         }
