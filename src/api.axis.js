@@ -3,9 +3,9 @@ c3_chart_fn.axis.labels = function (labels) {
     var $$ = this.internal;
     if (arguments.length) {
         Object.keys(labels).forEach(function (axisId) {
-            $$.setAxisLabelText(axisId, labels[axisId]);
+            $$._axis.setLabelText(axisId, labels[axisId]);
         });
-        $$.updateAxisLabels();
+        $$._axis.updateLabels();
     }
     // TODO: return some values?
 };

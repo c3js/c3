@@ -15,6 +15,7 @@
     "newcap": false,
     "loopfunc": true,
     "bitwise": false,
+    "validthis": true,
 
     "browser": true,
 

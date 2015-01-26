@@ -2,6 +2,25 @@ var c3 = { version: "0.4.9" };
 
 var c3_chart_fn, c3_chart_internal_fn;
 
+function API(owner) {
+    this.owner = owner;
+}
+
+function inherit(base, derived) {
+
+    if (Object.create) {
+        derived.prototype = Object.create(base.prototype);
+    } else {
+        var f = function f() {};
+        f.prototype = base.prototype;
+        derived.prototype = new f();
+    }
+
+    derived.prototype.constructor = derived;
+
+    return derived;
+}
+
 function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
@@ -149,6 +168,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     var defs, main, binding = true;
 
+    $$._axis = new _Axis($$);
+
     if ($$.initPie) { $$.initPie(); }
     if ($$.initBrush) { $$.initBrush(); }
     if ($$.initZoom) { $$.initZoom(); }
@@ -266,7 +287,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     if (config.axis_x_extent) { $$.brush.extent($$.getDefaultExtent()); }
 
     // Add Axis
-    $$.initAxis();
+    $$._axis.init();
 
     // Set targets
     $$.updateTargets($$.data.targets);
@@ -456,7 +477,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     durationForExit = withTransitionForExit ? duration : 0;
     durationForAxis = withTransitionForAxis ? duration : 0;
 
-    transitions = transitions || $$.generateAxisTransitions(durationForAxis);
+    transitions = transitions || $$._axis.generateTransitions(durationForAxis);
 
     // update legend and transform each g
     if (withLegend && config.legend_show) {
@@ -475,7 +496,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     if (targetsToShow.length) {
         $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
         if (!config.axis_x_tick_values) {
-            tickValues = $$.updateXAxisTickValues(targetsToShow);
+            tickValues = $$._axis.updateXAxisTickValues(targetsToShow);
         }
     } else {
         $$.xAxis.tickValues([]);
@@ -490,17 +511,17 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
     if (!config.axis_y_tick_values && config.axis_y_tick_count) {
-        $$.yAxis.tickValues($$.generateTickValues($$.y.domain(), config.axis_y_tick_count));
+        $$.yAxis.tickValues($$._axis.generateTickValues($$.y.domain(), config.axis_y_tick_count));
     }
     if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
-        $$.y2Axis.tickValues($$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
+        $$.y2Axis.tickValues($$._axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
     }
 
     // axes
-    $$.redrawAxis(transitions, hideAxis);
+    $$._axis.redraw(transitions, hideAxis);
 
     // Update axis label
-    $$.updateAxisLabels(withTransition);
+    $$._axis.updateLabels(withTransition);
 
     // show/hide if manual culling needed
     if ((withUpdateXDomain || withUpdateXAxis) && targetsToShow.length) {
@@ -681,7 +702,7 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     $$.updateSizes();
     // MEMO: called in updateLegend in redraw if withLegend
     if (!(options.withLegend && config.legend_show)) {
-        transitions = $$.generateAxisTransitions(options.withTransitionForAxis ? config.transition_duration : 0);
+        transitions = $$._axis.generateTransitions(options.withTransitionForAxis ? config.transition_duration : 0);
         // Update scales
         $$.updateScales();
         $$.updateSvgSize();
