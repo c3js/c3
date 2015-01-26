@@ -70,7 +70,7 @@ c3_chart_internal_fn.updateYGrid = function () {
 };
 
 
-c3_chart_internal_fn.redrawGrid = function (duration) {
+c3_chart_internal_fn.updateGrid = function (duration) {
     var $$ = this, main = $$.main, config = $$.config,
         xgridLine, ygridLine, yv;
 
@@ -91,7 +91,7 @@ c3_chart_internal_fn.redrawGrid = function (duration) {
     xgridLine.append('text')
         .attr("text-anchor", "end")
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
-        .attr('dx', config.axis_rotated ? 0 : -$$.margin.top)
+        .attr('dx', -4)
         .attr('dy', -5)
         .style("opacity", 0);
     // udpate
@@ -138,19 +138,23 @@ c3_chart_internal_fn.redrawGrid = function (duration) {
         .style("opacity", 0)
         .remove();
 };
-c3_chart_internal_fn.addTransitionForGrid = function (transitions) {
-    var $$ = this, config = $$.config, xv = $$.xv.bind($$);
-    transitions.push($$.xgridLines.select('line').transition()
-                     .attr("x1", config.axis_rotated ? 0 : xv)
-                     .attr("x2", config.axis_rotated ? $$.width : xv)
-                     .attr("y1", config.axis_rotated ? xv : $$.margin.top)
-                     .attr("y2", config.axis_rotated ? xv : $$.height)
-                     .style("opacity", 1));
-    transitions.push($$.xgridLines.select('text').transition()
-                     .attr("x", config.axis_rotated ? $$.width : 0)
-                     .attr("y", xv)
-                     .text(function (d) { return d.text; })
-                     .style("opacity", 1));
+c3_chart_internal_fn.redrawGrid = function (withTransition) {
+    var $$ = this, config = $$.config, xv = $$.xv.bind($$),
+        lines = $$.xgridLines.select('line'),
+        texts = $$.xgridLines.select('text');
+    return [
+        (withTransition ? lines.transition() : lines)
+            .attr("x1", config.axis_rotated ? 0 : xv)
+            .attr("x2", config.axis_rotated ? $$.width : xv)
+            .attr("y1", config.axis_rotated ? xv : 0)
+            .attr("y2", config.axis_rotated ? xv : $$.height)
+            .style("opacity", 1),
+        (withTransition ? texts.transition() : texts)
+            .attr("x", config.axis_rotated ? $$.width : 0)
+            .attr("y", xv)
+            .text(function (d) { return d.text; })
+            .style("opacity", 1)
+    ];
 };
 c3_chart_internal_fn.showXGridFocus = function (selectedData) {
     var $$ = this, config = $$.config,

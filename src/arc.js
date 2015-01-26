@@ -273,7 +273,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             var updated = $$.updateAngle(d),
                 arcData = $$.convertToArcData(updated),
                 selectedData = [arcData];
-            $$.showTooltip(selectedData, d3.mouse(this));
+            $$.showTooltip(selectedData, this);
         } : null)
         .on('mouseout', config.interaction_enabled ? function (d) {
             var updated, arcData;

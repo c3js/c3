@@ -38,33 +38,27 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
-        name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
         value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
-        bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
+        if (value !== undefined) {
+            name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
+            bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
-        text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
-        text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
-        text += "<td class='value'>" + value + "</td>";
-        text += "</tr>";
+            text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
+            text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
+            text += "<td class='value'>" + value + "</td>";
+            text += "</tr>";
+        }
     }
     return text + "</table>";
 };
-c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
-    var $$ = this, config = $$.config;
-    var tWidth, tHeight, svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
+c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, element) {
+    var $$ = this, config = $$.config, d3 = $$.d3;
+    var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
     var forArc = $$.hasArcType(),
-        dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); });
-    if (dataToShow.length === 0 || !config.tooltip_show) {
-        return;
-    }
-    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
-
-    // Get tooltip dimensions
-    tWidth = $$.tooltip.property('offsetWidth');
-    tHeight = $$.tooltip.property('offsetHeight');
-    // Determin tooltip position
+        mouse = d3.mouse(element);
+  // Determin tooltip position
     if (forArc) {
-        tooltipLeft = ($$.width / 2) + mouse[0];
+        tooltipLeft = (($$.width - ($$.isLegendRight ? $$.getLegendWidth() : 0)) / 2) + mouse[0];
         tooltipTop = ($$.height / 2) + mouse[1] + 20;
     } else {
         svgLeft = $$.getSvgLeft(true);
@@ -90,10 +84,28 @@ c3_chart_internal_fn.showTooltip = function (selectedData, mouse) {
     if (tooltipTop < 0) {
         tooltipTop = 0;
     }
+    return {top: tooltipTop, left: tooltipLeft};
+};
+c3_chart_internal_fn.showTooltip = function (selectedData, element) {
+    var $$ = this, config = $$.config;
+    var tWidth, tHeight, position;
+    var forArc = $$.hasArcType(),
+        dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
+        positionFunction = config.tooltip_position || c3_chart_internal_fn.tooltipPosition;
+    if (dataToShow.length === 0 || !config.tooltip_show) {
+        return;
+    }
+    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+
+    // Get tooltip dimensions
+    tWidth = $$.tooltip.property('offsetWidth');
+    tHeight = $$.tooltip.property('offsetHeight');
+
+    position = positionFunction.call(this, dataToShow, tWidth, tHeight, element);
     // Set tooltip
     $$.tooltip
-        .style("top", tooltipTop + "px")
-        .style("left", tooltipLeft + 'px');
+        .style("top", position.top + "px")
+        .style("left", position.left + 'px');
 };
 c3_chart_internal_fn.hideTooltip = function () {
     this.tooltip.style("display", "none");

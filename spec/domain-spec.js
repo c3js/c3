@@ -1,9 +1,5 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it,
-    beforeEach = window.beforeEach;
 
-describe('c3 chart axis', function () {
+describe('c3 chart domain', function () {
     'use strict';
 
     var chart, d3;

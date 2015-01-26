@@ -1,7 +1,3 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it,
-    beforeEach = window.beforeEach;
 
 describe('c3 chart axis', function () {
     'use strict';
@@ -380,11 +376,10 @@ describe('c3 chart axis', function () {
                         expectedTickTexts = [
                             'this is a very',
                             'long tick text',
-                            'on category',
-                            'axis',
+                            'on category axis'
                         ],
                         expectedX = '0';
-                    expect(tspans.size()).toBe(4);
+                    expect(tspans.size()).toBe(3);
                     tspans.each(function (d, i) {
                         var tspan = d3.select(this);
                         expect(tspan.text()).toBe(expectedTickTexts[i]);
@@ -697,7 +692,7 @@ describe('c3 chart axis', function () {
         it('should not have inner y axis', function () {
             var paddingLeft = chart.internal.getCurrentPaddingLeft(),
                 tickTexts = chart.internal.main.selectAll('.c3-axis-y g.tick text');
-            expect(paddingLeft).toBe(50);
+            expect(paddingLeft).toBeGreaterThan(19);
             tickTexts.each(function () {
                 expect(+d3.select(this).attr('x')).toBeLessThan(0);
             });
@@ -742,7 +737,7 @@ describe('c3 chart axis', function () {
         it('should not have inner y axis', function () {
             var paddingRight = chart.internal.getCurrentPaddingRight(),
                 tickTexts = chart.internal.main.selectAll('.c3-axis-2y g.tick text');
-            expect(paddingRight).toBeGreaterThan(39);
+            expect(paddingRight).toBeGreaterThan(19);
             tickTexts.each(function () {
                 expect(+d3.select(this).attr('x')).toBeGreaterThan(0);
             });

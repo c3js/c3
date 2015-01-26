@@ -1,7 +1,3 @@
-var describe = window.describe,
-    expect = window.expect,
-    it = window.it,
-    beforeEach = window.beforeEach;
 
 describe('c3 chart data', function () {
     'use strict';
@@ -173,10 +169,10 @@ describe('c3 chart data', function () {
 
                 it('should have Date object as x', function () {
                     var xs = chart.internal.data.xs;
-                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
-                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data1[0]).toBe(1417622461123);
+                    expect(+xs.data1[1]).toBe(1417622522345);
+                    expect(+xs.data2[0]).toBe(1417622461123);
+                    expect(+xs.data2[1]).toBe(1417622522345);
                 });
             });
 
@@ -213,10 +209,10 @@ describe('c3 chart data', function () {
 
                 it('should have Date object as x', function () {
                     var xs = chart.internal.data.xs;
-                    expect(+xs.data1[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data1[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
-                    expect(+xs.data2[0]).toBe(+new Date(2014, 11, 3, 16, 1, 1, 123));
-                    expect(+xs.data2[1]).toBe(+new Date(2014, 11, 3, 16, 2, 2, 345));
+                    expect(+xs.data1[0]).toBe(1417622461123);
+                    expect(+xs.data1[1]).toBe(1417622522345);
+                    expect(+xs.data2[0]).toBe(1417622461123);
+                    expect(+xs.data2[1]).toBe(1417622522345);
                 });
 
             });
@@ -226,6 +222,106 @@ describe('c3 chart data', function () {
     });
 
     describe('data.label', function () {
+
+        describe('for all targets', function () {
+
+            it('should update args to show data label for all data', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 100, 200, 100, 400, 150, 250],
+                            ['data2', 10, 20, 10, 40, 15, 25],
+                            ['data3', 1000, 2000, 1000, 4000, 1500, 2500]
+                        ],
+                        labels: true
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should have data labels on all data', function () {
+                d3.selectAll('.c3-texts-data1 text').each(function (d, i) {
+                    expect(d3.select(this).text()).toBe(args.data.columns[0][i + 1] + '');
+                });
+                d3.selectAll('.c3-texts-data2 text').each(function (d, i) {
+                    expect(d3.select(this).text()).toBe(args.data.columns[1][i + 1] + '');
+                });
+                d3.selectAll('.c3-texts-data3 text').each(function (d, i) {
+                    expect(d3.select(this).text()).toBe(args.data.columns[2][i + 1] + '');
+                });
+            });
+
+        });
+
+        describe('for each target', function () {
+
+            describe('as true', function () {
+
+                it('should update args to show data label for only data1', function () {
+                    args = {
+                        data: {
+                            columns: [
+                                ['data1', 100, 200, 100, 400, 150, 250],
+                                ['data2', 10, 20, 10, 40, 15, 25],
+                                ['data3', 1000, 2000, 1000, 4000, 1500, 2500]
+                            ],
+                            labels: {
+                                format: {
+                                    data1: true
+                                }
+                            }
+                        }
+                    };
+                    expect(true).toBeTruthy();
+                });
+
+                it('should have data labels on all data', function () {
+                    d3.selectAll('.c3-texts-data1 text').each(function (d, i) {
+                        expect(d3.select(this).text()).toBe(args.data.columns[0][i + 1] + '');
+                    });
+                    d3.selectAll('.c3-texts-data2 text').each(function () {
+                        expect(d3.select(this).text()).toBe('');
+                    });
+                    d3.selectAll('.c3-texts-data3 text').each(function () {
+                        expect(d3.select(this).text()).toBe('');
+                    });
+                });
+            });
+
+            describe('as function', function () {
+
+                it('should update args to show data label for only data1', function () {
+                    args = {
+                        data: {
+                            columns: [
+                                ['data1', 100, 200, 100, 400, 150, 250],
+                                ['data2', 10, 20, 10, 40, 15, 25],
+                                ['data3', 1000, 2000, 1000, 4000, 1500, 2500]
+                            ],
+                            labels: {
+                                format: {
+                                    data1: d3.format('$')
+                                }
+                            }
+                        }
+                    };
+                    expect(true).toBeTruthy();
+                });
+
+                it('should have data labels on all data', function () {
+                    d3.selectAll('.c3-texts-data1 text').each(function (d, i) {
+                        expect(d3.select(this).text()).toBe('$' + args.data.columns[0][i + 1]);
+                    });
+                    d3.selectAll('.c3-texts-data2 text').each(function () {
+                        expect(d3.select(this).text()).toBe('');
+                    });
+                    d3.selectAll('.c3-texts-data3 text').each(function () {
+                        expect(d3.select(this).text()).toBe('');
+                    });
+                });
+            });
+
+        });
 
         describe('with small values', function () {
 

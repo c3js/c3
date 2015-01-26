@@ -42,9 +42,9 @@ c3_chart_fn.hide = function (targetIds, options) {
     $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 };
 
-c3_chart_fn.toggle = function (targetIds) {
+c3_chart_fn.toggle = function (targetIds, options) {
     var that = this, $$ = this.internal;
     $$.mapToTargetIds(targetIds).forEach(function (targetId) {
-        $$.isTargetToShow(targetId) ? that.hide(targetId) : that.show(targetId);
+        $$.isTargetToShow(targetId) ? that.hide(targetId, options) : that.show(targetId, options);
     });
 };

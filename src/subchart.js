@@ -13,9 +13,7 @@ c3_chart_internal_fn.initSubchart = function () {
     var $$ = this, config = $$.config,
         context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context'));
 
-    if (!config.subchart_show) {
-        context.style('visibility', 'hidden');
-    }
+    context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
     // Define g for chart area
     context.append('g')
@@ -34,9 +32,7 @@ c3_chart_internal_fn.initSubchart = function () {
     context.append("g")
         .attr("clip-path", $$.clipPath)
         .attr("class", CLASS.brush)
-        .call($$.brush)
-        .selectAll("rect")
-        .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
+        .call($$.brush);
 
     // ATTENTION: This must be called AFTER chart added
     // Add Axis
@@ -55,6 +51,7 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         classAreas = $$.classAreas.bind($$);
 
     if (config.subchart_show) {
+        //-- Bar --//
         contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
             .data(targets)
             .attr('class', classChartBar);
@@ -78,17 +75,74 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         // Area
         contextLineEnter.append("g")
             .attr("class", classAreas);
+
+        //-- Brush --//
+        context.selectAll('.' + CLASS.brush + ' rect')
+            .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
     }
 };
+c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
+    var $$ = this;
+    $$.contextBar = $$.context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+        .data($$.barData.bind($$));
+    $$.contextBar.enter().append('path')
+        .attr("class", $$.classBar.bind($$))
+        .style("stroke", 'none')
+        .style("fill", $$.color);
+    $$.contextBar
+        .style("opacity", $$.initialOpacity.bind($$));
+    $$.contextBar.exit().transition().duration(durationForExit)
+        .style('opacity', 0)
+        .remove();
+};
+c3_chart_internal_fn.redrawBarForSubchart = function (drawBarOnSub, withTransition, duration) {
+    (withTransition ? this.contextBar.transition().duration(duration) : this.contextBar)
+        .attr('d', drawBarOnSub)
+        .style('opacity', 1);
+};
+c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
+    var $$ = this;
+    $$.contextLine = $$.context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+        .data($$.lineData.bind($$));
+    $$.contextLine.enter().append('path')
+        .attr('class', $$.classLine.bind($$))
+        .style('stroke', $$.color);
+    $$.contextLine
+        .style("opacity", $$.initialOpacity.bind($$));
+    $$.contextLine.exit().transition().duration(durationForExit)
+        .style('opacity', 0)
+        .remove();
+};
+c3_chart_internal_fn.redrawLineForSubchart = function (drawLineOnSub, withTransition, duration) {
+    (withTransition ? this.contextLine.transition().duration(duration) : this.contextLine)
+        .attr("d", drawLineOnSub)
+        .style('opacity', 1);
+};
+c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
+    var $$ = this, d3 = $$.d3;
+    $$.contextArea = $$.context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+        .data($$.lineData.bind($$));
+    $$.contextArea.enter().append('path')
+        .attr("class", $$.classArea.bind($$))
+        .style("fill", $$.color)
+        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+    $$.contextArea
+        .style("opacity", 0);
+    $$.contextArea.exit().transition().duration(durationForExit)
+        .style('opacity', 0)
+        .remove();
+};
+c3_chart_internal_fn.redrawAreaForSubchart = function (drawAreaOnSub, withTransition, duration) {
+    (withTransition ? this.contextArea.transition().duration(duration) : this.contextArea)
+        .attr("d", drawAreaOnSub)
+        .style("fill", this.color)
+        .style("opacity", this.orgAreaOpacity);
+};
 c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
-    var $$ = this, d3 = $$.d3, context = $$.context, config = $$.config,
-        contextLine,  contextArea, contextBar, drawAreaOnSub, drawBarOnSub, drawLineOnSub,
-        barData = $$.barData.bind($$),
-        lineData = $$.lineData.bind($$),
-        classBar = $$.classBar.bind($$),
-        classLine = $$.classLine.bind($$),
-        classArea = $$.classArea.bind($$),
-        initialOpacity = $$.initialOpacity.bind($$);
+    var $$ = this, d3 = $$.d3, config = $$.config,
+        drawAreaOnSub, drawBarOnSub, drawLineOnSub;
+
+    $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
 
     // subchart
     if (config.subchart_show) {
@@ -107,51 +161,14 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
             drawAreaOnSub = $$.generateDrawArea(areaIndices, true);
             drawBarOnSub = $$.generateDrawBar(barIndices, true);
             drawLineOnSub = $$.generateDrawLine(lineIndices, true);
-            // bars
-            contextBar = context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
-                .data(barData);
-            contextBar.enter().append('path')
-                .attr("class", classBar)
-                .style("stroke", 'none')
-                .style("fill", $$.color);
-            contextBar
-                .style("opacity", initialOpacity)
-                .transition().duration(duration)
-                .attr('d', drawBarOnSub)
-                .style('opacity', 1);
-            contextBar.exit().transition().duration(duration)
-                .style('opacity', 0)
-                .remove();
-            // lines
-            contextLine = context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
-                .data(lineData);
-            contextLine.enter().append('path')
-                .attr('class', classLine)
-                .style('stroke', $$.color);
-            contextLine
-                .style("opacity", initialOpacity)
-                .transition().duration(duration)
-                .attr("d", drawLineOnSub)
-                .style('opacity', 1);
-            contextLine.exit().transition().duration(duration)
-                .style('opacity', 0)
-                .remove();
-            // area
-            contextArea = context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
-                .data(lineData);
-            contextArea.enter().append('path')
-                .attr("class", classArea)
-                .style("fill", $$.color)
-                .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-            contextArea
-                .style("opacity", 0)
-                .transition().duration(duration)
-                .attr("d", drawAreaOnSub)
-                .style("fill", $$.color)
-                .style("opacity", $$.orgAreaOpacity);
-            contextArea.exit().transition().duration(durationForExit)
-                .style('opacity', 0)
-                .remove();
+
+            $$.updateBarForSubchart(duration);
+            $$.updateLineForSubchart(duration);
+            $$.updateAreaForSubchart(duration);
+
+            $$.redrawBarForSubchart(drawBarOnSub, duration, duration);
+            $$.redrawLineForSubchart(drawLineOnSub, duration, duration);
+            $$.redrawAreaForSubchart(drawAreaOnSub, duration, duration);
         }
     }
 };

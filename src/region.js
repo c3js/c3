@@ -4,7 +4,7 @@ c3_chart_internal_fn.initRegion = function () {
         .attr("clip-path", $$.clipPath)
         .attr("class", CLASS.regions);
 };
-c3_chart_internal_fn.redrawRegion = function (duration) {
+c3_chart_internal_fn.updateRegion = function (duration) {
     var $$ = this, config = $$.config;
 
     // hide if arc type
@@ -20,18 +20,21 @@ c3_chart_internal_fn.redrawRegion = function (duration) {
         .style("opacity", 0)
         .remove();
 };
-c3_chart_internal_fn.addTransitionForRegion = function (transitions) {
+c3_chart_internal_fn.redrawRegion = function (withTransition) {
     var $$ = this,
+        regions = $$.mainRegion.selectAll('rect'),
         x = $$.regionX.bind($$),
         y = $$.regionY.bind($$),
         w = $$.regionWidth.bind($$),
         h = $$.regionHeight.bind($$);
-    transitions.push($$.mainRegion.selectAll('rect').transition()
-                     .attr("x", x)
-                     .attr("y", y)
-                     .attr("width", w)
-                     .attr("height", h)
-                     .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }));
+    return [
+        (withTransition ? regions.transition() : regions)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("width", w)
+            .attr("height", h)
+            .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
+    ];
 };
 c3_chart_internal_fn.regionX = function (d) {
     var $$ = this, config = $$.config,

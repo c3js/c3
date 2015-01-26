@@ -48,7 +48,8 @@ function c3_axis(d3, params) {
         return newScale;
     }
     function textFormatted(v) {
-        return tickFormat ? tickFormat(v) : v;
+        var formatted = tickFormat ? tickFormat(v) : v;
+        return typeof formatted !== 'undefined' ? formatted : '';
     }
     function getSizeFor1Char(tick) {
         if (tickTextCharSize) {

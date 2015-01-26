@@ -1,4 +1,4 @@
-c3 [![Build Status](https://travis-ci.org/masayuki0812/c3.svg?branch=master)](https://travis-ci.org/masayuki0812/c3)
+c3 [![Build Status](https://travis-ci.org/masayuki0812/c3.svg?branch=master)](https://travis-ci.org/masayuki0812/c3) [![Dependency Status](https://david-dm.org/masayuki0812/c3.svg)](https://david-dm.org/masayuki0812/c3) [![devDependency Status](https://david-dm.org/masayuki0812/c3/dev-status.svg)](https://david-dm.org/masayuki0812/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/masayuki0812/c3/blob/master/LICENSE)
 ==
 
 c3 is a D3-based reusable chart library that enables deeper integration of charts into web applications.
@@ -41,6 +41,9 @@ If you choose to submit a pull request, please do not bump the version number un
 ## Playground
 Please fork this fiddle:
 + [http://jsfiddle.net/masayuki0812/7kYJu/](http://jsfiddle.net/masayuki0812/7kYJu/)
+
+## Dependency
++ [D3.js](https://github.com/mbostock/d3) `<=3.5.0`
 
 ## License
 MIT
