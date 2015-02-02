@@ -1,6 +1,27 @@
 var c3 = { version: "0.4.9" };
 
-var c3_chart_fn, c3_chart_internal_fn;
+var c3_chart_fn,
+    c3_chart_internal_fn,
+    c3_chart_internal_axis_fn;
+
+function API(owner) {
+    this.owner = owner;
+}
+
+function inherit(base, derived) {
+
+    if (Object.create) {
+        derived.prototype = Object.create(base.prototype);
+    } else {
+        var f = function f() {};
+        f.prototype = base.prototype;
+        derived.prototype = new f();
+    }
+
+    derived.prototype.constructor = derived;
+
+    return derived;
+}
 
 function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
@@ -35,12 +56,15 @@ c3.generate = function (config) {
 c3.chart = {
     fn: Chart.prototype,
     internal: {
-        fn: ChartInternal.prototype
+        fn: ChartInternal.prototype,
+        axis: {
+            fn: Axis.prototype
+        }
     }
 };
 c3_chart_fn = c3.chart.fn;
 c3_chart_internal_fn = c3.chart.internal.fn;
-
+c3_chart_internal_axis_fn = c3.chart.internal.axis.fn;
 
 c3_chart_internal_fn.init = function () {
     var $$ = this, config = $$.config;
@@ -148,6 +172,8 @@ c3_chart_internal_fn.initChartElements = function () {
 c3_chart_internal_fn.initWithData = function (data) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     var defs, main, binding = true;
+
+    $$.axis = new Axis($$);
 
     if ($$.initPie) { $$.initPie(); }
     if ($$.initBrush) { $$.initBrush(); }
@@ -266,7 +292,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     if (config.axis_x_extent) { $$.brush.extent($$.getDefaultExtent()); }
 
     // Add Axis
-    $$.initAxis();
+    $$.axis.init();
 
     // Set targets
     $$.updateTargets($$.data.targets);
@@ -456,7 +482,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     durationForExit = withTransitionForExit ? duration : 0;
     durationForAxis = withTransitionForAxis ? duration : 0;
 
-    transitions = transitions || $$.generateAxisTransitions(durationForAxis);
+    transitions = transitions || $$.axis.generateTransitions(durationForAxis);
 
     // update legend and transform each g
     if (withLegend && config.legend_show) {
@@ -475,7 +501,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     if (targetsToShow.length) {
         $$.updateXDomain(targetsToShow, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain);
         if (!config.axis_x_tick_values) {
-            tickValues = $$.updateXAxisTickValues(targetsToShow);
+            tickValues = $$.axis.updateXAxisTickValues(targetsToShow);
         }
     } else {
         $$.xAxis.tickValues([]);
@@ -490,17 +516,17 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
     if (!config.axis_y_tick_values && config.axis_y_tick_count) {
-        $$.yAxis.tickValues($$.generateTickValues($$.y.domain(), config.axis_y_tick_count));
+        $$.yAxis.tickValues($$.axis.generateTickValues($$.y.domain(), config.axis_y_tick_count));
     }
     if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
-        $$.y2Axis.tickValues($$.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
+        $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
     }
 
     // axes
-    $$.redrawAxis(transitions, hideAxis);
+    $$.axis.redraw(transitions, hideAxis);
 
     // Update axis label
-    $$.updateAxisLabels(withTransition);
+    $$.axis.updateLabels(withTransition);
 
     // show/hide if manual culling needed
     if ((withUpdateXDomain || withUpdateXAxis) && targetsToShow.length) {
@@ -681,7 +707,7 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     $$.updateSizes();
     // MEMO: called in updateLegend in redraw if withLegend
     if (!(options.withLegend && config.legend_show)) {
-        transitions = $$.generateAxisTransitions(options.withTransitionForAxis ? config.transition_duration : 0);
+        transitions = $$.axis.generateTransitions(options.withTransitionForAxis ? config.transition_duration : 0);
         // Update scales
         $$.updateScales();
         $$.updateSvgSize();
