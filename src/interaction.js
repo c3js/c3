@@ -324,7 +324,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
 
             // select if selection enabled
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
-                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index).each(function () {
+                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
                     if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                         $$.toggleShape(this, closest, closest.index);
                         $$.config.data_onclick.call($$.api, closest, this);
