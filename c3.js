@@ -2514,10 +2514,12 @@
                 }
             })
             .call(
-                d3.behavior.drag().origin(Object)
-                    .on('drag', function () { $$.drag(d3.mouse(this)); })
-                    .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
-                    .on('dragend', function () { $$.dragend(); })
+                config.data_selection_draggable && $$.drag ? (
+                    d3.behavior.drag().origin(Object)
+                        .on('drag', function () { $$.drag(d3.mouse(this)); })
+                        .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
+                        .on('dragend', function () { $$.dragend(); })
+                ) : function () {}
             );
     };
     c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
