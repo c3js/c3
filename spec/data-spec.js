@@ -50,39 +50,82 @@ describe('c3 chart data', function () {
         });
 
         describe('timeseries x', function () {
-            it('should load timeseries data successfully', function () {
-                args = {
-                    data: {
-                        x : 'date',
-                        columns: [
-                            ['date', '2013-01-01', '2013-01-02', '2013-01-03'],
-                            ['data1', 30, 200, 100],
-                            ['data2', 130, 300, 200]
-                        ]
-                    },
-                    axis : {
-                        x : {
-                            type : 'timeseries'
+            describe('without xFormat', function () {
+
+                it('should load timeseries data successfully', function () {
+                    args = {
+                        data: {
+                            x : 'date',
+                            columns: [
+                                ['date', '2013-01-01', '2013-01-02', '2013-01-03'],
+                                ['data1', 30, 200, 100],
+                                ['data2', 130, 300, 200]
+                            ]
+                        },
+                        axis : {
+                            x : {
+                                type : 'timeseries'
+                            }
                         }
-                    }
-                };
-                expect(true).toBeTruthy();
+                    };
+                    expect(true).toBeTruthy();
+                });
+
+                it('should have correct number of xs', function () {
+                    expect(Object.keys(chart.internal.data.xs).length).toBe(2);
+                    expect(chart.internal.data.xs.data1.length).toBe(3);
+                    expect(chart.internal.data.xs.data2.length).toBe(3);
+                });
+
+                it('should have Date object as x', function () {
+                    var xs = chart.internal.data.xs;
+                    expect(+xs.data1[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
+                    expect(+xs.data1[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
+                    expect(+xs.data1[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
+                    expect(+xs.data2[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
+                    expect(+xs.data2[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
+                    expect(+xs.data2[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
+                });
             });
 
-            it('should have correct number of xs', function () {
-                expect(Object.keys(chart.internal.data.xs).length).toBe(2);
-                expect(chart.internal.data.xs.data1.length).toBe(3);
-                expect(chart.internal.data.xs.data2.length).toBe(3);
-            });
+            describe('with xFormat', function () {
+                describe('timeseries x with xFormat', function () {
+                    it('should load timeseries data successfully', function () {
+                        args = {
+                            data: {
+                                x : 'date',
+                                xFormat: '%Y%m%d',
+                                columns: [
+                                    ['date', '20130101', '20130102', '20130103'],
+                                    ['data1', 30, 200, 100],
+                                    ['data2', 130, 300, 200]
+                                ]
+                            },
+                            axis : {
+                                x : {
+                                    type : 'timeseries'
+                                }
+                            }
+                        };
+                        expect(true).toBeTruthy();
+                    });
 
-            it('should have Date object as x', function () {
-                var xs = chart.internal.data.xs;
-                expect(+xs.data1[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
-                expect(+xs.data1[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
-                expect(+xs.data1[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
-                expect(+xs.data2[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
-                expect(+xs.data2[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
-                expect(+xs.data2[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
+                    it('should have correct number of xs', function () {
+                        expect(Object.keys(chart.internal.data.xs).length).toBe(2);
+                        expect(chart.internal.data.xs.data1.length).toBe(3);
+                        expect(chart.internal.data.xs.data2.length).toBe(3);
+                    });
+
+                    it('should have Date object as x', function () {
+                        var xs = chart.internal.data.xs;
+                        expect(+xs.data1[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
+                        expect(+xs.data1[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
+                        expect(+xs.data1[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
+                        expect(+xs.data2[0]).toBe(+new Date(2013, 0, 1, 0, 0, 0));
+                        expect(+xs.data2[1]).toBe(+new Date(2013, 0, 2, 0, 0, 0));
+                        expect(+xs.data2[2]).toBe(+new Date(2013, 0, 3, 0, 0, 0));
+                    });
+                });
             });
         });
 
@@ -174,47 +217,6 @@ describe('c3 chart data', function () {
                     expect(+xs.data2[0]).toBe(1417622461123);
                     expect(+xs.data2[1]).toBe(1417622522345);
                 });
-            });
-
-            describe('as unixtime string', function () {
-
-                it('should upate args', function () {
-                    args = {
-                        data: {
-                            x : 'date',
-                            columns: [
-                                ['date', "1417622461123", "1417622522345"],
-                                ['data1', 30, 200],
-                                ['data2', 130, 300]
-                            ]
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d %H:%M:%S.%L',
-                                    multiline: false
-                                }
-                            }
-                        }
-                    };
-                    expect(true).toBeTruthy();
-                });
-
-                it('should have correct number of xs', function () {
-                    expect(Object.keys(chart.internal.data.xs).length).toBe(2);
-                    expect(chart.internal.data.xs.data1.length).toBe(2);
-                    expect(chart.internal.data.xs.data2.length).toBe(2);
-                });
-
-                it('should have Date object as x', function () {
-                    var xs = chart.internal.data.xs;
-                    expect(+xs.data1[0]).toBe(1417622461123);
-                    expect(+xs.data1[1]).toBe(1417622522345);
-                    expect(+xs.data2[0]).toBe(1417622461123);
-                    expect(+xs.data2[1]).toBe(1417622522345);
-                });
-
             });
 
         });

@@ -946,10 +946,10 @@
         var $$ = this, parsedDate;
         if (date instanceof Date) {
             parsedDate = date;
+        } else if (typeof date === 'string') {
+            parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
         } else if (typeof date === 'number' || !isNaN(date)) {
             parsedDate = new Date(+date);
-        } else {
-            parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
         }
         if (!parsedDate || isNaN(+parsedDate)) {
             window.console.error("Failed to parse x '" + date + "' to Date object");
