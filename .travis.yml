@@ -2,3 +2,4 @@ language: node_js
 
 before_script:
 - npm install -g grunt-cli
+- gem install sass
