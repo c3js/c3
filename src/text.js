@@ -62,7 +62,7 @@ c3_chart_internal_fn.getTextRect = function (text, cls) {
 };
 c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
     var $$ = this,
-        getAreaPoints = $$.generateGetAreaPoints(barIndices, false),
+        getAreaPoints = $$.generateGetAreaPoints(areaIndices, false),
         getBarPoints = $$.generateGetBarPoints(barIndices, false),
         getLinePoints = $$.generateGetLinePoints(lineIndices, false),
         getter = forX ? $$.getXForText : $$.getYForText;
