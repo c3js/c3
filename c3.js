@@ -3263,7 +3263,7 @@
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
         var body = this.d3.select('body').classed('c3', true),
-            svg = body.append("svg").style('visibility', 'hidden'), rect;
+            svg = body.append("svg").style('visibility', 'hidden').style('height', 0), rect;
         svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')
@@ -4391,7 +4391,7 @@
                 $$.updateXAxisTickValues(targetsToShow, axis);
             }
             body = this.d3.select('body').classed('c3', true);
-            svg = body.append('svg').style('visibility', 'hidden');
+            svg = body.append('svg').style('visibility', 'hidden').style('height', 0);
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text tspan').each(function () {
                     var box = this.getBoundingClientRect();

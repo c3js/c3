@@ -49,7 +49,7 @@ c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTra
 };
 c3_chart_internal_fn.getTextRect = function (text, cls) {
     var body = this.d3.select('body').classed('c3', true),
-        svg = body.append("svg").style('visibility', 'hidden'), rect;
+        svg = body.append("svg").style('visibility', 'hidden').style('height', 0), rect;
     svg.selectAll('.dummy')
         .data([text])
       .enter().append('text')

@@ -298,7 +298,7 @@ c3_chart_internal_fn.getMaxTickWidth = function (id, withoutRecompute) {
             $$.updateXAxisTickValues(targetsToShow, axis);
         }
         body = this.d3.select('body').classed('c3', true);
-        svg = body.append('svg').style('visibility', 'hidden');
+        svg = body.append('svg').style('visibility', 'hidden').style('height', 0);
         svg.append('g').call(axis).each(function () {
             $$.d3.select(this).selectAll('text tspan').each(function () {
                 var box = this.getBoundingClientRect();
