@@ -50,7 +50,7 @@ c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
 };
 c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
     var $$ = this, config = $$.config,
-        w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * config.bar_width_ratio) / barTargetsNum : 0;
+        w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickInterval() * config.bar_width_ratio) / barTargetsNum : 0;
     return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
 };
 c3_chart_internal_fn.getBars = function (i, id) {

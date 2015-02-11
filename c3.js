@@ -2630,21 +2630,7 @@
     };
 
     c3_chart_internal_fn.getEventRectWidth = function () {
-        var $$ = this;
-        var target = $$.getMaxDataCountTarget($$.data.targets),
-            firstData, lastData, base, maxDataCount, ratio, w;
-        if (!target) {
-            return 0;
-        }
-        firstData = target.values[0], lastData = target.values[target.values.length - 1];
-        base = $$.x(lastData.x) - $$.x(firstData.x);
-        if (base === 0) {
-            return $$.config.axis_rotated ? $$.height : $$.width;
-        }
-        maxDataCount = $$.getMaxDataCount();
-        ratio = ($$.hasType('bar') ? (maxDataCount - ($$.isCategorized() ? 0.25 : 1)) / maxDataCount : 1);
-        w = maxDataCount > 1 ? (base * ratio) / (maxDataCount - 1) : base;
-        return w < 1 ? 1 : w;
+        return this.xAxis.tickInterval();
     };
 
     c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
@@ -3141,7 +3127,7 @@
     };
     c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
         var $$ = this, config = $$.config,
-            w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickOffset() * 2 * config.bar_width_ratio) / barTargetsNum : 0;
+            w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickInterval() * config.bar_width_ratio) / barTargetsNum : 0;
         return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
     };
     c3_chart_internal_fn.getBars = function (i, id) {
@@ -4145,14 +4131,6 @@
             if (isEmpty(config.axis_x_tick_culling)) {
                 config.axis_x_tick_culling = false;
             }
-        } else {
-            // TODO: move this to c3_axis
-            axis.tickOffset = function () {
-                var scale = this.scale(),
-                    edgeX = $$.getEdgeX($$.data.targets), diff = scale(edgeX[1]) - scale(edgeX[0]),
-                    base = diff ? diff : (config.axis_rotated ? $$.height : $$.width);
-                return (base / $$.getMaxDataCount()) / 2;
-            };
         }
 
         return axis;
@@ -6633,6 +6611,7 @@
         var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
         var tickOffset = 0, tickCulling = true, tickCentered;
+        var axis_g;
 
         params = params || {};
         outerTickSize = params.withOuterTick ? 6 : 0;
@@ -6699,6 +6678,7 @@
             return size;
         }
         function axis(g) {
+            axis_g = g;
             g.each(function () {
                 var g = d3.select(this);
                 var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
@@ -6883,8 +6863,19 @@
             tickCentered = isCentered;
             return axis;
         };
-        axis.tickOffset = function () { // This will be overwritten when normal x axis
+        axis.tickOffset = function () {
             return tickOffset;
+        };
+        axis.tickInterval = function () {
+            var interval, length;
+            if (params.isCategory) {
+                interval = tickOffset * 2;
+            }
+            else {
+                length = axis_g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
+                interval = length / axis_g.selectAll('line').size();
+            }
+            return interval;
         };
         axis.ticks = function () {
             if (!arguments.length) { return tickArguments; }

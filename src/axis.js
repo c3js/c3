@@ -52,14 +52,6 @@ c3_chart_internal_fn.getXAxis = function (scale, orient, tickFormat, tickValues,
         if (isEmpty(config.axis_x_tick_culling)) {
             config.axis_x_tick_culling = false;
         }
-    } else {
-        // TODO: move this to c3_axis
-        axis.tickOffset = function () {
-            var scale = this.scale(),
-                edgeX = $$.getEdgeX($$.data.targets), diff = scale(edgeX[1]) - scale(edgeX[0]),
-                base = diff ? diff : (config.axis_rotated ? $$.height : $$.width);
-            return (base / $$.getMaxDataCount()) / 2;
-        };
     }
 
     return axis;
