@@ -54,14 +54,52 @@ describe('c3 chart', function () {
 
     describe('bindto', function () {
 
-        it('should accept d3.selection object', function () {
-            args.bindto = d3.select('#chart');
-            expect(true).toBeTruthy();
+        describe('selector', function () {
+            it('update args', function () {
+                d3.select('#chart').html('');
+                args.bindto = '#chart';
+                expect(true).toBeTruthy();
+            });
+            it('should be created', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.size()).toBe(1);
+            });
         });
 
-        it('should be created', function () {
-            var svg = d3.select('#chart svg');
-            expect(svg).not.toBeNull();
+        describe('d3.selection object', function () {
+            it('update args', function () {
+                d3.select('#chart').html('');
+                args.bindto = d3.select('#chart');
+                expect(true).toBeTruthy();
+            });
+            it('should be created', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.size()).toBe(1);
+            });
+        });
+
+        describe('null', function () {
+            it('update args', function () {
+                d3.select('#chart').html('');
+                args.bindto = null;
+                expect(true).toBeTruthy();
+            });
+            it('should not be created', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.size()).toBe(0);
+            });
+        });
+
+        describe('empty string', function () {
+            it('update args', function () {
+                d3.select('#chart').html('');
+                args.bindto = '';
+                expect(true).toBeTruthy();
+            });
+            it('should not be created', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.size()).toBe(0);
+            });
         });
 
     });

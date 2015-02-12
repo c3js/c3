@@ -153,7 +153,15 @@ c3_chart_internal_fn.initWithData = function (data) {
     if ($$.initBrush) { $$.initBrush(); }
     if ($$.initZoom) { $$.initZoom(); }
 
-    $$.selectChart = typeof config.bindto.node === 'function' ? config.bindto : d3.select(config.bindto);
+    if (!config.bindto) {
+        $$.selectChart = d3.selectAll([]);
+    }
+    else if (typeof config.bindto.node === 'function') {
+        $$.selectChart = config.bindto;
+    }
+    else {
+        $$.selectChart = d3.select(config.bindto);
+    }
     if ($$.selectChart.empty()) {
         $$.selectChart = d3.select(document.createElement('div')).style('opacity', 0);
         $$.observeInserted($$.selectChart);
@@ -859,7 +867,12 @@ c3_chart_internal_fn.updateDimension = function (withoutAxis) {
 };
 
 c3_chart_internal_fn.observeInserted = function (selection) {
-    var $$ = this, observer = new MutationObserver(function (mutations) {
+    var $$ = this, observer;
+    if (typeof MutationObserver === 'undefined') {
+        window.console.error("MutationObserver not defined.");
+        return;
+    }
+    observer= new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
             if (mutation.type === 'childList' && mutation.previousSibling) {
                 observer.disconnect();
