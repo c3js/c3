@@ -114,27 +114,10 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         .attr("class", $$.classEvent.bind($$))
         .style("cursor", config.data_selection_enabled && config.data_selection_grouped ? "pointer" : null)
         .on('mouseover', function (d) {
-            var index = d.index, selectedData, newData;
+            var index = d.index;
 
             if ($$.dragging || $$.flowing) { return; } // do nothing while dragging/flowing
             if ($$.hasArcType()) { return; }
-
-            selectedData = $$.data.targets.map(function (t) {
-                return $$.addName($$.getValueOnIndex(t.values, index));
-            });
-
-            // Sort selectedData as names order
-            newData = [];
-            Object.keys(config.data_names).forEach(function (id) {
-                for (var j = 0; j < selectedData.length; j++) {
-                    if (selectedData[j] && selectedData[j].id === id) {
-                        newData.push(selectedData[j]);
-                        selectedData.shift(j);
-                        break;
-                    }
-                }
-            });
-            selectedData = newData.concat(selectedData); // Add remained
 
             // Expand shapes for selection
             if (config.point_focus_expand_enabled) { $$.expandCircles(index, null, true); }
