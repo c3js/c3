@@ -56,8 +56,11 @@ describe('c3 chart arc', function () {
             expect(true).toBeTruthy();
         });
 
-        it('should have correct d even if data id can be converted to a color', function () {
-            expect(d3.select('.c3-arc-black').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+ 0 0,1 -3\..+,-211\..+L0,0Z/);
+        it('should have correct d even if data id can be converted to a color', function (done) {
+            setTimeout(function () {
+                expect(d3.select('.c3-arc-black').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+ 0 0,1 -3\..+,-211\..+L0,0Z/);
+                done();
+            }, 500);
         });
 
         it('should update args to have empty pie chart', function () {
