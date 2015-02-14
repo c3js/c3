@@ -90,7 +90,7 @@ module.exports = (grunt) ->
               specs: 'spec/*-spec.js'
               helpers: 'spec/*-helper.js'
               styles: 'c3.css'
-              vendor: 'http://d3js.org/d3.v3.min.js'
+              vendor: 'https://raw.githubusercontent.com/mbostock/d3/v3.5.0/d3.min.js'
 
         uglify:
           c3:
