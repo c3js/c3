@@ -39,7 +39,7 @@ function initChart(chart, args, done) {
 
     window.setTimeout(function () {
         done();
-    }, 10);
+    }, 100);
 
     return chart;
 }
