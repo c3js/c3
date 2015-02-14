@@ -29,10 +29,13 @@ function initChart(chart, args, done) {
     if (typeof chart === 'undefined') {
         window.initDom();
     }
-    chart = window.c3.generate(args);
-    chart.internal.d3.select('.jasmine_html-reporter')
-        .style('position', 'absolute')
-        .style('right', 0);
+    if (args) {
+        chart = window.c3.generate(args);
+        window.d3 = chart.internal.d3;
+        window.d3.select('.jasmine_html-reporter')
+            .style('position', 'absolute')
+            .style('right', 0);
+    }
 
     window.setTimeout(function () {
         done();
