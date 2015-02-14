@@ -1,36 +1,29 @@
-
 describe('c3 api zoom', function () {
     'use strict';
 
-    var chart, d3;
-
-    var args = {
-        data: {
-            columns: [
-                ['data1', 30, 200, 100, 400, 150, 250],
-                ['data2', 50, 20, 10, 40, 15, 25],
-                ['data3', 150, 120, 110, 140, 115, 125]
-            ]
-        },
-        zoom: {
-            enabled: true
-        }
-    };
+    var chart, args;
 
     beforeEach(function (done) {
-        if (typeof chart === 'undefined') {
-            window.initDom();
-        }
-        chart = window.c3.generate(args);
-        d3 = chart.internal.d3;
-//        chart.internal.d3.select('.jasmine_html-reporter').style('display', 'none');
-
-        window.setTimeout(function () {
-            done();
-        }, 10);
+        chart = window.initChart(chart, args, done);
     });
 
     describe('zoom', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', 150, 120, 110, 140, 115, 125]
+                    ]
+                },
+                zoom: {
+                    enabled: true
+                }
+            };
+            expect(true).toBeTruthy();
+        });
 
         it('should be zoomed properly', function () {
             var target = [3, 5], domain;

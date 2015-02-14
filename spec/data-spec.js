@@ -1,8 +1,7 @@
-
 describe('c3 chart data', function () {
     'use strict';
 
-    var chart, d3;
+    var chart;
 
     var args = {
         data: {
@@ -19,7 +18,6 @@ describe('c3 chart data', function () {
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
-        d3 = chart.internal.d3;
     });
 
     describe('function in data.order', function () {

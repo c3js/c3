@@ -19,8 +19,10 @@
     "browser": true,
 
     "globals": {
+        "jasmine": false,
         "describe": false,
         "beforeEach": false,
+        "beforeAll": false,
         "it": false,
         "expect": false,
         "d3": false

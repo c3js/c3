@@ -1,8 +1,7 @@
-
 describe('c3 chart axis', function () {
     'use strict';
 
-    var chart, d3;
+    var chart;
 
     var args = {
         data: {
@@ -30,16 +29,13 @@ describe('c3 chart axis', function () {
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
-        d3 = chart.internal.d3;
     });
 
     describe('axis.y.tick.count', function () {
 
-        var i = 1;
-
-        beforeEach(function () {
-            args.axis.y.tick.count = i++;
-            chart = window.c3.generate(args);
+        it('should update args to have only 1 tick on y axis', function () {
+            args.axis.y.tick.count = 1;
+            expect(true).toBeTruthy();
         });
 
         it('should have only 1 tick on y axis', function () {
@@ -47,9 +43,19 @@ describe('c3 chart axis', function () {
             expect(ticksSize).toBe(1);
         });
 
+        it('should update args to have 2 ticks on y axis', function () {
+            args.axis.y.tick.count = 2;
+            expect(true).toBeTruthy();
+        });
+
         it('should have 2 ticks on y axis', function () {
             var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
             expect(ticksSize).toBe(2);
+        });
+
+        it('should update args to have 3 ticks on y axis', function () {
+            args.axis.y.tick.count = 3;
+            expect(true).toBeTruthy();
         });
 
         it('should have 3 ticks on y axis', function () {
@@ -63,9 +69,9 @@ describe('c3 chart axis', function () {
 
         var values = [100, 500];
 
-        beforeEach(function () {
+        it('should update args to have only 2 ticks on y axis', function () {
             args.axis.y.tick.values = values;
-            chart = window.c3.generate(args);
+            expect(true).toBeTruthy();
         });
 
         it('should have only 2 tick on y axis', function () {
@@ -84,25 +90,24 @@ describe('c3 chart axis', function () {
 
     describe('axis y timeseries', function () {
 
-        var args = {
-            data: {
-                columns: [
-                    ["times", 60000, 120000, 180000, 240000]
-                ]
-            },
-            axis: {
-                y: {
-                    type : 'timeseries',
-                    tick: {
-                        time: {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ["times", 60000, 120000, 180000, 240000]
+                    ]
+                },
+                axis: {
+                    y: {
+                        type : 'timeseries',
+                        tick: {
+                            time: {
+                            }
                         }
                     }
                 }
-            }
-        };
-
-        beforeEach(function () {
-            chart = window.c3.generate(args);
+            };
+            expect(true).toBeTruthy();
         });
 
         it('should have 7 ticks on y axis', function () {

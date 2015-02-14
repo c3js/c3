@@ -1,10 +1,7 @@
-var jasmine = window.jasmine,
-    beforeAll = window.beforeAll;
-
 describe('c3 chart tooltip', function () {
     'use strict';
 
-    var chart, d3;
+    var chart;
     var tooltipConfiguration;
 
     var args = function () {
@@ -22,7 +19,6 @@ describe('c3 chart tooltip', function () {
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args(), done);
-        d3 = chart.internal.d3;
     });
 
     describe('tooltip position', function () {

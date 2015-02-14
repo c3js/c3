@@ -1,26 +1,27 @@
-
 describe('c3 api load', function () {
     'use strict';
 
-    var chart, d3;
-
-    var args = {
-        data: {
-            columns: [
-                ['data1', 30, 200, 100, 400, 150, 250],
-                ['data2', 5000, 2000, 1000, 4000, 1500, 2500]
-            ]
-        }
-    };
+    var chart, args;
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
-        d3 = chart.internal.d3;
     });
 
     describe('indexed data', function () {
 
         describe('as column', function () {
+
+            it('should update args', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 5000, 2000, 1000, 4000, 1500, 2500]
+                        ]
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
 
             it('should load additional data', function (done) {
                 var main = chart.internal.main,

@@ -1,4 +1,3 @@
-
 describe('c3', function () {
     'use strict';
 
@@ -9,4 +8,3 @@ describe('c3', function () {
         expect(typeof c3).toBe('object');
     });
 });
-
