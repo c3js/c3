@@ -256,7 +256,7 @@ c3_chart_internal_fn.hasDataLabel = function () {
     var config = this.config;
     if (typeof config.data_labels === 'boolean' && config.data_labels) {
         return true;
-    } else if (typeof config.data_labels === 'object' && notEmpty(config.data_labels)) {
+    } else if (typeof config.data_labels === 'object' && notEmpty(config.data_labels) && config.data_labels.show) {
         return true;
     }
     return false;
