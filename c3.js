@@ -2010,7 +2010,7 @@
             }
             // Set tooltip
             tooltip
-                .style("top", tooltipTop + "px")
+                .style("top", Math.max(tooltipTop, -100) + "px")
                 .style("left", tooltipLeft + 'px');
         }
         function hideTooltip() {
