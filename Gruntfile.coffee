@@ -40,6 +40,7 @@ module.exports = (grunt) ->
               'src/grid.js',
               'src/tooltip.js',
               'src/legend.js',
+              'src/title.js',
               'src/axis.js',
               'src/clip.js',
               'src/arc.js',
