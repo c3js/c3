@@ -117,9 +117,7 @@
             __zoom_privileged = getConfig(['zoom', 'privileged'], false);
 
         var __onenter = getConfig(['onenter'], function () {}),
-            __onleave = getConfig(['onleave'], function () {}),
-            __onresize = getConfig(['onresize'], function () {}),
-            __onresized = getConfig(['onresized'], function () {});
+            __onleave = getConfig(['onleave'], function () {});
 
         var __transition_duration = getConfig(['transition', 'duration'], 350);
 
@@ -338,10 +336,10 @@
             context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             x : function () {
-              if (__legend_show === true) {
-                return "translate(0," + (__axis_rotated ? 0 : height) + ")";
-              }
-              return "translate(0," + (__axis_rotated ? 0 : height + margin3.top) + ")";
+                if (__legend_show === true) {
+                    return "translate(0," + (__axis_rotated ? 0 : height) + ")";
+                }
+                return "translate(0," + (__axis_rotated ? 0 : height + margin3.top) + ")";
             },
             y : function () { return "translate(0," + (__axis_rotated ? height : 0) + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 1 : 0) + ")"; },
@@ -3721,19 +3719,6 @@
             }
         }
 
-        function generateResize() {
-            var resizeFunctions = [];
-            function callResizeFunctions() {
-                resizeFunctions.forEach(function (f) {
-                    f();
-                });
-            }
-            callResizeFunctions.add = function (f) {
-                resizeFunctions.push(f);
-            };
-            return callResizeFunctions;
-        }
-
         function updateSvgSize() {
             svg.attr('width', currentWidth).attr('height', currentHeight);
             svg.select('#' + clipId).select('rect')
@@ -4331,7 +4316,7 @@
             }
         };
 
-        c3.unload = function (targetIds, done) {
+        c3.unload = function (targetIds) {
             unload(mapToTargetIds(targetIds), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: __legend_show});
             });
