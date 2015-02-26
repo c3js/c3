@@ -117,7 +117,6 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var paddingTop = 4, paddingRight = 10, maxWidth = 0, maxHeight = 0, posMin = 10, tileWidth = 15;
     var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
     var withTransition, withTransitionForTransform;
-    var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
     var texts, rects, tiles, background;
 
     options = options || {};
@@ -307,16 +306,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     // toggle legend state
     $$.legend.selectAll('.' + CLASS.legendItem)
-        .classed(CLASS.legendItemHidden, function (id) { return !$$.isTargetToShow(id); })
-        .transition()
-        .style('opacity', function (id) {
-            var This = $$.d3.select(this);
-            if ($$.isTargetToShow(id)) {
-                return !hasFocused || This.classed(CLASS.legendItemFocused) ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
-            } else {
-                return null; // c3-legend-item-hidden will be applied
-            }
-        });
+        .classed(CLASS.legendItemHidden, function (id) { return !$$.isTargetToShow(id); });
 
     // Update all to reflect change of legend
     $$.updateLegendItemWidth(maxWidth);

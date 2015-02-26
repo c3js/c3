@@ -3873,7 +3873,6 @@
         var paddingTop = 4, paddingRight = 10, maxWidth = 0, maxHeight = 0, posMin = 10, tileWidth = 15;
         var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
         var withTransition, withTransitionForTransform;
-        var hasFocused = $$.legend.selectAll('.' + CLASS.legendItemFocused).size();
         var texts, rects, tiles, background;
 
         options = options || {};
@@ -4063,16 +4062,7 @@
 
         // toggle legend state
         $$.legend.selectAll('.' + CLASS.legendItem)
-            .classed(CLASS.legendItemHidden, function (id) { return !$$.isTargetToShow(id); })
-            .transition()
-            .style('opacity', function (id) {
-                var This = $$.d3.select(this);
-                if ($$.isTargetToShow(id)) {
-                    return !hasFocused || This.classed(CLASS.legendItemFocused) ? $$.opacityForLegend(This) : $$.opacityForUnfocusedLegend(This);
-                } else {
-                    return null; // c3-legend-item-hidden will be applied
-                }
-            });
+            .classed(CLASS.legendItemHidden, function (id) { return !$$.isTargetToShow(id); });
 
         // Update all to reflect change of legend
         $$.updateLegendItemWidth(maxWidth);
@@ -5809,7 +5799,6 @@
         targetIds = $$.mapToTargetIds(targetIds);
         candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))),
 
-        this.revert();
         candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
         if ($$.hasArcType()) {
             $$.unexpandArc(targetIds);
@@ -5834,6 +5823,11 @@
         }
         if ($$.config.legend_show) {
             $$.showLegend(targetIds.filter($$.isLegendToShow.bind($$)));
+            $$.legend.selectAll($$.selectorLegends(targetIds))
+                .filter(function () {
+                    return $$.d3.select(this).classed(CLASS.legendItemFocused);
+                })
+                .classed(CLASS.legendItemFocused, false);
         }
 
         $$.focusedTargetIds = [];

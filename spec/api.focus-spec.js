@@ -219,6 +219,7 @@ describe('c3 api focus', function () {
                     });
                     legendItems.each(function () {
                         var item = d3.select(this);
+                        expect(item.classed('c3-legend-item-focused')).toBeFalsy();
                         expect(+item.style('opacity')).toBeCloseTo(1);
                     });
                     done();
@@ -241,6 +242,7 @@ describe('c3 api focus', function () {
                     });
                     legendItems.each(function () {
                         var item = d3.select(this);
+                        expect(item.classed('c3-legend-item-focused')).toBeFalsy();
                         expect(+item.style('opacity')).toBeCloseTo(1);
                     });
                     done();
@@ -271,6 +273,9 @@ describe('c3 api focus', function () {
                     expect(+legendItems.data1.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data2.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data3.style('opacity')).toBeCloseTo(1);
+                    expect(legendItems.data1.classed('c3-legend-item-focused')).toBeTruthy();
+                    expect(legendItems.data2.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data3.classed('c3-legend-item-focused')).toBeTruthy();
                     done();
                 }, 1000);
             }, 1000);
@@ -299,6 +304,9 @@ describe('c3 api focus', function () {
                     expect(+legendItems.data1.style('opacity')).toBeCloseTo(0.3);
                     expect(+legendItems.data2.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data3.style('opacity')).toBeCloseTo(0.3);
+                    expect(legendItems.data1.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data2.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data3.classed('c3-legend-item-focused')).toBeFalsy();
                     done();
                 }, 1000);
             }, 1000);
@@ -327,6 +335,9 @@ describe('c3 api focus', function () {
                     expect(+legendItems.data1.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data2.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data3.style('opacity')).toBeCloseTo(1);
+                    expect(legendItems.data1.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data2.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data3.classed('c3-legend-item-focused')).toBeTruthy();
                     done();
                 }, 1000);
             }, 1000);
@@ -355,6 +366,9 @@ describe('c3 api focus', function () {
                     expect(+legendItems.data1.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data2.style('opacity')).toBeCloseTo(1);
                     expect(+legendItems.data3.style('opacity')).toBeCloseTo(0.3);
+                    expect(legendItems.data1.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data2.classed('c3-legend-item-focused')).toBeFalsy();
+                    expect(legendItems.data3.classed('c3-legend-item-focused')).toBeFalsy();
                     done();
                 }, 1000);
             }, 1000);

@@ -24,7 +24,6 @@ c3_chart_fn.defocus = function (targetIds) {
     targetIds = $$.mapToTargetIds(targetIds);
     candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))),
 
-    this.revert();
     candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
     if ($$.hasArcType()) {
         $$.unexpandArc(targetIds);
@@ -49,6 +48,11 @@ c3_chart_fn.revert = function (targetIds) {
     }
     if ($$.config.legend_show) {
         $$.showLegend(targetIds.filter($$.isLegendToShow.bind($$)));
+        $$.legend.selectAll($$.selectorLegends(targetIds))
+            .filter(function () {
+                return $$.d3.select(this).classed(CLASS.legendItemFocused);
+            })
+            .classed(CLASS.legendItemFocused, false);
     }
 
     $$.focusedTargetIds = [];
