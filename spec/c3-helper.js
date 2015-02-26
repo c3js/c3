@@ -34,6 +34,7 @@ function initChart(chart, args, done) {
         window.d3 = chart.internal.d3;
         window.d3.select('.jasmine_html-reporter')
             .style('position', 'absolute')
+            .style('width', '640px')
             .style('right', 0);
     }
 
