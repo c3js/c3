@@ -7,7 +7,6 @@ function c3_axis(d3, params) {
     var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
     var tickOffset = 0, tickCulling = true, tickCentered;
-    var axis_g;
 
     params = params || {};
     outerTickSize = params.withOuterTick ? 6 : 0;
@@ -74,9 +73,9 @@ function c3_axis(d3, params) {
         return size;
     }
     function axis(g) {
-        axis_g = g;
         g.each(function () {
-            var g = d3.select(this);
+            var g = axis.g = d3.select(this);
+
             var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
 
             var ticks = tickValues ? tickValues : generateTicks(scale1),
@@ -268,8 +267,8 @@ function c3_axis(d3, params) {
             interval = tickOffset * 2;
         }
         else {
-            length = axis_g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
-            interval = length / axis_g.selectAll('line').size();
+            length = axis.g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
+            interval = length / axis.g.selectAll('line').size();
         }
         return interval;
     };
