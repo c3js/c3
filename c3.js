@@ -3247,8 +3247,8 @@
         ];
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
-        var body = this.d3.select('body').classed('c3', true),
-            svg = body.append("svg").style('visibility', 'hidden').style('height', 0), rect;
+        var body = this.d3.select('body'),
+            svg = body.append("svg").classed('c3', true).style('visibility', 'hidden').style('height', 0), rect;
         svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')
@@ -3256,7 +3256,6 @@
             .text(text)
           .each(function () { rect = this.getBoundingClientRect(); });
         svg.remove();
-        body.classed('c3', false);
         return rect;
     };
     c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
@@ -4368,8 +4367,8 @@
                 axis = $$.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
                 $$.updateXAxisTickValues(targetsToShow, axis);
             }
-            body = this.d3.select('body').classed('c3', true);
-            svg = body.append('svg').style('visibility', 'hidden').style('height', 0);
+            body = this.d3.select('body');
+            svg = body.append('svg').classed('c3', true).style('visibility', 'hidden').style('height', 0);
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text tspan').each(function () {
                     var box = this.getBoundingClientRect();
@@ -4380,7 +4379,6 @@
             window.setTimeout(function () {
                 svg.remove();
             }, 100);
-            body.classed('c3', false);
         }
         $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
         return $$.currentMaxTickWidths[id];
