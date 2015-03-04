@@ -2,7 +2,7 @@
     'use strict';
 
     var c3 = {
-        version: "0.1.34"
+        version: '0.1.34'
     };
 
     var CLASS = {
@@ -76,7 +76,7 @@
      */
     c3.generate = function (config) {
 
-        var d3 = window.d3 ? window.d3 : window.require ? window.require("d3") : undefined;
+        var d3 = window.d3 ? window.d3 : window.require ? window.require('d3') : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
             cache = {};
@@ -242,7 +242,7 @@
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
             __donut_expand = getConfig(['donut', 'expand'], true),
-            __donut_title = getConfig(['donut', 'title'], ""),
+            __donut_title = getConfig(['donut', 'title'], ''),
             __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
             __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
             __donut_onmouseout = getConfig(['donut', 'onmouseout'], function () {});
@@ -2006,10 +2006,17 @@
                     tooltipTop -= tHeight + 30;
                 }
             }
+
+            var parent = d3.select(__bindto);
+            var parentRect = parent[0][0].getBoundingClientRect();
+
+            tooltipTop = Math.max(tooltipTop, -100) + parentRect.top + document.body.scrollTop;
+            tooltipLeft = Math.max(tooltipLeft, -20) + parentRect.left;
+
             // Set tooltip
             tooltip
-                .style("top", Math.max(tooltipTop, -100) + "px")
-                .style("left", Math.max(tooltipLeft, -20) + 'px');
+                .style("top", tooltipTop + "px")
+                .style("left", tooltipLeft + 'px');
         }
         function hideTooltip() {
             tooltip.style("display", "none");
@@ -2660,12 +2667,12 @@
             }
 
             // Define tooltip
-            tooltip = d3.select(__bindto)
+            tooltip = d3.select(document.body)
                 .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
                 .style("pointer-events", "none")
-                .style("z-index", "10")
+                .style("z-index", "9")
                 .style("display", "none");
 
             // MEMO: call here to update legend box and tranlate for all
