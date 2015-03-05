@@ -1098,7 +1098,8 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
-            axis_y_tick_values: null,
+            axis_y_tick_values: null,        
+            axis_y_tick_rotate: 0,
             axis_y_tick_count: undefined,
             axis_y_tick_time_value: undefined,
             axis_y_tick_time_interval: undefined,
@@ -4339,9 +4340,14 @@
     c3_chart_internal_fn.yForRotatedTickText = function (r) {
         return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
     };
-    c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {
-        axis.selectAll('.tick text')
-            .style("text-anchor", rotate > 0 ? "start" : "end");
+    c3_chart_internal_fn.rotateTickText = function (axis, transition, rotate) {    
+        if (axis.classed(c3_chart_internal_fn.CLASS.axisY) && !this.config.axis_rotated) {
+            axis.selectAll('.tick text')
+                .style("text-anchor", rotate > 0 ? "end" : "start");
+        } else {
+            axis.selectAll('.tick text')
+                .style("text-anchor", rotate > 0 ? "start" : "end");
+        }
         transition.selectAll('.tick text')
             .attr("y", this.yForRotatedTickText(rotate))
             .attr("transform", "rotate(" + rotate + ")")
@@ -4472,6 +4478,10 @@
         if (!config.axis_rotated && config.axis_x_tick_rotate) {
             $$.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
             $$.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
+        }
+        // we may want to rotate y axis when chart in horizontal
+        if (config.axis_y_tick_rotate) {
+            $$.rotateTickText($$.axes.y, transitions.axisY, config.axis_y_tick_rotate);
         }
     };
 
