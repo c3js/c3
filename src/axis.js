@@ -294,7 +294,7 @@ c3_chart_internal_fn.getMaxTickWidth = function (id, withoutRecompute) {
         svg.append('g').call(axis).each(function () {
             $$.d3.select(this).selectAll('text tspan').each(function () {
                 var box = this.getBoundingClientRect();
-                if (box.left >= 0 && maxWidth < box.width) { maxWidth = box.width; }
+                if (maxWidth < box.width) { maxWidth = box.width; }
             });
         });
         // TODO: time lag to get maxWidth
