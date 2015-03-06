@@ -3248,7 +3248,8 @@
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
         var body = this.d3.select('body').classed('c3', true),
-            svg = body.append("svg").style('visibility', 'hidden').style('height', 0), rect;
+            // height = 1 is needed to get rect on Firefox - #1026
+            svg = body.append("svg").style('visibility', 'hidden').style('height', 1), rect;
         svg.selectAll('.dummy')
             .data([text])
           .enter().append('text')
@@ -4369,7 +4370,8 @@
                 $$.updateXAxisTickValues(targetsToShow, axis);
             }
             body = this.d3.select('body').classed('c3', true);
-            svg = body.append('svg').style('visibility', 'hidden').style('height', 0);
+            // height = 1 is needed to get rect on Firefox - #1026
+            svg = body.append('svg').style('visibility', 'hidden').style('height', 1);
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text tspan').each(function () {
                     var box = this.getBoundingClientRect();
