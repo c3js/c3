@@ -4240,7 +4240,7 @@
         return isString(option) ? option : option ? option.text : null;
     };
     Axis.prototype.setLabelText = function setLabelText(axisId, text) {
-        var $$ = this, config = $$.config,
+        var $$ = this.owner, config = $$.config,
             option = this.getLabelOptionByAxisId(axisId);
         if (isString(option)) {
             if (axisId === 'y') {
