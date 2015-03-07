@@ -3745,7 +3745,8 @@
             }
 
             if (tooltipRight > chartRight) {
-                tooltipLeft -= tooltipRight - chartRight;
+                // 20 is needed for Firefox to keep tooletip width
+                tooltipLeft -= tooltipRight - chartRight + 20;
             }
             if (tooltipTop + tHeight > $$.currentHeight) {
                 tooltipTop -= tHeight + 30;
