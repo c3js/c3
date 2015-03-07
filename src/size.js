@@ -22,7 +22,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
     } else if (config.axis_rotated) {
         return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
-        return $$._axis.getYAxisLabelPosition().isOuter ? 30 : 1;
+        return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
         return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
     }
@@ -35,7 +35,7 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
     } else if (config.axis_rotated) {
         return defaultPadding + legendWidthOnRight;
     } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
-        return 2 + legendWidthOnRight + ($$._axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
+        return 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
         return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
@@ -75,8 +75,8 @@ c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
 
 
 c3_chart_internal_fn.getAxisWidthByAxisId = function (id, withoutRecompute) {
-    var $$ = this, position = $$._axis.getLabelPositionById(id);
-    return $$._axis.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
+    var $$ = this, position = $$.axis.getLabelPositionById(id);
+    return $$.axis.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
 };
 c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;
@@ -86,9 +86,9 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
     // Calculate x axis height when tick rotated
     if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
-        h = $$._axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+        h = $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
     }
-    return h + ($$._axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
+    return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
 };
 
 c3_chart_internal_fn.getEventRectWidth = function () {

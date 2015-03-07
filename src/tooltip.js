@@ -18,7 +18,7 @@ c3_chart_internal_fn.initTooltip = function () {
         }
         $$.tooltip.html(config.tooltip_contents.call($$, $$.data.targets.map(function (d) {
             return $$.addName(d.values[config.tooltip_init_x]);
-        }), $$._axis.getXAxisTickFormat(), $$.getYFormat($$.hasArcType()), $$.color));
+        }), $$.axis.getXAxisTickFormat(), $$.getYFormat($$.hasArcType()), $$.color));
         $$.tooltip.style("top", config.tooltip_init_position.top)
             .style("left", config.tooltip_init_position.left)
             .style("display", "block");
@@ -95,7 +95,7 @@ c3_chart_internal_fn.showTooltip = function (selectedData, element) {
     if (dataToShow.length === 0 || !config.tooltip_show) {
         return;
     }
-    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$._axis.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.axis.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
 
     // Get tooltip dimensions
     tWidth = $$.tooltip.property('offsetWidth');
