@@ -638,7 +638,7 @@
             flow = $$.generateFlow({
                 targets: targetsToShow,
                 flow: options.flow,
-                duration: duration,
+                duration: options.flow.duration,
                 drawBar: drawBar,
                 drawLine: drawLine,
                 drawArea: drawArea,
@@ -650,7 +650,7 @@
             });
         }
 
-        if (duration && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
+        if ((duration || flow) && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
             // transition should be derived from one transition
             d3.transition().duration(duration).each(function () {
                 var transitionsToWait = [];
