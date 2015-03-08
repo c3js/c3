@@ -6918,7 +6918,7 @@
                 length = axis.g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
                 interval = length / axis.g.selectAll('line').size();
             }
-            return interval;
+            return interval === Infinity ? 0 : interval;
         };
         axis.ticks = function () {
             if (!arguments.length) { return tickArguments; }
