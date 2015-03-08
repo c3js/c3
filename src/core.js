@@ -310,6 +310,7 @@ c3_chart_internal_fn.initWithData = function (data) {
         $$.updateDimension();
         $$.config.oninit.call($$);
         $$.redraw({
+            withTransition: false,
             withTransform: true,
             withUpdateXDomain: true,
             withUpdateOrgXDomain: true,

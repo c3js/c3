@@ -315,6 +315,7 @@
             $$.updateDimension();
             $$.config.oninit.call($$);
             $$.redraw({
+                withTransition: false,
                 withTransform: true,
                 withUpdateXDomain: true,
                 withUpdateOrgXDomain: true,
