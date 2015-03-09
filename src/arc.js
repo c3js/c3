@@ -265,18 +265,22 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 return;
             }
             updated = $$.updateAngle(d);
-            arcData = $$.convertToArcData(updated);
-            // transitions
-            $$.expandArc(updated.data.id);
-            $$.api.focus(updated.data.id);
-            $$.toggleFocusLegend(updated.data.id, true);
-            $$.config.data_onmouseover(arcData, this);
+            if (updated) {
+                arcData = $$.convertToArcData(updated);
+                // transitions
+                $$.expandArc(updated.data.id);
+                $$.api.focus(updated.data.id);
+                $$.toggleFocusLegend(updated.data.id, true);
+                $$.config.data_onmouseover(arcData, this);
+            }
         } : null)
         .on('mousemove', config.interaction_enabled ? function (d) {
-            var updated = $$.updateAngle(d),
-                arcData = $$.convertToArcData(updated),
-                selectedData = [arcData];
-            $$.showTooltip(selectedData, this);
+            var updated = $$.updateAngle(d);
+            if (updated) {
+                var arcData = $$.convertToArcData(updated),
+                    selectedData = [arcData];
+                $$.showTooltip(selectedData, this);
+            }
         } : null)
         .on('mouseout', config.interaction_enabled ? function (d) {
             var updated, arcData;
@@ -284,19 +288,25 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 return;
             }
             updated = $$.updateAngle(d);
-            arcData = $$.convertToArcData(updated);
-            // transitions
-            $$.unexpandArc(updated.data.id);
-            $$.api.revert();
-            $$.revertLegend();
-            $$.hideTooltip();
-            $$.config.data_onmouseout(arcData, this);
+            if (updated) {
+                arcData = $$.convertToArcData(updated);
+                // transitions
+                $$.unexpandArc(updated.data.id);
+                $$.api.revert();
+                $$.revertLegend();
+                $$.hideTooltip();
+                $$.config.data_onmouseout(arcData, this);
+            }
         } : null)
         .on('click', config.interaction_enabled ? function (d, i) {
-            var updated = $$.updateAngle(d),
-                arcData = $$.convertToArcData(updated);
-            if ($$.toggleShape) { $$.toggleShape(this, arcData, i); }
-            $$.config.data_onclick.call($$.api, arcData, this);
+            var updated = $$.updateAngle(d);
+            if (updated) {
+                var arcData = $$.convertToArcData(updated);
+                if ($$.toggleShape) {
+                    $$.toggleShape(this, arcData, i);
+                }
+                $$.config.data_onclick.call($$.api, arcData, this);
+            }
         } : null)
         .each(function () { $$.transiting = true; })
         .transition().duration(duration)
