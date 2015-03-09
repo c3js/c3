@@ -2668,7 +2668,6 @@
 
             // Define tooltip
             tooltip = d3.select(document.body)
-                .style("position", "relative")
               .append("div")
                 .style("position", "absolute")
                 .style("pointer-events", "none")
