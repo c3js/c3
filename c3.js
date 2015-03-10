@@ -2858,6 +2858,7 @@
             prev = -1, i, j,
             s = "M", sWithRegion,
             xp, yp, dx, dy, dd, diff, diffx2,
+            xOffset = $$.isCategorized() ? 0.5 : 0,
             xValue, yValue,
             regions = [];
 
@@ -2891,16 +2892,31 @@
         yValue = config.axis_rotated ? function (d) { return x(d.x); } : function (d) { return y(d.value); };
 
         // Define svg generator function for region
+        function generateM(points) {
+            return 'M' + points[0][0] + ' ' + points[0][1] + ' ' + points[1][0] + ' ' + points[1][1];
+        }
         if ($$.isTimeSeries()) {
             sWithRegion = function (d0, d1, j, diff) {
                 var x0 = d0.x.getTime(), x_diff = d1.x - d0.x,
                     xv0 = new Date(x0 + x_diff * j),
-                    xv1 = new Date(x0 + x_diff * (j + diff));
-                return "M" + x(xv0) + " " + y(yp(j)) + " " + x(xv1) + " " + y(yp(j + diff));
+                    xv1 = new Date(x0 + x_diff * (j + diff)),
+                    points;
+                if (config.axis_rotated) {
+                    points = [[y(yp(j)), x(xv0)], [y(yp(j + diff)), x(xv1)]];
+                } else {
+                    points = [[x(xv0), y(yp(j))], [x(xv1), y(yp(j + diff))]];
+                }
+                return generateM(points);
             };
         } else {
             sWithRegion = function (d0, d1, j, diff) {
-                return "M" + x(xp(j), true) + " " + y(yp(j)) + " " + x(xp(j + diff), true) + " " + y(yp(j + diff));
+                var points;
+                if (config.axis_rotated) {
+                    points = [[y(yp(j), true), x(xp(j))], [y(yp(j + diff), true), x(xp(j + diff))]];
+                } else {
+                    points = [[x(xp(j), true), y(yp(j))], [x(xp(j + diff), true), y(yp(j + diff))]];
+                }
+                return generateM(points);
             };
         }
 
@@ -2913,7 +2929,7 @@
             }
             // Draw with region // TODO: Fix for horizotal charts
             else {
-                xp = $$.getScale(d[i - 1].x, d[i].x, $$.isTimeSeries());
+                xp = $$.getScale(d[i - 1].x + xOffset, d[i].x + xOffset, $$.isTimeSeries());
                 yp = $$.getScale(d[i - 1].value, d[i].value);
 
                 dx = x(d[i].x) - x(d[i - 1].x);
