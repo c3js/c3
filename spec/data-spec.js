@@ -7,6 +7,76 @@ describe('c3 chart data', function () {
         chart = window.initChart(chart, args, done);
     });
 
+    describe('load json', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    json: {
+                        data1: [30, 20, 50],
+                        data2: [200, 130, 90]
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should draw correctly', function () {
+            var expectedCx = [6, 299, 593],
+                expectedCy = [370, 390, 331];
+            d3.selectAll('.c3-circles-data1 .c3-circle').each(function (d, i) {
+                var circle = d3.select(this);
+                expect(+circle.attr('cx')).toBeCloseTo(expectedCx[i], -2);
+                expect(+circle.attr('cy')).toBeCloseTo(expectedCy[i], -2);
+            });
+        });
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    json: [{
+                        "date": "2014-06-03",
+                        "443": "3000",
+                        "995": "500"
+                    }, {
+                        "date": "2014-06-04",
+                        "443": "1000"
+                    }, {
+                        "date": "2014-06-05",
+                        "443": "5000",
+                        "995": "1000"
+                    }],
+                    keys: {
+                        x: 'date',
+                        value: [ "443", "995" ]
+                    }
+                },
+                axis: {
+                    x: {
+                        type: "category"
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should draw correctly', function () {
+            var expectedCx = {443: [98, 294, 490], 995: [98, 294, 490]},
+                expectedCy = {443: [193, 351, 36], 995: [390, 429, 351]};
+            d3.selectAll('.c3-circles-443 .c3-circle').each(function (d, i) {
+                var circle = d3.select(this);
+                expect(+circle.attr('cx')).toBeCloseTo(expectedCx[443][i], -2);
+                expect(+circle.attr('cy')).toBeCloseTo(expectedCy[443][i], -2);
+            });
+            d3.selectAll('.c3-circles-995 .c3-circle').each(function (d, i) {
+                var circle = d3.select(this);
+                expect(+circle.attr('cx')).toBeCloseTo(expectedCx[995][i], -2);
+                expect(+circle.attr('cy')).toBeCloseTo(expectedCy[995][i], -2);
+            });
+        });
+
+    });
+
     describe('function in data.order', function () {
         it('should update args', function () {
             args = {

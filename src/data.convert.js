@@ -37,10 +37,11 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     var $$ = this,
         new_rows = [], targetKeys, data;
     if (keys) { // when keys specified, json would be an array that includes objects
-        targetKeys = keys.value;
         if (keys.x) {
-            targetKeys.push(keys.x);
+            targetKeys = keys.value.concat(keys.x);
             $$.config.data_x = keys.x;
+        } else {
+            targetKeys = keys.value;
         }
         new_rows.push(targetKeys);
         json.forEach(function (o) {
