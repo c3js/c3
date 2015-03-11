@@ -44,7 +44,15 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
 c3_chart_internal_fn.getParentRectValue = function (key) {
     var parent = this.selectChart.node(), v;
     while (parent && parent.tagName !== 'BODY') {
-        v = parent.getBoundingClientRect()[key];
+        try {
+            v = parent.getBoundingClientRect()[key];
+        } catch(e) {
+            if (key === 'width') {
+                // In IE in certain cases getBoundingClientRect
+                // will cause an "unspecified error"
+                v = parent.offsetWidth;
+            }
+        }
         if (v) {
             break;
         }
