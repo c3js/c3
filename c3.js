@@ -2611,10 +2611,12 @@
     c3_chart_internal_fn.getParentRectValue = function (key) {
         var parent = this.selectChart.node(), v;
         while (parent && parent.tagName !== 'BODY') {
-            v = parent.getBoundingClientRect()[key];
-            if (v) {
-                break;
-            }
+            try {
+                v = parent.getBoundingClientRect()[key];
+                if (v) {
+                    break;
+                }
+            } catch(e) {}
             parent = parent.parentNode;
         }
         return v;
