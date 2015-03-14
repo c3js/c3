@@ -2613,10 +2613,16 @@
         while (parent && parent.tagName !== 'BODY') {
             try {
                 v = parent.getBoundingClientRect()[key];
-                if (v) {
-                    break;
+            } catch(e) {
+                if (key === 'width') {
+                    // In IE in certain cases getBoundingClientRect
+                    // will cause an "unspecified error"
+                    v = parent.offsetWidth;
                 }
-            } catch(e) {}
+            }
+            if (v) {
+                break;
+            }
             parent = parent.parentNode;
         }
         return v;
