@@ -2355,6 +2355,7 @@
             })
             .on('mouseout', function (d) {
                 var index = d.index;
+                if (!$$.config) { return; } // chart is destroyed
                 if ($$.hasArcType()) { return; }
                 $$.hideXGridFocus();
                 $$.hideTooltip();
@@ -2466,6 +2467,7 @@
             .attr('height', $$.height)
             .attr('class', CLASS.eventRect)
             .on('mouseout', function () {
+                if (!$$.config) { return; } // chart is destroyed
                 if ($$.hasArcType()) { return; }
                 mouseout();
             })
