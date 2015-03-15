@@ -48,8 +48,8 @@ c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTra
     ];
 };
 c3_chart_internal_fn.getTextRect = function (text, cls) {
-    var body = this.d3.select('body').classed('c3', true),
-        svg = body.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+    var dummy = this.d3.select('body').append('div').classed('c3', true),
+        svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
         rect;
     svg.selectAll('.dummy')
         .data([text])
@@ -57,8 +57,7 @@ c3_chart_internal_fn.getTextRect = function (text, cls) {
         .classed(cls ? cls : "", true)
         .text(text)
       .each(function () { rect = this.getBoundingClientRect(); });
-    svg.remove();
-    body.classed('c3', false);
+    dummy.remove();
     return rect;
 };
 c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {

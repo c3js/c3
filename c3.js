@@ -3302,8 +3302,8 @@
         ];
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
-        var body = this.d3.select('body').classed('c3', true),
-            svg = body.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+        var dummy = this.d3.select('body').append('div').classed('c3', true),
+            svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             rect;
         svg.selectAll('.dummy')
             .data([text])
@@ -3311,8 +3311,7 @@
             .classed(cls ? cls : "", true)
             .text(text)
           .each(function () { rect = this.getBoundingClientRect(); });
-        svg.remove();
-        body.classed('c3', false);
+        dummy.remove();
         return rect;
     };
     c3_chart_internal_fn.generateXYForText = function (areaIndices, barIndices, lineIndices, forX) {
@@ -4401,7 +4400,7 @@
     };
     Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
         var $$ = this.owner, config = $$.config,
-            maxWidth = 0, targetsToShow, scale, axis, body, svg;
+            maxWidth = 0, targetsToShow, scale, axis, dummy, svg;
         if (withoutRecompute && $$.currentMaxTickWidths[id]) {
             return $$.currentMaxTickWidths[id];
         }
@@ -4418,16 +4417,15 @@
                 axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
                 this.updateXAxisTickValues(targetsToShow, axis);
             }
-            body = $$.d3.select('body').classed('c3', true);
-            svg = body.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+            dummy = $$.d3.select('body').append('div').classed('c3', true);
+            svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
                     var box = this.getBoundingClientRect();
                     if (maxWidth < box.width) { maxWidth = box.width; }
                 });
-                svg.remove();
+                dummy.remove();
             });
-            body.classed('c3', false);
         }
         $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
         return $$.currentMaxTickWidths[id];
