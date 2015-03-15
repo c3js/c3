@@ -3812,6 +3812,7 @@
 
     c3_chart_internal_fn.initLegend = function () {
         var $$ = this;
+        $$.legendItemTextBox = {};
         $$.legendHasRendered = false;
         $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
         if (!$$.config.legend_show) {
@@ -3919,9 +3920,8 @@
             .style('opacity', 0)
             .style('visibility', 'hidden');
     };
-    var legendItemTextBox = {};
     c3_chart_internal_fn.clearLegendItemTextBoxCache = function () {
-        legendItemTextBox = {};
+        this.legendItemTextBox = {};
     };
     c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         var $$ = this, config = $$.config;
@@ -3936,10 +3936,10 @@
         withTransitionForTransform = getOption(options, "withTransitionForTransform", true);
 
         function getTextBox(textElement, id) {
-            if (!legendItemTextBox[id]) {
-                legendItemTextBox[id] = $$.getTextRect(textElement.textContent, CLASS.legendItem);
+            if (!$$.legendItemTextBox[id]) {
+                $$.legendItemTextBox[id] = $$.getTextRect(textElement.textContent, CLASS.legendItem);
             }
-            return legendItemTextBox[id];
+            return $$.legendItemTextBox[id];
         }
 
         function updatePositions(textElement, id, index) {

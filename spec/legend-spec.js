@@ -7,6 +7,45 @@ describe('c3 chart legend', function () {
         chart = window.initChart(chart, args, done);
     });
 
+    describe('legend when multiple charts rendered', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 50],
+                        ['data3', 100]
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should update args with long data names', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['long data name 1', 30],
+                        ['long data name 2', 50],
+                        ['long data name 3', 50],
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should have properly computed legend width', function () {
+            var expectedLeft = [148, 226, 384],
+                expectedWidth = [118, 118, 108];
+            d3.selectAll('.c3-legend-item').each(function (d, i) {
+                var rect = d3.select(this).node().getBoundingClientRect();
+                expect(rect.left).toBeCloseTo(expectedLeft[i], -2);
+                expect(rect.width).toBeCloseTo(expectedWidth[i], -2);
+            });
+        });
+    });
+
     describe('legend position', function () {
 
         it('should update args', function () {
