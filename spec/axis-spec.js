@@ -562,8 +562,10 @@ describe('c3 chart axis', function () {
             });
 
             it('should have automatically calculated x axis height', function () {
-                var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect();
+                var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect(),
+                    height = chart.internal.getHorizontalAxisHeight('x');
                 expect(box.height).toBeGreaterThan(50);
+                expect(height).toBeCloseTo(70, -1);
             });
 
         });

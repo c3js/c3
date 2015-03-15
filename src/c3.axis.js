@@ -174,6 +174,33 @@ function c3_axis(d3, params) {
             tspan.exit().remove();
             tspan.text(function (d) { return d.splitted; });
 
+            var rotate = params.tickTextRotate;
+
+            function textAnchorForText(rotate) {
+                if (!rotate) {
+                    return 'middle';
+                }
+                return rotate > 0 ? "start" : "end";
+            }
+            function textTransform(rotate) {
+                if (!rotate) {
+                    return '';
+                }
+                return "rotate(" + rotate + ")";
+            }
+            function dxForText(rotate) {
+                if (!rotate) {
+                    return 0;
+                }
+                return 8 * Math.sin(Math.PI * (rotate / 180));
+            }
+            function yForText(rotate) {
+                if (!rotate) {
+                    return tickLength;
+                }
+                return 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1);
+            }
+
             switch (orient) {
             case "bottom":
                 {
@@ -181,14 +208,16 @@ function c3_axis(d3, params) {
                     lineEnter.attr("y2", innerTickSize);
                     textEnter.attr("y", tickLength);
                     lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
-                    textUpdate.attr("x", 0).attr("y", tickLength);
-                    text.style("text-anchor", "middle");
-                    tspan.attr('x', 0).attr("dy", tspanDy);
+                    textUpdate.attr("x", 0).attr("y", yForText(rotate))
+                        .style("text-anchor", textAnchorForText(rotate))
+                        .attr("transform", textTransform(rotate));
+                    tspan.attr('x', 0).attr("dy", tspanDy).attr('dx', dxForText(rotate));
                     pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
                     break;
                 }
             case "top":
                 {
+                    // TODO: rotated tick text
                     tickTransform = axisX;
                     lineEnter.attr("y2", -innerTickSize);
                     textEnter.attr("y", -tickLength);

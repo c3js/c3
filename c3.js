@@ -2661,7 +2661,7 @@
         if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
         // Calculate x axis height when tick rotated
         if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
-            h = $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
         }
         return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
     };
@@ -4171,13 +4171,14 @@
             .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
             .style("text-anchor", this.textAnchorForY2AxisLabel.bind(this));
     };
-    Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition) {
+    Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
         var $$ = this.owner, config = $$.config,
             axisParams = {
                 isCategory: $$.isCategorized(),
                 withOuterTick: withOuterTick,
                 tickMultiline: config.axis_x_tick_multiline,
                 tickWidth: config.axis_x_tick_width,
+                tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
                 withoutTransition: withoutTransition,
             },
             axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
@@ -4397,21 +4398,6 @@
         var $$ = this.owner;
         return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getY2AxisLabelPosition());
     };
-    Axis.prototype.xForRotatedTickText = function xForRotatedTickText(r) {
-        return 8 * Math.sin(Math.PI * (r / 180));
-    };
-    Axis.prototype.yForRotatedTickText = function yForRotatedTickText(r) {
-        return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
-    };
-    Axis.prototype.rotateTickText = function rotateTickText(axis, transition, rotate) {
-        axis.selectAll('.tick text')
-            .style("text-anchor", rotate > 0 ? "start" : "end");
-        transition.selectAll('.tick text')
-            .attr("y", this.yForRotatedTickText(rotate))
-            .attr("transform", "rotate(" + rotate + ")")
-          .selectAll('tspan')
-            .attr('dx', this.xForRotatedTickText(rotate));
-    };
     Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
         var $$ = this.owner, config = $$.config,
             maxWidth = 0, targetsToShow, scale, axis, body, svg;
@@ -4428,21 +4414,18 @@
                 axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues);
             } else {
                 scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-                axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
+                axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
                 this.updateXAxisTickValues(targetsToShow, axis);
             }
             body = $$.d3.select('body').classed('c3', true);
             svg = body.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
-                $$.d3.select(this).selectAll('text tspan').each(function () {
+                $$.d3.select(this).selectAll('text').each(function () {
                     var box = this.getBoundingClientRect();
                     if (maxWidth < box.width) { maxWidth = box.width; }
                 });
-            });
-            // TODO: time lag to get maxWidth
-            window.setTimeout(function () {
                 svg.remove();
-            }, 100);
+            });
             body.classed('c3', false);
         }
         $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
@@ -4521,7 +4504,7 @@
         };
     };
     Axis.prototype.redraw = function redraw(transitions, isHidden) {
-        var $$ = this.owner, config = $$.config;
+        var $$ = this.owner;
         $$.axes.x.style("opacity", isHidden ? 0 : 1);
         $$.axes.y.style("opacity", isHidden ? 0 : 1);
         $$.axes.y2.style("opacity", isHidden ? 0 : 1);
@@ -4530,11 +4513,6 @@
         transitions.axisY.call($$.yAxis);
         transitions.axisY2.call($$.y2Axis);
         transitions.axisSubX.call($$.subXAxis);
-        // rotate tick text if needed
-        if (!config.axis_rotated && config.axis_x_tick_rotate) {
-            this.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
-            this.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
-        }
     };
 
     c3_chart_internal_fn.getClipPath = function (id) {
@@ -6850,6 +6828,33 @@
                 tspan.exit().remove();
                 tspan.text(function (d) { return d.splitted; });
 
+                var rotate = params.tickTextRotate;
+
+                function textAnchorForText(rotate) {
+                    if (!rotate) {
+                        return 'middle';
+                    }
+                    return rotate > 0 ? "start" : "end";
+                }
+                function textTransform(rotate) {
+                    if (!rotate) {
+                        return '';
+                    }
+                    return "rotate(" + rotate + ")";
+                }
+                function dxForText(rotate) {
+                    if (!rotate) {
+                        return 0;
+                    }
+                    return 8 * Math.sin(Math.PI * (rotate / 180));
+                }
+                function yForText(rotate) {
+                    if (!rotate) {
+                        return tickLength;
+                    }
+                    return 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1);
+                }
+
                 switch (orient) {
                 case "bottom":
                     {
@@ -6857,14 +6862,16 @@
                         lineEnter.attr("y2", innerTickSize);
                         textEnter.attr("y", tickLength);
                         lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
-                        textUpdate.attr("x", 0).attr("y", tickLength);
-                        text.style("text-anchor", "middle");
-                        tspan.attr('x', 0).attr("dy", tspanDy);
+                        textUpdate.attr("x", 0).attr("y", yForText(rotate))
+                            .style("text-anchor", textAnchorForText(rotate))
+                            .attr("transform", textTransform(rotate));
+                        tspan.attr('x', 0).attr("dy", tspanDy).attr('dx', dxForText(rotate));
                         pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
                         break;
                     }
                 case "top":
                     {
+                        // TODO: rotated tick text
                         tickTransform = axisX;
                         lineEnter.attr("y2", -innerTickSize);
                         textEnter.attr("y", -tickLength);

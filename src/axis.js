@@ -36,13 +36,14 @@ Axis.prototype.init = function init() {
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .style("text-anchor", this.textAnchorForY2AxisLabel.bind(this));
 };
-Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition) {
+Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
     var $$ = this.owner, config = $$.config,
         axisParams = {
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
             tickMultiline: config.axis_x_tick_multiline,
             tickWidth: config.axis_x_tick_width,
+            tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
             withoutTransition: withoutTransition,
         },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
@@ -262,21 +263,6 @@ Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
     var $$ = this.owner;
     return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getY2AxisLabelPosition());
 };
-Axis.prototype.xForRotatedTickText = function xForRotatedTickText(r) {
-    return 8 * Math.sin(Math.PI * (r / 180));
-};
-Axis.prototype.yForRotatedTickText = function yForRotatedTickText(r) {
-    return 11.5 - 2.5 * (r / 15) * (r > 0 ? 1 : -1);
-};
-Axis.prototype.rotateTickText = function rotateTickText(axis, transition, rotate) {
-    axis.selectAll('.tick text')
-        .style("text-anchor", rotate > 0 ? "start" : "end");
-    transition.selectAll('.tick text')
-        .attr("y", this.yForRotatedTickText(rotate))
-        .attr("transform", "rotate(" + rotate + ")")
-      .selectAll('tspan')
-        .attr('dx', this.xForRotatedTickText(rotate));
-};
 Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
     var $$ = this.owner, config = $$.config,
         maxWidth = 0, targetsToShow, scale, axis, body, svg;
@@ -293,21 +279,18 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
             axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues);
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-            axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues);
+            axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
             this.updateXAxisTickValues(targetsToShow, axis);
         }
         body = $$.d3.select('body').classed('c3', true);
         svg = body.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
         svg.append('g').call(axis).each(function () {
-            $$.d3.select(this).selectAll('text tspan').each(function () {
+            $$.d3.select(this).selectAll('text').each(function () {
                 var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) { maxWidth = box.width; }
             });
-        });
-        // TODO: time lag to get maxWidth
-        window.setTimeout(function () {
             svg.remove();
-        }, 100);
+        });
         body.classed('c3', false);
     }
     $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
@@ -386,7 +369,7 @@ Axis.prototype.generateTransitions = function generateTransitions(duration) {
     };
 };
 Axis.prototype.redraw = function redraw(transitions, isHidden) {
-    var $$ = this.owner, config = $$.config;
+    var $$ = this.owner;
     $$.axes.x.style("opacity", isHidden ? 0 : 1);
     $$.axes.y.style("opacity", isHidden ? 0 : 1);
     $$.axes.y2.style("opacity", isHidden ? 0 : 1);
@@ -395,9 +378,4 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisY.call($$.yAxis);
     transitions.axisY2.call($$.y2Axis);
     transitions.axisSubX.call($$.subXAxis);
-    // rotate tick text if needed
-    if (!config.axis_rotated && config.axis_x_tick_rotate) {
-        this.rotateTickText($$.axes.x, transitions.axisX, config.axis_x_tick_rotate);
-        this.rotateTickText($$.axes.subx, transitions.axisSubX, config.axis_x_tick_rotate);
-    }
 };
