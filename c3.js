@@ -4211,8 +4211,11 @@
         }
         return tickValues;
     };
-    Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick) {
-        var axisParams = {withOuterTick: withOuterTick},
+    Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition) {
+        var axisParams = {
+            withOuterTick: withOuterTick,
+            withoutTransition: withoutTransition,
+        },
             $$ = this.owner,
             d3 = $$.d3,
             config = $$.config,
@@ -4408,10 +4411,10 @@
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
             if (id === 'y') {
                 scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-                axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues);
+                axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true);
             } else if (id === 'y2') {
                 scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-                axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues);
+                axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true);
             } else {
                 scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
                 axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
@@ -6725,6 +6728,9 @@
             tickTextCharSize = size;
             return size;
         }
+        function transitionise(selection) {
+            return params.withoutTransition ? selection : d3.transition(selection);
+        }
         function axis(g) {
             g.each(function () {
                 var g = axis.g = d3.select(this);
@@ -6736,12 +6742,12 @@
                     tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                     // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                     tickExit = tick.exit().remove(),
-                    tickUpdate = d3.transition(tick).style("opacity", 1),
+                    tickUpdate = transitionise(tick).style("opacity", 1),
                     tickTransform, tickX, tickY;
 
                 var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                     path = g.selectAll(".domain").data([ 0 ]),
-                    pathUpdate = (path.enter().append("path").attr("class", "domain"), d3.transition(path));
+                    pathUpdate = (path.enter().append("path").attr("class", "domain"), transitionise(path));
                 tickEnter.append("line");
                 tickEnter.append("text");
 

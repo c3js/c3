@@ -72,6 +72,9 @@ function c3_axis(d3, params) {
         tickTextCharSize = size;
         return size;
     }
+    function transitionise(selection) {
+        return params.withoutTransition ? selection : d3.transition(selection);
+    }
     function axis(g) {
         g.each(function () {
             var g = axis.g = d3.select(this);
@@ -83,12 +86,12 @@ function c3_axis(d3, params) {
                 tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
-                tickUpdate = d3.transition(tick).style("opacity", 1),
+                tickUpdate = transitionise(tick).style("opacity", 1),
                 tickTransform, tickX, tickY;
 
             var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                 path = g.selectAll(".domain").data([ 0 ]),
-                pathUpdate = (path.enter().append("path").attr("class", "domain"), d3.transition(path));
+                pathUpdate = (path.enter().append("path").attr("class", "domain"), transitionise(path));
             tickEnter.append("line");
             tickEnter.append("text");
 
