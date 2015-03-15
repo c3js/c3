@@ -5972,6 +5972,12 @@
                 config.data_axes[id] = args.axes[id];
             });
         }
+        // update colors if exists
+        if ('colors' in args) {
+            Object.keys(args.colors).forEach(function (id) {
+                config.data_colors[id] = args.colors[id];
+            });
+        }
         // use cache if exists
         if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {
             $$.load($$.getCaches(args.cacheIds), args.done);
