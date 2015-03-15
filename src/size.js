@@ -100,5 +100,5 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
 };
 
 c3_chart_internal_fn.getEventRectWidth = function () {
-    return this.xAxis.tickInterval();
+    return Math.max(0, this.xAxis.tickInterval());
 };
