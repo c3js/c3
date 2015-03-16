@@ -3346,11 +3346,13 @@
     };
     c3_chart_internal_fn.getYForText = function (points, d, textElement) {
         var $$ = this,
-            box = textElement.getBoundingClientRect(), yPos;
+            box = textElement.getBoundingClientRect(),
+            offset = $$.isBarType(d) ? 0 : 3,
+            yPos;
         if ($$.config.axis_rotated) {
             yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
         } else {
-            yPos = points[2][1] + (d.value < 0 ? box.height * 1.3 : $$.isBarType(d) ? -3 : -6);
+            yPos = points[2][1] + (d.value < 0 ? box.height + offset : (-3 - offset));
         }
         // show labels regardless of the domain if value is null
         if (d.value === null && !$$.config.axis_rotated) {
