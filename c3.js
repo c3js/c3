@@ -3347,12 +3347,22 @@
     c3_chart_internal_fn.getYForText = function (points, d, textElement) {
         var $$ = this,
             box = textElement.getBoundingClientRect(),
-            offset = $$.isBarType(d) ? 0 : 3,
             yPos;
         if ($$.config.axis_rotated) {
             yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
         } else {
-            yPos = points[2][1] + (d.value < 0 ? box.height + offset : (-3 - offset));
+            yPos = points[2][1];
+            if (d.value < 0) {
+                yPos += box.height;
+                if ($$.isBarType(d) && $$.isSafari()) {
+                    yPos -= 3;
+                }
+                else if (!$$.isBarType(d) && $$.isChrome()) {
+                    yPos += 3;
+                }
+            } else {
+                yPos += $$.isBarType(d) ? -3 : -6;
+            }
         }
         // show labels regardless of the domain if value is null
         if (d.value === null && !$$.config.axis_rotated) {
@@ -6992,6 +7002,15 @@
         };
         return axis;
     }
+
+    c3_chart_internal_fn.isSafari = function () {
+        var ua = window.navigator.userAgent;
+        return ua.indexOf('Safari') >= 0 && ua.indexOf('Chrome') < 0;
+    };
+    c3_chart_internal_fn.isChrome = function () {
+        var ua = window.navigator.userAgent;
+        return ua.indexOf('Chrome') >= 0;
+    };
 
     // PhantomJS doesn't have support for Function.prototype.bind, which has caused confusion. Use
     // this polyfill to avoid the confusion.
