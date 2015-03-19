@@ -14,7 +14,7 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
         .attr('class', function (d) { return classChartBar(d) + classFocus(d); });
     mainBarEnter = mainBarUpdate.enter().append('g')
         .attr('class', classChartBar)
-        .style('opacity', 0)
+//        .style('opacity', 0)
         .style("pointer-events", "none");
     // Bars for each data
     mainBarEnter.append('g')
@@ -37,7 +37,7 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
     $$.mainBar
         .style("opacity", initialOpacity);
     $$.mainBar.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
+//        .style('opacity', 0)
         .remove();
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
