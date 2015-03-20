@@ -143,9 +143,9 @@ c3_chart_internal_fn.expandArc = function (targetIds) {
     $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).each(function (d) {
         if (! $$.shouldExpand(d.data.id)) { return; }
         $$.d3.select(this).selectAll('path')
-            .transition().duration(50)
+            .transition().duration($$.expandDuration(d.data.id))
             .attr("d", $$.svgArcExpanded)
-            .transition().duration(100)
+            .transition().duration($$.expandDuration(d.data.id) * 2)
             .attr("d", $$.svgArcExpandedSub)
             .each(function (d) {
                 if ($$.isDonutType(d.data)) {
@@ -163,15 +163,34 @@ c3_chart_internal_fn.unexpandArc = function (targetIds) {
     targetIds = $$.mapToTargetIds(targetIds);
 
     $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).selectAll('path')
-        .transition().duration(50)
+        .transition().duration(function(d) {
+            return $$.expandDuration(d.data.id);
+        })
         .attr("d", $$.svgArc);
     $$.svg.selectAll('.' + CLASS.arc)
         .style("opacity", 1);
 };
 
+c3_chart_internal_fn.expandDuration = function (id) {
+    var $$ = this, config = $$.config;
+
+    if ($$.isDonutType(id)) {
+        return config.donut_expand_duration;
+    } else if ($$.isGaugeType(id)) {
+        return config.gauge_expand_duration;
+    } else if ($$.isPieType(id)) {
+        return config.pie_expand_duration;
+    } else {
+        return 50;
+    }
+
+};
+
 c3_chart_internal_fn.shouldExpand = function (id) {
     var $$ = this, config = $$.config;
-    return ($$.isDonutType(id) && config.donut_expand) || ($$.isGaugeType(id) && config.gauge_expand) || ($$.isPieType(id) && config.pie_expand);
+    return ($$.isDonutType(id) && config.donut_expand) ||
+           ($$.isGaugeType(id) && config.gauge_expand) ||
+           ($$.isPieType(id) && config.pie_expand);
 };
 
 c3_chart_internal_fn.shouldShowArcLabel = function () {
