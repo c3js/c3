@@ -570,9 +570,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.subY2.domain($$.getYDomain(targetsToShow, 'y2'));
     }
 
-    // tooltip
-    $$.tooltip.style("display", "none");
-
     // xgrid focus
     $$.updateXgridFocus();
 
