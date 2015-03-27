@@ -34,7 +34,7 @@ Before reporting an issue, please do the following:
 
 1. When posting the issue, please use a descriptive title and include the version of C3 (or, if cloning from Git, the commit hash — C3 is under active development and the master branch contains the latest dev commits!), along with any platform/browser/OS information that may be relevant.
 
-## Pull requests
+## Pull requests
 Pull requests are welcome, though please post an issue first to see whether such a change is desirable.
 If you choose to submit a pull request, please do not bump the version number unless asked to, and please include test cases for any new features!
 
