@@ -70,11 +70,11 @@
 /*-- Region --*/
 .c3-region {
   fill: steelblue;
-  fill-opacity: 0.1; }
+  fill-opacity: .1; }
 
 /*-- Brush --*/
 .c3-brush .extent {
-  fill-opacity: 0.1; }
+  fill-opacity: .1; }
 
 /*-- Select - Drag --*/
 /*-- Legend --*/
