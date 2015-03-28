@@ -2036,6 +2036,8 @@
         var $$ = this, config = $$.config,
             ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
             xs = $$.d3.keys(data[0]).filter($$.isX, $$),
+            zeroUnderYAxis = true,
+            allZero = true,
             targets;
 
         $$.allDataIsNegative = true;
@@ -2095,8 +2097,12 @@
                         x = undefined;
                     }
 
+                    if(value !== null && value !== 0) {
+                        allZero = false;
+                    }
+
                     if(value > 0) {
-                        $$.allDataIsNegative = false;
+                        zeroUnderYAxis = false;
                     }
 
                     return {x: x, value: value, id: convertedId};
@@ -2125,6 +2131,12 @@
                 return v1 - v2;
             });
         });
+
+        if(allZero) {
+            zeroUnderYAxis = false;
+        }
+
+        $$.zeroUnderYAxis = zeroUnderYAxis;
 
         // set target types
         if (config.data_type) {
@@ -3361,7 +3373,7 @@
             yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
         } else {
             yPos = points[2][1];
-            if (d.value < 0  || (d.value === 0 && $$.allDataIsNegative)) {
+            if (d.value < 0  || (d.value === 0 && $$.zeroUnderYAxis)) {
                 yPos += box.height;
                 if ($$.isBarType(d) && $$.isSafari()) {
                     yPos -= 3;

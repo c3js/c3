@@ -96,6 +96,8 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     var $$ = this, config = $$.config,
         ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
         xs = $$.d3.keys(data[0]).filter($$.isX, $$),
+        zeroUnderYAxis = true,
+        allZero = true,
         targets;
 
     $$.allDataIsNegative = true;
@@ -155,8 +157,12 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                     x = undefined;
                 }
 
+                if(value !== null && value !== 0) {
+                    allZero = false;
+                }
+
                 if(value > 0) {
-                    $$.allDataIsNegative = false;
+                    zeroUnderYAxis = false;
                 }
 
                 return {x: x, value: value, id: convertedId};
@@ -185,6 +191,12 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
             return v1 - v2;
         });
     });
+
+    if(allZero) {
+        zeroUnderYAxis = false;
+    }
+
+    $$.zeroUnderYAxis = zeroUnderYAxis;
 
     // set target types
     if (config.data_type) {
