@@ -119,7 +119,7 @@ c3_chart_internal_fn.textForArcLabel = function (d) {
     id = d.data.id;
     if (! $$.hasType('gauge') && ! $$.meetsArcLabelThreshold(ratio)) { return ""; }
     format = $$.getArcLabelFormat();
-    return format ? format(value, ratio, id) : $$.defaultArcValueFormat(value, ratio);
+    return format(value, ratio, id);
 };
 
 c3_chart_internal_fn.expandArc = function (targetIds) {
@@ -193,13 +193,13 @@ c3_chart_internal_fn.meetsArcLabelThreshold = function (ratio) {
 
 c3_chart_internal_fn.getArcLabelFormat = function () {
     var $$ = this, config = $$.config,
-        format = config.pie_label_format;
+        customFormat = config.pie_label_format;
     if ($$.hasType('gauge')) {
-        format = config.gauge_label_format;
+        customFormat = config.gauge_label_format;
     } else if ($$.hasType('donut')) {
-        format = config.donut_label_format;
+        customFormat = config.donut_label_format;
     }
-    return format;
+    return customFormat || $$.defaultArcValueFormat;
 };
 
 c3_chart_internal_fn.getArcTitle = function () {
@@ -242,7 +242,7 @@ c3_chart_internal_fn.initArc = function () {
 
 c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransform) {
     var $$ = this, d3 = $$.d3, config = $$.config, main = $$.main,
-        mainArc;
+        mainArc, gaugeLabelFormat, minGaugeValue, maxGaugeValue;
     mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
         .data($$.arcData.bind($$));
     mainArc.enter().append('path')
@@ -348,6 +348,10 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .style("opacity", $$.hasType('donut') || $$.hasType('gauge') ? 1 : 0);
 
     if ($$.hasType('gauge')) {
+        gaugeLabelFormat = $$.getArcLabelFormat();
+        minGaugeValue = $$.config.gauge_label_formatall ? gaugeLabelFormat(config.gauge_min) :  config.gauge_min;
+        maxGaugeValue = $$.config.gauge_label_formatall ? gaugeLabelFormat(config.gauge_max) :  config.gauge_max;
+        
         $$.arcs.select('.' + CLASS.chartArcsBackground)
             .attr("d", function () {
                 var d = {
@@ -363,11 +367,11 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         $$.arcs.select('.' + CLASS.chartArcsGaugeMin)
             .attr("dx", -1 * ($$.innerRadius + (($$.radius - $$.innerRadius) / 2)) + "px")
             .attr("dy", "1.2em")
-            .text(config.gauge_label_show ? config.gauge_min : '');
+            .text(config.gauge_label_show ? minGaugeValue : '');
         $$.arcs.select('.' + CLASS.chartArcsGaugeMax)
             .attr("dx", $$.innerRadius + (($$.radius - $$.innerRadius) / 2) + "px")
             .attr("dy", "1.2em")
-            .text(config.gauge_label_show ? config.gauge_max : '');
+            .text(config.gauge_label_show ? maxGaugeValue : '');
     }
 };
 c3_chart_internal_fn.initGauge = function () {
