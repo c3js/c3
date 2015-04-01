@@ -164,6 +164,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_expand: true,
         // gauge
         gauge_label_show: true,
+        gauge_label_formatall: false,
         gauge_label_format: undefined,
         gauge_expand: true,
         gauge_min: 0,
