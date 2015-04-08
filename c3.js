@@ -2010,7 +2010,16 @@
             var parent = d3.select(__bindto);
             var parentRect = parent[0][0].getBoundingClientRect();
 
-            tooltipTop = Math.max(tooltipTop, -100) + parentRect.top + document.body.scrollTop;
+            var scrollTop = document.body.scrollTop;
+            var html = document.getElementsByTagName('html')[0];
+
+            if (html && html.scrollTop) {
+              scrollTop = html.scrollTop
+            }
+
+            scrollTop = scrollTop || 0;
+
+            tooltipTop = Math.max(tooltipTop, -100) + parentRect.top + scrollTop;
             tooltipLeft = Math.max(tooltipLeft, -20) + parentRect.left;
 
             // Set tooltip
