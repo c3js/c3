@@ -4017,7 +4017,7 @@
             function updatePositions(textElement, id, reset, textHolder) {
                 var textClone = textHolder.append(function () {
                         return textElement.cloneNode(true);
-                    })
+                    });
 
                 textClone.attr('style', 'visibility:hidden;');
 
@@ -4121,13 +4121,13 @@
                     }
                 });
 
-                var docBody = d3.select('body');
+            var docBody = d3.select('body');
 
-                var textHolder = docBody.append('svg');
+            var textHolder = docBody.append('svg');
 
-                textHolder.attr('width', 0)
-                    .attr('height', 0)
-                    .attr('style', 'position:absolute;overflow:hidden;');
+            textHolder.attr('width', 0)
+                .attr('height', 0)
+                .attr('style', 'position:absolute;overflow:hidden;');
 
             l.append('text')
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
@@ -4159,8 +4159,8 @@
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
 
-                textHolder.remove();
-                textHolder = null;
+            textHolder.remove();
+            textHolder = null;
 
             legend.selectAll('rect.' + CLASS.legendItemEvent)
                 .data(targetIds)
