@@ -76,6 +76,8 @@
      */
     c3.generate = function (config) {
 
+        var tooltip;
+
         var d3 = window.d3 ? window.d3 : window.require ? window.require('d3') : undefined;
 
         var c3 = { data : {}, axis: {}, legend: {} },
@@ -2010,7 +2012,16 @@
             var parent = d3.select(__bindto);
             var parentRect = parent[0][0].getBoundingClientRect();
 
-            tooltipTop = Math.max(tooltipTop, -100) + parentRect.top + document.body.scrollTop;
+            var scrollTop = document.body.scrollTop;
+            var html = document.getElementsByTagName('html')[0];
+
+            if (html && html.scrollTop) {
+                scrollTop = html.scrollTop;
+            }
+
+            scrollTop = scrollTop || 0;
+
+            tooltipTop = Math.max(tooltipTop, -100) + parentRect.top + scrollTop;
             tooltipLeft = Math.max(tooltipLeft, -20) + parentRect.left;
 
             // Set tooltip
@@ -2593,7 +2604,7 @@
         /*-- Draw Chart --*/
 
         // for svg elements
-        var svg, defs, main, context, legend, tooltip, selectChart;
+        var svg, defs, main, context, legend, selectChart;
 
         // for brush area culculation
         var orgXDomain;
@@ -4575,6 +4586,9 @@
         c3.destroy = function () {
             c3.data.targets = undefined;
             c3.data.xs = {};
+            if (tooltip && typeof tooltip.remove === 'function') {
+                tooltip.remove();
+            }
             selectChart.html("");
             window.onresize = null;
         };
