@@ -4014,8 +4014,14 @@
             withTransition = isDefined(options.withTransition) ? options.withTransition : true;
             withTransitionForTransform = isDefined(options.withTransitionForTransform) ? options.withTransitionForTransform : true;
 
-            function updatePositions(textElement, id, reset) {
-                var box = textElement.getBoundingClientRect(),
+            function updatePositions(textElement, id, reset, textHolder) {
+                var textClone = textHolder.append(function () {
+                        return textElement.cloneNode(true);
+                    });
+
+                textClone.attr('style', 'visibility:hidden;');
+
+                var box = textClone[0][0].getBBox ? textClone[0][0].getBBox() : textClone[0][0].getBoundingClientRect(),
                     itemWidth = Math.ceil((box.width + paddingRight) / 10) * 10,
                     itemHeight = Math.ceil((box.height + paddingTop) / 10) * 10,
                     itemLength = isLegendRight ? itemHeight : itemWidth,
@@ -4114,9 +4120,18 @@
                         __legend_item_onmouseout(id);
                     }
                 });
+
+            var docBody = d3.select('body');
+
+            var textHolder = docBody.append('svg');
+
+            textHolder.attr('width', 0)
+                .attr('height', 0)
+                .attr('style', 'position:absolute;overflow:hidden;');
+
             l.append('text')
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; })
-                .each(function (id, i) { updatePositions(this, id, i === 0); })
+                .each(function (id, i) { updatePositions(this, id, i === 0, textHolder); })
                 .style("pointer-events", "none")
                 .attr('x', isLegendRight ? xForLegendText : -200)
                 .attr('y', isLegendRight ? -200 : yForLegendText);
@@ -4139,10 +4154,13 @@
             legend.selectAll('text')
                 .data(targetIds)
                 .text(function (id) { return isDefined(__data_names[id]) ? __data_names[id] : id; }) // MEMO: needed for update
-                .each(function (id, i) { updatePositions(this, id, i === 0); })
+                .each(function (id, i) { updatePositions(this, id, i === 0, textHolder); })
               .transition().duration(withTransition ? 250 : 0)
                 .attr('x', xForLegendText)
                 .attr('y', yForLegendText);
+
+            textHolder.remove();
+            textHolder = null;
 
             legend.selectAll('rect.' + CLASS.legendItemEvent)
                 .data(targetIds)
