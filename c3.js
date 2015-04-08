@@ -2016,7 +2016,7 @@
             var html = document.getElementsByTagName('html')[0];
 
             if (html && html.scrollTop) {
-              scrollTop = html.scrollTop
+                scrollTop = html.scrollTop;
             }
 
             scrollTop = scrollTop || 0;
@@ -4587,7 +4587,7 @@
             c3.data.targets = undefined;
             c3.data.xs = {};
             if (tooltip && typeof tooltip.remove === 'function') {
-              tooltip.remove();
+                tooltip.remove();
             }
             selectChart.html("");
             window.onresize = null;
