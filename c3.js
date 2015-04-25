@@ -4997,10 +4997,12 @@
 
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
-        $$.mainRegion.enter().append('g')
+        var g = $$.mainRegion.enter().append('g')
             .attr('class', $$.classRegion.bind($$))
-          .append('rect')
+        g.append('rect')
             .style("fill-opacity", 0);
+        g.append('text')
+            .text($$.labelRegion.bind($$));
         $$.mainRegion.exit().transition().duration(duration)
             .style("opacity", 0)
             .remove();
@@ -5012,13 +5014,20 @@
             y = $$.regionY.bind($$),
             w = $$.regionWidth.bind($$),
             h = $$.regionHeight.bind($$);
+            
+            var paddedY = $$.regionY($$) + 10; //To allow for text height
+            var regionLabels = $$.mainRegion.selectAll('text');
+            
         return [
             (withTransition ? regions.transition() : regions)
                 .attr("x", x)
                 .attr("y", y)
                 .attr("width", w)
                 .attr("height", h)
-                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
+                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }),
+                regionLabels
+                .attr("x", x)
+                .attr("y", paddedY)
         ];
     };
     c3_chart_internal_fn.regionX = function (d) {
@@ -5728,6 +5737,9 @@
     };
     c3_chart_internal_fn.classRegion = function (d, i) {
         return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
+    };
+    c3_chart_internal_fn.labelRegion = function (d, i) {
+        return 'label' in d ? d['label'] : '';
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
