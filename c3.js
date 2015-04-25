@@ -4998,7 +4998,7 @@
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
         var g = $$.mainRegion.enter().append('g')
-            .attr('class', $$.classRegion.bind($$))
+            .attr('class', $$.classRegion.bind($$));
         g.append('rect')
             .style("fill-opacity", 0);
         g.append('text')
