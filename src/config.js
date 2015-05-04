@@ -144,6 +144,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // point - point of each data
         point_show: true,
         point_r: 2.5,
+        point_sensitivity: 10,
         point_focus_expand_enabled: true,
         point_focus_expand_r: undefined,
         point_select_r: undefined,
