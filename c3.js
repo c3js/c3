@@ -263,6 +263,7 @@
         if ($$.initSubchart) { $$.initSubchart(); }
         if ($$.initTooltip) { $$.initTooltip(); }
         if ($$.initLegend) { $$.initLegend(); }
+        if ($$.initTitle) { $$.initTitle(); }
 
         /*-- Main Region --*/
 
@@ -607,6 +608,9 @@
         if ($$.hasDataLabel()) {
             $$.updateText(durationForExit);
         }
+
+        // title
+        if ($$.redrawTitle) { $$.redrawTitle(); }
 
         // arc
         if ($$.redrawArc) { $$.redrawArc(duration, durationForExit, withTransform); }
@@ -1206,7 +1210,11 @@
             },
             tooltip_init_show: false,
             tooltip_init_x: 0,
-            tooltip_init_position: {top: '0px', left: '50px'}
+            tooltip_init_position: {top: '0px', left: '50px'},
+            // title
+            title_text: undefined,
+            title_x: 0,
+            title_y: 0
         };
 
         Object.keys(this.additionalConfig).forEach(function (key) {
@@ -2577,8 +2585,13 @@
         return h > 0 ? h : 320 / ($$.hasType('gauge') ? 2 : 1);
     };
     c3_chart_internal_fn.getCurrentPaddingTop = function () {
-        var config = this.config;
-        return isValue(config.padding_top) ? config.padding_top : 0;
+        var $$ = this,
+            config = $$.config,
+            padding = isValue(config.padding_top) ? config.padding_top : 0;
+        if ($$.title && $$.title.node()) {
+            padding += $$.getTitlePadding();
+        }
+        return padding;
     };
     c3_chart_internal_fn.getCurrentPaddingBottom = function () {
         var config = this.config;
@@ -2670,6 +2683,11 @@
 
     c3_chart_internal_fn.getEventRectWidth = function () {
         return Math.max(0, this.xAxis.tickInterval());
+    };
+
+    c3_chart_internal_fn.getTitlePadding = function() {
+        var $$ = this;
+        return $$.config.title_y + $$.title.node().getBBox().height;
     };
 
     c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
@@ -4146,6 +4164,21 @@
         $$.legendHasRendered = true;
     };
 
+    c3_chart_internal_fn.initTitle = function () {
+        var $$ = this;
+        $$.title = $$.svg.append("text")
+              .text($$.config.title_text)
+              .attr("class", "c3-chart-title")
+              .attr("x", $$.config.title_x)
+              .attr("y", $$.config.title_y);
+    };
+
+    c3_chart_internal_fn.redrawTitle = function () {
+        var $$ = this;
+        $$.title
+              .attr("x", $$.config.title_x)
+              .attr("y", $$.config.title_y || $$.title.node().getBBox().height);
+    };
     function Axis(owner) {
         API.call(this, owner);
     }
