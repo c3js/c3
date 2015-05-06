@@ -1213,8 +1213,13 @@
             tooltip_init_position: {top: '0px', left: '50px'},
             // title
             title_text: undefined,
-            title_x: 0,
-            title_y: 0
+            title_padding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+            title_position: 'top-center',
         };
 
         Object.keys(this.additionalConfig).forEach(function (key) {
@@ -2683,11 +2688,6 @@
 
     c3_chart_internal_fn.getEventRectWidth = function () {
         return Math.max(0, this.xAxis.tickInterval());
-    };
-
-    c3_chart_internal_fn.getTitlePadding = function() {
-        var $$ = this;
-        return $$.config.title_y + $$.title.node().getBBox().height;
     };
 
     c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
@@ -4168,17 +4168,34 @@
         var $$ = this;
         $$.title = $$.svg.append("text")
               .text($$.config.title_text)
-              .attr("class", "c3-chart-title")
-              .attr("x", $$.config.title_x)
-              .attr("y", $$.config.title_y);
+              .attr("class", $$.CLASS.title);
     };
-
     c3_chart_internal_fn.redrawTitle = function () {
         var $$ = this;
         $$.title
-              .attr("x", $$.config.title_x)
-              .attr("y", $$.config.title_y || $$.title.node().getBBox().height);
+              .attr("x", $$.xForTitle.bind($$))
+              .attr("y", $$.yForTitle.bind($$));
     };
+    c3_chart_internal_fn.xForTitle = function () {
+        var $$ = this, config = $$.config, position = config.title_position || 'left', x;
+        if (position.indexOf('right') >= 0) {
+            x = $$.currentWidth - $$.title.node().getBBox().width - config.title_padding.right;
+        } else if (position.indexOf('center') >= 0) {
+            x = ($$.currentWidth - $$.title.node().getBBox().width) / 2;
+        } else { // left
+            x = config.title_padding.left;
+        }
+        return x;
+    };
+    c3_chart_internal_fn.yForTitle = function () {
+        var $$ = this;
+        return $$.config.title_padding.top + $$.title.node().getBBox().height;
+    };
+    c3_chart_internal_fn.getTitlePadding = function() {
+        var $$ = this;
+        return $$.yForTitle() + $$.config.title_padding.bottom;
+    };
+
     function Axis(owner) {
         API.call(this, owner);
     }
@@ -5667,6 +5684,7 @@
         defocused: 'c3-defocused',
         region: 'c3-region',
         regions: 'c3-regions',
+        title: 'c3-title',
         tooltipContainer: 'c3-tooltip-container',
         tooltip: 'c3-tooltip',
         tooltipName: 'c3-tooltip-name',

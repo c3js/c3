@@ -194,8 +194,13 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         tooltip_init_position: {top: '0px', left: '50px'},
         // title
         title_text: undefined,
-        title_x: 0,
-        title_y: 0
+        title_padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+        },
+        title_position: 'top-center',
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {

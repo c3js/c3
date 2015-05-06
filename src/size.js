@@ -107,8 +107,3 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
 c3_chart_internal_fn.getEventRectWidth = function () {
     return Math.max(0, this.xAxis.tickInterval());
 };
-
-c3_chart_internal_fn.getTitlePadding = function() {
-    var $$ = this;
-    return $$.config.title_y + $$.title.node().getBBox().height;
-};
