@@ -53,7 +53,7 @@ c3_chart_internal_fn.addName = function (data) {
     var $$ = this, name;
     if (data) {
         name = $$.config.data_names[data.id];
-        data.name = name ? name : data.id;
+        data.name = name !== undefined ? name : data.id;
     }
     return data;
 };

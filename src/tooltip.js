@@ -40,6 +40,8 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
 
         value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
         if (value !== undefined) {
+            // Skip elements when their name is set to null
+            if (d[i].name === null) { continue; }
             name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
