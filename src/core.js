@@ -856,7 +856,7 @@ c3_chart_internal_fn.updateSvgSize = function () {
     var $$ = this,
         brush = $$.svg.select(".c3-brush .background");
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
-    $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect')
+    $$.svg.selectAll(['#' + $$.clipIdForGrid,'#' + $$.clipId].join(',')).select('rect')
         .attr('width', $$.width)
         .attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
