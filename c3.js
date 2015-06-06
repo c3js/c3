@@ -1257,6 +1257,8 @@
             tooltip_init_show: false,
             tooltip_init_x: 0,
             tooltip_init_position: {top: '0px', left: '50px'},
+            tooltip_onshow: function () {},
+            tooltip_onhide: function () {},
             // title
             title_text: undefined,
             title_padding: {
@@ -6856,10 +6858,14 @@
         // emulate mouse events to show
         $$.dispatchEvent('mouseover', index, mouse);
         $$.dispatchEvent('mousemove', index, mouse);
+
+        this.config.tooltip_onshow.call($$, args.data);
     };
     c3_chart_fn.tooltip.hide = function () {
         // TODO: get target data by checking the state of focus
         this.internal.dispatchEvent('mouseout', 0);
+
+        this.config.tooltip_onhide.call(this);
     };
 
     // Features:
