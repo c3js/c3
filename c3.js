@@ -1042,6 +1042,8 @@
             zoom_onzoom: function () {},
             zoom_onzoomstart: function () {},
             zoom_onzoomend: function () {},
+            zoom_x_min: undefined,
+            zoom_x_max: undefined,
             interaction_enabled: true,
             onmouseover: function () {},
             onmouseout: function () {},
@@ -1579,14 +1581,16 @@
         return $$.x.domain();
     };
     c3_chart_internal_fn.trimXDomain = function (domain) {
-        var $$ = this;
-        if (domain[0] <= $$.orgXDomain[0]) {
-            domain[1] = +domain[1] + ($$.orgXDomain[0] - domain[0]);
-            domain[0] = $$.orgXDomain[0];
+        var $$ = this, config = $$.config, d3 = $$.d3;
+        var min = d3.min([$$.orgXDomain[0], config.zoom_x_min]);
+        var max = d3.max([$$.orgXDomain[1], config.zoom_x_max]);
+        if (domain[0] <= min) {
+            domain[1] = +domain[1] + (min - domain[0]);
+            domain[0] = min;
         }
-        if ($$.orgXDomain[1] <= domain[1]) {
-            domain[0] = +domain[0] - (domain[1] - $$.orgXDomain[1]);
-            domain[1] = $$.orgXDomain[1];
+        if (max <= domain[1]) {
+            domain[0] = +domain[0] - (domain[1] - max);
+            domain[1] = max;
         }
         return domain;
     };
@@ -6021,6 +6025,38 @@
         var $$ = this.internal;
         $$.brush.clear().update();
         $$.redraw({withUpdateXDomain: true});
+    };
+
+    c3_chart_fn.zoom.max = function (max) {
+        var $$ = this.internal, config = $$.config, d3 = $$.d3;
+        if (max === 0 || max) {
+            config.zoom_x_max = d3.max([$$.orgXDomain[1], max]);
+        }
+        else {
+            return config.zoom_x_max;
+        }
+    };
+
+    c3_chart_fn.zoom.min = function (min) {
+        var $$ = this.internal, config = $$.config, d3 = $$.d3;
+        if (min === 0 || min) {
+            config.zoom_x_min = d3.min([$$.orgXDomain[0], min]);
+        }
+        else {
+            return config.zoom_x_min;
+        }
+    };
+
+    c3_chart_fn.zoom.range = function (range) {
+        if (arguments.length) {
+            if (isDefined(range.max)) { this.domain.max(range.max); }
+            if (isDefined(range.min)) { this.domain.min(range.min); }
+        } else {
+            return {
+                max: this.domain.max(),
+                min: this.domain.min()
+            };
+        }
     };
 
     c3_chart_fn.load = function (args) {
