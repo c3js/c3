@@ -926,17 +926,13 @@ c3_chart_internal_fn.bindResize = function () {
     });
     if (config.resize_auto) {
         $$.resizeFunction.add(function () {
-            if (config.resize_timeout) {
-                if ($$.resizeTimeout !== undefined) {
-                    window.clearTimeout($$.resizeTimeout);
-                }
-                $$.resizeTimeout = window.setTimeout(function () {
-                    delete $$.resizeTimeout;
-                    $$.api.flush();
-                }, config.resize_timeout);
-            } else {
-                $$.api.flush();
+            if ($$.resizeTimeout !== undefined) {
+                window.clearTimeout($$.resizeTimeout);
             }
+            $$.resizeTimeout = window.setTimeout(function () {
+                delete $$.resizeTimeout;
+                $$.api.flush();
+            }, 100);
         });
     }
     $$.resizeFunction.add(function () {

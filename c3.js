@@ -931,17 +931,13 @@
         });
         if (config.resize_auto) {
             $$.resizeFunction.add(function () {
-                if (config.resize_timeout) {
-                    if ($$.resizeTimeout !== undefined) {
-                        window.clearTimeout($$.resizeTimeout);
-                    }
-                    $$.resizeTimeout = window.setTimeout(function () {
-                        delete $$.resizeTimeout;
-                        $$.api.flush();
-                    }, config.resize_timeout);
-                } else {
-                    $$.api.flush();
+                if ($$.resizeTimeout !== undefined) {
+                    window.clearTimeout($$.resizeTimeout);
                 }
+                $$.resizeTimeout = window.setTimeout(function () {
+                    delete $$.resizeTimeout;
+                    $$.api.flush();
+                }, 100);
             });
         }
         $$.resizeFunction.add(function () {
@@ -1066,7 +1062,6 @@
             padding_top: undefined,
             padding_bottom: undefined,
             resize_auto: true,
-            resize_timeout: 100,
             zoom_enabled: false,
             zoom_extent: undefined,
             zoom_privileged: false,
