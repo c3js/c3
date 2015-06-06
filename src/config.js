@@ -65,6 +65,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // subchart
         subchart_show: false,
         subchart_size_height: 60,
+        subchart_axis_x_show: true,
         subchart_onbrush: function () {},
         // color
         color_pattern: [],

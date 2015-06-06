@@ -1089,8 +1089,8 @@
             // subchart
             subchart_show: false,
             subchart_size_height: 60,
-            subchart_onbrush: function () {},
             subchart_axis_x_show: true,
+            subchart_onbrush: function () {},
             // color
             color_pattern: [],
             color_threshold: {},
