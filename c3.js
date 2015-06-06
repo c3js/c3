@@ -329,12 +329,20 @@
             window.onresize = $$.generateResize();
         }
         if (window.onresize.add) {
+            var timeout;
             window.onresize.add(function () {
                 config.onresize.call($$);
             });
-            window.onresize.add(function () {
-                $$.api.flush();
-            });
+            if (config.resize_auto) {
+                window.onresize.add(function () {
+                    if (timeout !== undefined) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        $$.api.flush();
+                    }, 100);
+                });
+            }
             window.onresize.add(function () {
                 config.onresized.call($$);
             });
@@ -1026,6 +1034,7 @@
             padding_right: undefined,
             padding_top: undefined,
             padding_bottom: undefined,
+            resize_auto: true,
             zoom_enabled: false,
             zoom_extent: undefined,
             zoom_privileged: false,
