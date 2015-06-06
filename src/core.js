@@ -324,12 +324,20 @@ c3_chart_internal_fn.initWithData = function (data) {
         window.onresize = $$.generateResize();
     }
     if (window.onresize.add) {
+        var timeout;
         window.onresize.add(function () {
             config.onresize.call($$);
         });
-        window.onresize.add(function () {
-            $$.api.flush();
-        });
+        if (config.resize_auto) {
+            window.onresize.add(function () {
+                if (timeout !== undefined) {
+                    clearTimeout(timeout);
+                }
+                timeout = setTimeout(function () {
+                    $$.api.flush();
+                }, 100);
+            });
+        }
         window.onresize.add(function () {
             config.onresized.call($$);
         });
