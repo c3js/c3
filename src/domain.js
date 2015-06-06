@@ -221,9 +221,8 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     return $$.x.domain();
 };
 c3_chart_internal_fn.trimXDomain = function (domain) {
-    var $$ = this, config = $$.config, d3 = $$.d3;
-    var min = d3.min([$$.orgXDomain[0], config.zoom_x_min]);
-    var max = d3.max([$$.orgXDomain[1], config.zoom_x_max]);
+    var zoomDomain = this.getZoomDomain(),
+        min = zoomDomain[0], max = zoomDomain[1];
     if (domain[0] <= min) {
         domain[1] = +domain[1] + (min - domain[0]);
         domain[0] = min;
