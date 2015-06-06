@@ -305,7 +305,7 @@ c3_chart_internal_fn.findClosestFromTargets = function (targets, pos) {
     return $$.findClosest(candidates, pos);
 };
 c3_chart_internal_fn.findClosest = function (values, pos) {
-    var $$ = this, minDist = 100, closest;
+    var $$ = this, minDist = $$.config.point_sensitivity, closest;
 
     // find mouseovering bar
     values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
@@ -332,7 +332,7 @@ c3_chart_internal_fn.dist = function (data, pos) {
         yIndex = config.axis_rotated ? 0 : 1,
         y = $$.circleY(data, data.index),
         x = $$.x(data.x);
-    return Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2);
+    return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
 };
 c3_chart_internal_fn.convertValuesToStep = function (values) {
     var converted = [].concat(values), i;

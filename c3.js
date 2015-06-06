@@ -1205,6 +1205,7 @@
             // point - point of each data
             point_show: true,
             point_r: 2.5,
+            point_sensitivity: 10,
             point_focus_expand_enabled: true,
             point_focus_expand_r: undefined,
             point_select_r: undefined,
@@ -1935,7 +1936,7 @@
         return $$.findClosest(candidates, pos);
     };
     c3_chart_internal_fn.findClosest = function (values, pos) {
-        var $$ = this, minDist = 100, closest;
+        var $$ = this, minDist = $$.config.point_sensitivity, closest;
 
         // find mouseovering bar
         values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
@@ -1962,7 +1963,7 @@
             yIndex = config.axis_rotated ? 0 : 1,
             y = $$.circleY(data, data.index),
             x = $$.x(data.x);
-        return Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2);
+        return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
     };
     c3_chart_internal_fn.convertValuesToStep = function (values) {
         var converted = [].concat(values), i;
@@ -2579,7 +2580,7 @@
                 $$.showXGridFocus(selectedData);
 
                 // Show cursor as pointer if point is close to mouse position
-                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
                     $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                     if (!$$.mouseover) {
                         config.data_onmouseover.call($$.api, closest);
@@ -2590,16 +2591,13 @@
             .on('click', function () {
                 var targetsToShow = $$.filterTargetsToShow($$.data.targets);
                 var mouse, closest;
-
                 if ($$.hasArcType(targetsToShow)) { return; }
 
                 mouse = d3.mouse(this);
                 closest = $$.findClosestFromTargets(targetsToShow, mouse);
-
                 if (! closest) { return; }
-
                 // select if selection enabled
-                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+                if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
                     $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
                         if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                             $$.toggleShape(this, closest, closest.index);
