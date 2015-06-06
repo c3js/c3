@@ -98,7 +98,7 @@ c3_chart_internal_fn.getYForText = function (points, d, textElement) {
         yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
     } else {
         yPos = points[2][1];
-        if (d.value < 0) {
+        if (d.value < 0  || (d.value === 0 && !$$.hasPositiveValue)) {
             yPos += box.height;
             if ($$.isBarType(d) && $$.isSafari()) {
                 yPos -= 3;
