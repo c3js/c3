@@ -1684,7 +1684,7 @@
         var $$ = this, name;
         if (data) {
             name = $$.config.data_names[data.id];
-            data.name = name ? name : data.id;
+            data.name = name !== undefined ? name : data.id;
         }
         return data;
     };
@@ -3818,6 +3818,8 @@
 
             value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
             if (value !== undefined) {
+                // Skip elements when their name is set to null
+                if (d[i].name === null) { continue; }
                 name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
                 bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
@@ -4010,6 +4012,11 @@
         var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
         var withTransition, withTransitionForTransform;
         var texts, rects, tiles, background;
+
+        // Skip elements when their name is set to null
+        targetIds = targetIds.filter(function(id) {
+            return !isDefined(config.data_names[id]) || config.data_names[id] !== null;
+        });
 
         options = options || {};
         withTransition = getOption(options, "withTransition", true);

@@ -120,7 +120,9 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var texts, rects, tiles, background;
 
     // Skip elements when their name is set to null
-    targetIds = targetIds.filter(function(id) {return !isDefined(config.data_names[id]) || config.data_names[id] !== null;});
+    targetIds = targetIds.filter(function(id) {
+        return !isDefined(config.data_names[id]) || config.data_names[id] !== null;
+    });
 
     options = options || {};
     withTransition = getOption(options, "withTransition", true);
