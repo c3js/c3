@@ -75,7 +75,7 @@ c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, el
         }
 
         if (tooltipRight > chartRight) {
-            // 20 is needed for Firefox to keep tooletip width
+            // 20 is needed for Firefox to keep tooltip width
             tooltipLeft -= tooltipRight - chartRight + 20;
         }
         if (tooltipTop + tHeight > $$.currentHeight) {
