@@ -91,9 +91,9 @@ describe('c3 chart grid', function () {
                     grid: {
                         y: {
                             lines: [
-                                {value: 30, text: 'Lable 30', position: 'start'},
-                                {value: 145, text: 'Lable 145', position: 'middle'},
-                                {value: 225, text: 'Lable 225'}
+                                {value: 30, text: 'Label 30', position: 'start'},
+                                {value: 145, text: 'Label 145', position: 'middle'},
+                                {value: 225, text: 'Label 225'}
                             ]
                         }
                     }
@@ -140,9 +140,9 @@ describe('c3 chart grid', function () {
                     grid: {
                         y: {
                             lines: [
-                                {value: 30, text: 'Lable 30', position: 'start'},
-                                {value: 145, text: 'Lable 145', position: 'middle'},
-                                {value: 225, text: 'Lable 225'}
+                                {value: 30, text: 'Label 30', position: 'start'},
+                                {value: 145, text: 'Label 145', position: 'middle'},
+                                {value: 225, text: 'Label 225'}
                             ]
                         }
                     }
