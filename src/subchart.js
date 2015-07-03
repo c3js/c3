@@ -40,7 +40,7 @@ c3_chart_internal_fn.initSubchart = function () {
         .attr("class", CLASS.axisX)
         .attr("transform", $$.getTranslate('subx'))
         .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis)
-        .style("visibility", config.subchart_axis_x_show ? 'visible' : 'hidden');
+        .style("visibility", config.subchart_show && config.subchart_axis_x_show ? 'visible' : 'hidden');
 };
 c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
     var $$ = this, context = $$.context, config = $$.config,
