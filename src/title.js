@@ -1,8 +1,22 @@
 c3_chart_internal_fn.initTitle = function () {
     var $$ = this;
     $$.title = $$.svg.append("text")
-          .text($$.config.title_text)
           .attr("class", $$.CLASS.title);
+    $$.titleText = $$.title.append("tspan")
+          .text($$.config.title_text)
+          .attr("class", $$.CLASS.titleText);
+    if ($$.config.title_author) {
+        $$.titleAuthor = $$.title.append("tspan")
+              .text($$.config.title_author)
+              .attr("class", $$.CLASS.titleAuthor)
+              .attr("dx", $$.config.title_spacing);
+    }
+    if ($$.config.title_source) {
+        $$.titleSource = $$.title.append("tspan")
+              .text($$.config.title_source)
+              .attr("class", $$.CLASS.titleSource)
+              .attr("dx", $$.config.title_spacing);
+    }
 };
 c3_chart_internal_fn.redrawTitle = function () {
     var $$ = this;

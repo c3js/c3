@@ -13,7 +13,9 @@ describe('c3 chart title', function () {
                         ]
                     },
                     title: {
-                        text: 'new title'
+                        text: 'new title',
+                        author: 'masayuki0812',
+                        source: 'GitHub'
                     }
                 };
                 chart = window.initChart(chart, config, done);
@@ -21,13 +23,19 @@ describe('c3 chart title', function () {
 
             it('renders the title at the default config position', function () {
                 var titleEl = d3.select(".c3-title");
-                expect(+titleEl.attr("x")).toBeCloseTo(294, -2);
+                expect(+titleEl.attr("x")).toBeCloseTo(221, -2);
                 expect(+titleEl.attr("y")).toEqual(titleEl.node().getBBox().height);
             });
 
             it('renders the title text', function () {
-                var titleEl = d3.select(".c3-title");
-                expect(titleEl.node().textContent).toEqual('new title');
+                var titleTextEl = d3.select(".c3-title-text");
+                expect(titleTextEl.node().textContent).toEqual('new title');
+                
+                var titleAuthorEl = d3.select(".c3-title-author");
+                expect(titleAuthorEl.node().textContent).toEqual('masayuki0812');
+                
+                var titleSourceEl = d3.select(".c3-title-source");
+                expect(titleSourceEl.node().textContent).toEqual('GitHub');
             });
         });
 
@@ -41,6 +49,8 @@ describe('c3 chart title', function () {
                     },
                     title: {
                         text: 'positioned title',
+                        author: 'masayuki0812',
+                        source: 'GitHub',
                         padding: {
                             top: 20,
                             right: 30,
@@ -59,7 +69,7 @@ describe('c3 chart title', function () {
                 });
                 it('renders the title at the default config position', function () {
                     var titleEl = d3.select(".c3-title");
-                    expect(+titleEl.attr("x")).toBeCloseTo(275, -2);
+                    expect(+titleEl.attr("x")).toBeCloseTo(201.5, -2);
                     expect(+titleEl.attr("y")).toBeCloseTo(34, -1);
                 });
                 it('adds the correct amount of padding to fit the title', function() {
@@ -88,7 +98,7 @@ describe('c3 chart title', function () {
                 });
                 it('renders the title at the default config position', function () {
                     var titleEl = d3.select(".c3-title");
-                    expect(+titleEl.attr("x")).toBeCloseTo(520, -2);
+                    expect(+titleEl.attr("x")).toBeCloseTo(373, -2);
                     expect(+titleEl.attr("y")).toBeCloseTo(34, -1);
                 });
             });
