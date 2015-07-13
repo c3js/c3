@@ -30,7 +30,7 @@ describe('c3 chart shape line', function () {
             });
         });
 
-        it('should chnage to step chart', function () {
+        it('should change to step chart', function () {
             args.data.type = 'step';
             expect(true).toBeTruthy();
         });
@@ -40,6 +40,15 @@ describe('c3 chart shape line', function () {
                 var style = d3.select(this).style('shape-rendering');
                 expect(style).toBe('crispedges');
             });
+        });
+
+        it('should change to spline chart', function () {
+            args.data.type = 'spline';
+            expect(true).toBeTruthy();
+        });
+
+        it('should use cardinal interpolation by default', function () {
+            expect(chart.internal.config.spline_interpolation_type).toBe('cardinal');
         });
 
     });
@@ -92,6 +101,42 @@ describe('c3 chart shape line', function () {
                 expect(+target.select('.c3-circle-2').style('opacity')).toBe(0.5);
                 done();
             }, 500);
+        });
+
+    });
+
+    describe('spline.interpolation option', function () {
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, -150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25],
+                        ['data3', -150, 120, 110, 140, 115, 125]
+                    ],
+                    type: 'spline'
+                },
+                spline: {
+                    interpolation: {
+                        type: 'monotone'
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should update interpolation function', function() {
+            expect(chart.internal.getInterpolate(chart.data()[0])).toBe('monotone');
+        });
+
+        it('should not use a non-valid interpolation', function () {
+            args.spline.interpolation.type = 'foo';
+            expect(true).toBeTruthy();
+        });
+
+        it('should use cardinal interpolation when given option is not valid', function() {
+            expect(chart.internal.getInterpolate(chart.data()[0])).toBe('cardinal');
         });
 
     });
