@@ -41,8 +41,23 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
             var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
-                if (values[i].value * d.value >= 0) {
-                    offset += scale(values[i].value) - y0;
+                // check if the x values line up
+                if (typeof values[i] === 'undefined' ||
+                    (values[i].x !== d.x) && (values[i].x - d.x !== 0)) {
+                    // if not, try to find the value that does line up
+                    i = -1;
+                    for (var j in values) {
+                        if ((values[j].x === d.x) || (values[j].x - d.x === 0)) {
+                            i = j;
+                            break;
+                        }
+                    }
+                }
+
+                if (i in values) {
+                    if (values[i].value * d.value >= 0) {
+                        offset += scale(values[i].value) - y0;
+                    }
                 }
             }
         });
