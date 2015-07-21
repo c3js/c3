@@ -72,7 +72,7 @@ c3_chart_internal_fn.init = function () {
     $$.initParams();
 
     if (config.data_url) {
-        $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_keys, $$.initWithData);
+        $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_headers, config.data_keys, $$.initWithData);
     }
     else if (config.data_json) {
         $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));

@@ -55,6 +55,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_onselected: function () {},
         data_onunselected: function () {},
         data_url: undefined,
+        data_headers: undefined,
         data_json: undefined,
         data_rows: undefined,
         data_columns: undefined,
