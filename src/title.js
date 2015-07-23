@@ -21,7 +21,7 @@ c3_chart_internal_fn.xForTitle = function () {
 			} else {
 				throw(e);
       }
-		}
+    }
     if (position.indexOf('right') >= 0) {
         x = $$.currentWidth - textWidth - config.title_padding.right;
     } else if (position.indexOf('center') >= 0) {
@@ -41,8 +41,8 @@ c3_chart_internal_fn.yForTitle = function () {
 				textHeight = 0;
 			} else {
 				throw(e);
-			}
-		}
+      }
+    }
     return $$.config.title_padding.top + textHeight;
 };
 c3_chart_internal_fn.getTitlePadding = function() {
