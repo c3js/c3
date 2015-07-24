@@ -1,6 +1,7 @@
 c3_chart_internal_fn.getDefaultConfig = function () {
     var config = {
         bindto: '#chart',
+        classname: undefined,
         size_width: undefined,
         size_height: undefined,
         padding_left: undefined,
