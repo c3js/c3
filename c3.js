@@ -1651,7 +1651,6 @@
         function mapToIds(targets) {
         	if (targets) {
         		return targets.map(function (d) { return d.id; });
-
         	}
         }
         function mapToTargetIds(ids) {
