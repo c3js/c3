@@ -1649,9 +1649,9 @@
             return [firstData.x, lastData.x];
         }
         function mapToIds(targets) {
-        	if (targets) {
-        		return targets.map(function (d) { return d.id; });
-        	}
+            if (targets) {
+                return targets.map(function (d) { return d.id; });
+            }
         }
         function mapToTargetIds(ids) {
             return ids ? (typeof ids === 'string' ? [ids] : ids) : mapToIds(c3.data.targets);
