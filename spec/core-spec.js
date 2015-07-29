@@ -4,6 +4,7 @@ describe('c3 chart', function () {
     var chart;
 
     var args = {
+        classname: 'customclass',
         data: {
             columns: [
                 ['data1', 30, 200, 100, 400, 150, 250],
@@ -34,6 +35,11 @@ describe('c3 chart', function () {
             expect(svg).not.toBeNull();
         });
 
+        it('should be created with a custom class', function () {
+            var svg = d3.select('#chart svg');
+            expect(svg.attr('class')).not.toBeNull();
+            expect(svg.attr('class')).toBe('customclass');
+        });
     });
 
     describe('size', function () {
