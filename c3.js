@@ -5378,9 +5378,10 @@
     };
     c3_chart_internal_fn.initSubchart = function () {
         var $$ = this, config = $$.config,
-            context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context'));
+            context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context')),
+            visibility = config.subchart_show ? 'visible' : 'hidden';
 
-        context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
+        context.style('visibility', visibility);
 
         // Define g for chart area
         context.append('g')
@@ -5407,7 +5408,7 @@
             .attr("class", CLASS.axisX)
             .attr("transform", $$.getTranslate('subx'))
             .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis)
-            .style("visibility", config.subchart_axis_x_show ? 'visible' : 'hidden');
+            .style("visibility", config.subchart_axis_x_show ? visibility : 'hidden');
     };
     c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
         var $$ = this, context = $$.context, config = $$.config,
