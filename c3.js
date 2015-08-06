@@ -4167,6 +4167,7 @@
             .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendRect);
         l.append('line')
             .attr('class', CLASS.legendItemTile)
+            .style('stroke', $$.color)
             .style("pointer-events", "none")
             .attr('stroke-width', config.legend_item_tile_height);
 
