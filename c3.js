@@ -1789,7 +1789,7 @@
     };
     c3_chart_internal_fn.mapToTargetIds = function (ids) {
         var $$ = this;
-        return ids ? (isString(ids) ? [ids] : ids) : $$.mapToIds($$.data.targets);
+        return ids ? (isString(ids) || isNumber(ids) ? [ids] : ids) : $$.mapToIds($$.data.targets);
     };
     c3_chart_internal_fn.hasTarget = function (targets, id) {
         var ids = this.mapToIds(targets), i;
@@ -5950,6 +5950,9 @@
         },
         isString = c3_chart_internal_fn.isString = function (o) {
             return typeof o === 'string';
+        },
+        isNumber = c3_chart_internal_fn.isNumber = function (o) {
+            return typeof o === 'number';
         },
         isUndefined = c3_chart_internal_fn.isUndefined = function (v) {
             return typeof v === 'undefined';
