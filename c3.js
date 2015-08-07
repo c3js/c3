@@ -2796,7 +2796,17 @@
                 var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
                 if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
                 if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
-                    if (values[i].value * d.value >= 0) {
+                    // check if the x values line up
+                    if (typeof values[i] === 'undefined' || values[i].x !== d.x) {
+                        // if not, try to find the value that does line up
+                        i = -1;
+                        values.forEach(function (v, j) {
+                            if (v.x === d.x) {
+                                i = j;
+                            }
+                        });
+                    }
+                    if (i in values && values[i].value * d.value >= 0) {
                         offset += scale(values[i].value) - y0;
                     }
                 }

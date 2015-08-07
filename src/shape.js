@@ -42,22 +42,17 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
                 // check if the x values line up
-                if (typeof values[i] === 'undefined' ||
-                    (values[i].x !== d.x) && (values[i].x - d.x !== 0)) {
+                if (typeof values[i] === 'undefined' || values[i].x !== d.x) {
                     // if not, try to find the value that does line up
                     i = -1;
-                    for (var j in values) {
-                        if ((values[j].x === d.x) || (values[j].x - d.x === 0)) {
+                    values.forEach(function (v, j) {
+                        if (v.x === d.x) {
                             i = j;
-                            break;
                         }
-                    }
+                    });
                 }
-
-                if (i in values) {
-                    if (values[i].value * d.value >= 0) {
-                        offset += scale(values[i].value) - y0;
-                    }
+                if (i in values && values[i].value * d.value >= 0) {
+                    offset += scale(values[i].value) - y0;
                 }
             }
         });
