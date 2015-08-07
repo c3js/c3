@@ -66,7 +66,7 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
 
 
 c3_chart_internal_fn.getInterpolate = function (d) {
-    var $$ = this;
-    var interpolation = $$.isInterpolationType() ? $$.config.spline_interpolation_type : 'cardinal';
+    var $$ = this,
+        interpolation = $$.isInterpolationType($$.config.spline_interpolation_type) ? $$.config.spline_interpolation_type : 'cardinal';
     return $$.isSplineType(d) ? interpolation : $$.isStepType(d) ? $$.config.line_step_type : "linear";
 };
