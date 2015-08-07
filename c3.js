@@ -1789,7 +1789,7 @@
     };
     c3_chart_internal_fn.mapToTargetIds = function (ids) {
         var $$ = this;
-        return ids ? (isString(ids) ? [ids] : ids) : $$.mapToIds($$.data.targets);
+        return ids ? [].concat(ids) : $$.mapToIds($$.data.targets);
     };
     c3_chart_internal_fn.hasTarget = function (targets, id) {
         var ids = this.mapToIds(targets), i;
