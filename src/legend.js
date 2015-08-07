@@ -256,7 +256,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             }
             else {
                 $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-                $$.api.revert();    
+                $$.api.revert();
             }
         });
     l.append('text')
