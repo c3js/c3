@@ -26,7 +26,10 @@ function inherit(base, derived) {
 function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
+
+    $$.beforeInit();
     $$.init();
+    $$.afterInit();
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
@@ -66,6 +69,12 @@ c3_chart_fn = c3.chart.fn;
 c3_chart_internal_fn = c3.chart.internal.fn;
 c3_chart_internal_axis_fn = c3.chart.internal.axis.fn;
 
+c3_chart_internal_fn.beforeInit = function () {
+    // can do something
+};
+c3_chart_internal_fn.afterInit = function () {
+    // can do something
+};
 c3_chart_internal_fn.init = function () {
     var $$ = this, config = $$.config;
 
