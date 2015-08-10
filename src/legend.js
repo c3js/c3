@@ -274,6 +274,10 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('class', CLASS.legendItemTile)
         .style('stroke', $$.color)
         .style("pointer-events", "none")
+        .attr('x1', $$.isLegendRight || $$.isLegendInset ? x1ForLegendTile : -200)
+        .attr('y1', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
+        .attr('x2', $$.isLegendRight || $$.isLegendInset ? x2ForLegendTile : -200)
+        .attr('y2', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
         .attr('stroke-width', config.legend_item_tile_height);
 
     // Set background for inset legend
