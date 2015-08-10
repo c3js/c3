@@ -27,9 +27,9 @@ function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
 
-    $$.beforeInit();
+    $$.beforeInit(config);
     $$.init();
-    $$.afterInit();
+    $$.afterInit(config);
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
