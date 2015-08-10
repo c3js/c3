@@ -221,7 +221,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
 
     // when gauge, hide legend // TODO: fix
-    if ($$.hasType('gauge')) {
+    if ($$.hasType('gauge') && $$.config.data_columns.length <= 1) {
         config.legend_show = false;
     }
 
