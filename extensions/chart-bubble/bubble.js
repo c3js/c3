@@ -49,7 +49,7 @@
             }
 
             max = d3.max(Object.keys(values).map(function (key) { return values[key]; }));
-            min = d3.min(Object.keys(values).map(function (key) { return values[key]; })),
+            min = d3.min(Object.keys(values).map(function (key) { return values[key]; })) * 0.8,
             a = ((base_length / (names.length * 2)) - 1) / (Math.log(max + 1) - Math.log(min + 1));
 
             value = !values[key] ? 0 : values[key];
