@@ -39,7 +39,10 @@
 
         this.config.point_r = function (d) {
             var names = extra.names, values = extra.values, base_length = extra.base_length,
-                x = names[d.x], y = d.id, key = extra.getKey(x, y), max, min, a, value, r;
+                x = names[d.x], y = d.id,
+                key = extra.getKey(x, y), value = !values[key] ? 0 : values[key],
+                max, max_r, max_area, min, min_r, min_area,
+                a, area, r;
 
             if (!base_length) {
                 base_length = extra.base_length = d3.min([
@@ -49,13 +52,19 @@
             }
 
             max = d3.max(Object.keys(values).map(function (key) { return values[key]; }));
-            min = d3.min(Object.keys(values).map(function (key) { return values[key]; })) * 0.8,
-            a = ((base_length / (names.length * 2)) - 1) / (Math.log(max + 1) - Math.log(min + 1));
+            min = d3.min(Object.keys(values).map(function (key) { return values[key]; }));
 
-            value = !values[key] ? 0 : values[key];
-            r = (Math.log(value + 1) - Math.log(min + 1)) * a;
+            max_r = (base_length / (names.length * 2));
+            max_area = max_r * max_r * Math.PI;
+            min_r = Math.sqrt(min * max_r * max_r / max);
+            min_area = min_r * min_r * Math.PI;
 
-            return r > 0 ? r : 0;
+            a = (max_area - min_area) / (max - min);
+
+            area = value * a;
+            r = Math.sqrt(area / Math.PI);
+
+            return r;
         };
         this.config.point_sensitivity = 25;
         this.config.point_focus_expand_enabled = false;
