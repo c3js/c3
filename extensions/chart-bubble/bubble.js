@@ -41,8 +41,7 @@
             var names = extra.names, values = extra.values, base_length = extra.base_length,
                 x = names[d.x], y = d.id,
                 key = extra.getKey(x, y), value = !values[key] ? 0 : values[key],
-                max, max_r, max_area, min, min_r, min_area,
-                a, area, r;
+                max, max_r, max_area, a, area, r;
 
             if (!base_length) {
                 base_length = extra.base_length = d3.min([
@@ -52,14 +51,10 @@
             }
 
             max = d3.max(Object.keys(values).map(function (key) { return values[key]; }));
-            min = d3.min(Object.keys(values).map(function (key) { return values[key]; }));
-
             max_r = (base_length / (names.length * 2));
             max_area = max_r * max_r * Math.PI;
-            min_r = Math.sqrt(min * max_r * max_r / max);
-            min_area = min_r * min_r * Math.PI;
 
-            a = (max_area - min_area) / (max - min);
+            a = max_area / max;
 
             area = value * a;
             r = Math.sqrt(area / Math.PI);
