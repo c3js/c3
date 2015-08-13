@@ -1784,10 +1784,33 @@
         function getTargetSelectorSuffix(targetId) {
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
-        function selectorTarget(id) { return '.' + CLASS.target + getTargetSelectorSuffix(id); }
-        function selectorTargets(ids) { return ids.length ? ids.map(function (id) { return selectorTarget(id); }) : null; }
-        function selectorLegend(id) { return '.' + CLASS.legendItem + getTargetSelectorSuffix(id); }
-        function selectorLegends(ids) { return ids.length ? ids.map(function (id) { return selectorLegend(id); }) : null; }
+        function selectorTarget(id) { 
+            if (id) { 
+                return '.' + CLASS.target + getTargetSelectorSuffix(id); 
+            }
+        }
+
+        function selectorTargets(ids) { 
+            if (ids) { 
+                return ids.length ? ids.map(function (id) { 
+                    return selectorTarget(id); 
+                }) : null; 
+            }
+        }
+
+        function selectorLegend(id) { 
+            if (id) {  
+                return '.' + CLASS.legendItem + getTargetSelectorSuffix(id); 
+            }
+        }
+
+        function selectorLegends(ids) { 
+            if (ids) { 
+                return ids.length ? ids.map(function (id) { 
+                    return selectorLegend(id); 
+                }) : null; 
+            }
+        }
 
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
