@@ -1784,31 +1784,32 @@
         function getTargetSelectorSuffix(targetId) {
             return targetId || targetId === 0 ? '-' + (targetId.replace ? targetId.replace(/([^a-zA-Z0-9-_])/g, '-') : targetId) : '';
         }
-        function selectorTarget(id) { 
-            if (id) { 
-                return '.' + CLASS.target + getTargetSelectorSuffix(id); 
+
+        function selectorTarget(id) {
+            if (id) {
+                return '.' + CLASS.target + getTargetSelectorSuffix(id);
             }
         }
 
-        function selectorTargets(ids) { 
-            if (ids) { 
-                return ids.length ? ids.map(function (id) { 
-                    return selectorTarget(id); 
-                }) : null; 
+        function selectorTargets(ids) {
+            if (ids) {
+                return ids.length ? ids.map(function (id) {
+                    return selectorTarget(id);
+                }) : null;
             }
         }
 
-        function selectorLegend(id) { 
-            if (id) {  
-                return '.' + CLASS.legendItem + getTargetSelectorSuffix(id); 
+        function selectorLegend(id) {
+            if (id) {
+                return '.' + CLASS.legendItem + getTargetSelectorSuffix(id);
             }
         }
 
-        function selectorLegends(ids) { 
-            if (ids) { 
-                return ids.length ? ids.map(function (id) { 
-                    return selectorLegend(id); 
-                }) : null; 
+        function selectorLegends(ids) {
+            if (ids) {
+                return ids.length ? ids.map(function (id) {
+                    return selectorLegend(id);
+                }) : null;
             }
         }
 
