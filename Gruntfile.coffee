@@ -89,8 +89,7 @@ module.exports = (grunt) ->
           c3:
             src: 'c3.js'
             options:
-                #specs: 'spec/*-spec.js'
-              specs: 'spec/core-spec.js'
+              specs: 'spec/*-spec.js'
               helpers: 'spec/*-helper.js'
               styles: 'c3.css'
               vendor: 'https://rawgit.com/mbostock/d3/v3.5.0/d3.min.js'
