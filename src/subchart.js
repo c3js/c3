@@ -98,7 +98,7 @@ c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
         .remove();
 };
 c3_chart_internal_fn.redrawBarForSubchart = function (drawBarOnSub, withTransition, duration) {
-    (withTransition ? this.contextBar.transition().duration(duration) : this.contextBar)
+    (withTransition ? this.contextBar.transition(Math.random().toString()).duration(duration) : this.contextBar)
         .attr('d', drawBarOnSub)
         .style('opacity', 1);
 };
@@ -116,7 +116,7 @@ c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
         .remove();
 };
 c3_chart_internal_fn.redrawLineForSubchart = function (drawLineOnSub, withTransition, duration) {
-    (withTransition ? this.contextLine.transition().duration(duration) : this.contextLine)
+    (withTransition ? this.contextLine.transition(Math.random().toString()).duration(duration) : this.contextLine)
         .attr("d", drawLineOnSub)
         .style('opacity', 1);
 };
@@ -135,7 +135,7 @@ c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
         .remove();
 };
 c3_chart_internal_fn.redrawAreaForSubchart = function (drawAreaOnSub, withTransition, duration) {
-    (withTransition ? this.contextArea.transition().duration(duration) : this.contextArea)
+    (withTransition ? this.contextArea.transition(Math.random().toString()).duration(duration) : this.contextArea)
         .attr("d", drawAreaOnSub)
         .style("fill", this.color)
         .style("opacity", this.orgAreaOpacity);
