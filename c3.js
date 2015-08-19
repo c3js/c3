@@ -2258,15 +2258,17 @@
                 var localDate = null;
                 // This returns the users timezone offset
                 var _userOffset = _date.getTimezoneOffset();
-                // Math.sign will return '1' if the number is positive, if the number of the offset is positive, it means that it is a number LESS than GMT/UTC. So we need to calculate the actual day required. Otherwise, it is fine.
+                // Math.sign will return '1' if the number is positive
+                // if the number of the offset is positive, it means that it is a number LESS than GMT/UTC. 
+                //So we need to calculate the actual day required. Otherwise, it is fine.
                 if (Math.sign(_userOffset) === 1) {
-                  // We take the users negative timezone offset, and calculate how many MS out it is
-                  var _userOffset = _userOffset * 60000;
-                  localDate = new Date(_date.getTime() + _userOffset);
+                    // We take the users negative timezone offset, and calculate how many MS out it is
+                    _userOffset = _userOffset * 60000;
+                    localDate = new Date(_date.getTime() + _userOffset);
                 } else {
-                  localDate = _date;
+                    localDate = _date;
                 }
-                localDate.setHours(0,0,0,0);
+                localDate.setHours(0, 0, 0, 0);
 
                 parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(localDate);
             } catch (e) {
