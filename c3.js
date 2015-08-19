@@ -2253,7 +2253,22 @@
         function parseDate(date) {
             var parsedDate;
             try {
-                parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(date);
+                // This code is shared with the applications DateUtil service, in the function getDateWithoutTimezone - if this is changed, that should be changed accordingly.
+                var _date = new Date(date);
+                var localDate = null;
+                // This returns the users timezone offset
+                var _userOffset = _date.getTimezoneOffset();
+                // Math.sign will return '1' if the number is positive, if the number of the offset is positive, it means that it is a number LESS than GMT/UTC. So we need to calculate the actual day required. Otherwise, it is fine.
+                if (Math.sign(_userOffset) === 1) {
+                  // We take the users negative timezone offset, and calculate how many MS out it is
+                  var _userOffset = _userOffset * 60000;
+                  localDate = new Date(_date.getTime() + _userOffset);
+                } else {
+                  localDate = _date;
+                }
+                localDate.setHours(0,0,0,0);
+
+                parsedDate = __data_x_format ? d3.time.format(__data_x_format).parse(date) : new Date(localDate);
             } catch (e) {
                 window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
             }
