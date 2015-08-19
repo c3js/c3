@@ -556,7 +556,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // setup drawer - MEMO: these must be called after axis updated
     drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
-    drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
+    drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices, null, config.bar_radius) : undefined;
     drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
     xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
     yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
@@ -595,6 +595,11 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // text
     if ($$.hasDataLabel()) {
         $$.updateText(durationForExit);
+    }
+
+    // text
+    if ($$.hasSecondDataLabel()) {
+        $$.updateSecondText(durationForExit);
     }
 
     // title
@@ -655,6 +660,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                 $$.redrawArea(drawArea, true),
                 $$.redrawCircle(cx, cy, true),
                 $$.redrawText(xForText, yForText, options.flow, true),
+                $$.redrawSecondText(xForText, yForText, options.flow, true),
                 $$.redrawRegion(true),
                 $$.redrawGrid(true),
             ].forEach(function (transitions) {
@@ -684,6 +690,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.redrawArea(drawArea);
         $$.redrawCircle(cx, cy);
         $$.redrawText(xForText, yForText, options.flow);
+        $$.redrawSecondText(xForText, yForText, options.flow, true);
         $$.redrawRegion();
         $$.redrawGrid();
         if (config.onrendered) {

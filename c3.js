@@ -561,7 +561,7 @@
 
         // setup drawer - MEMO: these must be called after axis updated
         drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
-        drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
+        drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices, null, config.bar_radius) : undefined;
         drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
         xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
         yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
@@ -600,6 +600,11 @@
         // text
         if ($$.hasDataLabel()) {
             $$.updateText(durationForExit);
+        }
+
+        // text
+        if ($$.hasSecondDataLabel()) {
+            $$.updateSecondText(durationForExit);
         }
 
         // title
@@ -660,6 +665,7 @@
                     $$.redrawArea(drawArea, true),
                     $$.redrawCircle(cx, cy, true),
                     $$.redrawText(xForText, yForText, options.flow, true),
+                    $$.redrawSecondText(xForText, yForText, options.flow, true),
                     $$.redrawRegion(true),
                     $$.redrawGrid(true),
                 ].forEach(function (transitions) {
@@ -689,6 +695,7 @@
             $$.redrawArea(drawArea);
             $$.redrawCircle(cx, cy);
             $$.redrawText(xForText, yForText, options.flow);
+            $$.redrawSecondText(xForText, yForText, options.flow, true);
             $$.redrawRegion();
             $$.redrawGrid();
             if (config.onrendered) {
@@ -1101,6 +1108,7 @@
             data_type: undefined,
             data_types: {},
             data_labels: {},
+            data_secondLabel: {},
             data_order: 'desc',
             data_regions: {},
             data_color: undefined,
@@ -1222,6 +1230,7 @@
             line_connectNull: false,
             line_step_type: 'step',
             // bar
+            bar_radius: 0,
             bar_width: undefined,
             bar_width_ratio: 0.6,
             bar_width_max: undefined,
@@ -1902,6 +1911,15 @@
         if (typeof config.data_labels === 'boolean' && config.data_labels) {
             return true;
         } else if (typeof config.data_labels === 'object' && notEmpty(config.data_labels)) {
+            return true;
+        }
+        return false;
+    };
+    c3_chart_internal_fn.hasSecondDataLabel = function () {
+        var config = this.config;
+        if (typeof config.data_secondLabel === 'boolean' && config.data_secondLabel) {
+            return true;
+        } else if (typeof config.data_secondLabel === 'object' && notEmpty(config.data_secondLabel)) {
             return true;
         }
         return false;
@@ -3290,7 +3308,7 @@
         var $$ = this;
         $$.getBars(i).classed(CLASS.EXPANDED, false);
     };
-    c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
+    c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub, r) {
         var $$ = this, config = $$.config,
             getPoints = $$.generateGetBarPoints(barIndices, isSub);
         return function (d, i) {
@@ -3301,13 +3319,21 @@
             var indexX = config.axis_rotated ? 1 : 0;
             var indexY = config.axis_rotated ? 0 : 1;
 
+            var pathWithRoundEdges = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+                'v' +(-1 * (points[0][indexY]-points[1][indexY]-r) )+ ' ' +
+                'a ' + r + ',' + r + ' 1 0 1 ' + r + ',' + (-r) + ' ' +
+                'h' + (points[2][indexX] - points[0][indexX] - 2 * r) + ' ' +
+                'a ' + r + ',' + r + ' 1 0 1 ' + (r) + ',' + r + ' ' +
+                'v' + ((points[0][indexY]-points[1][indexY]-r))+ ' ' + 'z';
+
+
             var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
                     'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
                     'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
                     'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
                     'z';
 
-            return path;
+            return r ? pathWithRoundEdges : path;
         };
     };
     c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
@@ -3350,6 +3376,7 @@
         $$.main.select('.' + CLASS.chart).append("g")
             .attr("class", CLASS.chartTexts);
         $$.mainText = $$.d3.selectAll([]);
+        $$.mainText2 = $$.d3.selectAll([]);
     };
     c3_chart_internal_fn.updateTargetsForText = function (targets) {
         var $$ = this, mainTextUpdate, mainTextEnter,
@@ -3385,11 +3412,39 @@
             .style('fill-opacity', 0)
             .remove();
     };
+    c3_chart_internal_fn.updateSecondText = function (durationForExit) {
+        var $$ = this, config = $$.config,
+            barOrLineData = $$.barOrLineData.bind($$),
+            classText = $$.classText.bind($$);
+        $$.mainText2 = $$.main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text + '2')
+            .data(barOrLineData);
+        $$.mainText2.enter().append('text')
+            .attr("class", function () {return 'second-label ' + classText.apply(this, arguments); })
+            .attr('text-anchor', function (d) { return config.axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
+            .style("stroke", 'none')
+            .style("fill", function (d) { return $$.color(d); })
+            .style("fill-opacity", 0);
+        $$.mainText2
+            .text(function (d, i, j) { return $$.dataSecondLabelFormat(d.id)(d.value, d.id, i, j); });
+        $$.mainText2.exit()
+            .transition().duration(durationForExit)
+            .style('fill-opacity', 0)
+            .remove();
+    };
     c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
         return [
             (withTransition ? this.mainText.transition() : this.mainText)
                 .attr('x', xForText)
                 .attr('y', yForText)
+                .style("fill", this.color)
+                .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
+        ];
+    };
+    c3_chart_internal_fn.redrawSecondText = function (xForText, yForText, forFlow, withTransition) {
+        return [
+            (withTransition ? this.mainText2.transition() : this.mainText2)
+                .attr('x', xForText)
+                .attr('y', function () {return 16 + yForText.apply(this, arguments);})
                 .style("fill", this.color)
                 .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
         ];
@@ -5764,6 +5819,23 @@
         } else if (typeof data_labels.format === 'object') {
             if (data_labels.format[targetId]) {
                 format = data_labels.format[targetId] === true ? defaultFormat : data_labels.format[targetId];
+            } else {
+                format = function () { return ''; };
+            }
+        } else {
+            format = defaultFormat;
+        }
+        return format;
+    };
+    c3_chart_internal_fn.dataSecondLabelFormat = function (targetId) {
+        var $$ = this, data_secondLabel = $$.config.data_secondLabel,
+            format, defaultFormat = function (v) { return isValue(v) ? +v : ""; };
+        // find format according to axis id
+        if (typeof data_secondLabel.format === 'function') {
+            format = data_secondLabel.format;
+        } else if (typeof data_secondLabel.format === 'object') {
+            if (data_secondLabel.format[targetId]) {
+                format = data_secondLabel.format[targetId] === true ? defaultFormat : data_secondLabel.format[targetId];
             } else {
                 format = function () { return ''; };
             }

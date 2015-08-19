@@ -66,7 +66,7 @@ c3_chart_internal_fn.unexpandBars = function (i) {
     var $$ = this;
     $$.getBars(i).classed(CLASS.EXPANDED, false);
 };
-c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
+c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub, r) {
     var $$ = this, config = $$.config,
         getPoints = $$.generateGetBarPoints(barIndices, isSub);
     return function (d, i) {
@@ -77,13 +77,21 @@ c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
         var indexX = config.axis_rotated ? 1 : 0;
         var indexY = config.axis_rotated ? 0 : 1;
 
+        var pathWithRoundEdges = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+            'v' +(-1 * (points[0][indexY]-points[1][indexY]-r) )+ ' ' +
+            'a ' + r + ',' + r + ' 1 0 1 ' + r + ',' + (-r) + ' ' +
+            'h' + (points[2][indexX] - points[0][indexX] - 2 * r) + ' ' +
+            'a ' + r + ',' + r + ' 1 0 1 ' + (r) + ',' + r + ' ' +
+            'v' + ((points[0][indexY]-points[1][indexY]-r))+ ' ' + 'z';
+
+
         var path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
                 'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
                 'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
                 'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
                 'z';
 
-        return path;
+        return r ? pathWithRoundEdges : path;
     };
 };
 c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {

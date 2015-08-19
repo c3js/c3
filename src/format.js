@@ -40,3 +40,20 @@ c3_chart_internal_fn.dataLabelFormat = function (targetId) {
     }
     return format;
 };
+c3_chart_internal_fn.dataSecondLabelFormat = function (targetId) {
+    var $$ = this, data_secondLabel = $$.config.data_secondLabel,
+        format, defaultFormat = function (v) { return isValue(v) ? +v : ""; };
+    // find format according to axis id
+    if (typeof data_secondLabel.format === 'function') {
+        format = data_secondLabel.format;
+    } else if (typeof data_secondLabel.format === 'object') {
+        if (data_secondLabel.format[targetId]) {
+            format = data_secondLabel.format[targetId] === true ? defaultFormat : data_secondLabel.format[targetId];
+        } else {
+            format = function () { return ''; };
+        }
+    } else {
+        format = defaultFormat;
+    }
+    return format;
+};
