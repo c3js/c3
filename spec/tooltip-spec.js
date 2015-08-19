@@ -98,4 +98,25 @@ describe('c3 chart tooltip', function () {
             expect(left).toBe(leftExpected);
         });
     });
+
+    describe('tooltip getTooltipContent', function () {
+	beforeAll(function () {
+            tooltipConfiguration = {
+		data_order: 'desc'
+	    };
+        });
+
+	it('should sort values desc', function () {
+	    var eventRect = d3.select('.c3-event-rect-2').node();
+            window.setMouseEvent(chart, 'mousemove', 100, 100, eventRect);
+
+            var tooltipTable = d3.select('.c3-tooltip')[0];
+	    var expected = ["", "c3-tooltip-name--data3",
+			    "c3-tooltip-name--data1", "c3-tooltip-name--data2"];
+	    var i;
+	    for (i = 0; i < tooltipTable[0].rows.length; i++) {
+		expect(tooltipTable[0].rows[i].className).toBe(expected[i]);
+	    }
+	});
+    });
 });

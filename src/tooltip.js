@@ -30,6 +30,17 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         nameFormat = config.tooltip_format_name || function (name) { return name; },
         valueFormat = config.tooltip_format_value || defaultValueFormat,
         text, i, title, value, name, bgcolor;
+    
+    if (config.data_order === 'desc') {
+	d.sort(function(a,b){
+	    return b.value-a.value;
+	});
+    } else if (config.data_order === 'asc') {
+	d.sort(function(a,b){
+	    return a.value-b.value;
+	});
+    }
+    
     for (i = 0; i < d.length; i++) {
         if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
