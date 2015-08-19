@@ -2254,19 +2254,19 @@
             var parsedDate;
             try {
                 // This code is shared with the applications DateUtil service, in the function getDateWithoutTimezone - if this is changed, that should be changed accordingly.
-                var _date = new Date(date);
+                var currentDate = new Date(date);
                 var localDate = null;
                 // This returns the users timezone offset
-                var _userOffset = _date.getTimezoneOffset();
+                var userOffset = currentDate.getTimezoneOffset();
                 // Math.sign will return '1' if the number is positive
                 // if the number of the offset is positive, it means that it is a number LESS than GMT/UTC. 
                 //So we need to calculate the actual day required. Otherwise, it is fine.
-                if (Math.sign(_userOffset) === 1) {
+                if (Math.sign(userOffset) === 1) {
                     // We take the users negative timezone offset, and calculate how many MS out it is
-                    _userOffset = _userOffset * 60000;
-                    localDate = new Date(_date.getTime() + _userOffset);
+                    userOffset = userOffset * 60000;
+                    localDate = new Date(currentDate.getTime() + userOffset);
                 } else {
-                    localDate = _date;
+                    localDate = currentDate;
                 }
                 localDate.setHours(0, 0, 0, 0);
 
