@@ -262,6 +262,15 @@ c3_chart_internal_fn.hasDataLabel = function () {
     }
     return false;
 };
+c3_chart_internal_fn.hasSecondDataLabel = function () {
+    var config = this.config;
+    if (typeof config.data_secondLabel === 'boolean' && config.data_secondLabel) {
+        return true;
+    } else if (typeof config.data_secondLabel === 'object' && notEmpty(config.data_secondLabel)) {
+        return true;
+    }
+    return false;
+};
 c3_chart_internal_fn.getDataLabelLength = function (min, max, key) {
     var $$ = this,
         lengths = [0, 0], paddingCoef = 1.3;

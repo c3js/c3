@@ -38,6 +38,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_type: undefined,
         data_types: {},
         data_labels: {},
+        data_secondLabel: {},
         data_order: 'desc',
         data_regions: {},
         data_color: undefined,
@@ -159,6 +160,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         line_connectNull: false,
         line_step_type: 'step',
         // bar
+        bar_radius: 0,
         bar_width: undefined,
         bar_width_ratio: 0.6,
         bar_width_max: undefined,

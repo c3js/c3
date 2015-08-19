@@ -3,6 +3,7 @@ c3_chart_internal_fn.initText = function () {
     $$.main.select('.' + CLASS.chart).append("g")
         .attr("class", CLASS.chartTexts);
     $$.mainText = $$.d3.selectAll([]);
+    $$.mainText2 = $$.d3.selectAll([]);
 };
 c3_chart_internal_fn.updateTargetsForText = function (targets) {
     var $$ = this, mainTextUpdate, mainTextEnter,
@@ -38,11 +39,39 @@ c3_chart_internal_fn.updateText = function (durationForExit) {
         .style('fill-opacity', 0)
         .remove();
 };
+c3_chart_internal_fn.updateSecondText = function (durationForExit) {
+    var $$ = this, config = $$.config,
+        barOrLineData = $$.barOrLineData.bind($$),
+        classText = $$.classText.bind($$);
+    $$.mainText2 = $$.main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text + '2')
+        .data(barOrLineData);
+    $$.mainText2.enter().append('text')
+        .attr("class", function () {return 'second-label ' + classText.apply(this, arguments); })
+        .attr('text-anchor', function (d) { return config.axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
+        .style("stroke", 'none')
+        .style("fill", function (d) { return $$.color(d); })
+        .style("fill-opacity", 0);
+    $$.mainText2
+        .text(function (d, i, j) { return $$.dataSecondLabelFormat(d.id)(d.value, d.id, i, j); });
+    $$.mainText2.exit()
+        .transition().duration(durationForExit)
+        .style('fill-opacity', 0)
+        .remove();
+};
 c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
     return [
         (withTransition ? this.mainText.transition() : this.mainText)
             .attr('x', xForText)
             .attr('y', yForText)
+            .style("fill", this.color)
+            .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
+    ];
+};
+c3_chart_internal_fn.redrawSecondText = function (xForText, yForText, forFlow, withTransition) {
+    return [
+        (withTransition ? this.mainText2.transition() : this.mainText2)
+            .attr('x', xForText)
+            .attr('y', function () {return 16 + yForText.apply(this, arguments);})
             .style("fill", this.color)
             .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
     ];
