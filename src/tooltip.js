@@ -30,20 +30,19 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         nameFormat = config.tooltip_format_name || function (name) { return name; },
         valueFormat = config.tooltip_format_value || defaultValueFormat,
         text, i, title, value, name, bgcolor,
-	orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
+	orderAsc = $$.isOrderAsc();
      
     if (config.data_groups.length === 0) {
 	d.sort(function(a,b){
 	    return orderAsc ? a.value - b.value : b.value - a.value;
 	});
     } else {
-	var targets = $$.orderTargets($$.data.targets);
-	var data_targets = targets.map(function (i) {
+	var ids = $$.orderTargets($$.data.targets).map(function (i) {
 	    return i.id;
 	});
 	d.sort(function(a, b) {
 	    if (a.value > 0 && b.value > 0) {
-		return orderAsc ? data_targets.indexOf(a.id) - data_targets.indexOf(b.id) : data_targets.indexOf(b.id) - data_targets.indexOf(a.id);
+		return orderAsc ? ids.indexOf(a.id) - ids.indexOf(b.id) : ids.indexOf(b.id) - ids.indexOf(a.id);
 	    } else {
 		return orderAsc ? a.value - b.value : b.value - a.value;
 	    }
