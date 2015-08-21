@@ -2261,7 +2261,7 @@
                 // Math.sign will return '1' if the number is positive
                 // if the number of the offset is positive, it means that it is a number LESS than GMT/UTC. 
                 //So we need to calculate the actual day required. Otherwise, it is fine.
-                if (Math.sign(userOffset) === 1) {
+                if (userOffset > 0) {
                     // We take the users negative timezone offset, and calculate how many MS out it is
                     userOffset = userOffset * 60000;
                     localDate = new Date(currentDate.getTime() + userOffset);
