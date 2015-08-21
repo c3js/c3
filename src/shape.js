@@ -42,7 +42,7 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
                 // check if the x values line up
-                if (typeof values[i] === 'undefined' || values[i].x !== d.x) {
+                if (typeof values[i] === 'undefined' || +values[i].x !== +d.x) {  // "+" for timeseries
                     // if not, try to find the value that does line up
                     i = -1;
                     values.forEach(function (v, j) {

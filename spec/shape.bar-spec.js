@@ -9,6 +9,99 @@ describe('c3 chart shape bar', function () {
         chart = window.initChart(chart, args, done);
     });
 
+    describe('with groups', function () {
+
+        describe('with indexed data', function () {
+            it('should update args', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, -100, 400, -150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                        ],
+                        groups: [
+                            ['data1', 'data2'],
+                        ],
+                        type: 'bar'
+                    },
+                };
+                expect(true).toBeTruthy();
+            });
+            it('should be stacked', function () {
+                var expectedBottom = [275, 293, 365, 281, 395, 290];
+                chart.internal.main.selectAll('.c3-bars-data1 .c3-bar').each(function (d, i) {
+                    var rect = d3.select(this).node().getBoundingClientRect();
+                    expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
+                });
+           });
+        });
+
+        describe('with timeseries data', function () {
+            it('should update args', function () {
+                args = {
+                    data: {
+                        x: 'date',
+                        columns: [
+                            ['date', '2012-12-24', '2012-12-25', '2012-12-26', '2012-12-27', '2012-12-28', '2012-12-29'],
+                            ['data1', 30, 200, -100, 400, -150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                        ],
+                        groups: [
+                            ['data1', 'data2'],
+                        ],
+                        type: 'bar'
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+            it('should be stacked', function () {
+                var expectedBottom = [275, 293, 365, 281, 395, 290];
+                chart.internal.main.selectAll('.c3-bars-data1 .c3-bar').each(function (d, i) {
+                    var rect = d3.select(this).node().getBoundingClientRect();
+                    expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
+                });
+           });
+        });
+
+        describe('with category data', function () {
+            it('should update args', function () {
+                args = {
+                    data: {
+                        x: 'date',
+                        columns: [
+                            ['date', '2012-12-24', '2012-12-25', '2012-12-26', '2012-12-27', '2012-12-28', '2012-12-29'],
+                            ['data1', 30, 200, -100, 400, -150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                        ],
+                        groups: [
+                            ['data1', 'data2'],
+                        ],
+                        type: 'bar'
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+            it('should be stacked', function () {
+                var expectedBottom = [275, 293, 365, 281, 395, 290];
+                chart.internal.main.selectAll('.c3-bars-data1 .c3-bar').each(function (d, i) {
+                    var rect = d3.select(this).node().getBoundingClientRect();
+                    expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
+                });
+           });
+        });
+
+    });
+
     describe('internal.isWithinBar', function () {
 
         describe('with normal axis', function () {
