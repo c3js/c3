@@ -2020,6 +2020,9 @@
             if (!data) {
                 throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
             }
+            if (!data.resonse) {
+              data.response = data.responseText;
+            }
             if (type === 'json') {
                 d = $$.convertJsonToData(JSON.parse(data.response), keys);
             } else if (type === 'tsv') {
