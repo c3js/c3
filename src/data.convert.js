@@ -11,15 +11,16 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
     }
     req.get(function (error, data) {
         var d;
+        var dataResponse = data.response || data.responseText; // Fixes IE9 XHR issue; see #1345
         if (!data) {
             throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
         }
         if (type === 'json') {
-            d = $$.convertJsonToData(JSON.parse(data.response), keys);
+            d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
         } else if (type === 'tsv') {
-            d = $$.convertTsvToData(data.response);
+            d = $$.convertTsvToData(dataResponse);
         } else {
-            d = $$.convertCsvToData(data.response);
+            d = $$.convertCsvToData(dataResponse);
         }
         done.call($$, d);
     });
