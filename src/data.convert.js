@@ -2,18 +2,16 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
     $$.d3.xhr(url, function (error, data) {
         var d;
+        var dataResponse = data.response || data.responseText;
         if (!data) {
             throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
         }
-        if (!data.resonse) {
-          data.response = data.responseText;
-        }
         if (type === 'json') {
-            d = $$.convertJsonToData(JSON.parse(data.response), keys);
+            d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
         } else if (type === 'tsv') {
-            d = $$.convertTsvToData(data.response);
+            d = $$.convertTsvToData(dataResponse);
         } else {
-            d = $$.convertCsvToData(data.response);
+            d = $$.convertCsvToData(dataResponse);
         }
         done.call($$, d);
     });
