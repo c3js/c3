@@ -61,8 +61,8 @@ c3_chart_internal_fn.updateSecondText = function (durationForExit) {
 c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
     return [
         (withTransition ? this.mainText.transition() : this.mainText)
-            .attr('x', function () {return -2 + xForText.apply(this, arguments)})
-            .attr('y', function () { return -3 + yForText.apply(this, arguments)})
+            .attr('x', function () {return -2 + xForText.apply(this, arguments);})
+            .attr('y', function () { return -3 + yForText.apply(this, arguments);})
             .style("fill", this.color)
             .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
     ];
