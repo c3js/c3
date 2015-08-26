@@ -257,8 +257,8 @@
             .on('mouseenter', function () { return config.onmouseover.call($$); })
             .on('mouseleave', function () { return config.onmouseout.call($$); });
 
-        if ($$.config.classname) {
-            $$.svg.attr('class', $$.config.classname);
+        if ($$.config.svg_classname) {
+            $$.svg.attr('class', $$.config.svg_classname);
         }
 
         // Define defs
@@ -1068,7 +1068,7 @@
     c3_chart_internal_fn.getDefaultConfig = function () {
         var config = {
             bindto: '#chart',
-            classname: undefined,
+            svg_classname: undefined,
             size_width: undefined,
             size_height: undefined,
             padding_left: undefined,
