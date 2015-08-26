@@ -154,6 +154,43 @@ describe('c3 chart arc', function () {
             // This test has bee updated to make tests pass. @TODO double-check this test is accurate.
             expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*? 0 1,1 -68.*?,210.*?L-65.*?,201.*?A211.*?,211.*? 0 1,0 -211.*?,-2.*?Z/);
         });
+
+        it('should update labels use custom text', function() {
+            args = {
+                gauge: {
+                    width: 10,
+                    max: 100,
+                    expand: true,
+                    label: {
+                        extents: function (value, isMax) {
+                            if (isMax) {
+                                return 'Max: ' + value + '%';
+                            }
+
+                            return 'Min: ' + value + '%';
+                        }
+                    }
+                },
+                data: {
+                    columns: [
+                        ['data', 8]
+                    ],
+                    type: 'gauge',
+                    fullCircle: true,
+                    startingAngle: Math.PI/2
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should show custom min/max guage labels', function () {
+            var chartArc = d3.select('.c3-chart-arcs'),
+                min = chartArc.select('.c3-chart-arcs-gauge-min'),
+                max = chartArc.select('.c3-chart-arcs-gauge-max');
+
+            expect(min.text()).toMatch('Min: 0%');
+            expect(max.text()).toMatch('Max: 100%');
+        });
     });
 
 });
