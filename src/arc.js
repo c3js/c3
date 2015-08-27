@@ -10,11 +10,14 @@ c3_chart_internal_fn.initPie = function () {
 
 c3_chart_internal_fn.updateRadius = function () {
     var $$ = this, config = $$.config,
-        w = config.gauge_width || config.donut_width;
-    $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
+        visibleTargetCount = $$.data.targets.length - $$.hiddenTargetIds.length,
+        w = config.gauge_width || config.donut_width,
+        gaugeArcWidth = visibleTargetCount * 5; // 5 = minimal arc width of one arc in multi arc gauge; TODO in config
+    $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2 * ($$.hasType('gauge') ? 0.85 : 1);
     $$.radius = $$.radiusExpanded * 0.95;
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
     $$.innerRadius = $$.hasType('donut') || $$.hasType('gauge') ? $$.radius * $$.innerRadiusRatio : 0;
+    $$.gaugeArcWidth = w ? w : (gaugeArcWidth <= $$.radius - $$.innerRadius ? $$.radius - $$.innerRadius : (gaugeArcWidth <= $$.radius ? gaugeArcWidth : $$.radius));
 };
 
 c3_chart_internal_fn.updateArc = function () {
@@ -52,8 +55,13 @@ c3_chart_internal_fn.updateAngle = function (d) {
 };
 
 c3_chart_internal_fn.getSvgArc = function () {
-    var $$ = this,
-        arc = $$.d3.svg.arc().outerRadius($$.radius).innerRadius($$.innerRadius),
+    var $$ = this, hasGaugeType = $$.hasType('gauge'),
+        singleArcWidth = $$.gaugeArcWidth / ($$.data.targets.length - $$.hiddenTargetIds.length), // TODO auslagern
+        arc = $$.d3.svg.arc().outerRadius(function(d) {
+            return hasGaugeType ? $$.radius - singleArcWidth * d.index : $$.radius;
+        }).innerRadius(function(d) {
+            return hasGaugeType ? $$.radius - singleArcWidth * (d.index + 1) : $$.innerRadius;
+        }),
         newArc = function (d, withoutUpdate) {
             var updated;
             if (withoutUpdate) { return arc(d); } // for interpolate
@@ -66,8 +74,15 @@ c3_chart_internal_fn.getSvgArc = function () {
 };
 
 c3_chart_internal_fn.getSvgArcExpanded = function (rate) {
-    var $$ = this,
-        arc = $$.d3.svg.arc().outerRadius($$.radiusExpanded * (rate ? rate : 1)).innerRadius($$.innerRadius);
+    rate = rate || 1;
+    var $$ = this, hasGaugeType = $$.hasType('gauge'),
+        singleArcWidth = $$.gaugeArcWidth / ($$.data.targets.length - $$.hiddenTargetIds.length), // TODO auslagern
+        expandWidth = Math.min($$.radiusExpanded * rate - $$.radius, singleArcWidth * 0.8 - (1 - rate) * 100),
+        arc = $$.d3.svg.arc().outerRadius(function(d){
+            return hasGaugeType ? $$.radius - singleArcWidth * d.index + expandWidth : $$.radiusExpanded * rate;
+        }).innerRadius(function(d){
+            return hasGaugeType ? $$.radius - singleArcWidth * (d.index + 1) : $$.innerRadius;
+        });
     return function (d) {
         var updated = $$.updateAngle(d);
         return updated ? arc(updated) : "M 0 0";
