@@ -176,9 +176,11 @@ c3_chart_internal_fn.mapTargetsToUniqueXs = function (targets) {
 };
 c3_chart_internal_fn.addHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds);
+    this.visibleTargetCount -= targetIds.length;
 };
 c3_chart_internal_fn.removeHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
+    this.visibleTargetCount += targetIds.length;
 };
 c3_chart_internal_fn.addHiddenLegendIds = function (targetIds) {
     this.hiddenLegendIds = this.hiddenLegendIds.concat(targetIds);

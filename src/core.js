@@ -135,6 +135,7 @@ c3_chart_internal_fn.initParams = function () {
         ["%Y/%-m/%-d", function () { return true; }]
     ]);
 
+    $$.visibleTargetCount = config.data_hide === true ? 0 : (config.data_columns ? (config.data_columns.length - (config.data_hide ? config.data_hide.length : 0)) : 0);
     $$.hiddenTargetIds = [];
     $$.hiddenLegendIds = [];
     $$.focusedTargetIds = [];

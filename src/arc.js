@@ -10,9 +10,8 @@ c3_chart_internal_fn.initPie = function () {
 
 c3_chart_internal_fn.updateRadius = function () {
     var $$ = this, config = $$.config,
-        visibleTargetCount = $$.data.targets.length - $$.hiddenTargetIds.length,
         w = config.gauge_width || config.donut_width,
-        gaugeArcWidth = visibleTargetCount * 5; // 5 = minimal arc width of one arc in multi arc gauge; TODO in config
+        gaugeArcWidth = $$.visibleTargetCount * 5; // 5 = minimal arc width of one arc in multi arc gauge; TODO in config
     $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2 * ($$.hasType('gauge') ? 0.85 : 1);
     $$.radius = $$.radiusExpanded * 0.95;
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
@@ -56,7 +55,7 @@ c3_chart_internal_fn.updateAngle = function (d) {
 
 c3_chart_internal_fn.getSvgArc = function () {
     var $$ = this, hasGaugeType = $$.hasType('gauge'),
-        singleArcWidth = $$.gaugeArcWidth / ($$.data.targets.length - $$.hiddenTargetIds.length), // TODO auslagern
+        singleArcWidth = $$.gaugeArcWidth / $$.visibleTargetCount,
         arc = $$.d3.svg.arc().outerRadius(function(d) {
             return hasGaugeType ? $$.radius - singleArcWidth * d.index : $$.radius;
         }).innerRadius(function(d) {
@@ -76,7 +75,7 @@ c3_chart_internal_fn.getSvgArc = function () {
 c3_chart_internal_fn.getSvgArcExpanded = function (rate) {
     rate = rate || 1;
     var $$ = this, hasGaugeType = $$.hasType('gauge'),
-        singleArcWidth = $$.gaugeArcWidth / ($$.data.targets.length - $$.hiddenTargetIds.length), // TODO auslagern
+        singleArcWidth = $$.gaugeArcWidth / $$.visibleTargetCount,
         expandWidth = Math.min($$.radiusExpanded * rate - $$.radius, singleArcWidth * 0.8 - (1 - rate) * 100),
         arc = $$.d3.svg.arc().outerRadius(function(d){
             return hasGaugeType ? $$.radius - singleArcWidth * d.index + expandWidth : $$.radiusExpanded * rate;
