@@ -39,6 +39,7 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     circle: 'c3-circle',
     circles: 'c3-circles',
     arc: 'c3-arc',
+    arcLabelLine: 'c3-arc-label-line',
     arcs: 'c3-arcs',
     area: 'c3-area',
     areas: 'c3-areas',
