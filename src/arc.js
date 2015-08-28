@@ -11,7 +11,7 @@ c3_chart_internal_fn.initPie = function () {
 c3_chart_internal_fn.updateRadius = function () {
     var $$ = this, config = $$.config,
         w = config.gauge_width || config.donut_width,
-        gaugeArcWidth = $$.visibleTargetCount * 5; // 5 = minimal arc width of one arc in multi arc gauge; TODO in config
+        gaugeArcWidth = $$.visibleTargetCount * $$.config.gauge_arcs_minWidth;
     $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2 * ($$.hasType('gauge') ? 0.85 : 1);
     $$.radius = $$.radiusExpanded * 0.95;
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
