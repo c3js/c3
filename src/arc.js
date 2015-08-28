@@ -95,8 +95,8 @@ c3_chart_internal_fn.getArc = function (d, withoutUpdate, force) {
 
 c3_chart_internal_fn.transformForArcLabel = function (d) {
     var $$ = this,
-        updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "";
-    if (updated && !$$.hasType('gauge')) {
+        updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "", hasGauge = $$.hasType('gauge');
+    if (updated && !hasGauge) {
         c = this.svgArc.centroid(updated);
         x = isNaN(c[0]) ? 0 : c[0];
         y = isNaN(c[1]) ? 0 : c[1];
@@ -104,6 +104,12 @@ c3_chart_internal_fn.transformForArcLabel = function (d) {
         // TODO: ratio should be an option?
         ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
         translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
+    }
+    else if (updated && hasGauge && $$.visibleTargetCount > 1) {
+        var y1 = Math.sin(updated.endAngle - Math.PI / 2);
+        x = Math.cos(updated.endAngle - Math.PI / 2) * ($$.radiusExpanded + 25);
+        y = y1 * ($$.radiusExpanded + 15 - Math.abs(y1 * 10)) + 3;
+        translate = "translate(" + x +  ',' + y +  ")";
     }
     return translate;
 };
@@ -384,7 +390,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .attr('class', function (d) { return $$.isGaugeType(d.data) ? CLASS.gaugeValue : ''; })
         .text($$.textForArcLabel.bind($$))
         .attr("transform", $$.transformForArcLabel.bind($$))
-        .style('font-size', function (d) { return $$.isGaugeType(d.data) ? Math.round($$.radius / 5) + 'px' : ''; })
+        .style('font-size', function (d) { return $$.isGaugeType(d.data) && $$.visibleTargetCount === 1 ? Math.round($$.radius / 5) + 'px' : ''; })
       .transition().duration(duration)
         .style("opacity", function (d) { return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0; });
     main.select('.' + CLASS.chartArcsTitle)
