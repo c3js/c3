@@ -397,12 +397,16 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .style("opacity", $$.hasType('donut') || $$.hasType('gauge') ? 1 : 0);
 
     if ($$.hasType('gauge')) {
-        $$.arcs.select('.' + CLASS.chartArcsBackground)
-            .attr("d", function () {
+        var index = 0;
+        $$.arcs.selectAll('.' + CLASS.chartArcsBackground)
+            .attr("d", function (d1) {
+                if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) { return "M 0 0"; }
+
                 var d = {
                     data: [{value: config.gauge_max}],
                     startAngle: -1 * (Math.PI / 2),
-                    endAngle: Math.PI / 2
+                    endAngle: Math.PI / 2,
+                    index: index++
                 };
                 return $$.getArc(d, true, true);
             });
@@ -420,10 +424,13 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
     }
 };
 c3_chart_internal_fn.initGauge = function () {
-    var arcs = this.arcs;
+    var $$ = this, arcs = $$.arcs;
     if (this.hasType('gauge')) {
-        arcs.append('path')
-            .attr("class", CLASS.chartArcsBackground);
+        arcs.selectAll().data($$.data.targets).enter()
+            .append('path')
+            .attr("class", function(d) {
+                return CLASS.chartArcsBackground + ' ' + CLASS.target +'-'+ d.id;
+            });
         arcs.append("text")
             .attr("class", CLASS.chartArcsGaugeUnit)
             .style("text-anchor", "middle")
