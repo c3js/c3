@@ -1,4 +1,4 @@
-var c3 = { version: "0.4.10" };
+var c3 = { version: "0.4.11-rc4" };
 
 var c3_chart_fn,
     c3_chart_internal_fn,
@@ -26,7 +26,10 @@ function inherit(base, derived) {
 function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
+
+    $$.beforeInit(config);
     $$.init();
+    $$.afterInit(config);
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
@@ -66,6 +69,12 @@ c3_chart_fn = c3.chart.fn;
 c3_chart_internal_fn = c3.chart.internal.fn;
 c3_chart_internal_axis_fn = c3.chart.internal.axis.fn;
 
+c3_chart_internal_fn.beforeInit = function () {
+    // can do something
+};
+c3_chart_internal_fn.afterInit = function () {
+    // can do something
+};
 c3_chart_internal_fn.init = function () {
     var $$ = this, config = $$.config;
 
@@ -320,20 +329,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
 
     // Bind resize event
-    if (window.onresize == null) {
-        window.onresize = $$.generateResize();
-    }
-    if (window.onresize.add) {
-        window.onresize.add(function () {
-            config.onresize.call($$);
-        });
-        window.onresize.add(function () {
-            $$.api.flush();
-        });
-        window.onresize.add(function () {
-            config.onresized.call($$);
-        });
-    }
+    $$.bindResize();
 
     // export element of the chart
     $$.api.element = $$.selectChart.node();
@@ -570,9 +566,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.subY.domain($$.getYDomain(targetsToShow, 'y'));
         $$.subY2.domain($$.getYDomain(targetsToShow, 'y2'));
     }
-
-    // tooltip
-    $$.tooltip.style("display", "none");
 
     // xgrid focus
     $$.updateXgridFocus();
@@ -932,6 +925,49 @@ c3_chart_internal_fn.observeInserted = function (selection) {
     observer.observe(selection.node(), {attributes: true, childList: true, characterData: true});
 };
 
+c3_chart_internal_fn.bindResize = function () {
+    var $$ = this, config = $$.config;
+
+    $$.resizeFunction = $$.generateResize();
+
+    $$.resizeFunction.add(function () {
+        config.onresize.call($$);
+    });
+    if (config.resize_auto) {
+        $$.resizeFunction.add(function () {
+            if ($$.resizeTimeout !== undefined) {
+                window.clearTimeout($$.resizeTimeout);
+            }
+            $$.resizeTimeout = window.setTimeout(function () {
+                delete $$.resizeTimeout;
+                $$.api.flush();
+            }, 100);
+        });
+    }
+    $$.resizeFunction.add(function () {
+        config.onresized.call($$);
+    });
+
+    if (window.attachEvent) {
+        window.attachEvent('onresize', $$.resizeFunction);
+    } else if (window.addEventListener) {
+        window.addEventListener('resize', $$.resizeFunction, false);
+    } else {
+        // fallback to this, if this is a very old browser
+        var wrapper = window.onresize;
+        if (!wrapper) {
+            // create a wrapper that will call all charts
+            wrapper = $$.generateResize();
+        } else if (!wrapper.add || !wrapper.remove) {
+            // there is already a handler registered, make sure we call it too
+            wrapper = $$.generateResize();
+            wrapper.add(window.onresize);
+        }
+        // add this graph to the wrapper, we will be removed if the user calls destroy
+        wrapper.add($$.resizeFunction);
+        window.onresize = wrapper;
+    }
+};
 
 c3_chart_internal_fn.generateResize = function () {
     var resizeFunctions = [];
@@ -942,6 +978,14 @@ c3_chart_internal_fn.generateResize = function () {
     }
     callResizeFunctions.add = function (f) {
         resizeFunctions.push(f);
+    };
+    callResizeFunctions.remove = function (f) {
+        for (var i = 0; i < resizeFunctions.length; i++) {
+            if (resizeFunctions[i] === f) {
+                resizeFunctions.splice(i, 1);
+                break;
+            }
+        }
     };
     return callResizeFunctions;
 };
@@ -988,7 +1032,7 @@ c3_chart_internal_fn.parseDate = function (date) {
         parsedDate = date;
     } else if (typeof date === 'string') {
         parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
-    } else if (typeof date === 'number' || !isNaN(date)) {
+    } else if (typeof date === 'number' && !isNaN(date)) {
         parsedDate = new Date(+date);
     }
     if (!parsedDate || isNaN(+parsedDate)) {

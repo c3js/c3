@@ -7,6 +7,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         padding_right: undefined,
         padding_top: undefined,
         padding_bottom: undefined,
+        resize_auto: true,
         zoom_enabled: false,
         zoom_extent: undefined,
         zoom_privileged: false,
@@ -14,6 +15,8 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_onzoom: function () {},
         zoom_onzoomstart: function () {},
         zoom_onzoomend: function () {},
+        zoom_x_min: undefined,
+        zoom_x_max: undefined,
         interaction_enabled: true,
         onmouseover: function () {},
         onmouseout: function () {},
@@ -62,6 +65,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // subchart
         subchart_show: false,
         subchart_size_height: 60,
+        subchart_axis_x_show: true,
         subchart_onbrush: function () {},
         // color
         color_pattern: [],
@@ -78,6 +82,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         legend_item_onmouseover: undefined,
         legend_item_onmouseout: undefined,
         legend_equally: false,
+        legend_padding: 0,
+        legend_item_tile_width: 10,
+        legend_item_tile_height: 10,
         // axis
         axis_rotated: false,
         axis_x_show: true,
@@ -144,6 +151,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // point - point of each data
         point_show: true,
         point_r: 2.5,
+        point_sensitivity: 10,
         point_focus_expand_enabled: true,
         point_focus_expand_r: undefined,
         point_select_r: undefined,
@@ -161,22 +169,27 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_label_show: true,
         pie_label_format: undefined,
         pie_label_threshold: 0.05,
-        pie_expand: true,
+        pie_expand: {},
+        pie_expand_duration: 50,
         // gauge
         gauge_label_show: true,
         gauge_label_format: undefined,
-        gauge_expand: true,
         gauge_min: 0,
         gauge_max: 100,
         gauge_units: undefined,
         gauge_width: undefined,
+        gauge_expand: {},
+        gauge_expand_duration: 50,
         // donut
         donut_label_show: true,
         donut_label_format: undefined,
         donut_label_threshold: 0.05,
         donut_width: undefined,
-        donut_expand: true,
         donut_title: "",
+        donut_expand: {},
+        donut_expand_duration: 50,
+        // spline
+        spline_interpolation_type: 'cardinal',
         // region - region to change style
         regions: [],
         // tooltip - show when mouseover on each data
@@ -192,6 +205,8 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         tooltip_init_show: false,
         tooltip_init_x: 0,
         tooltip_init_position: {top: '0px', left: '50px'},
+        tooltip_onshow: function () {},
+        tooltip_onhide: function () {},
         // title
         title_text: undefined,
         title_padding: {

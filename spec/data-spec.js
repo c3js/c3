@@ -755,7 +755,7 @@ describe('c3 chart data', function () {
 
         });
 
-        describe('with positive values and null', function () {
+        describe('with negative values and null', function () {
 
             describe('on not rotated axis', function () {
 
@@ -763,7 +763,7 @@ describe('c3 chart data', function () {
                     args = {
                         data: {
                             columns: [
-                                ['data1', -190, -200, -190, null],
+                                ['data1', -190, 0, -190, null],
                             ],
                             type: 'bar',
                             labels: {
@@ -781,13 +781,13 @@ describe('c3 chart data', function () {
 
                 it('should have y domain with proper padding', function () {
                     var domain = chart.internal.y.domain();
-                    expect(domain[0]).toBeCloseTo(-227, -1);
+                    expect(domain[0]).toBeCloseTo(-215, -1);
                     expect(domain[1]).toBeCloseTo(0, -1);
                 });
 
                 it('should locate labels above each data point', function () {
                     var texts = chart.internal.main.selectAll('.c3-texts-data1 text'),
-                        expectedYs = [368, 387, 368, 12],
+                        expectedYs = [368, 12, 368, 12],
                         expectedXs = [74, 221, 368, 515];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
@@ -803,13 +803,13 @@ describe('c3 chart data', function () {
 
                 it('should have y domain with proper padding', function () {
                     var domain = chart.internal.y.domain();
-                    expect(domain[0]).toBeCloseTo(-201, -1);
-                    expect(domain[1]).toBeCloseTo(-189, -1);
+                    expect(domain[0]).toBeCloseTo(-215, -1);
+                    expect(domain[1]).toBeCloseTo(25, -1);
                 });
 
                 it('should locate labels above each data point', function () {
                     var texts = chart.internal.main.selectAll('.c3-texts-data1 text'),
-                        expectedYs = [58, 392, 58, 12],
+                        expectedYs = [395, 60, 395, 12],
                         expectedXs = [6, 198, 391, 583];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
@@ -832,14 +832,14 @@ describe('c3 chart data', function () {
 
                 it('should have y domain with proper padding', function () {
                     var domain = chart.internal.y.domain();
-                    expect(domain[0]).toBeCloseTo(-232, -1);
+                    expect(domain[0]).toBeCloseTo(-220, -1);
                     expect(domain[1]).toBeCloseTo(0, -1);
                 });
 
                 it('should locate labels above each data point', function () {
                     var texts = chart.internal.main.selectAll('.c3-texts-data1 text'),
                         expectedYs = [57, 163, 269, 375],
-                        expectedXs = [103, 78, 103, 526];
+                        expectedXs = [103, 594, 103, 526];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
                         expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);
@@ -854,14 +854,14 @@ describe('c3 chart data', function () {
 
                 it('should have y domain with proper padding', function () {
                     var domain = chart.internal.y.domain();
-                    expect(domain[0]).toBeCloseTo(-202, -1);
-                    expect(domain[1]).toBeCloseTo(-188, -1);
+                    expect(domain[0]).toBeCloseTo(-220, -1);
+                    expect(domain[1]).toBeCloseTo(24, -1);
                 });
 
                 it('should locate labels above each data point', function () {
                     var texts = chart.internal.main.selectAll('.c3-texts-data1 text'),
                         expectedYs = [9, 147, 286, 424],
-                        expectedXs = [511, 67, 511, 526];
+                        expectedXs = [67, 537, 67, 526];
                     texts.each(function (d, i) {
                         var text = d3.select(this);
                         expect(+text.attr('y')).toBeCloseTo(expectedYs[i], -2);

@@ -143,9 +143,9 @@ c3_chart_internal_fn.expandArc = function (targetIds) {
     $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).each(function (d) {
         if (! $$.shouldExpand(d.data.id)) { return; }
         $$.d3.select(this).selectAll('path')
-            .transition().duration(50)
+            .transition().duration($$.expandDuration(d.data.id))
             .attr("d", $$.svgArcExpanded)
-            .transition().duration(100)
+            .transition().duration($$.expandDuration(d.data.id) * 2)
             .attr("d", $$.svgArcExpandedSub)
             .each(function (d) {
                 if ($$.isDonutType(d.data)) {
@@ -163,15 +163,34 @@ c3_chart_internal_fn.unexpandArc = function (targetIds) {
     targetIds = $$.mapToTargetIds(targetIds);
 
     $$.svg.selectAll($$.selectorTargets(targetIds, '.' + CLASS.chartArc)).selectAll('path')
-        .transition().duration(50)
+        .transition().duration(function(d) {
+            return $$.expandDuration(d.data.id);
+        })
         .attr("d", $$.svgArc);
     $$.svg.selectAll('.' + CLASS.arc)
         .style("opacity", 1);
 };
 
+c3_chart_internal_fn.expandDuration = function (id) {
+    var $$ = this, config = $$.config;
+
+    if ($$.isDonutType(id)) {
+        return config.donut_expand_duration;
+    } else if ($$.isGaugeType(id)) {
+        return config.gauge_expand_duration;
+    } else if ($$.isPieType(id)) {
+        return config.pie_expand_duration;
+    } else {
+        return 50;
+    }
+
+};
+
 c3_chart_internal_fn.shouldExpand = function (id) {
     var $$ = this, config = $$.config;
-    return ($$.isDonutType(id) && config.donut_expand) || ($$.isGaugeType(id) && config.gauge_expand) || ($$.isPieType(id) && config.pie_expand);
+    return ($$.isDonutType(id) && config.donut_expand) ||
+           ($$.isGaugeType(id) && config.gauge_expand) ||
+           ($$.isPieType(id) && config.pie_expand);
 };
 
 c3_chart_internal_fn.shouldShowArcLabel = function () {
@@ -265,18 +284,22 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 return;
             }
             updated = $$.updateAngle(d);
-            arcData = $$.convertToArcData(updated);
-            // transitions
-            $$.expandArc(updated.data.id);
-            $$.api.focus(updated.data.id);
-            $$.toggleFocusLegend(updated.data.id, true);
-            $$.config.data_onmouseover(arcData, this);
+            if (updated) {
+                arcData = $$.convertToArcData(updated);
+                // transitions
+                $$.expandArc(updated.data.id);
+                $$.api.focus(updated.data.id);
+                $$.toggleFocusLegend(updated.data.id, true);
+                $$.config.data_onmouseover(arcData, this);
+            }
         } : null)
         .on('mousemove', config.interaction_enabled ? function (d) {
-            var updated = $$.updateAngle(d),
+            var updated = $$.updateAngle(d), arcData, selectedData;
+            if (updated) {
                 arcData = $$.convertToArcData(updated),
                 selectedData = [arcData];
-            $$.showTooltip(selectedData, this);
+                $$.showTooltip(selectedData, this);
+            }
         } : null)
         .on('mouseout', config.interaction_enabled ? function (d) {
             var updated, arcData;
@@ -284,19 +307,25 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 return;
             }
             updated = $$.updateAngle(d);
-            arcData = $$.convertToArcData(updated);
-            // transitions
-            $$.unexpandArc(updated.data.id);
-            $$.api.revert();
-            $$.revertLegend();
-            $$.hideTooltip();
-            $$.config.data_onmouseout(arcData, this);
+            if (updated) {
+                arcData = $$.convertToArcData(updated);
+                // transitions
+                $$.unexpandArc(updated.data.id);
+                $$.api.revert();
+                $$.revertLegend();
+                $$.hideTooltip();
+                $$.config.data_onmouseout(arcData, this);
+            }
         } : null)
         .on('click', config.interaction_enabled ? function (d, i) {
-            var updated = $$.updateAngle(d),
+            var updated = $$.updateAngle(d), arcData;
+            if (updated) {
                 arcData = $$.convertToArcData(updated);
-            if ($$.toggleShape) { $$.toggleShape(this, arcData, i); }
-            $$.config.data_onclick.call($$.api, arcData, this);
+                if ($$.toggleShape) {
+                    $$.toggleShape(this, arcData, i);
+                }
+                $$.config.data_onclick.call($$.api, arcData, this);
+            }
         } : null)
         .each(function () { $$.transiting = true; })
         .transition().duration(duration)

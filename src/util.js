@@ -23,10 +23,10 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
         return d[1] - d[0];
     },
     isEmpty = c3_chart_internal_fn.isEmpty = function (o) {
-        return !o || (isString(o) && o.length === 0) || (typeof o === 'object' && Object.keys(o).length === 0);
+        return typeof o === 'undefined' || o === null || (isString(o) && o.length === 0) || (typeof o === 'object' && Object.keys(o).length === 0);
     },
     notEmpty = c3_chart_internal_fn.notEmpty = function (o) {
-        return Object.keys(o).length > 0;
+        return !c3_chart_internal_fn.isEmpty(o);
     },
     getOption = c3_chart_internal_fn.getOption = function (options, key, defaultValue) {
         return isDefined(options[key]) ? options[key] : defaultValue;

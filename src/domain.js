@@ -221,14 +221,15 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     return $$.x.domain();
 };
 c3_chart_internal_fn.trimXDomain = function (domain) {
-    var $$ = this;
-    if (domain[0] <= $$.orgXDomain[0]) {
-        domain[1] = +domain[1] + ($$.orgXDomain[0] - domain[0]);
-        domain[0] = $$.orgXDomain[0];
+    var zoomDomain = this.getZoomDomain(),
+        min = zoomDomain[0], max = zoomDomain[1];
+    if (domain[0] <= min) {
+        domain[1] = +domain[1] + (min - domain[0]);
+        domain[0] = min;
     }
-    if ($$.orgXDomain[1] <= domain[1]) {
-        domain[0] = +domain[0] - (domain[1] - $$.orgXDomain[1]);
-        domain[1] = $$.orgXDomain[1];
+    if (max <= domain[1]) {
+        domain[0] = +domain[0] - (domain[1] - max);
+        domain[1] = max;
     }
     return domain;
 };

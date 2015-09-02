@@ -48,7 +48,7 @@ Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValue
         },
         axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
-    if ($$.isTimeSeries() && tickValues) {
+    if ($$.isTimeSeries() && tickValues && typeof tickValues !== "function") {
         tickValues = tickValues.map(function (v) { return $$.parseDate(v); });
     }
 
@@ -321,14 +321,15 @@ Axis.prototype.updateLabels = function updateLabels(withTransition) {
         .text(this.textForY2AxisLabel.bind(this));
 };
 Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, domainLength) {
-    if (!isValue(padding[key])) {
+    var p = typeof padding === 'number' ? padding : padding[key];
+    if (!isValue(p)) {
         return defaultValue;
     }
     if (padding.unit === 'ratio') {
         return padding[key] * domainLength;
     }
     // assume padding is pixels if unit is not specified
-    return this.convertPixelsToAxisPadding(padding[key], domainLength);
+    return this.convertPixelsToAxisPadding(p, domainLength);
 };
 Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) {
     var $$ = this.owner,

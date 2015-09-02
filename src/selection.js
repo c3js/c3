@@ -18,7 +18,7 @@ c3_chart_internal_fn.selectPoint = function (target, d, i) {
 };
 c3_chart_internal_fn.unselectPoint = function (target, d, i) {
     var $$ = this;
-    $$.config.data_onunselected(d, target.node());
+    $$.config.data_onunselected.call($$.api, d, target.node());
     // remove selected-circle from low layer g
     $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
         .transition().duration(100).attr('r', 0)
