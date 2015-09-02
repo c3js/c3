@@ -6,3 +6,6 @@ d3.min.js
 components
 build
 .sass-cache
+.idea
+.grunt
+_SpecRunner.html

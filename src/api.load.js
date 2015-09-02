@@ -26,6 +26,12 @@ c3_chart_fn.load = function (args) {
             config.data_colors[id] = args.colors[id];
         });
     }
+
+    // update x axis tick format if exists
+    if ('xtickformat' in args) {
+        config.axis_x_tick_format = args.xtickformat;
+    }
+
     // use cache if exists
     if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {
         $$.load($$.getCaches(args.cacheIds), args.done);

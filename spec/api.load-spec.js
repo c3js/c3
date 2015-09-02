@@ -118,4 +118,49 @@ describe('c3 api load', function () {
 
     });
 
+    describe('timeseries data', function(){
+
+        describe('as column', function(){
+
+            it('should update args', function () {
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
+                            ['data1', 30, 200, 100, 400, 150, 250]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                format: '%Y-%m-%d'
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should update x axis format', function (done) {
+                var main = chart.internal.main;
+                setTimeout(function () {
+                    var target = main.select('.c3-axis.c3-axis-x').select('tspan');
+                    expect(target.text()).toBe('2013-01-01');
+
+                    chart.load({
+                        xtickformat: '%Y'
+                    });
+                    setTimeout(function () {
+                        var target = main.select('.c3-axis.c3-axis-x').select('tspan');
+                        expect(target.text()).toBe('2013');
+                        done();
+                    }, 500);
+                }, 500);
+
+            });
+        });
+    });
+
 });
