@@ -40,6 +40,20 @@ describe('c3 api load', function () {
                 }, 500);
             });
 
+            it('should load axes names', function (done) {
+                var legend = chart.internal.legend;
+                chart.load({
+                    names: {
+                      'data1': 'Data 1 Title'
+                    }
+                });
+                setTimeout(function () {
+                    var legendItem = legend.select('.c3-legend-item.c3-legend-item-data1 text');
+                    expect(legendItem.text()).toBe('Data 1 Title');
+                    done();
+                }, 500);
+            });
+
         });
 
     });
