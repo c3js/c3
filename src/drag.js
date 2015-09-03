@@ -60,6 +60,7 @@ c3_chart_internal_fn.dragstart = function (mouse) {
     var $$ = this, config = $$.config;
     if ($$.hasArcType()) { return; }
     if (! config.data_selection_enabled) { return; } // do nothing if not selectable
+    $$.config.data_ondragstart.call($$);
     $$.dragStart = mouse;
     $$.main.select('.' + CLASS.chart).append('rect')
         .attr('class', CLASS.dragarea)
@@ -71,6 +72,7 @@ c3_chart_internal_fn.dragend = function () {
     var $$ = this, config = $$.config;
     if ($$.hasArcType()) { return; }
     if (! config.data_selection_enabled) { return; } // do nothing if not selectable
+    $$.config.data_ondragend.call($$);
     $$.main.select('.' + CLASS.dragarea)
         .transition().duration(100)
         .style('opacity', 0)
