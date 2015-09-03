@@ -29,7 +29,7 @@ c3_chart_internal_fn.load = function (targets, args) {
     $$.updateTargets($$.data.targets);
 
     // Redraw with new targets
-    $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+    $$.redraw({withUpdateOrgXDomain: true, withUpdateXAxis: true, withLegend: true});
 
     if (args.done) { args.done(); }
 };
