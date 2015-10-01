@@ -85,15 +85,6 @@ module.exports = (grunt) ->
           options:
             jshintrc: '.jshintrc'
 
-        jasmine:
-          c3:
-            src: 'c3.js'
-            options:
-              specs: 'spec/*-spec.js'
-              helpers: 'spec/*-helper.js'
-              styles: 'c3.css'
-              vendor: 'https://rawgit.com/mbostock/d3/v3.5.0/d3.min.js'
-
         uglify:
           c3:
             files:
@@ -111,4 +102,6 @@ module.exports = (grunt) ->
             files:
               'c3.css': 'src/scss/main.scss'
 
-    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'sass', 'cssmin', 'uglify']
+    grunt.registerTask 'lint', ['jshint']
+    grunt.registerTask 'build', ['concat', 'sass', 'cssmin', 'uglify']
+    grunt.registerTask 'defualt', ['lint', 'build']
