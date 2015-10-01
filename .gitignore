@@ -6,3 +6,6 @@ d3.min.js
 components
 build
 .sass-cache
+
+# coverage report
+/coverage
