@@ -188,6 +188,8 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_title: "",
         donut_expand: {},
         donut_expand_duration: 50,
+        // spline
+        spline_interpolation_type: 'cardinal',
         // region - region to change style
         regions: [],
         // tooltip - show when mouseover on each data

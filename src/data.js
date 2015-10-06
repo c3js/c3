@@ -147,7 +147,7 @@ c3_chart_internal_fn.mapToIds = function (targets) {
 };
 c3_chart_internal_fn.mapToTargetIds = function (ids) {
     var $$ = this;
-    return ids ? (isString(ids) ? [ids] : ids) : $$.mapToIds($$.data.targets);
+    return ids ? [].concat(ids) : $$.mapToIds($$.data.targets);
 };
 c3_chart_internal_fn.hasTarget = function (targets, id) {
     var ids = this.mapToIds(targets), i;
@@ -171,7 +171,8 @@ c3_chart_internal_fn.filterTargetsToShow = function (targets) {
 c3_chart_internal_fn.mapTargetsToUniqueXs = function (targets) {
     var $$ = this;
     var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return +v.x; }); }))).values();
-    return $$.isTimeSeries() ? xs.map(function (x) { return new Date(+x); }) : xs.map(function (x) { return +x; });
+    xs = $$.isTimeSeries() ? xs.map(function (x) { return new Date(+x); }) : xs.map(function (x) { return +x; });
+    return xs.sort(function (a, b) { return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN; });
 };
 c3_chart_internal_fn.addHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds);

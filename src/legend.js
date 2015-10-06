@@ -130,7 +130,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     function getTextBox(textElement, id) {
         if (!$$.legendItemTextBox[id]) {
-            $$.legendItemTextBox[id] = $$.getTextRect(textElement.textContent, CLASS.legendItem);
+            $$.legendItemTextBox[id] = $$.getTextRect(textElement.textContent, CLASS.legendItem, textElement);
         }
         return $$.legendItemTextBox[id];
     }
@@ -240,19 +240,23 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             }
         })
         .on('mouseover', function (id) {
-            $$.d3.select(this).classed(CLASS.legendItemFocused, true);
-            if (!$$.transiting && $$.isTargetToShow(id)) {
-                $$.api.focus(id);
-            }
             if (config.legend_item_onmouseover) {
                 config.legend_item_onmouseover.call($$, id);
             }
+            else {
+                $$.d3.select(this).classed(CLASS.legendItemFocused, true);
+                if (!$$.transiting && $$.isTargetToShow(id)) {
+                    $$.api.focus(id);
+                }
+            }
         })
         .on('mouseout', function (id) {
-            $$.d3.select(this).classed(CLASS.legendItemFocused, false);
-            $$.api.revert();
             if (config.legend_item_onmouseout) {
                 config.legend_item_onmouseout.call($$, id);
+            }
+            else {
+                $$.d3.select(this).classed(CLASS.legendItemFocused, false);
+                $$.api.revert();
             }
         });
     l.append('text')
@@ -268,7 +272,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendRect);
     l.append('line')
         .attr('class', CLASS.legendItemTile)
+        .style('stroke', $$.color)
         .style("pointer-events", "none")
+        .attr('x1', $$.isLegendRight || $$.isLegendInset ? x1ForLegendTile : -200)
+        .attr('y1', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
+        .attr('x2', $$.isLegendRight || $$.isLegendInset ? x2ForLegendTile : -200)
+        .attr('y2', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
         .attr('stroke-width', config.legend_item_tile_height);
 
     // Set background for inset legend

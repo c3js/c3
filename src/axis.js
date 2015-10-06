@@ -321,14 +321,15 @@ Axis.prototype.updateLabels = function updateLabels(withTransition) {
         .text(this.textForY2AxisLabel.bind(this));
 };
 Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, domainLength) {
-    if (!isValue(padding[key])) {
+    var p = typeof padding === 'number' ? padding : padding[key];
+    if (!isValue(p)) {
         return defaultValue;
     }
     if (padding.unit === 'ratio') {
         return padding[key] * domainLength;
     }
     // assume padding is pixels if unit is not specified
-    return this.convertPixelsToAxisPadding(padding[key], domainLength);
+    return this.convertPixelsToAxisPadding(p, domainLength);
 };
 Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) {
     var $$ = this.owner,
