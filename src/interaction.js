@@ -109,8 +109,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         .attr("height", h);
 };
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
-    var $$ = this, d3 = $$.d3, config = $$.config,
-        tap = false, tapX;
+    var $$ = this, d3 = $$.d3, config = $$.config;
 
     function click(shape, d) {
         var index = d.index;
@@ -218,32 +217,30 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 });
         })
         .on('click', function (d) {
-            //click event was simulated via a 'tap' touch event, cancel regular click
-            if (tap) {
-                return;
-            }
-
             click(this, d);
-
         })
         .on('touchstart', function(d) {
-            //store current X selection for comparison during touch end event
-            tapX = d.x;
-        })
-        .on('touchend', function(d) {
-            var finalX = d.x;
+          var index = d.index;
+            // Show tooltip
+            var selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
+                return $$.addName($$.getValueOnIndex(t.values, index));
+            });
 
-            //If end is not the same as the start, event doesn't count as a tap
-            if (tapX !== finalX) {
-                return;
+            if (config.tooltip_grouped) {
+                $$.showTooltip(selectedData, this);
+                $$.showXGridFocus(selectedData);
             }
-            
+
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+                if (!config.tooltip_grouped) {
+                    $$.showTooltip([d], this);
+                    $$.showXGridFocus([d]);
+                    if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
+                    $$.expandBars(index, d.id, true);
+                }
+            });
 
             click(this, d);
-
-            //indictate tap event fired to prevent click;
-            tap = true;
-            setTimeout(function() { tap = false; }, config.touch_tap_delay);
         })
 
         .call(
@@ -257,8 +254,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
 };
 
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
-    var $$ = this, d3 = $$.d3, config = $$.config,
-        tap = false, tapX, tapY;
+    var $$ = this, d3 = $$.d3, config = $$.config;
 
     function mouseout() {
         $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
@@ -349,35 +345,29 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             }
         })
         .on('click', function () {
-            //click event was simulated via a 'tap' touch event, cancel regular click
-            if (tap) {
-                return;
-            }
-
             click(this);
         })
-        .on('touchstart', function(){
-            var mouse = d3.mouse(this);
-            //store starting coordinates for distance comparision during touch end event
-            tapX = mouse[0];
-            tapY = mouse[1];
+        .on('touchstart', function(d){
+          var index = d.index;
+            // Show tooltip
+            var selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
+                return $$.addName($$.getValueOnIndex(t.values, index));
+            });
 
-        })
-        .on('touchend', function(){
-            var mouse = d3.mouse(this),
-                x = mouse[0],
-                y = mouse[1];
-
-            //If end is too far from start, event doesn't count as a tap
-            if (Math.abs(x - tapX) > config.touch_tap_radius || Math.abs(y - tapY) > config.touch_tap_radius) {
-                return;
+            if (config.tooltip_grouped) {
+                $$.showTooltip(selectedData, this);
+                $$.showXGridFocus(selectedData);
             }
 
-            click(this);
-
-            //indictate tap event fired to prevent click;
-            tap = true;
-            setTimeout(function() { tap = false; }, config.touch_tap_delay);
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+                if (!config.tooltip_grouped) {
+                    $$.showTooltip([d], this);
+                    $$.showXGridFocus([d]);
+                    if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
+                    $$.expandBars(index, d.id, true);
+                }
+            });
+            click(this, d);
         })
         .call(
             config.data_selection_draggable && $$.drag ? (

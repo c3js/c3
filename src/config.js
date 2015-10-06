@@ -213,10 +213,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
             bottom: 0,
             left: 0
         },
-        title_position: 'top-center',
-        //TouchEvent configuration
-        touch_tap_radius : 20,  //touch movement must be less than this to be a 'tap'
-        touch_tap_delay : 500,  //clicks are suppressed for this many ms after a tap
+        title_position: 'top-center'
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {
