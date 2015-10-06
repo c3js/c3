@@ -110,6 +110,25 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
 };
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
+
+    function click(shape, d) {
+        var index = d.index;
+        if ($$.hasArcType() || !$$.toggleShape) { return; }
+        if ($$.cancelClick) {
+            $$.cancelClick = false;
+            return;
+        }
+        if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(shape)[0] < $$.x($$.getXValue(d.id, index))) {
+            index -= 1;
+        }
+        $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+            if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                $$.toggleShape(this, d, index);
+                $$.config.data_onclick.call($$.api, d, this);
+            }
+        });
+    }
+
     eventRectEnter.append("rect")
         .attr("class", $$.classEvent.bind($$))
         .style("cursor", config.data_selection_enabled && config.data_selection_grouped ? "pointer" : null)
@@ -198,22 +217,32 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 });
         })
         .on('click', function (d) {
-            var index = d.index;
-            if ($$.hasArcType() || !$$.toggleShape) { return; }
-            if ($$.cancelClick) {
-                $$.cancelClick = false;
-                return;
+            click(this, d);
+        })
+        .on('touchstart', function(d) {
+          var index = d.index;
+            // Show tooltip
+            var selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
+                return $$.addName($$.getValueOnIndex(t.values, index));
+            });
+
+            if (config.tooltip_grouped) {
+                $$.showTooltip(selectedData, this);
+                $$.showXGridFocus(selectedData);
             }
-            if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
-                index -= 1;
-            }
+
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
-                    $$.toggleShape(this, d, index);
-                    $$.config.data_onclick.call($$.api, d, this);
+                if (!config.tooltip_grouped) {
+                    $$.showTooltip([d], this);
+                    $$.showXGridFocus([d]);
+                    if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
+                    $$.expandBars(index, d.id, true);
                 }
             });
+
+            click(this, d);
         })
+
         .call(
             config.data_selection_draggable && $$.drag ? (
                 d3.behavior.drag().origin(Object)
@@ -233,6 +262,25 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         $$.hideTooltip();
         $$.unexpandCircles();
         $$.unexpandBars();
+    }
+
+    function click(shape) {
+        var targetsToShow = $$.filterTargetsToShow($$.data.targets);
+        var mouse, closest;
+        if ($$.hasArcType(targetsToShow)) { return; }
+
+        mouse = d3.mouse(shape);
+        closest = $$.findClosestFromTargets(targetsToShow, mouse);
+        if (! closest) { return; }
+        // select if selection enabled
+        if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
+            $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
+                if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
+                    $$.toggleShape(this, closest, closest.index);
+                    $$.config.data_onclick.call($$.api, closest, this);
+                }
+            });
+        }
     }
 
     eventRectEnter.append('rect')
@@ -297,22 +345,29 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             }
         })
         .on('click', function () {
-            var targetsToShow = $$.filterTargetsToShow($$.data.targets);
-            var mouse, closest;
-            if ($$.hasArcType(targetsToShow)) { return; }
+            click(this);
+        })
+        .on('touchstart', function(d){
+          var index = d.index;
+            // Show tooltip
+            var selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
+                return $$.addName($$.getValueOnIndex(t.values, index));
+            });
 
-            mouse = d3.mouse(this);
-            closest = $$.findClosestFromTargets(targetsToShow, mouse);
-            if (! closest) { return; }
-            // select if selection enabled
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
-                    if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
-                        $$.toggleShape(this, closest, closest.index);
-                        $$.config.data_onclick.call($$.api, closest, this);
-                    }
-                });
+            if (config.tooltip_grouped) {
+                $$.showTooltip(selectedData, this);
+                $$.showXGridFocus(selectedData);
             }
+
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+                if (!config.tooltip_grouped) {
+                    $$.showTooltip([d], this);
+                    $$.showXGridFocus([d]);
+                    if (config.point_focus_expand_enabled) { $$.expandCircles(index, d.id, true); }
+                    $$.expandBars(index, d.id, true);
+                }
+            });
+            click(this, d);
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
