@@ -2,9 +2,10 @@
   z-index: 10;
 }
 .c3-tooltip {
-  border-collapse:collapse;
-  border-spacing:0;
-  background-color:#fff;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #222;
+  background-color: #fff;
   empty-cells:show;
   -webkit-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
      -moz-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
@@ -12,20 +13,20 @@
   opacity: 0.9;
 }
 .c3-tooltip tr {
-  border:1px solid #CCC;
+  border: 1px solid #ccc;
 }
 .c3-tooltip th {
+  color: #fff;
   background-color: #aaa;
-  font-size:14px;
-  padding:2px 5px;
-  text-align:left;
-  color:#FFF;
+  padding: 2px 5px;
+  font-size: 14px;
+  text-align: left;
 }
 .c3-tooltip td {
-  font-size:13px;
+  color: inherit;
+  background-color: inherit;
   padding: 3px 6px;
-  background-color:#fff;
-  border-left:1px dotted #999;
+  font-size: 13px;
 }
 .c3-tooltip td > span {
   display: inline-block;
@@ -34,5 +35,8 @@
   margin-right: 6px;
 }
 .c3-tooltip td.value{
+  border-left-width: 1px;
+  border-left-style: dotted;
+  border-left-color: inherit;
   text-align: right;
 }
