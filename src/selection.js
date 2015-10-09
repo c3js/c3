@@ -5,12 +5,12 @@ c3_chart_internal_fn.selectPoint = function (target, d, i) {
         r = $$.pointSelectR.bind($$);
     config.data_onselected.call($$.api, d, target.node());
     // add selected-circle on low layer g
-    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
+    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + d.index)
         .data([d])
         .enter().append('circle')
         .attr("class", function () { return $$.generateClass(CLASS.selectedCircle, i); })
         .attr("cx", cx)
-        .attr("cy", cy)
+        .attr("cy", function(d){return cy(d, d.index);})
         .attr("stroke", function () { return $$.color(d); })
         .attr("r", function (d) { return $$.pointSelectR(d) * 1.4; })
         .transition().duration(100)
@@ -20,7 +20,7 @@ c3_chart_internal_fn.unselectPoint = function (target, d, i) {
     var $$ = this;
     $$.config.data_onunselected.call($$.api, d, target.node());
     // remove selected-circle from low layer g
-    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
+    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + d.index)
         .transition().duration(100).attr('r', 0)
         .remove();
 };
