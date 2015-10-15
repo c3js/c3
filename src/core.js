@@ -466,7 +466,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
     var waitForDraw, flow;
-    var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
+    var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, xDomainForZoom;
     var xv = $$.xv.bind($$), cx, cy;
 
     options = options || {};
@@ -534,24 +534,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // Update axis label
     $$.axis.updateLabels(withTransition);
 
-    // show/hide if manual culling needed
     if ((withUpdateXDomain || withUpdateXAxis) && targetsToShow.length) {
-        if (config.axis_x_tick_culling && tickValues) {
-            for (i = 1; i < tickValues.length; i++) {
-                if (tickValues.length / i < config.axis_x_tick_culling_max) {
-                    intervalForCulling = i;
-                    break;
-                }
-            }
-            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
-                var index = tickValues.indexOf(e);
-                if (index >= 0) {
-                    d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
-                }
-            });
-        } else {
-            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
-        }
+        $$.axis.updateCulling(tickValues);
     }
 
     // setup drawer - MEMO: these must be called after axis updated

@@ -320,6 +320,26 @@ Axis.prototype.updateLabels = function updateLabels(withTransition) {
         .attr("dy", this.dyForY2AxisLabel.bind(this))
         .text(this.textForY2AxisLabel.bind(this));
 };
+Axis.prototype.updateCulling = function updateCulling(tickValues) {
+    var $$ = this.owner, config = $$.config;
+    if (config.axis_x_tick_culling && tickValues) {
+        var intervalForCulling, i;
+        for (i = 1; i < tickValues.length; i++) {
+            if (tickValues.length / i < config.axis_x_tick_culling_max) {
+                intervalForCulling = i;
+                break;
+            }
+        }
+        $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+            var index = tickValues.indexOf(e);
+            if (index >= 0) {
+                d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+            }
+        });
+    } else {
+        $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
+    }
+};
 Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, domainLength) {
     var p = typeof padding === 'number' ? padding : padding[key];
     if (!isValue(p)) {
