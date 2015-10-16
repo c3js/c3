@@ -1,5 +1,5 @@
 module.exports = (grunt) ->
-    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass']
+    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma']
 
     grunt.initConfig
         watch:
@@ -85,14 +85,9 @@ module.exports = (grunt) ->
           options:
             jshintrc: '.jshintrc'
 
-        jasmine:
-          c3:
-            src: 'c3.js'
-            options:
-              specs: 'spec/*-spec.js'
-              helpers: 'spec/*-helper.js'
-              styles: 'c3.css'
-              vendor: 'https://rawgit.com/mbostock/d3/v3.5.0/d3.min.js'
+        karma:
+          unit:
+            configFile: 'karma.conf.js'
 
         uglify:
           c3:
@@ -111,4 +106,8 @@ module.exports = (grunt) ->
             files:
               'c3.css': 'src/scss/main.scss'
 
-    grunt.registerTask 'default', ['concat', 'jshint', 'jasmine', 'sass', 'cssmin', 'uglify']
+    grunt.registerTask 'lint', ['jshint']
+    grunt.registerTask 'test', ['karma']
+    grunt.registerTask 'build', ['concat', 'sass']
+    grunt.registerTask 'minify', ['cssmin', 'uglify']
+    grunt.registerTask 'default', ['lint', 'build', 'test', 'minify']
