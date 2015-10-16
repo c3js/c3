@@ -1,4 +1,4 @@
-c3 [![Build Status](https://travis-ci.org/masayuki0812/c3.svg?branch=master)](https://travis-ci.org/masayuki0812/c3) [![Dependency Status](https://david-dm.org/masayuki0812/c3.svg)](https://david-dm.org/masayuki0812/c3) [![devDependency Status](https://david-dm.org/masayuki0812/c3/dev-status.svg)](https://david-dm.org/masayuki0812/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/masayuki0812/c3/blob/master/LICENSE)
+c3 [![Build Status](https://travis-ci.org/masayuki0812/c3.svg?branch=master)](https://travis-ci.org/masayuki0812/c3) [![Dependency Status](https://david-dm.org/masayuki0812/c3.svg)](https://david-dm.org/masayuki0812/c3) [![devDependency Status](https://david-dm.org/masayuki0812/c3/dev-status.svg)](https://david-dm.org/masayuki0812/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/masayuki0812/c3/blob/master/LICENSE)[![codecov.io](https://codecov.io/github/masayuki0812/c3/coverage.svg?branch=master)](https://codecov.io/github/masayuki0812/c3?branch=master)
 ==
 
 c3 is a D3-based reusable chart library that enables deeper integration of charts into web applications.
@@ -51,5 +51,3 @@ Please fork this fiddle:
 
 ## License
 MIT
-
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=masayuki0812&url=https://github.com/masayuki0812/c3&title=c3&language=javascript&tags=github&category=software)
