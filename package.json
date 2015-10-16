@@ -22,7 +22,7 @@
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
   "dependencies": {
-    "d3": "<=3.5.0"
+    "d3": "3.5.6"
   },
   "devDependencies": {
     "codecov.io": "^0.1.6",
