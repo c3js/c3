@@ -252,6 +252,10 @@ c3_chart_internal_fn.initWithData = function (data) {
         .on('mouseenter', function () { return config.onmouseover.call($$); })
         .on('mouseleave', function () { return config.onmouseout.call($$); });
 
+    if ($$.config.svg_classname) {
+        $$.svg.attr('class', $$.config.svg_classname);
+    }
+
     // Define defs
     defs = $$.svg.append("defs");
     $$.clipChart = $$.appendClip(defs, $$.clipId);
