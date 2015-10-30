@@ -22,10 +22,16 @@ c3_chart_internal_fn.xForTitle = function () {
     return x;
 };
 c3_chart_internal_fn.yForTitle = function () {
-    var $$ = this;
-    return $$.config.title_padding.top + $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height;
+    var $$ = this, position = $$.config.title_position || 'left';
+    if (position.indexOf('bottom') >= 0) {
+      return $$.getCurrentHeight() - ($$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height + ($$.config.title_padding.bottom || 0));
+    }
+    return ($$.config.title_padding.top || 0) + $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height;
 };
 c3_chart_internal_fn.getTitlePadding = function() {
-    var $$ = this;
-    return $$.yForTitle() + $$.config.title_padding.bottom;
+    var $$ = this, position = $$.config.title_position || 'left';
+    if (position.indexOf('bottom') !== -1) {
+      return ($$.config.title_padding.bottom || 0) + ($$.config.title_padding.top || 0);
+    }
+    return $$.yForTitle() + ($$.config.title_padding.bottom || 0);
 };

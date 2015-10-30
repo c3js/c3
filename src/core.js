@@ -270,6 +270,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     if ($$.initSubchart) { $$.initSubchart(); }
     if ($$.initTooltip) { $$.initTooltip(); }
+    if ($$.initFooter) { $$.initFooter(); }
     if ($$.initLegend) { $$.initLegend(); }
     if ($$.initTitle) { $$.initTitle(); }
 
@@ -531,6 +532,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
         $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
     }
+
+    // footer background
+    if ($$.redrawFooter) { $$.redrawFooter(); }
 
     // axes
     $$.axis.redraw(transitions, hideAxis);

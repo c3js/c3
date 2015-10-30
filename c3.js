@@ -275,6 +275,7 @@
 
         if ($$.initSubchart) { $$.initSubchart(); }
         if ($$.initTooltip) { $$.initTooltip(); }
+        if ($$.initFooter) { $$.initFooter(); }
         if ($$.initLegend) { $$.initLegend(); }
         if ($$.initTitle) { $$.initTitle(); }
 
@@ -536,6 +537,9 @@
         if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
             $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
         }
+
+        // footer background
+        if ($$.redrawFooter) { $$.redrawFooter(); }
 
         // axes
         $$.axis.redraw(transitions, hideAxis);
@@ -1284,6 +1288,13 @@
                 left: 0
             },
             title_position: 'top-center',
+            // footer
+            footer_show: false,
+            footer_height: 15,
+            footer_color: '#FFF',
+            footer_border_show: false,
+            footer_border_color: '#000',
+            footer_border_width: 1
         };
 
         Object.keys(this.additionalConfig).forEach(function (key) {
@@ -2661,14 +2672,19 @@
         var $$ = this,
             config = $$.config,
             padding = isValue(config.padding_top) ? config.padding_top : 0;
-        if ($$.title && $$.title.node()) {
+        if ($$.title && $$.title.node() && $$.config.title_position.indexOf('bottom') === -1) {
             padding += $$.getTitlePadding();
         }
         return padding;
     };
     c3_chart_internal_fn.getCurrentPaddingBottom = function () {
-        var config = this.config;
-        return isValue(config.padding_bottom) ? config.padding_bottom : 0;
+        var $$ = this,
+            config = this.config,
+            padding = isValue(config.padding_bottom) ? config.padding_bottom : 0;
+        if ($$.title && $$.title.node() && $$.config.title_position.indexOf('bottom') !== -1) {
+            padding += $$.getTitlePadding();
+        }
+        return padding;
     };
     c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
         var $$ = this, config = $$.config;
@@ -4308,12 +4324,57 @@
         return x;
     };
     c3_chart_internal_fn.yForTitle = function () {
-        var $$ = this;
-        return $$.config.title_padding.top + $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height;
+        var $$ = this, position = $$.config.title_position || 'left';
+        if (position.indexOf('bottom') >= 0) {
+          return $$.getCurrentHeight() - ($$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height + ($$.config.title_padding.bottom || 0));
+        }
+        return ($$.config.title_padding.top || 0) + $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height;
     };
     c3_chart_internal_fn.getTitlePadding = function() {
+        var $$ = this, position = $$.config.title_position || 'left';
+        if (position.indexOf('bottom') !== -1) {
+          return ($$.config.title_padding.bottom || 0) + ($$.config.title_padding.top || 0);
+        }
+        return $$.yForTitle() + ($$.config.title_padding.bottom || 0);
+    };
+
+    c3_chart_internal_fn.initFooter = function() {
+      var $$ = this;
+      if ($$.config.footer_show) {
+          var padding_for_bottom_title = ($$.config.title_position.indexOf('bottom') !== -1 ? ($$.config.title_padding.top || 0) - ($$.config.title_padding.bottom || 0) : 0);
+          $$.footer = $$.svg.append("rect")
+                .attr("class", "c3-chart-footer")
+                .attr("style", "fill: " + $$.config.footer_color)
+                .attr("x", 0)
+                .attr("y", $$.getCurrentHeight() - $$.config.footer_height - padding_for_bottom_title)
+                .attr("width", $$.getCurrentWidth())
+                .attr("height", $$.config.footer_height + padding_for_bottom_title);
+
+          if ($$.config.footer_border_show) {
+              $$.footerBorder = $$.svg.append("line")
+                    .attr("class", "c3-chart-footer-border")
+                    .attr("style", "stroke-width: " + $$.config.footer_border_width +
+                          "; stroke: " + $$.config.footer_border_color)
+                    .attr("x1", 0)
+                    .attr("x2", $$.getCurrentWidth())
+                    .attr("y1", $$.getCurrentHeight() - $$.config.footer_height - padding_for_bottom_title)
+                    .attr("y2", $$.getCurrentHeight() - $$.config.footer_height - padding_for_bottom_title);
+          }
+      }
+    };
+    c3_chart_internal_fn.redrawFooter = function () {
         var $$ = this;
-        return $$.yForTitle() + $$.config.title_padding.bottom;
+        if ($$.footer) {
+            var padding_for_bottom_title = ($$.config.title_position.indexOf('bottom') !== -1 ? ($$.config.title_padding.top || 0) - ($$.config.title_padding.bottom || 0) : 0);
+            $$.footer
+                .attr("width", $$.getCurrentWidth())
+                .attr("height", $$.config.footer_height + padding_for_bottom_title);
+        }
+
+        if ($$.footerBorder) {
+            $$.footerBorder
+                .attr("x2", $$.getCurrentWidth());
+        }
     };
 
     function Axis(owner) {
