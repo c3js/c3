@@ -49,9 +49,46 @@ c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
     ];
 };
 c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
-    var $$ = this, config = $$.config,
-        w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickInterval() * config.bar_width_ratio) / barTargetsNum : 0;
-    return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
+    var $$ = this, config = $$.config, w = 0;
+    if(typeof config.bar_width === 'number'){
+        w = config.bar_width;
+    } else if (barTargetsNum) {
+        var tickInterval = axis.tickInterval();
+        if(config.axis_x_type === 'timeseries'){
+            var time, timePerPx, min;
+            Object.keys($$.data.xs).forEach(function(v){
+                // find each pixel represent how long time
+                var x = $$.data.xs[v], diff = x[x.length - 1].getTime() - x[0].getTime();
+                if( !time || diff > time){
+                    time = diff;
+                }
+
+                // find minimal time diff between ticks
+                x.forEach(function(v, i){
+                    if( x[i+1] ){
+                        var diff = x[i+1].getTime() - v.getTime();
+                        if(!min || min > diff){
+                            min = diff;
+                        }
+                    }
+                });
+            });
+            timePerPx = time / ($$.xMax - $$.xMin);
+            tickInterval = Math.floor( min / timePerPx) + 1;
+        }
+
+        w = (tickInterval * config.bar_width_ratio) / barTargetsNum;
+    }
+
+    if(config.bar_width_max && w > config.bar_width_max){
+        return config.bar_width_max;
+    }
+
+    if(w < 1){
+        return 1;
+    }
+
+    return  w;
 };
 c3_chart_internal_fn.getBars = function (i, id) {
     var $$ = this;
