@@ -56,17 +56,18 @@ c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
         var tickInterval = axis.tickInterval();
         if(config.axis_x_type === 'timeseries'){
             var time, timePerPx, min;
-            Object.keys($$.data.xs).forEach(function(v){
+            $$.data.targets.forEach(function(target){
+                var data = $$.data.xs[target.id];
                 // find each pixel represent how long time
-                var x = $$.data.xs[v], diff = x[x.length - 1].getTime() - x[0].getTime();
+                var diff = data[data.length - 1].getTime() - data[0].getTime();
                 if( !time || diff > time){
                     time = diff;
                 }
 
                 // find minimal time diff between ticks
-                x.forEach(function(v, i){
-                    if( x[i+1] ){
-                        var diff = x[i+1].getTime() - v.getTime();
+                data.forEach(function(v, i){
+                    if( data[i+1] ){
+                        var diff = data[i+1].getTime() - v.getTime();
                         if(!min || min > diff){
                             min = diff;
                         }
@@ -74,7 +75,7 @@ c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
                 });
             });
             timePerPx = time / ($$.xMax - $$.xMin);
-            tickInterval = Math.floor( min / timePerPx) + 1;
+            tickInterval = Math.floor( min / timePerPx / 2);
         }
 
         w = (tickInterval * config.bar_width_ratio) / barTargetsNum;
