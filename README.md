@@ -47,7 +47,7 @@ Please fork this fiddle:
 + [http://jsfiddle.net/masayuki0812/7kYJu/](http://jsfiddle.net/masayuki0812/7kYJu/)
 
 ## Dependency
-+ [D3.js](https://github.com/mbostock/d3) `<=3.5.0`
++ [D3.js](https://github.com/mbostock/d3) `~3.5.0`
 
 ## License
 MIT
