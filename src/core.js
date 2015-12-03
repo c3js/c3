@@ -378,7 +378,7 @@ c3_chart_internal_fn.updateSizes = function () {
         bottom: $$.getHorizontalAxisHeight('y') + legendHeightForBottom + $$.getCurrentPaddingBottom(),
         left: subchartHeight + (hasArc ? 0 : $$.getCurrentPaddingLeft())
     } : {
-        top: 4 + $$.getCurrentPaddingTop(), // for top tick text
+        top: ( hasArc ? 0 : 4 ) + $$.getCurrentPaddingTop(), // for top tick text
         right: hasArc ? 0 : $$.getCurrentPaddingRight(),
         bottom: xAxisHeight + subchartHeight + legendHeightForBottom + $$.getCurrentPaddingBottom(),
         left: hasArc ? 0 : $$.getCurrentPaddingLeft()
@@ -417,8 +417,16 @@ c3_chart_internal_fn.updateSizes = function () {
     if ($$.height2 < 0) { $$.height2 = 0; }
 
     // for arc
-    $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
-    $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+
+    $$.arcWidth = $$.width;
+    $$.arcHeight = $$.height;
+
+    // Don't assume we have a legend
+    if ( $$.config.has_legend ) {
+        $$.arcWidth -= ($$.isLegendRight ? legendWidth + 10 : 0);
+        $$.arcHeight -= ($$.isLegendRight ? 0 : 10);
+    }
+
     if ($$.hasType('gauge')) {
         $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
     }
