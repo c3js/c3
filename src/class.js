@@ -22,6 +22,7 @@ export default {
     eventRectsMultiple: 'c3-event-rects-multiple',
     zoomRect: 'c3-zoom-rect',
     brush: 'c3-brush',
+    dragZoom: 'c3-drag-zoom',
     focused: 'c3-focused',
     defocused: 'c3-defocused',
     region: 'c3-region',

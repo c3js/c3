@@ -5,17 +5,29 @@ ChartInternal.prototype.initZoom = function () {
 
     $$.zoom = d3.zoom()
         .on("start", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
             startEvent = e;
             config.zoom_onzoomstart.call($$.api, e);
         })
         .on("zoom", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
             $$.redrawForZoom.call($$);
         })
         .on('end', function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
             // if click, do nothing. otherwise, click interaction will be canceled.
@@ -46,6 +58,74 @@ ChartInternal.prototype.initZoom = function () {
 ChartInternal.prototype.zoomTransform = function (range) {
     var $$ = this, s = [$$.x(range[0]), $$.x(range[1])];
     return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0);
+};
+
+ChartInternal.prototype.initDragZoom = function () {
+    if (this.config.zoom_type === 'drag' && this.config.zoom_enabled) {
+        var $$ = this, d3 = $$.d3, config = $$.config,
+            context = $$.context = $$.svg,
+            brushXPos, brushYPos;
+
+        $$.dragZoomBrush = d3.svg.brush()
+            .x($$.x)
+            .y($$.y)
+            .on("brushstart", function () {
+                config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
+            })
+            .on("brush", function () {
+                var extent = $$.dragZoomBrush.extent(),
+                    ar1 = [extent[0][0], $$.y.domain()[0]],
+                    ar2 = [extent[1][0], $$.y.domain()[1]];
+
+                $$.dragZoomBrush.extent([ar1, ar2]);
+                $$.svg.select("." + CLASS.dragZoom).call($$.dragZoomBrush);
+
+
+                config.zoom_onzoom.call($$.api, $$.x.orgDomain());
+            })
+            .on("brushend", function () {
+                var extent = $$.dragZoomBrush.extent();
+
+                if (!config.zoom_disableDefaultBehavior) {
+                    $$.api.zoom([extent[0][0], extent[1][0]]);
+                }
+                else {
+                    var ar1 = [$$.x.domain()[0], $$.y.domain()[0]],
+                        ar2 = [$$.x.domain()[1], $$.y.domain()[1]];
+                    $$.dragZoomBrush.extent([ar1, ar2]);
+                    $$.api.zoom([$$.x.domain()[0], $$.x.domain()[1]]);
+                }
+
+                d3.selectAll("." + CLASS.dragZoom)
+                    .attr("class", CLASS.dragZoom + " disabled");
+
+                $$.dragZoomBrush.clear();
+                $$.svg.select("." + CLASS.dragZoom).call($$.dragZoomBrush);
+
+                config.zoom_onzoomend.call($$.api, [extent[0][0], extent[1][0]]);
+            });
+
+        brushXPos = $$.margin.left + 20.5;
+        brushYPos = $$.margin.top + 0.5;
+        context.append("g")
+            .attr("clip-path", $$.clipPath)
+            .attr("class", CLASS.dragZoom + " disabled")
+            .attr("transform", "translate(" + brushXPos + "," + brushYPos + ")")
+            .call($$.dragZoomBrush);
+
+        $$.svg.on("mousedown", function () {
+            d3.selectAll("." + CLASS.dragZoom)
+                .attr("class", CLASS.dragZoom + " enabled");
+
+            var brush_elm = $$.svg.select("." + CLASS.dragZoom).node();
+            var new_click_event = new Event('mousedown');
+            new_click_event.pageX = d3.event.pageX;
+            new_click_event.clientX = d3.event.clientX;
+            new_click_event.pageY = d3.event.pageY;
+            new_click_event.clientY = d3.event.clientY;
+            brush_elm.dispatchEvent(new_click_event);
+        });
+    }
 };
 
 ChartInternal.prototype.getZoomDomain = function () {
