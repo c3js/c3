@@ -11,13 +11,18 @@
       var chart = c3.generate({
         data: {
           columns: [
-            ['sample', 30, 200, 100, 400, 150, 250, 300]
-          ]
+            ['sample', 30, 200, 100, 400, 150, 250, 300],
+            ['sample2', 22, 11, 41, 5, 28, 20, 8]
+          ],
+          axes: {
+            sample: "y",
+            sample2: "y2",
+          }
         },
         axis: {
           rotated: true,
           y2: {
-//            show: true,
+            show: true,
           }
         },
         regions: [
@@ -27,6 +32,8 @@
           {end:50,axis:'y'},
           {start:100,end:200,axis:'y'},
           {start:300,axis:'y'},
+          {start:{x:2.5,y:250},end:{x:4.5,y:350},axis:'xy'},
+          {start:{x:2.5,y:26},end:{x:4.5,y:34},axis:'xy2',class:'region-y2'},
         ],
         zoom: {
 //          enabled: true
