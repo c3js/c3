@@ -257,6 +257,9 @@ ChartInternal.prototype.initWithData = function(data) {
     if ($$.initPie) {
         $$.initPie();
     }
+    if ($$.initDragZoom) {
+        $$.initDragZoom();
+    }
     if ($$.initSubchart) {
         $$.initSubchart();
     }

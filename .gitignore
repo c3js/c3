@@ -20,3 +20,10 @@ components
 
 # coverage report
 /coverage
+
+# OS related
+.DS_Store
+
+# IDE related
+.idea
+
