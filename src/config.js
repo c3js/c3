@@ -86,6 +86,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         legend_padding: 0,
         legend_item_tile_width: 10,
         legend_item_tile_height: 10,
+        legend_item_extraspace: 0,
         // axis
         axis_rotated: false,
         axis_x_show: true,

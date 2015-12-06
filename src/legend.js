@@ -114,7 +114,7 @@ c3_chart_internal_fn.clearLegendItemTextBoxCache = function () {
 c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     var $$ = this, config = $$.config;
     var xForLegend, xForLegendText, xForLegendRect, yForLegend, yForLegendText, yForLegendRect, x1ForLegendTile, x2ForLegendTile, yForLegendTile;
-    var paddingTop = 4, paddingRight = 10, maxWidth = 0, maxHeight = 0, posMin = 10, tileWidth = config.legend_item_tile_width + 5;
+    var paddingTop = 4, paddingRight = 10, maxWidth = 0, maxHeight = 0, posMin = 10, tileWidth = config.legend_item_tile_width + 5, extraspace = config.legend_item_extraspace;
     var l, totalLength = 0, offsets = {}, widths = {}, heights = {}, margins = [0], steps = {}, step = 0;
     var withTransition, withTransitionForTransform;
     var texts, rects, tiles, background;
@@ -138,8 +138,8 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     function updatePositions(textElement, id, index) {
         var reset = index === 0, isLast = index === targetIds.length - 1,
             box = getTextBox(textElement, id),
-            itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight) + config.legend_padding,
-            itemHeight = box.height + paddingTop,
+            itemWidth = box.width + tileWidth + config.legend_padding + (!($$.isLegendRight || $$.isLegendInset) ? (isLast ? 0 : paddingRight + config.legend_item_extraspace) : paddingRight),
+            itemHeight = box.height + paddingTop + ((!isLast && $$.isLegendRight) ? config.legend_item_extraspace : 0),
             itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
             areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
             margin, maxLength;

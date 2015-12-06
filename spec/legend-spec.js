@@ -241,7 +241,7 @@ describe('c3 chart legend', function () {
         it('renders the legend item with the correct width and height', function () {
             d3.selectAll('.c3-legend-item-tile').each(function () {
                 expect(d3.select(this).style('stroke-width')).toBe(args.legend.item.tile.height + 'px');
-                var tileWidth = d3.select(this).attr('x2') - d3.select(this).attr('x1'); 
+                var tileWidth = d3.select(this).attr('x2') - d3.select(this).attr('x1');
                 expect(tileWidth).toBe(args.legend.item.tile.width);
             });
         });
@@ -267,10 +267,69 @@ describe('c3 chart legend', function () {
             d3.selectAll('.c3-legend-item-padded1 .c3-legend-item-tile, .c3-legend-item-padded2 .c3-legend-item-tile').each(function (el, index) {
                 var itemWidth = d3.select(this).node().parentNode.getBBox().width,
                     textBoxWidth = d3.select(d3.select(this).node().parentNode).select('text').node().getBBox().width,
-                    tileWidth = 15, // default value is 10, plus 5 more for padding 
+                    tileWidth = 15, // default value is 10, plus 5 more for padding
                     expectedWidth = textBoxWidth + tileWidth + (index ? 0 : 10) + args.legend.padding;
 
                 expect(itemWidth).toBe(expectedWidth);
+            });
+        });
+    });
+
+    describe('custom legend item distance', function() {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 130]
+                    ]
+                },
+                legend: {
+                    position: 'right',
+                    item: {
+                        extraspace: 15
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('renders the correct distance between right legend elements', function () {
+            var expectedWidth = 55,
+                expectedHeight = 33;
+            d3.selectAll('.c3-legend-item-event').each(function (d, i) {
+                var rect = d3.select(this).node().getBoundingClientRect();
+                expect(rect.width).toBeCloseTo(expectedWidth, -2);
+                expect(rect.height).toBeCloseTo(expectedHeight, -2);
+            });
+        });
+
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 130],
+                        ['data3', 90]
+                    ]
+                },
+                legend: {
+                    position: 'bottom',
+                    item: {
+                        extraspace: 15
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('renders the correct distance between right legend elements', function () {
+            var expectedWidth = 55,
+                expectedHeight = 18;
+            d3.selectAll('.c3-legend-item-event').each(function (d, i) {
+                var rect = d3.select(this).node().getBoundingClientRect();
+                expect(rect.width).toBeCloseTo(expectedWidth + ((i === 2) ? 15 : 0), -2);
+                expect(rect.height).toBeCloseTo(expectedHeight, -2);
             });
         });
     });
