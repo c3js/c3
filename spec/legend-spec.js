@@ -297,7 +297,7 @@ describe('c3 chart legend', function () {
         it('renders the correct distance between right legend elements', function () {
             var expectedWidth = 55,
                 expectedHeight = 33;
-            d3.selectAll('.c3-legend-item-event').each(function (d, i) {
+            d3.selectAll('.c3-legend-item-event').each(function () {
                 var rect = d3.select(this).node().getBoundingClientRect();
                 expect(rect.width).toBeCloseTo(expectedWidth, -2);
                 expect(rect.height).toBeCloseTo(expectedHeight, -2);
@@ -327,6 +327,7 @@ describe('c3 chart legend', function () {
             var expectedWidth = 55,
                 expectedHeight = 18;
             d3.selectAll('.c3-legend-item-event').each(function (d, i) {
+                expect(d).toBeDefined();
                 var rect = d3.select(this).node().getBoundingClientRect();
                 expect(rect.width).toBeCloseTo(expectedWidth + ((i === 2) ? 15 : 0), -2);
                 expect(rect.height).toBeCloseTo(expectedHeight, -2);
