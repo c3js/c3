@@ -217,6 +217,13 @@ c3_chart_internal_fn.getDefaultConfig = function () {
             left: 0
         },
         title_position: 'top-center',
+        // header
+        header_show: false,
+        header_height: 15,
+        header_color: '#FFF',
+        header_border_show: false,
+        header_border_color: '#000',
+        header_border_width: 1
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {

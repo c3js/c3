@@ -274,6 +274,7 @@
         main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
 
         if ($$.initSubchart) { $$.initSubchart(); }
+        if ($$.initHeader) { $$.initHeader(); }
         if ($$.initTooltip) { $$.initTooltip(); }
         if ($$.initLegend) { $$.initLegend(); }
         if ($$.initTitle) { $$.initTitle(); }
@@ -536,6 +537,9 @@
         if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
             $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
         }
+
+        // header background
+        if ($$.redrawHeader) { $$.redrawHeader(); }
 
         // axes
         $$.axis.redraw(transitions, hideAxis);
@@ -1284,6 +1288,13 @@
                 left: 0
             },
             title_position: 'top-center',
+            // header
+            header_show: false,
+            header_height: 15,
+            header_color: '#FFF',
+            header_border_show: false,
+            header_border_color: '#000',
+            header_border_width: 1
         };
 
         Object.keys(this.additionalConfig).forEach(function (key) {
@@ -4314,6 +4325,43 @@
     c3_chart_internal_fn.getTitlePadding = function() {
         var $$ = this;
         return $$.yForTitle() + $$.config.title_padding.bottom;
+    };
+
+    c3_chart_internal_fn.initHeader = function() {
+      var $$ = this;
+      if ($$.config.header_show) {
+          $$.header = $$.svg.append("rect")
+                .attr("class", "c3-chart-header")
+                .attr("style", "fill: " + $$.config.header_color)
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", $$.getCurrentWidth())
+                .attr("height", $$.config.header_height);
+
+          if ($$.config.header_border_show) {
+              $$.headerBorder = $$.svg.append("line")
+                    .attr("class", "c3-chart-header-border")
+                    .attr("style", "stroke-width: " + $$.config.header_border_width +
+                          "; stroke: " + $$.config.header_border_color)
+                    .attr("x1", 0)
+                    .attr("x2", $$.getCurrentWidth())
+                    .attr("y1", $$.config.header_height)
+                    .attr("y2", $$.config.header_height);
+          }
+      }
+    };
+    c3_chart_internal_fn.redrawHeader = function () {
+        var $$ = this;
+        if ($$.header) {
+            $$.header
+                .attr("width", $$.getCurrentWidth())
+                .attr("height", $$.config.header_height);
+        }
+
+        if ($$.headerBorder) {
+            $$.headerBorder
+                .attr("x2", $$.getCurrentWidth());
+        }
     };
 
     function Axis(owner) {
