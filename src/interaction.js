@@ -155,7 +155,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
 
             // Show tooltip
             selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
-                return $$.addName($$.getValueOnIndex(t.values, index));
+                return $$.addName($$.getValueOnIndex(t.values, $$.getIndexByX(d.x, [t])));
             });
 
             if (config.tooltip_grouped) {

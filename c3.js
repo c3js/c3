@@ -1668,9 +1668,9 @@
         });
         return xValues;
     };
-    c3_chart_internal_fn.getIndexByX = function (x) {
+    c3_chart_internal_fn.getIndexByX = function (x, targets) {
         var $$ = this,
-            data = $$.filterByX($$.data.targets, x);
+            data = $$.filterByX(targets || $$.data.targets, x);
         return data.length ? data[0].index : null;
     };
     c3_chart_internal_fn.getXValue = function (id, i) {
@@ -2466,7 +2466,7 @@
 
                 // Show tooltip
                 selectedData = $$.filterTargetsToShow($$.data.targets).map(function (t) {
-                    return $$.addName($$.getValueOnIndex(t.values, index));
+                    return $$.addName($$.getValueOnIndex(t.values, $$.getIndexByX(d.x, [t])));
                 });
 
                 if (config.tooltip_grouped) {
@@ -3847,6 +3847,8 @@
 
         if (config.data_groups.length === 0) {
             d.sort(function(a,b){
+                if (!a) return -1;
+                if (!b) return 1;
                 return orderAsc ? a.value - b.value : b.value - a.value;
             });
         } else {
@@ -3854,6 +3856,8 @@
                 return i.id;
             });
             d.sort(function(a, b) {
+                if (!a) return -1;
+                if (!b) return 1;
                 if (a.value > 0 && b.value > 0) {
                     return orderAsc ? ids.indexOf(a.id) - ids.indexOf(b.id) : ids.indexOf(b.id) - ids.indexOf(a.id);
                 } else {

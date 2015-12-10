@@ -19,9 +19,9 @@ c3_chart_internal_fn.getXValuesOfXKey = function (key, targets) {
     });
     return xValues;
 };
-c3_chart_internal_fn.getIndexByX = function (x) {
+c3_chart_internal_fn.getIndexByX = function (x, targets) {
     var $$ = this,
-        data = $$.filterByX($$.data.targets, x);
+        data = $$.filterByX(targets || $$.data.targets, x);
     return data.length ? data[0].index : null;
 };
 c3_chart_internal_fn.getXValue = function (id, i) {
