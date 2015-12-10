@@ -34,8 +34,8 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
 
     if (config.data_groups.length === 0) {
         d.sort(function(a,b){
-            if (!a) return -1;
-            if (!b) return 1;
+            if (!a) { return -1; }
+            if (!b) { return 1; }
             return orderAsc ? a.value - b.value : b.value - a.value;
         });
     } else {
@@ -43,8 +43,8 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             return i.id;
         });
         d.sort(function(a, b) {
-            if (!a) return -1;
-            if (!b) return 1;
+            if (!a) { return -1; }
+            if (!b) { return 1; }
             if (a.value > 0 && b.value > 0) {
                 return orderAsc ? ids.indexOf(a.id) - ids.indexOf(b.id) : ids.indexOf(b.id) - ids.indexOf(a.id);
             } else {
