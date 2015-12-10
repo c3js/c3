@@ -93,6 +93,18 @@ describe('c3 chart title', function () {
                 });
             });
 
+            describe('and position bottom', function () {
+                beforeEach(function(done) {
+                    config = getConfig('bottom');
+                    chart = window.initChart(chart, config, done);
+                });
+                it('renders the title at the default config position', function () {
+                    var titleEl = d3.select(".c3-title");
+                    expect(+titleEl.attr("x")).toBeCloseTo(50, -2);
+                    expect(+titleEl.attr("y")).toBeCloseTo(426, -1);
+                });
+            });
+
         });
     });
 });
