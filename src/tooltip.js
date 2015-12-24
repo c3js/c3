@@ -29,7 +29,9 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         titleFormat = config.tooltip_format_title || defaultTitleFormat,
         nameFormat = config.tooltip_format_name || function (name) { return name; },
         valueFormat = config.tooltip_format_value || defaultValueFormat,
-        text, i, title, value, name, bgcolor,
+        totalName = config.tooltip_total_name || "Total",
+        totalValueFormat = config.tooltip_total_format_value || valueFormat,
+        text, i, title, value, name, bgcolor, totalValue,
         orderAsc = $$.isOrderAsc();
 
     if (config.data_groups.length === 0) {
@@ -69,6 +71,17 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             text += "<td class='value'>" + value + "</td>";
             text += "</tr>";
         }
+    }
+    // adding a "Total" row to the tooltip - if a formatter is not given then the total
+    // value will be formatted the same way as the other values
+    if (config.tooltip_total_show) {
+        totalValue = 0;
+        for (i=0; i < d.length; i++) {
+            totalValue += d[i].value;
+        }
+        totalValue = totalValueFormat(totalValue);
+        text += "<tr><td class='name'><strong>" + totalName + "</strong></td>";
+        text += "<td class='value'>" + totalValue + "</td></tr>";
     }
     return text + "</table>";
 };
