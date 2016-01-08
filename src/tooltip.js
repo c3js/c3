@@ -76,12 +76,15 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
     // value will be formatted the same way as the other values
     if (config.tooltip_total_show) {
         totalValue = 0;
-        for (i=0; i < d.length; i++) {
+        for (i = 0; i < d.length; i++) {
+            if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
             totalValue += d[i].value;
         }
         totalValue = totalValueFormat(totalValue);
-        text += "<tr><td class='name'><strong>" + totalName + "</strong></td>";
-        text += "<td class='value'>" + totalValue + "</td></tr>";
+        text += "<tr>";
+        text += "<td class='name'><strong>" + totalName + "</strong></td>";
+        text += "<td class='value'>" + totalValue + "</td>";
+        text += "</tr>";
     }
     return text + "</table>";
 };
