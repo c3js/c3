@@ -4187,6 +4187,10 @@
                     }
                 }
             })
+            .on('dblclick', function(id){
+                $$.api.hide();
+                $$.api.show(id);
+            })
             .on('mouseover', function (id) {
                 if (config.legend_item_onmouseover) {
                     config.legend_item_onmouseover.call($$, id);
