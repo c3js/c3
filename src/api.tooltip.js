@@ -28,8 +28,12 @@ c3_chart_fn.tooltip.show = function (args) {
     // emulate mouse events to show
     $$.dispatchEvent('mouseover', index, mouse);
     $$.dispatchEvent('mousemove', index, mouse);
+
+    $$.config.tooltip_onshow.call($$, args.data);
 };
 c3_chart_fn.tooltip.hide = function () {
     // TODO: get target data by checking the state of focus
     this.internal.dispatchEvent('mouseout', 0);
+
+    this.internal.config.tooltip_onhide.call(this);
 };

@@ -130,6 +130,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         })
         .on('mouseout', function (d) {
             var index = d.index;
+            if (!$$.config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
             $$.hideXGridFocus();
             $$.hideTooltip();
@@ -241,6 +242,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .attr('height', $$.height)
         .attr('class', CLASS.eventRect)
         .on('mouseout', function () {
+            if (!$$.config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
             mouseout();
         })
@@ -286,7 +288,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             $$.showXGridFocus(selectedData);
 
             // Show cursor as pointer if point is close to mouse position
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
                 $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                 if (!$$.mouseover) {
                     config.data_onmouseover.call($$.api, closest);
@@ -297,16 +299,13 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .on('click', function () {
             var targetsToShow = $$.filterTargetsToShow($$.data.targets);
             var mouse, closest;
-
             if ($$.hasArcType(targetsToShow)) { return; }
 
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
-
             if (! closest) { return; }
-
             // select if selection enabled
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < 100) {
+            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
                 $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
                     if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                         $$.toggleShape(this, closest, closest.index);

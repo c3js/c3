@@ -1,10 +1,12 @@
 {
   "name": "c3",
-  "version": "0.4.10-rc1",
+  "version": "0.4.11-rc4",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
-    "test": "grunt"
+    "lint": "grunt lint",
+    "test": "karma start karma.conf.js",
+    "codecov": "cat coverage/*/lcov.info | codecov"
   },
   "repository": {
     "type": "git",
@@ -20,17 +22,25 @@
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
   "dependencies": {
-    "d3": "<=3.5.0"
+    "d3": "~3.5.0"
   },
   "devDependencies": {
+    "codecov.io": "^0.1.6",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-cssmin": "^0.10.0",
-    "grunt-contrib-jasmine": "~0.8.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-sass": "^0.17.0",
-    "load-grunt-tasks": "~0.2.0"
+    "grunt-karma": "^0.12.1",
+    "grunt-sass": "^1.0.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.10",
+    "karma-coverage": "^0.5.2",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-spec-reporter": "0.0.20",
+    "load-grunt-tasks": "~0.2.0",
+    "phantomjs": "^1.9.18"
   }
 }

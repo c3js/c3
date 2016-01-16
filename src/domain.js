@@ -20,7 +20,7 @@ c3_chart_internal_fn.getYDomainMin = function (targets) {
                 id = idsInGroup[k];
                 if (! ys[id]) { continue; }
                 ys[id].forEach(function (v, i) {
-                    if ($$.getAxisId(id) === $$.getAxisId(baseId) && ys[baseId] && !(hasNegativeValue && +v > 0)) {
+                    if ($$.axis.getId(id) === $$.axis.getId(baseId) && ys[baseId] && !(hasNegativeValue && +v > 0)) {
                         ys[baseId][i] += +v;
                     }
                 });
@@ -51,7 +51,7 @@ c3_chart_internal_fn.getYDomainMax = function (targets) {
                 id = idsInGroup[k];
                 if (! ys[id]) { continue; }
                 ys[id].forEach(function (v, i) {
-                    if ($$.getAxisId(id) === $$.getAxisId(baseId) && ys[baseId] && !(hasPositiveValue && +v < 0)) {
+                    if ($$.axis.getId(id) === $$.axis.getId(baseId) && ys[baseId] && !(hasPositiveValue && +v < 0)) {
                         ys[baseId][i] += +v;
                     }
                 });
@@ -62,7 +62,7 @@ c3_chart_internal_fn.getYDomainMax = function (targets) {
 };
 c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
     var $$ = this, config = $$.config,
-        targetsByAxisId = targets.filter(function (t) { return $$.getAxisId(t.id) === axisId; }),
+        targetsByAxisId = targets.filter(function (t) { return $$.axis.getId(t.id) === axisId; }),
         yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
@@ -123,16 +123,16 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
         padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
     } else if (showVerticalDataLabel) {
         lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'height');
-        padding_top += this.convertPixelsToAxisPadding(lengths[1], domainLength);
-        padding_bottom += this.convertPixelsToAxisPadding(lengths[0], domainLength);
+        padding_top += $$.axis.convertPixelsToAxisPadding(lengths[1], domainLength);
+        padding_bottom += $$.axis.convertPixelsToAxisPadding(lengths[0], domainLength);
     }
     if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
-        padding_top = $$.getAxisPadding(config.axis_y_padding, 'top', padding_top, domainLength);
-        padding_bottom = $$.getAxisPadding(config.axis_y_padding, 'bottom', padding_bottom, domainLength);
+        padding_top = $$.axis.getPadding(config.axis_y_padding, 'top', padding_top, domainLength);
+        padding_bottom = $$.axis.getPadding(config.axis_y_padding, 'bottom', padding_bottom, domainLength);
     }
     if (axisId === 'y2' && notEmpty(config.axis_y2_padding)) {
-        padding_top = $$.getAxisPadding(config.axis_y2_padding, 'top', padding_top, domainLength);
-        padding_bottom = $$.getAxisPadding(config.axis_y2_padding, 'bottom', padding_bottom, domainLength);
+        padding_top = $$.axis.getPadding(config.axis_y2_padding, 'top', padding_top, domainLength);
+        padding_bottom = $$.axis.getPadding(config.axis_y2_padding, 'bottom', padding_bottom, domainLength);
     }
     // Bar/Area chart should be 0-based if all positive|negative
     if (isZeroBased) {
@@ -221,14 +221,15 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     return $$.x.domain();
 };
 c3_chart_internal_fn.trimXDomain = function (domain) {
-    var $$ = this;
-    if (domain[0] <= $$.orgXDomain[0]) {
-        domain[1] = +domain[1] + ($$.orgXDomain[0] - domain[0]);
-        domain[0] = $$.orgXDomain[0];
+    var zoomDomain = this.getZoomDomain(),
+        min = zoomDomain[0], max = zoomDomain[1];
+    if (domain[0] <= min) {
+        domain[1] = +domain[1] + (min - domain[0]);
+        domain[0] = min;
     }
-    if ($$.orgXDomain[1] <= domain[1]) {
-        domain[0] = +domain[0] - (domain[1] - $$.orgXDomain[1]);
-        domain[1] = $$.orgXDomain[1];
+    if (max <= domain[1]) {
+        domain[0] = +domain[0] - (domain[1] - max);
+        domain[1] = max;
     }
     return domain;
 };

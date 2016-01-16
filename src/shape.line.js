@@ -56,7 +56,7 @@ c3_chart_internal_fn.updateLine = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
     return [
-        (withTransition ? this.mainLine.transition() : this.mainLine)
+        (withTransition ? this.mainLine.transition(Math.random().toString()) : this.mainLine)
             .attr("d", drawLine)
             .style("stroke", this.color)
             .style("opacity", 1)
@@ -125,6 +125,7 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
         prev = -1, i, j,
         s = "M", sWithRegion,
         xp, yp, dx, dy, dd, diff, diffx2,
+        xOffset = $$.isCategorized() ? 0.5 : 0,
         xValue, yValue,
         regions = [];
 
@@ -158,16 +159,31 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
     yValue = config.axis_rotated ? function (d) { return x(d.x); } : function (d) { return y(d.value); };
 
     // Define svg generator function for region
+    function generateM(points) {
+        return 'M' + points[0][0] + ' ' + points[0][1] + ' ' + points[1][0] + ' ' + points[1][1];
+    }
     if ($$.isTimeSeries()) {
         sWithRegion = function (d0, d1, j, diff) {
             var x0 = d0.x.getTime(), x_diff = d1.x - d0.x,
                 xv0 = new Date(x0 + x_diff * j),
-                xv1 = new Date(x0 + x_diff * (j + diff));
-            return "M" + x(xv0) + " " + y(yp(j)) + " " + x(xv1) + " " + y(yp(j + diff));
+                xv1 = new Date(x0 + x_diff * (j + diff)),
+                points;
+            if (config.axis_rotated) {
+                points = [[y(yp(j)), x(xv0)], [y(yp(j + diff)), x(xv1)]];
+            } else {
+                points = [[x(xv0), y(yp(j))], [x(xv1), y(yp(j + diff))]];
+            }
+            return generateM(points);
         };
     } else {
         sWithRegion = function (d0, d1, j, diff) {
-            return "M" + x(xp(j), true) + " " + y(yp(j)) + " " + x(xp(j + diff), true) + " " + y(yp(j + diff));
+            var points;
+            if (config.axis_rotated) {
+                points = [[y(yp(j), true), x(xp(j))], [y(yp(j + diff), true), x(xp(j + diff))]];
+            } else {
+                points = [[x(xp(j), true), y(yp(j))], [x(xp(j + diff), true), y(yp(j + diff))]];
+            }
+            return generateM(points);
         };
     }
 
@@ -180,7 +196,7 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
         }
         // Draw with region // TODO: Fix for horizotal charts
         else {
-            xp = $$.getScale(d[i - 1].x, d[i].x, $$.isTimeSeries());
+            xp = $$.getScale(d[i - 1].x + xOffset, d[i].x + xOffset, $$.isTimeSeries());
             yp = $$.getScale(d[i - 1].value, d[i].value);
 
             dx = x(d[i].x) - x(d[i - 1].x);
@@ -216,7 +232,7 @@ c3_chart_internal_fn.updateArea = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
     return [
-        (withTransition ? this.mainArea.transition() : this.mainArea)
+        (withTransition ? this.mainArea.transition(Math.random().toString()) : this.mainArea)
             .attr("d", drawArea)
             .style("fill", this.color)
             .style("opacity", this.orgAreaOpacity)
@@ -299,12 +315,12 @@ c3_chart_internal_fn.updateCircle = function () {
 c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
     var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
     return [
-        (withTransition ? this.mainCircle.transition() : this.mainCircle)
+        (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
             .style('opacity', this.opacityForCircle.bind(this))
             .style("fill", this.color)
             .attr("cx", cx)
             .attr("cy", cy),
-        (withTransition ? selectedCircles.transition() : selectedCircles)
+        (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
             .attr("cx", cx)
             .attr("cy", cy)
     ];

@@ -72,6 +72,9 @@ function c3_axis(d3, params) {
         tickTextCharSize = size;
         return size;
     }
+    function transitionise(selection) {
+        return params.withoutTransition ? selection : d3.transition(selection);
+    }
     function axis(g) {
         g.each(function () {
             var g = axis.g = d3.select(this);
@@ -83,12 +86,12 @@ function c3_axis(d3, params) {
                 tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
-                tickUpdate = d3.transition(tick).style("opacity", 1),
+                tickUpdate = transitionise(tick).style("opacity", 1),
                 tickTransform, tickX, tickY;
 
             var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                 path = g.selectAll(".domain").data([ 0 ]),
-                pathUpdate = (path.enter().append("path").attr("class", "domain"), d3.transition(path));
+                pathUpdate = (path.enter().append("path").attr("class", "domain"), transitionise(path));
             tickEnter.append("line");
             tickEnter.append("text");
 
@@ -174,6 +177,33 @@ function c3_axis(d3, params) {
             tspan.exit().remove();
             tspan.text(function (d) { return d.splitted; });
 
+            var rotate = params.tickTextRotate;
+
+            function textAnchorForText(rotate) {
+                if (!rotate) {
+                    return 'middle';
+                }
+                return rotate > 0 ? "start" : "end";
+            }
+            function textTransform(rotate) {
+                if (!rotate) {
+                    return '';
+                }
+                return "rotate(" + rotate + ")";
+            }
+            function dxForText(rotate) {
+                if (!rotate) {
+                    return 0;
+                }
+                return 8 * Math.sin(Math.PI * (rotate / 180));
+            }
+            function yForText(rotate) {
+                if (!rotate) {
+                    return tickLength;
+                }
+                return 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1);
+            }
+
             switch (orient) {
             case "bottom":
                 {
@@ -181,14 +211,16 @@ function c3_axis(d3, params) {
                     lineEnter.attr("y2", innerTickSize);
                     textEnter.attr("y", tickLength);
                     lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
-                    textUpdate.attr("x", 0).attr("y", tickLength);
-                    text.style("text-anchor", "middle");
-                    tspan.attr('x', 0).attr("dy", tspanDy);
+                    textUpdate.attr("x", 0).attr("y", yForText(rotate))
+                        .style("text-anchor", textAnchorForText(rotate))
+                        .attr("transform", textTransform(rotate));
+                    tspan.attr('x', 0).attr("dy", tspanDy).attr('dx', dxForText(rotate));
                     pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
                     break;
                 }
             case "top":
                 {
+                    // TODO: rotated tick text
                     tickTransform = axisX;
                     lineEnter.attr("y2", -innerTickSize);
                     textEnter.attr("y", -tickLength);
@@ -270,7 +302,7 @@ function c3_axis(d3, params) {
             length = axis.g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
             interval = length / axis.g.selectAll('line').size();
         }
-        return interval;
+        return interval === Infinity ? 0 : interval;
     };
     axis.ticks = function () {
         if (!arguments.length) { return tickArguments; }

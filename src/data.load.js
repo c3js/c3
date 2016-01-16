@@ -8,7 +8,8 @@ c3_chart_internal_fn.load = function (targets, args) {
         // set type if args.types || args.type specified
         if (args.type || args.types) {
             targets.forEach(function (t) {
-                $$.setTargetType(t.id, args.types ? args.types[t.id] : args.type);
+                var type = args.types && args.types[t.id] ? args.types[t.id] : args.type;
+                $$.setTargetType(t.id, type);
             });
         }
         // Update/Add data

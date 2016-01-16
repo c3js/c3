@@ -4,6 +4,10 @@ c3_chart_fn.load = function (args) {
     if (args.xs) {
         $$.addXs(args.xs);
     }
+    // update names if exists
+    if ('names' in args) {
+        c3_chart_fn.data.names.bind(this)(args.names);
+    }
     // update classes if exists
     if ('classes' in args) {
         Object.keys(args.classes).forEach(function (id) {
@@ -18,6 +22,12 @@ c3_chart_fn.load = function (args) {
     if ('axes' in args) {
         Object.keys(args.axes).forEach(function (id) {
             config.data_axes[id] = args.axes[id];
+        });
+    }
+    // update colors if exists
+    if ('colors' in args) {
+        Object.keys(args.colors).forEach(function (id) {
+            config.data_colors[id] = args.colors[id];
         });
     }
     // use cache if exists
