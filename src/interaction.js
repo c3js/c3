@@ -290,10 +290,8 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             // Show cursor as pointer if point is close to mouse position
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
                 $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
-                if (!$$.mouseover) {
-                    config.data_onmouseover.call($$.api, closest);
-                    $$.mouseover = closest;
-                }
+                config.data_onmouseover.call($$.api, closest);
+                $$.mouseover = closest;
             }
         })
         .on('click', function () {
