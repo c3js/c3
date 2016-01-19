@@ -2806,8 +2806,9 @@
                         // if not, try to find the value that does line up
                         i = -1;
                         values.forEach(function (v, j) {
-                            if (v.x === d.x) {
+                            if ((v.x === d.x) || (v.x - d.x === 0)) {
                                 i = j;
+                                return false;
                             }
                         });
                     }
