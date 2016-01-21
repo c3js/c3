@@ -39,6 +39,9 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
         return found;
     },
     getPathBox = c3_chart_internal_fn.getPathBox = function (path) {
+        if (path.pathSegList.numberOfItems < 2) {
+        	return {x: 0, y: 0, width: 0, height: 0};
+        }
         var box = path.getBoundingClientRect(),
             items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
             minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
