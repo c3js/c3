@@ -113,10 +113,12 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
     };
 };
 c3_chart_internal_fn.isWithinBar = function (that) {
-    var mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
-        seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
-        x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
-        w = box.width, h = box.height, offset = 2,
-        sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
+  var mouse = this.d3.mouse(that),
+        box = getPathBox(that), 
+        offset = 2,
+        sx = box.x - offset,
+        ex = box.x + box.width + offset,
+        sy = box.y + box.height + offset,
+        ey = box.y - offset;
     return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
 };
