@@ -117,6 +117,9 @@ ChartInternal.prototype.generateGetBarPoints = function (barIndices, isSub) {
     };
 };
 ChartInternal.prototype.isWithinBar = function (mouse, that) {
+    if (that.pathSegList.numberOfItems < 2) {
+        return false;
+    }
     var box = that.getBoundingClientRect(),
         seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
         x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
