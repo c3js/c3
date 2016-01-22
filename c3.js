@@ -1993,12 +1993,13 @@
         return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
     };
     c3_chart_internal_fn.convertValuesToStep = function (values) {
-        var converted = [].concat(values), i;
 
         if (!this.isCategorized()) {
             return values;
         }
-
+        
+        var converted = values.slice(0), i;
+        
         for (i = values.length + 1; 0 < i; i--) {
             converted[i] = converted[i - 1];
         }
