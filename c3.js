@@ -6983,7 +6983,7 @@
                 var translateValue = Math.ceil(y(d));
                 return isNaN(translateValue) ?
                     "translate(0, 0)" :
-                    "translate(" + translateValue + ", 0)";
+                    "translate(0, " + translateValue + ")";
             });
         }
         function scaleExtent(domain) {
