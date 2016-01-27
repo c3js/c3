@@ -1275,6 +1275,9 @@
             tooltip_init_position: {top: '0px', left: '50px'},
             tooltip_onshow: function () {},
             tooltip_onhide: function () {},
+            tooltip_total_show: false,
+            tooltip_total_name: undefined,
+            tooltip_total_format_value: undefined,
             // title
             title_text: undefined,
             title_padding: {
@@ -3842,7 +3845,9 @@
             titleFormat = config.tooltip_format_title || defaultTitleFormat,
             nameFormat = config.tooltip_format_name || function (name) { return name; },
             valueFormat = config.tooltip_format_value || defaultValueFormat,
-            text, i, title, value, name, bgcolor,
+            totalName = config.tooltip_total_name || "Total",
+            totalValueFormat = config.tooltip_total_format_value || valueFormat,
+            text, i, title, value, name, bgcolor, totalValue,
             orderAsc = $$.isOrderAsc();
 
         if (config.data_groups.length === 0) {
@@ -3882,6 +3887,20 @@
                 text += "<td class='value'>" + value + "</td>";
                 text += "</tr>";
             }
+        }
+        // adding a "Total" row to the tooltip - if a formatter is not given then the total
+        // value will be formatted the same way as the other values
+        if (config.tooltip_total_show) {
+            totalValue = 0;
+            for (i = 0; i < d.length; i++) {
+                if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
+                totalValue += d[i].value;
+            }
+            totalValue = totalValueFormat(totalValue);
+            text += "<tr>";
+            text += "<td class='name'><strong>" + totalName + "</strong></td>";
+            text += "<td class='value'>" + totalValue + "</td>";
+            text += "</tr>";
         }
         return text + "</table>";
     };
@@ -6953,12 +6972,18 @@
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
-                return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+                var translateValue = Math.ceil(x(d) + tickOffset);
+                return isNaN(translateValue) ?
+                    "translate(0, 0)" :
+                    "translate(" + translateValue + ", 0)";
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
-                return "translate(0," + Math.ceil(y(d)) + ")";
+                var translateValue = Math.ceil(y(d));
+                return isNaN(translateValue) ?
+                    "translate(0, 0)" :
+                    "translate(" + translateValue + ", 0)";
             });
         }
         function scaleExtent(domain) {
