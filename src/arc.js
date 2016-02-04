@@ -313,8 +313,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                         var updated = $$.updateAngle(d),
                             innerLineLength = $$.gaugeArcWidth / $$.visibleTargetCount * (updated.index + 1),
                             lineAngle = updated.endAngle - Math.PI / 2,
-                            linePositioningAngle = lineAngle - Math.PI / 180 / 3,
-                            arcInnerRadius = $$.radius - innerLineLength;
+                            arcInnerRadius = $$.radius - innerLineLength,
+                            linePositioningAngle = lineAngle - (arcInnerRadius === 0 ? 0 : (1 / arcInnerRadius));
                         lineLength = $$.radiusExpanded - $$.radius + innerLineLength;
                         x = Math.cos(linePositioningAngle) * arcInnerRadius;
                         y = Math.sin(linePositioningAngle) * arcInnerRadius;
