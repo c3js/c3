@@ -139,7 +139,6 @@ c3_chart_internal_fn.initParams = function () {
         ["%Y/%-m/%-d", function () { return true; }]
     ]);
 
-    $$.visibleTargetCount = config.data_hide === true ? 0 : (config.data_columns ? (config.data_columns.length - (config.data_hide ? config.data_hide.length : 0)) : 0);
     $$.hiddenTargetIds = [];
     $$.hiddenLegendIds = [];
     $$.focusedTargetIds = [];
@@ -223,11 +222,6 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
     if (config.legend_hide) {
         $$.addHiddenLegendIds(config.legend_hide === true ? $$.mapToIds($$.data.targets) : config.legend_hide);
-    }
-
-    // when gauge, hide legend // TODO: fix
-    if ($$.hasType('gauge') && $$.config.data_columns.length <= 1) {
-        config.legend_show = false;
     }
 
     // Init sizes and scales
@@ -781,7 +775,7 @@ c3_chart_internal_fn.getTranslate = function (target) {
         y = config.axis_rotated ? 0 : $$.height2;
     } else if (target === 'arc') {
         x = $$.arcWidth / 2;
-        y = $$.arcHeight / 2;
+        y = $$.arcHeight / 2 - ($$.hasType('gauge') ? 6 : 0);// to prevent wrong display of min and max label
     }
     return "translate(" + x + "," + y + ")";
 };

@@ -183,6 +183,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // gauge
         gauge_fullCircle: false,
         gauge_label_show: true,
+        gauge_labelLine_show: true,
         gauge_label_format: undefined,
         gauge_min: 0,
         gauge_max: 100,
