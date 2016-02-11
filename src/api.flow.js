@@ -202,7 +202,7 @@ c3_chart_internal_fn.generateFlow = function (args) {
                     translateX = diffDomain(domain) / 2;
                 }
             }
-        } else if (flow.orgDataCount === 1 || flowStart.x === flowEnd.x) {
+        } else if (flow.orgDataCount === 1 || (flowStart && flowStart.x) === (flowEnd && flowEnd.x)) {
             translateX = $$.x(orgDomain[0]) - $$.x(domain[0]);
         } else {
             if ($$.isTimeSeries()) {
