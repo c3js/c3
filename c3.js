@@ -3846,9 +3846,11 @@
             orderAsc = $$.isOrderAsc();
 
         if (config.data_groups.length === 0) {
-            d.sort(function(a,b){
-                return orderAsc ? a.value - b.value : b.value - a.value;
-            });
+            if(config.data_order) {
+                d.sort(function(a,b){
+                    return orderAsc ? a.value - b.value : b.value - a.value;
+                });
+            }
         } else {
             var ids = $$.orderTargets($$.data.targets).map(function (i) {
                 return i.id;
