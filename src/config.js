@@ -173,10 +173,12 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_expand: {},
         pie_expand_duration: 50,
         // gauge
+        gauge_fullCircle: false,
         gauge_label_show: true,
         gauge_label_format: undefined,
         gauge_min: 0,
         gauge_max: 100,
+        gauge_startingAngle: -1 * Math.PI/2,
         gauge_units: undefined,
         gauge_width: undefined,
         gauge_expand: {},
