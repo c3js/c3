@@ -217,4 +217,62 @@ describe('c3 chart legend', function () {
 
     });
 
+    describe('custom legend size', function() {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    item: {
+                        tile: {
+                            width: 15,
+                            height: 2
+                        }
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('renders the legend item with the correct width and height', function () {
+            d3.selectAll('.c3-legend-item-tile').each(function () {
+                expect(d3.select(this).style('stroke-width')).toBe(args.legend.item.tile.height + 'px');
+                var tileWidth = d3.select(this).attr('x2') - d3.select(this).attr('x1'); 
+                expect(tileWidth).toBe(args.legend.item.tile.width);
+            });
+        });
+    });
+
+    describe('custom legend padding', function() {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['padded1', 30, 200, 100, 400, 150, 250],
+                        ['padded2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    padding: 10
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('renders the correct amount of padding on the legend element', function () {
+            d3.selectAll('.c3-legend-item-padded1 .c3-legend-item-tile, .c3-legend-item-padded2 .c3-legend-item-tile').each(function (el, index) {
+                var itemWidth = d3.select(this).node().parentNode.getBBox().width,
+                    textBoxWidth = d3.select(d3.select(this).node().parentNode).select('text').node().getBBox().width,
+                    tileWidth = 15, // default value is 10, plus 5 more for padding 
+                    expectedWidth = textBoxWidth + tileWidth + (index ? 0 : 10) + args.legend.padding;
+
+                expect(itemWidth).toBe(expectedWidth);
+            });
+        });
+    });
+
 });

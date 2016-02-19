@@ -1,6 +1,7 @@
 /*-- Chart --*/
 .c3 svg {
-  font: 10px sans-serif; }
+  font: 10px sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
 .c3 path, .c3 line {
   fill: none;
@@ -89,6 +90,10 @@
   fill: white;
   stroke: lightgray;
   stroke-width: 1; }
+
+/*-- Title --*/
+.c3-title {
+  font: 14px sans-serif; }
 
 /*-- Tooltip --*/
 .c3-tooltip-container {

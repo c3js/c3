@@ -89,6 +89,29 @@ describe('c3 chart domain', function () {
                 },
                 axis: {
                     y: {
+                        padding: 200,
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should be set properly when bigger than min of data', function () {
+            var domain = chart.internal.y.domain();
+            expect(domain[0]).toBeCloseTo(-9, -1);
+            expect(domain[1]).toBeCloseTo(69, -1);
+        });
+
+        it('should change axis.y.max to 1000 with top/bottom padding', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 10, 20, 10, 40, 15, 25],
+                        ['data2', 50, 40, 30, 45, 25, 45]
+                    ]
+                },
+                axis: {
+                    y: {
                         padding: {
                             top: 200,
                             bottom: 200

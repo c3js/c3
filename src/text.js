@@ -47,14 +47,16 @@ c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTra
             .style("fill-opacity", forFlow ? 0 : this.opacityForText.bind(this))
     ];
 };
-c3_chart_internal_fn.getTextRect = function (text, cls) {
+c3_chart_internal_fn.getTextRect = function (text, cls, element) {
     var dummy = this.d3.select('body').append('div').classed('c3', true),
         svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+        font = this.d3.select(element).style('font'),
         rect;
     svg.selectAll('.dummy')
         .data([text])
       .enter().append('text')
         .classed(cls ? cls : "", true)
+        .style('font', font)
         .text(text)
       .each(function () { rect = this.getBoundingClientRect(); });
     dummy.remove();
@@ -98,7 +100,7 @@ c3_chart_internal_fn.getYForText = function (points, d, textElement) {
         yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
     } else {
         yPos = points[2][1];
-        if (d.value < 0) {
+        if (d.value < 0  || (d.value === 0 && !$$.hasPositiveValue)) {
             yPos += box.height;
             if ($$.isBarType(d) && $$.isSafari()) {
                 yPos -= 3;

@@ -8,8 +8,13 @@ c3_chart_internal_fn.getCurrentHeight = function () {
     return h > 0 ? h : 320 / ($$.hasType('gauge') ? 2 : 1);
 };
 c3_chart_internal_fn.getCurrentPaddingTop = function () {
-    var config = this.config;
-    return isValue(config.padding_top) ? config.padding_top : 0;
+    var $$ = this,
+        config = $$.config,
+        padding = isValue(config.padding_top) ? config.padding_top : 0;
+    if ($$.title && $$.title.node()) {
+        padding += $$.getTitlePadding();
+    }
+    return padding;
 };
 c3_chart_internal_fn.getCurrentPaddingBottom = function () {
     var config = this.config;

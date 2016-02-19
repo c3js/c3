@@ -41,7 +41,17 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
             var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
-                if (values[i].value * d.value >= 0) {
+                // check if the x values line up
+                if (typeof values[i] === 'undefined' || +values[i].x !== +d.x) {  // "+" for timeseries
+                    // if not, try to find the value that does line up
+                    i = -1;
+                    values.forEach(function (v, j) {
+                        if (v.x === d.x) {
+                            i = j;
+                        }
+                    });
+                }
+                if (i in values && values[i].value * d.value >= 0) {
                     offset += scale(values[i].value) - y0;
                 }
             }
@@ -66,6 +76,7 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
 
 
 c3_chart_internal_fn.getInterpolate = function (d) {
-    var $$ = this;
-    return $$.isSplineType(d) ? "cardinal" : $$.isStepType(d) ? $$.config.line_step_type : "linear";
+    var $$ = this,
+        interpolation = $$.isInterpolationType($$.config.spline_interpolation_type) ? $$.config.spline_interpolation_type : 'cardinal';
+    return $$.isSplineType(d) ? interpolation : $$.isStepType(d) ? $$.config.line_step_type : "linear";
 };

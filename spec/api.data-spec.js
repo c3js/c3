@@ -132,8 +132,8 @@ describe('c3 api data', function () {
         it('should set data.colors specified as api', function () {
             expect(d3.select('.c3-line-data1').style('stroke')).toBe("#00ff00");
             expect(d3.select('.c3-line-data2').style('stroke')).toBe("#ff0000");
-            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('fill')).toBe("#00ff00");
-            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('fill')).toBe("#ff0000");
+            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('stroke')).toBe("#00ff00");
+            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('stroke')).toBe("#ff0000");
         });
 
     });
