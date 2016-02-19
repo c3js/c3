@@ -5218,14 +5218,14 @@
     c3_chart_internal_fn.redrawRegion = function (withTransition) {
         var $$ = this,
             regions = $$.mainRegion.selectAll('rect'),
+            regionLabels = $$.mainRegion.selectAll('text'),
             x = $$.regionX.bind($$),
             y = $$.regionY.bind($$),
             w = $$.regionWidth.bind($$),
-            h = $$.regionHeight.bind($$);
-            
-            var paddedY = $$.regionY($$) + 10; //To allow for text height
-            var regionLabels = $$.mainRegion.selectAll('text');
-            
+            h = $$.regionHeight.bind($$),
+            labelX = $$.labelOffsetX.bind($$),
+            labelY = $$.labelOffsetY.bind($$),
+            labelTransform = $$.labelTransform.bind($$);
         return [
             (withTransition ? regions.transition() : regions)
                 .attr("x", x)
@@ -5234,8 +5234,10 @@
                 .attr("height", h)
                 .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }),
                 regionLabels
-                .attr("x", x)
-                .attr("y", paddedY)
+                .attr("x", labelX)
+                .attr("y", labelY)
+                .attr("transform", labelTransform)
+                .attr("style", "text-anchor: left;")
         ];
     };
     c3_chart_internal_fn.regionX = function (d) {
@@ -5957,6 +5959,17 @@
     };
     c3_chart_internal_fn.labelRegion = function (d, i) {
         return 'label' in d ? d['label'] : '';
+    };
+    c3_chart_internal_fn.labelTransform = function (d, i) {
+        return ('vertical' in d && d['vertical']) ? "rotate(90)" : "";
+    };
+    c3_chart_internal_fn.labelOffsetX = function (d, x) {
+        var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
+        return ('vertical' in d && d['vertical']) ? padding : (this.regionX(d) + padding);
+    };
+    c3_chart_internal_fn.labelOffsetY = function (d, x) {
+        var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
+        return ('vertical' in d && d['vertical']) ? -(this.regionX(d) + padding) : 10 + padding; 
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
