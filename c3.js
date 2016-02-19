@@ -5965,11 +5965,11 @@
     };
     c3_chart_internal_fn.labelOffsetX = function (d, x) {
         var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
-        return ('vertical' in d && d['vertical']) ? padding : (this.regionX(d) + padding);
+        return ('vertical' in d && d['vertical']) ? this.regionY(d) + padding : (this.regionX(d) + padding);
     };
     c3_chart_internal_fn.labelOffsetY = function (d, x) {
         var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
-        return ('vertical' in d && d['vertical']) ? -(this.regionX(d) + padding) : 10 + padding; 
+        return ('vertical' in d && d['vertical']) ? -(this.regionX(d) + padding) : this.regionY(d) + 10 + padding;  
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
