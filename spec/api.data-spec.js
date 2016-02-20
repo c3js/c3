@@ -30,6 +30,7 @@ describe('c3 api data', function () {
     };
 
     beforeEach(function (done) {
+        jasmine.addMatchers(customMatchers);
         chart = window.initChart(chart, args, done);
     });
 
@@ -116,8 +117,8 @@ describe('c3 api data', function () {
 
         it('should return data.colors specified as argument', function () {
             var results = chart.data.colors();
-            expect(results.data1).toBe('#FF0000');
-            expect(results.data2).toBe('#00FF00');
+            expect(results.data1).toBeHexOrRGB('#FF0000');
+            expect(results.data2).toBeHexOrRGB('#00FF00');
         });
 
         it('should return data.colors specified as api', function () {
@@ -125,15 +126,15 @@ describe('c3 api data', function () {
                 data1: '#00FF00',
                 data2: '#FF0000'
             });
-            expect(results.data1).toBe('#00FF00');
-            expect(results.data2).toBe('#FF0000');
+            expect(results.data1).toBeHexOrRGB('#00FF00');
+            expect(results.data2).toBeHexOrRGB('#FF0000');
         });
 
         it('should set data.colors specified as api', function () {
-            expect(d3.select('.c3-line-data1').style('stroke')).toBe("#00ff00");
-            expect(d3.select('.c3-line-data2').style('stroke')).toBe("#ff0000");
-            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('stroke')).toBe("#00ff00");
-            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('stroke')).toBe("#ff0000");
+            expect(d3.select('.c3-line-data1').style('stroke')).toBeHexOrRGB("#00ff00");
+            expect(d3.select('.c3-line-data2').style('stroke')).toBeHexOrRGB("#ff0000");
+            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('stroke')).toBeHexOrRGB("#00ff00");
+            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('stroke')).toBeHexOrRGB("#ff0000");
         });
 
     });
@@ -162,3 +163,39 @@ describe('c3 api data', function () {
     });
 
 });
+
+var customMatchers = {
+    toBeHexOrRGB: function(util, customEqualityTesters) {
+        'use strict';
+        function rgb2hex(rgb){
+            rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+            return (rgb && rgb.length === 4) ? "#" +
+              ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+              ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+              ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+        }
+
+
+        return {
+            compare: function(actual, expected){
+                if (expected === undefined) {
+                  expected = '';
+                }
+
+                var result = {};
+                actual = actual.match('rgb') ? rgb2hex(actual) : actual;
+                expected = expected.match('rgb') ? rgb2hex(expected) : expected;
+
+                result.pass = util.equals(actual, expected, customEqualityTesters);
+                if (result.pass) {
+                    result.message = "Expected " + actual + " not to be quite so goofy";
+                } else {
+                     result.message = "Expected " + actual + " to be goofy, but it was not very goofy";
+
+                 }
+
+                 return result;
+            }
+        };
+    }
+};

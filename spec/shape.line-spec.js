@@ -1,13 +1,13 @@
 describe('c3 chart shape line', function () {
     'use strict';
 
-
-
     var chart, args;
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
     });
+
+    var parseSvgPath = window.parseSvgPath;
 
     describe('shape-rendering for line chart', function () {
 
@@ -49,7 +49,7 @@ describe('c3 chart shape line', function () {
 
         it("should have shape-rendering = crispedges when it's step chart", function () {
             d3.selectAll('.c3-line').each(function () {
-                var style = d3.select(this).style('shape-rendering');
+                var style = d3.select(this).style('shape-rendering').toLowerCase();
                 expect(style).toBe('crispedges');
             });
         });
@@ -97,7 +97,7 @@ describe('c3 chart shape line', function () {
                 var commands = parseSvgPath( target.select('.c3-line-data1').attr('d'));
                 var segments = 0;
                 for(var i = 0; i < commands.length; i++) {
-                    (commands[i].command == 'L') ? segments++ : null;
+                    (commands[i].command === 'L') ? segments++ : null;
                 }
                 expect(segments).toBe(3);
                 done();

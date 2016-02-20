@@ -83,6 +83,7 @@ module.exports = (grunt) ->
           c3: 'c3.js'
           spec: 'spec/*.js'
           options:
+            reporter: require('jshint-stylish')
             jshintrc: '.jshintrc'
 
         karma:
