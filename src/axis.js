@@ -79,15 +79,13 @@ Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, a
 Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
     var $$ = this.owner, config = $$.config,
         axisParams = {
-        withOuterTick: withOuterTick,
-        withoutTransition: withoutTransition,
-        tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
-    },
-        d3 = $$.d3,
-        config = $$.config,
-        axis = c3_axis(d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
+            withOuterTick: withOuterTick,
+            withoutTransition: withoutTransition,
+            tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
+        },
+        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
     if ($$.isTimeSeriesY()) {
-        axis.ticks(d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
+        axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
     } else {
         axis.tickValues(tickValues);
     }
