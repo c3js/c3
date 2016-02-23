@@ -168,6 +168,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         bar_zerobased: true,
         // area
         area_zerobased: true,
+        area_above: false,
         // pie
         pie_label_show: true,
         pie_label_format: undefined,
