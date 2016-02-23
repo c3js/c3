@@ -122,7 +122,7 @@ describe('c3 chart arc', function () {
                     .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
                     .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
-            expect(data.attr('d')).toMatch('M-304,-3.7229262694079536e-14A304,304 0 0,1 245.94116628998404,-178.68671669691184L237.85099634623455,-172.8088641739871A294,294 0 0,0 -294,-3.6004615894932184e-14Z'); //jshint ignore:line
+            expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304 0 0,1 245\..+,-178\..+L237\..+,-172\..+A294,294 0 0,0 -294,-3\..+Z/);
         });
 
         it('should update args to have a 2 Pi radian gauge that starts at Pi/2', function() {
@@ -151,7 +151,7 @@ describe('c3 chart arc', function () {
                     .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
                     .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
-            expect(data.attr('d')).toMatch('M-304,-3.7229262694079536e-14A304,304 0 0,1 245.94116628998404,-178.68671669691184L237.85099634623455,-172.8088641739871A294,294 0 0,0 -294,-3.6004615894932184e-14Z'); //jshint ignore:line
+            expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304 0 0,1 245\..+,-178\..+L237\..+,-172\..+A294,294 0 0,0 -294,-3\..+Z/);
         });
     });
 
