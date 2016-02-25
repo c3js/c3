@@ -390,7 +390,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 var d = {
                     data: [{value: config.gauge_max}],
                     startAngle: config.gauge_startingAngle,
-                    endAngle: -1 * config.gauge_startingAngle
+                    endAngle: -1 * config.gauge_startingAngle * (config.gauge_fullCircle ? Math.PI : 1)
                 };
                 return $$.getArc(d, true, true);
             });
