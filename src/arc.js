@@ -50,9 +50,9 @@ c3_chart_internal_fn.updateAngle = function (d) {
     if ($$.isGaugeType(d.data)) {
         gMin = config.gauge_min;
         gMax = config.gauge_max;
-        gTic = (Math.PI) / (gMax - gMin);
+        gTic = (Math.PI * (config.gauge_fullCircle ? 2 : 1)) / (gMax - gMin);
         gValue = d.value < gMin ? 0 : d.value < gMax ? d.value - gMin : (gMax - gMin);
-        d.startAngle = -1 * (Math.PI / 2);
+        d.startAngle = config.gauge_startingAngle;
         d.endAngle = d.startAngle + gTic * gValue;
     }
     return found ? d : null;
@@ -103,7 +103,8 @@ c3_chart_internal_fn.transformForArcLabel = function (d) {
 
 c3_chart_internal_fn.getArcRatio = function (d) {
     var $$ = this,
-        whole = $$.hasType('gauge') ? Math.PI : (Math.PI * 2);
+        config = $$.config,
+        whole = Math.PI * ($$.hasType('gauge') && !config.gauge_fullCircle ? 1 : 2);
     return d ? (d.endAngle - d.startAngle) / whole : null;
 };
 
@@ -278,7 +279,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .style("opacity", 0)
         .each(function (d) {
             if ($$.isGaugeType(d.data)) {
-                d.startAngle = d.endAngle = -1 * (Math.PI / 2);
+                d.startAngle = d.endAngle = config.gauge_startingAngle;
             }
             this._current = d;
         });
@@ -388,8 +389,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             .attr("d", function () {
                 var d = {
                     data: [{value: config.gauge_max}],
-                    startAngle: -1 * (Math.PI / 2),
-                    endAngle: Math.PI / 2
+                    startAngle: config.gauge_startingAngle,
+                    endAngle: -1 * config.gauge_startingAngle * (config.gauge_fullCircle ? Math.PI : 1)
                 };
                 return $$.getArc(d, true, true);
             });
@@ -397,11 +398,11 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             .attr("dy", ".75em")
             .text(config.gauge_label_show ? config.gauge_units : '');
         $$.arcs.select('.' + CLASS.chartArcsGaugeMin)
-            .attr("dx", -1 * ($$.innerRadius + (($$.radius - $$.innerRadius) / 2)) + "px")
+            .attr("dx", -1 * ($$.innerRadius + (($$.radius - $$.innerRadius) / (config.gauge_fullCircle ? 1 : 2))) + "px")
             .attr("dy", "1.2em")
             .text(config.gauge_label_show ? config.gauge_min : '');
         $$.arcs.select('.' + CLASS.chartArcsGaugeMax)
-            .attr("dx", $$.innerRadius + (($$.radius - $$.innerRadius) / 2) + "px")
+            .attr("dx", $$.innerRadius + (($$.radius - $$.innerRadius) / (config.gauge_fullCircle ? 1 : 2)) + "px")
             .attr("dy", "1.2em")
             .text(config.gauge_label_show ? config.gauge_max : '');
     }
