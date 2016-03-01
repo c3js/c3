@@ -372,7 +372,7 @@ c3_chart_internal_fn.pointExpandedR = function (d) {
 };
 c3_chart_internal_fn.pointSelectR = function (d) {
     var $$ = this, config = $$.config;
-    return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
+    return isFunction(config.point_select_r) ? config.point_select_r(d) : ((config.point_select_r) ? config.point_select_r : $$.pointR(d) * 4);
 };
 c3_chart_internal_fn.isWithinCircle = function (that, r) {
     var d3 = this.d3,
