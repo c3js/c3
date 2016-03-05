@@ -5957,19 +5957,19 @@
     c3_chart_internal_fn.classRegion = function (d, i) {
         return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
     };
-    c3_chart_internal_fn.labelRegion = function (d, i) {
-        return 'label' in d ? d['label'] : '';
+    c3_chart_internal_fn.labelRegion = function (d) {
+        return 'label' in d ? d.label : '';
     };
-    c3_chart_internal_fn.labelTransform = function (d, i) {
-        return ('vertical' in d && d['vertical']) ? "rotate(90)" : "";
+    c3_chart_internal_fn.labelTransform = function (d) {
+        return ('vertical' in d && d.vertical) ? "rotate(90)" : "";
     };
-    c3_chart_internal_fn.labelOffsetX = function (d, x) {
-        var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
-        return ('vertical' in d && d['vertical']) ? this.regionY(d) + padding : (this.regionX(d) + padding);
+    c3_chart_internal_fn.labelOffsetX = function (d) {
+        var padding = 'padding' in d ? d.padding : 3; //Default padding = 3
+        return ('vertical' in d && d.vertical) ? this.regionY(d) + padding : (this.regionX(d) + padding);
     };
-    c3_chart_internal_fn.labelOffsetY = function (d, x) {
-        var padding = 'padding' in d ? d['padding'] : 3; //Default padding = 3
-        return ('vertical' in d && d['vertical']) ? -(this.regionX(d) + padding) : this.regionY(d) + 10 + padding;  
+    c3_chart_internal_fn.labelOffsetY = function (d) {
+        var padding = 'padding' in d ? d.padding : 3; //Default padding = 3
+        return ('vertical' in d && d.vertical) ? -(this.regionX(d) + padding) : this.regionY(d) + 10 + padding;  
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
