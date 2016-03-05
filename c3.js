@@ -5218,10 +5218,12 @@
 
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
-        $$.mainRegion.enter().append('g')
-            .attr('class', $$.classRegion.bind($$))
-          .append('rect')
+        var g = $$.mainRegion.enter().append('g')
+            .attr('class', $$.classRegion.bind($$));
+        g.append('rect')
             .style("fill-opacity", 0);
+        g.append('text')
+            .text($$.labelRegion.bind($$));
         $$.mainRegion.exit().transition().duration(duration)
             .style("opacity", 0)
             .remove();
@@ -5229,17 +5231,26 @@
     c3_chart_internal_fn.redrawRegion = function (withTransition) {
         var $$ = this,
             regions = $$.mainRegion.selectAll('rect'),
+            regionLabels = $$.mainRegion.selectAll('text'),
             x = $$.regionX.bind($$),
             y = $$.regionY.bind($$),
             w = $$.regionWidth.bind($$),
-            h = $$.regionHeight.bind($$);
+            h = $$.regionHeight.bind($$),
+            labelX = $$.labelOffsetX.bind($$),
+            labelY = $$.labelOffsetY.bind($$),
+            labelTransform = $$.labelTransform.bind($$);
         return [
             (withTransition ? regions.transition() : regions)
                 .attr("x", x)
                 .attr("y", y)
                 .attr("width", w)
                 .attr("height", h)
-                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
+                .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }),
+                regionLabels
+                .attr("x", labelX)
+                .attr("y", labelY)
+                .attr("transform", labelTransform)
+                .attr("style", "text-anchor: left;")
         ];
     };
     c3_chart_internal_fn.regionX = function (d) {
@@ -5958,6 +5969,20 @@
     };
     c3_chart_internal_fn.classRegion = function (d, i) {
         return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
+    };
+    c3_chart_internal_fn.labelRegion = function (d) {
+        return 'label' in d ? d.label : '';
+    };
+    c3_chart_internal_fn.labelTransform = function (d) {
+        return ('vertical' in d && d.vertical) ? "rotate(90)" : "";
+    };
+    c3_chart_internal_fn.labelOffsetX = function (d) {
+        var padding = 'padding' in d ? d.padding : 3; //Default padding = 3
+        return ('vertical' in d && d.vertical) ? this.regionY(d) + padding : (this.regionX(d) + padding);
+    };
+    c3_chart_internal_fn.labelOffsetY = function (d) {
+        var padding = 'padding' in d ? d.padding : 3; //Default padding = 3
+        return ('vertical' in d && d.vertical) ? -(this.regionX(d) + padding) : this.regionY(d) + 10 + padding;  
     };
     c3_chart_internal_fn.classEvent = function (d) {
         return this.generateClass(CLASS.eventRect, d.index);
