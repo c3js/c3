@@ -1187,7 +1187,7 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
-            axis_y_tick_values: null,        
+            axis_y_tick_values: null,
             axis_y_tick_rotate: 0,
             axis_y_tick_count: undefined,
             axis_y_tick_time_value: undefined,
@@ -2076,7 +2076,10 @@
                 var new_row = [];
                 targetKeys.forEach(function (key) {
                     // convert undefined to null because undefined data will be removed in convertDataToTargets()
-                    var v = isUndefined(o[key]) ? null : o[key];
+                    var v = $$.findValueInJson(o, key);
+                    if (isUndefined(v)) {
+                        v = null;
+                    }
                     new_row.push(v);
                 });
                 new_rows.push(new_row);
@@ -2089,6 +2092,20 @@
             data = $$.convertColumnsToData(new_rows);
         }
         return data;
+    };
+    c3_chart_internal_fn.findValueInJson = function (object, path) {
+        path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
+        path = path.replace(/^\./, '');           // strip a leading dot
+        var pathArray = path.split('.');
+        for (var i = 0; i < pathArray.length; ++i) {
+            var k = pathArray[i];
+            if (k in object) {
+                object = object[k];
+            } else {
+                return;
+            }
+        }
+        return object;
     };
     c3_chart_internal_fn.convertRowsToData = function (rows) {
         var keys = rows[0], new_row = {}, new_rows = [], i, j;
@@ -2753,8 +2770,8 @@
         var $$ = this, config = $$.config, h = 30;
         if (axisId === 'x' && !config.axis_x_show) { return 8; }
         if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }
-        if (axisId === 'y' && !config.axis_y_show) { 
-            return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; 
+        if (axisId === 'y' && !config.axis_y_show) {
+            return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1;
         }
         if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
         // Calculate x axis height when tick rotated
