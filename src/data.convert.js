@@ -54,7 +54,10 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
             var new_row = [];
             targetKeys.forEach(function (key) {
                 // convert undefined to null because undefined data will be removed in convertDataToTargets()
-                var v = isUndefined(o[key]) ? null : o[key];
+                var v = $$.findValueInJson(o, key);
+                if (isUndefined(v)) {
+                    v = null;
+                }
                 new_row.push(v);
             });
             new_rows.push(new_row);
@@ -67,6 +70,20 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         data = $$.convertColumnsToData(new_rows);
     }
     return data;
+};
+c3_chart_internal_fn.findValueInJson = function (object, path) {
+    path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
+    path = path.replace(/^\./, '');           // strip a leading dot
+    var pathArray = path.split('.');
+    for (var i = 0; i < pathArray.length; ++i) {
+        var k = pathArray[i];
+        if (k in object) {
+            object = object[k];
+        } else {
+            return;
+        }
+    }
+    return object;
 };
 c3_chart_internal_fn.convertRowsToData = function (rows) {
     var keys = rows[0], new_row = {}, new_rows = [], i, j;
