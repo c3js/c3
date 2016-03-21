@@ -94,7 +94,9 @@ c3_chart_internal_fn.transformForArcLabel = function (d) {
         x = isNaN(c[0]) ? 0 : c[0];
         y = isNaN(c[1]) ? 0 : c[1];
         h = Math.sqrt(x * x + y * y);
-        if (config.pie_label_ratio) {
+        if ($$.hasType('donut') && config.donut_label_ratio) {
+            ratio = isFunction(config.donut_label_ratio) ? config.donut_label_ratio(d, $$.radius, h) : config.donut_label_ratio;
+        } else if ($$.hasType('pie') && config.pie_label_ratio) {
             ratio = isFunction(config.pie_label_ratio) ? config.pie_label_ratio(d, $$.radius, h) : config.pie_label_ratio;
         } else {
             ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
