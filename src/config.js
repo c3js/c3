@@ -190,6 +190,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_label_show: true,
         donut_label_format: undefined,
         donut_label_threshold: 0.05,
+        donut_label_ratio: undefined,
         donut_width: undefined,
         donut_title: "",
         donut_expand: {},
