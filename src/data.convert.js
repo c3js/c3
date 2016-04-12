@@ -150,7 +150,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                     value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null;
                 // use x as categories if custom x and categorized
                 if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
-                    if (i === 0) { config.axis_x_categories = []; }
+                    if (i === 0 && !$$.flowing) { config.axis_x_categories = []; }
                     config.axis_x_categories.push(rawX);
                 }
                 // mark as x = undefined if value is undefined and filter to remove after mapped

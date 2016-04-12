@@ -3,6 +3,9 @@ c3_chart_fn.flow = function (args) {
         targets, data, notfoundIds = [], orgDataCount = $$.getMaxDataCount(),
         dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
 
+    // set flag
+    $$.flowing = true;
+
     if (args.json) {
         data = $$.convertJsonToData(args.json, args.keys);
     }
