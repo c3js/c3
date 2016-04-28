@@ -1187,7 +1187,7 @@
             axis_y_label: {},
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
-            axis_y_tick_values: null,        
+            axis_y_tick_values: null,
             axis_y_tick_rotate: 0,
             axis_y_tick_count: undefined,
             axis_y_tick_time_value: undefined,
@@ -3462,10 +3462,14 @@
         var $$ = this,
             box = textElement.getBoundingClientRect(),
             yPos;
+
         if ($$.config.axis_rotated) {
             yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
         } else {
             yPos = points[2][1];
+            if($$.config.data_labels.centered){
+                yPos = yPos + (points[0][1] - yPos) / 2 + 8;
+            }
             if (d.value < 0  || (d.value === 0 && !$$.hasPositiveValue)) {
                 yPos += box.height;
                 if ($$.isBarType(d) && $$.isSafari()) {
@@ -3486,6 +3490,8 @@
                 yPos = this.height - 4;
             }
         }
+            console.log(yPos)
+                console.log('\n\n\n')
         return yPos;
     };
 
