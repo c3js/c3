@@ -167,8 +167,16 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                     value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                 // use x as categories if custom x and categorized
                 if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
-                    if (i === 0) { config.axis_x_categories = []; }
-                    config.axis_x_categories.push(rawX);
+                    if (index === 0 && i === 0) {
+                        config.axis_x_categories = [];
+                    }
+                    x = config.axis_x_categories.indexOf(rawX);
+                    if (x === -1) {
+                        x = config.axis_x_categories.length;
+                        config.axis_x_categories.push(rawX);
+                    }
+                } else {
+                    x  = $$.generateTargetX(rawX, id, i);
                 }
                 // mark as x = undefined if value is undefined and filter to remove after mapped
                 if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {

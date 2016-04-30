@@ -1085,6 +1085,7 @@
             zoom_onzoomend: function () {},
             zoom_x_min: undefined,
             zoom_x_max: undefined,
+            interaction_brighten: true,
             interaction_enabled: true,
             onmouseover: function () {},
             onmouseout: function () {},
@@ -1235,10 +1236,12 @@
             bar_zerobased: true,
             // area
             area_zerobased: true,
+            area_above: false,
             // pie
             pie_label_show: true,
             pie_label_format: undefined,
             pie_label_threshold: 0.05,
+            pie_label_ratio: undefined,
             pie_expand: {},
             pie_expand_duration: 50,
             // gauge
@@ -1256,6 +1259,7 @@
             donut_label_show: true,
             donut_label_format: undefined,
             donut_label_threshold: 0.05,
+            donut_label_ratio: undefined,
             donut_width: undefined,
             donut_title: "",
             donut_expand: {},
@@ -2078,7 +2082,10 @@
                 var new_row = [];
                 targetKeys.forEach(function (key) {
                     // convert undefined to null because undefined data will be removed in convertDataToTargets()
-                    var v = isUndefined(o[key]) ? null : o[key];
+                    var v = $$.findValueInJson(o, key);
+                    if (isUndefined(v)) {
+                        v = null;
+                    }
                     new_row.push(v);
                 });
                 new_rows.push(new_row);
@@ -2091,6 +2098,20 @@
             data = $$.convertColumnsToData(new_rows);
         }
         return data;
+    };
+    c3_chart_internal_fn.findValueInJson = function (object, path) {
+        path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
+        path = path.replace(/^\./, '');           // strip a leading dot
+        var pathArray = path.split('.');
+        for (var i = 0; i < pathArray.length; ++i) {
+            var k = pathArray[i];
+            if (k in object) {
+                object = object[k];
+            } else {
+                return;
+            }
+        }
+        return object;
     };
     c3_chart_internal_fn.convertRowsToData = function (rows) {
         var keys = rows[0], new_row = {}, new_rows = [], i, j;
@@ -2170,12 +2191,20 @@
                 id: convertedId,
                 id_org: id,
                 values: data.map(function (d, i) {
-                    var xKey = $$.getXKey(id), rawX = d[xKey], x = $$.generateTargetX(rawX, id, i),
-                        value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null;
+                    var xKey = $$.getXKey(id), rawX = d[xKey],
+                        value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                     // use x as categories if custom x and categorized
-                    if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
-                        if (i === 0) { config.axis_x_categories = []; }
-                        config.axis_x_categories.push(rawX);
+                    if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
+                        if (index === 0 && i === 0) {
+                            config.axis_x_categories = [];
+                        }
+                        x = config.axis_x_categories.indexOf(rawX);
+                        if (x === -1) {
+                            x = config.axis_x_categories.length;
+                            config.axis_x_categories.push(rawX);
+                        }
+                    } else {
+                        x  = $$.generateTargetX(rawX, id, i);
                     }
                     // mark as x = undefined if value is undefined and filter to remove after mapped
                     if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
@@ -3109,7 +3138,7 @@
                 return config.data_groups.length > 0 ? getPoints(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
             };
 
-        area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+        area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(config.area_above ? 0 : value0).y1(value1);
         if (!config.line_connectNull) {
             area = area.defined(function (d) { return d.value !== null; });
         }
@@ -3231,7 +3260,7 @@
     };
     c3_chart_internal_fn.pointSelectR = function (d) {
         var $$ = this, config = $$.config;
-        return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
+        return isFunction(config.point_select_r) ? config.point_select_r(d) : ((config.point_select_r) ? config.point_select_r : $$.pointR(d) * 4);
     };
     c3_chart_internal_fn.isWithinCircle = function (that, r) {
         var d3 = this.d3,
@@ -4864,15 +4893,20 @@
 
 
     c3_chart_internal_fn.transformForArcLabel = function (d) {
-        var $$ = this,
+        var $$ = this, config = $$.config,
             updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "";
         if (updated && !$$.hasType('gauge')) {
             c = this.svgArc.centroid(updated);
             x = isNaN(c[0]) ? 0 : c[0];
             y = isNaN(c[1]) ? 0 : c[1];
             h = Math.sqrt(x * x + y * y);
-            // TODO: ratio should be an option?
-            ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+            if ($$.hasType('donut') && config.donut_label_ratio) {
+                ratio = isFunction(config.donut_label_ratio) ? config.donut_label_ratio(d, $$.radius, h) : config.donut_label_ratio;
+            } else if ($$.hasType('pie') && config.pie_label_ratio) {
+                ratio = isFunction(config.pie_label_ratio) ? config.pie_label_ratio(d, $$.radius, h) : config.pie_label_ratio;
+            } else {
+                ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+            }
             translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
         }
         return translate;
@@ -5403,14 +5437,18 @@
     c3_chart_internal_fn.selectPath = function (target, d) {
         var $$ = this;
         $$.config.data_onselected.call($$, d, target.node());
-        target.transition().duration(100)
-            .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
+        if ($$.config.interaction_brighten) {
+            target.transition().duration(100)
+                .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
+        }
     };
     c3_chart_internal_fn.unselectPath = function (target, d) {
         var $$ = this;
         $$.config.data_onunselected.call($$, d, target.node());
-        target.transition().duration(100)
-            .style("fill", function () { return $$.color(d); });
+        if ($$.config.interaction_brighten) {
+            target.transition().duration(100)
+                .style("fill", function () { return $$.color(d); });
+        }
     };
     c3_chart_internal_fn.togglePath = function (selected, target, d, i) {
         selected ? this.selectPath(target, d, i) : this.unselectPath(target, d, i);
