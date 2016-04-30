@@ -149,7 +149,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                 var xKey = $$.getXKey(id), rawX = d[xKey], x = $$.generateTargetX(rawX, id, i),
                     value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null;
                 // use x as categories if custom x and categorized
-                if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
+                if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
                     if (i === 0) { config.axis_x_categories = []; }
                     config.axis_x_categories.push(rawX);
                 }
