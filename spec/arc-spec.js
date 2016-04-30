@@ -97,4 +97,62 @@ describe('c3 chart arc', function () {
 
     });
 
+    describe('show gauge', function () {
+
+        it('should update args to have a 180 degree gauge', function () {
+            args = {
+                gauge: {
+                    width: 10,
+                    max: 10,
+                    expand: true
+                },
+                data: {
+                    columns: [
+                        ['data', 8]
+                    ],
+                    type: 'gauge'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should have correct d for Pi radian gauge', function () {
+            var chartArc = d3.select('.c3-chart-arcs'),
+                data = chartArc.select('.c3-chart-arc.c3-target.c3-target-data')
+                    .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
+                    .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
+
+            expect(data.attr('d')).toMatch('M-304,-3.7229262694079536e-14A304,304 0 0,1 245.94116628998404,-178.68671669691184L237.85099634623455,-172.8088641739871A294,294 0 0,0 -294,-3.6004615894932184e-14Z');
+        });
+
+        it('should update args to have a 2 Pi radian gauge that starts at Pi/2', function() {
+            args = {
+                gauge: {
+                    width: 10,
+                    max: 10,
+                    expand: true,
+                    fullCircle: true
+                },
+                data: {
+                    columns: [
+                        ['data', 8]
+                    ],
+                    type: 'gauge',
+                    fullCircle: true,
+                    startingAngle: Math.PI/2
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should have correct d for 2 Pi radian gauge starting at Pi/2', function() {
+            var chartArc = d3.select('.c3-chart-arcs'),
+                data = chartArc.select('.c3-chart-arc.c3-target.c3-target-data')
+                    .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
+                    .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
+
+            expect(data.attr('d')).toMatch('M-304,-3.7229262694079536e-14A304,304 0 0,1 245.94116628998404,-178.68671669691184L237.85099634623455,-172.8088641739871A294,294 0 0,0 -294,-3.6004615894932184e-14Z');
+        });
+    });
+
 });
