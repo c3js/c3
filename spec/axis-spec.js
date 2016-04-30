@@ -153,7 +153,7 @@ describe('c3 chart axis', function () {
 
     describe('axis.x.tick.values', function () {
         describe('function is provided', function () {
-            var tickGenerator = function (/*domain*/) {
+            var tickGenerator = function () {
                 var values = [];
                 for (var i = 0; i <= 300; i += 50) {
                     values.push(i);
@@ -594,6 +594,49 @@ describe('c3 chart axis', function () {
                     height = chart.internal.getHorizontalAxisHeight('x');
                 expect(box.height).toBeGreaterThan(50);
                 expect(height).toBeCloseTo(70, -1);
+            });
+
+        });
+    });
+
+    describe('axis.y.tick.rotate', function () {
+
+        describe('not rotated', function () {
+
+            it('should update args successfully', function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250, 100, 600],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                        ]
+                    },
+                    axis: {
+                        rotated: true,
+                        y: {
+                            tick: {
+                                rotate: 45
+                            }
+                        }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+
+            it('should rotate tick texts', function () {
+                chart.internal.main.selectAll('.c3-axis-y g.tick').each(function () {
+                    var tick = d3.select(this),
+                        text = tick.select('text'),
+                        tspan = text.select('tspan');
+                    expect(text.attr('transform')).toBe('rotate(45)');
+                    expect(text.attr('y')).toBe('4');
+                    expect(tspan.attr('dx')).toBeCloseTo('5.6', 0);
+                });
+            });
+
+            it('should have automatically calculated y axis width', function () {
+                var box = chart.internal.main.select('.c3-axis-y').node().getBoundingClientRect();
+                expect(box.width).toBeCloseTo(590, 1);
             });
 
         });
