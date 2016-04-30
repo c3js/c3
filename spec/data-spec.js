@@ -99,6 +99,65 @@ describe('c3 chart data', function () {
         });
     });
 
+    describe('addHiddenTargetIds if not already hidden', function () {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 150, 120, 110, 140, 115, 125]
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('length of hiddenTargetIds should not change if same key added twice', function () {
+            chart.addHiddenTargetIds('data1');
+            expect(chart.hiddenTargetIds.length).toBe(1);
+            chart.addHiddenTargetIds('data1');
+            expect(chart.hiddenTargetIds.length).toBe(1);
+            chart.hide('data1');
+            expect(chart.hiddenTargetIds.length).toBe(1);
+            chart.addHiddenTargetIds('data2');
+            expect(chart.hiddenTargetIds.length).toBe(2);
+            chart.show();
+            chart.hide(['data1', 'data2']);
+            expect(chart.hiddenTargetIds.length).toBe(2);
+            chart.show();
+            chart.hide();
+            expect(chart.hiddenTargetIds.length).toBe(2);
+        });
+    });
+
+    describe('addHiddenLegendIds if not already hidden', function () {
+        it('should update args', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 150, 120, 110, 140, 115, 125]
+                    ]
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('length of hiddenLegendIds should not change if same key added twice', function () {
+            chart.addHiddenLegendIds('data1');
+            expect(chart.hiddenLegendIds.length).toBe(1);
+            chart.addHiddenLegendIds('data1');
+            expect(chart.hiddenLegendIds.length).toBe(1);
+            chart.hide('data1', {withLegend: true});
+            expect(chart.hiddenLegendIds.length).toBe(1);
+            chart.hide('data2', {withLegend: true});
+            expect(chart.hiddenLegendIds.length).toBe(2);
+            chart.show(['data1', 'data2'], {withLegend: true});
+            chart.hide(['data1', 'data2']);
+            expect(chart.hiddenLegendIds.length).toBe(2);
+        });
+    });
+
     describe('data.xs', function () {
 
         it('should update args', function () {
@@ -115,7 +174,7 @@ describe('c3 chart data', function () {
         });
 
         describe('normal x', function () {
- 
+
             it('should have correct number of xs for each', function () {
                 expect(Object.keys(chart.internal.data.xs).length).toBe(3);
                 expect(chart.internal.data.xs.data1.length).toBe(6);
