@@ -38,6 +38,9 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
         });
         return found;
     },
+    sanitise = c3_chart_internal_fn.sanitise = function (str) {
+        return typeof str === 'string' ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : str;
+    },
     getPathBox = c3_chart_internal_fn.getPathBox = function (path) {
         var box = path.getBoundingClientRect(),
             items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],

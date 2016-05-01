@@ -55,15 +55,15 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
         if (! text) {
-            title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+            title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
             text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
-        value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d);
+        value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
         if (value !== undefined) {
             // Skip elements when their name is set to null
             if (d[i].name === null) { continue; }
-            name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
+            name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
             text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";
