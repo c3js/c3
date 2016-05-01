@@ -113,20 +113,20 @@ describe('c3 chart data', function () {
         });
 
         it('length of hiddenTargetIds should not change if same key added twice', function () {
-            chart.addHiddenTargetIds('data1');
-            expect(chart.hiddenTargetIds.length).toBe(1);
-            chart.addHiddenTargetIds('data1');
-            expect(chart.hiddenTargetIds.length).toBe(1);
+            chart.internal.addHiddenTargetIds('data1');
+            expect(chart.internal.hiddenTargetIds.length).toBe(1);
+            chart.internal.addHiddenTargetIds('data1');
+            expect(chart.internal.hiddenTargetIds.length).toBe(1);
             chart.hide('data1');
-            expect(chart.hiddenTargetIds.length).toBe(1);
-            chart.addHiddenTargetIds('data2');
-            expect(chart.hiddenTargetIds.length).toBe(2);
+            expect(chart.internal.hiddenTargetIds.length).toBe(1);
+            chart.internal.addHiddenTargetIds('data2');
+            expect(chart.internal.hiddenTargetIds.length).toBe(2);
             chart.show();
             chart.hide(['data1', 'data2']);
-            expect(chart.hiddenTargetIds.length).toBe(2);
+            expect(chart.internal.hiddenTargetIds.length).toBe(2);
             chart.show();
             chart.hide();
-            expect(chart.hiddenTargetIds.length).toBe(2);
+            expect(chart.internal.hiddenTargetIds.length).toBe(2);
         });
     });
 
@@ -144,17 +144,17 @@ describe('c3 chart data', function () {
         });
 
         it('length of hiddenLegendIds should not change if same key added twice', function () {
-            chart.addHiddenLegendIds('data1');
-            expect(chart.hiddenLegendIds.length).toBe(1);
-            chart.addHiddenLegendIds('data1');
-            expect(chart.hiddenLegendIds.length).toBe(1);
+            chart.internal.addHiddenLegendIds('data1');
+            expect(chart.internal.hiddenLegendIds.length).toBe(1);
+            chart.internal.addHiddenLegendIds('data1');
+            expect(chart.internal.hiddenLegendIds.length).toBe(1);
             chart.hide('data1', {withLegend: true});
-            expect(chart.hiddenLegendIds.length).toBe(1);
+            expect(chart.internal.hiddenLegendIds.length).toBe(1);
             chart.hide('data2', {withLegend: true});
-            expect(chart.hiddenLegendIds.length).toBe(2);
+            expect(chart.internal.hiddenLegendIds.length).toBe(2);
             chart.show(['data1', 'data2'], {withLegend: true});
-            chart.hide(['data1', 'data2']);
-            expect(chart.hiddenLegendIds.length).toBe(2);
+            chart.hide(['data1', 'data2'], {withLegend: true});
+            expect(chart.internal.hiddenLegendIds.length).toBe(2);
         });
     });
 
