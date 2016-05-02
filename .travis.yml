@@ -5,8 +5,7 @@ before_script:
 - gem install sass
 
 script:
-- npm run lint
-- npm test
+- grunt
 
 after_success:
 - npm run codecov
