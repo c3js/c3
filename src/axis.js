@@ -335,6 +335,30 @@ Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(
         length = $$.config.axis_rotated ? $$.width : $$.height;
     return domainLength * (pixels / length);
 };
+/**
+ * Finds the closest "nicely" arranged set of y/y2 axis ticks,
+ * with count of ticks below the number specified in "maxCount"
+ * Turned on by setting axis.tick.isCountMax and axis.tick.count arguments in chart definition JSON
+ * Minimum number of ticks = 2, in case get getYDomain doesnt return 2 elements range, will build a range of first and last element
+ * Michael Rodov.
+ * @param self- chart object
+ * @param maxCount - maximum number of desired ticks, nicely arranged
+ * @param axisName - can be either y or y2 axis
+ * @returns {*} - set of nicely arranged ticks, with count lower then maxCount
+ */
+Axis.prototype.getTickValuesWithMaxTickCount = function (self, maxCount, axisName) {
+    maxCount = Math.max(2, maxCount);
+    var tickValues = self[axisName].domain(self.getYDomain(self.data.targets, axisName)).ticks(i);
+    for (var i = maxCount; tickValues.length > maxCount && i > 1; i--) {
+        tickValues = self[axisName].domain(self.getYDomain(self.data.targets, axisName)).ticks(i);
+    }
+
+    if (tickValues.length === 1 || (maxCount === 2 & tickValues.length > 2)) { //for those who only have one tick generated,
+        return [Math.min(0, tickValues[0]), Math.max(0, tickValues[tickValues.length - 1])];
+    }
+
+    return tickValues;
+};
 Axis.prototype.generateTickValues = function generateTickValues(values, tickCount, forTimeSeries) {
     var tickValues = values, targetCount, start, end, count, interval, i, tickValue;
     if (tickCount) {
