@@ -5,7 +5,7 @@ c3_chart_internal_fn.getCurrentWidth = function () {
 c3_chart_internal_fn.getCurrentHeight = function () {
     var $$ = this, config = $$.config,
         h = config.size_height ? config.size_height : $$.getParentHeight();
-    return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1); 
+    return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1);
 };
 c3_chart_internal_fn.getCurrentPaddingTop = function () {
     var $$ = this,
@@ -21,15 +21,15 @@ c3_chart_internal_fn.getCurrentPaddingBottom = function () {
     return isValue(config.padding_bottom) ? config.padding_bottom : 0;
 };
 c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
-    var $$ = this, config = $$.config;
+    var $$ = this, config = $$.config, legendWidthOnLeft = $$.isLegendLeft ? $$.getLegendWidth() + 20 : 0;
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return legendWidthOnLeft + (!config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40));
     } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
-        return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
+        return legendWidthOnLeft + ($$.axis.getYAxisLabelPosition().isOuter ? 30 : 1);
     } else {
-        return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
+        return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute)) + legendWidthOnLeft;
     }
 };
 c3_chart_internal_fn.getCurrentPaddingRight = function () {
@@ -95,8 +95,8 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;
     if (axisId === 'x' && !config.axis_x_show) { return 8; }
     if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }
-    if (axisId === 'y' && !config.axis_y_show) { 
-        return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; 
+    if (axisId === 'y' && !config.axis_y_show) {
+        return config.legend_show && !$$.isLegendRight && !$$.isLegendLeft && !$$.isLegendInset ? 10 : 1;
     }
     if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
     // Calculate x axis height when tick rotated

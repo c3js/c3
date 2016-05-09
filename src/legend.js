@@ -18,15 +18,15 @@ c3_chart_internal_fn.updateLegendWithDefaults = function () {
 };
 c3_chart_internal_fn.updateSizeForLegend = function (legendHeight, legendWidth) {
     var $$ = this, config = $$.config, insetLegendPosition = {
-        top: $$.isLegendTop ? $$.getCurrentPaddingTop() + config.legend_inset_y + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config.legend_inset_y,
-        left: $$.isLegendLeft ? $$.getCurrentPaddingLeft() + config.legend_inset_x + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config.legend_inset_x + 0.5
+        top: $$.isLegendInsetTop ? $$.getCurrentPaddingTop() + config.legend_inset_y + 5.5 : $$.currentHeight - legendHeight - $$.getCurrentPaddingBottom() - config.legend_inset_y,
+        left: $$.isLegendInsetLeft ? $$.getCurrentPaddingLeft() + config.legend_inset_x + 0.5 : $$.currentWidth - legendWidth - $$.getCurrentPaddingRight() - config.legend_inset_x + 0.5
     };
 
     $$.margin3 = {
-        top: $$.isLegendRight ? 0 : $$.isLegendInset ? insetLegendPosition.top : $$.currentHeight - legendHeight,
+        top: $$.isLegendRight || $$.isLegendLeft ? 0 : $$.isLegendInset || $$.isLegendTop ? insetLegendPosition.top : $$.currentHeight - legendHeight,
         right: NaN,
         bottom: 0,
-        left: $$.isLegendRight ? $$.currentWidth - legendWidth : $$.isLegendInset ? insetLegendPosition.left : 0
+        left: $$.isLegendRight ? $$.currentWidth - legendWidth : $$.isLegendInset ? insetLegendPosition.left : $$.isLegendLeft ? 10 : 0
     };
 };
 c3_chart_internal_fn.transformLegend = function (withTransition) {
@@ -44,12 +44,12 @@ c3_chart_internal_fn.updateLegendItemHeight = function (h) {
 };
 c3_chart_internal_fn.getLegendWidth = function () {
     var $$ = this;
-    return $$.config.legend_show ? $$.isLegendRight || $$.isLegendInset ? $$.legendItemWidth * ($$.legendStep + 1) : $$.currentWidth : 0;
+    return $$.config.legend_show ? $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? $$.legendItemWidth * ($$.legendStep + 1) : $$.currentWidth : 0;
 };
 c3_chart_internal_fn.getLegendHeight = function () {
     var $$ = this, h = 0;
     if ($$.config.legend_show) {
-        if ($$.isLegendRight) {
+        if ($$.isLegendRight || $$.isLegendLeft) {
             h = $$.currentHeight;
         } else {
             h = Math.max(20, $$.legendItemHeight) * ($$.legendStep + 1);
@@ -138,10 +138,10 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
     function updatePositions(textElement, id, index) {
         var reset = index === 0, isLast = index === targetIds.length - 1,
             box = getTextBox(textElement, id),
-            itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight) + config.legend_padding,
+            itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendLeft || $$.isLegendInset) ? 0 : paddingRight) + config.legend_padding,
             itemHeight = box.height + paddingTop,
-            itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
-            areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
+            itemLength = $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? itemHeight : itemWidth,
+            areaLength = $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
             margin, maxLength;
 
         // MEMO: care about condifion of step, totalLength
@@ -177,7 +177,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
         if (!maxWidth || itemWidth >= maxWidth) { maxWidth = itemWidth; }
         if (!maxHeight || itemHeight >= maxHeight) { maxHeight = itemHeight; }
-        maxLength = $$.isLegendRight || $$.isLegendInset ? maxHeight : maxWidth;
+        maxLength = $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? maxHeight : maxWidth;
 
         if (config.legend_equally) {
             Object.keys(widths).forEach(function (id) { widths[id] = maxWidth; });
@@ -201,7 +201,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         $$.updateLegendStep(step);
     }
 
-    if ($$.isLegendRight) {
+    if ($$.isLegendRight || $$.isLegendLeft) {
         xForLegend = function (id) { return maxWidth * steps[id]; };
         yForLegend = function (id) { return margins[steps[id]] + offsets[id]; };
     } else if ($$.isLegendInset) {
@@ -263,21 +263,21 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; })
         .each(function (id, i) { updatePositions(this, id, i); })
         .style("pointer-events", "none")
-        .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
-        .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendText);
+        .attr('x', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? xForLegendText : -200)
+        .attr('y', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? -200 : yForLegendText);
     l.append('rect')
         .attr("class", CLASS.legendItemEvent)
         .style('fill-opacity', 0)
-        .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendRect : -200)
-        .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendRect);
+        .attr('x', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? xForLegendRect : -200)
+        .attr('y', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? -200 : yForLegendRect);
     l.append('line')
         .attr('class', CLASS.legendItemTile)
         .style('stroke', $$.color)
         .style("pointer-events", "none")
-        .attr('x1', $$.isLegendRight || $$.isLegendInset ? x1ForLegendTile : -200)
-        .attr('y1', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
-        .attr('x2', $$.isLegendRight || $$.isLegendInset ? x2ForLegendTile : -200)
-        .attr('y2', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendTile)
+        .attr('x1', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? x1ForLegendTile : -200)
+        .attr('y1', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? -200 : yForLegendTile)
+        .attr('x2', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? x2ForLegendTile : -200)
+        .attr('y2', $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset ? -200 : yForLegendTile)
         .attr('stroke-width', config.legend_item_tile_height);
 
     // Set background for inset legend
