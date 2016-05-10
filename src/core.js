@@ -176,6 +176,7 @@ c3_chart_internal_fn.initChartElements = function () {
     if (this.initArc) { this.initArc(); }
     if (this.initGauge) { this.initGauge(); }
     if (this.initText) { this.initText(); }
+    if (this.initCandleStick) { this.initCandleStick(); }
 };
 
 c3_chart_internal_fn.initWithData = function (data) {
@@ -446,6 +447,9 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     //-- Arc --//
     if ($$.hasArcType() && $$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
 
+    //-- Candle stick --//
+    if ($$.hasCandleStickType() && $$.updateTargetsForArc) { $$.updateTargetsForCandleStick(targets); }
+
     /*-- Sub --*/
 
     if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
@@ -462,12 +466,15 @@ c3_chart_internal_fn.showTargets = function () {
 
 c3_chart_internal_fn.redraw = function (options, transitions) {
     var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
+    var areaIndices = $$.getShapeIndices($$.isAreaType),
+        barIndices = $$.getShapeIndices($$.isBarType),
+        lineIndices = $$.getShapeIndices($$.isLineType),
+        candleStickIndicies = $$.getShapeIndices($$.isCandleStickType);
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis,
         withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend,
         withEventRect, withDimension, withUpdateXAxis;
     var hideAxis = $$.hasArcType();
-    var drawArea, drawBar, drawLine, xForText, yForText;
+    var drawArea, drawBar, drawCandleStick, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
     var waitForDraw, flow;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
@@ -561,6 +568,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // setup drawer - MEMO: these must be called after axis updated
     drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
     drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
+    drawCandleStick = $$.generateDrawCandleStick ? $$.generateDrawCandleStick(candleStickIndicies) : undefined;
     drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
     xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
     yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
@@ -590,6 +598,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // bars
     $$.updateBar(durationForExit);
+
+    // candlestick
+    $$.updateCandleStick(durationForExit);
 
     // lines, areas and cricles
     $$.updateLine(durationForExit);
@@ -637,6 +648,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             flow: options.flow,
             duration: options.flow.duration,
             drawBar: drawBar,
+            drawCandleStick: drawCandleStick,
             drawLine: drawLine,
             drawArea: drawArea,
             cx: cx,
@@ -657,6 +669,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                 $$.redrawBar(drawBar, true),
                 $$.redrawLine(drawLine, true),
                 $$.redrawArea(drawArea, true),
+                $$.redrawCandleStick(drawCandleStick, true),
                 $$.redrawCircle(cx, cy, true),
                 $$.redrawText(xForText, yForText, options.flow, true),
                 $$.redrawRegion(true),
@@ -686,6 +699,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.redrawBar(drawBar);
         $$.redrawLine(drawLine);
         $$.redrawArea(drawArea);
+        $$.redrawCandleStick(drawCandleStick),
         $$.redrawCircle(cx, cy);
         $$.redrawText(xForText, yForText, options.flow);
         $$.redrawRegion();
