@@ -72,9 +72,17 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     return data;
 };
 c3_chart_internal_fn.findValueInJson = function (object, path) {
+    if (path in object) {
+        // if object has a key that contains . or [], return the key's value
+        // instead of searching for an inner object
+        return object[path];
+    }
+
     path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
     path = path.replace(/^\./, '');           // strip a leading dot
     var pathArray = path.split('.');
+
+    // search for any inner objects or arrays denoted by the path
     for (var i = 0; i < pathArray.length; ++i) {
         var k = pathArray[i];
         if (k in object) {
