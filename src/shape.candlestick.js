@@ -94,6 +94,7 @@ c3_chart_internal_fn.updateTargetsForCandleStick = function (targets) {
 // Updating one candle stick
 c3_chart_internal_fn.updateCandleStick = function (durationForExit) {
     var $$ = this,
+        config = $$.config,
         candleStickData = $$.candleStickData.bind($$),
         classCandleStick = $$.classCandleStick.bind($$),
         classCandleStickShadowUpper = $$.classCandleStickShadowUpper.bind($$),
@@ -105,7 +106,8 @@ c3_chart_internal_fn.updateCandleStick = function (durationForExit) {
     $$.mainCandleStick.enter().append('path')
         .attr('class', classCandleStick)
         .style('fill', function(d) {
-            return !!d.csValue && d.csValue.start < d.csValue.end ? 'green' : !!d.csValue && d.csValue.start > d.csValue.end ? 'red' : 'gray';
+            return !!d.csValue && d.csValue.start < d.csValue.end ? config.candlestick_color_inc :
+                !!d.csValue && d.csValue.start > d.csValue.end ? config.candlestick_color_dec : config.candlestick_color_neutral;
         });
     $$.mainCandleStick.exit().transition().duration(durationForExit)
         .style('opacity', 0)

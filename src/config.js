@@ -175,6 +175,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         candlestick_data_max: 'max',
         candlestick_data_start: 'start',
         candlestick_data_end: 'end',
+        candlestick_color_inc: 'green',
+        candlestick_color_dec: 'red',
+        candlestick_color_neutral: 'gray',
         // area
         area_zerobased: true,
         area_above: false,

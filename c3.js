@@ -1256,6 +1256,9 @@
             candlestick_data_max: 'max',
             candlestick_data_start: 'start',
             candlestick_data_end: 'end',
+            candlestick_color_inc: 'green',
+            candlestick_color_dec: 'red',
+            candlestick_color_neutral: 'gray',
             // area
             area_zerobased: true,
             area_above: false,
@@ -3513,6 +3516,7 @@
     // Updating one candle stick
     c3_chart_internal_fn.updateCandleStick = function (durationForExit) {
         var $$ = this,
+            config = $$.config,
             candleStickData = $$.candleStickData.bind($$),
             classCandleStick = $$.classCandleStick.bind($$),
             classCandleStickShadowUpper = $$.classCandleStickShadowUpper.bind($$),
@@ -3524,7 +3528,8 @@
         $$.mainCandleStick.enter().append('path')
             .attr('class', classCandleStick)
             .style('fill', function(d) {
-                return !!d.csValue && d.csValue.start < d.csValue.end ? 'green' : !!d.csValue && d.csValue.start > d.csValue.end ? 'red' : 'gray';
+                return !!d.csValue && d.csValue.start < d.csValue.end ? config.candlestick_color_inc :
+                    !!d.csValue && d.csValue.start > d.csValue.end ? config.candlestick_color_dec : config.candlestick_color_neutral;
             });
         $$.mainCandleStick.exit().transition().duration(durationForExit)
             .style('opacity', 0)
