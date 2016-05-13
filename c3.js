@@ -1226,6 +1226,7 @@
             point_focus_expand_enabled: true,
             point_focus_expand_r: undefined,
             point_select_r: undefined,
+            point_stroked: false,
             // line
             line_connectNull: false,
             line_step_type: 'step',
@@ -3195,17 +3196,18 @@
         $$.mainCircle.enter().append("circle")
             .attr("class", $$.classCircle.bind($$))
             .attr("r", $$.pointR.bind($$))
-            .style("fill", $$.color);
+            .style($$.config.point_stroked ? "stroked" : "fill", $$.color);
         $$.mainCircle
             .style("opacity", $$.initialOpacityForCircle.bind($$));
         $$.mainCircle.exit().remove();
     };
     c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
-        var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
+        var $$ = this,
+        selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
         return [
             (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
                 .style('opacity', this.opacityForCircle.bind(this))
-                .style("fill", this.color)
+                .style($$.config.point_stroked ? "stroked" : "fill", this.color)
                 .attr("cx", cx)
                 .attr("cy", cy),
             (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
