@@ -307,7 +307,7 @@ c3_chart_internal_fn.updateCircle = function () {
     $$.mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
         .attr("r", $$.pointR.bind($$))
-        .style($$.config.point_stroked ? "stroked" : "fill", $$.color);
+        .style($$.config.point_stroked ? "stroke" : "fill", $$.color);
     $$.mainCircle
         .style("opacity", $$.initialOpacityForCircle.bind($$));
     $$.mainCircle.exit().remove();
@@ -318,7 +318,7 @@ c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
     return [
         (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
             .style('opacity', this.opacityForCircle.bind(this))
-            .style($$.config.point_stroked ? "stroked" : "fill", this.color)
+            .style($$.config.point_stroked ? "stroke" : "fill", this.color)
             .attr("cx", cx)
             .attr("cy", cy),
         (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
