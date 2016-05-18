@@ -1038,7 +1038,10 @@ c3_chart_internal_fn.parseDate = function (date) {
         parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
     } else if (typeof date === 'number' && !isNaN(date)) {
         parsedDate = new Date(+date);
+    } else if (Array.isArray(date) && date[0]) {
+            parsedDate = new Date(+date[0]);
     }
+    
     if (!parsedDate || isNaN(+parsedDate)) {
         window.console.error("Failed to parse x '" + date + "' to Date object");
     }
