@@ -1,6 +1,12 @@
-c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
+c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
-    $$.d3.xhr(url, function (error, data) {
+    var req = $$.d3.xhr(url);
+    if (headers) {
+        Object.keys(headers).forEach(function (header) {
+            req.header(header, headers[header]);
+        });
+    }
+    req.get(function (error, data) {
         var d;
         if (!data) {
             throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
@@ -48,7 +54,10 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
             var new_row = [];
             targetKeys.forEach(function (key) {
                 // convert undefined to null because undefined data will be removed in convertDataToTargets()
-                var v = isUndefined(o[key]) ? null : o[key];
+                var v = $$.findValueInJson(o, key);
+                if (isUndefined(v)) {
+                    v = null;
+                }
                 new_row.push(v);
             });
             new_rows.push(new_row);
@@ -61,6 +70,20 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         data = $$.convertColumnsToData(new_rows);
     }
     return data;
+};
+c3_chart_internal_fn.findValueInJson = function (object, path) {
+    path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
+    path = path.replace(/^\./, '');           // strip a leading dot
+    var pathArray = path.split('.');
+    for (var i = 0; i < pathArray.length; ++i) {
+        var k = pathArray[i];
+        if (k in object) {
+            object = object[k];
+        } else {
+            return;
+        }
+    }
+    return object;
 };
 c3_chart_internal_fn.convertRowsToData = function (rows) {
     var keys = rows[0], new_row = {}, new_rows = [], i, j;
@@ -140,12 +163,20 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
             id: convertedId,
             id_org: id,
             values: data.map(function (d, i) {
-                var xKey = $$.getXKey(id), rawX = d[xKey], x = $$.generateTargetX(rawX, id, i),
-                    value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null;
+                var xKey = $$.getXKey(id), rawX = d[xKey],
+                    value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                 // use x as categories if custom x and categorized
-                if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
-                    if (i === 0) { config.axis_x_categories = []; }
-                    config.axis_x_categories.push(rawX);
+                if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
+                    if (index === 0 && i === 0) {
+                        config.axis_x_categories = [];
+                    }
+                    x = config.axis_x_categories.indexOf(rawX);
+                    if (x === -1) {
+                        x = config.axis_x_categories.length;
+                        config.axis_x_categories.push(rawX);
+                    }
+                } else {
+                    x  = $$.generateTargetX(rawX, id, i);
                 }
                 // mark as x = undefined if value is undefined and filter to remove after mapped
                 if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {

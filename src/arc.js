@@ -87,15 +87,20 @@ c3_chart_internal_fn.getArc = function (d, withoutUpdate, force) {
 
 
 c3_chart_internal_fn.transformForArcLabel = function (d) {
-    var $$ = this,
+    var $$ = this, config = $$.config,
         updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "";
     if (updated && !$$.hasType('gauge')) {
         c = this.svgArc.centroid(updated);
         x = isNaN(c[0]) ? 0 : c[0];
         y = isNaN(c[1]) ? 0 : c[1];
         h = Math.sqrt(x * x + y * y);
-        // TODO: ratio should be an option?
-        ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+        if ($$.hasType('donut') && config.donut_label_ratio) {
+            ratio = isFunction(config.donut_label_ratio) ? config.donut_label_ratio(d, $$.radius, h) : config.donut_label_ratio;
+        } else if ($$.hasType('pie') && config.pie_label_ratio) {
+            ratio = isFunction(config.pie_label_ratio) ? config.pie_label_ratio(d, $$.radius, h) : config.pie_label_ratio;
+        } else {
+            ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+        }
         translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
     }
     return translate;

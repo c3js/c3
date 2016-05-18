@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+      var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+          x: 'date',
+          xFormat : '%Y%m%d',
+          columns: [
+            ['date', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106', '20130107', '20130108', '20130109'],
+            ['min', 10, 10, 30, 10, 55, 10, 55, 30, 10,],
+            ['start', 30, 30, 30, 55, 55, 55, 55, 30, 80],
+            ['end', 80, 80, 80, 55, 55, 55, 55, 80, 30],
+            ['max', 110, 80, 110, 110, 55, 55, 110, 80, 110]
+          ],
+          type: 'candle-stick'
+        },
+        candlestick: {
+            data: {
+              min: 'min',
+              max: 'max',
+              start: 'start',
+              end: 'end'
+            },
+            color: {
+                inc: 'yellow',
+                dec: 'orange',
+                neutral: 'green'
+            }
+        },
+        axis: {
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%Y-%m-%d'
+                }
+            }
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -3,7 +3,7 @@
 
     /*global define, module, exports, require */
 
-    var c3 = { version: "0.4.11-rc4" };
+    var c3 = { version: "0.4.11" };
 
     var c3_chart_fn,
         c3_chart_internal_fn,
@@ -86,7 +86,7 @@
         $$.initParams();
 
         if (config.data_url) {
-            $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_keys, $$.initWithData);
+            $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_headers, config.data_keys, $$.initWithData);
         }
         else if (config.data_json) {
             $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));
@@ -181,6 +181,7 @@
         if (this.initArc) { this.initArc(); }
         if (this.initGauge) { this.initGauge(); }
         if (this.initText) { this.initText(); }
+        if (this.initCandleStick) { this.initCandleStick(); }
     };
 
     c3_chart_internal_fn.initWithData = function (data) {
@@ -451,6 +452,9 @@
         //-- Arc --//
         if ($$.hasArcType() && $$.updateTargetsForArc) { $$.updateTargetsForArc(targets); }
 
+        //-- Candle stick --//
+        if ($$.hasCandleStickType() && $$.updateTargetsForArc) { $$.updateTargetsForCandleStick(targets); }
+
         /*-- Sub --*/
 
         if ($$.updateTargetsForSubchart) { $$.updateTargetsForSubchart(targets); }
@@ -467,12 +471,15 @@
 
     c3_chart_internal_fn.redraw = function (options, transitions) {
         var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-        var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
+        var areaIndices = $$.getShapeIndices($$.isAreaType),
+            barIndices = $$.getShapeIndices($$.isBarType),
+            lineIndices = $$.getShapeIndices($$.isLineType),
+            candleStickIndicies = $$.getShapeIndices($$.isCandleStickType);
         var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis,
             withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend,
             withEventRect, withDimension, withUpdateXAxis;
         var hideAxis = $$.hasArcType();
-        var drawArea, drawBar, drawLine, xForText, yForText;
+        var drawArea, drawBar, drawCandleStick, drawLine, xForText, yForText;
         var duration, durationForExit, durationForAxis;
         var waitForDraw, flow;
         var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
@@ -566,6 +573,7 @@
         // setup drawer - MEMO: these must be called after axis updated
         drawArea = $$.generateDrawArea ? $$.generateDrawArea(areaIndices, false) : undefined;
         drawBar = $$.generateDrawBar ? $$.generateDrawBar(barIndices) : undefined;
+        drawCandleStick = $$.generateDrawCandleStick ? $$.generateDrawCandleStick(candleStickIndicies) : undefined;
         drawLine = $$.generateDrawLine ? $$.generateDrawLine(lineIndices, false) : undefined;
         xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
         yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
@@ -595,6 +603,9 @@
 
         // bars
         $$.updateBar(durationForExit);
+
+        // candlestick
+        $$.updateCandleStick(durationForExit);
 
         // lines, areas and cricles
         $$.updateLine(durationForExit);
@@ -642,6 +653,7 @@
                 flow: options.flow,
                 duration: options.flow.duration,
                 drawBar: drawBar,
+                drawCandleStick: drawCandleStick,
                 drawLine: drawLine,
                 drawArea: drawArea,
                 cx: cx,
@@ -662,6 +674,7 @@
                     $$.redrawBar(drawBar, true),
                     $$.redrawLine(drawLine, true),
                     $$.redrawArea(drawArea, true),
+                    $$.redrawCandleStick(drawCandleStick, true),
                     $$.redrawCircle(cx, cy, true),
                     $$.redrawText(xForText, yForText, options.flow, true),
                     $$.redrawRegion(true),
@@ -691,6 +704,7 @@
             $$.redrawBar(drawBar);
             $$.redrawLine(drawLine);
             $$.redrawArea(drawArea);
+            $$.redrawCandleStick(drawCandleStick),
             $$.redrawCircle(cx, cy);
             $$.redrawText(xForText, yForText, options.flow);
             $$.redrawRegion();
@@ -1085,6 +1099,7 @@
             zoom_onzoomend: function () {},
             zoom_x_min: undefined,
             zoom_x_max: undefined,
+            interaction_brighten: true,
             interaction_enabled: true,
             onmouseover: function () {},
             onmouseout: function () {},
@@ -1123,6 +1138,7 @@
             data_onselected: function () {},
             data_onunselected: function () {},
             data_url: undefined,
+            data_headers: undefined,
             data_json: undefined,
             data_rows: undefined,
             data_columns: undefined,
@@ -1187,6 +1203,7 @@
             axis_y_tick_format: undefined,
             axis_y_tick_outer: true,
             axis_y_tick_values: null,
+            axis_y_tick_rotate: 0,
             axis_y_tick_count: undefined,
             axis_y_tick_time_value: undefined,
             axis_y_tick_time_interval: undefined,
@@ -1231,12 +1248,25 @@
             bar_width_ratio: 0.6,
             bar_width_max: undefined,
             bar_zerobased: true,
+            // candlestick
+            candlestick_width: undefined,
+            candlestick_width_ratio: 0.6,
+            candlestick_width_max: undefined,
+            candlestick_data_min: 'min',
+            candlestick_data_max: 'max',
+            candlestick_data_start: 'start',
+            candlestick_data_end: 'end',
+            candlestick_color_inc: 'green',
+            candlestick_color_dec: 'red',
+            candlestick_color_neutral: 'gray',
             // area
             area_zerobased: true,
+            area_above: false,
             // pie
             pie_label_show: true,
             pie_label_format: undefined,
             pie_label_threshold: 0.05,
+            pie_label_ratio: undefined,
             pie_expand: {},
             pie_expand_duration: 50,
             // gauge
@@ -1254,6 +1284,7 @@
             donut_label_show: true,
             donut_label_format: undefined,
             donut_label_threshold: 0.05,
+            donut_label_ratio: undefined,
             donut_width: undefined,
             donut_title: "",
             donut_expand: {},
@@ -1575,7 +1606,7 @@
             maxDataCount, padding, paddingLeft, paddingRight;
         if ($$.isCategorized()) {
             padding = 0;
-        } else if ($$.hasType('bar')) {
+        } else if ($$.hasType('bar') || $$.hasType('candle-stick')) {
             maxDataCount = $$.getMaxDataCount();
             padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
         } else {
@@ -2020,9 +2051,15 @@
         return current;
     };
 
-    c3_chart_internal_fn.convertUrlToData = function (url, mimeType, keys, done) {
+    c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
         var $$ = this, type = mimeType ? mimeType : 'csv';
-        $$.d3.xhr(url, function (error, data) {
+        var req = $$.d3.xhr(url);
+        if (headers) {
+            Object.keys(headers).forEach(function (header) {
+                req.header(header, headers[header]);
+            });
+        }
+        req.get(function (error, data) {
             var d;
             if (!data) {
                 throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
@@ -2070,7 +2107,10 @@
                 var new_row = [];
                 targetKeys.forEach(function (key) {
                     // convert undefined to null because undefined data will be removed in convertDataToTargets()
-                    var v = isUndefined(o[key]) ? null : o[key];
+                    var v = $$.findValueInJson(o, key);
+                    if (isUndefined(v)) {
+                        v = null;
+                    }
                     new_row.push(v);
                 });
                 new_rows.push(new_row);
@@ -2083,6 +2123,20 @@
             data = $$.convertColumnsToData(new_rows);
         }
         return data;
+    };
+    c3_chart_internal_fn.findValueInJson = function (object, path) {
+        path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
+        path = path.replace(/^\./, '');           // strip a leading dot
+        var pathArray = path.split('.');
+        for (var i = 0; i < pathArray.length; ++i) {
+            var k = pathArray[i];
+            if (k in object) {
+                object = object[k];
+            } else {
+                return;
+            }
+        }
+        return object;
     };
     c3_chart_internal_fn.convertRowsToData = function (rows) {
         var keys = rows[0], new_row = {}, new_rows = [], i, j;
@@ -2162,12 +2216,20 @@
                 id: convertedId,
                 id_org: id,
                 values: data.map(function (d, i) {
-                    var xKey = $$.getXKey(id), rawX = d[xKey], x = $$.generateTargetX(rawX, id, i),
-                        value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null;
+                    var xKey = $$.getXKey(id), rawX = d[xKey],
+                        value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                     // use x as categories if custom x and categorized
-                    if ($$.isCustomX() && $$.isCategorized() && index === 0 && rawX) {
-                        if (i === 0) { config.axis_x_categories = []; }
-                        config.axis_x_categories.push(rawX);
+                    if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
+                        if (index === 0 && i === 0) {
+                            config.axis_x_categories = [];
+                        }
+                        x = config.axis_x_categories.indexOf(rawX);
+                        if (x === -1) {
+                            x = config.axis_x_categories.length;
+                            config.axis_x_categories.push(rawX);
+                        }
+                    } else {
+                        x  = $$.generateTargetX(rawX, id, i);
                     }
                     // mark as x = undefined if value is undefined and filter to remove after mapped
                     if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
@@ -2258,7 +2320,7 @@
             $$.load($$.convertDataToTargets(args.data), args);
         }
         else if (args.url) {
-            $$.convertUrlToData(args.url, args.mimeType, args.keys, function (data) {
+            $$.convertUrlToData(args.url, args.mimeType, args.headers, args.keys, function (data) {
                 $$.load($$.convertDataToTargets(data), args);
             });
         }
@@ -2747,11 +2809,17 @@
         var $$ = this, config = $$.config, h = 30;
         if (axisId === 'x' && !config.axis_x_show) { return 8; }
         if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }
-        if (axisId === 'y' && !config.axis_y_show) { return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; }
+        if (axisId === 'y' && !config.axis_y_show) { 
+            return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; 
+        }
         if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
         // Calculate x axis height when tick rotated
         if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
             h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+        }
+        // Calculate y axis height when tick rotated
+        if (axisId === 'y' && config.axis_rotated && config.axis_y_tick_rotate) {
+            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_y_tick_rotate) / 180);
         }
         return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
     };
@@ -3095,7 +3163,7 @@
                 return config.data_groups.length > 0 ? getPoints(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
             };
 
-        area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+        area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(config.area_above ? 0 : value0).y1(value1);
         if (!config.line_connectNull) {
             area = area.defined(function (d) { return d.value !== null; });
         }
@@ -3217,7 +3285,7 @@
     };
     c3_chart_internal_fn.pointSelectR = function (d) {
         var $$ = this, config = $$.config;
-        return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
+        return isFunction(config.point_select_r) ? config.point_select_r(d) : ((config.point_select_r) ? config.point_select_r : $$.pointR(d) * 4);
     };
     c3_chart_internal_fn.isWithinCircle = function (that, r) {
         var d3 = this.d3,
@@ -3345,6 +3413,271 @@
     };
     c3_chart_internal_fn.isWithinBar = function (that) {
         var mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
+            seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
+            x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
+            w = box.width, h = box.height, offset = 2,
+            sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
+        return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
+    };
+
+    // Candle stick chart initialization
+    c3_chart_internal_fn.initCandleStick = function() {
+        var $$ = this;
+        $$.main.select('.' + CLASS.chart).append("g")
+            .attr('class', CLASS.chartCandleSticks);
+    };
+    // Convert candlestick data
+    c3_chart_internal_fn.convertTargetsForCandleStick = function (targets) {
+        var $$ = this,
+            config = $$.config,
+            minValues = (targets.filter(function (t) { return t.id === config.candlestick_data_min; })[0] || {}).values,
+            maxValues = (targets.filter(function (t) { return t.id === config.candlestick_data_max; })[0] || {}).values,
+            startValues = (targets.filter(function (t) { return t.id === config.candlestick_data_start; })[0] || {}).values,
+            endValues = (targets.filter(function (t) { return t.id === config.candlestick_data_end; })[0] || {}).values;
+
+        if (!minValues) {
+            throw new Error('No min values found at ' + config.candlestick_data_min + ' data property!');
+        }
+
+        if (!maxValues) {
+            throw new Error('No max values found at ' + config.candlestick_data_max + ' data property!');
+        }
+
+        if (!startValues) {
+            throw new Error('No start values found at ' + config.candlestick_data_start + ' data property!');
+        }
+
+        if (!endValues) {
+            throw new Error('No end values found at ' + config.candlestick_data_end + ' data property!');
+        }
+
+        var dataNum = Math.max(minValues.length, maxValues.length, startValues.length, endValues.length);
+
+        if (minValues.length !== dataNum) {
+            throw new Error('Not enough min values! Required ' + dataNum + ' values');
+        }
+
+        if (maxValues.length !== dataNum) {
+            throw new Error('Not enough max values! Required ' + dataNum + ' values');
+        }
+
+        if (startValues.length !== dataNum) {
+            throw new Error('Not enough start values! Required ' + dataNum + ' values');
+        }
+
+        if (endValues.length !== dataNum) {
+            throw new Error('Not enough end values! Required ' + dataNum + ' values');
+        }
+
+        // Saving data to internal var
+        var candleStickValues = minValues.map(function(min, index) {
+            return {
+                id: 'cs-data',
+                index: index,
+                value: min.value,
+                csValue: {
+                    min: min.value,
+                    max: maxValues[index].value,
+                    start: startValues[index].value,
+                    end: endValues[index].value
+                },
+                x: min.x
+            };
+        });
+
+        $$.config.data_types['cs-data'] = 'candle-stick';
+        $$.candleStickValues = candleStickValues;
+
+        return $$.candleStickValues;
+    };
+    // Updating candle stick chart containers
+    c3_chart_internal_fn.updateTargetsForCandleStick = function (targets) {
+        var $$ = this,
+            mainCandleStickUpdate,
+            mainCandleStickEnter,
+            classChartCandleStick = $$.classChartCandleStick.bind($$),
+            classFocus = $$.classFocus.bind($$),
+            classCandleStick = $$.classCandleStick.bind($$),
+            classCandleSticks = $$.classCandleSticks.bind($$);
+
+        var candleStickValues = $$.convertTargetsForCandleStick(targets);
+
+        mainCandleStickUpdate = $$.main.select('.' + CLASS.chartCandleSticks).selectAll('.' + CLASS.chartCandleStick)
+            .data(candleStickValues.length > 0 ? [{id: 'cs-data', values: candleStickValues}] : null)
+            .attr('class', function (d) { return classCandleStick(d) + classFocus(d); });
+        mainCandleStickEnter = mainCandleStickUpdate.enter().append('g')
+            .attr('class', classChartCandleStick)
+            .style('opacity', 0)
+            .style('pointer-events', 'none');
+        // Candlestick for data
+        mainCandleStickEnter.append('g')
+            .attr('class', classCandleSticks);
+    };
+    // Updating one candle stick
+    c3_chart_internal_fn.updateCandleStick = function (durationForExit) {
+        var $$ = this,
+            config = $$.config,
+            candleStickData = $$.candleStickData.bind($$),
+            classCandleStick = $$.classCandleStick.bind($$),
+            classCandleStickShadowUpper = $$.classCandleStickShadowUpper.bind($$),
+            classCandleStickShadowLower = $$.classCandleStickShadowLower.bind($$);
+
+        $$.mainCandleStick = $$.main.selectAll('.' + CLASS.candleSticks)
+            .selectAll('.' + CLASS.candleStick)
+            .data(candleStickData);
+        $$.mainCandleStick.enter().append('path')
+            .attr('class', classCandleStick)
+            .style('fill', function(d) {
+                return !!d.csValue && d.csValue.start < d.csValue.end ? config.candlestick_color_inc :
+                    !!d.csValue && d.csValue.start > d.csValue.end ? config.candlestick_color_dec : config.candlestick_color_neutral;
+            });
+        $$.mainCandleStick.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+
+        $$.mainCandleStickShadowsUpper = $$.main.selectAll('.' + CLASS.candleSticks)
+            .selectAll('.' + CLASS.candleStickShadowUpper)
+            .data(candleStickData);
+        $$.mainCandleStickShadowsUpper.enter()
+            .append('path')
+            .attr('class', classCandleStickShadowUpper);
+        $$.mainCandleStickShadowsUpper.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+
+        $$.mainCandleStickShadowsLower = $$.main.selectAll('.' + CLASS.candleSticks)
+            .selectAll('.' + CLASS.candleStickShadowLower)
+            .data(candleStickData);
+        $$.mainCandleStickShadowsLower.enter()
+            .append('path')
+            .attr('class', classCandleStickShadowLower);
+        $$.mainCandleStickShadowsLower.exit().transition().duration(durationForExit)
+            .style('opacity', 0)
+            .remove();
+    };
+    c3_chart_internal_fn.redrawCandleStick = function (drawCandleStick, withTransition) {
+        var $$ = this;
+        return [
+            (withTransition ? this.mainCandleStick.transition(Math.random().toString()) : this.mainCandleStick)
+                .attr('d', drawCandleStick)
+                .style('opacity', 1),
+            (withTransition ? this.mainCandleStickShadowsUpper.transition(Math.random().toString()) : this.mainCandleStickShadowsUpper)
+                .attr('d', $$.generateDrawCandleStickUpperShadow())
+                .style('opacity', 1),
+            (withTransition ? this.mainCandleStickShadowsLower.transition(Math.random().toString()) : this.mainCandleStickShadowsLower)
+                .attr('d', $$.generateDrawCandleStickLowerShadow())
+                .style('opacity', 1)
+        ];
+    };
+    c3_chart_internal_fn.getCandleStickW = function (axis) {
+        var $$ = this, config = $$.config,
+            w = typeof config.candlestick_width === 'number' ? config.candlestick_width : axis.tickInterval() * config.candlestick_width_ratio;
+        return config.candlestick_width_max && w > config.candlestick_width_max ? config.candlestick_width_max : w;
+    };
+    c3_chart_internal_fn.getCandleStick = function (i, id) {
+        var $$ = this;
+        return (id ? $$.main.selectAll('.' + CLASS.candleSticks + $$.getTargetSelectorSuffix(id)) : $$.main)
+            .selectAll('.' + CLASS.candleSticks + (isValue(i) ? '-' + i : ''));
+    };
+    c3_chart_internal_fn.expandCandleStick = function (i, id, reset) {
+        var $$ = this;
+        if (reset) { $$.unexpandCandleStick(); }
+        $$.getCandleStick(i, id).classed(CLASS.EXPANDED, true);
+    };
+    c3_chart_internal_fn.unexpandCandleStick = function (i) {
+        var $$ = this;
+        $$.getCandleStick(i).classed(CLASS.EXPANDED, false);
+    };
+    c3_chart_internal_fn.generateDrawCandleStick = function (candleStickIndices) {
+        var $$ = this,
+            getPoints = $$.generateGetCandleStickPoints(candleStickIndices);
+        return function (d, i) {
+            // 8 points describing candlestick chart
+            var points = getPoints(d, i);
+
+            if (points[0][1] - points[2][1] < 1) {
+                points[2][1] -= 1;
+                points[3][1] -= 1;
+            }
+
+            var path =
+                'M ' + points[0][0] + ',' + points[0][1] + ' ' +
+                    'L' + points[1][0] + ',' + points[1][1] + ' ' +
+                    'L' + points[2][0] + ',' + points[2][1] + ' ' +
+                    'L' + points[3][0] + ',' + points[3][1] + ' ' +
+                    'z';
+
+            return path;
+        };
+    };
+    c3_chart_internal_fn.generateDrawCandleStickUpperShadow = function (candleStickIndices) {
+        var $$ = this,
+            getPoints = $$.generateGetCandleStickPoints(candleStickIndices);
+        return function (d, i) {
+            // 8 points describing candlestick chart
+            var points = getPoints(d, i);
+
+            var path =
+                'M ' + points[4][0] + ',' + points[4][1] + ' ' +
+                    'L' + points[5][0] + ',' + points[5][1];
+
+            return path;
+        };
+    };
+    c3_chart_internal_fn.generateDrawCandleStickLowerShadow = function (candleStickIndices) {
+        var $$ = this,
+            getPoints = $$.generateGetCandleStickPoints(candleStickIndices);
+        return function (d, i) {
+            // 8 points describing candlestick chart
+            var points = getPoints(d, i);
+
+            var path =
+                'M ' + points[6][0] + ',' + points[6][1] + ' ' +
+                    'L' + points[7][0] + ',' + points[7][1];
+
+            return path;
+        };
+    };
+    c3_chart_internal_fn.generateGetCandleStickPoints = function (candleStickIndices, isSub) {
+        var $$ = this,
+            axis = isSub ? $$.subXAxis : $$.xAxis,
+            candleStickW = $$.getCandleStickW(axis),
+            candleStickX = $$.getShapeX(candleStickW, 1, {data: 0}, false),
+            candleStickY = $$.getShapeY(false),
+            candleStickValues = $$.candleStickValues;
+
+        return function (d, i) {
+            var value = candleStickValues[i];
+            var inc = value.csValue.start < value.csValue.end;
+            var min = value.csValue.min,
+                max = value.csValue.max,
+                end = inc ? value.csValue.end : value.csValue.start,
+                start = inc ? value.csValue.start : value.csValue.end;
+            var posX = candleStickX({id: 'cs-data', x: value.x}),
+                posYMax = candleStickY({id: 'cs-data', x: value.x, value: max}),
+                posYMin = candleStickY({id: 'cs-data', x: value.x, value: min}),
+                posYStart = candleStickY({id: 'cs-data', x: value.x, value: start}),
+                posYEnd = candleStickY({id: 'cs-data', x: value.x, value: end});
+
+            // 8 points that make a candle stick
+            return [
+                // Body
+                [posX, posYEnd],
+                [posX + candleStickW, posYEnd],
+                [posX + candleStickW, posYStart],
+                [posX, posYStart],
+                // Upper shadow
+                [posX + candleStickW / 2, posYMax],
+                [posX + candleStickW / 2, posYEnd],
+                // Lower shadow
+                [posX + candleStickW / 2, posYStart],
+                [posX + candleStickW / 2, posYMin]
+            ];
+        };
+    };
+    c3_chart_internal_fn.isWithinCandleStick = function (that) {
+        var mouse = this.d3.mouse(that),
+            box = that.getBoundingClientRect(),
             seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
             x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
             w = box.width, h = box.height, offset = 2,
@@ -3509,6 +3842,9 @@
     c3_chart_internal_fn.hasArcType = function (targets) {
         return this.hasType('pie', targets) || this.hasType('donut', targets) || this.hasType('gauge', targets);
     };
+    c3_chart_internal_fn.hasCandleStickType = function (targets) {
+        return this.hasType('candle-stick', targets);
+    };
     c3_chart_internal_fn.isLineType = function (d) {
         var config = this.config, id = isString(d) ? d : d.id;
         return !config.data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config.data_types[id]) >= 0;
@@ -3545,6 +3881,10 @@
         var id = isString(d) ? d : d.id;
         return this.config.data_types[id] === 'donut';
     };
+    c3_chart_internal_fn.isCandleStickType = function (d) {
+        var id = isString(d) ? d : d.id;
+        return this.config.data_types[id] === 'candle-stick';
+    };
     c3_chart_internal_fn.isArcType = function (d) {
         return this.isPieType(d) || this.isDonutType(d) || this.isGaugeType(d);
     };
@@ -3561,6 +3901,9 @@
      */
     c3_chart_internal_fn.barData = function (d) {
         return this.isBarType(d) ? d.values : [];
+    };
+    c3_chart_internal_fn.candleStickData = function (d) {
+        return this.isCandleStickType(d) ? d.values : [];
     };
     c3_chart_internal_fn.lineOrScatterData = function (d) {
         return this.isLineType(d) || this.isScatterType(d) ? d.values : [];
@@ -3848,19 +4191,21 @@
             orderAsc = $$.isOrderAsc();
 
         if (config.data_groups.length === 0) {
-            d.sort(function(a,b){
-                return orderAsc ? a.value - b.value : b.value - a.value;
+            d.sort(function(a, b){
+                var v1 = a ? a.value : null, v2 = b ? b.value : null;
+                return orderAsc ? v1 - v2 : v2 - v1;
             });
         } else {
             var ids = $$.orderTargets($$.data.targets).map(function (i) {
                 return i.id;
             });
             d.sort(function(a, b) {
-                if (a.value > 0 && b.value > 0) {
-                    return orderAsc ? ids.indexOf(a.id) - ids.indexOf(b.id) : ids.indexOf(b.id) - ids.indexOf(a.id);
-                } else {
-                    return orderAsc ? a.value - b.value : b.value - a.value;
+                var v1 = a ? a.value : null, v2 = b ? b.value : null;
+                if (v1 > 0 && v2 > 0) {
+                    v1 = a ? ids.indexOf(a.id) : null;
+                    v2 = b ? ids.indexOf(b.id) : null;
                 }
+                return orderAsc ? v1 - v2 : v2 - v1;
             });
         }
 
@@ -3868,15 +4213,15 @@
             if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
             if (! text) {
-                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+                title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
                 text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
             }
 
-            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d);
+            value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
             if (value !== undefined) {
                 // Skip elements when their name is set to null
                 if (d[i].name === null) { continue; }
-                name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
+                name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
                 bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
                 text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";
@@ -4396,17 +4741,16 @@
         }
         return tickValues;
     };
-    Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition) {
-        var axisParams = {
-            withOuterTick: withOuterTick,
-            withoutTransition: withoutTransition,
-        },
-            $$ = this.owner,
-            d3 = $$.d3,
-            config = $$.config,
-            axis = c3_axis(d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
+    Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
+        var $$ = this.owner, config = $$.config,
+            axisParams = {
+                withOuterTick: withOuterTick,
+                withoutTransition: withoutTransition,
+                tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
+            },
+            axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
         if ($$.isTimeSeriesY()) {
-            axis.ticks(d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
+            axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
         } else {
             axis.tickValues(tickValues);
         }
@@ -4596,10 +4940,10 @@
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
             if (id === 'y') {
                 scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-                axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true);
+                axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true, true);
             } else if (id === 'y2') {
                 scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-                axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true);
+                axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true, true);
             } else {
                 scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
                 axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
@@ -4851,15 +5195,20 @@
 
 
     c3_chart_internal_fn.transformForArcLabel = function (d) {
-        var $$ = this,
+        var $$ = this, config = $$.config,
             updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "";
         if (updated && !$$.hasType('gauge')) {
             c = this.svgArc.centroid(updated);
             x = isNaN(c[0]) ? 0 : c[0];
             y = isNaN(c[1]) ? 0 : c[1];
             h = Math.sqrt(x * x + y * y);
-            // TODO: ratio should be an option?
-            ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+            if ($$.hasType('donut') && config.donut_label_ratio) {
+                ratio = isFunction(config.donut_label_ratio) ? config.donut_label_ratio(d, $$.radius, h) : config.donut_label_ratio;
+            } else if ($$.hasType('pie') && config.pie_label_ratio) {
+                ratio = isFunction(config.pie_label_ratio) ? config.pie_label_ratio(d, $$.radius, h) : config.pie_label_ratio;
+            } else {
+                ratio = $$.radius && h ? (36 / $$.radius > 0.375 ? 1.175 - 36 / $$.radius : 0.8) * $$.radius / h : 0;
+            }
             translate = "translate(" + (x * ratio) +  ',' + (y * ratio) +  ")";
         }
         return translate;
@@ -5209,16 +5558,23 @@
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
         $$.mainRegion.enter().append('g')
-            .attr('class', $$.classRegion.bind($$))
           .append('rect')
             .style("fill-opacity", 0);
+        $$.mainRegion
+            .attr('class', $$.classRegion.bind($$));
         $$.mainRegion.exit().transition().duration(duration)
             .style("opacity", 0)
             .remove();
     };
     c3_chart_internal_fn.redrawRegion = function (withTransition) {
         var $$ = this,
-            regions = $$.mainRegion.selectAll('rect'),
+            regions = $$.mainRegion.selectAll('rect').each(function () {
+                // data is binded to g and it's not transferred to rect (child node) automatically,
+                // then data of each rect has to be updated manually.
+                // TODO: there should be more efficient way to solve this?
+                var parentData = $$.d3.select(this.parentNode).datum();
+                $$.d3.select(this).datum(parentData);
+            }),
             x = $$.regionX.bind($$),
             y = $$.regionY.bind($$),
             w = $$.regionWidth.bind($$),
@@ -5390,14 +5746,18 @@
     c3_chart_internal_fn.selectPath = function (target, d) {
         var $$ = this;
         $$.config.data_onselected.call($$, d, target.node());
-        target.transition().duration(100)
-            .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
+        if ($$.config.interaction_brighten) {
+            target.transition().duration(100)
+                .style("fill", function () { return $$.d3.rgb($$.color(d)).brighter(0.75); });
+        }
     };
     c3_chart_internal_fn.unselectPath = function (target, d) {
         var $$ = this;
         $$.config.data_onunselected.call($$, d, target.node());
-        target.transition().duration(100)
-            .style("fill", function () { return $$.color(d); });
+        if ($$.config.interaction_brighten) {
+            target.transition().duration(100)
+                .style("fill", function () { return $$.color(d); });
+        }
     };
     c3_chart_internal_fn.togglePath = function (selected, target, d, i) {
         selected ? this.selectPath(target, d, i) : this.unselectPath(target, d, i);
@@ -5831,6 +6191,8 @@
         chartLines: 'c3-chart-lines',
         chartBar: 'c3-chart-bar',
         chartBars: 'c3-chart-bars',
+        chartCandleStick: 'c3-chart-candle-stick',
+        chartCandleSticks: 'c3-chart-candle-sticks',
         chartText: 'c3-chart-text',
         chartTexts: 'c3-chart-texts',
         chartArc: 'c3-chart-arc',
@@ -5866,6 +6228,10 @@
         circles: 'c3-circles',
         arc: 'c3-arc',
         arcs: 'c3-arcs',
+        candleStick: 'c3-candle-stick',
+        candleStickShadowUpper: 'c3-candle-stick-shadow-upper',
+        candleStickShadowLower: 'c3-candle-stick-shadow-lower',
+        candleSticks: 'c3-candle-sticks',
         area: 'c3-area',
         areas: 'c3-areas',
         empty: 'c3-empty',
@@ -5940,6 +6306,18 @@
     c3_chart_internal_fn.classArcs = function (d) {
         return this.classShapes(d.data) + this.generateClass(CLASS.arcs, d.data.id);
     };
+    c3_chart_internal_fn.classCandleStick = function (d) {
+        return this.classShapes(d) + this.generateClass(CLASS.candleStick, d.id);
+    };
+    c3_chart_internal_fn.classCandleStickShadowUpper = function (d) {
+        return this.classShapes(d) + this.generateClass(CLASS.candleStickShadowUpper, d.id);
+    };
+    c3_chart_internal_fn.classCandleStickShadowLower = function (d) {
+        return this.classShapes(d) + this.generateClass(CLASS.candleStickShadowLower, d.id);
+    };
+    c3_chart_internal_fn.classCandleSticks = function (d) {
+        return this.classShapes(d) + this.generateClass(CLASS.candleSticks, d.id);
+    };
     c3_chart_internal_fn.classArea = function (d) {
         return this.classShape(d) + this.generateClass(CLASS.area, d.id);
     };
@@ -5980,6 +6358,9 @@
     };
     c3_chart_internal_fn.classChartArc = function (d) {
         return CLASS.chartArc + this.classTarget(d.data.id);
+    };
+    c3_chart_internal_fn.classChartCandleStick = function (d) {
+        return CLASS.chartCandleStick + this.classTarget(d.id);
     };
     c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
         return targetId || targetId === 0 ? ('-' + targetId).replace(/[\s?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\]/g, '-') : '';
@@ -6039,6 +6420,9 @@
                 if (dict[key] === value) { found = true; }
             });
             return found;
+        },
+        sanitise = c3_chart_internal_fn.sanitise = function (str) {
+            return typeof str === 'string' ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : str;
         },
         getPathBox = c3_chart_internal_fn.getPathBox = function (path) {
             var box = path.getBoundingClientRect(),
@@ -6219,6 +6603,10 @@
         // update xs if specified
         if (args.xs) {
             $$.addXs(args.xs);
+        }
+        // update names if exists
+        if ('names' in args) {
+            c3_chart_fn.data.names.bind(this)(args.names);
         }
         // update classes if exists
         if ('classes' in args) {

@@ -5,6 +5,8 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     chartLines: 'c3-chart-lines',
     chartBar: 'c3-chart-bar',
     chartBars: 'c3-chart-bars',
+    chartCandleStick: 'c3-chart-candle-stick',
+    chartCandleSticks: 'c3-chart-candle-sticks',
     chartText: 'c3-chart-text',
     chartTexts: 'c3-chart-texts',
     chartArc: 'c3-chart-arc',
@@ -40,6 +42,10 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     circles: 'c3-circles',
     arc: 'c3-arc',
     arcs: 'c3-arcs',
+    candleStick: 'c3-candle-stick',
+    candleStickShadowUpper: 'c3-candle-stick-shadow-upper',
+    candleStickShadowLower: 'c3-candle-stick-shadow-lower',
+    candleSticks: 'c3-candle-sticks',
     area: 'c3-area',
     areas: 'c3-areas',
     empty: 'c3-empty',
@@ -114,6 +120,18 @@ c3_chart_internal_fn.classArc = function (d) {
 c3_chart_internal_fn.classArcs = function (d) {
     return this.classShapes(d.data) + this.generateClass(CLASS.arcs, d.data.id);
 };
+c3_chart_internal_fn.classCandleStick = function (d) {
+    return this.classShapes(d) + this.generateClass(CLASS.candleStick, d.id);
+};
+c3_chart_internal_fn.classCandleStickShadowUpper = function (d) {
+    return this.classShapes(d) + this.generateClass(CLASS.candleStickShadowUpper, d.id);
+};
+c3_chart_internal_fn.classCandleStickShadowLower = function (d) {
+    return this.classShapes(d) + this.generateClass(CLASS.candleStickShadowLower, d.id);
+};
+c3_chart_internal_fn.classCandleSticks = function (d) {
+    return this.classShapes(d) + this.generateClass(CLASS.candleSticks, d.id);
+};
 c3_chart_internal_fn.classArea = function (d) {
     return this.classShape(d) + this.generateClass(CLASS.area, d.id);
 };
@@ -154,6 +172,9 @@ c3_chart_internal_fn.classChartBar = function (d) {
 };
 c3_chart_internal_fn.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
+};
+c3_chart_internal_fn.classChartCandleStick = function (d) {
+    return CLASS.chartCandleStick + this.classTarget(d.id);
 };
 c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
     return targetId || targetId === 0 ? ('-' + targetId).replace(/[\s?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\]/g, '-') : '';
