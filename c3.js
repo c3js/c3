@@ -546,16 +546,17 @@
         // show/hide if manual culling needed
         if ((withUpdateXDomain || withUpdateXAxis) && targetsToShow.length) {
             if (config.axis_x_tick_culling && tickValues) {
-                var cullSet = tickValues;
+                var cullSetLength = tickValues.length;
                 if (config.zoom_rescale && !options.flow && xDomainForZoom && xDomainForZoom.length===2) {
-                    cullSet = [];
+                    cullSetLength = 0;
                     for (i = 1; i < tickValues.length; i++) {
                         if (tickValues[i]<xDomainForZoom[0] || tickValues[i]>xDomainForZoom[1]) continue;
-                        cullSet.push(tickValues[i]);
+                        cullSetLength++;
                     }
                 }
-                for (i = 1; i < cullSet.length; i++) {
-                    if (cullSet.length / i < config.axis_x_tick_culling_max) {
+
+                for (i = 1; i < cullSetLength; i++) {
+                    if (cullSetLength / i < config.axis_x_tick_culling_max) {
                         intervalForCulling = i;
                         break;
                     }
