@@ -5747,6 +5747,7 @@
         var $$ = this, z = $$.config.zoom_enabled ? $$.zoom : function () {};
         $$.main.select('.' + CLASS.zoomRect).call(z).on("dblclick.zoom", null);
         $$.main.selectAll('.' + CLASS.eventRect).call(z).on("dblclick.zoom", null);
+        $$.config.zoom_onzoom.call($$.api, $$.x.orgDomain());
     };
     c3_chart_internal_fn.redrawForZoom = function () {
         var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
