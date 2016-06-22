@@ -550,7 +550,10 @@
                 if (config.zoom_rescale && !options.flow && xDomainForZoom && xDomainForZoom.length===2) {
                     cullSetLength = 0;
                     for (i = 1; i < tickValues.length; i++) {
-                        if (tickValues[i]<xDomainForZoom[0] || tickValues[i]>xDomainForZoom[1]) continue;
+                        if (tickValues[i]<xDomainForZoom[0] || tickValues[i]>xDomainForZoom[1]) {
+                            continue;
+                        }
+
                         cullSetLength++;
                     }
                 }
