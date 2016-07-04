@@ -34,7 +34,7 @@ c3_chart_internal_fn.load = function (targets, args) {
     if (args.done) { args.done(); }
 };
 c3_chart_internal_fn.loadFromArgs = function (args) {
-    var $$ = this;
+    var $$ = this, config = $$.config;
     if (args.data) {
         $$.load($$.convertDataToTargets(args.data), args);
     }
@@ -44,6 +44,11 @@ c3_chart_internal_fn.loadFromArgs = function (args) {
         });
     }
     else if (args.json) {
+        // If keys not provided use previously saved if available
+        var existingKeys = config.data_keys;
+        if (!('keys' in args) && existingKeys) {
+            args.keys = existingKeys;
+        }
         $$.load($$.convertDataToTargets($$.convertJsonToData(args.json, args.keys)), args);
     }
     else if (args.rows) {
