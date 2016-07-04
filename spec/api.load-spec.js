@@ -118,4 +118,47 @@ describe('c3 api load', function () {
 
     });
 
+    describe('json data', function () {
+        var jsonArgs = {
+            data: {
+                json: [
+                    {name: 'Jan', upload: 200, download: 200},
+                    {name: 'Feb', upload: 100, download: 300},
+                    {name: 'Mar', upload: 300, download: 200}
+                ],
+                keys: {
+                    x: 'name',
+                    value: ['upload', 'download']
+                },
+            },
+            axis: {
+                x: {
+                    type: 'category'
+                }
+            }
+        };
+
+
+        it('should load', function() {
+            args = jsonArgs;
+            expect(true).toBeTruthy();
+        });
+
+        it('should not require re-specifying the keys', function () {
+            chart.load({
+                json: [
+                    {name: 'Jan', upload: 300, download: 400},
+                    {name: 'Feb', upload: 200, download: 100},
+                    {name: 'Mar', upload: 100, download: 400}
+                ]
+            });
+
+            var legend = chart.internal.legend;
+            var legendItems = legend.selectAll('.c3-legend-item');
+
+            // Should not add 3 new legend items
+            expect(legendItems.size()).toBe(2);
+        });
+    });
+
 });
