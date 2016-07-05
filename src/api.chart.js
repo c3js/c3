@@ -5,6 +5,29 @@ c3_chart_fn.resize = function (size) {
     this.flush();
 };
 
+c3_chart_fn.width = function(width){
+    var $$ = this.internal, config = $$.config;
+
+    if(width === undefined){
+        return config.size_width;
+    }
+
+    config.size_width = width;
+    this.flush();
+}
+
+c3_chart_fn.height = function(height){
+    var $$ = this.internal, config = $$.config;
+
+    if(height === undefined){
+        return config.size_height;
+    }
+
+    config.size_height = height;
+    this.flush();
+}
+
+
 c3_chart_fn.flush = function () {
     var $$ = this.internal;
     $$.updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
