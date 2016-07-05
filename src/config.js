@@ -177,6 +177,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_label_ratio: undefined,
         pie_expand: {},
         pie_expand_duration: 50,
+        pie_explodeRadius: 0,
         // gauge
         gauge_fullCircle: false,
         gauge_label_show: true,

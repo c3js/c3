@@ -13,6 +13,11 @@ c3_chart_internal_fn.updateRadius = function () {
         w = config.gauge_width || config.donut_width;
     $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
     $$.radius = $$.radiusExpanded * 0.95;
+
+    // Because we are exploding pie
+    // outer radius might become bigger that it should be
+    $$.radius -= config.pie_explodeRadius;
+
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
     $$.innerRadius = $$.hasType('donut') || $$.hasType('gauge') ? $$.radius * $$.innerRadiusRatio : 0;
 };
@@ -289,7 +294,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             this._current = d;
         });
     mainArc
-        .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
+        .attr("transform", $$.wrapExplode())
         .style("opacity", function (d) { return d === this._current ? 0 : 1; })
         .on('mouseover', config.interaction_enabled ? function (d) {
             var updated, arcData;
@@ -367,7 +372,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 return $$.getArc(interpolated, true);
             };
         })
-        .attr("transform", withTransform ? "scale(1)" : "")
+        .attr("transform", $$.wrapExplode())
         .style("fill", function (d) {
             return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
         }) // Where gauge reading color would receive customization.
@@ -412,6 +417,35 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             .text(config.gauge_label_show ? config.gauge_max : '');
     }
 };
+
+// This is needed because d3 binds transform function to DOM element,
+// thus we can't just pass c3_chart_internal_fn.explode
+// but need to close it against c3_chart_internal_fn
+c3_chart_internal_fn.wrapExplode = function(){
+    var $$ = this, config = $$.config;
+
+    return function explode(d) {
+        d = $$.updateAngle(d);
+
+        if(d === null){
+            return "";
+        }
+
+        var offset = config.pie_explodeRadius;
+
+        if(offset <= 0){
+            return "translate(0, 0)";
+        }
+        
+        var angle = (d.startAngle + d.endAngle) / 2;
+        var xOff = Math.sin(angle) * offset;
+        var yOff = -Math.cos(angle) * offset;
+
+        return 'translate(' + xOff + ',' + yOff +')';
+    };
+
+};
+
 c3_chart_internal_fn.initGauge = function () {
     var arcs = this.arcs;
     if (this.hasType('gauge')) {
