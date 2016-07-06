@@ -303,17 +303,17 @@ Axis.prototype.updateLabels = function updateLabels(withTransition) {
     var axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
         axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
         axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
-    (withTransition ? axisXLabel.transition() : axisXLabel)
+    (withTransition ? axisXLabel.transition(Math.random().toString()) : axisXLabel)
         .attr("x", this.xForXAxisLabel.bind(this))
         .attr("dx", this.dxForXAxisLabel.bind(this))
         .attr("dy", this.dyForXAxisLabel.bind(this))
         .text(this.textForXAxisLabel.bind(this));
-    (withTransition ? axisYLabel.transition() : axisYLabel)
+    (withTransition ? axisYLabel.transition(Math.random().toString()) : axisYLabel)
         .attr("x", this.xForYAxisLabel.bind(this))
         .attr("dx", this.dxForYAxisLabel.bind(this))
         .attr("dy", this.dyForYAxisLabel.bind(this))
         .text(this.textForYAxisLabel.bind(this));
-    (withTransition ? axisY2Label.transition() : axisY2Label)
+    (withTransition ? axisY2Label.transition(Math.random().toString()) : axisY2Label)
         .attr("x", this.xForY2AxisLabel.bind(this))
         .attr("dx", this.dxForY2AxisLabel.bind(this))
         .attr("dy", this.dyForY2AxisLabel.bind(this))

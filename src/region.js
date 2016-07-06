@@ -35,7 +35,7 @@ c3_chart_internal_fn.redrawRegion = function (withTransition) {
         w = $$.regionWidth.bind($$),
         h = $$.regionHeight.bind($$);
     return [
-        (withTransition ? regions.transition() : regions)
+        (withTransition ? regions.transition(Math.random().toString()) : regions)
             .attr("x", x)
             .attr("y", y)
             .attr("width", w)

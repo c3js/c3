@@ -154,13 +154,13 @@ c3_chart_internal_fn.redrawGrid = function (withTransition) {
         lines = $$.xgridLines.select('line'),
         texts = $$.xgridLines.select('text');
     return [
-        (withTransition ? lines.transition() : lines)
+        (withTransition ? lines.transition(Math.random().toString()) : lines)
             .attr("x1", config.axis_rotated ? 0 : xv)
             .attr("x2", config.axis_rotated ? $$.width : xv)
             .attr("y1", config.axis_rotated ? xv : 0)
             .attr("y2", config.axis_rotated ? xv : $$.height)
             .style("opacity", 1),
-        (withTransition ? texts.transition() : texts)
+        (withTransition ? texts.transition(Math.random().toString()) : texts)
             .attr("x", config.axis_rotated ? $$.yGridTextX.bind($$) : $$.xGridTextX.bind($$))
             .attr("y", xv)
             .text(function (d) { return d.text; })

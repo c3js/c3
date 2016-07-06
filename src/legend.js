@@ -292,13 +292,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         .data(targetIds)
         .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; }) // MEMO: needed for update
         .each(function (id, i) { updatePositions(this, id, i); });
-    (withTransition ? texts.transition() : texts)
+    (withTransition ? texts.transition(Math.random().toString()) : texts)
         .attr('x', xForLegendText)
         .attr('y', yForLegendText);
 
     rects = $$.legend.selectAll('rect.' + CLASS.legendItemEvent)
         .data(targetIds);
-    (withTransition ? rects.transition() : rects)
+    (withTransition ? rects.transition(Math.random().toString()) : rects)
         .attr('width', function (id) { return widths[id]; })
         .attr('height', function (id) { return heights[id]; })
         .attr('x', xForLegendRect)
@@ -306,7 +306,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     tiles = $$.legend.selectAll('line.' + CLASS.legendItemTile)
             .data(targetIds);
-        (withTransition ? tiles.transition() : tiles)
+        (withTransition ? tiles.transition(Math.random().toString()) : tiles)
             .style('stroke', $$.color)
             .attr('x1', x1ForLegendTile)
             .attr('y1', yForLegendTile)
@@ -314,7 +314,7 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             .attr('y2', yForLegendTile);
 
     if (background) {
-        (withTransition ? background.transition() : background)
+        (withTransition ? background.transition(Math.random().toString()) : background)
             .attr('height', $$.getLegendHeight() - 12)
             .attr('width', maxWidth * (step + 1) + 10);
     }

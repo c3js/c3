@@ -40,7 +40,7 @@ c3_chart_internal_fn.updateText = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
     return [
-        (withTransition ? this.mainText.transition() : this.mainText)
+        (withTransition ? this.mainText.transition(Math.random().toString()) : this.mainText)
             .attr('x', xForText)
             .attr('y', yForText)
             .style("fill", this.color)
