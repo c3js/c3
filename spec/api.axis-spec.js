@@ -51,4 +51,106 @@ describe('c3 api axis', function () {
         });
 
     });
+
+    describe('isShown', function(){
+        it('should get value', function(){
+             args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100],
+                        ['data2', 50, 20, 10]
+                    ],
+                },
+                axis: {
+                    x: {
+                        show: true
+                    },
+                    y: {
+                        show: true,
+                    }
+                }
+            };
+
+            chart = window.initChart(chart, args);
+
+            expect(chart.axis.isXShown()).toBe(true);
+            expect(chart.axis.isYShown()).toBe(true);
+
+            args.axis.x.show = false;
+            args.axis.y.show = false;
+
+            chart = window.initChart(chart, args);
+
+            expect(chart.axis.isXShown()).toBe(false);
+            expect(chart.axis.isYShown()).toBe(false);
+                
+        });
+
+        it('should set value', function(){
+            chart.axis.isXShown(true);
+
+            expect(chart.axis.isXShown()).toBe(true);
+            expect(chart.axis.isYShown()).toBe(false);
+
+            chart.axis.isYShown(true);
+
+            expect(chart.axis.isXShown()).toBe(true);
+            expect(chart.axis.isYShown()).toBe(true);
+
+            chart.axis.isXShown(false);
+
+            expect(chart.axis.isXShown()).toBe(false);
+            expect(chart.axis.isYShown()).toBe(true);
+
+            chart.axis.isYShown(false);
+
+            expect(chart.axis.isXShown()).toBe(false);
+            expect(chart.axis.isYShown()).toBe(false);
+        });
+
+        it('should actualy show and hide axis', function(){
+            function check(axis, prop){
+                expect(d3.select('.c3-axis-' + axis).style('visibility')).toBe(prop);
+            }
+
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100],
+                        ['data2', 50, 20, 10]
+                    ],
+                },
+                axis: {
+                    x: {
+                        show: true
+                    },
+                    y: {
+                        show: true,
+                    }
+                }
+            };
+
+            chart = window.initChart(chart, args);
+
+            chart.axis.isXShown(false);
+
+            check('x', 'hidden');
+            check('y', 'visible');
+
+            chart.axis.isYShown(false);
+
+            check('x', 'hidden');
+            check('y', 'hidden');
+
+            chart.axis.isXShown(true);
+
+            check('x', 'visible');
+            check('y', 'hidden');
+
+            chart.axis.isYShown(true);
+
+            check('x', 'visible');
+            check('y', 'visible');
+        });
+    });
 });
