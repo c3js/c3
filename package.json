@@ -1,47 +1,47 @@
 {
-  "name": "c3",
-  "version": "0.4.11-rc4",
-  "description": "D3-based reusable chart library",
-  "main": "c3.js",
-  "scripts": {
-    "lint": "grunt lint",
-    "test": "karma start karma.conf.js",
-    "codecov": "cat coverage/*/lcov.info | codecov"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/masayuki0812/c3.git"
-  },
-  "keywords": [
-    "d3",
-    "chart",
-    "graph"
-  ],
-  "author": "Masayuki Tanaka",
-  "license": "MIT",
-  "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
-  "readmeFilename": "README.md",
-  "dependencies": {
-    "d3": "~3.5.0"
-  },
-  "devDependencies": {
-    "codecov.io": "^0.1.6",
-    "grunt": "^0.4.5",
-    "grunt-contrib-concat": "~0.5.0",
-    "grunt-contrib-cssmin": "^0.10.0",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-karma": "^0.12.1",
-    "grunt-sass": "^1.0.0",
-    "jasmine-core": "^2.3.4",
-    "jshint-stylish": "^2.1.0",
-    "karma": "^0.13.10",
-    "karma-coverage": "^0.5.2",
-    "karma-jasmine": "^0.3.6",
-    "karma-phantomjs-launcher": "^0.2.1",
-    "karma-spec-reporter": "0.0.20",
-    "load-grunt-tasks": "~0.2.0",
-    "phantomjs": "^1.9.18"
-  }
+    "name": "c3",
+    "version": "0.4.11-rc4",
+    "description": "D3-based reusable chart library",
+    "main": "c3.js",
+    "scripts": {
+        "lint": "grunt lint",
+        "test": "karma start karma.conf.js",
+        "codecov": "cat coverage/*/lcov.info | codecov"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/masayuki0812/c3.git"
+    },
+    "keywords": [
+        "d3",
+        "chart",
+        "graph"
+    ],
+    "author": "Masayuki Tanaka",
+    "license": "MIT",
+    "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "d3": "^3.5.17"
+    },
+    "devDependencies": {
+        "codecov.io": "^0.1.6",
+        "grunt": "^1.0.1",
+        "grunt-contrib-concat": "^1.0.1",
+        "grunt-contrib-cssmin": "^1.0.1",
+        "grunt-contrib-jshint": "^1.0.0",
+        "grunt-contrib-uglify": "^1.0.1",
+        "grunt-contrib-watch": "^1.0.0",
+        "grunt-karma": "^2.0.0",
+        "grunt-sass": "^1.2.0",
+        "jasmine-core": "^2.4.1",
+        "jshint-stylish": "^2.2.0",
+        "karma": "^1.1.1",
+        "karma-coverage": "^1.1.0",
+        "karma-jasmine": "^1.0.2",
+        "karma-phantomjs-launcher": "^1.0.1",
+        "karma-spec-reporter": "0.0.26",
+        "load-grunt-tasks": "^3.5.0",
+        "phantomjs-prebuilt": "^2.1.7"
+    }
 }
