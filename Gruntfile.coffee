@@ -1,7 +1,24 @@
 module.exports = (grunt) ->
-    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma']
+    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma', 'grunt-rollup']
+
+
+
+
 
     grunt.initConfig
+        rollup: 
+          options: 
+            external: ['d3']
+            format: "umd"
+            moduleName: "c3"
+            globals:
+              d3: 'd3'
+            
+          files: 
+            src: 'es6_modules/rollup.entry.js'
+            dest: 'c3.es6.js'
+          
+      
         watch:
           concat:
             tasks: 'concat'
@@ -11,6 +28,102 @@ module.exports = (grunt) ->
             files: ['src/scss/*.scss']
 
         concat:
+          axis:
+            options:
+                process: (src, filepath) ->
+                  if filepath.indexOf('axis/index')!=-1
+                    src= "import {CLASS,isValue,isFunction,isString,isUndefined,isDefined,ceil10,asHalfPixel,diffDomain,isEmpty,notEmpty,getOption,hasValue,sanitise,getPathBox, ChartInternal} from './chartinternal.js';"+'\n'+src;
+
+                  if filepath.indexOf('axis/axis')!=-1
+                    src = src + 'export {Axis};'+'\n'+'export default Axis;';
+                  return src
+            src: [
+              'src/axis/index.js',
+              'src/axis/c3.axis.js',
+              'src/axis/axis.js',
+            ]
+            dest: 'es6_modules/axis.js'
+
+          chart:
+            options:
+                process: (src, filepath) ->
+                  if filepath.indexOf('chart/index')!=-1
+                    src= "import {CLASS,isValue,isFunction,isString,isUndefined,isDefined,ceil10,asHalfPixel,diffDomain,isEmpty,notEmpty,getOption,hasValue,sanitise,getPathBox, ChartInternal} from './chartinternal.js';"+'\n'+src;
+
+                  if filepath.indexOf('chart/api.tooltip')!=-1
+                    src = src + 'export {Chart};'+'\n'+'export default Chart;';
+                  return src
+            src: [
+              'src/chart/index.js',
+              'src/chart/api.focus.js',
+              'src/chart/api.show.js',
+              'src/chart/api.zoom.js',
+              'src/chart/api.load.js',
+              'src/chart/api.flow.js',
+              'src/chart/api.selection.js',
+              'src/chart/api.transform.js',
+              'src/chart/api.group.js',
+              'src/chart/api.grid.js',
+              'src/chart/api.region.js',
+              'src/chart/api.data.js',
+              'src/chart/api.category.js',
+              'src/chart/api.color.js',
+              'src/chart/api.x.js',
+              'src/chart/api.axis.js',
+              'src/chart/api.legend.js',
+              'src/chart/api.chart.js',
+              'src/chart/api.tooltip.js'
+            ]
+            dest: 'es6_modules/chart.js'
+
+          chartinternal:
+            options:
+                process: (src, filepath) ->
+                  if filepath.indexOf('chartinternal/index')!=-1
+                    src= "import d3 from 'd3';"+'\n'+src;
+                    src= "import {Axis} from './axis.js';"+'\n'+src;
+
+                  if filepath.indexOf('chartinternal/ua')!=-1
+                    src = src + 'export {CLASS,isValue,isFunction,isString,isUndefined,isDefined,ceil10,asHalfPixel,diffDomain,isEmpty,notEmpty,getOption,hasValue,sanitise,getPathBox, ChartInternal};'+'\n'+'export default ChartIntenal;'
+                  return src
+            src: [
+              'src/chartinternal/index.js',
+              'src/chartinternal/config.js',
+              'src/chartinternal/scale.js',
+              'src/chartinternal/domain.js',
+              'src/chartinternal/data.js',
+              'src/chartinternal/data.convert.js',
+              'src/chartinternal/data.load.js',
+              'src/chartinternal/category.js',
+              'src/chartinternal/interaction.js',
+              'src/chartinternal/size.js',
+              'src/chartinternal/shape.js',
+              'src/chartinternal/shape.line.js',
+              'src/chartinternal/shape.bar.js',
+              'src/chartinternal/text.js',
+              'src/chartinternal/type.js',
+              'src/chartinternal/grid.js',
+              'src/chartinternal/tooltip.js',
+              'src/chartinternal/legend.js',
+              'src/chartinternal/title.js',
+              'src/chartinternal/clip.js',
+              'src/chartinternal/arc.js',
+              'src/chartinternal/region.js',
+              'src/chartinternal/drag.js',
+              'src/chartinternal/selection.js',
+              'src/chartinternal/subchart.js',
+              'src/chartinternal/zoom.js',
+              'src/chartinternal/color.js',
+              'src/chartinternal/format.js',
+              'src/chartinternal/cache.js',
+              'src/chartinternal/class.js',
+              'src/chartinternal/util.js',
+              'src/chartinternal/transform.js',
+              'src/chartinternal/flow.js',
+              'src/chartinternal/ua.js'
+            ]
+            dest: 'es6_modules/chartinternal.js'
+
           dist:
             options:
               process: (src, filepath) ->
@@ -22,60 +135,71 @@ module.exports = (grunt) ->
                 return src
             src: [
               'src/head.js',
-              'src/core.js',
-              'src/config.js',
-              'src/scale.js',
-              'src/domain.js',
-              'src/data.js',
-              'src/data.convert.js',
-              'src/data.load.js',
-              'src/category.js',
-              'src/interaction.js',
-              'src/size.js',
-              'src/shape.js',
-              'src/shape.line.js',
-              'src/shape.bar.js',
-              'src/text.js',
-              'src/type.js',
-              'src/grid.js',
-              'src/tooltip.js',
-              'src/legend.js',
-              'src/title.js',
-              'src/axis.js',
-              'src/clip.js',
-              'src/arc.js',
-              'src/region.js',
-              'src/drag.js',
-              'src/selection.js',
-              'src/subchart.js',
-              'src/zoom.js',
-              'src/color.js',
-              'src/format.js',
-              'src/cache.js',
-              'src/class.js',
-              'src/util.js',
-              'src/api.focus.js',
-              'src/api.show.js',
-              'src/api.zoom.js',
-              'src/api.load.js',
-              'src/api.flow.js',
-              'src/api.selection.js',
-              'src/api.transform.js',
-              'src/api.group.js',
-              'src/api.grid.js',
-              'src/api.region.js',
-              'src/api.data.js',
-              'src/api.category.js',
-              'src/api.color.js',
-              'src/api.x.js',
-              'src/api.axis.js',
-              'src/api.legend.js',
-              'src/api.chart.js',
-              'src/api.tooltip.js',
-              'src/c3.axis.js',
-              'src/ua.js',
-              'src/polyfill.js',
-              'src/tail.js'
+
+              
+              'src/axis/index.js',
+              'src/axis/c3.axis.js',
+              'src/axis/axis.js',
+
+              'src/chartinternal/index.js',
+              'src/chartinternal/config.js',
+              'src/chartinternal/scale.js',
+              'src/chartinternal/domain.js',
+              'src/chartinternal/data.js',
+              'src/chartinternal/data.convert.js',
+              'src/chartinternal/data.load.js',
+              'src/chartinternal/category.js',
+              'src/chartinternal/interaction.js',
+              'src/chartinternal/size.js',
+              'src/chartinternal/shape.js',
+              'src/chartinternal/shape.line.js',
+              'src/chartinternal/shape.bar.js',
+              'src/chartinternal/text.js',
+              'src/chartinternal/type.js',
+              'src/chartinternal/grid.js',
+              'src/chartinternal/tooltip.js',
+              'src/chartinternal/legend.js',
+              'src/chartinternal/title.js',
+              'src/chartinternal/clip.js',
+              'src/chartinternal/arc.js',
+              'src/chartinternal/region.js',
+              'src/chartinternal/drag.js',
+              'src/chartinternal/selection.js',
+              'src/chartinternal/subchart.js',
+              'src/chartinternal/zoom.js',
+              'src/chartinternal/color.js',
+              'src/chartinternal/format.js',
+              'src/chartinternal/cache.js',
+              'src/chartinternal/class.js',
+              'src/chartinternal/util.js',
+              'src/chartinternal/transform.js',
+              'src/chartinternal/flow.js',
+              'src/chartinternal/ua.js',
+              
+              'src/chart/index.js',
+              'src/chart/api.focus.js',
+              'src/chart/api.show.js',
+              'src/chart/api.zoom.js',
+              'src/chart/api.load.js',
+              'src/chart/api.flow.js',
+              'src/chart/api.selection.js',
+              'src/chart/api.transform.js',
+              'src/chart/api.group.js',
+              'src/chart/api.grid.js',
+              'src/chart/api.region.js',
+              'src/chart/api.data.js',
+              'src/chart/api.category.js',
+              'src/chart/api.color.js',
+              'src/chart/api.x.js',
+              'src/chart/api.axis.js',
+              'src/chart/api.legend.js',
+              'src/chart/api.chart.js',
+              'src/chart/api.tooltip.js',
+              
+              
+              'src/tail.js',
+              'src/polyfill.js'
+              
             ]
             dest: 'c3.js'
 
@@ -109,6 +233,7 @@ module.exports = (grunt) ->
 
     grunt.registerTask 'lint', ['jshint']
     grunt.registerTask 'test', ['karma']
-    grunt.registerTask 'build', ['concat', 'sass']
+    grunt.registerTask 'build', ['concat:dist', 'sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
     grunt.registerTask 'default', ['lint', 'build', 'test', 'minify']
+    grunt.registerTask 'build_rollup', ['concat:axis', 'concat:chart', 'concat:chartinternal','rollup']
