@@ -1,47 +1,3 @@
-var c3 = { version: "0.4.11" };
-
-var c3_chart_fn,
-    c3_chart_internal_fn,
-    c3_chart_internal_axis_fn;
-
-function API(owner) {
-    this.owner = owner;
-}
-
-function inherit(base, derived) {
-
-    if (Object.create) {
-        derived.prototype = Object.create(base.prototype);
-    } else {
-        var f = function f() {};
-        f.prototype = base.prototype;
-        derived.prototype = new f();
-    }
-
-    derived.prototype.constructor = derived;
-
-    return derived;
-}
-
-function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
-    $$.loadConfig(config);
-
-    $$.beforeInit(config);
-    $$.init();
-    $$.afterInit(config);
-
-    // bind "this" to nested API
-    (function bindThis(fn, target, argThis) {
-        Object.keys(fn).forEach(function (key) {
-            target[key] = fn[key].bind(argThis);
-            if (Object.keys(fn[key]).length > 0) {
-                bindThis(fn[key], target[key], argThis);
-            }
-        });
-    })(c3_chart_fn, this, this);
-}
-
 function ChartInternal(api) {
     var $$ = this;
     $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
@@ -52,67 +8,51 @@ function ChartInternal(api) {
     $$.axes = {};
 }
 
-c3.generate = function (config) {
-    return new Chart(config);
-};
+var c3_chart_internal_fn = ChartInternal.prototype;
 
-c3.chart = {
-    fn: Chart.prototype,
-    internal: {
-        fn: ChartInternal.prototype,
-        axis: {
-            fn: Axis.prototype
-        }
-    }
-};
-c3_chart_fn = c3.chart.fn;
-c3_chart_internal_fn = c3.chart.internal.fn;
-c3_chart_internal_axis_fn = c3.chart.internal.axis.fn;
-
-c3_chart_internal_fn.beforeInit = function () {
+c3_chart_internal_fn.beforeInit = function() {
     // can do something
 };
-c3_chart_internal_fn.afterInit = function () {
+c3_chart_internal_fn.afterInit = function() {
     // can do something
 };
-c3_chart_internal_fn.init = function () {
-    var $$ = this, config = $$.config;
+c3_chart_internal_fn.init = function() {
+    var $$ = this,
+        config = $$.config;
 
     $$.initParams();
 
     if (config.data_url) {
         $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_headers, config.data_keys, $$.initWithData);
-    }
-    else if (config.data_json) {
+    } else if (config.data_json) {
         $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));
-    }
-    else if (config.data_rows) {
+    } else if (config.data_rows) {
         $$.initWithData($$.convertRowsToData(config.data_rows));
-    }
-    else if (config.data_columns) {
+    } else if (config.data_columns) {
         $$.initWithData($$.convertColumnsToData(config.data_columns));
-    }
-    else {
+    } else {
         throw Error('url or json or rows or columns is required.');
     }
 };
 
-c3_chart_internal_fn.initParams = function () {
-    var $$ = this, d3 = $$.d3, config = $$.config;
+c3_chart_internal_fn.initParams = function() {
+    var $$ = this,
+        d3 = $$.d3,
+        config = $$.config;
 
     // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
     $$.clipId = "c3-" + (+new Date()) + '-clip',
-    $$.clipIdForXAxis = $$.clipId + '-xaxis',
-    $$.clipIdForYAxis = $$.clipId + '-yaxis',
-    $$.clipIdForGrid = $$.clipId + '-grid',
-    $$.clipIdForSubchart = $$.clipId + '-subchart',
-    $$.clipPath = $$.getClipPath($$.clipId),
-    $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
-    $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
+        $$.clipIdForXAxis = $$.clipId + '-xaxis',
+        $$.clipIdForYAxis = $$.clipId + '-yaxis',
+        $$.clipIdForGrid = $$.clipId + '-grid',
+        $$.clipIdForSubchart = $$.clipId + '-subchart',
+        $$.clipPath = $$.getClipPath($$.clipId),
+        $$.clipPathForXAxis = $$.getClipPath($$.clipIdForXAxis),
+        $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
     $$.clipPathForGrid = $$.getClipPath($$.clipIdForGrid),
-    $$.clipPathForSubchart = $$.getClipPath($$.clipIdForSubchart),
+        $$.clipPathForSubchart = $$.getClipPath($$.clipIdForSubchart),
 
-    $$.dragStart = null;
+        $$.dragStart = null;
     $$.dragging = false;
     $$.flowing = false;
     $$.cancelClick = false;
@@ -125,14 +65,30 @@ c3_chart_internal_fn.initParams = function () {
     $$.dataTimeFormat = config.data_xLocaltime ? d3.time.format : d3.time.format.utc;
     $$.axisTimeFormat = config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
     $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
-        [".%L", function (d) { return d.getMilliseconds(); }],
-        [":%S", function (d) { return d.getSeconds(); }],
-        ["%I:%M", function (d) { return d.getMinutes(); }],
-        ["%I %p", function (d) { return d.getHours(); }],
-        ["%-m/%-d", function (d) { return d.getDay() && d.getDate() !== 1; }],
-        ["%-m/%-d", function (d) { return d.getDate() !== 1; }],
-        ["%-m/%-d", function (d) { return d.getMonth(); }],
-        ["%Y/%-m/%-d", function () { return true; }]
+        [".%L", function(d) {
+            return d.getMilliseconds();
+        }],
+        [":%S", function(d) {
+            return d.getSeconds();
+        }],
+        ["%I:%M", function(d) {
+            return d.getMinutes();
+        }],
+        ["%I %p", function(d) {
+            return d.getHours();
+        }],
+        ["%-m/%-d", function(d) {
+            return d.getDay() && d.getDate() !== 1;
+        }],
+        ["%-m/%-d", function(d) {
+            return d.getDate() !== 1;
+        }],
+        ["%-m/%-d", function(d) {
+            return d.getMonth();
+        }],
+        ["%Y/%-m/%-d", function() {
+            return true;
+        }]
     ]);
 
     $$.hiddenTargetIds = [];
@@ -170,7 +126,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.axes.subx = d3.selectAll([]); // needs when excluding subchart.js
 };
 
-c3_chart_internal_fn.initChartElements = function () {
+c3_chart_internal_fn.initChartElements = function() {
     if (this.initBar) { this.initBar(); }
     if (this.initLine) { this.initLine(); }
     if (this.initArc) { this.initArc(); }
@@ -178,8 +134,10 @@ c3_chart_internal_fn.initChartElements = function () {
     if (this.initText) { this.initText(); }
 };
 
-c3_chart_internal_fn.initWithData = function (data) {
-    var $$ = this, d3 = $$.d3, config = $$.config;
+c3_chart_internal_fn.initWithData = function(data) {
+    var $$ = this,
+        d3 = $$.d3,
+        config = $$.config;
     var defs, main, binding = true;
 
     $$.axis = new Axis($$);
@@ -190,11 +148,9 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     if (!config.bindto) {
         $$.selectChart = d3.selectAll([]);
-    }
-    else if (typeof config.bindto.node === 'function') {
+    } else if (typeof config.bindto.node === 'function') {
         $$.selectChart = config.bindto;
-    }
-    else {
+    } else {
         $$.selectChart = d3.select(config.bindto);
     }
     if ($$.selectChart.empty()) {
@@ -249,8 +205,12 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define svgs
     $$.svg = $$.selectChart.append("svg")
         .style("overflow", "hidden")
-        .on('mouseenter', function () { return config.onmouseover.call($$); })
-        .on('mouseleave', function () { return config.onmouseout.call($$); });
+        .on('mouseenter', function() {
+            return config.onmouseover.call($$);
+        })
+        .on('mouseleave', function() {
+            return config.onmouseout.call($$);
+        });
 
     if ($$.config.svg_classname) {
         $$.svg.attr('class', $$.config.svg_classname);
@@ -339,10 +299,10 @@ c3_chart_internal_fn.initWithData = function (data) {
     $$.api.element = $$.selectChart.node();
 };
 
-c3_chart_internal_fn.smoothLines = function (el, type) {
+c3_chart_internal_fn.smoothLines = function(el, type) {
     var $$ = this;
     if (type === 'grid') {
-        el.each(function () {
+        el.each(function() {
             var g = $$.d3.select(this),
                 x1 = g.attr('x1'),
                 x2 = g.attr('x2'),
@@ -359,8 +319,9 @@ c3_chart_internal_fn.smoothLines = function (el, type) {
 };
 
 
-c3_chart_internal_fn.updateSizes = function () {
-    var $$ = this, config = $$.config;
+c3_chart_internal_fn.updateSizes = function() {
+    var $$ = this,
+        config = $$.config;
     var legendHeight = $$.legend ? $$.getLegendHeight() : 0,
         legendWidth = $$.legend ? $$.getLegendWidth() : 0,
         legendHeightForBottom = $$.isLegendRight || $$.isLegendInset ? 0 : legendHeight,
@@ -429,7 +390,7 @@ c3_chart_internal_fn.updateSizes = function () {
     }
 };
 
-c3_chart_internal_fn.updateTargets = function (targets) {
+c3_chart_internal_fn.updateTargets = function(targets) {
     var $$ = this;
 
     /*-- Main --*/
@@ -453,16 +414,23 @@ c3_chart_internal_fn.updateTargets = function (targets) {
     // Fade-in each chart
     $$.showTargets();
 };
-c3_chart_internal_fn.showTargets = function () {
+c3_chart_internal_fn.showTargets = function() {
     var $$ = this;
-    $$.svg.selectAll('.' + CLASS.target).filter(function (d) { return $$.isTargetToShow(d.id); })
-      .transition().duration($$.config.transition_duration)
+    $$.svg.selectAll('.' + CLASS.target).filter(function(d) {
+            return $$.isTargetToShow(d.id);
+        })
+        .transition().duration($$.config.transition_duration)
         .style("opacity", 1);
 };
 
-c3_chart_internal_fn.redraw = function (options, transitions) {
-    var $$ = this, main = $$.main, d3 = $$.d3, config = $$.config;
-    var areaIndices = $$.getShapeIndices($$.isAreaType), barIndices = $$.getShapeIndices($$.isBarType), lineIndices = $$.getShapeIndices($$.isLineType);
+c3_chart_internal_fn.redraw = function(options, transitions) {
+    var $$ = this,
+        main = $$.main,
+        d3 = $$.d3,
+        config = $$.config;
+    var areaIndices = $$.getShapeIndices($$.isAreaType),
+        barIndices = $$.getShapeIndices($$.isBarType),
+        lineIndices = $$.getShapeIndices($$.isLineType);
     var withY, withSubchart, withTransition, withTransitionForExit, withTransitionForAxis,
         withTransform, withUpdateXDomain, withUpdateOrgXDomain, withTrimXDomain, withLegend,
         withEventRect, withDimension, withUpdateXAxis;
@@ -470,8 +438,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
     var waitForDraw, flow;
-    var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
-    var xv = $$.xv.bind($$), cx, cy;
+    var targetsToShow = $$.filterTargetsToShow($$.data.targets),
+        tickValues, i, intervalForCulling, xDomainForZoom;
+    var xv = $$.xv.bind($$),
+        cx, cy;
 
     options = options || {};
     withY = getOption(options, "withY", true);
@@ -547,7 +517,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                     break;
                 }
             }
-            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function(e) {
                 var index = tickValues.indexOf(e);
                 if (index >= 0) {
                     d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
@@ -579,7 +549,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .attr("x", $$.width / 2)
         .attr("y", $$.height / 2)
         .text(config.data_empty_label_text)
-      .transition()
+        .transition()
         .style('opacity', targetsToShow.length ? 0 : 1);
 
     // grid
@@ -649,40 +619,39 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     if ((duration || flow) && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
         // transition should be derived from one transition
-        d3.transition().duration(duration).each(function () {
-            var transitionsToWait = [];
+        d3.transition().duration(duration).each(function() {
+                var transitionsToWait = [];
 
-            // redraw and gather transitions
-            [
-                $$.redrawBar(drawBar, true),
-                $$.redrawLine(drawLine, true),
-                $$.redrawArea(drawArea, true),
-                $$.redrawCircle(cx, cy, true),
-                $$.redrawText(xForText, yForText, options.flow, true),
-                $$.redrawRegion(true),
-                $$.redrawGrid(true),
-            ].forEach(function (transitions) {
-                transitions.forEach(function (transition) {
-                    transitionsToWait.push(transition);
+                // redraw and gather transitions
+                [
+                    $$.redrawBar(drawBar, true),
+                    $$.redrawLine(drawLine, true),
+                    $$.redrawArea(drawArea, true),
+                    $$.redrawCircle(cx, cy, true),
+                    $$.redrawText(xForText, yForText, options.flow, true),
+                    $$.redrawRegion(true),
+                    $$.redrawGrid(true),
+                ].forEach(function(transitions) {
+                    transitions.forEach(function(transition) {
+                        transitionsToWait.push(transition);
+                    });
                 });
-            });
 
-            // Wait for end of transitions to call flow and onrendered callback
-            waitForDraw = $$.generateWait();
-            transitionsToWait.forEach(function (t) {
-                waitForDraw.add(t);
+                // Wait for end of transitions to call flow and onrendered callback
+                waitForDraw = $$.generateWait();
+                transitionsToWait.forEach(function(t) {
+                    waitForDraw.add(t);
+                });
+            })
+            .call(waitForDraw, function() {
+                if (flow) {
+                    flow();
+                }
+                if (config.onrendered) {
+                    config.onrendered.call($$);
+                }
             });
-        })
-        .call(waitForDraw, function () {
-            if (flow) {
-                flow();
-            }
-            if (config.onrendered) {
-                config.onrendered.call($$);
-            }
-        });
-    }
-    else {
+    } else {
         $$.redrawBar(drawBar);
         $$.redrawLine(drawLine);
         $$.redrawArea(drawArea);
@@ -696,13 +665,15 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // update fadein condition
-    $$.mapToIds($$.data.targets).forEach(function (id) {
+    $$.mapToIds($$.data.targets).forEach(function(id) {
         $$.withoutFadeIn[id] = true;
     });
 };
 
-c3_chart_internal_fn.updateAndRedraw = function (options) {
-    var $$ = this, config = $$.config, transitions;
+c3_chart_internal_fn.updateAndRedraw = function(options) {
+    var $$ = this,
+        config = $$.config,
+        transitions;
     options = options || {};
     // same with redraw
     options.withTransition = getOption(options, "withTransition", true);
@@ -727,7 +698,7 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     // Draw with new sizes & scales
     $$.redraw(options, transitions);
 };
-c3_chart_internal_fn.redrawWithoutRescale = function () {
+c3_chart_internal_fn.redrawWithoutRescale = function() {
     this.redraw({
         withY: false,
         withSubchart: false,
@@ -736,23 +707,26 @@ c3_chart_internal_fn.redrawWithoutRescale = function () {
     });
 };
 
-c3_chart_internal_fn.isTimeSeries = function () {
+c3_chart_internal_fn.isTimeSeries = function() {
     return this.config.axis_x_type === 'timeseries';
 };
-c3_chart_internal_fn.isCategorized = function () {
+c3_chart_internal_fn.isCategorized = function() {
     return this.config.axis_x_type.indexOf('categor') >= 0;
 };
-c3_chart_internal_fn.isCustomX = function () {
-    var $$ = this, config = $$.config;
+c3_chart_internal_fn.isCustomX = function() {
+    var $$ = this,
+        config = $$.config;
     return !$$.isTimeSeries() && (config.data_x || notEmpty(config.data_xs));
 };
 
-c3_chart_internal_fn.isTimeSeriesY = function () {
+c3_chart_internal_fn.isTimeSeriesY = function() {
     return this.config.axis_y_type === 'timeseries';
 };
 
-c3_chart_internal_fn.getTranslate = function (target) {
-    var $$ = this, config = $$.config, x, y;
+c3_chart_internal_fn.getTranslate = function(target) {
+    var $$ = this,
+        config = $$.config,
+        x, y;
     if (target === 'main') {
         x = asHalfPixel($$.margin.left);
         y = asHalfPixel($$.margin.top);
@@ -780,48 +754,48 @@ c3_chart_internal_fn.getTranslate = function (target) {
     }
     return "translate(" + x + "," + y + ")";
 };
-c3_chart_internal_fn.initialOpacity = function (d) {
+c3_chart_internal_fn.initialOpacity = function(d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? 1 : 0;
 };
-c3_chart_internal_fn.initialOpacityForCircle = function (d) {
+c3_chart_internal_fn.initialOpacityForCircle = function(d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
 };
-c3_chart_internal_fn.opacityForCircle = function (d) {
+c3_chart_internal_fn.opacityForCircle = function(d) {
     var opacity = this.config.point_show ? 1 : 0;
     return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
 };
-c3_chart_internal_fn.opacityForText = function () {
+c3_chart_internal_fn.opacityForText = function() {
     return this.hasDataLabel() ? 1 : 0;
 };
-c3_chart_internal_fn.xx = function (d) {
+c3_chart_internal_fn.xx = function(d) {
     return d ? this.x(d.x) : null;
 };
-c3_chart_internal_fn.xv = function (d) {
-    var $$ = this, value = d.value;
+c3_chart_internal_fn.xv = function(d) {
+    var $$ = this,
+        value = d.value;
     if ($$.isTimeSeries()) {
         value = $$.parseDate(d.value);
-    }
-    else if ($$.isCategorized() && typeof d.value === 'string') {
+    } else if ($$.isCategorized() && typeof d.value === 'string') {
         value = $$.config.axis_x_categories.indexOf(d.value);
     }
     return Math.ceil($$.x(value));
 };
-c3_chart_internal_fn.yv = function (d) {
+c3_chart_internal_fn.yv = function(d) {
     var $$ = this,
         yScale = d.axis && d.axis === 'y2' ? $$.y2 : $$.y;
     return Math.ceil(yScale(d.value));
 };
-c3_chart_internal_fn.subxx = function (d) {
+c3_chart_internal_fn.subxx = function(d) {
     return d ? this.subX(d.x) : null;
 };
 
-c3_chart_internal_fn.transformMain = function (withTransition, transitions) {
+c3_chart_internal_fn.transformMain = function(withTransition, transitions) {
     var $$ = this,
         xAxis, yAxis, y2Axis;
     if (transitions && transitions.axisX) {
         xAxis = transitions.axisX;
     } else {
-        xAxis  = $$.main.select('.' + CLASS.axisX);
+        xAxis = $$.main.select('.' + CLASS.axisX);
         if (withTransition) { xAxis = xAxis.transition(); }
     }
     if (transitions && transitions.axisY) {
@@ -842,14 +816,14 @@ c3_chart_internal_fn.transformMain = function (withTransition, transitions) {
     y2Axis.attr("transform", $$.getTranslate('y2'));
     $$.main.select('.' + CLASS.chartArcs).attr("transform", $$.getTranslate('arc'));
 };
-c3_chart_internal_fn.transformAll = function (withTransition, transitions) {
+c3_chart_internal_fn.transformAll = function(withTransition, transitions) {
     var $$ = this;
     $$.transformMain(withTransition, transitions);
     if ($$.config.subchart_show) { $$.transformContext(withTransition, transitions); }
     if ($$.legend) { $$.transformLegend(withTransition); }
 };
 
-c3_chart_internal_fn.updateSvgSize = function () {
+c3_chart_internal_fn.updateSvgSize = function() {
     var $$ = this,
         brush = $$.svg.select(".c3-brush .background");
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
@@ -877,7 +851,7 @@ c3_chart_internal_fn.updateSvgSize = function () {
 };
 
 
-c3_chart_internal_fn.updateDimension = function (withoutAxis) {
+c3_chart_internal_fn.updateDimension = function(withoutAxis) {
     var $$ = this;
     if (!withoutAxis) {
         if ($$.config.axis_rotated) {
@@ -894,18 +868,19 @@ c3_chart_internal_fn.updateDimension = function (withoutAxis) {
     $$.transformAll(false);
 };
 
-c3_chart_internal_fn.observeInserted = function (selection) {
-    var $$ = this, observer;
+c3_chart_internal_fn.observeInserted = function(selection) {
+    var $$ = this,
+        observer;
     if (typeof MutationObserver === 'undefined') {
         window.console.error("MutationObserver not defined.");
         return;
     }
-    observer= new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
+    observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
             if (mutation.type === 'childList' && mutation.previousSibling) {
                 observer.disconnect();
                 // need to wait for completion of load because size calculation requires the actual sizes determined after that completion
-                $$.intervalForObserveInserted = window.setInterval(function () {
+                $$.intervalForObserveInserted = window.setInterval(function() {
                     // parentNode will NOT be null when completed
                     if (selection.node().parentNode) {
                         window.clearInterval($$.intervalForObserveInserted);
@@ -926,29 +901,30 @@ c3_chart_internal_fn.observeInserted = function (selection) {
             }
         });
     });
-    observer.observe(selection.node(), {attributes: true, childList: true, characterData: true});
+    observer.observe(selection.node(), { attributes: true, childList: true, characterData: true });
 };
 
-c3_chart_internal_fn.bindResize = function () {
-    var $$ = this, config = $$.config;
+c3_chart_internal_fn.bindResize = function() {
+    var $$ = this,
+        config = $$.config;
 
     $$.resizeFunction = $$.generateResize();
 
-    $$.resizeFunction.add(function () {
+    $$.resizeFunction.add(function() {
         config.onresize.call($$);
     });
     if (config.resize_auto) {
-        $$.resizeFunction.add(function () {
+        $$.resizeFunction.add(function() {
             if ($$.resizeTimeout !== undefined) {
                 window.clearTimeout($$.resizeTimeout);
             }
-            $$.resizeTimeout = window.setTimeout(function () {
+            $$.resizeTimeout = window.setTimeout(function() {
                 delete $$.resizeTimeout;
                 $$.api.flush();
             }, 100);
         });
     }
-    $$.resizeFunction.add(function () {
+    $$.resizeFunction.add(function() {
         config.onresized.call($$);
     });
 
@@ -973,17 +949,18 @@ c3_chart_internal_fn.bindResize = function () {
     }
 };
 
-c3_chart_internal_fn.generateResize = function () {
+c3_chart_internal_fn.generateResize = function() {
     var resizeFunctions = [];
+
     function callResizeFunctions() {
-        resizeFunctions.forEach(function (f) {
+        resizeFunctions.forEach(function(f) {
             f();
         });
     }
-    callResizeFunctions.add = function (f) {
+    callResizeFunctions.add = function(f) {
         resizeFunctions.push(f);
     };
-    callResizeFunctions.remove = function (f) {
+    callResizeFunctions.remove = function(f) {
         for (var i = 0; i < resizeFunctions.length; i++) {
             if (resizeFunctions[i] === f) {
                 resizeFunctions.splice(i, 1);
@@ -994,20 +971,20 @@ c3_chart_internal_fn.generateResize = function () {
     return callResizeFunctions;
 };
 
-c3_chart_internal_fn.endall = function (transition, callback) {
+c3_chart_internal_fn.endall = function(transition, callback) {
     var n = 0;
     transition
-        .each(function () { ++n; })
-        .each("end", function () {
+        .each(function() {++n; })
+        .each("end", function() {
             if (!--n) { callback.apply(this, arguments); }
         });
 };
-c3_chart_internal_fn.generateWait = function () {
+c3_chart_internal_fn.generateWait = function() {
     var transitionsToWait = [],
-        f = function (transition, callback) {
-            var timer = setInterval(function () {
+        f = function(transition, callback) {
+            var timer = setInterval(function() {
                 var done = 0;
-                transitionsToWait.forEach(function (t) {
+                transitionsToWait.forEach(function(t) {
                     if (t.empty()) {
                         done += 1;
                         return;
@@ -1024,14 +1001,15 @@ c3_chart_internal_fn.generateWait = function () {
                 }
             }, 10);
         };
-    f.add = function (transition) {
+    f.add = function(transition) {
         transitionsToWait.push(transition);
     };
     return f;
 };
 
-c3_chart_internal_fn.parseDate = function (date) {
-    var $$ = this, parsedDate;
+c3_chart_internal_fn.parseDate = function(date) {
+    var $$ = this,
+        parsedDate;
     if (date instanceof Date) {
         parsedDate = date;
     } else if (typeof date === 'string') {
@@ -1045,7 +1023,7 @@ c3_chart_internal_fn.parseDate = function (date) {
     return parsedDate;
 };
 
-c3_chart_internal_fn.isTabVisible = function () {
+c3_chart_internal_fn.isTabVisible = function() {
     var hidden;
     if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
         hidden = "hidden";

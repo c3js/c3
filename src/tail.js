@@ -1,9 +1,17 @@
-    if (typeof define === 'function' && define.amd) {
-        define("c3", ["d3"], function () { return c3; });
-    } else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
-        module.exports = c3;
-    } else {
-        window.c3 = c3;
-    }
+	c3.generate = function(config) {
+	    return new Chart(config);
+	};
 
-})(window);
+	c3.chart = {
+	    fn: Chart.prototype,
+	    internal: {
+	        fn: ChartInternal.prototype,
+	        axis: {
+	            fn: Axis.prototype
+	        }
+	    }
+	};
+
+	return c3;
+
+}));
