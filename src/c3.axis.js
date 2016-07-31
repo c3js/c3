@@ -25,10 +25,11 @@ function c3_axis(d3, params) {
         var start = domain[0], stop = domain[domain.length - 1];
         return start < stop ? [ start, stop ] : [ stop, start ];
     }
-    function generateTicks(scale) {
+    function generateTicks(scale, count) {
         var i, domain, ticks = [];
         if (scale.ticks) {
-            return scale.ticks.apply(scale, tickArguments);
+            count = count ? [count] : tickArguments;
+            return scale.ticks.apply(scale, count);
         }
         domain = scale.domain();
         for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
@@ -81,7 +82,7 @@ function c3_axis(d3, params) {
 
             var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
 
-            var ticks = tickValues ? tickValues : generateTicks(scale1),
+            var ticks = tickValues ? tickValues : generateTicks(scale1, params.tickCount),
                 tick = g.selectAll(".tick").data(ticks, scale1),
                 tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.

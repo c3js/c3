@@ -525,10 +525,10 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.y.domain($$.getYDomain(targetsToShow, 'y', xDomainForZoom));
     $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
-    if (!config.axis_y_tick_values && config.axis_y_tick_count) {
+    if (!config.axis_y_tick_values && config.axis_y_tick_count && config.axis_y_tick_exact) {
         $$.yAxis.tickValues($$.axis.generateTickValues($$.y.domain(), config.axis_y_tick_count));
     }
-    if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
+    if (!config.axis_y2_tick_values && config.axis_y2_tick_count && config.axis_y2_tick_exact) {
         $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
     }
 

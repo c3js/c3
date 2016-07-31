@@ -65,6 +65,36 @@ describe('c3 chart axis', function () {
 
     });
 
+
+    describe('axis.y.tick.exact', function () {
+
+        it('should update args to have 12 ticks on y axis', function () {
+            args.axis.y.tick.count = 12;
+            expect(true).toBeTruthy();
+        });
+
+        it('should display exact count numbers', function () {
+           var text = d3.select('.c3-axis-y').selectAll('g.tick').filter(function (d, i) { 
+               return i === 1;
+           }).select('text').text();
+
+           expect(+text).toBe(13.545454545454547);
+       });
+
+        it('should update args to not to be exact ticks on y axis', function () {
+           args.axis.y.tick.exact = false;
+           expect(true).toBeTruthy();
+       });
+
+        it('should display average count numbers', function () {
+           var text = d3.select('.c3-axis-y').selectAll('g.tick').filter(function (d, i) { 
+               return i === 1;
+           }).select('text').text();
+
+           expect(+text).toBe(50);
+       });
+    });
+
     describe('axis.y.tick.values', function () {
 
         var values = [100, 500];
