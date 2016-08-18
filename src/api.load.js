@@ -35,6 +35,10 @@ c3_chart_fn.load = function (args) {
         $$.load($$.getCaches(args.cacheIds), args.done);
         return;
     }
+    // update json if exists
+    if ('json' in args) {
+        config.data_json = args.json;
+    }
     // unload if needed
     if ('unload' in args) {
         // TODO: do not unload if target will load (included in url/rows/columns)

@@ -118,4 +118,44 @@ describe('c3 api load', function () {
 
     });
 
+    describe('reload data', function () {
+
+        it('should define chart via json', function () {
+            args = {
+                data: {
+                    json: [
+                        {x: 1, y: 2},
+                        {x: 3, y: 1},
+                        {x: 5, y: 3}
+                    ],
+                    keys: {
+                      value: ["x", "y"],
+                      x: 'x',
+                    },
+                },
+            };
+            expect(true).toBeTruthy();
+        });
+
+        describe('json property of config', function () {
+
+            it('should store the re-loaded json data', function (done) {
+                chart.load({
+                    json: [
+                        {x: 10, y: 20},
+                        {x: 30, y: 10},
+                    ]
+                });
+                setTimeout(function () {
+                    var json = chart.internal.config.data_json;
+                    expect(json.length).toBe(2);
+                    expect(json[0].x).toBe(10);
+                    done();
+                }, 500);
+            });
+
+        });
+
+    });
+
 });
