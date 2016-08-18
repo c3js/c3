@@ -189,7 +189,14 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
 
     // finish targets
     targets.forEach(function (t) {
-        var i;
+        var i = 0;
+        // index values by index in input data, e.g. json
+        // this is very useful in callbacks so you can access source data
+        // and use those in the callbacks
+        t.values.forEach(function (v) {
+            v.source_index = i++;
+        });
+
         // sort values by its x
         if (config.data_xSort) {
             t.values = t.values.sort(function (v1, v2) {
