@@ -7,6 +7,12 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
     isString = c3_chart_internal_fn.isString = function (o) {
         return typeof o === 'string';
     },
+    isArray = c3_chart_internal_fn.isArray = function (o) {
+        if (Array.isArray) {
+            return Array.isArray(o);
+        }
+        return Object.prototype.toString.call(o) === '[object Array]';
+    },
     isUndefined = c3_chart_internal_fn.isUndefined = function (v) {
         return typeof v === 'undefined';
     },

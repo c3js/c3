@@ -121,7 +121,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_label: {},
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
-        axis_y_tick_values: null,        
+        axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
         axis_y_tick_time_value: undefined,
@@ -203,6 +203,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         regions: [],
         // tooltip - show when mouseover on each data
         tooltip_show: true,
+        tooltip_order: undefined,
         tooltip_grouped: true,
         tooltip_format_title: undefined,
         tooltip_format_name: undefined,
