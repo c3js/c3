@@ -97,6 +97,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
         barY = $$.getShapeY(!!isSub),
         barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
+        barSpaceOffset = barW * ($$.config.bar_space / 2),
         yScale = isSub ? $$.getSubYScale : $$.getYScale;
     return function (d, i) {
         var y0 = yScale.call($$, d.id)(0),
@@ -108,10 +109,10 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         }
         // 4 points that make a bar
         return [
-            [posX, offset],
-            [posX, posY - (y0 - offset)],
-            [posX + barW, posY - (y0 - offset)],
-            [posX + barW, offset]
+            [posX + barSpaceOffset, offset],
+            [posX + barSpaceOffset, posY - (y0 - offset)],
+            [posX + barW - barSpaceOffset, posY - (y0 - offset)],
+            [posX + barW - barSpaceOffset, offset]
         ];
     };
 };
