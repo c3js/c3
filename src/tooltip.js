@@ -133,4 +133,5 @@ c3_chart_internal_fn.showTooltip = function (selectedData, element) {
 };
 c3_chart_internal_fn.hideTooltip = function () {
     this.tooltip.style("display", "none");
+    this.config.tooltip_onhide.call(this);
 };
