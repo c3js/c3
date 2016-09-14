@@ -1,24 +1,11 @@
 module.exports = (grunt) ->
-    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma', 'grunt-rollup']
+    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma']
 
 
 
 
 
     grunt.initConfig
-        rollup: 
-          options: 
-            external: ['d3']
-            format: "umd"
-            moduleName: "c3"
-            globals:
-              d3: 'd3'
-            
-          files: 
-            src: 'es6_modules/rollup.entry.js'
-            dest: 'c3.es6.js'
-          
-      
         watch:
           concat:
             tasks: 'concat'
@@ -136,7 +123,7 @@ module.exports = (grunt) ->
             src: [
               'src/head.js',
 
-              
+
               'src/axis/index.js',
               'src/axis/c3.axis.js',
               'src/axis/axis.js',
@@ -175,7 +162,7 @@ module.exports = (grunt) ->
               'src/chartinternal/transform.js',
               'src/chartinternal/flow.js',
               'src/chartinternal/ua.js',
-              
+
               'src/chart/index.js',
               'src/chart/api.focus.js',
               'src/chart/api.show.js',
@@ -195,11 +182,11 @@ module.exports = (grunt) ->
               'src/chart/api.legend.js',
               'src/chart/api.chart.js',
               'src/chart/api.tooltip.js',
-              
-              
+
+
               'src/tail.js',
               'src/polyfill.js'
-              
+
             ]
             dest: 'c3.js'
 
@@ -236,4 +223,4 @@ module.exports = (grunt) ->
     grunt.registerTask 'build', ['concat:dist', 'sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
     grunt.registerTask 'default', ['lint', 'build', 'test', 'minify']
-    grunt.registerTask 'build_rollup', ['concat:axis', 'concat:chart', 'concat:chartinternal','rollup']
+    grunt.registerTask 'build_modules', ['concat:axis', 'concat:chart', 'concat:chartinternal']
