@@ -1,5 +1,5 @@
 c3_chart_fn.load = function (args) {
-    var $$ = this.internal, config = $$.config;
+    let $$ = this.internal, config = $$.config;
     // update xs if specified
     if (args.xs) {
         $$.addXs(args.xs);
@@ -10,7 +10,7 @@ c3_chart_fn.load = function (args) {
     }
     // update classes if exists
     if ('classes' in args) {
-        Object.keys(args.classes).forEach(function (id) {
+        Object.keys(args.classes).forEach((id) => {
             config.data_classes[id] = args.classes[id];
         });
     }
@@ -20,13 +20,13 @@ c3_chart_fn.load = function (args) {
     }
     // update axes if exists
     if ('axes' in args) {
-        Object.keys(args.axes).forEach(function (id) {
+        Object.keys(args.axes).forEach((id) => {
             config.data_axes[id] = args.axes[id];
         });
     }
     // update colors if exists
     if ('colors' in args) {
-        Object.keys(args.colors).forEach(function (id) {
+        Object.keys(args.colors).forEach((id) => {
             config.data_colors[id] = args.colors[id];
         });
     }
@@ -38,7 +38,7 @@ c3_chart_fn.load = function (args) {
     // unload if needed
     if ('unload' in args) {
         // TODO: do not unload if target will load (included in url/rows/columns)
-        $$.unload($$.mapToTargetIds((typeof args.unload === 'boolean' && args.unload) ? null : args.unload), function () {
+        $$.unload($$.mapToTargetIds((typeof args.unload === 'boolean' && args.unload) ? null : args.unload), () => {
             $$.loadFromArgs(args);
         });
     } else {
@@ -47,15 +47,15 @@ c3_chart_fn.load = function (args) {
 };
 
 c3_chart_fn.unload = function (args) {
-    var $$ = this.internal;
+    const $$ = this.internal;
     args = args || {};
     if (args instanceof Array) {
-        args = {ids: args};
+        args = { ids: args };
     } else if (typeof args === 'string') {
-        args = {ids: [args]};
+        args = { ids: [args] };
     }
-    $$.unload($$.mapToTargetIds(args.ids), function () {
-        $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+    $$.unload($$.mapToTargetIds(args.ids), () => {
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
         if (args.done) { args.done(); }
     });
 };

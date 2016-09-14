@@ -1,10 +1,10 @@
-c3_chart_internal_fn.generateFlow = function(args) {
-    var $$ = this,
+c3_chart_internal_fn.generateFlow = function (args) {
+    let $$ = this,
         config = $$.config,
         d3 = $$.d3;
 
-    return function() {
-        var targets = args.targets,
+    return function () {
+        let targets = args.targets,
             flow = args.flow,
             drawBar = args.drawBar,
             drawLine = args.drawLine,
@@ -16,7 +16,7 @@ c3_chart_internal_fn.generateFlow = function(args) {
             yForText = args.yForText,
             duration = args.duration;
 
-        var translateX, scaleX = 1,
+        let translateX, scaleX = 1,
             transform,
             flowIndex = flow.index,
             flowLength = flow.length,
@@ -25,10 +25,10 @@ c3_chart_internal_fn.generateFlow = function(args) {
             orgDomain = $$.x.domain(),
             domain,
             durationForFlow = flow.duration || duration,
-            done = flow.done || function() {},
+            done = flow.done || function () {},
             wait = $$.generateWait();
 
-        var xgrid = $$.xgrid || d3.selectAll([]),
+        let xgrid = $$.xgrid || d3.selectAll([]),
             xgridLines = $$.xgridLines || d3.selectAll([]),
             mainRegion = $$.mainRegion || d3.selectAll([]),
             mainText = $$.mainText || d3.selectAll([]),
@@ -41,7 +41,7 @@ c3_chart_internal_fn.generateFlow = function(args) {
         $$.flowing = true;
 
         // remove head data after rendered
-        $$.data.targets.forEach(function(d) {
+        $$.data.targets.forEach((d) => {
             d.values.splice(0, flowLength);
         });
 
@@ -77,19 +77,19 @@ c3_chart_internal_fn.generateFlow = function(args) {
 
         $$.hideXGridFocus();
 
-        d3.transition().ease('linear').duration(durationForFlow).each(function() {
-                wait.add($$.axes.x.transition().call($$.xAxis));
-                wait.add(mainBar.transition().attr('transform', transform));
-                wait.add(mainLine.transition().attr('transform', transform));
-                wait.add(mainArea.transition().attr('transform', transform));
-                wait.add(mainCircle.transition().attr('transform', transform));
-                wait.add(mainText.transition().attr('transform', transform));
-                wait.add(mainRegion.filter($$.isRegionOnX).transition().attr('transform', transform));
-                wait.add(xgrid.transition().attr('transform', transform));
-                wait.add(xgridLines.transition().attr('transform', transform));
-            })
-            .call(wait, function() {
-                var i, shapes = [],
+        d3.transition().ease('linear').duration(durationForFlow).each(() => {
+            wait.add($$.axes.x.transition().call($$.xAxis));
+            wait.add(mainBar.transition().attr('transform', transform));
+            wait.add(mainLine.transition().attr('transform', transform));
+            wait.add(mainArea.transition().attr('transform', transform));
+            wait.add(mainCircle.transition().attr('transform', transform));
+            wait.add(mainText.transition().attr('transform', transform));
+            wait.add(mainRegion.filter($$.isRegionOnX).transition().attr('transform', transform));
+            wait.add(xgrid.transition().attr('transform', transform));
+            wait.add(xgridLines.transition().attr('transform', transform));
+        })
+            .call(wait, () => {
+                let i, shapes = [],
                     texts = [],
                     eventRects = [];
 
@@ -113,24 +113,24 @@ c3_chart_internal_fn.generateFlow = function(args) {
                 xgridLines
                     .attr('transform', null);
                 xgridLines.select('line')
-                    .attr("x1", config.axis_rotated ? 0 : xv)
-                    .attr("x2", config.axis_rotated ? $$.width : xv);
+                    .attr('x1', config.axis_rotated ? 0 : xv)
+                    .attr('x2', config.axis_rotated ? $$.width : xv);
                 xgridLines.select('text')
-                    .attr("x", config.axis_rotated ? $$.width : 0)
-                    .attr("y", xv);
+                    .attr('x', config.axis_rotated ? $$.width : 0)
+                    .attr('y', xv);
                 mainBar
                     .attr('transform', null)
-                    .attr("d", drawBar);
+                    .attr('d', drawBar);
                 mainLine
                     .attr('transform', null)
-                    .attr("d", drawLine);
+                    .attr('d', drawLine);
                 mainArea
                     .attr('transform', null)
-                    .attr("d", drawArea);
+                    .attr('d', drawArea);
                 mainCircle
                     .attr('transform', null)
-                    .attr("cx", cx)
-                    .attr("cy", cy);
+                    .attr('cx', cx)
+                    .attr('cy', cy);
                 mainText
                     .attr('transform', null)
                     .attr('x', xForText)
@@ -139,8 +139,8 @@ c3_chart_internal_fn.generateFlow = function(args) {
                 mainRegion
                     .attr('transform', null);
                 mainRegion.select('rect').filter($$.isRegionOnX)
-                    .attr("x", $$.regionX.bind($$))
-                    .attr("width", $$.regionWidth.bind($$));
+                    .attr('x', $$.regionX.bind($$))
+                    .attr('width', $$.regionWidth.bind($$));
 
                 if (config.interaction_enabled) {
                     $$.redrawEventRect();

@@ -1,6 +1,6 @@
 c3_chart_fn.data = function (targetIds) {
-    var targets = this.internal.data.targets;
-    return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {
+    const targets = this.internal.data.targets;
+    return typeof targetIds === 'undefined' ? targets : targets.filter((t) => {
         return [].concat(targetIds).indexOf(t.id) >= 0;
     });
 };
@@ -8,10 +8,10 @@ c3_chart_fn.data.shown = function (targetIds) {
     return this.internal.filterTargetsToShow(this.data(targetIds));
 };
 c3_chart_fn.data.values = function (targetId) {
-    var targets, values = null;
+    let targets, values = null;
     if (targetId) {
         targets = this.data(targetId);
-        values = targets[0] ? targets[0].values.map(function (d) { return d.value; }) : null;
+        values = targets[0] ? targets[0].values.map((d) => { return d.value; }) : null;
     }
     return values;
 };

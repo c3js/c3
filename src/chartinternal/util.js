@@ -1,6 +1,6 @@
-var isValue = c3_chart_internal_fn.isValue = function (v) {
-    return v || v === 0;
-},
+let isValue = c3_chart_internal_fn.isValue = function (v) {
+        return v || v === 0;
+    },
     isFunction = c3_chart_internal_fn.isFunction = function (o) {
         return typeof o === 'function';
     },
@@ -32,8 +32,8 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
         return isDefined(options[key]) ? options[key] : defaultValue;
     },
     hasValue = c3_chart_internal_fn.hasValue = function (dict, value) {
-        var found = false;
-        Object.keys(dict).forEach(function (key) {
+        let found = false;
+        Object.keys(dict).forEach((key) => {
             if (dict[key] === value) { found = true; }
         });
         return found;
@@ -42,8 +42,8 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
         return typeof str === 'string' ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : str;
     },
     getPathBox = c3_chart_internal_fn.getPathBox = function (path) {
-        var box = path.getBoundingClientRect(),
+        let box = path.getBoundingClientRect(),
             items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
             minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
-        return {x: minX, y: minY, width: box.width, height: box.height};
+        return { x: minX, y: minY, width: box.width, height: box.height };
     };

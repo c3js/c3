@@ -1,6 +1,6 @@
 c3_chart_internal_fn.setTargetType = function (targetIds, type) {
-    var $$ = this, config = $$.config;
-    $$.mapToTargetIds(targetIds).forEach(function (id) {
+    let $$ = this, config = $$.config;
+    $$.mapToTargetIds(targetIds).forEach((id) => {
         $$.withoutFadeIn[id] = (type === config.data_types[id]);
         config.data_types[id] = type;
     });
@@ -9,17 +9,17 @@ c3_chart_internal_fn.setTargetType = function (targetIds, type) {
     }
 };
 c3_chart_internal_fn.hasType = function (type, targets) {
-    var $$ = this, types = $$.config.data_types, has = false;
+    let $$ = this, types = $$.config.data_types, has = false;
     targets = targets || $$.data.targets;
     if (targets && targets.length) {
-        targets.forEach(function (target) {
-            var t = types[target.id];
+        targets.forEach((target) => {
+            const t = types[target.id];
             if ((t && t.indexOf(type) >= 0) || (!t && type === 'line')) {
                 has = true;
             }
         });
     } else if (Object.keys(types).length) {
-        Object.keys(types).forEach(function (id) {
+        Object.keys(types).forEach((id) => {
             if (types[id] === type) { has = true; }
         });
     } else {
@@ -31,39 +31,39 @@ c3_chart_internal_fn.hasArcType = function (targets) {
     return this.hasType('pie', targets) || this.hasType('donut', targets) || this.hasType('gauge', targets);
 };
 c3_chart_internal_fn.isLineType = function (d) {
-    var config = this.config, id = isString(d) ? d : d.id;
+    let config = this.config, id = isString(d) ? d : d.id;
     return !config.data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isStepType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return ['step', 'area-step'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isSplineType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return ['spline', 'area-spline'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isAreaType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return ['area', 'area-spline', 'area-step'].indexOf(this.config.data_types[id]) >= 0;
 };
 c3_chart_internal_fn.isBarType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'bar';
 };
 c3_chart_internal_fn.isScatterType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'scatter';
 };
 c3_chart_internal_fn.isPieType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'pie';
 };
 c3_chart_internal_fn.isGaugeType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'gauge';
 };
 c3_chart_internal_fn.isDonutType = function (d) {
-    var id = isString(d) ? d : d.id;
+    const id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'donut';
 };
 c3_chart_internal_fn.isArcType = function (d) {

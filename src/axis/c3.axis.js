@@ -2,31 +2,31 @@
 // 1. category axis
 // 2. ceil values of translate/x/y to int for half pixel antialiasing
 // 3. multiline tick text
-var tickTextCharSize;
+let tickTextCharSize;
 function c3_axis(d3, params) {
-    var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+    let scale = d3.scale.linear(), orient = 'bottom', innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
-    var tickOffset = 0, tickCulling = true, tickCentered;
+    let tickOffset = 0, tickCulling = true, tickCentered;
 
     params = params || {};
     outerTickSize = params.withOuterTick ? 6 : 0;
 
     function axisX(selection, x) {
-        selection.attr("transform", function (d) {
-            return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+        selection.attr('transform', (d) => {
+            return 'translate(' + Math.ceil(x(d) + tickOffset) + ', 0)';
         });
     }
     function axisY(selection, y) {
-        selection.attr("transform", function (d) {
-            return "translate(0," + Math.ceil(y(d)) + ")";
+        selection.attr('transform', (d) => {
+            return 'translate(0,' + Math.ceil(y(d)) + ')';
         });
     }
     function scaleExtent(domain) {
-        var start = domain[0], stop = domain[domain.length - 1];
-        return start < stop ? [ start, stop ] : [ stop, start ];
+        let start = domain[0], stop = domain[domain.length - 1];
+        return start < stop ? [start, stop] : [stop, start];
     }
     function generateTicks(scale) {
-        var i, domain, ticks = [];
+        let i, domain, ticks = [];
         if (scale.ticks) {
             return scale.ticks.apply(scale, tickArguments);
         }
@@ -40,7 +40,7 @@ function c3_axis(d3, params) {
         return ticks;
     }
     function copyScale() {
-        var newScale = scale.copy(), domain;
+        let newScale = scale.copy(), domain;
         if (params.isCategory) {
             domain = scale.domain();
             newScale.domain([domain[0], domain[1] - 1]);
@@ -48,19 +48,19 @@ function c3_axis(d3, params) {
         return newScale;
     }
     function textFormatted(v) {
-        var formatted = tickFormat ? tickFormat(v) : v;
+        const formatted = tickFormat ? tickFormat(v) : v;
         return typeof formatted !== 'undefined' ? formatted : '';
     }
     function getSizeFor1Char(tick) {
         if (tickTextCharSize) {
             return tickTextCharSize;
         }
-        var size = {
+        const size = {
             h: 11.5,
-            w: 5.5
+            w: 5.5,
         };
         tick.select('text').text(textFormatted).each(function (d) {
-            var box = this.getBoundingClientRect(),
+            let box = this.getBoundingClientRect(),
                 text = textFormatted(d),
                 h = box.height,
                 w = text ? (box.width / text.length) : undefined;
@@ -77,28 +77,28 @@ function c3_axis(d3, params) {
     }
     function axis(g) {
         g.each(function () {
-            var g = axis.g = d3.select(this);
+            const g = axis.g = d3.select(this);
 
-            var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
+            let scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
 
-            var ticks = tickValues ? tickValues : generateTicks(scale1),
-                tick = g.selectAll(".tick").data(ticks, scale1),
-                tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
+            let ticks = tickValues ? tickValues : generateTicks(scale1),
+                tick = g.selectAll('.tick').data(ticks, scale1),
+                tickEnter = tick.enter().insert('g', '.domain').attr('class', 'tick').style('opacity', 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
-                tickUpdate = transitionise(tick).style("opacity", 1),
+                tickUpdate = transitionise(tick).style('opacity', 1),
                 tickTransform, tickX, tickY;
 
-            var range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
-                path = g.selectAll(".domain").data([ 0 ]),
-                pathUpdate = (path.enter().append("path").attr("class", "domain"), transitionise(path));
-            tickEnter.append("line");
-            tickEnter.append("text");
+            let range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
+                path = g.selectAll('.domain').data([0]),
+                pathUpdate = (path.enter().append('path').attr('class', 'domain'), transitionise(path));
+            tickEnter.append('line');
+            tickEnter.append('text');
 
-            var lineEnter = tickEnter.select("line"),
-                lineUpdate = tickUpdate.select("line"),
-                textEnter = tickEnter.select("text"),
-                textUpdate = tickUpdate.select("text");
+            let lineEnter = tickEnter.select('line'),
+                lineUpdate = tickUpdate.select('line'),
+                textEnter = tickEnter.select('text'),
+                textUpdate = tickUpdate.select('text');
 
             if (params.isCategory) {
                 tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
@@ -108,16 +108,16 @@ function c3_axis(d3, params) {
                 tickOffset = tickX = 0;
             }
 
-            var text, tspan, sizeFor1Char = getSizeFor1Char(g.select('.tick')), counts = [];
-            var tickLength = Math.max(innerTickSize, 0) + tickPadding,
+            let text, tspan, sizeFor1Char = getSizeFor1Char(g.select('.tick')), counts = [];
+            let tickLength = Math.max(innerTickSize, 0) + tickPadding,
                 isVertical = orient === 'left' || orient === 'right';
 
             // this should be called only when category axis
             function splitTickText(d, maxWidth) {
-                var tickText = textFormatted(d),
+                let tickText = textFormatted(d),
                     subtext, spaceIndex, textWidth, splitted = [];
 
-                if (Object.prototype.toString.call(tickText) === "[object Array]") {
+                if (Object.prototype.toString.call(tickText) === '[object Array]') {
                     return tickText;
                 }
 
@@ -127,7 +127,7 @@ function c3_axis(d3, params) {
 
                 function split(splitted, text) {
                     spaceIndex = undefined;
-                    for (var i = 1; i < text.length; i++) {
+                    for (let i = 1; i < text.length; i++) {
                         if (text.charAt(i) === ' ') {
                             spaceIndex = i;
                         }
@@ -144,52 +144,52 @@ function c3_axis(d3, params) {
                     return splitted.concat(text);
                 }
 
-                return split(splitted, tickText + "");
+                return split(splitted, tickText + '');
             }
 
             function tspanDy(d, i) {
-                var dy = sizeFor1Char.h;
+                let dy = sizeFor1Char.h;
                 if (i === 0) {
                     if (orient === 'left' || orient === 'right') {
                         dy = -((counts[d.index] - 1) * (sizeFor1Char.h / 2) - 3);
                     } else {
-                        dy = ".71em";
+                        dy = '.71em';
                     }
                 }
                 return dy;
             }
 
             function tickSize(d) {
-                var tickPosition = scale(d) + (tickCentered ? 0 : tickOffset);
+                const tickPosition = scale(d) + (tickCentered ? 0 : tickOffset);
                 return range[0] < tickPosition && tickPosition < range[1] ? innerTickSize : 0;
             }
 
-            text = tick.select("text");
+            text = tick.select('text');
             tspan = text.selectAll('tspan')
-                .data(function (d, i) {
-                    var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
+                .data((d, i) => {
+                    const splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
                     counts[i] = splitted.length;
-                    return splitted.map(function (s) {
+                    return splitted.map((s) => {
                         return { index: i, splitted: s };
                     });
                 });
             tspan.enter().append('tspan');
             tspan.exit().remove();
-            tspan.text(function (d) { return d.splitted; });
+            tspan.text((d) => { return d.splitted; });
 
-            var rotate = params.tickTextRotate;
+            const rotate = params.tickTextRotate;
 
             function textAnchorForText(rotate) {
                 if (!rotate) {
                     return 'middle';
                 }
-                return rotate > 0 ? "start" : "end";
+                return rotate > 0 ? 'start' : 'end';
             }
             function textTransform(rotate) {
                 if (!rotate) {
                     return '';
                 }
-                return "rotate(" + rotate + ")";
+                return 'rotate(' + rotate + ')';
             }
             function dxForText(rotate) {
                 if (!rotate) {
@@ -205,59 +205,59 @@ function c3_axis(d3, params) {
             }
 
             switch (orient) {
-            case "bottom":
+            case 'bottom':
                 {
                     tickTransform = axisX;
-                    lineEnter.attr("y2", innerTickSize);
-                    textEnter.attr("y", tickLength);
-                    lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", tickSize);
-                    textUpdate.attr("x", 0).attr("y", yForText(rotate))
-                        .style("text-anchor", textAnchorForText(rotate))
-                        .attr("transform", textTransform(rotate));
-                    tspan.attr('x', 0).attr("dy", tspanDy).attr('dx', dxForText(rotate));
-                    pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
+                    lineEnter.attr('y2', innerTickSize);
+                    textEnter.attr('y', tickLength);
+                    lineUpdate.attr('x1', tickX).attr('x2', tickX).attr('y2', tickSize);
+                    textUpdate.attr('x', 0).attr('y', yForText(rotate))
+                        .style('text-anchor', textAnchorForText(rotate))
+                        .attr('transform', textTransform(rotate));
+                    tspan.attr('x', 0).attr('dy', tspanDy).attr('dx', dxForText(rotate));
+                    pathUpdate.attr('d', 'M' + range[0] + ',' + outerTickSize + 'V0H' + range[1] + 'V' + outerTickSize);
                     break;
                 }
-            case "top":
+            case 'top':
                 {
                     // TODO: rotated tick text
                     tickTransform = axisX;
-                    lineEnter.attr("y2", -innerTickSize);
-                    textEnter.attr("y", -tickLength);
-                    lineUpdate.attr("x2", 0).attr("y2", -innerTickSize);
-                    textUpdate.attr("x", 0).attr("y", -tickLength);
-                    text.style("text-anchor", "middle");
-                    tspan.attr('x', 0).attr("dy", "0em");
-                    pathUpdate.attr("d", "M" + range[0] + "," + -outerTickSize + "V0H" + range[1] + "V" + -outerTickSize);
+                    lineEnter.attr('y2', -innerTickSize);
+                    textEnter.attr('y', -tickLength);
+                    lineUpdate.attr('x2', 0).attr('y2', -innerTickSize);
+                    textUpdate.attr('x', 0).attr('y', -tickLength);
+                    text.style('text-anchor', 'middle');
+                    tspan.attr('x', 0).attr('dy', '0em');
+                    pathUpdate.attr('d', 'M' + range[0] + ',' + -outerTickSize + 'V0H' + range[1] + 'V' + -outerTickSize);
                     break;
                 }
-            case "left":
+            case 'left':
                 {
                     tickTransform = axisY;
-                    lineEnter.attr("x2", -innerTickSize);
-                    textEnter.attr("x", -tickLength);
-                    lineUpdate.attr("x2", -innerTickSize).attr("y1", tickY).attr("y2", tickY);
-                    textUpdate.attr("x", -tickLength).attr("y", tickOffset);
-                    text.style("text-anchor", "end");
-                    tspan.attr('x', -tickLength).attr("dy", tspanDy);
-                    pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);
+                    lineEnter.attr('x2', -innerTickSize);
+                    textEnter.attr('x', -tickLength);
+                    lineUpdate.attr('x2', -innerTickSize).attr('y1', tickY).attr('y2', tickY);
+                    textUpdate.attr('x', -tickLength).attr('y', tickOffset);
+                    text.style('text-anchor', 'end');
+                    tspan.attr('x', -tickLength).attr('dy', tspanDy);
+                    pathUpdate.attr('d', 'M' + -outerTickSize + ',' + range[0] + 'H0V' + range[1] + 'H' + -outerTickSize);
                     break;
                 }
-            case "right":
+            case 'right':
                 {
                     tickTransform = axisY;
-                    lineEnter.attr("x2", innerTickSize);
-                    textEnter.attr("x", tickLength);
-                    lineUpdate.attr("x2", innerTickSize).attr("y2", 0);
-                    textUpdate.attr("x", tickLength).attr("y", 0);
-                    text.style("text-anchor", "start");
-                    tspan.attr('x', tickLength).attr("dy", tspanDy);
-                    pathUpdate.attr("d", "M" + outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + outerTickSize);
+                    lineEnter.attr('x2', innerTickSize);
+                    textEnter.attr('x', tickLength);
+                    lineUpdate.attr('x2', innerTickSize).attr('y2', 0);
+                    textUpdate.attr('x', tickLength).attr('y', 0);
+                    text.style('text-anchor', 'start');
+                    tspan.attr('x', tickLength).attr('dy', tspanDy);
+                    pathUpdate.attr('d', 'M' + outerTickSize + ',' + range[0] + 'H0V' + range[1] + 'H' + outerTickSize);
                     break;
                 }
             }
             if (scale1.rangeBand) {
-                var x = scale1, dx = x.rangeBand() / 2;
+                let x = scale1, dx = x.rangeBand() / 2;
                 scale0 = scale1 = function (d) {
                     return x(d) + dx;
                 };
@@ -277,7 +277,7 @@ function c3_axis(d3, params) {
     };
     axis.orient = function (x) {
         if (!arguments.length) { return orient; }
-        orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
+        orient = x in { top: 1, right: 1, bottom: 1, left: 1 } ? x + '' : 'bottom';
         return axis;
     };
     axis.tickFormat = function (format) {
@@ -294,7 +294,7 @@ function c3_axis(d3, params) {
         return tickOffset;
     };
     axis.tickInterval = function () {
-        var interval, length;
+        let interval, length;
         if (params.isCategory) {
             interval = tickOffset * 2;
         }

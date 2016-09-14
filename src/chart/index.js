@@ -1,8 +1,8 @@
-var c3_chart_fn;
+let c3_chart_fn;
 
 
 function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
+    const $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);
 
     $$.beforeInit(config);
@@ -11,7 +11,7 @@ function Chart(config) {
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
-        Object.keys(fn).forEach(function(key) {
+        Object.keys(fn).forEach((key) => {
             target[key] = fn[key].bind(argThis);
             if (Object.keys(fn[key]).length > 0) {
                 bindThis(fn[key], target[key], argThis);

@@ -1,5 +1,5 @@
-c3_chart_fn.flow = function(args) {
-    var $$ = this.internal,
+c3_chart_fn.flow = function (args) {
+    let $$ = this.internal,
         targets, data, notfoundIds = [],
         orgDataCount = $$.getMaxDataCount(),
         dataCount, domain, baseTarget, baseValue, length = 0,
@@ -18,8 +18,8 @@ c3_chart_fn.flow = function(args) {
     targets = $$.convertDataToTargets(data, true);
 
     // Update/Add data
-    $$.data.targets.forEach(function(t) {
-        var found = false,
+    $$.data.targets.forEach((t) => {
+        let found = false,
             i, j;
         for (i = 0; i < targets.length; i++) {
             if (t.id === targets[i].id) {
@@ -46,8 +46,8 @@ c3_chart_fn.flow = function(args) {
     });
 
     // Append null for not found targets
-    $$.data.targets.forEach(function(t) {
-        var i, j;
+    $$.data.targets.forEach((t) => {
+        let i, j;
         for (i = 0; i < notfoundIds.length; i++) {
             if (t.id === notfoundIds[i]) {
                 tail = t.values[t.values.length - 1].index + 1;
@@ -56,7 +56,7 @@ c3_chart_fn.flow = function(args) {
                         id: t.id,
                         index: tail + j,
                         x: $$.isTimeSeries() ? $$.getOtherTargetX(tail + j) : tail + j,
-                        value: null
+                        value: null,
                     });
                 }
             }
@@ -65,17 +65,17 @@ c3_chart_fn.flow = function(args) {
 
     // Generate null values for new target
     if ($$.data.targets.length) {
-        targets.forEach(function(t) {
-            var i, missing = [];
+        targets.forEach((t) => {
+            let i, missing = [];
             for (i = $$.data.targets[0].values[0].index; i < tail; i++) {
                 missing.push({
                     id: t.id,
                     index: i,
                     x: $$.isTimeSeries() ? $$.getOtherTargetX(i) : i,
-                    value: null
+                    value: null,
                 });
             }
-            t.values.forEach(function(v) {
+            t.values.forEach((v) => {
                 v.index += tail;
                 if (!$$.isTimeSeries()) {
                     v.x += tail;
@@ -95,7 +95,7 @@ c3_chart_fn.flow = function(args) {
     if (isDefined(args.to)) {
         length = 0;
         to = $$.isTimeSeries() ? $$.parseDate(args.to) : args.to;
-        baseTarget.values.forEach(function(v) {
+        baseTarget.values.forEach((v) => {
             if (v.x < to) { length++; }
         });
     } else if (isDefined(args.length)) {
@@ -130,10 +130,10 @@ c3_chart_fn.flow = function(args) {
     $$.redraw({
         flow: {
             index: baseValue.index,
-            length: length,
+            length,
             duration: isValue(args.duration) ? args.duration : $$.config.transition_duration,
             done: args.done,
-            orgDataCount: orgDataCount,
+            orgDataCount,
         },
         withLegend: true,
         withTransition: orgDataCount > 1,

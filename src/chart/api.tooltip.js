@@ -1,6 +1,6 @@
 c3_chart_fn.tooltip = function () {};
 c3_chart_fn.tooltip.show = function (args) {
-    var $$ = this.internal, index, mouse;
+    let $$ = this.internal, index, mouse;
 
     // determine mouse position on the chart
     if (args.mouse) {

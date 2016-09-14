@@ -1,5 +1,5 @@
 c3_chart_internal_fn.getDefaultConfig = function () {
-    var config = {
+    const config = {
         bindto: '#chart',
         svg_classname: undefined,
         size_width: undefined,
@@ -13,26 +13,26 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_extent: undefined,
         zoom_privileged: false,
         zoom_rescale: false,
-        zoom_onzoom: function () {},
-        zoom_onzoomstart: function () {},
-        zoom_onzoomend: function () {},
+        zoom_onzoom() {},
+        zoom_onzoomstart() {},
+        zoom_onzoomend() {},
         zoom_x_min: undefined,
         zoom_x_max: undefined,
         interaction_brighten: true,
         interaction_enabled: true,
-        onmouseover: function () {},
-        onmouseout: function () {},
-        onresize: function () {},
-        onresized: function () {},
-        oninit: function () {},
-        onrendered: function () {},
+        onmouseover() {},
+        onmouseout() {},
+        onresize() {},
+        onresized() {},
+        oninit() {},
+        onrendered() {},
         transition_duration: 350,
         data_x: undefined,
         data_xs: {},
         data_xFormat: '%Y-%m-%d',
         data_xLocaltime: true,
         data_xSort: true,
-        data_idConverter: function (id) { return id; },
+        data_idConverter(id) { return id; },
         data_names: {},
         data_classes: {},
         data_groups: [],
@@ -48,14 +48,14 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_filter: undefined,
         data_selection_enabled: false,
         data_selection_grouped: false,
-        data_selection_isselectable: function () { return true; },
+        data_selection_isselectable() { return true; },
         data_selection_multiple: true,
         data_selection_draggable: false,
-        data_onclick: function () {},
-        data_onmouseover: function () {},
-        data_onmouseout: function () {},
-        data_onselected: function () {},
-        data_onunselected: function () {},
+        data_onclick() {},
+        data_onmouseover() {},
+        data_onmouseout() {},
+        data_onselected() {},
+        data_onunselected() {},
         data_url: undefined,
         data_headers: undefined,
         data_json: undefined,
@@ -64,12 +64,12 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_mimeType: undefined,
         data_keys: undefined,
         // configuration for no plot-able data supplied.
-        data_empty_label_text: "",
+        data_empty_label_text: '',
         // subchart
         subchart_show: false,
         subchart_size_height: 60,
         subchart_axis_x_show: true,
-        subchart_onbrush: function () {},
+        subchart_onbrush() {},
         // color
         color_pattern: [],
         color_threshold: {},
@@ -121,7 +121,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_label: {},
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
-        axis_y_tick_values: null,        
+        axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
         axis_y_tick_time_value: undefined,
@@ -183,7 +183,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         gauge_label_format: undefined,
         gauge_min: 0,
         gauge_max: 100,
-        gauge_startingAngle: -1 * Math.PI/2,
+        gauge_startingAngle: -1 * Math.PI / 2,
         gauge_units: undefined,
         gauge_width: undefined,
         gauge_expand: {},
@@ -194,7 +194,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_label_threshold: 0.05,
         donut_label_ratio: undefined,
         donut_width: undefined,
-        donut_title: "",
+        donut_title: '',
         donut_expand: {},
         donut_expand_duration: 50,
         // spline
@@ -208,26 +208,26 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         tooltip_format_name: undefined,
         tooltip_format_value: undefined,
         tooltip_position: undefined,
-        tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+        tooltip_contents(d, defaultTitleFormat, defaultValueFormat, color) {
             return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
         },
         tooltip_init_show: false,
         tooltip_init_x: 0,
-        tooltip_init_position: {top: '0px', left: '50px'},
-        tooltip_onshow: function () {},
-        tooltip_onhide: function () {},
+        tooltip_init_position: { top: '0px', left: '50px' },
+        tooltip_onshow() {},
+        tooltip_onhide() {},
         // title
         title_text: undefined,
         title_padding: {
             top: 0,
             right: 0,
             bottom: 0,
-            left: 0
+            left: 0,
         },
         title_position: 'top-center',
-        //TouchEvent configuration
-        touch_tap_radius : 20,  //touch movement must be less than this to be a 'tap'
-        touch_tap_delay : 500,  //clicks are suppressed for this many ms after a tap
+        // TouchEvent configuration
+        touch_tap_radius: 20,  // touch movement must be less than this to be a 'tap'
+        touch_tap_delay: 500,  //clicks are suppressed for this many ms after a tap
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {
@@ -239,9 +239,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
 c3_chart_internal_fn.additionalConfig = {};
 
 c3_chart_internal_fn.loadConfig = function (config) {
-    var this_config = this.config, target, keys, read;
+    let this_config = this.config, target, keys, read;
     function find() {
-        var key = keys.shift();
+        const key = keys.shift();
 //        console.log("key =>", key, ", target =>", target);
         if (key && target && typeof target === 'object' && key in target) {
             target = target[key];
@@ -254,7 +254,7 @@ c3_chart_internal_fn.loadConfig = function (config) {
             return undefined;
         }
     }
-    Object.keys(this_config).forEach(function (key) {
+    Object.keys(this_config).forEach((key) => {
         target = config;
         keys = key.split('_');
         read = find();

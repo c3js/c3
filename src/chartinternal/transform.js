@@ -1,7 +1,7 @@
-c3_chart_internal_fn.transformTo = function(targetIds, type, optionsForRedraw) {
-    var $$ = this,
+c3_chart_internal_fn.transformTo = function (targetIds, type, optionsForRedraw) {
+    let $$ = this,
         withTransitionForAxis = !$$.hasArcType(),
-        options = optionsForRedraw || { withTransitionForAxis: withTransitionForAxis };
+        options = optionsForRedraw || { withTransitionForAxis };
     options.withTransitionForTransform = false;
     $$.transiting = false;
     $$.setTargetType(targetIds, type);

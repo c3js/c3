@@ -2,19 +2,19 @@ c3_chart_internal_fn.getScale = function (min, max, forTimeseries) {
     return (forTimeseries ? this.d3.time.scale() : this.d3.scale.linear()).range([min, max]);
 };
 c3_chart_internal_fn.getX = function (min, max, domain, offset) {
-    var $$ = this,
+    let $$ = this,
         scale = $$.getScale(min, max, $$.isTimeSeries()),
         _scale = domain ? scale.domain(domain) : scale, key;
     // Define customized scale if categorized axis
     if ($$.isCategorized()) {
         offset = offset || function () { return 0; };
         scale = function (d, raw) {
-            var v = _scale(d) + offset(d);
+            const v = _scale(d) + offset(d);
             return raw ? v : Math.ceil(v);
         };
     } else {
         scale = function (d, raw) {
-            var v = _scale(d);
+            const v = _scale(d);
             return raw ? v : Math.ceil(v);
         };
     }
@@ -39,7 +39,7 @@ c3_chart_internal_fn.getX = function (min, max, domain, offset) {
     return scale;
 };
 c3_chart_internal_fn.getY = function (min, max, domain) {
-    var scale = this.getScale(min, max, this.isTimeSeriesY());
+    const scale = this.getScale(min, max, this.isTimeSeriesY());
     if (domain) { scale.domain(domain); }
     return scale;
 };
@@ -50,7 +50,7 @@ c3_chart_internal_fn.getSubYScale = function (id) {
     return this.axis.getId(id) === 'y2' ? this.subY2 : this.subY;
 };
 c3_chart_internal_fn.updateScales = function () {
-    var $$ = this, config = $$.config,
+    let $$ = this, config = $$.config,
         forInit = !$$.x;
     // update edges
     $$.xMin = config.axis_rotated ? 1 : 0;
@@ -62,10 +62,10 @@ c3_chart_internal_fn.updateScales = function () {
     $$.subYMin = config.axis_rotated ? 0 : $$.height2;
     $$.subYMax = config.axis_rotated ? $$.width2 : 1;
     // update scales
-    $$.x = $$.getX($$.xMin, $$.xMax, forInit ? undefined : $$.x.orgDomain(), function () { return $$.xAxis.tickOffset(); });
+    $$.x = $$.getX($$.xMin, $$.xMax, forInit ? undefined : $$.x.orgDomain(), () => { return $$.xAxis.tickOffset(); });
     $$.y = $$.getY($$.yMin, $$.yMax, forInit ? config.axis_y_default : $$.y.domain());
     $$.y2 = $$.getY($$.yMin, $$.yMax, forInit ? config.axis_y2_default : $$.y2.domain());
-    $$.subX = $$.getX($$.xMin, $$.xMax, $$.orgXDomain, function (d) { return d % 1 ? 0 : $$.subXAxis.tickOffset(); });
+    $$.subX = $$.getX($$.xMin, $$.xMax, $$.orgXDomain, (d) => { return d % 1 ? 0 : $$.subXAxis.tickOffset(); });
     $$.subY = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y_default : $$.subY.domain());
     $$.subY2 = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y2_default : $$.subY2.domain());
     // update axes

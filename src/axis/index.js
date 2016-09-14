@@ -3,11 +3,10 @@ function API(owner) {
 }
 
 function inherit(base, derived) {
-
     if (Object.create) {
         derived.prototype = Object.create(base.prototype);
     } else {
-        var f = function f() {};
+        const f = function f() {};
         f.prototype = base.prototype;
         derived.prototype = new f();
     }

@@ -1,7 +1,7 @@
 c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
-    var $$ = this, config = $$.config,
+    let $$ = this, config = $$.config,
         indices = {}, i = 0, j, k;
-    $$.filterTargetsToShow($$.data.targets.filter(typeFilter, $$)).forEach(function (d) {
+    $$.filterTargetsToShow($$.data.targets.filter(typeFilter, $$)).forEach((d) => {
         for (j = 0; j < config.data_groups.length; j++) {
             if (config.data_groups[j].indexOf(d.id) < 0) { continue; }
             for (k = 0; k < config.data_groups[j].length; k++) {
@@ -17,35 +17,35 @@ c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
     return indices;
 };
 c3_chart_internal_fn.getShapeX = function (offset, targetsNum, indices, isSub) {
-    var $$ = this, scale = isSub ? $$.subX : $$.x;
+    let $$ = this, scale = isSub ? $$.subX : $$.x;
     return function (d) {
-        var index = d.id in indices ? indices[d.id] : 0;
+        const index = d.id in indices ? indices[d.id] : 0;
         return d.x || d.x === 0 ? scale(d.x) - offset * (targetsNum / 2 - index) : 0;
     };
 };
 c3_chart_internal_fn.getShapeY = function (isSub) {
-    var $$ = this;
+    const $$ = this;
     return function (d) {
-        var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id);
+        const scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id);
         return scale(d.value);
     };
 };
 c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
-    var $$ = this,
+    let $$ = this,
         targets = $$.orderTargets($$.filterTargetsToShow($$.data.targets.filter(typeFilter, $$))),
-        targetIds = targets.map(function (t) { return t.id; });
+        targetIds = targets.map((t) => { return t.id; });
     return function (d, i) {
-        var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
+        let scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
             y0 = scale(0), offset = y0;
-        targets.forEach(function (t) {
-            var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
+        targets.forEach((t) => {
+            const values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
                 // check if the x values line up
                 if (typeof values[i] === 'undefined' || +values[i].x !== +d.x) {  // "+" for timeseries
                     // if not, try to find the value that does line up
                     i = -1;
-                    values.forEach(function (v, j) {
+                    values.forEach((v, j) => {
                         if (v.x === d.x) {
                             i = j;
                         }
@@ -60,7 +60,7 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
     };
 };
 c3_chart_internal_fn.isWithinShape = function (that, d) {
-    var $$ = this,
+    let $$ = this,
         shape = $$.d3.select(that), isWithin;
     if (!$$.isTargetToShow(d.id)) {
         isWithin = false;
@@ -76,7 +76,7 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
 
 
 c3_chart_internal_fn.getInterpolate = function (d) {
-    var $$ = this,
+    let $$ = this,
         interpolation = $$.isInterpolationType($$.config.spline_interpolation_type) ? $$.config.spline_interpolation_type : 'cardinal';
-    return $$.isSplineType(d) ? interpolation : $$.isStepType(d) ? $$.config.line_step_type : "linear";
+    return $$.isSplineType(d) ? interpolation : $$.isStepType(d) ? $$.config.line_step_type : 'linear';
 };

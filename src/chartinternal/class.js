@@ -1,4 +1,4 @@
-var CLASS = c3_chart_internal_fn.CLASS = {
+const CLASS = c3_chart_internal_fn.CLASS = {
     target: 'c3-target',
     chart: 'c3-chart',
     chartLine: 'c3-chart-line',
@@ -73,10 +73,10 @@ var CLASS = c3_chart_internal_fn.CLASS = {
     dragarea: 'c3-dragarea',
     EXPANDED: '_expanded_',
     SELECTED: '_selected_',
-    INCLUDED: '_included_'
+    INCLUDED: '_included_',
 };
 c3_chart_internal_fn.generateClass = function (prefix, targetId) {
-    return " " + prefix + " " + prefix + this.getTargetSelectorSuffix(targetId);
+    return ' ' + prefix + ' ' + prefix + this.getTargetSelectorSuffix(targetId);
 };
 c3_chart_internal_fn.classText = function (d) {
     return this.generateClass(CLASS.text, d.index);
@@ -121,14 +121,14 @@ c3_chart_internal_fn.classAreas = function (d) {
     return this.classShapes(d) + this.generateClass(CLASS.areas, d.id);
 };
 c3_chart_internal_fn.classRegion = function (d, i) {
-    return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
+    return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d.class : '');
 };
 c3_chart_internal_fn.classEvent = function (d) {
     return this.generateClass(CLASS.eventRect, d.index);
 };
 c3_chart_internal_fn.classTarget = function (id) {
-    var $$ = this;
-    var additionalClassSuffix = $$.config.data_classes[id], additionalClass = '';
+    const $$ = this;
+    let additionalClassSuffix = $$.config.data_classes[id], additionalClass = '';
     if (additionalClassSuffix) {
         additionalClass = ' ' + CLASS.target + '-' + additionalClassSuffix;
     }
@@ -162,14 +162,14 @@ c3_chart_internal_fn.selectorTarget = function (id, prefix) {
     return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);
 };
 c3_chart_internal_fn.selectorTargets = function (ids, prefix) {
-    var $$ = this;
+    const $$ = this;
     ids = ids || [];
-    return ids.length ? ids.map(function (id) { return $$.selectorTarget(id, prefix); }) : null;
+    return ids.length ? ids.map((id) => { return $$.selectorTarget(id, prefix); }) : null;
 };
 c3_chart_internal_fn.selectorLegend = function (id) {
     return '.' + CLASS.legendItem + this.getTargetSelectorSuffix(id);
 };
 c3_chart_internal_fn.selectorLegends = function (ids) {
-    var $$ = this;
-    return ids && ids.length ? ids.map(function (id) { return $$.selectorLegend(id); }) : null;
+    const $$ = this;
+    return ids && ids.length ? ids.map((id) => { return $$.selectorLegend(id); }) : null;
 };

@@ -1,25 +1,25 @@
 c3_chart_internal_fn.getYDomainMin = function (targets) {
-    var $$ = this, config = $$.config,
+    let $$ = this, config = $$.config,
         ids = $$.mapToIds(targets), ys = $$.getValuesAsIdKeyed(targets),
         j, k, baseId, idsInGroup, id, hasNegativeValue;
     if (config.data_groups.length > 0) {
         hasNegativeValue = $$.hasNegativeValueInTargets(targets);
         for (j = 0; j < config.data_groups.length; j++) {
             // Determine baseId
-            idsInGroup = config.data_groups[j].filter(function (id) { return ids.indexOf(id) >= 0; });
+            idsInGroup = config.data_groups[j].filter((id) => { return ids.indexOf(id) >= 0; });
             if (idsInGroup.length === 0) { continue; }
             baseId = idsInGroup[0];
             // Consider negative values
             if (hasNegativeValue && ys[baseId]) {
-                ys[baseId].forEach(function (v, i) {
+                ys[baseId].forEach((v, i) => {
                     ys[baseId][i] = v < 0 ? v : 0;
                 });
             }
             // Compute min
             for (k = 1; k < idsInGroup.length; k++) {
                 id = idsInGroup[k];
-                if (! ys[id]) { continue; }
-                ys[id].forEach(function (v, i) {
+                if (!ys[id]) { continue; }
+                ys[id].forEach((v, i) => {
                     if ($$.axis.getId(id) === $$.axis.getId(baseId) && ys[baseId] && !(hasNegativeValue && +v > 0)) {
                         ys[baseId][i] += +v;
                     }
@@ -27,30 +27,30 @@ c3_chart_internal_fn.getYDomainMin = function (targets) {
             }
         }
     }
-    return $$.d3.min(Object.keys(ys).map(function (key) { return $$.d3.min(ys[key]); }));
+    return $$.d3.min(Object.keys(ys).map((key) => { return $$.d3.min(ys[key]); }));
 };
 c3_chart_internal_fn.getYDomainMax = function (targets) {
-    var $$ = this, config = $$.config,
+    let $$ = this, config = $$.config,
         ids = $$.mapToIds(targets), ys = $$.getValuesAsIdKeyed(targets),
         j, k, baseId, idsInGroup, id, hasPositiveValue;
     if (config.data_groups.length > 0) {
         hasPositiveValue = $$.hasPositiveValueInTargets(targets);
         for (j = 0; j < config.data_groups.length; j++) {
             // Determine baseId
-            idsInGroup = config.data_groups[j].filter(function (id) { return ids.indexOf(id) >= 0; });
+            idsInGroup = config.data_groups[j].filter((id) => { return ids.indexOf(id) >= 0; });
             if (idsInGroup.length === 0) { continue; }
             baseId = idsInGroup[0];
             // Consider positive values
             if (hasPositiveValue && ys[baseId]) {
-                ys[baseId].forEach(function (v, i) {
+                ys[baseId].forEach((v, i) => {
                     ys[baseId][i] = v > 0 ? v : 0;
                 });
             }
             // Compute max
             for (k = 1; k < idsInGroup.length; k++) {
                 id = idsInGroup[k];
-                if (! ys[id]) { continue; }
-                ys[id].forEach(function (v, i) {
+                if (!ys[id]) { continue; }
+                ys[id].forEach((v, i) => {
                     if ($$.axis.getId(id) === $$.axis.getId(baseId) && ys[baseId] && !(hasPositiveValue && +v < 0)) {
                         ys[baseId][i] += +v;
                     }
@@ -58,11 +58,11 @@ c3_chart_internal_fn.getYDomainMax = function (targets) {
             }
         }
     }
-    return $$.d3.max(Object.keys(ys).map(function (key) { return $$.d3.max(ys[key]); }));
+    return $$.d3.max(Object.keys(ys).map((key) => { return $$.d3.max(ys[key]); }));
 };
 c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
-    var $$ = this, config = $$.config,
-        targetsByAxisId = targets.filter(function (t) { return $$.axis.getId(t.id) === axisId; }),
+    let $$ = this, config = $$.config,
+        targetsByAxisId = targets.filter((t) => { return $$.axis.getId(t.id) === axisId; }),
         yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
@@ -143,19 +143,19 @@ c3_chart_internal_fn.getYDomain = function (targets, axisId, xDomain) {
     return isInverted ? domain.reverse() : domain;
 };
 c3_chart_internal_fn.getXDomainMin = function (targets) {
-    var $$ = this, config = $$.config;
+    let $$ = this, config = $$.config;
     return isDefined(config.axis_x_min) ?
         ($$.isTimeSeries() ? this.parseDate(config.axis_x_min) : config.axis_x_min) :
-    $$.d3.min(targets, function (t) { return $$.d3.min(t.values, function (v) { return v.x; }); });
+    $$.d3.min(targets, (t) => { return $$.d3.min(t.values, (v) => { return v.x; }); });
 };
 c3_chart_internal_fn.getXDomainMax = function (targets) {
-    var $$ = this, config = $$.config;
+    let $$ = this, config = $$.config;
     return isDefined(config.axis_x_max) ?
         ($$.isTimeSeries() ? this.parseDate(config.axis_x_max) : config.axis_x_max) :
-    $$.d3.max(targets, function (t) { return $$.d3.max(t.values, function (v) { return v.x; }); });
+    $$.d3.max(targets, (t) => { return $$.d3.max(t.values, (v) => { return v.x; }); });
 };
 c3_chart_internal_fn.getXDomainPadding = function (domain) {
-    var $$ = this, config = $$.config,
+    let $$ = this, config = $$.config,
         diff = domain[1] - domain[0],
         maxDataCount, padding, paddingLeft, paddingRight;
     if ($$.isCategorized()) {
@@ -174,10 +174,10 @@ c3_chart_internal_fn.getXDomainPadding = function (domain) {
     } else {
         paddingLeft = paddingRight = padding;
     }
-    return {left: paddingLeft, right: paddingRight};
+    return { left: paddingLeft, right: paddingRight };
 };
 c3_chart_internal_fn.getXDomain = function (targets) {
-    var $$ = this,
+    let $$ = this,
         xDomain = [$$.getXDomainMin(targets), $$.getXDomainMax(targets)],
         firstX = xDomain[0], lastX = xDomain[1],
         padding = $$.getXDomainPadding(xDomain),
@@ -201,7 +201,7 @@ c3_chart_internal_fn.getXDomain = function (targets) {
     return [min, max];
 };
 c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withUpdateOrgXDomain, withTrim, domain) {
-    var $$ = this, config = $$.config;
+    let $$ = this, config = $$.config;
 
     if (withUpdateOrgXDomain) {
         $$.x.domain(domain ? domain : $$.d3.extent($$.getXDomain(targets)));
@@ -221,7 +221,7 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     return $$.x.domain();
 };
 c3_chart_internal_fn.trimXDomain = function (domain) {
-    var zoomDomain = this.getZoomDomain(),
+    let zoomDomain = this.getZoomDomain(),
         min = zoomDomain[0], max = zoomDomain[1];
     if (domain[0] <= min) {
         domain[1] = +domain[1] + (min - domain[0]);

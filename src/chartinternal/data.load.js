@@ -1,5 +1,5 @@
 c3_chart_internal_fn.load = function (targets, args) {
-    var $$ = this;
+    const $$ = this;
     if (targets) {
         // filter loading targets if needed
         if (args.filter) {
@@ -7,14 +7,14 @@ c3_chart_internal_fn.load = function (targets, args) {
         }
         // set type if args.types || args.type specified
         if (args.type || args.types) {
-            targets.forEach(function (t) {
-                var type = args.types && args.types[t.id] ? args.types[t.id] : args.type;
+            targets.forEach((t) => {
+                const type = args.types && args.types[t.id] ? args.types[t.id] : args.type;
                 $$.setTargetType(t.id, type);
             });
         }
         // Update/Add data
-        $$.data.targets.forEach(function (d) {
-            for (var i = 0; i < targets.length; i++) {
+        $$.data.targets.forEach((d) => {
+            for (let i = 0; i < targets.length; i++) {
                 if (d.id === targets[i].id) {
                     d.values = targets[i].values;
                     targets.splice(i, 1);
@@ -29,17 +29,17 @@ c3_chart_internal_fn.load = function (targets, args) {
     $$.updateTargets($$.data.targets);
 
     // Redraw with new targets
-    $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+    $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
 
     if (args.done) { args.done(); }
 };
 c3_chart_internal_fn.loadFromArgs = function (args) {
-    var $$ = this;
+    const $$ = this;
     if (args.data) {
         $$.load($$.convertDataToTargets(args.data), args);
     }
     else if (args.url) {
-        $$.convertUrlToData(args.url, args.mimeType, args.headers, args.keys, function (data) {
+        $$.convertUrlToData(args.url, args.mimeType, args.headers, args.keys, (data) => {
             $$.load($$.convertDataToTargets(data), args);
         });
     }
@@ -57,23 +57,23 @@ c3_chart_internal_fn.loadFromArgs = function (args) {
     }
 };
 c3_chart_internal_fn.unload = function (targetIds, done) {
-    var $$ = this;
+    const $$ = this;
     if (!done) {
         done = function () {};
     }
     // filter existing target
-    targetIds = targetIds.filter(function (id) { return $$.hasTarget($$.data.targets, id); });
+    targetIds = targetIds.filter((id) => { return $$.hasTarget($$.data.targets, id); });
     // If no target, call done and return
     if (!targetIds || targetIds.length === 0) {
         done();
         return;
     }
-    $$.svg.selectAll(targetIds.map(function (id) { return $$.selectorTarget(id); }))
+    $$.svg.selectAll(targetIds.map((id) => { return $$.selectorTarget(id); }))
         .transition()
         .style('opacity', 0)
         .remove()
         .call($$.endall, done);
-    targetIds.forEach(function (id) {
+    targetIds.forEach((id) => {
         // Reset fadein for future load
         $$.withoutFadeIn[id] = false;
         // Remove target's elements
@@ -81,7 +81,7 @@ c3_chart_internal_fn.unload = function (targetIds, done) {
             $$.legend.selectAll('.' + CLASS.legendItem + $$.getTargetSelectorSuffix(id)).remove();
         }
         // Remove target
-        $$.data.targets = $$.data.targets.filter(function (t) {
+        $$.data.targets = $$.data.targets.filter((t) => {
             return t.id !== id;
         });
     });
