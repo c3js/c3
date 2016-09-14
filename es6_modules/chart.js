@@ -1,4 +1,10 @@
-import {CLASS,isValue,isFunction,isString,isUndefined,isDefined,ceil10,asHalfPixel,diffDomain,isEmpty,notEmpty,getOption,hasValue,sanitise,getPathBox, ChartInternal} from './chartinternal.js';
+import { CLASS,
+    isValue,
+    isUndefined,
+    isDefined,
+    ChartInternal,
+} from './chartinternal.js';
+
 let c3_chart_fn;
 
 
@@ -760,5 +766,5 @@ c3_chart_fn.tooltip.hide = function () {
 
     this.internal.config.tooltip_onhide.call(this);
 };
-export {Chart};
+export { Chart };
 export default Chart;

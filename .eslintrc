@@ -2,6 +2,19 @@
     "extends": "airbnb-base",
     "rules": {
         "indent": ["error", 4],
-        "no-var": "error"
+        "no-var": "error",
+        "camelcase": 0,
+        "prefer-template": 0,
+        "no-param-reassign": 0,
+        "func-names": 0,
+        "one-var": 0,
+        "prefer-const": 0,
+        "no-nested-ternary": 0,
+        "no-else-return": 0,
+        "no-plusplus": 0,
+        "no-mixed-operators": 0,
+        "prefer-spread": 0,
+        "no-shadow": 0,
+        "no-underscore-dangle": 0,
     }
 }

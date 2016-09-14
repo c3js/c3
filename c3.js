@@ -4,105 +4,23 @@
   (factory((global.c3 = global.c3 || {}),global.d3));
 }(this, (function (exports,d3) { 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
-
-function API(owner) {
-    this.owner = owner;
-}
-
-function inherit(base, derived) {
-    if (Object.create) {
-        derived.prototype = Object.create(base.prototype);
-    } else {
-        var f = function f() {};
-        f.prototype = base.prototype;
-        derived.prototype = new f();
-    }
-
-    derived.prototype.constructor = derived;
-
-    return derived;
-}
-
-// Features:
-// 1. category axis
-// 2. ceil values of translate/x/y to int for half pixel antialiasing
-// 3. multiline tick text
 var tickTextCharSize = void 0;
 function c3_axis(d3$$1, params) {
-    var scale = d3$$1.scale.linear(),
-        orient = 'bottom',
-        innerTickSize = 6,
-        outerTickSize = void 0,
-        tickPadding = 3,
-        tickValues = null,
-        tickFormat = void 0,
-        tickArguments = void 0;
+    var scale = d3$$1.scale.linear();
+    var orient = 'bottom';
+    var innerTickSize = 6;
+    var tickPadding = 3;
+    var tickValues = null;
+    var tickFormat = void 0;
+    var tickArguments = void 0;
 
-    var tickOffset = 0,
-        tickCulling = true,
-        tickCentered = void 0;
+    var tickOffset = 0;
+    var tickCulling = true;
+    var tickCentered = void 0;
 
     params = params || {};
-    outerTickSize = params.withOuterTick ? 6 : 0;
+
+    var outerTickSize = params.withOuterTick ? 6 : 0;
 
     function axisX(selection, x) {
         selection.attr('transform', function (d) {
@@ -115,18 +33,18 @@ function c3_axis(d3$$1, params) {
         });
     }
     function scaleExtent(domain) {
-        var start = domain[0],
-            stop = domain[domain.length - 1];
+        var start = domain[0];
+        var stop = domain[domain.length - 1];
         return start < stop ? [start, stop] : [stop, start];
     }
     function generateTicks(scale) {
-        var i = void 0,
-            domain = void 0,
-            ticks = [];
+        // eslint-disable-line no-shadow
+        var i = void 0;
+        var ticks = [];
         if (scale.ticks) {
             return scale.ticks.apply(scale, tickArguments);
         }
-        domain = scale.domain();
+        var domain = scale.domain();
         for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
             ticks.push(i);
         }
@@ -136,8 +54,8 @@ function c3_axis(d3$$1, params) {
         return ticks;
     }
     function copyScale() {
-        var newScale = scale.copy(),
-            domain = void 0;
+        var newScale = scale.copy();
+        var domain = void 0;
         if (params.isCategory) {
             domain = scale.domain();
             newScale.domain([domain[0], domain[1] - 1]);
@@ -179,11 +97,12 @@ function c3_axis(d3$$1, params) {
             var scale0 = this.__chart__ || scale,
                 scale1 = this.__chart__ = copyScale();
 
-            var ticks = tickValues ? tickValues : generateTicks(scale1),
+            var ticks = tickValues || generateTicks(scale1),
                 tick = g.selectAll('.tick').data(ticks, scale1),
                 tickEnter = tick.enter().insert('g', '.domain').attr('class', 'tick').style('opacity', 1e-6),
 
-            // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
+            // MEMO: No exit transition. The reason is this transition affects max tick width
+            // calculation because old tick will be included in the ticks.
             tickExit = tick.exit().remove(),
                 tickUpdate = transitionise(tick).style('opacity', 1),
                 tickTransform = void 0,
@@ -213,6 +132,7 @@ function c3_axis(d3$$1, params) {
                 tspan = void 0,
                 sizeFor1Char = getSizeFor1Char(g.select('.tick')),
                 counts = [];
+
             var tickLength = Math.max(innerTickSize, 0) + tickPadding,
                 isVertical = orient === 'left' || orient === 'right';
 
@@ -242,7 +162,7 @@ function c3_axis(d3$$1, params) {
                         textWidth = sizeFor1Char.w * subtext.length;
                         // if text width gets over tick width, split by space index or crrent index
                         if (maxWidth < textWidth) {
-                            return split(splitted.concat(text.substr(0, spaceIndex ? spaceIndex : i)), text.slice(spaceIndex ? spaceIndex + 1 : i));
+                            return split(splitted.concat(text.substr(0, spaceIndex || i)), text.slice(spaceIndex ? spaceIndex + 1 : i));
                         }
                     }
                     return splitted.concat(text);
@@ -358,6 +278,8 @@ function c3_axis(d3$$1, params) {
                         pathUpdate.attr('d', 'M' + outerTickSize + ',' + range[0] + 'H0V' + range[1] + 'H' + outerTickSize);
                         break;
                     }
+                default:
+                    break;
             }
             if (scale1.rangeBand) {
                 (function () {
@@ -419,10 +341,14 @@ function c3_axis(d3$$1, params) {
         return interval === Infinity ? 0 : interval;
     };
     axis.ticks = function () {
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
         if (!arguments.length) {
             return tickArguments;
         }
-        tickArguments = arguments;
+        tickArguments = args;
         return axis;
     };
     axis.tickCulling = function (culling) {
@@ -448,16 +374,76 @@ function c3_axis(d3$$1, params) {
     return axis;
 }
 
-function Axis(owner) {
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
+function Axis$$1(owner) {
     API.call(this, owner);
 }
 
-inherit(API, Axis);
+inherit(API, Axis$$1);
 
-Axis.prototype.init = function init() {
-    var $$ = this.owner,
-        config = $$.config,
-        main = $$.main;
+Axis$$1.prototype.init = function init() {
+    var $$ = this.owner;
+    var config = $$.config;
+    var main = $$.main;
     $$.axes.x = main.append('g').attr('class', CLASS.axis + ' ' + CLASS.axisX).attr('clip-path', $$.clipPathForXAxis).attr('transform', $$.getTranslate('x')).style('visibility', config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append('text').attr('class', CLASS.axisXLabel).attr('transform', config.axis_rotated ? 'rotate(-90)' : '').style('text-anchor', this.textAnchorForXAxisLabel.bind(this));
     $$.axes.y = main.append('g').attr('class', CLASS.axis + ' ' + CLASS.axisY).attr('clip-path', config.axis_y_inner ? '' : $$.clipPathForYAxis).attr('transform', $$.getTranslate('y')).style('visibility', config.axis_y_show ? 'visible' : 'hidden');
@@ -468,18 +454,18 @@ Axis.prototype.init = function init() {
     .attr('transform', $$.getTranslate('y2')).style('visibility', config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append('text').attr('class', CLASS.axisY2Label).attr('transform', config.axis_rotated ? '' : 'rotate(-90)').style('text-anchor', this.textAnchorForY2AxisLabel.bind(this));
 };
-Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    var $$ = this.owner,
-        config = $$.config,
-        axisParams = {
+Axis$$1.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var axisParams = {
         isCategory: $$.isCategorized(),
         withOuterTick: withOuterTick,
         tickMultiline: config.axis_x_tick_multiline,
         tickWidth: config.axis_x_tick_width,
         tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
         withoutTransition: withoutTransition
-    },
-        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
+    };
+    var axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
 
     if ($$.isTimeSeries() && tickValues && typeof tickValues !== 'function') {
         tickValues = tickValues.map(function (v) {
@@ -498,10 +484,10 @@ Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValue
 
     return axis;
 };
-Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, axis) {
-    var $$ = this.owner,
-        config = $$.config,
-        tickValues = void 0;
+Axis$$1.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, axis) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var tickValues = void 0;
     if (config.axis_x_tick_fit || config.axis_x_tick_count) {
         tickValues = this.generateTickValues($$.mapTargetsToUniqueXs(targets), config.axis_x_tick_count, $$.isTimeSeries());
     }
@@ -513,15 +499,15 @@ Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, a
     }
     return tickValues;
 };
-Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    var $$ = this.owner,
-        config = $$.config,
-        axisParams = {
+Axis$$1.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var axisParams = {
         withOuterTick: withOuterTick,
         withoutTransition: withoutTransition,
         tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
-    },
-        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
+    };
+    var axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
     if ($$.isTimeSeriesY()) {
         axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
     } else {
@@ -529,14 +515,15 @@ Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValue
     }
     return axis;
 };
-Axis.prototype.getId = function getId(id) {
+Axis$$1.prototype.getId = function getId(id) {
     var config = this.owner.config;
     return id in config.data_axes ? config.data_axes[id] : 'y';
 };
-Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
-    var $$ = this.owner,
-        config = $$.config,
-        format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
+Axis$$1.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
+    var $$ = this.owner;
+    var config = $$.config;
+    var format = $$.isTimeSeries() ? // eslint-disable-line no-nested-ternary
+    $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
         return v < 0 ? v.toFixed(0) : v;
     };
     if (config.axis_x_tick_format) {
@@ -552,22 +539,23 @@ Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
         return format.call($$, v);
     } : format;
 };
-Axis.prototype.getTickValues = function getTickValues(tickValues, axis) {
-    return tickValues ? tickValues : axis ? axis.tickValues() : undefined;
+Axis$$1.prototype.getTickValues = function getTickValues(tickValues, axis) {
+    return tickValues ? tickValues : // eslint-disable-line no-nested-ternary,no-unneeded-ternary
+    axis ? axis.tickValues() : undefined;
 };
-Axis.prototype.getXAxisTickValues = function getXAxisTickValues() {
+Axis$$1.prototype.getXAxisTickValues = function getXAxisTickValues() {
     return this.getTickValues(this.owner.config.axis_x_tick_values, this.owner.xAxis);
 };
-Axis.prototype.getYAxisTickValues = function getYAxisTickValues() {
+Axis$$1.prototype.getYAxisTickValues = function getYAxisTickValues() {
     return this.getTickValues(this.owner.config.axis_y_tick_values, this.owner.yAxis);
 };
-Axis.prototype.getY2AxisTickValues = function getY2AxisTickValues() {
+Axis$$1.prototype.getY2AxisTickValues = function getY2AxisTickValues() {
     return this.getTickValues(this.owner.config.axis_y2_tick_values, this.owner.y2Axis);
 };
-Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(axisId) {
-    var $$ = this.owner,
-        config = $$.config,
-        option = void 0;
+Axis$$1.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(axisId) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var option = void 0;
     if (axisId === 'y') {
         option = config.axis_y_label;
     } else if (axisId === 'y2') {
@@ -577,14 +565,14 @@ Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(axisId) 
     }
     return option;
 };
-Axis.prototype.getLabelText = function getLabelText(axisId) {
+Axis$$1.prototype.getLabelText = function getLabelText(axisId) {
     var option = this.getLabelOptionByAxisId(axisId);
-    return isString(option) ? option : option ? option.text : null;
+    return isString(option) ? option : option ? option.text : null; // eslint-disable-line no-nested-ternary,max-len
 };
-Axis.prototype.setLabelText = function setLabelText(axisId, text) {
-    var $$ = this.owner,
-        config = $$.config,
-        option = this.getLabelOptionByAxisId(axisId);
+Axis$$1.prototype.setLabelText = function setLabelText(axisId, text) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var option = this.getLabelOptionByAxisId(axisId);
     if (isString(option)) {
         if (axisId === 'y') {
             config.axis_y_label = text;
@@ -597,9 +585,9 @@ Axis.prototype.setLabelText = function setLabelText(axisId, text) {
         option.text = text;
     }
 };
-Axis.prototype.getLabelPosition = function getLabelPosition(axisId, defaultPosition) {
-    var option = this.getLabelOptionByAxisId(axisId),
-        position = option && (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' && option.position ? option.position : defaultPosition;
+Axis$$1.prototype.getLabelPosition = function getLabelPosition(axisId, defaultPosition) {
+    var option = this.getLabelOptionByAxisId(axisId);
+    var position = option && (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' && option.position ? option.position : defaultPosition;
     return {
         isInner: position.indexOf('inner') >= 0,
         isOuter: position.indexOf('outer') >= 0,
@@ -611,28 +599,28 @@ Axis.prototype.getLabelPosition = function getLabelPosition(axisId, defaultPosit
         isBottom: position.indexOf('bottom') >= 0
     };
 };
-Axis.prototype.getXAxisLabelPosition = function getXAxisLabelPosition() {
+Axis$$1.prototype.getXAxisLabelPosition = function getXAxisLabelPosition() {
     return this.getLabelPosition('x', this.owner.config.axis_rotated ? 'inner-top' : 'inner-right');
 };
-Axis.prototype.getYAxisLabelPosition = function getYAxisLabelPosition() {
+Axis$$1.prototype.getYAxisLabelPosition = function getYAxisLabelPosition() {
     return this.getLabelPosition('y', this.owner.config.axis_rotated ? 'inner-right' : 'inner-top');
 };
-Axis.prototype.getY2AxisLabelPosition = function getY2AxisLabelPosition() {
+Axis$$1.prototype.getY2AxisLabelPosition = function getY2AxisLabelPosition() {
     return this.getLabelPosition('y2', this.owner.config.axis_rotated ? 'inner-right' : 'inner-top');
 };
-Axis.prototype.getLabelPositionById = function getLabelPositionById(id) {
+Axis$$1.prototype.getLabelPositionById = function getLabelPositionById(id) {
     return id === 'y2' ? this.getY2AxisLabelPosition() : id === 'y' ? this.getYAxisLabelPosition() : this.getXAxisLabelPosition();
 };
-Axis.prototype.textForXAxisLabel = function textForXAxisLabel() {
+Axis$$1.prototype.textForXAxisLabel = function textForXAxisLabel() {
     return this.getLabelText('x');
 };
-Axis.prototype.textForYAxisLabel = function textForYAxisLabel() {
+Axis$$1.prototype.textForYAxisLabel = function textForYAxisLabel() {
     return this.getLabelText('y');
 };
-Axis.prototype.textForY2AxisLabel = function textForY2AxisLabel() {
+Axis$$1.prototype.textForY2AxisLabel = function textForY2AxisLabel() {
     return this.getLabelText('y2');
 };
-Axis.prototype.xForAxisLabel = function xForAxisLabel(forHorizontal, position) {
+Axis$$1.prototype.xForAxisLabel = function xForAxisLabel(forHorizontal, position) {
     var $$ = this.owner;
     if (forHorizontal) {
         return position.isLeft ? 0 : position.isCenter ? $$.width / 2 : $$.width;
@@ -640,87 +628,87 @@ Axis.prototype.xForAxisLabel = function xForAxisLabel(forHorizontal, position) {
         return position.isBottom ? -$$.height : position.isMiddle ? -$$.height / 2 : 0;
     }
 };
-Axis.prototype.dxForAxisLabel = function dxForAxisLabel(forHorizontal, position) {
+Axis$$1.prototype.dxForAxisLabel = function dxForAxisLabel(forHorizontal, position) {
     if (forHorizontal) {
         return position.isLeft ? '0.5em' : position.isRight ? '-0.5em' : '0';
     } else {
         return position.isTop ? '-0.5em' : position.isBottom ? '0.5em' : '0';
     }
 };
-Axis.prototype.textAnchorForAxisLabel = function textAnchorForAxisLabel(forHorizontal, position) {
+Axis$$1.prototype.textAnchorForAxisLabel = function textAnchorForAxisLabel(forHorizontal, position) {
     if (forHorizontal) {
         return position.isLeft ? 'start' : position.isCenter ? 'middle' : 'end';
     } else {
         return position.isBottom ? 'start' : position.isMiddle ? 'middle' : 'end';
     }
 };
-Axis.prototype.xForXAxisLabel = function xForXAxisLabel() {
+Axis$$1.prototype.xForXAxisLabel = function xForXAxisLabel() {
     return this.xForAxisLabel(!this.owner.config.axis_rotated, this.getXAxisLabelPosition());
 };
-Axis.prototype.xForYAxisLabel = function xForYAxisLabel() {
+Axis$$1.prototype.xForYAxisLabel = function xForYAxisLabel() {
     return this.xForAxisLabel(this.owner.config.axis_rotated, this.getYAxisLabelPosition());
 };
-Axis.prototype.xForY2AxisLabel = function xForY2AxisLabel() {
+Axis$$1.prototype.xForY2AxisLabel = function xForY2AxisLabel() {
     return this.xForAxisLabel(this.owner.config.axis_rotated, this.getY2AxisLabelPosition());
 };
-Axis.prototype.dxForXAxisLabel = function dxForXAxisLabel() {
+Axis$$1.prototype.dxForXAxisLabel = function dxForXAxisLabel() {
     return this.dxForAxisLabel(!this.owner.config.axis_rotated, this.getXAxisLabelPosition());
 };
-Axis.prototype.dxForYAxisLabel = function dxForYAxisLabel() {
+Axis$$1.prototype.dxForYAxisLabel = function dxForYAxisLabel() {
     return this.dxForAxisLabel(this.owner.config.axis_rotated, this.getYAxisLabelPosition());
 };
-Axis.prototype.dxForY2AxisLabel = function dxForY2AxisLabel() {
+Axis$$1.prototype.dxForY2AxisLabel = function dxForY2AxisLabel() {
     return this.dxForAxisLabel(this.owner.config.axis_rotated, this.getY2AxisLabelPosition());
 };
-Axis.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
-    var $$ = this.owner,
-        config = $$.config,
-        position = this.getXAxisLabelPosition();
+Axis$$1.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
+    var $$ = this.owner;
+    var config = $$.config;
+    var position = this.getXAxisLabelPosition();
     if (config.axis_rotated) {
         return position.isInner ? '1.2em' : -25 - this.getMaxTickWidth('x');
     } else {
         return position.isInner ? '-0.5em' : config.axis_x_height ? config.axis_x_height - 10 : '3em';
     }
 };
-Axis.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
-    var $$ = this.owner,
-        position = this.getYAxisLabelPosition();
+Axis$$1.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
+    var $$ = this.owner;
+    var position = this.getYAxisLabelPosition();
     if ($$.config.axis_rotated) {
         return position.isInner ? '-0.5em' : '3em';
     } else {
         return position.isInner ? '1.2em' : -10 - ($$.config.axis_y_inner ? 0 : this.getMaxTickWidth('y') + 10);
     }
 };
-Axis.prototype.dyForY2AxisLabel = function dyForY2AxisLabel() {
-    var $$ = this.owner,
-        position = this.getY2AxisLabelPosition();
+Axis$$1.prototype.dyForY2AxisLabel = function dyForY2AxisLabel() {
+    var $$ = this.owner;
+    var position = this.getY2AxisLabelPosition();
     if ($$.config.axis_rotated) {
         return position.isInner ? '1.2em' : '-2.2em';
     } else {
         return position.isInner ? '-0.5em' : 15 + ($$.config.axis_y2_inner ? 0 : this.getMaxTickWidth('y2') + 15);
     }
 };
-Axis.prototype.textAnchorForXAxisLabel = function textAnchorForXAxisLabel() {
+Axis$$1.prototype.textAnchorForXAxisLabel = function textAnchorForXAxisLabel() {
     var $$ = this.owner;
     return this.textAnchorForAxisLabel(!$$.config.axis_rotated, this.getXAxisLabelPosition());
 };
-Axis.prototype.textAnchorForYAxisLabel = function textAnchorForYAxisLabel() {
+Axis$$1.prototype.textAnchorForYAxisLabel = function textAnchorForYAxisLabel() {
     var $$ = this.owner;
     return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getYAxisLabelPosition());
 };
-Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
+Axis$$1.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
     var $$ = this.owner;
     return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getY2AxisLabelPosition());
 };
-Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
-    var $$ = this.owner,
-        config = $$.config,
-        maxWidth = 0,
-        targetsToShow = void 0,
-        scale = void 0,
-        axis = void 0,
-        dummy = void 0,
-        svg = void 0;
+Axis$$1.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
+    var $$ = this.owner;
+    var config = $$.config;
+    var maxWidth = 0;
+    var targetsToShow = void 0;
+    var scale = void 0;
+    var axis = void 0;
+    var dummy = void 0;
+    var svg = void 0;
     if (withoutRecompute && $$.currentMaxTickWidths[id]) {
         return $$.currentMaxTickWidths[id];
     }
@@ -738,7 +726,8 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
             this.updateXAxisTickValues(targetsToShow, axis);
         }
         dummy = $$.d3.select('body').append('div').classed('c3', true);
-        svg = dummy.append('svg').style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0), svg.append('g').call(axis).each(function () {
+        svg = dummy.append('svg').style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0);
+        svg.append('g').call(axis).each(function () {
             $$.d3.select(this).selectAll('text').each(function () {
                 var box = this.getBoundingClientRect();
                 if (maxWidth < box.width) {
@@ -752,16 +741,16 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
     return $$.currentMaxTickWidths[id];
 };
 
-Axis.prototype.updateLabels = function updateLabels(withTransition) {
+Axis$$1.prototype.updateLabels = function updateLabels(withTransition) {
     var $$ = this.owner;
-    var axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
-        axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
-        axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
+    var axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel);
+    var axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel);
+    var axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
     (withTransition ? axisXLabel.transition() : axisXLabel).attr('x', this.xForXAxisLabel.bind(this)).attr('dx', this.dxForXAxisLabel.bind(this)).attr('dy', this.dyForXAxisLabel.bind(this)).text(this.textForXAxisLabel.bind(this));
     (withTransition ? axisYLabel.transition() : axisYLabel).attr('x', this.xForYAxisLabel.bind(this)).attr('dx', this.dxForYAxisLabel.bind(this)).attr('dy', this.dyForYAxisLabel.bind(this)).text(this.textForYAxisLabel.bind(this));
     (withTransition ? axisY2Label.transition() : axisY2Label).attr('x', this.xForY2AxisLabel.bind(this)).attr('dx', this.dxForY2AxisLabel.bind(this)).attr('dy', this.dyForY2AxisLabel.bind(this)).text(this.textForY2AxisLabel.bind(this));
 };
-Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, domainLength) {
+Axis$$1.prototype.getPadding = function getPadding(padding, key, defaultValue, domainLength) {
     var p = typeof padding === 'number' ? padding : padding[key];
     if (!isValue(p)) {
         return defaultValue;
@@ -772,20 +761,21 @@ Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, doma
     // assume padding is pixels if unit is not specified
     return this.convertPixelsToAxisPadding(p, domainLength);
 };
-Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) {
-    var $$ = this.owner,
-        length = $$.config.axis_rotated ? $$.width : $$.height;
+Axis$$1.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) {
+    // eslint-disable-line max-len
+    var $$ = this.owner;
+    var length = $$.config.axis_rotated ? $$.width : $$.height;
     return domainLength * (pixels / length);
 };
-Axis.prototype.generateTickValues = function generateTickValues(values, tickCount, forTimeSeries) {
-    var tickValues = values,
-        targetCount = void 0,
-        start = void 0,
-        end = void 0,
-        count = void 0,
-        interval = void 0,
-        i = void 0,
-        tickValue = void 0;
+Axis$$1.prototype.generateTickValues = function generateTickValues(values, tickCount, forTimeSeries) {
+    var tickValues = values;
+    var targetCount = void 0;
+    var start = void 0;
+    var end = void 0;
+    var count = void 0;
+    var interval = void 0;
+    var i = void 0;
+    var tickValue = void 0;
     if (tickCount) {
         targetCount = isFunction(tickCount) ? tickCount() : tickCount;
         // compute ticks according to tickCount
@@ -814,9 +804,9 @@ Axis.prototype.generateTickValues = function generateTickValues(values, tickCoun
     }
     return tickValues;
 };
-Axis.prototype.generateTransitions = function generateTransitions(duration) {
-    var $$ = this.owner,
-        axes = $$.axes;
+Axis$$1.prototype.generateTransitions = function generateTransitions(duration) {
+    var $$ = this.owner;
+    var axes = $$.axes;
     return {
         axisX: duration ? axes.x.transition().duration(duration) : axes.x,
         axisY: duration ? axes.y.transition().duration(duration) : axes.y,
@@ -824,7 +814,7 @@ Axis.prototype.generateTransitions = function generateTransitions(duration) {
         axisSubX: duration ? axes.subx.transition().duration(duration) : axes.subx
     };
 };
-Axis.prototype.redraw = function redraw(transitions, isHidden) {
+Axis$$1.prototype.redraw = function redraw(transitions, isHidden) {
     var $$ = this.owner;
     $$.axes.x.style('opacity', isHidden ? 0 : 1);
     $$.axes.y.style('opacity', isHidden ? 0 : 1);
@@ -836,11 +826,48 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
+// import {
+//     CLASS,
+//     isValue,
+//     isFunction,
+//     isString,
+//     isUndefined,
+//     isDefined,
+//     ceil10,
+//     asHalfPixel,
+//     diffDomain,
+//     isEmpty,
+//     notEmpty,
+//     getOption,
+//     hasValue,
+//     sanitise,
+//     getPathBox,
+//     ChartInternal } from '../chartinternal';
+
+function API(owner) {
+    this.owner = owner;
+}
+
+/* eslint-disable */
+function inherit(base, derived) {
+    if (Object.create) {
+        derived.prototype = Object.create(base.prototype);
+    } else {
+        var f = function f() {};
+        f.prototype = base.prototype;
+        derived.prototype = new f();
+    }
+
+    derived.prototype.constructor = derived;
+
+    return derived;
+}
+
 function ChartInternal(api){var $$=this;$$.d3=window.d3?window.d3:typeof require!=='undefined'?require('d3'):undefined;$$.api=api;$$.config=$$.getDefaultConfig();$$.data={};$$.cache={};$$.axes={};}var c3_chart_internal_fn=ChartInternal.prototype;c3_chart_internal_fn.beforeInit=function(){// can do something
 };c3_chart_internal_fn.afterInit=function(){// can do something
 };c3_chart_internal_fn.init=function(){var $$=this,config=$$.config;$$.initParams();if(config.data_url){$$.convertUrlToData(config.data_url,config.data_mimeType,config.data_headers,config.data_keys,$$.initWithData);}else if(config.data_json){$$.initWithData($$.convertJsonToData(config.data_json,config.data_keys));}else if(config.data_rows){$$.initWithData($$.convertRowsToData(config.data_rows));}else if(config.data_columns){$$.initWithData($$.convertColumnsToData(config.data_columns));}else{throw Error('url or json or rows or columns is required.');}};c3_chart_internal_fn.initParams=function(){var $$=this,d3$$1=$$.d3,config=$$.config;// MEMO: clipId needs to be unique because it conflicts when multiple charts exist
 $$.clipId='c3-'+ +new Date()+'-clip',$$.clipIdForXAxis=$$.clipId+'-xaxis',$$.clipIdForYAxis=$$.clipId+'-yaxis',$$.clipIdForGrid=$$.clipId+'-grid',$$.clipIdForSubchart=$$.clipId+'-subchart',$$.clipPath=$$.getClipPath($$.clipId),$$.clipPathForXAxis=$$.getClipPath($$.clipIdForXAxis),$$.clipPathForYAxis=$$.getClipPath($$.clipIdForYAxis);$$.clipPathForGrid=$$.getClipPath($$.clipIdForGrid),$$.clipPathForSubchart=$$.getClipPath($$.clipIdForSubchart),$$.dragStart=null;$$.dragging=false;$$.flowing=false;$$.cancelClick=false;$$.mouseover=false;$$.transiting=false;$$.color=$$.generateColor();$$.levelColor=$$.generateLevelColor();$$.dataTimeFormat=config.data_xLocaltime?d3$$1.time.format:d3$$1.time.format.utc;$$.axisTimeFormat=config.axis_x_localtime?d3$$1.time.format:d3$$1.time.format.utc;$$.defaultAxisTimeFormat=$$.axisTimeFormat.multi([['.%L',function(d){return d.getMilliseconds();}],[':%S',function(d){return d.getSeconds();}],['%I:%M',function(d){return d.getMinutes();}],['%I %p',function(d){return d.getHours();}],['%-m/%-d',function(d){return d.getDay()&&d.getDate()!==1;}],['%-m/%-d',function(d){return d.getDate()!==1;}],['%-m/%-d',function(d){return d.getMonth();}],['%Y/%-m/%-d',function(){return true;}]]);$$.hiddenTargetIds=[];$$.hiddenLegendIds=[];$$.focusedTargetIds=[];$$.defocusedTargetIds=[];$$.xOrient=config.axis_rotated?'left':'bottom';$$.yOrient=config.axis_rotated?config.axis_y_inner?'top':'bottom':config.axis_y_inner?'right':'left';$$.y2Orient=config.axis_rotated?config.axis_y2_inner?'bottom':'top':config.axis_y2_inner?'left':'right';$$.subXOrient=config.axis_rotated?'left':'bottom';$$.isLegendRight=config.legend_position==='right';$$.isLegendInset=config.legend_position==='inset';$$.isLegendTop=config.legend_inset_anchor==='top-left'||config.legend_inset_anchor==='top-right';$$.isLegendLeft=config.legend_inset_anchor==='top-left'||config.legend_inset_anchor==='bottom-left';$$.legendStep=0;$$.legendItemWidth=0;$$.legendItemHeight=0;$$.currentMaxTickWidths={x:0,y:0,y2:0};$$.rotated_padding_left=30;$$.rotated_padding_right=config.axis_rotated&&!config.axis_x_show?0:30;$$.rotated_padding_top=5;$$.withoutFadeIn={};$$.intervalForObserveInserted=undefined;$$.axes.subx=d3$$1.selectAll([]);// needs when excluding subchart.js
-};c3_chart_internal_fn.initChartElements=function(){if(this.initBar){this.initBar();}if(this.initLine){this.initLine();}if(this.initArc){this.initArc();}if(this.initGauge){this.initGauge();}if(this.initText){this.initText();}};c3_chart_internal_fn.initWithData=function(data){var $$=this,d3$$1=$$.d3,config=$$.config;var defs=void 0,main=void 0,binding=true;$$.axis=new Axis($$);if($$.initPie){$$.initPie();}if($$.initBrush){$$.initBrush();}if($$.initZoom){$$.initZoom();}if(!config.bindto){$$.selectChart=d3$$1.selectAll([]);}else if(typeof config.bindto.node==='function'){$$.selectChart=config.bindto;}else{$$.selectChart=d3$$1.select(config.bindto);}if($$.selectChart.empty()){$$.selectChart=d3$$1.select(document.createElement('div')).style('opacity',0);$$.observeInserted($$.selectChart);binding=false;}$$.selectChart.html('').classed('c3',true);// Init data as targets
+};c3_chart_internal_fn.initChartElements=function(){if(this.initBar){this.initBar();}if(this.initLine){this.initLine();}if(this.initArc){this.initArc();}if(this.initGauge){this.initGauge();}if(this.initText){this.initText();}};c3_chart_internal_fn.initWithData=function(data){var $$=this,d3$$1=$$.d3,config=$$.config;var defs=void 0,main=void 0,binding=true;$$.axis=new Axis$$1($$);if($$.initPie){$$.initPie();}if($$.initBrush){$$.initBrush();}if($$.initZoom){$$.initZoom();}if(!config.bindto){$$.selectChart=d3$$1.selectAll([]);}else if(typeof config.bindto.node==='function'){$$.selectChart=config.bindto;}else{$$.selectChart=d3$$1.select(config.bindto);}if($$.selectChart.empty()){$$.selectChart=d3$$1.select(document.createElement('div')).style('opacity',0);$$.observeInserted($$.selectChart);binding=false;}$$.selectChart.html('').classed('c3',true);// Init data as targets
 $$.data.xs={};$$.data.targets=$$.convertDataToTargets(data);if(config.data_filter){$$.data.targets=$$.data.targets.filter(config.data_filter);}// Set targets to hide if needed
 if(config.data_hide){$$.addHiddenTargetIds(config.data_hide===true?$$.mapToIds($$.data.targets):config.data_hide);}if(config.legend_hide){$$.addHiddenLegendIds(config.legend_hide===true?$$.mapToIds($$.data.targets):config.legend_hide);}// when gauge, hide legend // TODO: fix
 if($$.hasType('gauge')){config.legend_show=false;}// Init sizes and scales
@@ -2030,17 +2057,24 @@ c3_chart_fn.tooltip.hide = function () {
     this.internal.config.tooltip_onhide.call(this);
 };
 
-// This file is only the entry point for rollup
-var version = "0.4.11";
+/**
+ * C3.js
+ * (c) 2016 Masayuki Tanaka and the C3.js contributors (See package.json)
+ * License: MIT
+ */
+
+var version = '0.4.11';
+
 var generate = function generate(config) {
     return new Chart(config);
 };
+
 var chart = {
     fn: Chart.prototype,
     internal: {
         fn: ChartInternal.prototype,
         axis: {
-            fn: Axis.prototype
+            fn: Axis$$1.prototype
         }
     }
 };

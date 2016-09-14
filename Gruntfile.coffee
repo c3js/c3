@@ -223,4 +223,4 @@ module.exports = (grunt) ->
     grunt.registerTask 'build', ['concat:dist', 'sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
     grunt.registerTask 'default', ['lint', 'build', 'test', 'minify']
-    grunt.registerTask 'build_modules', ['concat:axis', 'concat:chart', 'concat:chartinternal']
+    # grunt.registerTask 'build_modules', ['concat:axis', 'concat:chart', 'concat:chartinternal']

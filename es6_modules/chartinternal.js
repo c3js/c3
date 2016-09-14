@@ -1,5 +1,7 @@
-import {Axis} from './axis.js';
+import { Axis } from './axis/index';
+
 import d3 from 'd3';
+
 function ChartInternal(api) {
     const $$ = this;
     $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require('d3') : undefined;
