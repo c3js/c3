@@ -35,19 +35,21 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         orderAsc = $$.isOrderAsc();
 
     if (config.data_groups.length === 0) {
-        d.sort(function(a,b){
-            return orderAsc ? a.value - b.value : b.value - a.value;
+        d.sort(function(a, b){
+            var v1 = a ? a.value : null, v2 = b ? b.value : null;
+            return orderAsc ? v1 - v2 : v2 - v1;
         });
     } else {
         var ids = $$.orderTargets($$.data.targets).map(function (i) {
             return i.id;
         });
         d.sort(function(a, b) {
-            if (a.value > 0 && b.value > 0) {
-                return orderAsc ? ids.indexOf(a.id) - ids.indexOf(b.id) : ids.indexOf(b.id) - ids.indexOf(a.id);
-            } else {
-                return orderAsc ? a.value - b.value : b.value - a.value;
+            var v1 = a ? a.value : null, v2 = b ? b.value : null;
+            if (v1 > 0 && v2 > 0) {
+                v1 = a ? ids.indexOf(a.id) : null;
+                v2 = b ? ids.indexOf(b.id) : null;
             }
+            return orderAsc ? v1 - v2 : v2 - v1;
         });
     }
 
@@ -55,15 +57,15 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
         if (! text) {
-            title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+            title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
             text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
-        value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+        value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
         if (value !== undefined) {
             // Skip elements when their name is set to null
             if (d[i].name === null) { continue; }
-            name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
+            name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
             text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";

@@ -1,4 +1,4 @@
-c3 [![Build Status](https://travis-ci.org/masayuki0812/c3.svg?branch=master)](https://travis-ci.org/masayuki0812/c3) [![Dependency Status](https://david-dm.org/masayuki0812/c3.svg)](https://david-dm.org/masayuki0812/c3) [![devDependency Status](https://david-dm.org/masayuki0812/c3/dev-status.svg)](https://david-dm.org/masayuki0812/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/masayuki0812/c3/blob/master/LICENSE) [![codecov.io](https://codecov.io/github/masayuki0812/c3/coverage.svg?branch=master)](https://codecov.io/github/masayuki0812/c3?branch=master)
+c3 [![Build Status](https://travis-ci.org/c3js/c3.svg?branch=master)](https://travis-ci.org/c3js/c3) [![Dependency Status](https://david-dm.org/c3js/c3.svg)](https://david-dm.org/c3js/c3) [![devDependency Status](https://david-dm.org/c3js/c3/dev-status.svg)](https://david-dm.org/c3js/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE) [![codecov.io](https://codecov.io/github/c3js/c3/coverage.svg?branch=master)](https://codecov.io/github/c3js/c3?branch=master)
 ==
 
 c3 is a D3-based reusable chart library that enables deeper integration of charts into web applications.
@@ -11,7 +11,7 @@ Follow the link for more information: [http://c3js.org](http://c3js.org/)
 + [Examples](http://c3js.org/examples.html)
 
 Additional samples can be found in this repository:
-+ [https://github.com/masayuki0812/c3/tree/master/htdocs/samples](https://github.com/masayuki0812/c3/tree/master/htdocs/samples)
++ [https://github.com/c3js/c3/tree/master/htdocs/samples](https://github.com/c3js/c3/tree/master/htdocs/samples)
 
 You can run these samples as:
 ```
@@ -23,14 +23,14 @@ $ python -m SimpleHTTPServer 8080
 For general C3.js-related discussion, please visit our [Google Group at https://groups.google.com/forum/#!forum/c3js](https://groups.google.com/forum/#!forum/c3js).
 
 ## Gitter
-[![Join the chat at https://gitter.im/masayuki0812/c3](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/masayuki0812/c3?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/c3js/c3](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/c3js/c3?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Using the issue queue
-The [issue queue](https://github.com/masayuki0812/c3/issues) is to be used for reporting defects and problems with C3.js, in addition to feature requests and ideas. It is **not** a catch-all support forum. **For general support enquiries, please use the [Google Group](https://groups.google.com/forum/#!forum/c3js) at https://groups.google.com/forum/#!forum/c3js.** All questions involving the interplay between C3.js and any other library (such as AngularJS) should be posted there first!
+The [issue queue](https://github.com/c3js/c3/issues) is to be used for reporting defects and problems with C3.js, in addition to feature requests and ideas. It is **not** a catch-all support forum. **For general support enquiries, please use the [Google Group](https://groups.google.com/forum/#!forum/c3js) at https://groups.google.com/forum/#!forum/c3js.** All questions involving the interplay between C3.js and any other library (such as AngularJS) should be posted there first!
 
 Before reporting an issue, please do the following:
 
-1. [Search for existing issues](https://github.com/masayuki0812/c3/issues) to ensure you're not posting a duplicate.
+1. [Search for existing issues](https://github.com/c3js/c3/issues) to ensure you're not posting a duplicate.
 
 1.  [Search the Google Group](https://groups.google.com/forum/#!forum/c3js) to ensure it hasn't been addressed there already.
 
