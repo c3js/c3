@@ -1,4 +1,23 @@
-c3_chart_fn.zoom = function (domain) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const zoom = function (domain) {
     const $$ = this.internal;
     if (domain) {
         if ($$.isTimeSeries()) {
@@ -10,18 +29,20 @@ c3_chart_fn.zoom = function (domain) {
     }
     return $$.brush.extent();
 };
-c3_chart_fn.zoom.enable = function (enabled) {
-    const $$ = this.internal;
-    $$.config.zoom_enabled = enabled;
-    $$.updateAndRedraw();
-};
-c3_chart_fn.unzoom = function () {
+
+const unzoom = function () {
     const $$ = this.internal;
     $$.brush.clear().update();
     $$.redraw({ withUpdateXDomain: true });
 };
 
-c3_chart_fn.zoom.max = function (max) {
+zoom.enable = function (enabled) {
+    const $$ = this.internal;
+    $$.config.zoom_enabled = enabled;
+    $$.updateAndRedraw();
+};
+
+zoom.max = function (max) {
     let $$ = this.internal, config = $$.config, d3 = $$.d3;
     if (max === 0 || max) {
         config.zoom_x_max = d3.max([$$.orgXDomain[1], max]);
@@ -31,7 +52,7 @@ c3_chart_fn.zoom.max = function (max) {
     }
 };
 
-c3_chart_fn.zoom.min = function (min) {
+zoom.min = function (min) {
     let $$ = this.internal, config = $$.config, d3 = $$.d3;
     if (min === 0 || min) {
         config.zoom_x_min = d3.min([$$.orgXDomain[0], min]);
@@ -41,7 +62,7 @@ c3_chart_fn.zoom.min = function (min) {
     }
 };
 
-c3_chart_fn.zoom.range = function (range) {
+zoom.range = function (range) {
     if (arguments.length) {
         if (isDefined(range.max)) { this.domain.max(range.max); }
         if (isDefined(range.min)) { this.domain.min(range.min); }
@@ -52,3 +73,5 @@ c3_chart_fn.zoom.range = function (range) {
         };
     }
 };
+
+export { zoom, unzoom };

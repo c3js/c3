@@ -1,4 +1,23 @@
-c3_chart_fn.show = function (targetIds, options) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const show = function (targetIds, options) {
     let $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -20,7 +39,7 @@ c3_chart_fn.show = function (targetIds, options) {
     $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
 };
 
-c3_chart_fn.hide = function (targetIds, options) {
+const hide = function (targetIds, options) {
     let $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -42,9 +61,11 @@ c3_chart_fn.hide = function (targetIds, options) {
     $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
 };
 
-c3_chart_fn.toggle = function (targetIds, options) {
+const toggle = function (targetIds, options) {
     let that = this, $$ = this.internal;
     $$.mapToTargetIds(targetIds).forEach((targetId) => {
         $$.isTargetToShow(targetId) ? that.hide(targetId, options) : that.show(targetId, options);
     });
 };
+
+export { show, hide, toggle };

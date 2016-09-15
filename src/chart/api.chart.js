@@ -1,16 +1,16 @@
-c3_chart_fn.resize = function (size) {
+const resize = function (size) {
     let $$ = this.internal, config = $$.config;
     config.size_width = size ? size.width : null;
     config.size_height = size ? size.height : null;
     this.flush();
 };
 
-c3_chart_fn.flush = function () {
+const flush = function () {
     const $$ = this.internal;
     $$.updateAndRedraw({ withLegend: true, withTransition: false, withTransitionForTransform: false });
 };
 
-c3_chart_fn.destroy = function () {
+const destroy = function () {
     const $$ = this.internal;
 
     window.clearInterval($$.intervalForObserveInserted);
@@ -33,10 +33,13 @@ c3_chart_fn.destroy = function () {
 
     $$.selectChart.classed('c3', false).html('');
 
-    // MEMO: this is needed because the reference of some elements will not be released, then memory leak will happen.
+    // MEMO: this is needed because the reference of some elements will not be released,
+    // then memory leak will happen.
     Object.keys($$).forEach((key) => {
         $$[key] = null;
     });
 
     return null;
 };
+
+export { resize, flush, destroy };

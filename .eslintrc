@@ -1,5 +1,9 @@
 {
     "extends": "airbnb-base",
+    "env": {
+        "browser": true,
+        "node": true
+    },
     "rules": {
         "indent": ["error", 4],
         "no-var": "error",
@@ -37,5 +41,7 @@
         "no-restricted-syntax": 0,
         "guard-for-in": 0,
         "max-lines": 0,
+        "vars-on-top": 0,
+        "no-unused-vars": 0,
     }
 }

@@ -1,3 +1,10 @@
+import {
+    isValue,
+    diffDomain,
+    notEmpty,
+    isDefined,
+} from './util';
+
 const getYDomainMin = function (targets) {
     let $$ = this, config = $$.config,
         ids = $$.mapToIds(targets), ys = $$.getValuesAsIdKeyed(targets),

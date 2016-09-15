@@ -4,10 +4,10 @@
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
-    "lint": "grunt lint",
+    "lint": "eslint src/",
     "test": "karma start karma.conf.js",
     "codecov": "cat coverage/*/lcov.info | codecov",
-    "build": "rollup -c"
+    "build": "rollup -cm"
   },
   "repository": {
     "type": "git",
@@ -43,9 +43,11 @@
     "jasmine-core": "^2.4.1",
     "jshint-stylish": "^2.2.0",
     "karma": "^1.1.1",
+    "karma-babel-preprocessor": "^6.0.1",
     "karma-coverage": "^1.1.0",
     "karma-jasmine": "^1.0.2",
     "karma-phantomjs-launcher": "^1.0.1",
+    "karma-rollup-plugin": "^0.2.3",
     "karma-spec-reporter": "0.0.26",
     "load-grunt-tasks": "^3.5.0",
     "phantomjs-prebuilt": "^2.1.7",

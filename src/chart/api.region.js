@@ -1,18 +1,39 @@
-c3_chart_fn.regions = function (regions) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const regions = function (regions) {
     let $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = regions;
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.add = function (regions) {
+
+regions.add = function (regions) {
     let $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = config.regions.concat(regions);
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.remove = function (options) {
+
+regions.remove = function (options) {
     let $$ = this.internal, config = $$.config,
         duration, classes, regions;
 
@@ -38,3 +59,5 @@ c3_chart_fn.regions.remove = function (options) {
 
     return config.regions;
 };
+
+export { regions };

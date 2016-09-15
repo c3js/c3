@@ -1,3 +1,5 @@
+import { CLASS } from './class';
+
 const selectPoint = function (target, d, i) {
     let $$ = this, config = $$.config,
         cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),

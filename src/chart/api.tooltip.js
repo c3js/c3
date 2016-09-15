@@ -1,5 +1,25 @@
-c3_chart_fn.tooltip = function () {};
-c3_chart_fn.tooltip.show = function (args) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const tooltip = function () {};
+
+tooltip.show = function (args) {
     let $$ = this.internal, index, mouse;
 
     // determine mouse position on the chart
@@ -17,11 +37,9 @@ c3_chart_fn.tooltip.show = function (args) {
             // TODO: when tooltip_grouped = false
             index = isValue(args.data.index) ? args.data.index : $$.getIndexByX(args.data.x);
         }
-    }
-    else if (typeof args.x !== 'undefined') {
+    } else if (typeof args.x !== 'undefined') {
         index = $$.getIndexByX(args.x);
-    }
-    else if (typeof args.index !== 'undefined') {
+    } else if (typeof args.index !== 'undefined') {
         index = args.index;
     }
 
@@ -31,9 +49,12 @@ c3_chart_fn.tooltip.show = function (args) {
 
     $$.config.tooltip_onshow.call($$, args.data);
 };
-c3_chart_fn.tooltip.hide = function () {
+
+tooltip.hide = function () {
     // TODO: get target data by checking the state of focus
     this.internal.dispatchEvent('mouseout', 0);
 
     this.internal.config.tooltip_onhide.call(this);
 };
+
+export { tooltip };

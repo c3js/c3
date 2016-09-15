@@ -1,4 +1,23 @@
-c3_chart_fn.x = function (x) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const x = function (x) {
     const $$ = this.internal;
     if (arguments.length) {
         $$.updateTargetX($$.data.targets, x);
@@ -6,7 +25,8 @@ c3_chart_fn.x = function (x) {
     }
     return $$.data.xs;
 };
-c3_chart_fn.xs = function (xs) {
+
+const xs = function (xs) {
     const $$ = this.internal;
     if (arguments.length) {
         $$.updateTargetXs($$.data.targets, xs);
@@ -14,3 +34,5 @@ c3_chart_fn.xs = function (xs) {
     }
     return $$.data.xs;
 };
+
+export { x, xs };

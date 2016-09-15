@@ -9,7 +9,7 @@ import { Chart } from './chart/index';
 import { Axis } from './axis/index';
 
 
-const version = '0.4.11';
+const version = '1.0.0';
 
 const generate = function generate(config) {
     return new Chart(config);

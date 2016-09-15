@@ -1,3 +1,6 @@
+import { CLASS } from './class';
+import { isValue } from './util';
+
 const initGrid = function () {
     let $$ = this, config = $$.config, d3 = $$.d3;
     $$.grid = $$.main.append('g')

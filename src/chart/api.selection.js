@@ -1,4 +1,23 @@
-c3_chart_fn.selected = function (targetId) {
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+    ChartInternal
+} from '../internals/index';
+
+const selected = function (targetId) {
     let $$ = this.internal, d3 = $$.d3;
     return d3.merge(
         $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape)
@@ -6,7 +25,8 @@ c3_chart_fn.selected = function (targetId) {
             .map((d) => { return d.map((d) => { const data = d.__data__; return data.data ? data.data : data; }); })
     );
 };
-c3_chart_fn.select = function (ids, indices, resetOther) {
+
+const select = function (ids, indices, resetOther) {
     let $$ = this.internal, d3 = $$.d3, config = $$.config;
     if (!config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
@@ -30,7 +50,8 @@ c3_chart_fn.select = function (ids, indices, resetOther) {
         }
     });
 };
-c3_chart_fn.unselect = function (ids, indices) {
+
+const unselect = function (ids, indices) {
     let $$ = this.internal, d3 = $$.d3, config = $$.config;
     if (!config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
@@ -52,3 +73,5 @@ c3_chart_fn.unselect = function (ids, indices) {
         }
     });
 };
+
+export { selected, select, unselect };

@@ -1,4 +1,8 @@
-c3_chart_fn.focus = function (targetIds) {
+import {
+    CLASS,
+} from '../internals/index';
+
+const focus = function (targetIds) {
     let $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -18,7 +22,7 @@ c3_chart_fn.focus = function (targetIds) {
     });
 };
 
-c3_chart_fn.defocus = function (targetIds) {
+const defocus = function (targetIds) {
     let $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -36,7 +40,7 @@ c3_chart_fn.defocus = function (targetIds) {
     $$.defocusedTargetIds = targetIds;
 };
 
-c3_chart_fn.revert = function (targetIds) {
+const revert = function (targetIds) {
     let $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -58,3 +62,5 @@ c3_chart_fn.revert = function (targetIds) {
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
 };
+
+export { focus, defocus, revert };

@@ -1,3 +1,5 @@
+import { isValue } from './util';
+
 const getYFormat = function (forArc) {
     let $$ = this,
         formatForY = forArc && !$$.hasType('gauge') ? $$.defaultArcValueFormat : $$.yFormat,

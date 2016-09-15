@@ -1,4 +1,9 @@
-c3_chart_fn.flow = function (args) {
+import {
+    isValue,
+    isDefined,
+} from '../internals/index';
+
+const flow = function (args) {
     let $$ = this.internal,
         targets, data, notfoundIds = [],
         orgDataCount = $$.getMaxDataCount(),
@@ -141,3 +146,5 @@ c3_chart_fn.flow = function (args) {
         withUpdateXAxis: true,
     });
 };
+
+export { flow };

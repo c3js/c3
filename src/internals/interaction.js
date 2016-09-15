@@ -1,10 +1,12 @@
-c3_chart_internal_fn.initEventRect = function () {
+import { CLASS } from './class';
+
+const initEventRect = function () {
     const $$ = this;
     $$.main.select('.' + CLASS.chart).append('g')
         .attr('class', CLASS.eventRects)
         .style('fill-opacity', 0);
 };
-c3_chart_internal_fn.redrawEventRect = function () {
+const redrawEventRect = function () {
     let $$ = this, config = $$.config,
         eventRectUpdate, maxDataCountTarget,
         isMultipleX = $$.isMultipleX();
@@ -43,7 +45,7 @@ c3_chart_internal_fn.redrawEventRect = function () {
         eventRectUpdate.exit().remove();
     }
 };
-c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
+const updateEventRect = function (eventRectUpdate) {
     let $$ = this, config = $$.config,
         x, y, w, h, rectW, rectX;
 
@@ -107,7 +109,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         .attr('width', w)
         .attr('height', h);
 };
-c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
+const generateEventRectsForSingleX = function (eventRectEnter) {
     let $$ = this, d3 = $$.d3, config = $$.config,
         tap = false, tapX;
 
@@ -254,7 +256,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         );
 };
 
-c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
+const generateEventRectsForMultipleXs = function (eventRectEnter) {
     let $$ = this, d3 = $$.d3, config = $$.config,
         tap = false, tapX, tapY;
 
@@ -385,7 +387,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             ) : () => {}
         );
 };
-c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
+const dispatchEvent = function (type, index, mouse) {
     let $$ = this,
         selector = '.' + CLASS.eventRect + (!$$.isMultipleX() ? '-' + index : ''),
         eventRect = $$.main.select(selector).node(),
@@ -397,4 +399,13 @@ c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
     event.initMouseEvent(type, true, true, window, 0, x, y, x, y,
                          false, false, false, false, 0, null);
     eventRect.dispatchEvent(event);
+};
+
+export {
+    initEventRect,
+    redrawEventRect,
+    updateEventRect,
+    generateEventRectsForSingleX,
+    generateEventRectsForMultipleXs,
+    dispatchEvent,
 };

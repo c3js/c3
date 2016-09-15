@@ -1,4 +1,6 @@
-c3_chart_fn.load = function (args) {
+import { c3_chart_fn } from './index';
+
+const load = function (args) {
     let $$ = this.internal, config = $$.config;
     // update xs if specified
     if (args.xs) {
@@ -46,7 +48,7 @@ c3_chart_fn.load = function (args) {
     }
 };
 
-c3_chart_fn.unload = function (args) {
+const unload = function (args) {
     const $$ = this.internal;
     args = args || {};
     if (args instanceof Array) {
@@ -59,3 +61,5 @@ c3_chart_fn.unload = function (args) {
         if (args.done) { args.done(); }
     });
 };
+
+export { load, unload };

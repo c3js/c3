@@ -1,3 +1,16 @@
+import * as d3 from 'd3';
+
+import {
+    CLASS,
+    isValue,
+    isFunction,
+    isString,
+    isEmpty,
+} from '../internals/index';
+
+import { inherit, API } from './index';
+import c3_axis from './c3.axis';
+
 function Axis(owner) {
     API.call(this, owner);
 }
@@ -5,7 +18,9 @@ function Axis(owner) {
 inherit(API, Axis);
 
 Axis.prototype.init = function init() {
-    let $$ = this.owner, config = $$.config, main = $$.main;
+    const $$ = this.owner;
+    const config = $$.config;
+    const main = $$.main;
     $$.axes.x = main.append('g')
         .attr('class', CLASS.axis + ' ' + CLASS.axisX)
         .attr('clip-path', $$.clipPathForXAxis)
@@ -35,20 +50,28 @@ Axis.prototype.init = function init() {
         .attr('transform', config.axis_rotated ? '' : 'rotate(-90)')
         .style('text-anchor', this.textAnchorForY2AxisLabel.bind(this));
 };
-Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    let $$ = this.owner, config = $$.config,
-        axisParams = {
-            isCategory: $$.isCategorized(),
-            withOuterTick,
-            tickMultiline: config.axis_x_tick_multiline,
-            tickWidth: config.axis_x_tick_width,
-            tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
-            withoutTransition,
-        },
-        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient);
+Axis.prototype.getXAxis = function getXAxis(
+    scale,
+    orient,
+    tickFormat,
+    tickValues,
+    withOuterTick,
+    withoutTransition,
+    withoutRotateTickText) {
+    const $$ = this.owner;
+    const config = $$.config;
+    const axisParams = {
+        isCategory: $$.isCategorized(),
+        withOuterTick,
+        tickMultiline: config.axis_x_tick_multiline,
+        tickWidth: config.axis_x_tick_width,
+        tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
+        withoutTransition,
+    };
+    const axis = c3_axis(axisParams).scale(scale).orient(orient);
 
     if ($$.isTimeSeries() && tickValues && typeof tickValues !== 'function') {
-        tickValues = tickValues.map((v) => { return $$.parseDate(v); });
+        tickValues = tickValues.map(v => $$.parseDate(v));
     }
 
     // Set tick
@@ -63,9 +86,15 @@ Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValue
     return axis;
 };
 Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, axis) {
-    let $$ = this.owner, config = $$.config, tickValues;
+    const $$ = this.owner;
+    const config = $$.config;
+    let tickValues;
     if (config.axis_x_tick_fit || config.axis_x_tick_count) {
-        tickValues = this.generateTickValues($$.mapTargetsToUniqueXs(targets), config.axis_x_tick_count, $$.isTimeSeries());
+        tickValues = this.generateTickValues(
+            $$.mapTargetsToUniqueXs(targets),
+            config.axis_x_tick_count,
+            $$.isTimeSeries()
+        );
     }
     if (axis) {
         axis.tickValues(tickValues);
@@ -75,14 +104,21 @@ Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, a
     }
     return tickValues;
 };
-Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    let $$ = this.owner, config = $$.config,
-        axisParams = {
-            withOuterTick,
-            withoutTransition,
-            tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate,
-        },
-        axis = c3_axis($$.d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
+Axis.prototype.getYAxis = function getYAxis(scale,
+    orient,
+    tickFormat,
+    tickValues,
+    withOuterTick,
+    withoutTransition,
+    withoutRotateTickText) {
+    const $$ = this.owner;
+    const config = $$.config;
+    const axisParams = {
+        withOuterTick,
+        withoutTransition,
+        tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate,
+    };
+    const axis = c3_axis(axisParams).scale(scale).orient(orient).tickFormat(tickFormat);
     if ($$.isTimeSeriesY()) {
         axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
     } else {
@@ -95,8 +131,13 @@ Axis.prototype.getId = function getId(id) {
     return id in config.data_axes ? config.data_axes[id] : 'y';
 };
 Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
-    let $$ = this.owner, config = $$.config,
-        format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
+    const $$ = this.owner;
+    const config = $$.config;
+    let format = $$.isTimeSeries() ? // eslint-disable-line no-nested-ternary
+        $$.defaultAxisTimeFormat :
+            $$.isCategorized() ?
+                $$.categoryName :
+                function (v) { return v < 0 ? v.toFixed(0) : v; };
     if (config.axis_x_tick_format) {
         if (isFunction(config.axis_x_tick_format)) {
             format = config.axis_x_tick_format;
@@ -109,7 +150,8 @@ Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
     return isFunction(format) ? function (v) { return format.call($$, v); } : format;
 };
 Axis.prototype.getTickValues = function getTickValues(tickValues, axis) {
-    return tickValues ? tickValues : axis ? axis.tickValues() : undefined;
+    return tickValues ? tickValues : // eslint-disable-line no-nested-ternary,no-unneeded-ternary
+        axis ? axis.tickValues() : undefined;
 };
 Axis.prototype.getXAxisTickValues = function getXAxisTickValues() {
     return this.getTickValues(this.owner.config.axis_x_tick_values, this.owner.xAxis);
@@ -121,7 +163,9 @@ Axis.prototype.getY2AxisTickValues = function getY2AxisTickValues() {
     return this.getTickValues(this.owner.config.axis_y2_tick_values, this.owner.y2Axis);
 };
 Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(axisId) {
-    let $$ = this.owner, config = $$.config, option;
+    const $$ = this.owner;
+    const config = $$.config;
+    let option;
     if (axisId === 'y') {
         option = config.axis_y_label;
     } else if (axisId === 'y2') {
@@ -133,11 +177,12 @@ Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(axisId) 
 };
 Axis.prototype.getLabelText = function getLabelText(axisId) {
     const option = this.getLabelOptionByAxisId(axisId);
-    return isString(option) ? option : option ? option.text : null;
+    return isString(option) ? option : option ? option.text : null; // eslint-disable-line no-nested-ternary,max-len
 };
 Axis.prototype.setLabelText = function setLabelText(axisId, text) {
-    let $$ = this.owner, config = $$.config,
-        option = this.getLabelOptionByAxisId(axisId);
+    const $$ = this.owner;
+    const config = $$.config;
+    const option = this.getLabelOptionByAxisId(axisId);
     if (isString(option)) {
         if (axisId === 'y') {
             config.axis_y_label = text;
@@ -151,8 +196,8 @@ Axis.prototype.setLabelText = function setLabelText(axisId, text) {
     }
 };
 Axis.prototype.getLabelPosition = function getLabelPosition(axisId, defaultPosition) {
-    let option = this.getLabelOptionByAxisId(axisId),
-        position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
+    const option = this.getLabelOptionByAxisId(axisId);
+    const position = (option && typeof option === 'object' && option.position) ? option.position : defaultPosition;
     return {
         isInner: position.indexOf('inner') >= 0,
         isOuter: position.indexOf('outer') >= 0,
@@ -174,7 +219,8 @@ Axis.prototype.getY2AxisLabelPosition = function getY2AxisLabelPosition() {
     return this.getLabelPosition('y2', this.owner.config.axis_rotated ? 'inner-right' : 'inner-top');
 };
 Axis.prototype.getLabelPositionById = function getLabelPositionById(id) {
-    return id === 'y2' ? this.getY2AxisLabelPosition() : id === 'y' ? this.getYAxisLabelPosition() : this.getXAxisLabelPosition();
+    return id === 'y2' ? this.getY2AxisLabelPosition() :
+        id === 'y' ? this.getYAxisLabelPosition() : this.getXAxisLabelPosition();
 };
 Axis.prototype.textForXAxisLabel = function textForXAxisLabel() {
     return this.getLabelText('x');
@@ -226,8 +272,9 @@ Axis.prototype.dxForY2AxisLabel = function dxForY2AxisLabel() {
     return this.dxForAxisLabel(this.owner.config.axis_rotated, this.getY2AxisLabelPosition());
 };
 Axis.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
-    let $$ = this.owner, config = $$.config,
-        position = this.getXAxisLabelPosition();
+    const $$ = this.owner;
+    const config = $$.config;
+    const position = this.getXAxisLabelPosition();
     if (config.axis_rotated) {
         return position.isInner ? '1.2em' : -25 - this.getMaxTickWidth('x');
     } else {
@@ -235,8 +282,8 @@ Axis.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
     }
 };
 Axis.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
-    let $$ = this.owner,
-        position = this.getYAxisLabelPosition();
+    const $$ = this.owner;
+    const position = this.getYAxisLabelPosition();
     if ($$.config.axis_rotated) {
         return position.isInner ? '-0.5em' : '3em';
     } else {
@@ -244,8 +291,8 @@ Axis.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
     }
 };
 Axis.prototype.dyForY2AxisLabel = function dyForY2AxisLabel() {
-    let $$ = this.owner,
-        position = this.getY2AxisLabelPosition();
+    const $$ = this.owner;
+    const position = this.getY2AxisLabelPosition();
     if ($$.config.axis_rotated) {
         return position.isInner ? '1.2em' : '-2.2em';
     } else {
@@ -265,8 +312,14 @@ Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
     return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getY2AxisLabelPosition());
 };
 Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
-    let $$ = this.owner, config = $$.config,
-        maxWidth = 0, targetsToShow, scale, axis, dummy, svg;
+    const $$ = this.owner;
+    const config = $$.config;
+    let maxWidth = 0;
+    let targetsToShow;
+    let scale;
+    let axis;
+    let dummy;
+    let svg;
     if (withoutRecompute && $$.currentMaxTickWidths[id]) {
         return $$.currentMaxTickWidths[id];
     }
@@ -274,17 +327,45 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         targetsToShow = $$.filterTargetsToShow($$.data.targets);
         if (id === 'y') {
             scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-            axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true, true);
+            axis = this.getYAxis(
+                scale,
+                $$.yOrient,
+                config.axis_y_tick_format,
+                $$.yAxisTickValues,
+                false,
+                true,
+                true
+            );
         } else if (id === 'y2') {
             scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-            axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true, true);
+            axis = this.getYAxis(
+                scale,
+                $$.y2Orient,
+                config.axis_y2_tick_format,
+                $$.y2AxisTickValues,
+                false,
+                true,
+                true
+            );
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-            axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
+            axis = this.getXAxis(
+                scale,
+                $$.xOrient,
+                $$.xAxisTickFormat,
+                $$.xAxisTickValues,
+                false,
+                true,
+                true
+            );
             this.updateXAxisTickValues(targetsToShow, axis);
         }
         dummy = $$.d3.select('body').append('div').classed('c3', true);
-        svg = dummy.append('svg').style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+        svg = dummy.append('svg')
+            .style('visibility', 'hidden')
+            .style('position', 'fixed')
+            .style('top', 0)
+            .style('left', 0);
         svg.append('g').call(axis).each(function () {
             $$.d3.select(this).selectAll('text').each(function () {
                 const box = this.getBoundingClientRect();
@@ -299,9 +380,9 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
 
 Axis.prototype.updateLabels = function updateLabels(withTransition) {
     const $$ = this.owner;
-    let axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
-        axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
-        axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
+    const axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel);
+    const axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel);
+    const axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label);
     (withTransition ? axisXLabel.transition() : axisXLabel)
         .attr('x', this.xForXAxisLabel.bind(this))
         .attr('dx', this.dxForXAxisLabel.bind(this))
@@ -329,13 +410,20 @@ Axis.prototype.getPadding = function getPadding(padding, key, defaultValue, doma
     // assume padding is pixels if unit is not specified
     return this.convertPixelsToAxisPadding(p, domainLength);
 };
-Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) {
-    let $$ = this.owner,
-        length = $$.config.axis_rotated ? $$.width : $$.height;
+Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(pixels, domainLength) { // eslint-disable-line max-len
+    const $$ = this.owner;
+    const length = $$.config.axis_rotated ? $$.width : $$.height;
     return domainLength * (pixels / length);
 };
 Axis.prototype.generateTickValues = function generateTickValues(values, tickCount, forTimeSeries) {
-    let tickValues = values, targetCount, start, end, count, interval, i, tickValue;
+    let tickValues = values;
+    let targetCount;
+    let start;
+    let end;
+    let count;
+    let interval;
+    let i;
+    let tickValue;
     if (tickCount) {
         targetCount = isFunction(tickCount) ? tickCount() : tickCount;
         // compute ticks according to tickCount
@@ -357,11 +445,12 @@ Axis.prototype.generateTickValues = function generateTickValues(values, tickCoun
             tickValues.push(end);
         }
     }
-    if (!forTimeSeries) { tickValues = tickValues.sort((a, b) => { return a - b; }); }
+    if (!forTimeSeries) { tickValues = tickValues.sort((a, b) => a - b); }
     return tickValues;
 };
 Axis.prototype.generateTransitions = function generateTransitions(duration) {
-    let $$ = this.owner, axes = $$.axes;
+    let $$ = this.owner;
+    let axes = $$.axes;
     return {
         axisX: duration ? axes.x.transition().duration(duration) : axes.x,
         axisY: duration ? axes.y.transition().duration(duration) : axes.y,
@@ -380,3 +469,5 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisY2.call($$.y2Axis);
     transitions.axisSubX.call($$.subXAxis);
 };
+
+export default Axis;

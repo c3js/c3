@@ -1,3 +1,6 @@
+import { CLASS } from './class';
+import { getPathBox } from './util';
+
 const drag = function (mouse) {
     let $$ = this, config = $$.config, main = $$.main, d3 = $$.d3;
     let sx, sy, mx, my, minX, maxX, minY, maxY;

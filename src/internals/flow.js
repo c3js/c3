@@ -1,3 +1,9 @@
+import {
+    diffDomain,
+} from './util';
+
+import { CLASS } from './class';
+
 const generateFlow = function (args) {
     let $$ = this,
         config = $$.config,

@@ -5,7 +5,7 @@
 import babel from 'rollup-plugin-babel';
 
 export default {
-    entry: 'es6_modules/rollup.entry.js',
+    entry: 'src/index.js',
     format: 'umd',
     moduleName: 'c3',
     external: ['d3'],

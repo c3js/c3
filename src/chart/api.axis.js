@@ -1,5 +1,10 @@
-c3_chart_fn.axis = function () {};
-c3_chart_fn.axis.labels = function (labels) {
+import {
+    isValue,
+    isDefined,
+} from '../internals/index';
+
+const axis = function () {};
+axis.labels = function (labels) {
     const $$ = this.internal;
     if (arguments.length) {
         Object.keys(labels).forEach((axisId) => {
@@ -9,7 +14,7 @@ c3_chart_fn.axis.labels = function (labels) {
     }
     // TODO: return some values?
 };
-c3_chart_fn.axis.max = function (max) {
+axis.max = function (max) {
     let $$ = this.internal, config = $$.config;
     if (arguments.length) {
         if (typeof max === 'object') {
@@ -28,7 +33,7 @@ c3_chart_fn.axis.max = function (max) {
         };
     }
 };
-c3_chart_fn.axis.min = function (min) {
+axis.min = function (min) {
     let $$ = this.internal, config = $$.config;
     if (arguments.length) {
         if (typeof min === 'object') {
@@ -47,7 +52,7 @@ c3_chart_fn.axis.min = function (min) {
         };
     }
 };
-c3_chart_fn.axis.range = function (range) {
+axis.range = function (range) {
     if (arguments.length) {
         if (isDefined(range.max)) { this.axis.max(range.max); }
         if (isDefined(range.min)) { this.axis.min(range.min); }
@@ -58,3 +63,5 @@ c3_chart_fn.axis.range = function (range) {
         };
     }
 };
+
+export { axis };

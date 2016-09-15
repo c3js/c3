@@ -1,36 +1,41 @@
-// Features:
-// 1. category axis
-// 2. ceil values of translate/x/y to int for half pixel antialiasing
-// 3. multiline tick text
-let tickTextCharSize;
-function c3_axis(d3, params) {
-    let scale = d3.scale.linear(), orient = 'bottom', innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+import d3 from 'd3';
 
-    let tickOffset = 0, tickCulling = true, tickCentered;
+let tickTextCharSize;
+function c3_axis(params) {
+    let scale = d3.scale.linear();
+    let orient = 'bottom';
+    const innerTickSize = 6;
+    const tickPadding = 3;
+    let tickValues = null;
+    let tickFormat;
+    let tickArguments;
+
+    let tickOffset = 0;
+    let tickCulling = true;
+    let tickCentered;
 
     params = params || {};
-    outerTickSize = params.withOuterTick ? 6 : 0;
+
+    const outerTickSize = params.withOuterTick ? 6 : 0;
 
     function axisX(selection, x) {
-        selection.attr('transform', (d) => {
-            return 'translate(' + Math.ceil(x(d) + tickOffset) + ', 0)';
-        });
+        selection.attr('transform', d => 'translate(' + Math.ceil(x(d) + tickOffset) + ', 0)');
     }
     function axisY(selection, y) {
-        selection.attr('transform', (d) => {
-            return 'translate(0,' + Math.ceil(y(d)) + ')';
-        });
+        selection.attr('transform', d => 'translate(0,' + Math.ceil(y(d)) + ')');
     }
     function scaleExtent(domain) {
-        let start = domain[0], stop = domain[domain.length - 1];
+        const start = domain[0];
+        const stop = domain[domain.length - 1];
         return start < stop ? [start, stop] : [stop, start];
     }
-    function generateTicks(scale) {
-        let i, domain, ticks = [];
+    function generateTicks(scale) { // eslint-disable-line no-shadow
+        let i;
+        const ticks = [];
         if (scale.ticks) {
             return scale.ticks.apply(scale, tickArguments);
         }
-        domain = scale.domain();
+        const domain = scale.domain();
         for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
             ticks.push(i);
         }
@@ -40,7 +45,8 @@ function c3_axis(d3, params) {
         return ticks;
     }
     function copyScale() {
-        let newScale = scale.copy(), domain;
+        const newScale = scale.copy();
+        let domain;
         if (params.isCategory) {
             domain = scale.domain();
             newScale.domain([domain[0], domain[1] - 1]);
@@ -79,15 +85,19 @@ function c3_axis(d3, params) {
         g.each(function () {
             const g = axis.g = d3.select(this);
 
-            let scale0 = this.__chart__ || scale, scale1 = this.__chart__ = copyScale();
+            let scale0 = this.__chart__ || scale,
+                scale1 = this.__chart__ = copyScale();
 
-            let ticks = tickValues ? tickValues : generateTicks(scale1),
+            let ticks = tickValues || generateTicks(scale1),
                 tick = g.selectAll('.tick').data(ticks, scale1),
                 tickEnter = tick.enter().insert('g', '.domain').attr('class', 'tick').style('opacity', 1e-6),
-                // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
+                // MEMO: No exit transition. The reason is this transition affects max tick width
+                // calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
                 tickUpdate = transitionise(tick).style('opacity', 1),
-                tickTransform, tickX, tickY;
+                tickTransform,
+                tickX,
+                tickY;
 
             let range = scale.rangeExtent ? scale.rangeExtent() : scaleExtent(scale.range()),
                 path = g.selectAll('.domain').data([0]),
@@ -108,21 +118,30 @@ function c3_axis(d3, params) {
                 tickOffset = tickX = 0;
             }
 
-            let text, tspan, sizeFor1Char = getSizeFor1Char(g.select('.tick')), counts = [];
+            let text,
+                tspan,
+                sizeFor1Char = getSizeFor1Char(g.select('.tick')),
+                counts = [];
+
             let tickLength = Math.max(innerTickSize, 0) + tickPadding,
                 isVertical = orient === 'left' || orient === 'right';
 
             // this should be called only when category axis
             function splitTickText(d, maxWidth) {
                 let tickText = textFormatted(d),
-                    subtext, spaceIndex, textWidth, splitted = [];
+                    subtext,
+                    spaceIndex,
+                    textWidth,
+                    splitted = [];
 
                 if (Object.prototype.toString.call(tickText) === '[object Array]') {
                     return tickText;
                 }
 
                 if (!maxWidth || maxWidth <= 0) {
-                    maxWidth = isVertical ? 95 : params.isCategory ? (Math.ceil(scale1(ticks[1]) - scale1(ticks[0])) - 12) : 110;
+                    maxWidth = isVertical ? 95 :
+                    params.isCategory ?
+                        (Math.ceil(scale1(ticks[1]) - scale1(ticks[0])) - 12) : 110;
                 }
 
                 function split(splitted, text) {
@@ -136,7 +155,7 @@ function c3_axis(d3, params) {
                         // if text width gets over tick width, split by space index or crrent index
                         if (maxWidth < textWidth) {
                             return split(
-                                splitted.concat(text.substr(0, spaceIndex ? spaceIndex : i)),
+                                splitted.concat(text.substr(0, spaceIndex || i)),
                                 text.slice(spaceIndex ? spaceIndex + 1 : i)
                             );
                         }
@@ -167,15 +186,15 @@ function c3_axis(d3, params) {
             text = tick.select('text');
             tspan = text.selectAll('tspan')
                 .data((d, i) => {
-                    const splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
+                    const splitted = params.tickMultiline ?
+                        splitTickText(d, params.tickWidth) :
+                        [].concat(textFormatted(d));
                     counts[i] = splitted.length;
-                    return splitted.map((s) => {
-                        return { index: i, splitted: s };
-                    });
+                    return splitted.map(s => ({ index: i, splitted: s }));
                 });
             tspan.enter().append('tspan');
             tspan.exit().remove();
-            tspan.text((d) => { return d.splitted; });
+            tspan.text(d => d.splitted);
 
             const rotate = params.tickTextRotate;
 
@@ -255,9 +274,12 @@ function c3_axis(d3, params) {
                     pathUpdate.attr('d', 'M' + outerTickSize + ',' + range[0] + 'H0V' + range[1] + 'H' + outerTickSize);
                     break;
                 }
+            default:
+                break;
             }
             if (scale1.rangeBand) {
-                let x = scale1, dx = x.rangeBand() / 2;
+                let x = scale1,
+                    dx = x.rangeBand() / 2;
                 scale0 = scale1 = function (d) {
                     return x(d) + dx;
                 };
@@ -294,19 +316,19 @@ function c3_axis(d3, params) {
         return tickOffset;
     };
     axis.tickInterval = function () {
-        let interval, length;
+        let interval,
+            length;
         if (params.isCategory) {
             interval = tickOffset * 2;
-        }
-        else {
+        } else {
             length = axis.g.select('path.domain').node().getTotalLength() - outerTickSize * 2;
             interval = length / axis.g.selectAll('line').size();
         }
         return interval === Infinity ? 0 : interval;
     };
-    axis.ticks = function () {
+    axis.ticks = function (...args) {
         if (!arguments.length) { return tickArguments; }
-        tickArguments = arguments;
+        tickArguments = args;
         return axis;
     };
     axis.tickCulling = function (culling) {
@@ -319,8 +341,7 @@ function c3_axis(d3, params) {
             tickValues = function () {
                 return x(scale.domain());
             };
-        }
-        else {
+        } else {
             if (!arguments.length) { return tickValues; }
             tickValues = x;
         }
@@ -328,3 +349,5 @@ function c3_axis(d3, params) {
     };
     return axis;
 }
+
+export default c3_axis;
