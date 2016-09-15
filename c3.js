@@ -1214,266 +1214,193 @@ if(flowLength){for(i=0;i<flowLength;i++){shapes.push('.'+CLASS.shape+'-'+(flowIn
 xgrid.attr('transform',null).attr($$.xgridAttr);xgridLines.attr('transform',null);xgridLines.select('line').attr('x1',config.axis_rotated?0:xv).attr('x2',config.axis_rotated?$$.width:xv);xgridLines.select('text').attr('x',config.axis_rotated?$$.width:0).attr('y',xv);mainBar.attr('transform',null).attr('d',drawBar);mainLine.attr('transform',null).attr('d',drawLine);mainArea.attr('transform',null).attr('d',drawArea);mainCircle.attr('transform',null).attr('cx',cx).attr('cy',cy);mainText.attr('transform',null).attr('x',xForText).attr('y',yForText).style('fill-opacity',$$.opacityForText.bind($$));mainRegion.attr('transform',null);mainRegion.select('rect').filter($$.isRegionOnX).attr('x',$$.regionX.bind($$)).attr('width',$$.regionWidth.bind($$));if(config.interaction_enabled){$$.redrawEventRect();}// callback for end of flow
 done();$$.flowing=false;});};};c3_chart_internal_fn.isSafari=function(){var ua=window.navigator.userAgent;return ua.indexOf('Safari')>=0&&ua.indexOf('Chrome')<0;};c3_chart_internal_fn.isChrome=function(){var ua=window.navigator.userAgent;return ua.indexOf('Chrome')>=0;};
 
-var c3_chart_fn = void 0;
-
-function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
-    $$.loadConfig(config);
-
-    $$.beforeInit(config);
-    $$.init();
-    $$.afterInit(config);
-
-    // bind "this" to nested API
-    (function bindThis(fn, target, argThis) {
-        Object.keys(fn).forEach(function (key) {
-            target[key] = fn[key].bind(argThis);
-            if (Object.keys(fn[key]).length > 0) {
-                bindThis(fn[key], target[key], argThis);
-            }
+var axis = function axis() {};
+axis.labels = function (labels) {
+    var $$ = this.internal;
+    if (arguments.length) {
+        Object.keys(labels).forEach(function (axisId) {
+            $$.axis.setLabelText(axisId, labels[axisId]);
         });
-    })(c3_chart_fn, this, this);
-}
-
-c3_chart_fn = Chart.prototype;
-
-c3_chart_fn.focus = function (targetIds) {
+        $$.axis.updateLabels();
+    }
+    // TODO: return some values?
+};
+axis.max = function (max) {
     var $$ = this.internal,
-        candidates = void 0;
-
-    targetIds = $$.mapToTargetIds(targetIds);
-    candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))), this.revert();
-    this.defocus();
-    candidates.classed(CLASS.focused, true).classed(CLASS.defocused, false);
-    if ($$.hasArcType()) {
-        $$.expandArc(targetIds);
-    }
-    $$.toggleFocusLegend(targetIds, true);
-
-    $$.focusedTargetIds = targetIds;
-    $$.defocusedTargetIds = $$.defocusedTargetIds.filter(function (id) {
-        return targetIds.indexOf(id) < 0;
-    });
-};
-
-c3_chart_fn.defocus = function (targetIds) {
-    var $$ = this.internal,
-        candidates = void 0;
-
-    targetIds = $$.mapToTargetIds(targetIds);
-    candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))), candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
-    if ($$.hasArcType()) {
-        $$.unexpandArc(targetIds);
-    }
-    $$.toggleFocusLegend(targetIds, false);
-
-    $$.focusedTargetIds = $$.focusedTargetIds.filter(function (id) {
-        return targetIds.indexOf(id) < 0;
-    });
-    $$.defocusedTargetIds = targetIds;
-};
-
-c3_chart_fn.revert = function (targetIds) {
-    var $$ = this.internal,
-        candidates = void 0;
-
-    targetIds = $$.mapToTargetIds(targetIds);
-    candidates = $$.svg.selectAll($$.selectorTargets(targetIds)); // should be for all targets
-
-    candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
-    if ($$.hasArcType()) {
-        $$.unexpandArc(targetIds);
-    }
-    if ($$.config.legend_show) {
-        $$.showLegend(targetIds.filter($$.isLegendToShow.bind($$)));
-        $$.legend.selectAll($$.selectorLegends(targetIds)).filter(function () {
-            return $$.d3.select(this).classed(CLASS.legendItemFocused);
-        }).classed(CLASS.legendItemFocused, false);
-    }
-
-    $$.focusedTargetIds = [];
-    $$.defocusedTargetIds = [];
-};
-
-c3_chart_fn.show = function (targetIds, options) {
-    var $$ = this.internal,
-        targets = void 0;
-
-    targetIds = $$.mapToTargetIds(targetIds);
-    options = options || {};
-
-    $$.removeHiddenTargetIds(targetIds);
-    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
-
-    targets.transition().style('opacity', 1, 'important').call($$.endall, function () {
-        targets.style('opacity', null).style('opacity', 1);
-    });
-
-    if (options.withLegend) {
-        $$.showLegend(targetIds);
-    }
-
-    $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
-};
-
-c3_chart_fn.hide = function (targetIds, options) {
-    var $$ = this.internal,
-        targets = void 0;
-
-    targetIds = $$.mapToTargetIds(targetIds);
-    options = options || {};
-
-    $$.addHiddenTargetIds(targetIds);
-    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
-
-    targets.transition().style('opacity', 0, 'important').call($$.endall, function () {
-        targets.style('opacity', null).style('opacity', 0);
-    });
-
-    if (options.withLegend) {
-        $$.hideLegend(targetIds);
-    }
-
-    $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
-};
-
-c3_chart_fn.toggle = function (targetIds, options) {
-    var that = this,
-        $$ = this.internal;
-    $$.mapToTargetIds(targetIds).forEach(function (targetId) {
-        $$.isTargetToShow(targetId) ? that.hide(targetId, options) : that.show(targetId, options);
-    });
-};
-
-c3_chart_fn.zoom = function (domain) {
-    var $$ = this.internal;
-    if (domain) {
-        if ($$.isTimeSeries()) {
-            domain = domain.map(function (x) {
-                return $$.parseDate(x);
-            });
+        config = $$.config;
+    if (arguments.length) {
+        if ((typeof max === 'undefined' ? 'undefined' : _typeof(max)) === 'object') {
+            if (isValue(max.x)) {
+                config.axis_x_max = max.x;
+            }
+            if (isValue(max.y)) {
+                config.axis_y_max = max.y;
+            }
+            if (isValue(max.y2)) {
+                config.axis_y2_max = max.y2;
+            }
+        } else {
+            config.axis_y_max = config.axis_y2_max = max;
         }
-        $$.brush.extent(domain);
-        $$.redraw({ withUpdateXDomain: true, withY: $$.config.zoom_rescale });
-        $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
-    }
-    return $$.brush.extent();
-};
-c3_chart_fn.zoom.enable = function (enabled) {
-    var $$ = this.internal;
-    $$.config.zoom_enabled = enabled;
-    $$.updateAndRedraw();
-};
-c3_chart_fn.unzoom = function () {
-    var $$ = this.internal;
-    $$.brush.clear().update();
-    $$.redraw({ withUpdateXDomain: true });
-};
-
-c3_chart_fn.zoom.max = function (max) {
-    var $$ = this.internal,
-        config = $$.config,
-        d3$$1 = $$.d3;
-    if (max === 0 || max) {
-        config.zoom_x_max = d3$$1.max([$$.orgXDomain[1], max]);
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
     } else {
-        return config.zoom_x_max;
+        return {
+            x: config.axis_x_max,
+            y: config.axis_y_max,
+            y2: config.axis_y2_max
+        };
     }
 };
-
-c3_chart_fn.zoom.min = function (min) {
+axis.min = function (min) {
     var $$ = this.internal,
-        config = $$.config,
-        d3$$1 = $$.d3;
-    if (min === 0 || min) {
-        config.zoom_x_min = d3$$1.min([$$.orgXDomain[0], min]);
+        config = $$.config;
+    if (arguments.length) {
+        if ((typeof min === 'undefined' ? 'undefined' : _typeof(min)) === 'object') {
+            if (isValue(min.x)) {
+                config.axis_x_min = min.x;
+            }
+            if (isValue(min.y)) {
+                config.axis_y_min = min.y;
+            }
+            if (isValue(min.y2)) {
+                config.axis_y2_min = min.y2;
+            }
+        } else {
+            config.axis_y_min = config.axis_y2_min = min;
+        }
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
     } else {
-        return config.zoom_x_min;
+        return {
+            x: config.axis_x_min,
+            y: config.axis_y_min,
+            y2: config.axis_y2_min
+        };
     }
 };
-
-c3_chart_fn.zoom.range = function (range) {
+axis.range = function (range) {
     if (arguments.length) {
         if (isDefined(range.max)) {
-            this.domain.max(range.max);
+            this.axis.max(range.max);
         }
         if (isDefined(range.min)) {
-            this.domain.min(range.min);
+            this.axis.min(range.min);
         }
     } else {
         return {
-            max: this.domain.max(),
-            min: this.domain.min()
+            max: this.axis.max(),
+            min: this.axis.min()
         };
     }
 };
 
-c3_chart_fn.load = function (args) {
+var category = function category(i, _category) {
     var $$ = this.internal,
         config = $$.config;
-    // update xs if specified
-    if (args.xs) {
-        $$.addXs(args.xs);
+    if (arguments.length > 1) {
+        config.axis_x_categories[i] = _category;
+        $$.redraw();
     }
-    // update names if exists
-    if ('names' in args) {
-        c3_chart_fn.data.names.bind(this)(args.names);
+    return config.axis_x_categories[i];
+};
+var categories = function categories(_categories) {
+    var $$ = this.internal,
+        config = $$.config;
+    if (!arguments.length) {
+        return config.axis_x_categories;
     }
-    // update classes if exists
-    if ('classes' in args) {
-        Object.keys(args.classes).forEach(function (id) {
-            config.data_classes[id] = args.classes[id];
-        });
-    }
-    // update categories if exists
-    if ('categories' in args && $$.isCategorized()) {
-        config.axis_x_categories = args.categories;
-    }
-    // update axes if exists
-    if ('axes' in args) {
-        Object.keys(args.axes).forEach(function (id) {
-            config.data_axes[id] = args.axes[id];
-        });
-    }
-    // update colors if exists
-    if ('colors' in args) {
-        Object.keys(args.colors).forEach(function (id) {
-            config.data_colors[id] = args.colors[id];
-        });
-    }
-    // use cache if exists
-    if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {
-        $$.load($$.getCaches(args.cacheIds), args.done);
-        return;
-    }
-    // unload if needed
-    if ('unload' in args) {
-        // TODO: do not unload if target will load (included in url/rows/columns)
-        $$.unload($$.mapToTargetIds(typeof args.unload === 'boolean' && args.unload ? null : args.unload), function () {
-            $$.loadFromArgs(args);
-        });
-    } else {
-        $$.loadFromArgs(args);
-    }
+    config.axis_x_categories = _categories;
+    $$.redraw();
+    return config.axis_x_categories;
 };
 
-c3_chart_fn.unload = function (args) {
+var resize = function resize(size) {
+    var $$ = this.internal,
+        config = $$.config;
+    config.size_width = size ? size.width : null;
+    config.size_height = size ? size.height : null;
+    this.flush();
+};
+
+var flush = function flush() {
     var $$ = this.internal;
-    args = args || {};
-    if (args instanceof Array) {
-        args = { ids: args };
-    } else if (typeof args === 'string') {
-        args = { ids: [args] };
+    $$.updateAndRedraw({ withLegend: true, withTransition: false, withTransitionForTransform: false });
+};
+
+var destroy = function destroy() {
+    var $$ = this.internal;
+
+    window.clearInterval($$.intervalForObserveInserted);
+
+    if ($$.resizeTimeout !== undefined) {
+        window.clearTimeout($$.resizeTimeout);
     }
-    $$.unload($$.mapToTargetIds(args.ids), function () {
-        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
-        if (args.done) {
-            args.done();
+
+    if (window.detachEvent) {
+        window.detachEvent('onresize', $$.resizeFunction);
+    } else if (window.removeEventListener) {
+        window.removeEventListener('resize', $$.resizeFunction);
+    } else {
+        var wrapper = window.onresize;
+        // check if no one else removed our wrapper and remove our resizeFunction from it
+        if (wrapper && wrapper.add && wrapper.remove) {
+            wrapper.remove($$.resizeFunction);
         }
+    }
+
+    $$.selectChart.classed('c3', false).html('');
+
+    // MEMO: this is needed because the reference of some elements will not be released,
+    // then memory leak will happen.
+    Object.keys($$).forEach(function (key) {
+        $$[key] = null;
+    });
+
+    return null;
+};
+
+// TODO: fix
+var color = function color(id) {
+    var $$ = this.internal;
+    return $$.color(id); // more patterns
+};
+
+var data = function data(targetIds) {
+    var targets = this.internal.data.targets;
+    return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {
+        return [].concat(targetIds).indexOf(t.id) >= 0;
     });
 };
 
-c3_chart_fn.flow = function (args) {
+data.shown = function (targetIds) {
+    return this.internal.filterTargetsToShow(this.data(targetIds));
+};
+
+data.values = function (targetId) {
+    var targets = void 0,
+        values = null;
+    if (targetId) {
+        targets = this.data(targetId);
+        values = targets[0] ? targets[0].values.map(function (d) {
+            return d.value;
+        }) : null;
+    }
+    return values;
+};
+
+data.names = function (names) {
+    this.internal.clearLegendItemTextBoxCache();
+    return this.internal.updateDataAttributes('names', names);
+};
+
+data.colors = function (colors) {
+    return this.internal.updateDataAttributes('colors', colors);
+};
+
+data.axes = function (axes) {
+    return this.internal.updateDataAttributes('axes', axes);
+};
+
+var flow = function flow(args) {
     var $$ = this.internal,
         targets = void 0,
         data = void 0,
@@ -1631,92 +1558,65 @@ c3_chart_fn.flow = function (args) {
     });
 };
 
-c3_chart_fn.selected = function (targetId) {
+var focus = function focus(targetIds) {
     var $$ = this.internal,
-        d3$$1 = $$.d3;
-    return d3$$1.merge($$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape).filter(function () {
-        return d3$$1.select(this).classed(CLASS.SELECTED);
-    }).map(function (d) {
-        return d.map(function (d) {
-            var data = d.__data__;return data.data ? data.data : data;
-        });
-    }));
-};
-c3_chart_fn.select = function (ids, indices, resetOther) {
-    var $$ = this.internal,
-        d3$$1 = $$.d3,
-        config = $$.config;
-    if (!config.data_selection_enabled) {
-        return;
+        candidates = void 0;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))), this.revert();
+    this.defocus();
+    candidates.classed(CLASS.focused, true).classed(CLASS.defocused, false);
+    if ($$.hasArcType()) {
+        $$.expandArc(targetIds);
     }
-    $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-        var shape = d3$$1.select(this),
-            id = d.data ? d.data.id : d.id,
-            toggle = $$.getToggle(this, d).bind($$),
-            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
-            isTargetIndex = !indices || indices.indexOf(i) >= 0,
-            isSelected = shape.classed(CLASS.SELECTED);
-        // line/area selection not supported yet
-        if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
-            return;
-        }
-        if (isTargetId && isTargetIndex) {
-            if (config.data_selection_isselectable(d) && !isSelected) {
-                toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
-            }
-        } else if (isDefined(resetOther) && resetOther) {
-            if (isSelected) {
-                toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
-            }
-        }
-    });
-};
-c3_chart_fn.unselect = function (ids, indices) {
-    var $$ = this.internal,
-        d3$$1 = $$.d3,
-        config = $$.config;
-    if (!config.data_selection_enabled) {
-        return;
-    }
-    $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
-        var shape = d3$$1.select(this),
-            id = d.data ? d.data.id : d.id,
-            toggle = $$.getToggle(this, d).bind($$),
-            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
-            isTargetIndex = !indices || indices.indexOf(i) >= 0,
-            isSelected = shape.classed(CLASS.SELECTED);
-        // line/area selection not supported yet
-        if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
-            return;
-        }
-        if (isTargetId && isTargetIndex) {
-            if (config.data_selection_isselectable(d)) {
-                if (isSelected) {
-                    toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
-                }
-            }
-        }
+    $$.toggleFocusLegend(targetIds, true);
+
+    $$.focusedTargetIds = targetIds;
+    $$.defocusedTargetIds = $$.defocusedTargetIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
     });
 };
 
-c3_chart_fn.transform = function (type, targetIds) {
+var defocus = function defocus(targetIds) {
     var $$ = this.internal,
-        options = ['pie', 'donut'].indexOf(type) >= 0 ? { withTransform: true } : null;
-    $$.transformTo(targetIds, type, options);
-};
+        candidates = void 0;
 
-c3_chart_fn.groups = function (groups) {
-    var $$ = this.internal,
-        config = $$.config;
-    if (isUndefined(groups)) {
-        return config.data_groups;
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds.filter($$.isTargetToShow, $$))), candidates.classed(CLASS.focused, false).classed(CLASS.defocused, true);
+    if ($$.hasArcType()) {
+        $$.unexpandArc(targetIds);
     }
-    config.data_groups = groups;
-    $$.redraw();
-    return config.data_groups;
+    $$.toggleFocusLegend(targetIds, false);
+
+    $$.focusedTargetIds = $$.focusedTargetIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
+    });
+    $$.defocusedTargetIds = targetIds;
 };
 
-c3_chart_fn.xgrids = function (grids) {
+var revert = function revert(targetIds) {
+    var $$ = this.internal,
+        candidates = void 0;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    candidates = $$.svg.selectAll($$.selectorTargets(targetIds)); // should be for all targets
+
+    candidates.classed(CLASS.focused, false).classed(CLASS.defocused, false);
+    if ($$.hasArcType()) {
+        $$.unexpandArc(targetIds);
+    }
+    if ($$.config.legend_show) {
+        $$.showLegend(targetIds.filter($$.isLegendToShow.bind($$)));
+        $$.legend.selectAll($$.selectorLegends(targetIds)).filter(function () {
+            return $$.d3.select(this).classed(CLASS.legendItemFocused);
+        }).classed(CLASS.legendItemFocused, false);
+    }
+
+    $$.focusedTargetIds = [];
+    $$.defocusedTargetIds = [];
+};
+
+var xgrids = function xgrids(grids) {
     var $$ = this.internal,
         config = $$.config;
     if (!grids) {
@@ -1726,17 +1626,19 @@ c3_chart_fn.xgrids = function (grids) {
     $$.redrawWithoutRescale();
     return config.grid_x_lines;
 };
-c3_chart_fn.xgrids.add = function (grids) {
+
+xgrids.add = function (grids) {
     var $$ = this.internal;
     return this.xgrids($$.config.grid_x_lines.concat(grids ? grids : []));
 };
-c3_chart_fn.xgrids.remove = function (params) {
+
+xgrids.remove = function (params) {
     // TODO: multiple
     var $$ = this.internal;
     $$.removeGridLines(params, true);
 };
 
-c3_chart_fn.ygrids = function (grids) {
+var ygrids = function ygrids(grids) {
     var $$ = this.internal,
         config = $$.config;
     if (!grids) {
@@ -1746,27 +1648,120 @@ c3_chart_fn.ygrids = function (grids) {
     $$.redrawWithoutRescale();
     return config.grid_y_lines;
 };
-c3_chart_fn.ygrids.add = function (grids) {
+
+ygrids.add = function (grids) {
     var $$ = this.internal;
     return this.ygrids($$.config.grid_y_lines.concat(grids ? grids : []));
 };
-c3_chart_fn.ygrids.remove = function (params) {
+
+ygrids.remove = function (params) {
     // TODO: multiple
     var $$ = this.internal;
     $$.removeGridLines(params, false);
 };
 
-c3_chart_fn.regions = function (regions) {
+var groups = function groups(_groups) {
     var $$ = this.internal,
         config = $$.config;
-    if (!regions) {
+    if (isUndefined(_groups)) {
+        return config.data_groups;
+    }
+    config.data_groups = _groups;
+    $$.redraw();
+    return config.data_groups;
+};
+
+var legend = function legend() {};
+
+legend.show = function (targetIds) {
+    var $$ = this.internal;
+    $$.showLegend($$.mapToTargetIds(targetIds));
+    $$.updateAndRedraw({ withLegend: true });
+};
+
+legend.hide = function (targetIds) {
+    var $$ = this.internal;
+    $$.hideLegend($$.mapToTargetIds(targetIds));
+    $$.updateAndRedraw({ withLegend: true });
+};
+
+var load = function load(args) {
+    var $$ = this.internal,
+        config = $$.config;
+    // update xs if specified
+    if (args.xs) {
+        $$.addXs(args.xs);
+    }
+    // update names if exists
+    if ('names' in args) {
+        c3_chart_fn.data.names.bind(this)(args.names);
+    }
+    // update classes if exists
+    if ('classes' in args) {
+        Object.keys(args.classes).forEach(function (id) {
+            config.data_classes[id] = args.classes[id];
+        });
+    }
+    // update categories if exists
+    if ('categories' in args && $$.isCategorized()) {
+        config.axis_x_categories = args.categories;
+    }
+    // update axes if exists
+    if ('axes' in args) {
+        Object.keys(args.axes).forEach(function (id) {
+            config.data_axes[id] = args.axes[id];
+        });
+    }
+    // update colors if exists
+    if ('colors' in args) {
+        Object.keys(args.colors).forEach(function (id) {
+            config.data_colors[id] = args.colors[id];
+        });
+    }
+    // use cache if exists
+    if ('cacheIds' in args && $$.hasCaches(args.cacheIds)) {
+        $$.load($$.getCaches(args.cacheIds), args.done);
+        return;
+    }
+    // unload if needed
+    if ('unload' in args) {
+        // TODO: do not unload if target will load (included in url/rows/columns)
+        $$.unload($$.mapToTargetIds(typeof args.unload === 'boolean' && args.unload ? null : args.unload), function () {
+            $$.loadFromArgs(args);
+        });
+    } else {
+        $$.loadFromArgs(args);
+    }
+};
+
+var unload = function unload(args) {
+    var $$ = this.internal;
+    args = args || {};
+    if (args instanceof Array) {
+        args = { ids: args };
+    } else if (typeof args === 'string') {
+        args = { ids: [args] };
+    }
+    $$.unload($$.mapToTargetIds(args.ids), function () {
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
+        if (args.done) {
+            args.done();
+        }
+    });
+};
+
+var regions = function regions(_regions) {
+    var $$ = this.internal,
+        config = $$.config;
+    if (!_regions) {
         return config.regions;
     }
-    config.regions = regions;
+    config.regions = _regions;
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.add = function (regions) {
+
+regions.add = function (regions) {
     var $$ = this.internal,
         config = $$.config;
     if (!regions) {
@@ -1776,7 +1771,8 @@ c3_chart_fn.regions.add = function (regions) {
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.remove = function (options) {
+
+regions.remove = function (options) {
     var $$ = this.internal,
         config = $$.config,
         duration = void 0,
@@ -1808,217 +1804,129 @@ c3_chart_fn.regions.remove = function (options) {
     return config.regions;
 };
 
-c3_chart_fn.data = function (targetIds) {
-    var targets = this.internal.data.targets;
-    return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {
-        return [].concat(targetIds).indexOf(t.id) >= 0;
-    });
-};
-c3_chart_fn.data.shown = function (targetIds) {
-    return this.internal.filterTargetsToShow(this.data(targetIds));
-};
-c3_chart_fn.data.values = function (targetId) {
-    var targets = void 0,
-        values = null;
-    if (targetId) {
-        targets = this.data(targetId);
-        values = targets[0] ? targets[0].values.map(function (d) {
-            return d.value;
-        }) : null;
-    }
-    return values;
-};
-c3_chart_fn.data.names = function (names) {
-    this.internal.clearLegendItemTextBoxCache();
-    return this.internal.updateDataAttributes('names', names);
-};
-c3_chart_fn.data.colors = function (colors) {
-    return this.internal.updateDataAttributes('colors', colors);
-};
-c3_chart_fn.data.axes = function (axes) {
-    return this.internal.updateDataAttributes('axes', axes);
-};
-
-c3_chart_fn.category = function (i, category) {
+var selected = function selected(targetId) {
     var $$ = this.internal,
-        config = $$.config;
-    if (arguments.length > 1) {
-        config.axis_x_categories[i] = category;
-        $$.redraw();
-    }
-    return config.axis_x_categories[i];
-};
-c3_chart_fn.categories = function (categories) {
-    var $$ = this.internal,
-        config = $$.config;
-    if (!arguments.length) {
-        return config.axis_x_categories;
-    }
-    config.axis_x_categories = categories;
-    $$.redraw();
-    return config.axis_x_categories;
-};
-
-// TODO: fix
-c3_chart_fn.color = function (id) {
-    var $$ = this.internal;
-    return $$.color(id); // more patterns
-};
-
-c3_chart_fn.x = function (x) {
-    var $$ = this.internal;
-    if (arguments.length) {
-        $$.updateTargetX($$.data.targets, x);
-        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
-    }
-    return $$.data.xs;
-};
-c3_chart_fn.xs = function (xs) {
-    var $$ = this.internal;
-    if (arguments.length) {
-        $$.updateTargetXs($$.data.targets, xs);
-        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
-    }
-    return $$.data.xs;
-};
-
-c3_chart_fn.axis = function () {};
-c3_chart_fn.axis.labels = function (labels) {
-    var $$ = this.internal;
-    if (arguments.length) {
-        Object.keys(labels).forEach(function (axisId) {
-            $$.axis.setLabelText(axisId, labels[axisId]);
+        d3$$1 = $$.d3;
+    return d3$$1.merge($$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape).filter(function () {
+        return d3$$1.select(this).classed(CLASS.SELECTED);
+    }).map(function (d) {
+        return d.map(function (d) {
+            var data = d.__data__;return data.data ? data.data : data;
         });
-        $$.axis.updateLabels();
-    }
-    // TODO: return some values?
+    }));
 };
-c3_chart_fn.axis.max = function (max) {
+
+var select = function select(ids, indices, resetOther) {
     var $$ = this.internal,
+        d3$$1 = $$.d3,
         config = $$.config;
-    if (arguments.length) {
-        if ((typeof max === 'undefined' ? 'undefined' : _typeof(max)) === 'object') {
-            if (isValue(max.x)) {
-                config.axis_x_max = max.x;
-            }
-            if (isValue(max.y)) {
-                config.axis_y_max = max.y;
-            }
-            if (isValue(max.y2)) {
-                config.axis_y2_max = max.y2;
-            }
-        } else {
-            config.axis_y_max = config.axis_y2_max = max;
-        }
-        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
-    } else {
-        return {
-            x: config.axis_x_max,
-            y: config.axis_y_max,
-            y2: config.axis_y2_max
-        };
+    if (!config.data_selection_enabled) {
+        return;
     }
+    $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
+        var shape = d3$$1.select(this),
+            id = d.data ? d.data.id : d.id,
+            toggle = $$.getToggle(this, d).bind($$),
+            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
+            isTargetIndex = !indices || indices.indexOf(i) >= 0,
+            isSelected = shape.classed(CLASS.SELECTED);
+        // line/area selection not supported yet
+        if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
+            return;
+        }
+        if (isTargetId && isTargetIndex) {
+            if (config.data_selection_isselectable(d) && !isSelected) {
+                toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
+            }
+        } else if (isDefined(resetOther) && resetOther) {
+            if (isSelected) {
+                toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
+            }
+        }
+    });
 };
-c3_chart_fn.axis.min = function (min) {
+
+var unselect = function unselect(ids, indices) {
     var $$ = this.internal,
+        d3$$1 = $$.d3,
         config = $$.config;
-    if (arguments.length) {
-        if ((typeof min === 'undefined' ? 'undefined' : _typeof(min)) === 'object') {
-            if (isValue(min.x)) {
-                config.axis_x_min = min.x;
-            }
-            if (isValue(min.y)) {
-                config.axis_y_min = min.y;
-            }
-            if (isValue(min.y2)) {
-                config.axis_y2_min = min.y2;
-            }
-        } else {
-            config.axis_y_min = config.axis_y2_min = min;
-        }
-        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
-    } else {
-        return {
-            x: config.axis_x_min,
-            y: config.axis_y_min,
-            y2: config.axis_y2_min
-        };
+    if (!config.data_selection_enabled) {
+        return;
     }
-};
-c3_chart_fn.axis.range = function (range) {
-    if (arguments.length) {
-        if (isDefined(range.max)) {
-            this.axis.max(range.max);
+    $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
+        var shape = d3$$1.select(this),
+            id = d.data ? d.data.id : d.id,
+            toggle = $$.getToggle(this, d).bind($$),
+            isTargetId = config.data_selection_grouped || !ids || ids.indexOf(id) >= 0,
+            isTargetIndex = !indices || indices.indexOf(i) >= 0,
+            isSelected = shape.classed(CLASS.SELECTED);
+        // line/area selection not supported yet
+        if (shape.classed(CLASS.line) || shape.classed(CLASS.area)) {
+            return;
         }
-        if (isDefined(range.min)) {
-            this.axis.min(range.min);
+        if (isTargetId && isTargetIndex) {
+            if (config.data_selection_isselectable(d)) {
+                if (isSelected) {
+                    toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
+                }
+            }
         }
-    } else {
-        return {
-            max: this.axis.max(),
-            min: this.axis.min()
-        };
-    }
+    });
 };
 
-c3_chart_fn.legend = function () {};
-c3_chart_fn.legend.show = function (targetIds) {
-    var $$ = this.internal;
-    $$.showLegend($$.mapToTargetIds(targetIds));
-    $$.updateAndRedraw({ withLegend: true });
-};
-c3_chart_fn.legend.hide = function (targetIds) {
-    var $$ = this.internal;
-    $$.hideLegend($$.mapToTargetIds(targetIds));
-    $$.updateAndRedraw({ withLegend: true });
-};
-
-c3_chart_fn.resize = function (size) {
+var show = function show(targetIds, options) {
     var $$ = this.internal,
-        config = $$.config;
-    config.size_width = size ? size.width : null;
-    config.size_height = size ? size.height : null;
-    this.flush();
-};
+        targets = void 0;
 
-c3_chart_fn.flush = function () {
-    var $$ = this.internal;
-    $$.updateAndRedraw({ withLegend: true, withTransition: false, withTransitionForTransform: false });
-};
+    targetIds = $$.mapToTargetIds(targetIds);
+    options = options || {};
 
-c3_chart_fn.destroy = function () {
-    var $$ = this.internal;
+    $$.removeHiddenTargetIds(targetIds);
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
-    window.clearInterval($$.intervalForObserveInserted);
-
-    if ($$.resizeTimeout !== undefined) {
-        window.clearTimeout($$.resizeTimeout);
-    }
-
-    if (window.detachEvent) {
-        window.detachEvent('onresize', $$.resizeFunction);
-    } else if (window.removeEventListener) {
-        window.removeEventListener('resize', $$.resizeFunction);
-    } else {
-        var wrapper = window.onresize;
-        // check if no one else removed our wrapper and remove our resizeFunction from it
-        if (wrapper && wrapper.add && wrapper.remove) {
-            wrapper.remove($$.resizeFunction);
-        }
-    }
-
-    $$.selectChart.classed('c3', false).html('');
-
-    // MEMO: this is needed because the reference of some elements will not be released, then memory leak will happen.
-    Object.keys($$).forEach(function (key) {
-        $$[key] = null;
+    targets.transition().style('opacity', 1, 'important').call($$.endall, function () {
+        targets.style('opacity', null).style('opacity', 1);
     });
 
-    return null;
+    if (options.withLegend) {
+        $$.showLegend(targetIds);
+    }
+
+    $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
 };
 
-c3_chart_fn.tooltip = function () {};
-c3_chart_fn.tooltip.show = function (args) {
+var hide = function hide(targetIds, options) {
+    var $$ = this.internal,
+        targets = void 0;
+
+    targetIds = $$.mapToTargetIds(targetIds);
+    options = options || {};
+
+    $$.addHiddenTargetIds(targetIds);
+    targets = $$.svg.selectAll($$.selectorTargets(targetIds));
+
+    targets.transition().style('opacity', 0, 'important').call($$.endall, function () {
+        targets.style('opacity', null).style('opacity', 0);
+    });
+
+    if (options.withLegend) {
+        $$.hideLegend(targetIds);
+    }
+
+    $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true });
+};
+
+var toggle = function toggle(targetIds, options) {
+    var that = this,
+        $$ = this.internal;
+    $$.mapToTargetIds(targetIds).forEach(function (targetId) {
+        $$.isTargetToShow(targetId) ? that.hide(targetId, options) : that.show(targetId, options);
+    });
+};
+
+var tooltip = function tooltip() {};
+
+tooltip.show = function (args) {
     var $$ = this.internal,
         index = void 0,
         mouse = void 0;
@@ -2050,12 +1958,157 @@ c3_chart_fn.tooltip.show = function (args) {
 
     $$.config.tooltip_onshow.call($$, args.data);
 };
-c3_chart_fn.tooltip.hide = function () {
+
+tooltip.hide = function () {
     // TODO: get target data by checking the state of focus
     this.internal.dispatchEvent('mouseout', 0);
 
     this.internal.config.tooltip_onhide.call(this);
 };
+
+var transform = function transform(type, targetIds) {
+    var $$ = this.internal,
+        options = ['pie', 'donut'].indexOf(type) >= 0 ? { withTransform: true } : null;
+    $$.transformTo(targetIds, type, options);
+};
+
+var x = function x(_x) {
+    var $$ = this.internal;
+    if (arguments.length) {
+        $$.updateTargetX($$.data.targets, _x);
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
+    }
+    return $$.data.xs;
+};
+
+var xs = function xs(_xs) {
+    var $$ = this.internal;
+    if (arguments.length) {
+        $$.updateTargetXs($$.data.targets, _xs);
+        $$.redraw({ withUpdateOrgXDomain: true, withUpdateXDomain: true });
+    }
+    return $$.data.xs;
+};
+
+var zoom = function zoom(domain) {
+    var $$ = this.internal;
+    if (domain) {
+        if ($$.isTimeSeries()) {
+            domain = domain.map(function (x) {
+                return $$.parseDate(x);
+            });
+        }
+        $$.brush.extent(domain);
+        $$.redraw({ withUpdateXDomain: true, withY: $$.config.zoom_rescale });
+        $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
+    }
+    return $$.brush.extent();
+};
+
+var unzoom = function unzoom() {
+    var $$ = this.internal;
+    $$.brush.clear().update();
+    $$.redraw({ withUpdateXDomain: true });
+};
+
+zoom.enable = function (enabled) {
+    var $$ = this.internal;
+    $$.config.zoom_enabled = enabled;
+    $$.updateAndRedraw();
+};
+
+zoom.max = function (max) {
+    var $$ = this.internal,
+        config = $$.config,
+        d3$$1 = $$.d3;
+    if (max === 0 || max) {
+        config.zoom_x_max = d3$$1.max([$$.orgXDomain[1], max]);
+    } else {
+        return config.zoom_x_max;
+    }
+};
+
+zoom.min = function (min) {
+    var $$ = this.internal,
+        config = $$.config,
+        d3$$1 = $$.d3;
+    if (min === 0 || min) {
+        config.zoom_x_min = d3$$1.min([$$.orgXDomain[0], min]);
+    } else {
+        return config.zoom_x_min;
+    }
+};
+
+zoom.range = function (range) {
+    if (arguments.length) {
+        if (isDefined(range.max)) {
+            this.domain.max(range.max);
+        }
+        if (isDefined(range.min)) {
+            this.domain.min(range.min);
+        }
+    } else {
+        return {
+            max: this.domain.max(),
+            min: this.domain.min()
+        };
+    }
+};
+
+var c3_chart_fn$1 = void 0;
+
+function Chart(config) {
+    var $$ = this.internal = new ChartInternal(this);
+    $$.loadConfig(config);
+
+    $$.beforeInit(config);
+    $$.init();
+    $$.afterInit(config);
+
+    // bind "this" to nested API
+    (function bindThis(fn, target, argThis) {
+        Object.keys(fn).forEach(function (key) {
+            target[key] = fn[key].bind(argThis);
+            if (Object.keys(fn[key]).length > 0) {
+                bindThis(fn[key], target[key], argThis);
+            }
+        });
+    })(c3_chart_fn$1, this, this);
+}
+
+c3_chart_fn$1 = Chart.prototype;
+
+c3_chart_fn$1.axis = axis;
+c3_chart_fn$1.category = category;
+c3_chart_fn$1.categories = categories;
+c3_chart_fn$1.resize = resize;
+c3_chart_fn$1.flush = flush;
+c3_chart_fn$1.destroy = destroy;
+c3_chart_fn$1.color = color;
+c3_chart_fn$1.data = data;
+c3_chart_fn$1.flow = flow;
+c3_chart_fn$1.focus = focus;
+c3_chart_fn$1.defocus = defocus;
+c3_chart_fn$1.revert = revert;
+c3_chart_fn$1.xgrids = xgrids;
+c3_chart_fn$1.ygrids = ygrids;
+c3_chart_fn$1.groups = groups;
+c3_chart_fn$1.legend = legend;
+c3_chart_fn$1.load = load;
+c3_chart_fn$1.unload = unload;
+c3_chart_fn$1.regions = regions;
+c3_chart_fn$1.selected = selected;
+c3_chart_fn$1.select = select;
+c3_chart_fn$1.unselect = unselect;
+c3_chart_fn$1.show = show;
+c3_chart_fn$1.hide = hide;
+c3_chart_fn$1.toggle = toggle;
+c3_chart_fn$1.tooltip = tooltip;
+c3_chart_fn$1.transform = transform;
+c3_chart_fn$1.x = x;
+c3_chart_fn$1.xs = xs;
+c3_chart_fn$1.zoom = zoom;
+c3_chart_fn$1.unzoom = unzoom;
 
 /**
  * C3.js

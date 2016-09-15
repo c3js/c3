@@ -5,7 +5,7 @@
  */
 
 import { ChartInternal } from './chartinternal.js';
-import { Chart } from './chart.js';
+import { Chart } from './chart/index';
 import { Axis } from './axis/index';
 
 
