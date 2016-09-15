@@ -15,7 +15,7 @@ import {
     sanitise,
     getPathBox,
     ChartInternal
-} from '../chartinternal.js';
+} from '../internals/index';
 
 const show = function (targetIds, options) {
     let $$ = this.internal, targets;

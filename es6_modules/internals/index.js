@@ -424,18 +424,30 @@ import {
 } from './ua';
 
 import {
-    isValue,
-    asHalfPixel,
-    notEmpty,
-    getOption,
-} from './util';
-
-import {
     initZoom,
     getZoomDomain,
     updateZoom,
     redrawForZoom,
 } from './zoom';
+
+import * as util from './util';
+
+export const {
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    isEmpty,
+    notEmpty,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox,
+} = util;
 
 // Start ChartInternal!!!!
 function ChartInternal(api) {
@@ -1816,3 +1828,4 @@ c3_chart_internal_fn.updateZoom = updateZoom;
 c3_chart_internal_fn.redrawForZoom = redrawForZoom;
 
 export { ChartInternal, c3_chart_internal_fn };
+export { CLASS };

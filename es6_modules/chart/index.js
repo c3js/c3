@@ -1,4 +1,4 @@
-import { ChartInternal } from '../chartinternal.js';
+import { ChartInternal } from '../internals/index';
 
 import { axis } from './api.axis';
 import { category, categories } from './api.category';
@@ -18,6 +18,7 @@ import { tooltip } from './api.tooltip';
 import { transform } from './api.transform';
 import { x, xs } from './api.x';
 import { zoom, unzoom } from './api.zoom';
+
 
 let c3_chart_fn;
 

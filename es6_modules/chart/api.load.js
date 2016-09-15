@@ -15,7 +15,7 @@ import {
     sanitise,
     getPathBox,
     ChartInternal
-} from '../chartinternal.js';
+} from '../internals/index';
 
 const load = function (args) {
     let $$ = this.internal, config = $$.config;

@@ -15,7 +15,7 @@ import {
     sanitise,
     getPathBox,
     ChartInternal
-} from '../chartinternal.js';
+} from '../internals/index';
 
 // TODO: fix
 const color = function (id) {

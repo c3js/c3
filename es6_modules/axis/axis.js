@@ -4,7 +4,7 @@ import {
     isFunction,
     isString,
     isEmpty,
-} from '../chartinternal';
+} from '../internals/index';
 
 import { inherit, API } from './index';
 import c3_axis from './c3.axis';

@@ -15,7 +15,7 @@ import {
     sanitise,
     getPathBox,
     ChartInternal
-} from '../chartinternal.js';
+} from '../internals/index';
 
 const selected = function (targetId) {
     let $$ = this.internal, d3 = $$.d3;
