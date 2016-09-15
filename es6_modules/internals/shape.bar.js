@@ -1,0 +1,138 @@
+import { CLASS } from './class';
+import { isValue } from './util';
+
+const initBar = function () {
+    const $$ = this;
+    $$.main.select('.' + CLASS.chart).append('g')
+        .attr('class', CLASS.chartBars);
+};
+const updateTargetsForBar = function (targets) {
+    let $$ = this, config = $$.config,
+        mainBarUpdate, mainBarEnter,
+        classChartBar = $$.classChartBar.bind($$),
+        classBars = $$.classBars.bind($$),
+        classFocus = $$.classFocus.bind($$);
+    mainBarUpdate = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+        .data(targets)
+        .attr('class', (d) => { return classChartBar(d) + classFocus(d); });
+    mainBarEnter = mainBarUpdate.enter().append('g')
+        .attr('class', classChartBar)
+        .style('opacity', 0)
+        .style('pointer-events', 'none');
+    // Bars for each data
+    mainBarEnter.append('g')
+        .attr('class', classBars)
+        .style('cursor', (d) => { return config.data_selection_isselectable(d) ? 'pointer' : null; });
+};
+const updateBar = function (durationForExit) {
+    let $$ = this,
+        barData = $$.barData.bind($$),
+        classBar = $$.classBar.bind($$),
+        initialOpacity = $$.initialOpacity.bind($$),
+        color = function (d) { return $$.color(d.id); };
+    $$.mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+        .data(barData);
+    $$.mainBar.enter().append('path')
+        .attr('class', classBar)
+        .style('stroke', color)
+        .style('fill', color);
+    $$.mainBar
+        .style('opacity', initialOpacity);
+    $$.mainBar.exit().transition().duration(durationForExit)
+        .style('opacity', 0)
+        .remove();
+};
+const redrawBar = function (drawBar, withTransition) {
+    return [
+        (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
+            .attr('d', drawBar)
+            .style('fill', this.color)
+            .style('opacity', 1),
+    ];
+};
+const getBarW = function (axis, barTargetsNum) {
+    let $$ = this, config = $$.config,
+        w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickInterval() * config.bar_width_ratio) / barTargetsNum : 0;
+    return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
+};
+const getBars = function (i, id) {
+    const $$ = this;
+    return (id ? $$.main.selectAll('.' + CLASS.bars + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
+};
+const expandBars = function (i, id, reset) {
+    const $$ = this;
+    if (reset) { $$.unexpandBars(); }
+    $$.getBars(i, id).classed(CLASS.EXPANDED, true);
+};
+const unexpandBars = function (i) {
+    const $$ = this;
+    $$.getBars(i).classed(CLASS.EXPANDED, false);
+};
+const generateDrawBar = function (barIndices, isSub) {
+    let $$ = this, config = $$.config,
+        getPoints = $$.generateGetBarPoints(barIndices, isSub);
+    return function (d, i) {
+        // 4 points that make a bar
+        const points = getPoints(d, i);
+
+        // switch points if axis is rotated, not applicable for sub chart
+        const indexX = config.axis_rotated ? 1 : 0;
+        const indexY = config.axis_rotated ? 0 : 1;
+
+        const path = 'M ' + points[0][indexX] + ',' + points[0][indexY] + ' ' +
+                'L' + points[1][indexX] + ',' + points[1][indexY] + ' ' +
+                'L' + points[2][indexX] + ',' + points[2][indexY] + ' ' +
+                'L' + points[3][indexX] + ',' + points[3][indexY] + ' ' +
+                'z';
+
+        return path;
+    };
+};
+const generateGetBarPoints = function (barIndices, isSub) {
+    let $$ = this,
+        axis = isSub ? $$.subXAxis : $$.xAxis,
+        barTargetsNum = barIndices.__max__ + 1,
+        barW = $$.getBarW(axis, barTargetsNum),
+        barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
+        barY = $$.getShapeY(!!isSub),
+        barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
+        yScale = isSub ? $$.getSubYScale : $$.getYScale;
+    return function (d, i) {
+        let y0 = yScale.call($$, d.id)(0),
+            offset = barOffset(d, i) || y0, // offset is for stacked bar chart
+            posX = barX(d), posY = barY(d);
+        // fix posY not to overflow opposite quadrant
+        if ($$.config.axis_rotated) {
+            if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
+        }
+        // 4 points that make a bar
+        return [
+            [posX, offset],
+            [posX, posY - (y0 - offset)],
+            [posX + barW, posY - (y0 - offset)],
+            [posX + barW, offset],
+        ];
+    };
+};
+const isWithinBar = function (that) {
+    let mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
+        seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
+        x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
+        w = box.width, h = box.height, offset = 2,
+        sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
+    return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
+};
+
+export {
+    initBar,
+    updateTargetsForBar,
+    updateBar,
+    redrawBar,
+    getBarW,
+    getBars,
+    expandBars,
+    unexpandBars,
+    generateDrawBar,
+    generateGetBarPoints,
+    isWithinBar,
+};

@@ -4,7 +4,7 @@
  * License: MIT
  */
 
-import { ChartInternal } from './chartinternal.js';
+import { ChartInternal } from './internals/index';
 import { Chart } from './chart/index';
 import { Axis } from './axis/index';
 
