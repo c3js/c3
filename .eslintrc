@@ -4,6 +4,7 @@
         "browser": true,
         "node": true
     },
+    "root": true,
     "rules": {
         "indent": ["error", 4],
         "no-var": "error",

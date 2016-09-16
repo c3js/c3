@@ -1,5 +1,5 @@
 function initDom() {
-    'use strict';
+    
 
     var div = document.createElement('div');
     div.id = 'chart';
@@ -11,7 +11,7 @@ function initDom() {
 typeof initDom !== 'undefined';
 
 function setMouseEvent(chart, name, x, y, element) {
-    'use strict';
+    
 
     var paddingLeft = chart.internal.main.node().transform.baseVal.getItem(0).matrix.e,
         event = document.createEvent("MouseEvents");
@@ -24,7 +24,7 @@ function setMouseEvent(chart, name, x, y, element) {
 typeof setMouseEvent !== 'undefined';
 
 function initChart(chart, args, done) {
-    'use strict';
+    
 
     if (typeof chart === 'undefined') {
         window.initDom();

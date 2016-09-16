@@ -1,8 +1,6 @@
 // Karma configuration
 // Generated on Wed Sep 30 2015 22:01:48 GMT+0900 (KST)
 
-const babel = require('rollup-plugin-babel');
-
 module.exports = function(config) {
   config.set({
 
@@ -17,6 +15,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/d3/d3.min.js',
+      'c3.js',
+      'c3.css',
       'spec/*-helper.js',
       'spec/*-spec.js'
     ],
@@ -30,21 +31,9 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'spec/*.js': ['rollup', 'coverage']
+      'c3.js': ['coverage']
     },
 
-
-    rollupPreprocessor: {
-      // rollup settings. See Rollup documentation
-      plugins: [
-          babel({
-              exclude: 'node_modules/**'
-          })
-      ],
-      // will help to prevent conflicts between different tests entries
-      format: 'iife',
-      sourceMap: 'inline'
-    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -67,7 +56,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR,
+    logLevel: config.LOG_INFO,
 
 
     // enable / disable watching file and executing tests whenever any file changes

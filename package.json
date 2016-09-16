@@ -28,6 +28,7 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
+    "chai-color-helpers": "github:aendrew/chai-color-helpers",
     "codecov.io": "^0.1.6",
     "eslint": "^3.5.0",
     "eslint-config-airbnb-base": "^7.1.0",

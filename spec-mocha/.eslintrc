@@ -1,0 +1,10 @@
+{
+    "env": {
+        "mocha": true,
+        "node": true
+    },
+    "rules": {
+        "prefer-arrow-callback": 0,
+        "no-var": 0,
+    },
+}
