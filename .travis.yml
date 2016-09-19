@@ -7,8 +7,8 @@ before_script:
 script:
 - grunt
 
-after_success:
-- npm run codecov
+after_script:
+- npm run coverage
 
 notifications:
   webhooks:
