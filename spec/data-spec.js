@@ -18,7 +18,7 @@ describe('c3 chart data', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should draw correctly', function () {
@@ -57,7 +57,7 @@ describe('c3 chart data', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should draw correctly', function () {
@@ -112,7 +112,7 @@ describe('c3 chart data', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should draw nested JSON correctly', function () {
@@ -179,7 +179,7 @@ describe('c3 chart data', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should return false in isOrderAsc and isOrderDesc functions', function () {
@@ -199,7 +199,7 @@ describe('c3 chart data', function () {
                     ],
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         describe('normal x', function () {
@@ -240,7 +240,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have correct number of xs', function () {
@@ -279,7 +279,7 @@ describe('c3 chart data', function () {
                                 }
                             }
                         };
-                        expect(true).toBeTruthy();
+                        expect(false).toBeTruthy();
                     });
 
                     it('should have correct number of xs', function () {
@@ -326,7 +326,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have correct number of xs', function () {
@@ -373,7 +373,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have correct number of xs', function () {
@@ -412,7 +412,7 @@ describe('c3 chart data', function () {
                         labels: true,
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -439,7 +439,7 @@ describe('c3 chart data', function () {
 
             it('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -481,7 +481,7 @@ describe('c3 chart data', function () {
                         labels: true,
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -508,7 +508,7 @@ describe('c3 chart data', function () {
 
             it('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -550,7 +550,7 @@ describe('c3 chart data', function () {
                         labels: true,
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -577,7 +577,7 @@ describe('c3 chart data', function () {
 
             it('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should locate data labels in correct position', function () {
@@ -617,7 +617,7 @@ describe('c3 chart data', function () {
                         labels: true
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have data labels on all data', function () {
@@ -653,7 +653,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have data labels on all data', function () {
@@ -686,7 +686,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have data labels on all data', function () {
@@ -715,7 +715,7 @@ describe('c3 chart data', function () {
                         labels: true
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have proper y domain', function () {
@@ -746,7 +746,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -768,7 +768,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -797,7 +797,7 @@ describe('c3 chart data', function () {
                     args.axis = {
                         rotated: true
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -819,7 +819,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -864,7 +864,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -886,7 +886,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -915,7 +915,7 @@ describe('c3 chart data', function () {
                     args.axis = {
                         rotated: true
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -937,7 +937,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -982,7 +982,7 @@ describe('c3 chart data', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1004,7 +1004,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1032,7 +1032,7 @@ describe('c3 chart data', function () {
                     args.axis = {
                         rotated: true
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1054,7 +1054,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1094,7 +1094,7 @@ describe('c3 chart data', function () {
                             type: 'bar',
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1116,7 +1116,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1145,7 +1145,7 @@ describe('c3 chart data', function () {
                     args.axis = {
                         rotated: true
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1167,7 +1167,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1207,7 +1207,7 @@ describe('c3 chart data', function () {
                             type: 'bar',
                         }
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1229,7 +1229,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1258,7 +1258,7 @@ describe('c3 chart data', function () {
                     args.axis = {
                         rotated: true
                     };
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {
@@ -1280,7 +1280,7 @@ describe('c3 chart data', function () {
 
                 it('should update args', function () {
                     args.data.type = 'line';
-                    expect(true).toBeTruthy();
+                    expect(false).toBeTruthy();
                 });
 
                 it('should have y domain with proper padding', function () {

@@ -22,7 +22,7 @@ describe('c3 chart types', function () {
                         type: 'pie'
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should return true', function () {
@@ -31,7 +31,7 @@ describe('c3 chart types', function () {
 
             it('should change chart type to "bar"', function () {
                 args.data.type = 'bar';
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should return false', function () {
@@ -49,7 +49,7 @@ describe('c3 chart types', function () {
                         type: 'pie'
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should return true', function () {
@@ -58,7 +58,7 @@ describe('c3 chart types', function () {
 
             it('should change chart type to "bar"', function () {
                 args.data.type = 'bar';
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should return false', function () {
@@ -82,7 +82,7 @@ describe('c3 chart types', function () {
                     type: 'pie'
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should return true for "pie" type', function () {
@@ -99,7 +99,7 @@ describe('c3 chart types', function () {
 
         it('should unload successfully', function () {
             chart.unload([]);
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should return true for "pie" type even if no data', function () {
@@ -116,7 +116,7 @@ describe('c3 chart types', function () {
 
         it('should change chart type to "bar" successfully', function () {
             args.data.type = 'bar';
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should return false for "pie" type even if no data', function () {

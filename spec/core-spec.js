@@ -29,7 +29,7 @@ describe('c3 chart', function () {
 
         it('should set 3rd party property to Function', function () {
             Function.prototype.$extIsFunction = true;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be created even if 3rd party property has been set', function () {
@@ -64,7 +64,7 @@ describe('c3 chart', function () {
             it('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = '#chart';
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should be created', function () {
                 var svg = d3.select('#chart svg');
@@ -76,7 +76,7 @@ describe('c3 chart', function () {
             it('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = d3.select('#chart');
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should be created', function () {
                 var svg = d3.select('#chart svg');
@@ -88,7 +88,7 @@ describe('c3 chart', function () {
             it('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = null;
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should not be created', function () {
                 var svg = d3.select('#chart svg');
@@ -100,7 +100,7 @@ describe('c3 chart', function () {
             it('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = '';
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should not be created', function () {
                 var svg = d3.select('#chart svg');
@@ -121,7 +121,7 @@ describe('c3 chart', function () {
                     ]
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should generate a chart', function () {
@@ -145,7 +145,7 @@ describe('c3 chart', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should generate a chart', function () {

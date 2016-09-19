@@ -25,7 +25,7 @@ describe('c3 chart shape bar', function () {
                         type: 'bar'
                     },
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
@@ -57,7 +57,7 @@ describe('c3 chart shape bar', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
@@ -89,7 +89,7 @@ describe('c3 chart shape bar', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
@@ -120,7 +120,7 @@ describe('c3 chart shape bar', function () {
                         rotated: false
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should not be within bar', function () {
@@ -153,7 +153,7 @@ describe('c3 chart shape bar', function () {
 
             it('should change the chart as axis rotated', function () {
                 args.axis.rotated = true;
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should not be within bar', function () {

@@ -22,7 +22,7 @@ describe('c3 chart shape line', function () {
                     type: 'line'
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
 
         });
 
@@ -44,7 +44,7 @@ describe('c3 chart shape line', function () {
 
         it('should change to step chart', function () {
             args.data.type = 'step';
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it("should have shape-rendering = crispedges when it's step chart", function () {
@@ -56,7 +56,7 @@ describe('c3 chart shape line', function () {
 
         it('should change to spline chart', function () {
             args.data.type = 'spline';
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should use cardinal interpolation by default', function () {
@@ -78,7 +78,7 @@ describe('c3 chart shape line', function () {
                     type: 'line'
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should not show the circle for null', function (done) {
@@ -115,7 +115,7 @@ describe('c3 chart shape line', function () {
         //             type: 'scatter'
         //         }
         //     };
-        //     expect(true).toBeTruthy();
+        //     expect(false).toBeTruthy();
         // });
 
         // it('should not show the circle for null', function (done) {
@@ -149,7 +149,7 @@ describe('c3 chart shape line', function () {
                 }
             };
 
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should update interpolation function', function() {
@@ -158,7 +158,7 @@ describe('c3 chart shape line', function () {
 
         it('should not use a non-valid interpolation', function () {
             args.spline.interpolation.type = 'foo';
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should use cardinal interpolation when given option is not valid', function() {

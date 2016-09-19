@@ -22,7 +22,7 @@ describe('c3 api zoom', function () {
                     enabled: true
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be zoomed properly', function () {
@@ -59,7 +59,7 @@ describe('c3 api zoom', function () {
                     enabled: true
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be zoomed properly', function () {
@@ -93,7 +93,7 @@ describe('c3 api zoom', function () {
                     enabled: true
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be unzoomed properly', function () {

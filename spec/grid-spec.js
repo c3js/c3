@@ -28,7 +28,7 @@ describe('c3 chart grid', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should not show y grids', function () {
@@ -37,7 +37,7 @@ describe('c3 chart grid', function () {
 
         it('should update args to show y grids', function () {
             args.grid.y.show = true;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should show y grids', function () {
@@ -48,7 +48,7 @@ describe('c3 chart grid', function () {
 
         it('should update args to show only 3 y grids', function () {
             args.grid.y.ticks = 3;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should show only 3 y grids', function () {
@@ -59,7 +59,7 @@ describe('c3 chart grid', function () {
 
         it('should update args to show y grids depending on y axis ticks', function () {
             args.axis.y.tick.count = 5;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should show grids depending on y axis ticks', function () {
@@ -98,7 +98,7 @@ describe('c3 chart grid', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show 3 grid lines', function () {
@@ -147,7 +147,7 @@ describe('c3 chart grid', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show 3 grid lines', function () {
@@ -200,7 +200,7 @@ describe('c3 chart grid', function () {
                         }
                     },
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show 3 grid lines', function () {
@@ -249,7 +249,7 @@ describe('c3 chart grid', function () {
                         }
                     },
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show 3 grid lines', function () {
@@ -300,7 +300,7 @@ describe('c3 chart grid', function () {
                         top: 50
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show x grid lines', function () {
@@ -343,7 +343,7 @@ describe('c3 chart grid', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should show x grid lines', function () {

@@ -22,7 +22,7 @@ describe('c3 chart interaction', function () {
                         type: 'bar'
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have 4 event rects properly', function () {
@@ -46,7 +46,7 @@ describe('c3 chart interaction', function () {
                         type: 'bar'
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have 1 event rects properly', function () {
@@ -72,7 +72,7 @@ describe('c3 chart interaction', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have 4 event rects properly', function () {
@@ -96,7 +96,7 @@ describe('c3 chart interaction', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should have 1 event rects properly', function () {

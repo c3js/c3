@@ -31,7 +31,7 @@ describe('c3 api axis', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should update y axis label', function () {

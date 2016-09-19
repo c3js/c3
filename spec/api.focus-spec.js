@@ -382,7 +382,7 @@ describe('c3 api focus', function () {
             args.legend = {
                 show: false
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should focus all targets without showing legend', function (done) {

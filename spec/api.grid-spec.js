@@ -17,7 +17,7 @@ describe('c3 api grid', function () {
                     ]
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should update y grids', function (done) {
