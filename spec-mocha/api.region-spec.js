@@ -33,7 +33,7 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should update regions', function (done) {
@@ -108,7 +108,7 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should add regions', function (done) {
@@ -205,7 +205,7 @@ describe('c3 api region', function () {
                     },
                 ]
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should remove regions', function (done) {

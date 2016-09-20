@@ -21,7 +21,7 @@ describe('c3 chart legend', function () {
                     ]
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should update args with long data names', function () {
@@ -34,7 +34,7 @@ describe('c3 chart legend', function () {
                     ]
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have properly computed legend width', function () {
@@ -59,7 +59,7 @@ describe('c3 chart legend', function () {
                     ]
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should be located on the center of chart', function () {
@@ -86,7 +86,7 @@ describe('c3 chart legend', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should be positioned properly', function () {
@@ -102,7 +102,7 @@ describe('c3 chart legend', function () {
 
         it('should change the legend step to 1 successfully', function () {
             args.legend.inset.step = 1;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have automatically calculated height', function () {
@@ -112,7 +112,7 @@ describe('c3 chart legend', function () {
 
         it('should change the legend step to 2 successfully', function () {
             args.legend.inset.step = 2;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have automatically calculated height', function () {
@@ -131,7 +131,7 @@ describe('c3 chart legend', function () {
                     position: 'inset'
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should locate legend properly', function () {
@@ -156,7 +156,7 @@ describe('c3 chart legend', function () {
                     hide: true
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should not show legends', function () {
@@ -177,7 +177,7 @@ describe('c3 chart legend', function () {
                     hide: 'data2'
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should not show legends', function () {
@@ -201,7 +201,7 @@ describe('c3 chart legend', function () {
                     show: false
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should not initially have rendered any legend items', function () {
@@ -237,7 +237,7 @@ describe('c3 chart legend', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('renders the legend item with the correct width and height', function () {
@@ -262,7 +262,7 @@ describe('c3 chart legend', function () {
                     padding: 10
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('renders the correct amount of padding on the legend element', function () {

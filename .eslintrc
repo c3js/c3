@@ -44,5 +44,8 @@
         "max-lines": 0,
         "vars-on-top": 0,
         "no-unused-vars": 0,
+        "import/no-extraneous-dependencies": [2, {
+            devDependencies: true
+        }],
     }
 }

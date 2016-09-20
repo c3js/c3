@@ -37,7 +37,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have only 1 tick on y axis', function () {
             args.axis.y.tick.count = 1;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have only 1 tick on y axis', function () {
@@ -47,7 +47,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have 2 ticks on y axis', function () {
             args.axis.y.tick.count = 2;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have 2 ticks on y axis', function () {
@@ -57,7 +57,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have 3 ticks on y axis', function () {
             args.axis.y.tick.count = 3;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have 3 ticks on y axis', function () {
@@ -73,7 +73,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have only 2 ticks on y axis', function () {
             args.axis.y.tick.values = values;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have only 2 tick on y axis', function () {
@@ -109,7 +109,7 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have 7 ticks on y axis', function () {
@@ -133,7 +133,7 @@ describe('c3 chart axis', function () {
                 value : 'seconds',
                 interval : 60
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have 4 ticks on y axis', function () {
@@ -204,7 +204,7 @@ describe('c3 chart axis', function () {
                             }
                         }
                     };
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should construct indexed x axis properly', function () {
@@ -232,7 +232,7 @@ describe('c3 chart axis', function () {
                             }
                         }
                     };
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should split x axis tick text to multiple lines', function () {
@@ -295,7 +295,7 @@ describe('c3 chart axis', function () {
                         ['data1', 3000000000000000, 200, 100, 400, 150, 250],
                         ['data2', 50, 20, 10, 40, 15, 25]
                     ];
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should not split y axis tick text to multiple lines', function () {
@@ -312,7 +312,7 @@ describe('c3 chart axis', function () {
 
                 it('should update args to rotate axis', function () {
                     args.axis.rotated = true;
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should split x axis tick text to multiple lines', function () {
@@ -385,7 +385,7 @@ describe('c3 chart axis', function () {
                             }
                         }
                     };
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should locate ticks properly', function () {
@@ -433,7 +433,7 @@ describe('c3 chart axis', function () {
 
                 it('should update args to rotate axis', function () {
                     args.axis.rotated = true;
-                    expect(true).to.be.ok;
+                    
                 });
 
                 it('should locate ticks on rotated axis properly', function () {
@@ -486,7 +486,7 @@ describe('c3 chart axis', function () {
                         args.axis.x.tick = {
                             multiline: false
                         };
-                        expect(true).to.be.ok;
+                        
                     });
 
                     it('should split x tick', function () {
@@ -503,7 +503,7 @@ describe('c3 chart axis', function () {
                         args.axis.x.tick = {
                             width: 150
                         };
-                        expect(true).to.be.ok;
+                        
                     });
 
                     it('should split x tick to 2 lines properly', function () {
@@ -537,7 +537,7 @@ describe('c3 chart axis', function () {
                 args.axis.x.tick.format = function () {
                     return ['this is a very long tick text', 'on category axis'];
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should have multiline tick text', function () {
@@ -577,7 +577,7 @@ describe('c3 chart axis', function () {
                         }
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should rotate tick texts', function () {
@@ -622,7 +622,7 @@ describe('c3 chart axis', function () {
                         }
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should rotate tick texts', function () {
@@ -658,7 +658,7 @@ describe('c3 chart axis', function () {
                         ]
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should show fitted ticks on indexed data', function () {
@@ -678,7 +678,7 @@ describe('c3 chart axis', function () {
                         ]
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should show fitted ticks on indexed data', function () {
@@ -714,7 +714,7 @@ describe('c3 chart axis', function () {
                         }
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should show fitted ticks on indexed data', function () {
@@ -732,7 +732,7 @@ describe('c3 chart axis', function () {
                         ['data3', 150, 120, 110, 140, 115, 125]
                     ]
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should show fitted ticks on indexed data', function () {
@@ -766,7 +766,7 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should not have inner y axis', function () {
@@ -780,7 +780,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have inner y axis', function () {
             args.axis.y.inner = true;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have inner y axis', function () {
@@ -811,7 +811,7 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should not have inner y axis', function () {
@@ -825,7 +825,7 @@ describe('c3 chart axis', function () {
 
         it('should update args to have inner y axis', function () {
             args.axis.y2.inner = true;
-            expect(true).to.be.ok;
+            
         });
 
         it('should have inner y axis', function () {

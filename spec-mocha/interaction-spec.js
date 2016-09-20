@@ -24,7 +24,7 @@ describe('c3 chart interaction', function () {
                         type: 'bar'
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should have 4 event rects properly', function () {
@@ -48,7 +48,7 @@ describe('c3 chart interaction', function () {
                         type: 'bar'
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should have 1 event rects properly', function () {
@@ -74,7 +74,7 @@ describe('c3 chart interaction', function () {
                         ]
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should have 4 event rects properly', function () {
@@ -98,7 +98,7 @@ describe('c3 chart interaction', function () {
                         ]
                     }
                 };
-                expect(true).to.be.ok;
+                
             });
 
             it('should have 1 event rects properly', function () {

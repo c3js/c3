@@ -32,7 +32,7 @@ describe('c3 api axis', function () {
                     }
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should update y axis label', function () {

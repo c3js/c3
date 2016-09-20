@@ -22,7 +22,7 @@ describe('c3 chart arc', function () {
                     type: 'pie'
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have correct classes', function () {
@@ -55,7 +55,7 @@ describe('c3 chart arc', function () {
                 ['data2', 150],
                 ['data3', 120]
             ];
-            expect(true).to.be.ok;
+            
         });
 
         it('should have correct d even if data id can be converted to a color', function (done) {
@@ -76,7 +76,7 @@ describe('c3 chart arc', function () {
                     type: 'pie'
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have correct d attribute', function () {
@@ -115,7 +115,7 @@ describe('c3 chart arc', function () {
                     type: 'gauge'
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have correct d for Pi radian gauge', function () {
@@ -144,7 +144,7 @@ describe('c3 chart arc', function () {
                     startingAngle: Math.PI/2
                 }
             };
-            expect(true).to.be.ok;
+            
         });
 
         it('should have correct d for 2 Pi radian gauge starting at Pi/2', function() {

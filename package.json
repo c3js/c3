@@ -5,7 +5,7 @@
   "main": "c3.js",
   "scripts": {
     "lint": "eslint src/",
-    "test": "karma start karma.conf.js",
+    "test": "mocha spec-mocha/ --compilers js:babel-register",
     "codecov": "cat coverage/*/lcov.info | codecov",
     "build": "rollup -cm"
   },
@@ -28,7 +28,9 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
+    "chai": "^3.5.0",
     "chai-color-helpers": "github:aendrew/chai-color-helpers",
+    "chai-colors": "^1.0.1",
     "codecov.io": "^0.1.6",
     "eslint": "^3.5.0",
     "eslint-config-airbnb-base": "^7.1.0",
@@ -42,6 +44,7 @@
     "grunt-karma": "^2.0.0",
     "grunt-sass": "^1.2.0",
     "jasmine-core": "^2.4.1",
+    "jsdom": "^9.5.0",
     "jshint-stylish": "^2.2.0",
     "karma": "^1.1.1",
     "karma-babel-preprocessor": "^6.0.1",
@@ -51,8 +54,10 @@
     "karma-rollup-plugin": "^0.2.3",
     "karma-spec-reporter": "0.0.26",
     "load-grunt-tasks": "^3.5.0",
+    "mocha": "^3.0.2",
     "phantomjs-prebuilt": "^2.1.7",
     "rollup": "^0.35.10",
-    "rollup-plugin-babel": "^2.6.1"
+    "rollup-plugin-babel": "^2.6.1",
+    "sinon": "^1.17.6"
   }
 }
