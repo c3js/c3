@@ -1,13 +1,13 @@
 import { jsdom } from 'jsdom';
-import * as c3 from '../src/index';
+import * as c3 from '../c3';
 
 export function initDom() {
-    var div = jsdom('<div></div>');
-    div.id = 'chart';
+    var document = jsdom('<div id="chart"></div>');
+    var div = document.getElementById('chart');
     div.style.width = '640px';
     div.style.height = '480px';
-    document.body.appendChild(div);
     document.body.style.margin = '0px';
+    return div;
 }
 
 // export function setMouseEvent(chart, name, x, y, element) {
@@ -20,20 +20,14 @@ export function initDom() {
 //     if (element) { element.dispatchEvent(event); }
 // }
 
-export function initChart(chart, args, done) {
+export function initChart(chart, args = {}, done) {
     if (typeof chart === 'undefined') {
-        initDom();
-    }
-    if (args) {
-        chart = c3.generate(args);
-        global.d3 = chart.internal.d3;
-        global.d3.select('.jasmine_html-reporter')
-            .style('position', 'absolute')
-            .style('width', '640px')
-            .style('right', 0);
+        args.bindto = initDom();
     }
 
-    window.setTimeout(function () {
+    chart = c3.generate(args);
+
+    setTimeout(function () {
         done();
     }, 10);
 

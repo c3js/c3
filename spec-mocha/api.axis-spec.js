@@ -1,15 +1,15 @@
-var expect = require('chai').expect;
+import d3 from 'd3';
+import { expect } from 'chai';
+import { initChart } from './c3-helper';
 
 describe('c3 api axis', function () {
-
     var chart, args;
 
     beforeEach(function (done) {
-        chart = window.initChart(chart, args, done);
+        chart = initChart(chart, args, done);
     });
 
     describe('axis.labels', function () {
-
         it('should update args', function () {
             args = {
                 data: {
@@ -32,11 +32,10 @@ describe('c3 api axis', function () {
                     }
                 }
             };
-            
         });
 
         it('should update y axis label', function () {
-            chart.axis.labels({y: 'New Y Axis Label'});
+            chart.axis.labels({ y: 'New Y Axis Label' });
             var label = d3.select('.c3-axis-y-label');
             expect(label.text()).to.equal('New Y Axis Label');
             expect(label.attr('dx')).to.equal('-0.5em');

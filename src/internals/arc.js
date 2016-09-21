@@ -1,6 +1,10 @@
 import { CLASS } from './class';
 import { isFunction } from './util';
 
+if (!window) {
+    const window = global;
+}
+
 const initPie = function () {
     let $$ = this, d3 = $$.d3, config = $$.config;
     $$.pie = d3.layout.pie().value((d) => {

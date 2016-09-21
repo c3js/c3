@@ -449,6 +449,10 @@ export const {
     getPathBox,
 } = util;
 
+if (!window) {
+    const window = global;
+}
+
 // Start ChartInternal!!!!
 function ChartInternal(api) {
     const $$ = this;

@@ -1,8 +1,11 @@
-var chai = require('chai');
-var chaiColors = require('chai-color-helpers');
-var expect = chai.expect;
+import * as chai from 'chai';
+import chaiColors from 'chai-colors';
+import * as d3 from 'd3';
+
+import { initChart } from './c3-helper';
 
 chai.use(chaiColors);
+const expect = chai.expect;
 
 describe('c3 api data', function () {
     var chart;
@@ -34,11 +37,10 @@ describe('c3 api data', function () {
     };
 
     beforeEach(function (done) {
-        chart = window.initChart(chart, args, done);
+        chart = initChart(chart, args, done);
     });
 
     describe('data()', function () {
-
         it('should return all of data if no argument given', function () {
             var results = chart.data(),
                 expected = ['data1', 'data2'];
@@ -59,11 +61,9 @@ describe('c3 api data', function () {
             expect(results[0].id).to.equal('data1');
             expect(results[1].id).to.equal('data2');
         });
-
     });
 
     describe('data.shown()', function () {
-
         it('should return only shown targets', function () {
             var results;
             chart.hide('data1');
@@ -71,11 +71,9 @@ describe('c3 api data', function () {
             expect(results.length).to.equal(1);
             expect(results[0].id).to.equal('data2');
         });
-
     });
 
     describe('data.values()', function () {
-
         it('should return values for specified target', function () {
             var values = chart.data.values('data1'),
                 expectedValues = [30, 200, 100, 400, 150, 250];
@@ -89,11 +87,9 @@ describe('c3 api data', function () {
             var values = chart.data.values();
             expect(values).to.be.null;
         });
-
     });
 
     describe('data.names()', function () {
-
         it('should return data.names specified as argument', function () {
             var results = chart.data.names();
             expect(results.data1).to.equal('Data Name 1');
@@ -110,14 +106,12 @@ describe('c3 api data', function () {
         });
 
         it('should set data.names specified as api', function () {
-            expect(d3.select('.c3-legend-item-data1 text').text()).to.equal("New Data Name 1");
-            expect(d3.select('.c3-legend-item-data2 text').text()).to.equal("New Data Name 2");
+            expect(d3.select('.c3-legend-item-data1 text').text()).to.equal('New Data Name 1');
+            expect(d3.select('.c3-legend-item-data2 text').text()).to.equal('New Data Name 2');
         });
-
     });
 
     describe('data.colors()', function () {
-
         it('should return data.colors specified as argument', function () {
             var results = chart.data.colors();
             expect(results.data1).to.be.color('#FF0000');
@@ -134,16 +128,14 @@ describe('c3 api data', function () {
         });
 
         it('should set data.colors specified as api', function () {
-            expect(d3.select('.c3-line-data1').style('stroke')).to.be.color("#00ff00");
-            expect(d3.select('.c3-line-data2').style('stroke')).to.be.color("#ff0000");
-            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('stroke')).to.be.color("#00ff00");
-            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('stroke')).to.be.color("#ff0000");
+            expect(d3.select('.c3-line-data1').style('stroke')).to.be.color('#00ff00');
+            expect(d3.select('.c3-line-data2').style('stroke')).to.be.color('#ff0000');
+            expect(d3.select('.c3-legend-item-data1 .c3-legend-item-tile').style('stroke')).to.be.color('#00ff00');
+            expect(d3.select('.c3-legend-item-data2 .c3-legend-item-tile').style('stroke')).to.be.color('#ff0000');
         });
-
     });
 
     describe('data.axes()', function () {
-
         it('should return data.axes specified as argument', function () {
             var results = chart.data.axes();
             expect(results.data1).to.equal('y');

@@ -1,3 +1,7 @@
+if (!window) {
+    const window = global;
+}
+
 const resize = function (size) {
     let $$ = this.internal, config = $$.config;
     config.size_width = size ? size.width : null;

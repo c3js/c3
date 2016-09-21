@@ -1,5 +1,9 @@
 import { CLASS } from './class';
 
+if (!window) {
+    const window = global;
+}
+
 const initEventRect = function () {
     const $$ = this;
     $$.main.select('.' + CLASS.chart).append('g')

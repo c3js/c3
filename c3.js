@@ -1565,8 +1565,9 @@ var categoryName = function categoryName(i) {
 };
 
 var getClipPath = function getClipPath(id) {
-    var isIE9 = window.navigator.appVersion.toLowerCase().indexOf('msie 9.') >= 0;
-    return 'url(' + (isIE9 ? '' : document.URL.split('#')[0]) + '#' + id + ')';
+    var isIE9 = typeof window !== 'undefined' && window.navigator.appVersion.toLowerCase().indexOf('msie 9.') >= 0;
+    var isBrowser = typeof document !== 'undefined';
+    return 'url(' + (isIE9 ? '' : isBrowser ? document.URL.split('#')[0] : Date.now()) + '#' + id + ')';
 };
 var appendClip = function appendClip(parent, id) {
     return parent.append('clipPath').attr('id', id).append('rect');
@@ -6073,6 +6074,7 @@ var asHalfPixel$$1 = asHalfPixel$1;
 var isEmpty$$1 = isEmpty$1;
 var notEmpty$$1 = notEmpty$1;
 var getOption$$1 = getOption$1;
+// Start ChartInternal!!!!
 function ChartInternal(api) {
     var $$ = this;
     $$.d3 = d3;
@@ -8384,7 +8386,7 @@ c3_chart_fn.unzoom = unzoom;
  * License: MIT
  */
 
-var version = '0.4.11';
+var version = '1.0.0';
 
 var generate = function generate(config) {
     return new Chart(config);

@@ -1,6 +1,7 @@
 const getClipPath = function (id) {
-    const isIE9 = window.navigator.appVersion.toLowerCase().indexOf('msie 9.') >= 0;
-    return 'url(' + (isIE9 ? '' : document.URL.split('#')[0]) + '#' + id + ')';
+    const isIE9 = typeof window !== 'undefined' && window.navigator.appVersion.toLowerCase().indexOf('msie 9.') >= 0;
+    const isBrowser = typeof document !== 'undefined';
+    return 'url(' + (isIE9 ? '' : isBrowser ? document.URL.split('#')[0] : Date.now()) + '#' + id + ')';
 };
 const appendClip = function (parent, id) {
     return parent.append('clipPath').attr('id', id).append('rect');
