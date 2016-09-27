@@ -123,6 +123,22 @@ c3_chart_internal_fn.classAreas = function (d) {
 c3_chart_internal_fn.classRegion = function (d, i) {
     return this.generateClass(CLASS.region, i) + ' ' + ('class' in d ? d['class'] : '');
 };
+c3_chart_internal_fn.labelRegion = function (d) {
+    return 'label' in d ? d.label : '';
+};
+c3_chart_internal_fn.labelTransform = function (d) {
+    return ('vertical' in d && d.vertical) ? "rotate(90)" : "";
+};
+c3_chart_internal_fn.labelOffsetX = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return ('vertical' in d && d.vertical) ? this.regionY(d) + paddingY : (this.regionX(d) + paddingX);
+};
+c3_chart_internal_fn.labelOffsetY = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return ('vertical' in d && d.vertical) ? -(this.regionX(d) + paddingX) : this.regionY(d) + 10 + paddingY;
+};
 c3_chart_internal_fn.classEvent = function (d) {
     return this.generateClass(CLASS.eventRect, d.index);
 };

@@ -12,11 +12,13 @@ c3_chart_internal_fn.updateRegion = function (duration) {
 
     $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
-    $$.mainRegion.enter().append('g')
-      .append('rect')
-        .style("fill-opacity", 0);
+    var g = $$.mainRegion.enter().append('g');
     $$.mainRegion
         .attr('class', $$.classRegion.bind($$));
+    g.append('rect')
+        .style("fill-opacity", 0);
+    g.append('text')
+        .text($$.labelRegion.bind($$));
     $$.mainRegion.exit().transition().duration(duration)
         .style("opacity", 0)
         .remove();
@@ -30,17 +32,26 @@ c3_chart_internal_fn.redrawRegion = function (withTransition) {
             var parentData = $$.d3.select(this.parentNode).datum();
             $$.d3.select(this).datum(parentData);
         }),
+        regionLabels = $$.mainRegion.selectAll('text'),
         x = $$.regionX.bind($$),
         y = $$.regionY.bind($$),
         w = $$.regionWidth.bind($$),
-        h = $$.regionHeight.bind($$);
+        h = $$.regionHeight.bind($$),
+        labelX = $$.labelOffsetX.bind($$),
+        labelY = $$.labelOffsetY.bind($$),
+        labelTransform = $$.labelTransform.bind($$);
     return [
         (withTransition ? regions.transition() : regions)
             .attr("x", x)
             .attr("y", y)
             .attr("width", w)
             .attr("height", h)
-            .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
+            .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }),
+        (withTransition ? regionLabels.transition() : regionLabels)
+            .attr("x", labelX)
+            .attr("y", labelY)
+            .attr("transform", labelTransform)
+            .attr("style", "text-anchor: left;")
     ];
 };
 c3_chart_internal_fn.regionX = function (d) {
