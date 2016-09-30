@@ -1,0 +1,69 @@
+<html>
+<head>
+    <link href="/css/c3.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="chart"></div>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
+<script src="https://cdn.rawgit.com/josephg/noisejs/master/perlin.js"></script>
+<script src="/js/c3.js"></script>
+<script>
+    var chart = c3.generate({
+        data: {
+            json: generate(),
+            keys: {
+                x: 'date',
+                value: ['value']
+            }
+        },
+        axis: {
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%Y-%m',
+                    count: 24,
+                    culling: false
+                }
+            }
+        },
+        subchart: {
+            show: true
+        },
+        zoom: {
+            enabled: true
+        },
+        grid: {
+            x: {
+                show: true,
+                ticks: 'auto'
+            },
+            y: {
+                show: true
+            }
+        }
+    });
+
+    function generate() {
+        noise.seed(Math.random());
+
+        var data = [];
+        var date = moment('2015-01-01');
+        var now = moment('2017-01-01');
+
+        while (date.isBefore(now)) {
+            data.push({
+                date: date.format('YYYY-MM-DD'),
+                value: Math.round(noise.perlin2(date.unix() / 1000000, date.unix() / 1000000) * 100)
+            });
+
+            date.add(1, 'day');
+        }
+
+        return data;
+    }
+
+</script>
+</body>
+</html>

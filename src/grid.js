@@ -29,7 +29,7 @@ c3_chart_internal_fn.initGridLines = function () {
 };
 c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
     var $$ = this, config = $$.config, d3 = $$.d3,
-        xgridData = $$.generateGridData(config.grid_x_type, $$.x),
+        xgridData = $$.generateGridData(config.grid_x_type, $$.x, config.grid_x_ticks),
         tickOffset = $$.isCategorized() ? $$.xAxis.tickOffset() : 0;
 
     $$.xgridAttr = config.axis_rotated ? {
@@ -193,10 +193,9 @@ c3_chart_internal_fn.updateXgridFocus = function () {
         .attr("y1", config.axis_rotated ? -10 : 0)
         .attr("y2", config.axis_rotated ? -10 : $$.height);
 };
-c3_chart_internal_fn.generateGridData = function (type, scale) {
+c3_chart_internal_fn.generateGridData = function (type, scale, ticks) {
     var $$ = this,
-        gridData = [], xDomain, firstYear, lastYear, i,
-        tickNum = $$.main.select("." + CLASS.axisX).selectAll('.tick').size();
+        gridData = [], xDomain, firstYear, lastYear, i, tickNum;
     if (type === 'year') {
         xDomain = $$.getXDomain();
         firstYear = xDomain[0].getFullYear();
@@ -204,8 +203,13 @@ c3_chart_internal_fn.generateGridData = function (type, scale) {
         for (i = firstYear; i <= lastYear; i++) {
             gridData.push(new Date(i + '-01-01 00:00:00'));
         }
+    } else if (ticks === 'auto') {
+        gridData = $$.main.select("." + CLASS.axisX).selectAll('.tick').data();
+    } else if (Array.isArray(ticks)) {
+        gridData = ticks;
     } else {
-        gridData = scale.ticks(10);
+        tickNum = $$.main.select("." + CLASS.axisX).selectAll('.tick').size();
+        gridData = scale.ticks(ticks || 10);
         if (gridData.length > tickNum) { // use only int
             gridData = gridData.filter(function (d) { return ("" + d).indexOf('.') < 0; });
         }
