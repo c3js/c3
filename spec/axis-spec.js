@@ -227,8 +227,6 @@ describe('c3 chart axis', function() {
 
     });
 
-
-
     describe('axis y timeseries', function() {
         beforeAll(function() {
             args = {
@@ -1010,4 +1008,81 @@ describe('c3 chart axis', function() {
         });
     });
 
+    describe('axis.x.label', function() {
+        beforeAll(function() {
+            args = {
+                data: {
+                    columns: [
+                        ['somewhat long 1', 30, 200, 100, 400, 150, 250],
+                        ['somewhat long 2', 50, 20, 10, 40, 15, 25]
+                    ]
+                },
+                axis: {
+                    x: {
+                        show: true,
+                        label: {
+                            text: 'Label of X axis'
+                        }
+                    }
+                }
+            };
+        });
+
+        it('renders label text properly', () => {
+            expect(d3.select('.c3-axis-x-label').text()).toEqual('Label of X axis');
+        });
+
+        describe('outer label position', function() {
+            beforeAll(function() {
+                args.axis.x.label.position = 'outer-center';
+            });
+
+            it('renders position properly', () => {
+                const label = d3.select('.c3-axis-x-label');
+
+                expect(label.attr('dy')).toEqual('30');
+            });
+
+            describe('with rotated tick', function() {
+                beforeAll(function() {
+                    args.axis.x.tick = {
+                        rotate: 90
+                    };
+                });
+
+                it('renders position properly', () => {
+                    const label = d3.select('.c3-axis-x-label');
+
+                    expect(label.attr('dy')).toBeGreaterThan('30');
+                });
+            });
+        });
+
+        describe('inner label position', function() {
+            beforeAll(function() {
+                args.axis.x.label.position = 'inner-center';
+            });
+
+            it('renders position properly', () => {
+                const label = d3.select('.c3-axis-x-label');
+
+                expect(label.attr('dy')).toEqual('-0.5em');
+            });
+
+            describe('with rotated tick', function() {
+                beforeAll(function() {
+                    args.axis.x.tick = {
+                        rotate: 90
+                    };
+                });
+
+                it('renders position properly', () => {
+                    const label = d3.select('.c3-axis-x-label');
+
+                    expect(label.attr('dy')).toEqual('-0.5em');
+                });
+            });
+        });
+
+    });
 });
