@@ -184,6 +184,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         gauge_min: 0,
         gauge_max: 100,
         gauge_startingAngle: -1 * Math.PI/2,
+        gauge_label_extents: undefined,
         gauge_units: undefined,
         gauge_width: undefined,
         gauge_expand: {},
