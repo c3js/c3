@@ -2204,7 +2204,10 @@
                             config.axis_x_categories.push(rawX);
                         }
                     } else {
-                        x  = $$.generateTargetX(rawX, id, i);
+                      x = config.axis_x_categories.indexOf(rawX);
+                        if (x === -1) {
+                            x  = $$.generateTargetX(rawX, id, i);
+                         }
                     }
                     // mark as x = undefined if value is undefined and filter to remove after mapped
                     if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
