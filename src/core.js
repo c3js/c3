@@ -645,6 +645,8 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
             xForText: xForText,
             yForText: yForText
         });
+
+        $$.redrawArea(drawArea);
     }
 
     if ((duration || flow) && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
