@@ -121,7 +121,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_label: {},
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
-        axis_y_tick_values: null,        
+        axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
         axis_y_tick_time_value: undefined,
@@ -177,6 +177,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         pie_label_ratio: undefined,
         pie_expand: {},
         pie_expand_duration: 50,
+        pie_padAngle: 0,
         // gauge
         gauge_fullCircle: false,
         gauge_label_show: true,
@@ -198,6 +199,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_title: "",
         donut_expand: {},
         donut_expand_duration: 50,
+        donut_padAngle: 0,
         // spline
         spline_interpolation_type: 'cardinal',
         // region - region to change style

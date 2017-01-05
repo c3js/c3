@@ -95,6 +95,28 @@ describe('c3 chart arc', function () {
             expect(arcs.data3.attr('d').indexOf('NaN')).toBe(-1);
         });
 
+        it('should set args with data padAngle that can be padded', function () {
+            var padAngle = 0.05;
+
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 60],
+                        ['data2', 40]
+                    ],
+                    type: 'donut'
+                },
+                donut: {
+                    padAngle: padAngle
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should set padAngle value', function () {
+            var padAngle = chart.internal.pie.padAngle();
+            expect(true).toBe(padAngle > 0);
+        });
     });
 
     describe('show gauge', function () {
