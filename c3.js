@@ -7008,6 +7008,10 @@
         this.internal.config.tooltip_onhide.call(this);
     };
 
+    c3_chart_fn.setTitleText = function(text){
+      this.internal.title.text(text);
+    };
+
     // Features:
     // 1. category axis
     // 2. ceil values of translate/x/y to int for half pixel antialiasing
