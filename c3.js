@@ -2144,113 +2144,115 @@
         return new_rows;
     };
     c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
-        var $$ = this, config = $$.config,
-            ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
-            xs = $$.d3.keys(data[0]).filter($$.isX, $$),
-            targets;
+        var $$ = this, config = $$.config, targets;
+        
+        if(config) {
+            var ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
+                xs = $$.d3.keys(data[0]).filter($$.isX, $$);
+            
+            // save x for update data by load when custom x and c3.x API
+            ids.forEach(function (id) {
+                var xKey = $$.getXKey(id);
 
-        // save x for update data by load when custom x and c3.x API
-        ids.forEach(function (id) {
-            var xKey = $$.getXKey(id);
-
-            if ($$.isCustomX() || $$.isTimeSeries()) {
-                // if included in input data
-                if (xs.indexOf(xKey) >= 0) {
-                    $$.data.xs[id] = (appendXs && $$.data.xs[id] ? $$.data.xs[id] : []).concat(
-                        data.map(function (d) { return d[xKey]; })
-                            .filter(isValue)
-                            .map(function (rawX, i) { return $$.generateTargetX(rawX, id, i); })
-                    );
-                }
-                // if not included in input data, find from preloaded data of other id's x
-                else if (config.data_x) {
-                    $$.data.xs[id] = $$.getOtherTargetXs();
-                }
-                // if not included in input data, find from preloaded data
-                else if (notEmpty(config.data_xs)) {
-                    $$.data.xs[id] = $$.getXValuesOfXKey(xKey, $$.data.targets);
-                }
-                // MEMO: if no x included, use same x of current will be used
-            } else {
-                $$.data.xs[id] = data.map(function (d, i) { return i; });
-            }
-        });
-
-
-        // check x is defined
-        ids.forEach(function (id) {
-            if (!$$.data.xs[id]) {
-                throw new Error('x is not defined for id = "' + id + '".');
-            }
-        });
-
-        // convert to target
-        targets = ids.map(function (id, index) {
-            var convertedId = config.data_idConverter(id);
-            return {
-                id: convertedId,
-                id_org: id,
-                values: data.map(function (d, i) {
-                    var xKey = $$.getXKey(id), rawX = d[xKey],
-                        value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
-                    // use x as categories if custom x and categorized
-                    if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
-                        if (index === 0 && i === 0) {
-                            config.axis_x_categories = [];
-                        }
-                        x = config.axis_x_categories.indexOf(rawX);
-                        if (x === -1) {
-                            x = config.axis_x_categories.length;
-                            config.axis_x_categories.push(rawX);
-                        }
-                    } else {
-                        x  = $$.generateTargetX(rawX, id, i);
+                if ($$.isCustomX() || $$.isTimeSeries()) {
+                    // if included in input data
+                    if (xs.indexOf(xKey) >= 0) {
+                        $$.data.xs[id] = (appendXs && $$.data.xs[id] ? $$.data.xs[id] : []).concat(
+                            data.map(function (d) { return d[xKey]; })
+                                .filter(isValue)
+                                .map(function (rawX, i) { return $$.generateTargetX(rawX, id, i); })
+                        );
                     }
-                    // mark as x = undefined if value is undefined and filter to remove after mapped
-                    if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
-                        x = undefined;
+                    // if not included in input data, find from preloaded data of other id's x
+                    else if (config.data_x) {
+                        $$.data.xs[id] = $$.getOtherTargetXs();
                     }
-                    return {x: x, value: value, id: convertedId};
-                }).filter(function (v) { return isDefined(v.x); })
-            };
-        });
+                    // if not included in input data, find from preloaded data
+                    else if (notEmpty(config.data_xs)) {
+                        $$.data.xs[id] = $$.getXValuesOfXKey(xKey, $$.data.targets);
+                    }
+                    // MEMO: if no x included, use same x of current will be used
+                } else {
+                    $$.data.xs[id] = data.map(function (d, i) { return i; });
+                }
+            });
 
-        // finish targets
-        targets.forEach(function (t) {
-            var i;
-            // sort values by its x
-            if (config.data_xSort) {
-                t.values = t.values.sort(function (v1, v2) {
-                    var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
-                        x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
-                    return x1 - x2;
+
+            // check x is defined
+            ids.forEach(function (id) {
+                if (!$$.data.xs[id]) {
+                    throw new Error('x is not defined for id = "' + id + '".');
+                }
+            });
+
+            // convert to target
+            targets = ids.map(function (id, index) {
+                var convertedId = config.data_idConverter(id);
+                return {
+                    id: convertedId,
+                    id_org: id,
+                    values: data.map(function (d, i) {
+                        var xKey = $$.getXKey(id), rawX = d[xKey],
+                            value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
+                        // use x as categories if custom x and categorized
+                        if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
+                            if (index === 0 && i === 0) {
+                                config.axis_x_categories = [];
+                            }
+                            x = config.axis_x_categories.indexOf(rawX);
+                            if (x === -1) {
+                                x = config.axis_x_categories.length;
+                                config.axis_x_categories.push(rawX);
+                            }
+                        } else {
+                            x  = $$.generateTargetX(rawX, id, i);
+                        }
+                        // mark as x = undefined if value is undefined and filter to remove after mapped
+                        if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
+                            x = undefined;
+                        }
+                        return {x: x, value: value, id: convertedId};
+                    }).filter(function (v) { return isDefined(v.x); })
+                };
+            });
+
+            // finish targets
+            targets.forEach(function (t) {
+                var i;
+                // sort values by its x
+                if (config.data_xSort) {
+                    t.values = t.values.sort(function (v1, v2) {
+                        var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+                            x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
+                        return x1 - x2;
+                    });
+                }
+                // indexing each value
+                i = 0;
+                t.values.forEach(function (v) {
+                    v.index = i++;
                 });
+                // this needs to be sorted because its index and value.index is identical
+                $$.data.xs[t.id].sort(function (v1, v2) {
+                    return v1 - v2;
+                });
+            });
+
+            // cache information about values
+            $$.hasNegativeValue = $$.hasNegativeValueInTargets(targets);
+            $$.hasPositiveValue = $$.hasPositiveValueInTargets(targets);
+
+            // set target types
+            if (config.data_type) {
+                $$.setTargetType($$.mapToIds(targets).filter(function (id) { return ! (id in config.data_types); }), config.data_type);
             }
-            // indexing each value
-            i = 0;
-            t.values.forEach(function (v) {
-                v.index = i++;
-            });
-            // this needs to be sorted because its index and value.index is identical
-            $$.data.xs[t.id].sort(function (v1, v2) {
-                return v1 - v2;
-            });
-        });
 
-        // cache information about values
-        $$.hasNegativeValue = $$.hasNegativeValueInTargets(targets);
-        $$.hasPositiveValue = $$.hasPositiveValueInTargets(targets);
-
-        // set target types
-        if (config.data_type) {
-            $$.setTargetType($$.mapToIds(targets).filter(function (id) { return ! (id in config.data_types); }), config.data_type);
+            // cache as original id keyed
+            targets.forEach(function (d) {
+                $$.addCache(d.id_org, d);
+            });
         }
-
-        // cache as original id keyed
-        targets.forEach(function (d) {
-            $$.addCache(d.id_org, d);
-        });
-
+        
         return targets;
     };
 
@@ -2279,15 +2281,15 @@
                 }
             });
             $$.data.targets = $$.data.targets.concat(targets); // add remained
+
+            // Set targets
+            $$.updateTargets($$.data.targets);
+
+            // Redraw with new targets
+            $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+
+            if (args.done) { args.done(); }
         }
-
-        // Set targets
-        $$.updateTargets($$.data.targets);
-
-        // Redraw with new targets
-        $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-
-        if (args.done) { args.done(); }
     };
     c3_chart_internal_fn.loadFromArgs = function (args) {
         var $$ = this;
