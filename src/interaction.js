@@ -221,6 +221,31 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
             ) : function () {}
+        )
+        .on('dblclick', function (d) {
+            var index = d.index;
+            if ($$.hasArcType() || !$$.toggleShape) { return; }
+            if ($$.cancelClick) {
+                $$.cancelClick = false;
+                return;
+            }
+            if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
+                index -= 1;
+            }
+            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+                if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                    $$.toggleShape(this, d, index);
+                    $$.config.data_ondblclick.call($$.api, d, this);
+                }
+            });
+        })
+        .call(
+            config.data_selection_draggable && $$.drag ? (
+                d3.behavior.drag().origin(Object)
+                    .on('drag', function () { $$.drag(d3.mouse(this)); })
+                    .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
+                    .on('dragend', function () { $$.dragend(); })
+            ) : function () {}
         );
 };
 
