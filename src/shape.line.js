@@ -313,7 +313,7 @@ ChartInternal.prototype.updateCircle = function (cx, cy) {
         .attr("cx", cx)
         .attr("cy", cy)
         .attr("r", $$.pointR.bind($$))
-        .style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color);
+        .style("color", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color);
 
     $$.mainCircle = mainCircleEnter.merge(mainCircle)
         .style("opacity", $$.isStanfordGraphType() ? 1 : $$.initialOpacityForCircle.bind($$));
@@ -327,7 +327,7 @@ ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transit
     return [
         (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
             .style('opacity', this.opacityForCircle.bind($$))
-            .style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color)
+            .style("color", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color)
             .attr("cx", cx)
             .attr("cy", cy),
         (withTransition ? selectedCircles.transition(transition) : selectedCircles)
