@@ -210,7 +210,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
                     $$.toggleShape(this, d, index);
-                    $$.config.data_onclick.call($$.api, d, this);
+                    $$.config.data_onclick.call($$.api, d, this, event);
                 }
             });
         })
@@ -309,7 +309,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
                 $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
                     if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
                         $$.toggleShape(this, closest, closest.index);
-                        $$.config.data_onclick.call($$.api, closest, this);
+                        $$.config.data_onclick.call($$.api, closest, this, event);
                     }
                 });
             }
