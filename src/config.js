@@ -121,7 +121,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_label: {},
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
-        axis_y_tick_values: null,        
+        axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
         axis_y_tick_time_value: undefined,
@@ -167,6 +167,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         bar_width_ratio: 0.6,
         bar_width_max: undefined,
         bar_zerobased: true,
+        bar_space: 0,
         // area
         area_zerobased: true,
         area_above: false,
