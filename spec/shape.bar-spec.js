@@ -68,6 +68,51 @@ describe('c3 chart shape bar', function () {
            });
         });
 
+        describe('with timeseries data, different [xs]', function () {
+            it('should update args', function () {
+                var t1 = 1474020000000; // "2016-09-16T10:00:00.000Z"
+                var t2 = 1474056000000; // "2016-09-16T20:00:00.000Z"
+
+                args = {
+                    data: {
+                        xs: {
+                            'data1': 'x1',
+                            'data2': 'x2',
+                            'data3': 'x3'
+                        },
+                        columns: [
+                            ['x1', t1, t2],
+                            ['data1', 500, 500],
+                            ['x2', t1],
+                            ['data2', 500],
+                            ['x3', t1, t2],
+                            ['data3', 500, 500]
+                        ],
+                        type: 'bar',
+                        groups: [['data1', 'data2', 'data3']]
+                    },
+                    axis: {
+                        x: { type: 'timeseries' }
+                    }
+                };
+                expect(true).toBeTruthy();
+            });
+            it('should be stacked', function () {
+                var expectedBottom = [
+                    [301, 430],
+                    [430],
+                    [172, 301]
+                ];
+
+                [1, 2, 3].forEach(function(dataIndex) {
+                    chart.internal.main.selectAll('.c3-bars-data' + dataIndex + ' .c3-bar').each(function (d, i) {
+                        var rect = d3.select(this).node().getBoundingClientRect();
+                        expect(rect.bottom).toBeCloseTo(expectedBottom[dataIndex - 1][i], -1);
+                    });
+                });
+           });
+        });
+
         describe('with category data', function () {
             it('should update args', function () {
                 args = {

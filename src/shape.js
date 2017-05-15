@@ -46,7 +46,7 @@ c3_chart_internal_fn.getShapeOffset = function (typeFilter, indices, isSub) {
                     // if not, try to find the value that does line up
                     i = -1;
                     values.forEach(function (v, j) {
-                        if (v.x === d.x) {
+                        if (+v.x === +d.x) { // "+" for timeseries
                             i = j;
                         }
                     });
