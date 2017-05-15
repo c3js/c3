@@ -160,7 +160,7 @@ c3_chart_internal_fn.getXDomainPadding = function (domain) {
         maxDataCount, padding, paddingLeft, paddingRight;
     if ($$.isCategorized()) {
         padding = 0;
-    } else if ($$.hasType('bar')) {
+    } else if ($$.hasType('bar') || $$.hasType('candle-stick')) {
         maxDataCount = $$.getMaxDataCount();
         padding = maxDataCount > 1 ? (diff / (maxDataCount - 1)) / 2 : 0.5;
     } else {

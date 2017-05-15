@@ -1,18 +1,20 @@
 <html>
   <head>
-    <link href="/css/c3.css" rel="stylesheet" type="text/css">
+    <link href="/c3.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <div id="chart"></div>
 
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="/js/c3.js"></script>
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="/c3.js"></script>
     <script>
       var chart = c3.generate({
         data: {
+          x: 'date',
+          xFormat : '%Y%m%d',
           columns: [
-            ['data1', 1030, 1200, 1100, 1400, 1150, 1250],
-            ['data2', 2130, 2100, 2140, 2200, 2150, 1850]
+            ['date', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106', '20130107', '20130108'],
+            ['max', 110, 80, 110, 110, 55, 55, 110, 80],
 //           ['data1', 30, 200, 100, 400, 150, 250],
 //           ['data2', 130, 100, 140, 200, 150, 50]
           ],
@@ -23,7 +25,10 @@
         },
         axis: {
           x: {
-            type: 'categorized'
+              type: 'timeseries',
+              tick: {
+                  format: '%Y-%m-%d'
+              }
           }
         },
         bar: {

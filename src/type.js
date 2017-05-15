@@ -30,6 +30,9 @@ c3_chart_internal_fn.hasType = function (type, targets) {
 c3_chart_internal_fn.hasArcType = function (targets) {
     return this.hasType('pie', targets) || this.hasType('donut', targets) || this.hasType('gauge', targets);
 };
+c3_chart_internal_fn.hasCandleStickType = function (targets) {
+    return this.hasType('candle-stick', targets);
+};
 c3_chart_internal_fn.isLineType = function (d) {
     var config = this.config, id = isString(d) ? d : d.id;
     return !config.data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config.data_types[id]) >= 0;
@@ -66,6 +69,10 @@ c3_chart_internal_fn.isDonutType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'donut';
 };
+c3_chart_internal_fn.isCandleStickType = function (d) {
+    var id = isString(d) ? d : d.id;
+    return this.config.data_types[id] === 'candle-stick';
+};
 c3_chart_internal_fn.isArcType = function (d) {
     return this.isPieType(d) || this.isDonutType(d) || this.isGaugeType(d);
 };
@@ -82,6 +89,9 @@ c3_chart_internal_fn.arcData = function (d) {
  */
 c3_chart_internal_fn.barData = function (d) {
     return this.isBarType(d) ? d.values : [];
+};
+c3_chart_internal_fn.candleStickData = function (d) {
+    return this.isCandleStickType(d) ? d.values : [];
 };
 c3_chart_internal_fn.lineOrScatterData = function (d) {
     return this.isLineType(d) || this.isScatterType(d) ? d.values : [];
