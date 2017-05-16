@@ -2,7 +2,7 @@
     "bitwise": true,
     "eqeqeq": true,
     "curly": true,
-    "strict": true,
+    "strict": false,
     "trailing": true,
     "white": true,
     "maxlen": 210,
@@ -25,7 +25,10 @@
         "beforeAll": false,
         "it": false,
         "expect": false,
-        "d3": false
+        "d3": false,
+        "module": false,
+        "require": false,
+        "define": false
     }
 
 }

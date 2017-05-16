@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isValue } from './util';
+
 c3_chart_internal_fn.getYFormat = function (forArc) {
     var $$ = this,
         formatForY = forArc && !$$.hasType('gauge') ? $$.defaultArcValueFormat : $$.yFormat,

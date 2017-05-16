@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.xgrids = function (grids) {
     var $$ = this.internal, config = $$.config;
     if (! grids) { return config.grid_x_lines; }

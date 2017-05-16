@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue, ceil10 } from './util';
+
 c3_chart_internal_fn.getCurrentWidth = function () {
     var $$ = this, config = $$.config;
     return config.size_width ? config.size_width : $$.getParentWidth();
@@ -5,7 +9,7 @@ c3_chart_internal_fn.getCurrentWidth = function () {
 c3_chart_internal_fn.getCurrentHeight = function () {
     var $$ = this, config = $$.config,
         h = config.size_height ? config.size_height : $$.getParentHeight();
-    return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1); 
+    return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1);
 };
 c3_chart_internal_fn.getCurrentPaddingTop = function () {
     var $$ = this,
@@ -95,8 +99,8 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;
     if (axisId === 'x' && !config.axis_x_show) { return 8; }
     if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }
-    if (axisId === 'y' && !config.axis_y_show) { 
-        return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1; 
+    if (axisId === 'y' && !config.axis_y_show) {
+        return config.legend_show && !$$.isLegendRight && !$$.isLegendInset ? 10 : 1;
     }
     if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
     // Calculate x axis height when tick rotated

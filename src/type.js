@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isString } from './util';
+
 c3_chart_internal_fn.setTargetType = function (targetIds, type) {
     var $$ = this, config = $$.config;
     $$.mapToTargetIds(targetIds).forEach(function (id) {

@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_fn, c3_chart_internal_fn } from './core';
+import { isValue, isDefined, diffDomain } from './util';
+
 c3_chart_fn.flow = function (args) {
     var $$ = this.internal,
         targets, data, notfoundIds = [], orgDataCount = $$.getMaxDataCount(),

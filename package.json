@@ -5,9 +5,9 @@
   "main": "c3.js",
   "scripts": {
     "lint": "grunt lint",
-    "build": "grunt build",
+    "build": "rollup -f umd --name c3 src/index.js > c3.js",
     "minify": "grunt minify",
-    "test": "npm run lint && npm run build && karma start karma.conf.js",
+    "test": "npm run build && npm run lint && karma start karma.conf.js",
     "dist": "npm run build && npm run minify",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
@@ -45,6 +45,7 @@
     "karma-phantomjs-launcher": "^0.2.1",
     "karma-spec-reporter": "0.0.20",
     "load-grunt-tasks": "~0.2.0",
-    "phantomjs": "^1.9.18"
+    "phantomjs": "^1.9.18",
+    "rollup": "^0.41.6"
   }
 }

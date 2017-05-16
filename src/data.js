@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue, isFunction, notEmpty, hasValue } from './util';
+
 c3_chart_internal_fn.isX = function (key) {
     var $$ = this, config = $$.config;
     return (config.data_x && key === config.data_x) || (notEmpty(config.data_xs) && hasValue(config.data_xs, key));

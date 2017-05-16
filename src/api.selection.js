@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_fn } from './core';
+import { isDefined } from './util';
+
 c3_chart_fn.selected = function (targetId) {
     var $$ = this.internal, d3 = $$.d3;
     return d3.merge(

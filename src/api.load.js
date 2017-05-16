@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.load = function (args) {
     var $$ = this.internal, config = $$.config;
     // update xs if specified

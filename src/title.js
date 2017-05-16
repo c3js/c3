@@ -1,3 +1,6 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.initTitle = function () {
     var $$ = this;
     $$.title = $$.svg.append("text")

@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { getPathBox } from './util';
+
 c3_chart_internal_fn.drag = function (mouse) {
     var $$ = this, config = $$.config, main = $$.main, d3 = $$.d3;
     var sx, sy, mx, my, minX, maxX, minY, maxY;

@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isFunction } from './util';
+
 c3_chart_internal_fn.initBrush = function () {
     var $$ = this, d3 = $$.d3;
     $$.brush = d3.svg.brush().on("brush", function () { $$.redrawForBrush(); });

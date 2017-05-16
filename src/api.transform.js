@@ -1,3 +1,5 @@
+import { c3_chart_fn, c3_chart_internal_fn } from './core';
+
 c3_chart_fn.transform = function (type, targetIds) {
     var $$ = this.internal,
         options = ['pie', 'donut'].indexOf(type) >= 0 ? {withTransform: true} : null;

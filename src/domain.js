@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isValue, isDefined, diffDomain, notEmpty } from './util';
+
 c3_chart_internal_fn.getYDomainMin = function (targets) {
     var $$ = this, config = $$.config,
         ids = $$.mapToIds(targets), ys = $$.getValuesAsIdKeyed(targets),
