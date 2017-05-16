@@ -1,5 +1,5 @@
 module.exports = (grunt) ->
-    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass', 'grunt-karma']
+    require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass']
 
     grunt.initConfig
         watch:
@@ -86,10 +86,6 @@ module.exports = (grunt) ->
             reporter: require('jshint-stylish')
             jshintrc: '.jshintrc'
 
-        karma:
-          unit:
-            configFile: 'karma.conf.js'
-
         uglify:
           c3:
             files:
@@ -108,7 +104,5 @@ module.exports = (grunt) ->
               'c3.css': 'src/scss/main.scss'
 
     grunt.registerTask 'lint', ['jshint']
-    grunt.registerTask 'test', ['karma']
     grunt.registerTask 'build', ['concat', 'sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
-    grunt.registerTask 'default', ['lint', 'build', 'test', 'minify']

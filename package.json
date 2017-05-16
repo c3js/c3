@@ -5,7 +5,10 @@
   "main": "c3.js",
   "scripts": {
     "lint": "grunt lint",
-    "test": "karma start karma.conf.js",
+    "build": "grunt build",
+    "minify": "grunt minify",
+    "test": "npm run lint && npm run build && karma start karma.conf.js",
+    "dist": "npm run build && npm run minify",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
   "repository": {
