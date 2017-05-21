@@ -1,6 +1,6 @@
 ## Filing an issue
 
-Before filing an issue, please [search the queue](https://github.com/masayuki0812/c3/issues) to make sure it hasn't already been reported.
+Before filing an issue, please [search the queue](https://github.com/c3js/c3/issues) to make sure it hasn't already been reported.
 
 If a bug, please include the following —
 
@@ -8,13 +8,13 @@ If a bug, please include the following —
 1. What browsers have you confirmed it in?
 1. Can you isolate the issue by providing a jsFiddle demonstrating it in a minimalist capacity?
 
-Please *do not* ask for support using the issue queue. For support, please ask [on chat](https://gitter.im/masayuki0812/c3) or [the mailing list](groups.google.com/forum/#!forum/c3js).
+Please *do not* ask for support using the issue queue. For support, please ask [on chat](https://gitter.im/c3js/c3) or [the mailing list](groups.google.com/forum/#!forum/c3js).
 
 ##Building C3 from sources
 
  1. **Clone the repo from GitHub**
 
-        git clone https://github.com/masayuki0812/c3.git
+        git clone https://github.com/c3js/c3.git
         cd c3
 
  2. **Acquire build dependencies.** Make sure you have [Node.js](http://nodejs.org/) installed on your workstation. This is only needed to _build_ C3 from sources. C3 itself has no dependency on Node.js once it is built. Now run:
