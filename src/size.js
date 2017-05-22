@@ -1,10 +1,10 @@
 c3_chart_internal_fn.getCurrentWidth = function () {
     var $$ = this, config = $$.config;
-    return config.size_width ? config.size_width : $$.getParentWidth();
+    return config.size_width ? parseInt(config.size_width) : $$.getParentWidth();
 };
 c3_chart_internal_fn.getCurrentHeight = function () {
     var $$ = this, config = $$.config,
-        h = config.size_height ? config.size_height : $$.getParentHeight();
+        h = config.size_height ? parseInt(config.size_height) : $$.getParentHeight();
     return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1); 
 };
 c3_chart_internal_fn.getCurrentPaddingTop = function () {
