@@ -1,31 +1,31 @@
-c3_chart_internal_fn.selectPoint = function (target, d, i) {
+c3_chart_internal_fn.selectPoint = function (target, d) {
     var $$ = this, config = $$.config,
         cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
         cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
         r = $$.pointSelectR.bind($$);
     config.data_onselected.call($$.api, d, target.node());
     // add selected-circle on low layer g
-    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
+    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + d.index)
         .data([d])
         .enter().append('circle')
-        .attr("class", function () { return $$.generateClass(CLASS.selectedCircle, i); })
+        .attr("class", function () { return $$.generateClass(CLASS.selectedCircle, d.index); })
         .attr("cx", cx)
-        .attr("cy", cy)
+        .attr("cy", function(d){return cy(d, d.index);})
         .attr("stroke", function () { return $$.color(d); })
         .attr("r", function (d) { return $$.pointSelectR(d) * 1.4; })
         .transition().duration(100)
         .attr("r", r);
 };
-c3_chart_internal_fn.unselectPoint = function (target, d, i) {
+c3_chart_internal_fn.unselectPoint = function (target, d) {
     var $$ = this;
     $$.config.data_onunselected.call($$.api, d, target.node());
     // remove selected-circle from low layer g
-    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
+    $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + d.index)
         .transition().duration(100).attr('r', 0)
         .remove();
 };
-c3_chart_internal_fn.togglePoint = function (selected, target, d, i) {
-    selected ? this.selectPoint(target, d, i) : this.unselectPoint(target, d, i);
+c3_chart_internal_fn.togglePoint = function (selected, target, d) {
+    selected ? this.selectPoint(target, d) : this.unselectPoint(target, d);
 };
 c3_chart_internal_fn.selectPath = function (target, d) {
     var $$ = this;
