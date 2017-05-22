@@ -20,7 +20,7 @@ describe('c3 api load', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
+                expect(false).toBeTruthy();
             });
 
             it('should load additional data', function (done) {
@@ -62,7 +62,7 @@ describe('c3 api load', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         describe('as column', function () {

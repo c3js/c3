@@ -24,7 +24,7 @@ describe('c3 chart domain', function () {
 
         it('should change axis.y.min to -100', function () {
             args.axis.y.min = -100;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when smaller than max of data', function () {
@@ -35,7 +35,7 @@ describe('c3 chart domain', function () {
 
         it('should change axis.y.min to 500', function () {
             args.axis.y.min = 500;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when bigger than max of data', function () {
@@ -46,7 +46,7 @@ describe('c3 chart domain', function () {
 
         it('should change axis.y.min to undefined', function () {
             args.axis.y.min = undefined;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
     });
@@ -55,7 +55,7 @@ describe('c3 chart domain', function () {
 
         it('should change axis.y.max to 1000', function () {
             args.axis.y.max = 1000;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when bigger than min of data', function () {
@@ -66,7 +66,7 @@ describe('c3 chart domain', function () {
 
         it('should change axis.y.max to 0', function () {
             args.axis.y.max = 0;
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when smaller than min of data', function () {
@@ -93,7 +93,7 @@ describe('c3 chart domain', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when bigger than min of data', function () {
@@ -119,7 +119,7 @@ describe('c3 chart domain', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
+            expect(false).toBeTruthy();
         });
 
         it('should be set properly when bigger than min of data', function () {

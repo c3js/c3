@@ -7,7 +7,7 @@
     "prepublish": "grunt",
     "lint": "grunt lint",
     "test": "karma start karma.conf.js",
-    "codecov": "cat coverage/*/lcov.info | codecov"
+    "coverage": "cat coverage/*/lcov.info | codecov"
   },
   "repository": {
     "type": "git",
