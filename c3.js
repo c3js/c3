@@ -5751,6 +5751,9 @@
     };
     c3_chart_internal_fn.redrawForZoom = function () {
         var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
+        if(d3.event.sourceEvent == null){
+            return;
+        }
         if (!config.zoom_enabled) {
             return;
         }
