@@ -1155,6 +1155,7 @@
             legend_padding: 0,
             legend_item_tile_width: 10,
             legend_item_tile_height: 10,
+            legend_item_extraspace: 0,
             // axis
             axis_rotated: false,
             axis_x_show: true,
@@ -4134,8 +4135,8 @@
         function updatePositions(textElement, id, index) {
             var reset = index === 0, isLast = index === targetIds.length - 1,
                 box = getTextBox(textElement, id),
-                itemWidth = box.width + tileWidth + (isLast && !($$.isLegendRight || $$.isLegendInset) ? 0 : paddingRight) + config.legend_padding,
-                itemHeight = box.height + paddingTop,
+                itemWidth = box.width + tileWidth + config.legend_padding + (!($$.isLegendRight || $$.isLegendInset) ? (isLast ? 0 : paddingRight + config.legend_item_extraspace) : paddingRight),
+                itemHeight = box.height + paddingTop + ((!isLast && $$.isLegendRight) ? config.legend_item_extraspace : 0),
                 itemLength = $$.isLegendRight || $$.isLegendInset ? itemHeight : itemWidth,
                 areaLength = $$.isLegendRight || $$.isLegendInset ? $$.getLegendHeight() : $$.getLegendWidth(),
                 margin, maxLength;
