@@ -43,7 +43,22 @@ var isValue = c3_chart_internal_fn.isValue = function (v) {
     },
     getPathBox = c3_chart_internal_fn.getPathBox = function (path) {
         var box = path.getBoundingClientRect(),
-            items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
-            minX = items[0].x, minY = Math.min(items[0].y, items[1].y);
-        return {x: minX, y: minY, width: box.width, height: box.height};
+            minX, minY;
+        // MSIE supports pathSegList while it crashes on latest Chrome: https://msdn.microsoft.com/en-us/library/ff971976(v=vs.85).aspx
+        // See also: https://github.com/masayuki0812/c3/issues/1465
+        if (path.pathSegList && path.pathSegList.getItem) {
+            var seg0 = path.pathSegList.getItem(0);
+            var seg1 = path.pathSegList.getItem(1);
+            minX = Math.min(seg0.x, seg1.x); 
+            minY = Math.min(seg0.y, seg1.y);
+        } else {
+            minX = box.left;
+            minY = box.top;
+        }
+        return {
+            x: minX, 
+            y: minY, 
+            width: box.width, 
+            height: box.height
+        };
     };
