@@ -115,7 +115,7 @@ function c3_axis(d3, params) {
             // this should be called only when category axis
             function splitTickText(d, maxWidth) {
                 var tickText = textFormatted(d),
-                    subtext, spaceIndex, textWidth, splitted = [];
+                    subtext, spaceIndex, preserveSpace, textWidth, splitted = [];
 
                 if (Object.prototype.toString.call(tickText) === "[object Array]") {
                     return tickText;
@@ -130,13 +130,17 @@ function c3_axis(d3, params) {
                     for (var i = 1; i < text.length; i++) {
                         if (text.charAt(i) === ' ') {
                             spaceIndex = i;
+                            preserveSpace = 0;
+                        } else if (text.charAt(i) === '/' || text.charAt(i) === '-') {
+                            spaceIndex = i;
+                            preserveSpace = 1;
                         }
                         subtext = text.substr(0, i + 1);
                         textWidth = sizeFor1Char.w * subtext.length;
                         // if text width gets over tick width, split by space index or crrent index
                         if (maxWidth < textWidth) {
                             return split(
-                                splitted.concat(text.substr(0, spaceIndex ? spaceIndex : i)),
+                                splitted.concat(text.substr(0, spaceIndex ? spaceIndex + preserveSpace : i)),
                                 text.slice(spaceIndex ? spaceIndex + 1 : i)
                             );
                         }
