@@ -4,6 +4,7 @@
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
+    "prepublish": "grunt",
     "lint": "grunt lint",
     "test": "karma start karma.conf.js",
     "codecov": "cat coverage/*/lcov.info | codecov"
