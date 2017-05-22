@@ -147,8 +147,10 @@ c3_chart_internal_fn.initParams = function () {
 
     $$.isLegendRight = config.legend_position === 'right';
     $$.isLegendInset = config.legend_position === 'inset';
-    $$.isLegendTop = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'top-right';
-    $$.isLegendLeft = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'bottom-left';
+    $$.isLegendTop = config.legend_position === 'top';
+    $$.isLegendLeft = config.legend_position === 'left';
+    $$.isLegendInsetTop = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'top-right';
+    $$.isLegendInsetLeft = config.legend_inset_anchor === 'top-left' || config.legend_inset_anchor === 'bottom-left';
     $$.legendStep = 0;
     $$.legendItemWidth = 0;
     $$.legendItemHeight = 0;
@@ -363,7 +365,8 @@ c3_chart_internal_fn.updateSizes = function () {
     var $$ = this, config = $$.config;
     var legendHeight = $$.legend ? $$.getLegendHeight() : 0,
         legendWidth = $$.legend ? $$.getLegendWidth() : 0,
-        legendHeightForBottom = $$.isLegendRight || $$.isLegendInset ? 0 : legendHeight,
+        legendHeightForBottom = $$.isLegendRight || $$.isLegendLeft || $$.isLegendInset || $$.isLegendTop ? 0 : legendHeight,
+        legendHeightForTop = $$.isLegendTop ? legendHeight : 0,
         hasArc = $$.hasArcType(),
         xAxisHeight = config.axis_rotated || hasArc ? 0 : $$.getHorizontalAxisHeight('x'),
         subchartHeight = config.subchart_show && !hasArc ? (config.subchart_size_height + xAxisHeight) : 0;
@@ -373,15 +376,15 @@ c3_chart_internal_fn.updateSizes = function () {
 
     // for main
     $$.margin = config.axis_rotated ? {
-        top: $$.getHorizontalAxisHeight('y2') + $$.getCurrentPaddingTop(),
+        top: $$.getHorizontalAxisHeight('y2') + $$.getCurrentPaddingTop() + legendHeightForTop,
         right: hasArc ? 0 : $$.getCurrentPaddingRight(),
         bottom: $$.getHorizontalAxisHeight('y') + legendHeightForBottom + $$.getCurrentPaddingBottom(),
-        left: subchartHeight + (hasArc ? 0 : $$.getCurrentPaddingLeft())
+        left: subchartHeight + (hasArc ? $$.isLegendLeft ? legendWidth : 0 : $$.getCurrentPaddingLeft())
     } : {
-        top: 4 + $$.getCurrentPaddingTop(), // for top tick text
-        right: hasArc ? 0 : $$.getCurrentPaddingRight(),
+        top: 4 + $$.getCurrentPaddingTop() + legendHeightForTop, // for top tick text
+        right: hasArc ? $$.isLegendLeft ? 20 : 0 : $$.getCurrentPaddingRight(),
         bottom: xAxisHeight + subchartHeight + legendHeightForBottom + $$.getCurrentPaddingBottom(),
-        left: hasArc ? 0 : $$.getCurrentPaddingLeft()
+        left: hasArc ? $$.isLegendLeft ? legendWidth + 5 : 0 : $$.getCurrentPaddingLeft()
     };
 
     // for subchart
@@ -389,7 +392,7 @@ c3_chart_internal_fn.updateSizes = function () {
         top: $$.margin.top,
         right: NaN,
         bottom: 20 + legendHeightForBottom,
-        left: $$.rotated_padding_left
+        left: $$.rotated_padding_left + ($$.isLegendLeft ? $$.getLegendWidth() + 20 : 0)
     } : {
         top: $$.currentHeight - subchartHeight - legendHeightForBottom,
         right: NaN,
@@ -411,14 +414,14 @@ c3_chart_internal_fn.updateSizes = function () {
     if ($$.width < 0) { $$.width = 0; }
     if ($$.height < 0) { $$.height = 0; }
 
-    $$.width2 = config.axis_rotated ? $$.margin.left - $$.rotated_padding_left - $$.rotated_padding_right : $$.width;
+    $$.width2 = config.axis_rotated ? $$.margin.left - $$.margin2.left - $$.rotated_padding_right : $$.width;
     $$.height2 = config.axis_rotated ? $$.height : $$.currentHeight - $$.margin2.top - $$.margin2.bottom;
     if ($$.width2 < 0) { $$.width2 = 0; }
     if ($$.height2 < 0) { $$.height2 = 0; }
 
     // for arc
-    $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
-    $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
+    $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : $$.isLegendLeft ? 10 : 0);
+    $$.arcHeight = $$.height - ($$.isLegendRight || $$.isLegendLeft ? 0 : 10);
     if ($$.hasType('gauge') && !config.gauge_fullCircle) {
         $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
     }

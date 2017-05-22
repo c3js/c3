@@ -140,6 +140,59 @@ describe('c3 chart legend', function () {
 
     });
 
+    describe('legend as top', function () {
+
+        it('should change the legend to "top" successfully', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                    ]
+                },
+                legend: {
+                    position: 'top'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should be located on the center of chart', function () {
+            var box = chart.internal.legend.node().getBoundingClientRect();
+            expect(box.left + box.right).toBe(640);
+        });
+
+        it('should be located on the top of chart', function () {
+            var box = chart.internal.legend.node().getBoundingClientRect();
+            expect(box.top).toBeCloseTo(0, -1);
+        });
+
+    });
+
+    describe('legend as left', function () {
+
+        it('should change the legend to "left" successfully', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                    ]
+                },
+                legend: {
+                    position: 'left'
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        it('should be located on the left of chart', function () {
+            var box = chart.internal.legend.node().getBoundingClientRect();
+            expect(box.left).toBe(10);
+        });
+
+    });
+
     describe('legend.hide', function () {
 
         it('should update args', function () {
