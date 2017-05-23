@@ -141,8 +141,8 @@ c3_chart_internal_fn.initParams = function () {
     $$.defocusedTargetIds = [];
 
     $$.xOrient = config.axis_rotated ? "left" : "bottom";
-    $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
-    $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_inner ? "left" : "right");
+    $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_position === "left" ? (config.axis_y_inner ? "right" : "left") : (config.axis_y_inner ? "left" : "right") );
+    $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_position === "right" ? (config.axis_y2_inner ? "left" : "right") : (config.axis_y2_inner ? "right" : "left"));
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";
 
     $$.isLegendRight = config.legend_position === 'right';
@@ -766,7 +766,7 @@ c3_chart_internal_fn.getTranslate = function (target) {
         x = 0;
         y = config.axis_rotated ? 0 : $$.height;
     } else if (target === 'y') {
-        x = 0;
+        x = config.axis_position === 'left' ? 0 : $$.width;
         y = config.axis_rotated ? $$.height : 0;
     } else if (target === 'y2') {
         x = config.axis_rotated ? 0 : $$.width;

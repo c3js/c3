@@ -146,8 +146,8 @@
         $$.defocusedTargetIds = [];
 
         $$.xOrient = config.axis_rotated ? "left" : "bottom";
-        $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
-        $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_inner ? "left" : "right");
+        $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_position === "left" ? (config.axis_y_inner ? "right" : "left") : (config.axis_y_inner ? "left" : "right") );
+        $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_position === "right" ? (config.axis_y2_inner ? "left" : "right") : (config.axis_y2_inner ? "right" : "left"));
         $$.subXOrient = config.axis_rotated ? "left" : "bottom";
 
         $$.isLegendRight = config.legend_position === 'right';
@@ -771,7 +771,7 @@
             x = 0;
             y = config.axis_rotated ? 0 : $$.height;
         } else if (target === 'y') {
-            x = 0;
+            x = config.axis_position === 'left' ? 0 : $$.width;
             y = config.axis_rotated ? $$.height : 0;
         } else if (target === 'y2') {
             x = config.axis_rotated ? 0 : $$.width;
@@ -1195,6 +1195,7 @@
             axis_y_tick_time_interval: undefined,
             axis_y_padding: {},
             axis_y_default: undefined,
+            axis_y_position: 'left',
             axis_y2_show: false,
             axis_y2_max: undefined,
             axis_y2_min: undefined,
@@ -1208,6 +1209,7 @@
             axis_y2_tick_count: undefined,
             axis_y2_padding: {},
             axis_y2_default: undefined,
+            axis_y2_position: 'right',
             // grid
             grid_x_show: false,
             grid_x_type: 'tick',
@@ -2716,6 +2718,8 @@
             return config.padding_left;
         } else if (config.axis_rotated) {
             return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        } else if (!config.axis_y_show || (config.axis_y_position === "right" && !config.axis_y_inner)) {
+            return ceil10($$.getAxisWidthByAxisId('y')) - 30;
         } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
             return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
         } else {
@@ -2729,10 +2733,12 @@
             return config.padding_right + 1; // 1 is needed not to hide tick line
         } else if (config.axis_rotated) {
             return defaultPadding + legendWidthOnRight;
+        } else if (!config.axis_y_show || (config.axis_y_position === "right" && !config.axis_y_inner)) {
+            return ceil10($$.getAxisWidthByAxisId('y')) + legendWidthOnRight;
         } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
             return 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
         } else {
-            return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
+            return ceil10($$.getAxisWidthByAxisId('y')) + legendWidthOnRight;
         }
     };
 
@@ -4773,7 +4779,7 @@
     };
     c3_chart_internal_fn.getYAxisClipX = function () {
         var $$ = this;
-        return $$.config.axis_y_inner ? -1 : $$.getAxisClipX($$.config.axis_rotated);
+        return $$.config.axis_y_inner || $$.config.axis_y_position === "right" ? -1 : $$.getAxisClipX($$.config.axis_rotated);
     };
     c3_chart_internal_fn.getYAxisClipY = function () {
         var $$ = this;
