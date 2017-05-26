@@ -1,3 +1,6 @@
+import { c3_chart_fn } from './core';
+import { isValue, isDefined } from './util';
+
 c3_chart_fn.axis = function () {};
 c3_chart_fn.axis.labels = function (labels) {
     var $$ = this.internal;

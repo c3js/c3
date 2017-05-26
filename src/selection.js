@@ -1,3 +1,6 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.selectPoint = function (target, d, i) {
     var $$ = this, config = $$.config,
         cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),

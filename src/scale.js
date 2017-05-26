@@ -1,3 +1,5 @@
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.getScale = function (min, max, forTimeseries) {
     return (forTimeseries ? this.d3.time.scale() : this.d3.scale.linear()).range([min, max]);
 };

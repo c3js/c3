@@ -1,3 +1,5 @@
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.getClipPath = function (id) {
     var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
     return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";

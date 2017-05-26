@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.resize = function (size) {
     var $$ = this.internal, config = $$.config;
     config.size_width = size ? size.width : null;

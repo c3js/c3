@@ -1,3 +1,6 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.initEventRect = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")

@@ -1,3 +1,6 @@
+import { c3_chart_fn } from './core';
+import { isDefined } from './util';
+
 c3_chart_fn.zoom = function (domain) {
     var $$ = this.internal;
     if (domain) {

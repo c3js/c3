@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue, isString, sanitise } from './util';
+
 c3_chart_internal_fn.initTooltip = function () {
     var $$ = this, config = $$.config, i;
     $$.tooltip = $$.selectChart

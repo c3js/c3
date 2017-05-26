@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.x = function (x) {
     var $$ = this.internal;
     if (arguments.length) {

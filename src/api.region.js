@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_fn } from './core';
+import { getOption } from './util';
+
 c3_chart_fn.regions = function (regions) {
     var $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }

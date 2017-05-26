@@ -1,4 +1,9 @@
-function Axis(owner) {
+import CLASS from './class';
+import { inherit, API } from './core'
+import { isValue, isFunction, isString, isEmpty } from './util';
+import c3_axis from './c3.axis'
+
+export default function Axis(owner) {
     API.call(this, owner);
 }
 

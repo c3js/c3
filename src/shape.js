@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isUndefined } from './util';
+
 c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
     var $$ = this, config = $$.config,
         indices = {}, i = 0, j, k;

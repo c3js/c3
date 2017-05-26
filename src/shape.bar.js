@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue } from './util';
+
 c3_chart_internal_fn.initBar = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")

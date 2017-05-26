@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isValue, isUndefined, isDefined, notEmpty } from './util';
+
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
     var req = $$.d3.xhr(url);

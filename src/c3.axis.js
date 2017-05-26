@@ -3,7 +3,7 @@
 // 2. ceil values of translate/x/y to int for half pixel antialiasing
 // 3. multiline tick text
 var tickTextCharSize;
-function c3_axis(d3, params) {
+export default function c3_axis(d3, params) {
     var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
     var tickOffset = 0, tickCulling = true, tickCentered;
