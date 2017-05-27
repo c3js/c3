@@ -25,7 +25,7 @@ c3_chart_internal_fn.generateColor = function () {
             color = pattern[ids.indexOf(id) % pattern.length];
             colors[id] = color;
         }
-        return callback instanceof Function ? callback(color, d) : color;
+        return callback instanceof Function ? callback.call($$.api,color, d) : color;
     };
 };
 c3_chart_internal_fn.generateLevelColor = function () {
