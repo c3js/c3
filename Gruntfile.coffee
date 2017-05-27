@@ -8,7 +8,7 @@ module.exports = (grunt) ->
             files: ['src/scss/*.scss']
 
         jshint:
-          c3: 'c3.js'
+          c3: 'src/**/*.js'
           spec: 'spec/*.js'
           options:
             reporter: require('jshint-stylish')

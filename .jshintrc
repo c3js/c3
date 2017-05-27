@@ -8,7 +8,7 @@
     "undef": true,
     "unused": true,
     "indent": 4,
-
+    "esversion": 6,
     "eqnull": true,
     "expr": true,
     "newcap": false,

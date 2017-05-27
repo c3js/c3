@@ -1,4 +1,4 @@
-import { c3 } from './core'
+import { c3 } from './core';
 
 import './polyfill';
 
@@ -55,4 +55,4 @@ import './ua';
 import './util';
 import './zoom';
 
-export default c3
+export default c3;
