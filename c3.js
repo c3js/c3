@@ -1121,6 +1121,7 @@
             data_onclick: function () {},
             data_onmouseover: function () {},
             data_onmouseout: function () {},
+            data_onmousemove: function () { },
             data_onselected: function () {},
             data_onunselected: function () {},
             data_url: undefined,
@@ -2513,6 +2514,11 @@
                     $$.showTooltip(selectedData, this);
                     $$.showXGridFocus(selectedData);
                 }
+
+                // Call event handler
+                $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+                    config.data_onmousemove.call($$.api, d);
+                });
 
                 if (config.tooltip_grouped && (!config.data_selection_enabled || config.data_selection_grouped)) {
                     return;
@@ -5122,6 +5128,7 @@
                     selectedData = [arcData];
                     $$.showTooltip(selectedData, this);
                 }
+                $$.config.data_onmousemove(arcData, this);
             } : null)
             .on('mouseout', config.interaction_enabled ? function (d) {
                 var updated, arcData;
