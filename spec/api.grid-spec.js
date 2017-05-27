@@ -9,7 +9,7 @@ describe('c3 api grid', function () {
 
     describe('ygrid.add and ygrid.remove', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [

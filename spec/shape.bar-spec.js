@@ -12,7 +12,7 @@ describe('c3 chart shape bar', function () {
     describe('with groups', function () {
 
         describe('with indexed data', function () {
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -37,7 +37,7 @@ describe('c3 chart shape bar', function () {
         });
 
         describe('with timeseries data', function () {
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         x: 'date',
@@ -69,7 +69,7 @@ describe('c3 chart shape bar', function () {
         });
 
         describe('with category data', function () {
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         x: 'date',
@@ -106,7 +106,7 @@ describe('c3 chart shape bar', function () {
 
         describe('with normal axis', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -151,7 +151,7 @@ describe('c3 chart shape bar', function () {
 
         describe('with rotated axis', function () {
 
-            it('should change the chart as axis rotated', function () {
+            xit('should change the chart as axis rotated', function () {
                 args.axis.rotated = true;
                 expect(true).toBeTruthy();
             });

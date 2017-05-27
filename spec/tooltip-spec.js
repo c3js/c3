@@ -45,7 +45,7 @@ describe('c3 chart tooltip', function () {
 
         describe('with left margin', function () {
 
-            it('should set left margin', function () {
+            xit('should set left margin', function () {
                 d3.select('#chart').style('margin-left', '300px');
                 expect(true).toBeTruthy();
             });

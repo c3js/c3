@@ -11,7 +11,7 @@ describe('c3 chart types', function () {
 
         describe('with data', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -29,7 +29,7 @@ describe('c3 chart types', function () {
                 expect(chart.internal.hasArcType()).toBeTruthy();
             });
 
-            it('should change chart type to "bar"', function () {
+            xit('should change chart type to "bar"', function () {
                 args.data.type = 'bar';
                 expect(true).toBeTruthy();
             });
@@ -42,7 +42,7 @@ describe('c3 chart types', function () {
 
         describe('with empty data', function () {
 
-            it('should update args to have empty data', function () {
+            xit('should update args to have empty data', function () {
                 args = {
                     data: {
                         columns: [],
@@ -56,7 +56,7 @@ describe('c3 chart types', function () {
                 expect(chart.internal.hasArcType()).toBeTruthy();
             });
 
-            it('should change chart type to "bar"', function () {
+            xit('should change chart type to "bar"', function () {
                 args.data.type = 'bar';
                 expect(true).toBeTruthy();
             });
@@ -71,7 +71,7 @@ describe('c3 chart types', function () {
 
     describe('internal.hasType', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -97,7 +97,7 @@ describe('c3 chart types', function () {
             expect(chart.internal.hasType('bar')).toBeFalsy();
         });
 
-        it('should unload successfully', function () {
+        xit('should unload successfully', function () {
             chart.unload([]);
             expect(true).toBeTruthy();
         });
@@ -114,7 +114,7 @@ describe('c3 chart types', function () {
             expect(chart.internal.hasType('bar')).toBeFalsy();
         });
 
-        it('should change chart type to "bar" successfully', function () {
+        xit('should change chart type to "bar" successfully', function () {
             args.data.type = 'bar';
             expect(true).toBeTruthy();
         });

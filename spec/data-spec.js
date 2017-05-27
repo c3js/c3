@@ -9,7 +9,7 @@ describe('c3 chart data', function () {
 
     describe('load json', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     json: {
@@ -31,7 +31,7 @@ describe('c3 chart data', function () {
             });
         });
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     json: [{
@@ -75,7 +75,7 @@ describe('c3 chart data', function () {
             });
         });
 
-        it('should update nested JSON args', function () {
+        xit('should update nested JSON args', function () {
             args = {
                 data: {
                     json: [{
@@ -166,7 +166,7 @@ describe('c3 chart data', function () {
     });
 
     describe('function in data.order', function () {
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -189,7 +189,7 @@ describe('c3 chart data', function () {
 
     describe('data.xs', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -224,7 +224,7 @@ describe('c3 chart data', function () {
         describe('timeseries x', function () {
             describe('without xFormat', function () {
 
-                it('should load timeseries data successfully', function () {
+                xit('should load timeseries data successfully', function () {
                     args = {
                         data: {
                             x : 'date',
@@ -262,7 +262,7 @@ describe('c3 chart data', function () {
 
             describe('with xFormat', function () {
                 describe('timeseries x with xFormat', function () {
-                    it('should load timeseries data successfully', function () {
+                    xit('should load timeseries data successfully', function () {
                         args = {
                             data: {
                                 x : 'date',
@@ -305,7 +305,7 @@ describe('c3 chart data', function () {
 
             describe('as date string', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             x : 'date',
@@ -354,7 +354,7 @@ describe('c3 chart data', function () {
 
             describe('as unixtime number', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             x : 'date',
@@ -399,7 +399,7 @@ describe('c3 chart data', function () {
 
         describe('on line chart', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -437,7 +437,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            it('should update args to be stacked', function () {
+            xit('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 expect(true).toBeTruthy();
             });
@@ -468,7 +468,7 @@ describe('c3 chart data', function () {
 
         describe('on area chart', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -506,7 +506,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            it('should update args to be stacked', function () {
+            xit('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 expect(true).toBeTruthy();
             });
@@ -537,7 +537,7 @@ describe('c3 chart data', function () {
 
         describe('on bar chart', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -575,7 +575,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            it('should update args to be stacked', function () {
+            xit('should update args to be stacked', function () {
                 args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 expect(true).toBeTruthy();
             });
@@ -606,7 +606,7 @@ describe('c3 chart data', function () {
 
         describe('for all targets', function () {
 
-            it('should update args to show data label for all data', function () {
+            xit('should update args to show data label for all data', function () {
                 args = {
                     data: {
                         columns: [
@@ -638,7 +638,7 @@ describe('c3 chart data', function () {
 
             describe('as true', function () {
 
-                it('should update args to show data label for only data1', function () {
+                xit('should update args to show data label for only data1', function () {
                     args = {
                         data: {
                             columns: [
@@ -671,7 +671,7 @@ describe('c3 chart data', function () {
 
             describe('as function', function () {
 
-                it('should update args to show data label for only data1', function () {
+                xit('should update args to show data label for only data1', function () {
                     args = {
                         data: {
                             columns: [
@@ -706,7 +706,7 @@ describe('c3 chart data', function () {
 
         describe('with small values', function () {
 
-            it('should update args to show data label', function () {
+            xit('should update args to show data label', function () {
                 args = {
                     data: {
                         columns: [
@@ -729,7 +729,7 @@ describe('c3 chart data', function () {
 
             describe('on not rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             columns: [
@@ -766,7 +766,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -792,7 +792,7 @@ describe('c3 chart data', function () {
 
             describe('on rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'bar';
                     args.axis = {
                         rotated: true
@@ -817,7 +817,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -847,7 +847,7 @@ describe('c3 chart data', function () {
 
             describe('on not rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             columns: [
@@ -884,7 +884,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -910,7 +910,7 @@ describe('c3 chart data', function () {
 
             describe('on rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'bar';
                     args.axis = {
                         rotated: true
@@ -935,7 +935,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -965,7 +965,7 @@ describe('c3 chart data', function () {
 
             describe('on non rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             columns: [
@@ -1002,7 +1002,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -1027,7 +1027,7 @@ describe('c3 chart data', function () {
 
             describe('on rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'bar';
                     args.axis = {
                         rotated: true
@@ -1052,7 +1052,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -1081,7 +1081,7 @@ describe('c3 chart data', function () {
 
             describe('on non rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             columns: [
@@ -1114,7 +1114,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -1140,7 +1140,7 @@ describe('c3 chart data', function () {
 
             describe('on rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'bar';
                     args.axis = {
                         rotated: true
@@ -1165,7 +1165,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -1194,7 +1194,7 @@ describe('c3 chart data', function () {
 
             describe('on non rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args = {
                         data: {
                             columns: [
@@ -1227,7 +1227,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });
@@ -1253,7 +1253,7 @@ describe('c3 chart data', function () {
 
             describe('on rotated axis', function () {
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'bar';
                     args.axis = {
                         rotated: true
@@ -1278,7 +1278,7 @@ describe('c3 chart data', function () {
                     });
                 });
 
-                it('should update args', function () {
+                xit('should update args', function () {
                     args.data.type = 'line';
                     expect(true).toBeTruthy();
                 });

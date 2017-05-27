@@ -27,7 +27,7 @@ describe('c3 chart', function () {
             expect(svg).not.toBeNull();
         });
 
-        it('should set 3rd party property to Function', function () {
+        xit('should set 3rd party property to Function', function () {
             Function.prototype.$extIsFunction = true;
             expect(true).toBeTruthy();
         });
@@ -61,7 +61,7 @@ describe('c3 chart', function () {
     describe('bindto', function () {
 
         describe('selector', function () {
-            it('update args', function () {
+            xit('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = '#chart';
                 expect(true).toBeTruthy();
@@ -73,7 +73,7 @@ describe('c3 chart', function () {
         });
 
         describe('d3.selection object', function () {
-            it('update args', function () {
+            xit('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = d3.select('#chart');
                 expect(true).toBeTruthy();
@@ -85,7 +85,7 @@ describe('c3 chart', function () {
         });
 
         describe('null', function () {
-            it('update args', function () {
+            xit('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = null;
                 expect(true).toBeTruthy();
@@ -97,7 +97,7 @@ describe('c3 chart', function () {
         });
 
         describe('empty string', function () {
-            it('update args', function () {
+            xit('update args', function () {
                 d3.select('#chart').html('');
                 args.bindto = '';
                 expect(true).toBeTruthy();
@@ -112,7 +112,7 @@ describe('c3 chart', function () {
 
     describe('empty data', function () {
 
-        it('should upaate args for empty data', function () {
+        xit('should upaate args for empty data', function () {
             args = {
                 data: {
                     columns: [
@@ -129,7 +129,7 @@ describe('c3 chart', function () {
             expect(ticks.size()).toBe(0);
         });
 
-        it('should upaate args for empty data', function () {
+        xit('should upaate args for empty data', function () {
             args = {
                 data: {
                     x: 'x',

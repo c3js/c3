@@ -9,7 +9,7 @@ describe('c3 api region', function () {
 
     describe('api.region', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -84,7 +84,7 @@ describe('c3 api region', function () {
 
     describe('api.region.add', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -175,7 +175,7 @@ describe('c3 api region', function () {
 
     describe('api.region.remove', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [

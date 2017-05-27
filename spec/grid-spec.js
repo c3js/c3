@@ -9,7 +9,7 @@ describe('c3 chart grid', function () {
 
     describe('y grid show', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -35,7 +35,7 @@ describe('c3 chart grid', function () {
             expect(chart.internal.main.select('.c3-ygrids').size()).toBe(0);
         });
 
-        it('should update args to show y grids', function () {
+        xit('should update args to show y grids', function () {
             args.grid.y.show = true;
             expect(true).toBeTruthy();
         });
@@ -46,7 +46,7 @@ describe('c3 chart grid', function () {
             expect(ygrids.selectAll('.c3-ygrid').size()).toBe(9);
         });
 
-        it('should update args to show only 3 y grids', function () {
+        xit('should update args to show only 3 y grids', function () {
             args.grid.y.ticks = 3;
             expect(true).toBeTruthy();
         });
@@ -57,7 +57,7 @@ describe('c3 chart grid', function () {
             expect(ygrids.selectAll('.c3-ygrid').size()).toBe(3);
         });
 
-        it('should update args to show y grids depending on y axis ticks', function () {
+        xit('should update args to show y grids depending on y axis ticks', function () {
             args.axis.y.tick.count = 5;
             expect(true).toBeTruthy();
         });
@@ -81,7 +81,7 @@ describe('c3 chart grid', function () {
 
         describe('position', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -127,7 +127,7 @@ describe('c3 chart grid', function () {
                 });
             });
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -183,7 +183,7 @@ describe('c3 chart grid', function () {
 
         describe('position', function () {
 
-            it('should have correct height', function () {
+            xit('should have correct height', function () {
                 args = {
                     data: {
                         columns: [
@@ -229,7 +229,7 @@ describe('c3 chart grid', function () {
                 });
             });
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -282,7 +282,7 @@ describe('c3 chart grid', function () {
 
         describe('with padding.top', function () {
 
-            it('should have correct height', function () {
+            xit('should have correct height', function () {
                 args = {
                     data: {
                         columns: [
@@ -320,7 +320,7 @@ describe('c3 chart grid', function () {
 
         describe('on category axis', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         x: 'x',
