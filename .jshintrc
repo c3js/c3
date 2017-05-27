@@ -16,18 +16,9 @@
     "bitwise": false,
 
     "browser": true,
+    "jasmine": true,
 
     "globals": {
-        "jasmine": false,
-        "describe": false,
-        "beforeEach": false,
-        "beforeAll": false,
-        "it": false,
-        "expect": false,
-        "d3": false,
-        "module": false,
-        "require": false,
-        "define": false
+        "d3": false
     }
-
 }
