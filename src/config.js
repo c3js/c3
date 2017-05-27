@@ -222,6 +222,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         tooltip_onhide: function () {},
         // title
         title_text: undefined,
+        title_author: undefined,
+        title_source: undefined,
+        title_spacing: 5,
         title_padding: {
             top: 0,
             right: 0,
