@@ -4,7 +4,7 @@
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
-    "prepublish": "grunt",
+    "prepublish": "npm run dist",
     "lint": "grunt lint",
     "build": "rollup -f umd --name c3 src/index.js > c3.js",
     "minify": "grunt minify",
