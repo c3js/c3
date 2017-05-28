@@ -13,12 +13,18 @@ export default function c3_axis(d3, params) {
 
     function axisX(selection, x) {
         selection.attr("transform", function (d) {
-            return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+            var translateValue = Math.ceil(x(d) + tickOffset);
+            return isNaN(translateValue) ?
+                "translate(0, 0)" :
+                "translate(" + translateValue + ", 0)";
         });
     }
     function axisY(selection, y) {
         selection.attr("transform", function (d) {
-            return "translate(0," + Math.ceil(y(d)) + ")";
+            var translateValue = Math.ceil(y(d));
+            return isNaN(translateValue) ?
+                "translate(0, 0)" :
+                "translate(0, " + translateValue + ")";
         });
     }
     function scaleExtent(domain) {

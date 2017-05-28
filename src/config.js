@@ -220,6 +220,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         tooltip_init_position: {top: '0px', left: '50px'},
         tooltip_onshow: function () {},
         tooltip_onhide: function () {},
+        tooltip_total_show: false,
+        tooltip_total_name: undefined,
+        tooltip_total_format_value: undefined,
         // title
         title_text: undefined,
         title_padding: {
