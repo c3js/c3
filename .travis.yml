@@ -1,10 +1,7 @@
+sudo: false
 language: node_js
 node_js:
 - 6
-
-before_install:
-- npm install -g grunt-cli
-- gem install sass
 
 after_success:
 - npm run codecov
