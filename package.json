@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "npm run dist",
     "lint": "grunt lint",
-    "build": "rollup -f umd --name c3 src/index.js > c3.js",
+    "build": "rollup -f umd --name c3 --globals d3:d3 src/index.js > c3.js",
     "minify": "grunt minify",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
     "dist": "npm run build && npm run minify",
