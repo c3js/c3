@@ -170,6 +170,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         bar_width_ratio: 0.6,
         bar_width_max: undefined,
         bar_zerobased: true,
+        bar_space: 0,
         // area
         area_zerobased: true,
         area_above: false,
