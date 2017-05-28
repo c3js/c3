@@ -9,7 +9,7 @@ describe('c3 api grid', function () {
 
     describe('ygrid.add and ygrid.remove', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -17,7 +17,6 @@ describe('c3 api grid', function () {
                     ]
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should update y grids', function (done) {

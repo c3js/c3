@@ -9,7 +9,7 @@ describe('c3 api axis', function () {
 
     describe('axis.labels', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -31,7 +31,6 @@ describe('c3 api axis', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should update y axis label', function () {
