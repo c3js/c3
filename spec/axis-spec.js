@@ -33,7 +33,7 @@ describe('c3 chart axis', function () {
 
     describe('axis.y.tick.count', function () {
 
-        it('should update args to have only 1 tick on y axis', function () {
+        xit('should update args to have only 1 tick on y axis', function () {
             args.axis.y.tick.count = 1;
             expect(true).toBeTruthy();
         });
@@ -43,7 +43,7 @@ describe('c3 chart axis', function () {
             expect(ticksSize).toBe(1);
         });
 
-        it('should update args to have 2 ticks on y axis', function () {
+        xit('should update args to have 2 ticks on y axis', function () {
             args.axis.y.tick.count = 2;
             expect(true).toBeTruthy();
         });
@@ -53,7 +53,7 @@ describe('c3 chart axis', function () {
             expect(ticksSize).toBe(2);
         });
 
-        it('should update args to have 3 ticks on y axis', function () {
+        xit('should update args to have 3 ticks on y axis', function () {
             args.axis.y.tick.count = 3;
             expect(true).toBeTruthy();
         });
@@ -69,7 +69,7 @@ describe('c3 chart axis', function () {
 
         var values = [100, 500];
 
-        it('should update args to have only 2 ticks on y axis', function () {
+        xit('should update args to have only 2 ticks on y axis', function () {
             args.axis.y.tick.values = values;
             expect(true).toBeTruthy();
         });
@@ -90,7 +90,7 @@ describe('c3 chart axis', function () {
 
     describe('axis y timeseries', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -126,7 +126,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to set axis.y.time', function () {
+        xit('should update args to set axis.y.time', function () {
             args.axis.y.tick.time = {
                 value : 'seconds',
                 interval : 60
@@ -185,7 +185,7 @@ describe('c3 chart axis', function () {
 
             describe('not rotated', function () {
 
-                it('should update args successfully', function () {
+                xit('should update args successfully', function () {
                     args = {
                         data: {
                             columns: [
@@ -222,7 +222,7 @@ describe('c3 chart axis', function () {
                     });
                 });
 
-                it('should set axis.x.tick.format', function () {
+                xit('should set axis.x.tick.format', function () {
                     args.axis.x = {
                         tick: {
                             format: function () {
@@ -288,7 +288,7 @@ describe('c3 chart axis', function () {
                     });
                 });
 
-                it('should set big values in y', function () {
+                xit('should set big values in y', function () {
                     args.data.columns = [
                         ['data1', 3000000000000000, 200, 100, 400, 150, 250],
                         ['data2', 50, 20, 10, 40, 15, 25]
@@ -308,7 +308,7 @@ describe('c3 chart axis', function () {
 
             describe('rotated', function () {
 
-                it('should update args to rotate axis', function () {
+                xit('should update args to rotate axis', function () {
                     args.axis.rotated = true;
                     expect(true).toBeTruthy();
                 });
@@ -367,7 +367,7 @@ describe('c3 chart axis', function () {
 
             describe('not rotated', function () {
 
-                it('should update args successfully', function () {
+                xit('should update args successfully', function () {
                     args = {
                         data: {
                             x: 'x',
@@ -429,7 +429,7 @@ describe('c3 chart axis', function () {
 
             describe('rotated', function () {
 
-                it('should update args to rotate axis', function () {
+                xit('should update args to rotate axis', function () {
                     args.axis.rotated = true;
                     expect(true).toBeTruthy();
                 });
@@ -480,7 +480,7 @@ describe('c3 chart axis', function () {
 
                 describe('as null', function () {
 
-                    it('should update args not to split ticks', function () {
+                    xit('should update args not to split ticks', function () {
                         args.axis.x.tick = {
                             multiline: false
                         };
@@ -497,7 +497,7 @@ describe('c3 chart axis', function () {
 
                 describe('as value', function () {
 
-                    it('should update args not to split ticks', function () {
+                    xit('should update args not to split ticks', function () {
                         args.axis.x.tick = {
                             width: 150
                         };
@@ -531,7 +531,7 @@ describe('c3 chart axis', function () {
 
         describe('with axis.x.tick.format', function () {
 
-            it('should update args to use axis.x.tick.format', function () {
+            xit('should update args to use axis.x.tick.format', function () {
                 args.axis.x.tick.format = function () {
                     return ['this is a very long tick text', 'on category axis'];
                 };
@@ -556,7 +556,7 @@ describe('c3 chart axis', function () {
 
         describe('not rotated', function () {
 
-            it('should update args successfully', function () {
+            xit('should update args successfully', function () {
                 args = {
                     data: {
                         x: 'x',
@@ -603,7 +603,7 @@ describe('c3 chart axis', function () {
 
         describe('not rotated', function () {
 
-            it('should update args successfully', function () {
+            xit('should update args successfully', function () {
                 args = {
                     data: {
                         columns: [
@@ -646,7 +646,7 @@ describe('c3 chart axis', function () {
 
         describe('axis.x.tick.fit = true', function () {
 
-            it('should set args for indexed data', function () {
+            xit('should set args for indexed data', function () {
                 args = {
                     data: {
                         columns: [
@@ -664,7 +664,7 @@ describe('c3 chart axis', function () {
                 expect(ticks.size()).toBe(6);
             });
 
-            it('should set args for x-based data', function () {
+            xit('should set args for x-based data', function () {
                 args = {
                     data: {
                         x: 'x',
@@ -695,7 +695,7 @@ describe('c3 chart axis', function () {
 
         describe('axis.x.tick.fit = false', function () {
 
-            it('should set args for indexed data', function () {
+            xit('should set args for indexed data', function () {
                 args = {
                     data: {
                         columns: [
@@ -720,7 +720,7 @@ describe('c3 chart axis', function () {
                 expect(ticks.size()).toBe(11);
             });
 
-            it('should set args for x-based data', function () {
+            xit('should set args for x-based data', function () {
                 args.data = {
                     x: 'x',
                     columns: [
@@ -750,7 +750,7 @@ describe('c3 chart axis', function () {
 
     describe('axis.y.inner', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -776,7 +776,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to have inner y axis', function () {
+        xit('should update args to have inner y axis', function () {
             args.axis.y.inner = true;
             expect(true).toBeTruthy();
         });
@@ -794,7 +794,7 @@ describe('c3 chart axis', function () {
 
     describe('axis.y2.inner', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -821,7 +821,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to have inner y axis', function () {
+        xit('should update args to have inner y axis', function () {
             args.axis.y2.inner = true;
             expect(true).toBeTruthy();
         });

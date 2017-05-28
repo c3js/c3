@@ -1,4 +1,4 @@
-import CLASS from './class'
+import CLASS from './class';
 import { c3_chart_internal_fn } from './core';
 
 c3_chart_internal_fn.generateClass = function (prefix, targetId) {

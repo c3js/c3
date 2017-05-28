@@ -11,7 +11,7 @@ describe('c3 chart interaction', function () {
 
         describe('custom x', function () {
 
-            it('should generate bar chart', function () {
+            xit('should generate bar chart', function () {
                 args = {
                     data: {
                         x: 'x',
@@ -35,7 +35,7 @@ describe('c3 chart interaction', function () {
                 });
             });
 
-            it('should generate bar chart with only one data', function () {
+            xit('should generate bar chart with only one data', function () {
                 args = {
                     data: {
                         x: 'x',
@@ -62,7 +62,7 @@ describe('c3 chart interaction', function () {
 
         describe('timeseries', function () {
 
-            it('should generate line chart with timeseries', function () {
+            xit('should generate line chart with timeseries', function () {
                 args = {
                     data: {
                         x: 'x',
@@ -86,7 +86,7 @@ describe('c3 chart interaction', function () {
 
             });
 
-            it('should generate line chart with only 1 data timeseries', function () {
+            xit('should generate line chart with only 1 data timeseries', function () {
                 args = {
                     data: {
                         x: 'x',

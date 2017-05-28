@@ -9,7 +9,7 @@ describe('c3 api zoom', function () {
 
     describe('zoom', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -41,7 +41,7 @@ describe('c3 api zoom', function () {
             expect(domain[1]).toBe(target[1]);
         });
 
-        it('should load timeseries data', function () {
+        xit('should load timeseries data', function () {
             args = {
                 data: {
                     x: 'date',
@@ -82,7 +82,7 @@ describe('c3 api zoom', function () {
 
     describe('unzoom', function () {
 
-        it('should load indexed data', function () {
+        xit('should load indexed data', function () {
             args = {
                 data: {
                     columns: [

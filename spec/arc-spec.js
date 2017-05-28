@@ -9,7 +9,7 @@ describe('c3 chart arc', function () {
 
     describe('show pie chart', function () {
 
-        it('should update args to have pie chart', function () {
+        xit('should update args to have pie chart', function () {
             args = {
                 data: {
                     columns: [
@@ -47,7 +47,7 @@ describe('c3 chart arc', function () {
             expect(d3.select('.c3-arc-data3').attr('d')).toMatch(/M1\..+,211\..+A211\..+,211\..+ 0 0,1 -124\..+,-171\..+L0,0Z/);
         });
 
-        it('should set args with data id that can be converted to a color', function () {
+        xit('should set args with data id that can be converted to a color', function () {
             args.data.columns = [
                 ['black', 30],
                 ['data2', 150],
@@ -63,7 +63,7 @@ describe('c3 chart arc', function () {
             }, 500);
         });
 
-        it('should update args to have empty pie chart', function () {
+        xit('should update args to have empty pie chart', function () {
             args = {
                 data: {
                     columns: [
@@ -99,7 +99,7 @@ describe('c3 chart arc', function () {
 
     describe('show gauge', function () {
 
-        it('should update args to have a 180 degree gauge', function () {
+        xit('should update args to have a 180 degree gauge', function () {
             args = {
                 gauge: {
                     width: 10,
@@ -125,7 +125,7 @@ describe('c3 chart arc', function () {
             expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304 0 0,1 245\..+,-178\..+L237\..+,-172\..+A294,294 0 0,0 -294,-3\..+Z/);
         });
 
-        it('should update args to have a 2 Pi radian gauge that starts at Pi/2', function() {
+        xit('should update args to have a 2 Pi radian gauge that starts at Pi/2', function() {
             args = {
                 gauge: {
                     width: 10,
@@ -155,7 +155,7 @@ describe('c3 chart arc', function () {
             expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*? 0 1,1 -68.*?,210.*?L-65.*?,201.*?A211.*?,211.*? 0 1,0 -211.*?,-2.*?Z/);
         });
 
-        it('should update labels use custom text', function() {
+        xit('should update labels use custom text', function() {
             args = {
                 gauge: {
                     width: 10,

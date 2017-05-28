@@ -9,7 +9,7 @@ describe('c3 api axis', function () {
 
     describe('axis.labels', function () {
 
-        it('should update args', function () {
+        xit('should update args', function () {
             args = {
                 data: {
                     columns: [
@@ -49,6 +49,5 @@ describe('c3 api axis', function () {
             expect(label.attr('dx')).toBe('-0.5em');
             expect(label.attr('dy')).toBe('-0.5em');
         });
-
     });
 });

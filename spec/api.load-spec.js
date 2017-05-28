@@ -11,7 +11,7 @@ describe('c3 api load', function () {
 
         describe('as column', function () {
 
-            it('should update args', function () {
+            xit('should update args', function () {
                 args = {
                     data: {
                         columns: [
@@ -46,7 +46,7 @@ describe('c3 api load', function () {
 
     describe('category data', function () {
 
-        it('should update arg to category data', function () {
+        xit('should update arg to category data', function () {
             args = {
                 data: {
                     x: 'x',
