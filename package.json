@@ -4,6 +4,7 @@
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
+    "serve": "static -p 8080 htdocs/",
     "prepublish": "npm run dist",
     "lint": "grunt lint",
     "build": "rollup -f umd --name c3 src/index.js > c3.js",
@@ -32,12 +33,10 @@
     "codecov.io": "^0.1.6",
     "grunt": "^0.4.5",
     "grunt-cli": "^1.2.0",
-    "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-cssmin": "^0.10.0",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-karma": "^0.12.1",
     "grunt-sass": "^2.0.0",
     "jasmine-core": "^2.3.4",
     "jshint-stylish": "^2.1.0",
@@ -47,6 +46,7 @@
     "karma-phantomjs-launcher": "^0.2.1",
     "karma-spec-reporter": "0.0.20",
     "load-grunt-tasks": "~0.2.0",
+    "node-static": "^0.7.9",
     "phantomjs": "^1.9.18",
     "rollup": "^0.41.6"
   }
