@@ -27,7 +27,11 @@
     "chart",
     "graph"
   ],
-  "author": "Masayuki Tanaka",
+  "authors": [
+    "Masayuki Tanaka",
+    "Ændrew Rininsland",
+    "Yoshiya Hinosawa"
+  ],
   "license": "MIT",
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
@@ -40,14 +44,16 @@
     "jasmine-core": "^2.3.4",
     "jshint": "^2.9.4",
     "jshint-stylish": "^2.1.0",
-    "karma": "^0.13.10",
-    "karma-coverage": "^0.5.2",
-    "karma-jasmine": "^0.3.6",
-    "karma-phantomjs-launcher": "^0.2.1",
-    "karma-spec-reporter": "0.0.20",
+    "karma": "^1.7.0",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-rollup-preprocessor": "^4.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-spec-reporter": "0.0.31",
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
-    "phantomjs": "^1.9.18",
+    "phantomjs": "^2.1.7",
     "rollup": "^0.41.6",
     "uglify-js": "^3.0.15"
   }

@@ -31,7 +31,14 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'c3.js': ['coverage']
+      'src/**/*.js': ['rollup', 'sourcemap', 'coverage'],
+    //   'spec/**/*.js': ['rollup']
+    },
+
+    rollupPreprocessor: {
+        format: 'iife',               // Helps prevent naming collisions.
+        moduleName: 'c3', // Required for 'iife' format.
+        sourceMap: 'inline',          // Sensible for testing.
     },
 
 
