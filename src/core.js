@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import Axis from './axis';
 import CLASS from './class';
 import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
@@ -7,8 +8,6 @@ export var c3 = { version: "0.4.11" };
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
 export var c3_chart_internal_axis_fn;
-
-var d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
 
 export function API(owner) {
     this.owner = owner;
@@ -50,7 +49,7 @@ function Chart(config) {
 
 function ChartInternal(api) {
     var $$ = this;
-    $$.d3 = d3
+    $$.d3 = d3;
     $$.api = api;
     $$.config = $$.getDefaultConfig();
     $$.data = {};
@@ -1084,4 +1083,3 @@ c3_chart_internal_fn.hasValue = hasValue;
 c3_chart_internal_fn.sanitise = sanitise;
 c3_chart_internal_fn.getPathBox = getPathBox;
 c3_chart_internal_fn.CLASS = CLASS;
-
