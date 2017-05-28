@@ -2,7 +2,7 @@ import Axis from './axis';
 import CLASS from './class';
 import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
 
-export var c3 = { version: "0.4.11" };
+export var c3 = { version: "0.4.12" };
 
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
@@ -1042,6 +1042,8 @@ c3_chart_internal_fn.parseDate = function (date) {
         parsedDate = date;
     } else if (typeof date === 'string') {
         parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
+    } else if (typeof date === 'object') {
+        parsedDate = new Date(+date);
     } else if (typeof date === 'number' && !isNaN(date)) {
         parsedDate = new Date(+date);
     }
