@@ -46,7 +46,7 @@ describe('c3 chart arc', function () {
             expect(d3.select('.c3-arc-data3').attr('d')).toMatch(/M1\..+,211\..+A211\..+,211\..+ 0 0,1 -124\..+,-171\..+L0,0Z/);
         });
 
-        describe('should set args with data id that can be converted to a color', function () {
+        describe('with data id that can be converted to a color', function () {
             beforeAll(function(){
                 args.data.columns = [
                     ['black', 30],
@@ -62,7 +62,7 @@ describe('c3 chart arc', function () {
                 }, 500);
             });
 
-            describe('should update args to have empty pie chart', function(){
+            describe('with empty pie chart', function(){
                 beforeAll(function () {
                     args = {
                         data: {
@@ -99,7 +99,7 @@ describe('c3 chart arc', function () {
 
     describe('show gauge', function () {
 
-        describe('should update args to have a 180 degree gauge', function(){
+        describe('with a 180 degree gauge', function(){
             beforeAll(function () {
                 args = {
                     gauge: {
@@ -126,7 +126,7 @@ describe('c3 chart arc', function () {
             });
         });
 
-        describe('should update args to have a 2 Pi radian gauge that starts at Pi/2', function() {
+        describe('with a 2 Pi radian gauge that starts at Pi/2', function() {
             beforeAll(function(){
                 args = {
                     gauge: {
@@ -156,7 +156,7 @@ describe('c3 chart arc', function () {
                 expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*? 0 1,1 -68.*?,210.*?L-65.*?,201.*?A211.*?,211.*? 0 1,0 -211.*?,-2.*?Z/);
             });
 
-            describe('should update labels use custom text', function() {
+            describe('with labels use custom text', function() {
                 beforeAll(function(){
                     args = {
                         gauge: {

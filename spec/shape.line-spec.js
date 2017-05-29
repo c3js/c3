@@ -151,7 +151,7 @@ describe('c3 chart shape line', function () {
             };
         });
 
-        it('should update interpolation function', function() {
+        it('with interpolation function', function() {
             expect(chart.internal.getInterpolate(chart.data()[0])).toBe('monotone');
         });
 

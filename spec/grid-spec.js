@@ -34,7 +34,7 @@ describe('c3 chart grid', function () {
             expect(chart.internal.main.select('.c3-ygrids').size()).toBe(0);
         });
 
-        describe('should update args to show y grids', function () {
+        describe('with y grids', function () {
             beforeAll(function(){
                 args.grid.y.show = true;
             });
@@ -46,7 +46,7 @@ describe('c3 chart grid', function () {
             });
         });
 
-        describe('should update args to show only 3 y grids', function () {
+        describe('with only 3 y grids', function () {
             beforeAll(function(){
                 args.grid.y.ticks = 3;
             });
@@ -58,7 +58,7 @@ describe('c3 chart grid', function () {
             });
         });
 
-        describe('should update args to show y grids depending on y axis ticks', function () {
+        describe('with y grids depending on y axis ticks', function () {
             beforeAll(function(){
                 args.axis.y.tick.count = 5;
             });

@@ -40,7 +40,7 @@ describe('c3 api zoom', function () {
             expect(domain[1]).toBe(target[1]);
         });
 
-        describe('should load timeseries data', function () {
+        describe('with timeseries data', function () {
             beforeAll(function(){
                 args = {
                     data: {

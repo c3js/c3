@@ -33,7 +33,7 @@ describe('c3 api axis', function () {
             };
         });
 
-        it('should update y axis label', function () {
+        it('with y axis label', function () {
             chart.axis.labels({y: 'New Y Axis Label'});
             var label = d3.select('.c3-axis-y-label');
             expect(label.text()).toBe('New Y Axis Label');
@@ -41,7 +41,7 @@ describe('c3 api axis', function () {
             expect(label.attr('dy')).toBe('1.2em');
         });
 
-        it('should update y axis label', function () {
+        it('with y axis label', function () {
             chart.axis.labels({y2: 'New Y2 Axis Label'});
             var label = d3.select('.c3-axis-y2-label');
             expect(label.text()).toBe('New Y2 Axis Label');

@@ -33,7 +33,7 @@ describe('c3 api region', function () {
             };
         });
 
-        it('should update regions', function (done) {
+        it('with regions', function (done) {
             var main = chart.internal.main,
                 expectedRegions = [
                     {

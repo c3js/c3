@@ -33,7 +33,7 @@ describe('c3 chart axis', function () {
 
     describe('axis.y.tick.count', function () {
 
-        describe('should update args to have only 1 tick on y axis', function () {
+        describe('with only 1 tick on y axis', function () {
             beforeAll(function(){
                 args.axis.y.tick.count = 1;
             });
@@ -44,7 +44,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        describe('should update args to have 2 ticks on y axis', function () {
+        describe('with 2 ticks on y axis', function () {
             beforeAll(function(){
                 args.axis.y.tick.count = 2;
             });
@@ -55,7 +55,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        describe('should update args to have 3 ticks on y axis', function () {
+        describe('with 3 ticks on y axis', function () {
             beforeAll(function(){
                 args.axis.y.tick.count = 3;
             });
@@ -71,7 +71,7 @@ describe('c3 chart axis', function () {
 
         var values = [100, 500];
 
-        describe('should update args to have only 2 ticks on y axis', function () {
+        describe('with only 2 ticks on y axis', function () {
             beforeAll(function(){
                 args.axis.y.tick.values = values;
             });
@@ -126,7 +126,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        describe('should update args to set axis.y.time', function () {
+        describe('with axis.y.time', function () {
             beforeAll(function(){
                 args.axis.y.tick.time = {
                     value : 'seconds',
@@ -478,7 +478,7 @@ describe('c3 chart axis', function () {
 
                 describe('as null', function () {
 
-                    beforeAll(function () { //'should update args not to split ticks',
+                    beforeAll(function () { //'without split ticks',
                         args.axis.x.tick = {
                             multiline: false
                         };
@@ -494,7 +494,7 @@ describe('c3 chart axis', function () {
 
                 describe('as value', function () {
 
-                    beforeAll(function () { // 'should update args not to split ticks',
+                    beforeAll(function () { // 'without split ticks',
                         args.axis.x.tick = {
                             width: 150
                         };
@@ -527,7 +527,7 @@ describe('c3 chart axis', function () {
 
         describe('with axis.x.tick.format', function () {
 
-            beforeAll(function () { // 'should update args to use axis.x.tick.format',
+            beforeAll(function () { // 'with axis.x.tick.format',
                 args.axis.x.tick.format = function () {
                     return ['this is a very long tick text', 'on category axis'];
                 };
@@ -769,7 +769,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        describe('should update args to have inner y axis', function () {
+        describe('with inner y axis', function () {
             beforeAll(function(){
                 args.axis.y.inner = true;
             });
@@ -813,7 +813,7 @@ describe('c3 chart axis', function () {
             });
         });
 
-        describe('should update args to have inner y axis', function () {
+        describe('with inner y axis', function () {
             beforeAll(function(){
                 args.axis.y2.inner = true;
             });

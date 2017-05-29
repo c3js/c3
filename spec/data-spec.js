@@ -75,7 +75,7 @@ describe('c3 chart data', function () {
             });
         });
 
-        describe('should update nested JSON args', function () {
+        describe('with nested JSON args', function () {
             beforeAll(function(){
                 args = {
                     data: {
@@ -429,7 +429,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            describe('should update args to be stacked', function () {
+            describe('with stacked', function () {
                 beforeAll(function(){
                     args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 });
@@ -497,7 +497,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            describe('should update args to be stacked', function () {
+            describe('with stacked', function () {
                 beforeAll(function(){
                     args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 });
@@ -566,7 +566,7 @@ describe('c3 chart data', function () {
                 });
             });
 
-            describe('should update args to be stacked', function () {
+            describe('with stacked', function () {
                 beforeAll(function(){
                     args.data.groups = [['data1', 'data2'], ['data3', 'data4']];
                 });
@@ -597,7 +597,7 @@ describe('c3 chart data', function () {
 
         describe('for all targets', function () {
 
-            describe('should update args to show data label for all data', function () {
+            describe('with data label for all data', function () {
                 beforeAll(function(){
                     args = {
                         data: {
@@ -629,7 +629,7 @@ describe('c3 chart data', function () {
 
             describe('as true', function () {
 
-                describe('should update args to show data label for only data1', function () {
+                describe('with data label for only data1', function () {
                     beforeAll(function(){
                         args = {
                             data: {
@@ -663,7 +663,7 @@ describe('c3 chart data', function () {
 
             describe('as function', function () {
 
-                describe('should update args to show data label for only data1', function () {
+                describe('with data label for only data1', function () {
                     beforeAll(function(){
                         args = {
                             data: {
@@ -699,7 +699,7 @@ describe('c3 chart data', function () {
 
         describe('with small values', function () {
 
-            describe('should update args to show data label', function () {
+            describe('with data label', function () {
                 beforeAll(function(){
                     args = {
                         data: {

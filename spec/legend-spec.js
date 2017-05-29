@@ -120,7 +120,7 @@ describe('c3 chart legend', function () {
             });
         });
 
-        describe('should update args to have only one series', function () {
+        describe('with only one series', function () {
             beforeAll(function(){
                 args = {
                     data: {
