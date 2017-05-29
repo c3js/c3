@@ -19,7 +19,7 @@ describe('c3 api grid', function () {
             };
         });
 
-        it('with y grids', function (done) {
+        it('updates y grids', function (done) {
             var main = chart.internal.main,
                 expectedGrids = [
                     {
@@ -61,7 +61,7 @@ describe('c3 api grid', function () {
             }, 1200);
         });
 
-        it("with x ygrids even if it's zoomed", function (done) {
+        it('updates x ygrids even if zoomed', function (done) {
             var main = chart.internal.main,
                 expectedGrids = [
                     {
