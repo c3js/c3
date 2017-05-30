@@ -11,7 +11,7 @@ describe('c3 chart types', function () {
 
         describe('with data', function () {
 
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         columns: [
@@ -22,47 +22,47 @@ describe('c3 chart types', function () {
                         type: 'pie'
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should return true', function () {
                 expect(chart.internal.hasArcType()).toBeTruthy();
             });
 
-            it('should change chart type to "bar"', function () {
-                args.data.type = 'bar';
-                expect(true).toBeTruthy();
-            });
+            describe('should change chart type to "bar"', function () {
+                beforeAll(function(){
+                    args.data.type = 'bar';
+                });
 
-            it('should return false', function () {
-                expect(chart.internal.hasArcType()).toBeFalsy();
+                it('should return false', function () {
+                    expect(chart.internal.hasArcType()).toBeFalsy();
+                });
             });
 
         });
 
         describe('with empty data', function () {
 
-            it('should update args to have empty data', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         columns: [],
                         type: 'pie'
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should return true', function () {
                 expect(chart.internal.hasArcType()).toBeTruthy();
             });
 
-            it('should change chart type to "bar"', function () {
-                args.data.type = 'bar';
-                expect(true).toBeTruthy();
-            });
+            describe('should change chart type to "bar"', function () {
+                beforeAll(function(){
+                    args.data.type = 'bar';
+                });
 
-            it('should return false', function () {
-                expect(chart.internal.hasArcType()).toBeFalsy();
+                it('should return false', function () {
+                    expect(chart.internal.hasArcType()).toBeFalsy();
+                });
             });
 
         });
@@ -71,7 +71,7 @@ describe('c3 chart types', function () {
 
     describe('internal.hasType', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -82,7 +82,6 @@ describe('c3 chart types', function () {
                     type: 'pie'
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should return true for "pie" type', function () {
@@ -97,40 +96,41 @@ describe('c3 chart types', function () {
             expect(chart.internal.hasType('bar')).toBeFalsy();
         });
 
-        it('should unload successfully', function () {
-            chart.unload([]);
-            expect(true).toBeTruthy();
-        });
+        describe('should unload successfully', function () {
+            beforeAll(function(){
+                chart.unload([]);
+            });
 
-        it('should return true for "pie" type even if no data', function () {
-            expect(chart.internal.hasType('pie')).toBeTruthy();
-        });
+            it('should return true for "pie" type even if no data', function () {
+                expect(chart.internal.hasType('pie')).toBeTruthy();
+            });
 
-        it('should return false for "line" type even if no data', function () {
-            expect(chart.internal.hasType('line')).toBeFalsy();
-        });
+            it('should return false for "line" type even if no data', function () {
+                expect(chart.internal.hasType('line')).toBeFalsy();
+            });
 
-        it('should return false for "bar" type even if no data', function () {
-            expect(chart.internal.hasType('bar')).toBeFalsy();
-        });
+            it('should return false for "bar" type even if no data', function () {
+                expect(chart.internal.hasType('bar')).toBeFalsy();
+            });
 
-        it('should change chart type to "bar" successfully', function () {
-            args.data.type = 'bar';
-            expect(true).toBeTruthy();
-        });
+            describe('should change chart type to "bar" successfully', function () {
+                beforeAll(function(){
+                    args.data.type = 'bar';
+                });
 
-        it('should return false for "pie" type even if no data', function () {
-            expect(chart.internal.hasType('pie')).toBeFalsy();
-        });
+                it('should return false for "pie" type even if no data', function () {
+                    expect(chart.internal.hasType('pie')).toBeFalsy();
+                });
 
-        it('should return false for "line" type even if no data', function () {
-            expect(chart.internal.hasType('line')).toBeFalsy();
-        });
+                it('should return false for "line" type even if no data', function () {
+                    expect(chart.internal.hasType('line')).toBeFalsy();
+                });
 
-        it('should return true for "bar" type even if no data', function () {
-            expect(chart.internal.hasType('bar')).toBeTruthy();
+                it('should return true for "bar" type even if no data', function () {
+                    expect(chart.internal.hasType('bar')).toBeTruthy();
+                });
+            });
         });
-
 
     });
 

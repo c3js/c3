@@ -11,7 +11,7 @@ describe('c3 chart interaction', function () {
 
         describe('custom x', function () {
 
-            it('should generate bar chart', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'x',
@@ -22,7 +22,6 @@ describe('c3 chart interaction', function () {
                         type: 'bar'
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should have 4 event rects properly', function () {
@@ -35,34 +34,34 @@ describe('c3 chart interaction', function () {
                 });
             });
 
-            it('should generate bar chart with only one data', function () {
-                args = {
-                    data: {
-                        x: 'x',
-                        columns: [
-                            ['x', 0],
-                            ['data', 10]
-                        ],
-                        type: 'bar'
-                    }
-                };
-                expect(true).toBeTruthy();
-            });
+            describe('should generate bar chart with only one data', function () {
+                beforeAll(function(){
+                    args = {
+                        data: {
+                            x: 'x',
+                            columns: [
+                                ['x', 0],
+                                ['data', 10]
+                            ],
+                            type: 'bar'
+                        }
+                    };
+                });
 
-            it('should have 1 event rects properly', function () {
-                var eventRects = d3.selectAll('.c3-event-rect');
-                expect(eventRects.size()).toBe(1);
-                eventRects.each(function () {
-                    var box = d3.select(this).node().getBoundingClientRect();
-                    expect(box.left).toBeCloseTo(40.5, -2);
-                    expect(box.width).toBeCloseTo(598, -2);
+                it('should have 1 event rects properly', function () {
+                    var eventRects = d3.selectAll('.c3-event-rect');
+                    expect(eventRects.size()).toBe(1);
+                    eventRects.each(function () {
+                        var box = d3.select(this).node().getBoundingClientRect();
+                        expect(box.left).toBeCloseTo(40.5, -2);
+                        expect(box.width).toBeCloseTo(598, -2);
+                    });
                 });
             });
         });
 
         describe('timeseries', function () {
-
-            it('should generate line chart with timeseries', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'x',
@@ -72,7 +71,6 @@ describe('c3 chart interaction', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should have 4 event rects properly', function () {
@@ -86,31 +84,29 @@ describe('c3 chart interaction', function () {
 
             });
 
-            it('should generate line chart with only 1 data timeseries', function () {
-                args = {
-                    data: {
-                        x: 'x',
-                        columns: [
-                            ['x', '20140101'],
-                            ['data', 10]
-                        ]
-                    }
-                };
-                expect(true).toBeTruthy();
-            });
+            describe('should generate line chart with only 1 data timeseries', function () {
+                beforeAll(function(){
+                    args = {
+                        data: {
+                            x: 'x',
+                            columns: [
+                                ['x', '20140101'],
+                                ['data', 10]
+                            ]
+                        }
+                    };
+                });
 
-            it('should have 1 event rects properly', function () {
-                var eventRects = d3.selectAll('.c3-event-rect');
-                expect(eventRects.size()).toBe(1);
-                eventRects.each(function () {
-                    var box = d3.select(this).node().getBoundingClientRect();
-                    expect(box.left).toBeCloseTo(40.5, -2);
-                    expect(box.width).toBeCloseTo(598, -2);
+                it('should have 1 event rects properly', function () {
+                    var eventRects = d3.selectAll('.c3-event-rect');
+                    expect(eventRects.size()).toBe(1);
+                    eventRects.each(function () {
+                        var box = d3.select(this).node().getBoundingClientRect();
+                        expect(box.left).toBeCloseTo(40.5, -2);
+                        expect(box.width).toBeCloseTo(598, -2);
+                    });
                 });
             });
-
         });
-
     });
-
 });

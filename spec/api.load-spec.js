@@ -11,7 +11,7 @@ describe('c3 api load', function () {
 
         describe('as column', function () {
 
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         columns: [
@@ -20,7 +20,6 @@ describe('c3 api load', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should load additional data', function (done) {
@@ -46,7 +45,7 @@ describe('c3 api load', function () {
 
     describe('category data', function () {
 
-        it('should update arg to category data', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     x: 'x',
@@ -62,7 +61,6 @@ describe('c3 api load', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         describe('as column', function () {

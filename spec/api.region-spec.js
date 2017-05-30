@@ -9,7 +9,7 @@ describe('c3 api region', function () {
 
     describe('api.region', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -31,10 +31,9 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
-        it('should update regions', function (done) {
+        it('updates regions', function (done) {
             var main = chart.internal.main,
                 expectedRegions = [
                     {
@@ -84,7 +83,7 @@ describe('c3 api region', function () {
 
     describe('api.region.add', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -106,7 +105,6 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
         it('should add regions', function (done) {
@@ -175,7 +173,7 @@ describe('c3 api region', function () {
 
     describe('api.region.remove', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -203,7 +201,6 @@ describe('c3 api region', function () {
                     },
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
         it('should remove regions', function (done) {
