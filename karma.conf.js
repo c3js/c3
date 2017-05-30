@@ -1,5 +1,7 @@
 // Karma configuration
 // Generated on Wed Sep 30 2015 22:01:48 GMT+0900 (KST)
+const istanbul = require('rollup-plugin-istanbul');
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
@@ -16,10 +18,9 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/d3/d3.min.js',
-      'c3.js',
-      'c3.css',
+      'src/index.js',
       'spec/*-helper.js',
-      'spec/*-spec.js'
+      'spec/*-spec.js',
     ],
 
 
@@ -31,18 +32,34 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'c3.js': ['coverage']
+      'src/index.js': ['rollup', 'sourcemap']
+    },
+
+    rollupPreprocessor: {
+        plugins: [
+            istanbul({
+                exclude: ['spec/**/*.js'],
+            })
+        ],
+        format: 'iife',               // Helps prevent naming collisions.
+        moduleName: 'c3',             // Required for 'iife' format.
+        sourceMap: 'inline',          // Sensible for testing.
+        globals: {
+            d3: 'd3',
+        },
+        external: ['d3']
     },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec', 'coverage'],
+    reporters: ['spec', 'coverage-istanbul'],
 
 
-    coverageReporter: {
-      reporters: [{type: 'lcov'}]
+    coverageIstanbulReporter: {
+      reports: ['html', 'lcovonly', 'text-summary'],
+      dir: path.join(__dirname, 'coverage'),
     },
 
 
@@ -56,6 +73,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    // logLevel: config.LOG_DEBUG,
     logLevel: config.LOG_INFO,
 
 
