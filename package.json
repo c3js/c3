@@ -39,23 +39,27 @@
     "d3": "~3.5.0"
   },
   "devDependencies": {
+    "babel-plugin-istanbul": "^4.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
     "clean-css-cli": "^4.1.3",
     "codecov.io": "^0.1.6",
     "jasmine-core": "^2.3.4",
     "jshint": "^2.9.4",
     "jshint-stylish": "^2.1.0",
     "karma": "^1.7.0",
+    "karma-browserify": "^5.1.1",
     "karma-coverage-istanbul-reporter": "^1.3.0",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
-    "karma-rollup-preprocessor": "^4.0.0",
-    "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
     "phantomjs": "^2.1.7",
     "rollup": "^0.41.6",
     "rollup-plugin-istanbul": "^1.1.0",
-    "uglify-js": "^3.0.15"
+    "uglify-js": "^3.0.15",
+    "watchify": "^3.9.0"
   }
 }
