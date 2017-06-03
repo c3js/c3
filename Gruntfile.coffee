@@ -7,13 +7,6 @@ module.exports = (grunt) ->
             tasks: 'sass'
             files: ['src/scss/*.scss']
 
-        jshint:
-          c3: 'src/**/*.js'
-          spec: 'spec/**/*.js'
-          options:
-            reporter: require('jshint-stylish')
-            jshintrc: '.jshintrc'
-
         uglify:
           c3:
             files:
@@ -31,6 +24,5 @@ module.exports = (grunt) ->
             files:
               'c3.css': 'src/scss/main.scss'
 
-    grunt.registerTask 'lint', ['jshint']
-    grunt.registerTask 'build', ['concat', 'sass']
+    grunt.registerTask 'build', ['sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
