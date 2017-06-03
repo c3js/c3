@@ -2,10 +2,6 @@ module.exports = (grunt) ->
     require('load-grunt-tasks') grunt, pattern: ['grunt-contrib-*', 'grunt-sass']
 
     grunt.initConfig
-        watch:
-          sass:
-            tasks: 'sass'
-            files: ['src/scss/*.scss']
 
         jshint:
           c3: 'src/**/*.js'
@@ -24,13 +20,5 @@ module.exports = (grunt) ->
             src: 'c3.css'
             dest: 'c3.min.css'
 
-        sass:
-          options:
-            sourcemap: 'none'
-          c3:
-            files:
-              'c3.css': 'src/scss/main.scss'
-
     grunt.registerTask 'lint', ['jshint']
-    grunt.registerTask 'build', ['concat', 'sass']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
