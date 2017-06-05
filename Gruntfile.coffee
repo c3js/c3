@@ -3,13 +3,6 @@ module.exports = (grunt) ->
 
     grunt.initConfig
 
-        jshint:
-          c3: 'src/**/*.js'
-          spec: 'spec/**/*.js'
-          options:
-            reporter: require('jshint-stylish')
-            jshintrc: '.jshintrc'
-
         uglify:
           c3:
             files:
@@ -20,5 +13,4 @@ module.exports = (grunt) ->
             src: 'c3.css'
             dest: 'c3.min.css'
 
-    grunt.registerTask 'lint', ['jshint']
     grunt.registerTask 'minify', ['cssmin', 'uglify']
