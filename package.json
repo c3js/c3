@@ -58,7 +58,6 @@
     "node-static": "^0.7.9",
     "phantomjs": "^2.1.7",
     "rollup": "^0.41.6",
-    "rollup-plugin-istanbul": "^1.1.0",
     "uglify-js": "^3.0.15",
     "watchify": "^3.9.0"
   },
