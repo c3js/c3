@@ -14,7 +14,6 @@
     "build:css": "npm run build:css:sass && npm run build:css:min",
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
     "build:css:min": "cleancss -o c3.min.css c3.css",
-    "minify": "grunt minify",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
     "dist": "npm run build && npm run minify",
     "codecov": "cat coverage/*/lcov.info | codecov"
@@ -46,7 +45,6 @@
     "karma-jasmine": "^0.3.6",
     "karma-phantomjs-launcher": "^0.2.1",
     "karma-spec-reporter": "0.0.20",
-    "load-grunt-tasks": "~0.2.0",
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
     "phantomjs": "^1.9.18",
