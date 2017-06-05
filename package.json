@@ -15,7 +15,7 @@
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
     "build:css:min": "cleancss -o c3.min.css c3.css",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
-    "dist": "npm run build && npm run minify",
+    "dist": "npm run build",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
   "repository": {
