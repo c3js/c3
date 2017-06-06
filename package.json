@@ -16,7 +16,7 @@
     "build:css:min": "cleancss -o c3.min.css c3.css",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
     "dist": "npm run build",
-    "codecov": "cat coverage/*/lcov.info | codecov"
+    "codecov": "codecov"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,11 @@
     "chart",
     "graph"
   ],
-  "author": "Masayuki Tanaka",
+  "authors": [
+    "Masayuki Tanaka",
+    "Ændrew Rininsland",
+    "Yoshiya Hinosawa"
+  ],
   "license": "MIT",
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
@@ -35,20 +39,31 @@
     "d3": "~3.5.0"
   },
   "devDependencies": {
+    "babel-plugin-istanbul": "^4.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
     "clean-css-cli": "^4.1.3",
-    "codecov.io": "^0.1.6",
+    "codecov": "^2.2.0",
     "jasmine-core": "^2.3.4",
     "jshint": "^2.9.4",
     "jshint-stylish": "^2.1.0",
-    "karma": "^0.13.10",
-    "karma-coverage": "^0.5.2",
-    "karma-jasmine": "^0.3.6",
-    "karma-phantomjs-launcher": "^0.2.1",
-    "karma-spec-reporter": "0.0.20",
+    "karma": "^1.7.0",
+    "karma-browserify": "^5.1.1",
+    "karma-coverage-istanbul-reporter": "^1.3.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-spec-reporter": "0.0.31",
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
-    "phantomjs": "^1.9.18",
+    "phantomjs": "^2.1.7",
     "rollup": "^0.41.6",
-    "uglify-js": "^3.0.15"
+    "uglify-js": "^3.0.15",
+    "watchify": "^3.9.0"
+  },
+  "nyc": {
+    "exclude": [
+      "src/polyfill.js"
+    ]
   }
 }
