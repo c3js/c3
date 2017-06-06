@@ -191,8 +191,7 @@ c3_chart_internal_fn.unexpandArc = function (targetIds) {
             return $$.expandDuration(d.data.id);
         })
         .attr("d", $$.svgArc);
-    $$.svg.selectAll('.' + CLASS.arc)
-        .style("opacity", 1);
+    $$.svg.selectAll('.' + CLASS.arc);
 };
 
 c3_chart_internal_fn.expandDuration = function (id) {
@@ -297,7 +296,6 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .attr("class", $$.classArc.bind($$))
         .style("fill", function (d) { return $$.color(d.data); })
         .style("cursor", function (d) { return config.interaction_enabled && config.data_selection_isselectable(d) ? "pointer" : null; })
-        .style("opacity", 0)
         .each(function (d) {
             if ($$.isGaugeType(d.data)) {
                 d.startAngle = d.endAngle = config.gauge_startingAngle;
@@ -306,7 +304,6 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         });
     mainArc
         .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
-        .style("opacity", function (d) { return d === this._current ? 0 : 1; })
         .on('mouseover', config.interaction_enabled ? function (d) {
             var updated, arcData;
             if ($$.transiting) { // skip while transiting
@@ -387,7 +384,6 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .style("fill", function (d) {
             return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
         }) // Where gauge reading color would receive customization.
-        .style("opacity", 1)
         .call($$.endall, function () {
             $$.transiting = false;
         });
