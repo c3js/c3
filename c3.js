@@ -88,6 +88,9 @@ var isValue = function (v) {
 var isFunction = function (o) {
     return typeof o === 'function';
 };
+var isArray = function (o) {
+    return Array.isArray(o);
+};
 var isString = function (o) {
     return typeof o === 'string';
 };
@@ -853,8 +856,6 @@ var c3_chart_fn;
 var c3_chart_internal_fn;
 var c3_chart_internal_axis_fn;
 
-var d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
-
 function API(owner) {
     this.owner = owner;
 }
@@ -895,7 +896,7 @@ function Chart(config) {
 
 function ChartInternal(api) {
     var $$ = this;
-    $$.d3 = d3;
+    $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
     $$.api = api;
     $$.config = $$.getDefaultConfig();
     $$.data = {};
@@ -4586,6 +4587,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // tooltip - show when mouseover on each data
         tooltip_show: true,
         tooltip_grouped: true,
+        tooltip_order: undefined,
         tooltip_format_title: undefined,
         tooltip_format_name: undefined,
         tooltip_format_value: undefined,
@@ -5107,7 +5109,11 @@ c3_chart_internal_fn.orderTargets = function (targets) {
         });
     } else if (isFunction(config.data_order)) {
         targets.sort(config.data_order);
-    } // TODO: accept name array for order
+    } else if (isArray(config.data_order)) {
+        targets.sort(function (t1, t2) {
+            return config.data_order.indexOf(t1.id) - config.data_order.indexOf(t2.id);
+        });
+    }
     return targets;
 };
 c3_chart_internal_fn.filterByX = function (targets, x) {
@@ -7968,31 +7974,85 @@ c3_chart_internal_fn.initTooltip = function () {
             .style("display", "block");
     }
 };
+c3_chart_internal_fn.getTooltipSortFunction = function() {
+    var $$ = this, config = $$.config;
+
+    if (config.data_groups.length === 0 || config.tooltip_order !== undefined) {
+        // if data are not grouped or if an order is specified
+        // for the tooltip values we sort them by their values
+
+        var order = config.tooltip_order;
+        if (order === undefined) {
+            order = config.data_order;
+        }
+
+        var valueOf = function(obj) {
+            return obj ? obj.value : null;
+        };
+
+        // if data are not grouped, we sort them by their value
+        if (isString(order) && order.toLowerCase() === 'asc') {
+            return function(a, b) {
+                return valueOf(a) - valueOf(b);
+            };
+        } else if (isString(order) && order.toLowerCase() === 'desc') {
+            return function (a, b) {
+                return valueOf(b) - valueOf(a);
+            };
+        } else if (isFunction(order)) {
+
+            // if the function is from data_order we need
+            // to wrap the returned function in order to format
+            // the sorted value to the expected format
+
+            var sortFunction = order;
+
+            if (config.tooltip_order === undefined) {
+                sortFunction = function (a, b) {
+                    return order(a ? {
+                        id: a.id,
+                        values: [ a ]
+                    } : null, b ? {
+                        id: b.id,
+                        values: [ b ]
+                    } : null);
+                };
+            }
+
+            return sortFunction;
+
+        } else if (isArray(order)) {
+            return function(a, b) {
+                return order.indexOf(a.id) - order.indexOf(b.id);
+            };
+        }
+    } else {
+        // if data are grouped, we follow the order of grouped targets
+        var ids = $$.orderTargets($$.data.targets).map(function(i) {
+            return i.id;
+        });
+
+        // if it was either asc or desc we need to invert the order
+        // returned by orderTargets
+        if ($$.isOrderAsc() || $$.isOrderDesc()) {
+            ids = ids.reverse();
+        }
+
+        return function(a, b) {
+            return ids.indexOf(a.id) - ids.indexOf(b.id);
+        };
+    }
+};
 c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
     var $$ = this, config = $$.config,
         titleFormat = config.tooltip_format_title || defaultTitleFormat,
         nameFormat = config.tooltip_format_name || function (name) { return name; },
         valueFormat = config.tooltip_format_value || defaultValueFormat,
-        text, i, title, value, name, bgcolor,
-        orderAsc = $$.isOrderAsc();
+        text, i, title, value, name, bgcolor;
 
-    if (config.data_groups.length === 0) {
-        d.sort(function(a, b){
-            var v1 = a ? a.value : null, v2 = b ? b.value : null;
-            return orderAsc ? v1 - v2 : v2 - v1;
-        });
-    } else {
-        var ids = $$.orderTargets($$.data.targets).map(function (i) {
-            return i.id;
-        });
-        d.sort(function(a, b) {
-            var v1 = a ? a.value : null, v2 = b ? b.value : null;
-            if (v1 > 0 && v2 > 0) {
-                v1 = a ? ids.indexOf(a.id) : null;
-                v2 = b ? ids.indexOf(b.id) : null;
-            }
-            return orderAsc ? v1 - v2 : v2 - v1;
-        });
+    var tooltipSortFunction = this.getTooltipSortFunction();
+    if(tooltipSortFunction) {
+        d.sort(tooltipSortFunction);
     }
 
     for (i = 0; i < d.length; i++) {

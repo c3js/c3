@@ -1,6 +1,6 @@
 import CLASS from './class';
 import { c3_chart_internal_fn } from './core';
-import { isValue, isFunction, notEmpty, hasValue } from './util';
+import { isValue, isFunction, isArray, notEmpty, hasValue } from './util';
 
 c3_chart_internal_fn.isX = function (key) {
     var $$ = this, config = $$.config;
@@ -237,7 +237,11 @@ c3_chart_internal_fn.orderTargets = function (targets) {
         });
     } else if (isFunction(config.data_order)) {
         targets.sort(config.data_order);
-    } // TODO: accept name array for order
+    } else if (isArray(config.data_order)) {
+        targets.sort(function (t1, t2) {
+            return config.data_order.indexOf(t1.id) - config.data_order.indexOf(t2.id);
+        });
+    }
     return targets;
 };
 c3_chart_internal_fn.filterByX = function (targets, x) {
