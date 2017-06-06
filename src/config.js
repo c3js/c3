@@ -208,6 +208,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // tooltip - show when mouseover on each data
         tooltip_show: true,
         tooltip_grouped: true,
+        tooltip_order: undefined,
         tooltip_format_title: undefined,
         tooltip_format_name: undefined,
         tooltip_format_value: undefined,

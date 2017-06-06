@@ -6,6 +6,9 @@ export var isValue = function (v) {
 export var isFunction = function (o) {
     return typeof o === 'function';
 };
+export var isArray = function (o) {
+    return Array.isArray(o);
+};
 export var isString = function (o) {
     return typeof o === 'string';
 };
