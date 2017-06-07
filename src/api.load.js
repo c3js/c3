@@ -20,6 +20,14 @@ c3_chart_fn.load = function (args) {
     if ('categories' in args && $$.isCategorized()) {
         config.axis_x_categories = args.categories;
     }
+    // update x axis tick format if exists
+    if ('axis_x_tick_format' in args) {
+        config.axis_x_tick_format = args.axis_x_tick_format;
+    }
+    // update y axis tick format if exists
+    if ('axis_y_tick_format' in args) {
+        config.axis_y_tick_format = args.axis_y_tick_format;
+    }
     // update axes if exists
     if ('axes' in args) {
         Object.keys(args.axes).forEach(function (id) {
