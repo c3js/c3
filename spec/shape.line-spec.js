@@ -129,6 +129,30 @@ describe('c3 chart shape line', function () {
             // });
         });
 
+        describe('should allow passing a function', function() {
+            beforeAll(function(){
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 50, 100]
+                        ],
+                        type: 'line'
+                    },
+                    point: {
+                        show: function(d) {
+                            return d.value > 50;
+                        }
+                    }
+                };
+            });
+
+            it('should show point if function returns true', function() {
+                var target = chart.internal.main.select('.c3-chart-line.c3-target-data1');
+                expect(+target.select('.c3-circle-0').style('opacity')).toBe(0);
+                expect(+target.select('.c3-circle-1').style('opacity')).toBe(0);
+                expect(+target.select('.c3-circle-2').style('opacity')).toBe(1);
+            });
+        });
     });
 
     describe('spline.interpolation option', function () {
