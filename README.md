@@ -18,6 +18,35 @@ You can run these samples as:
 $ npm run serve
 ```
 
+## Running with PhantomJS
+
+Beginning with c3 v0.3.0, a number of users have reported problems using c3 with phantomjs.
+
+```
+TypeError: 'undefined' is not a function (evaluating 'a.getXAxisClipX.bind(a)')
+          at /path/to/c3/c3.min.js:1
+          at /path/to/c3/c3.min.js:1
+          at /path/to/c3/c3.min.js:1
+          at b (/path/to/c3/c3.min.js:1)
+          at /path/to/c3/c3.min.js:1
+```
+
+If you see errors like this, a polyfill such as the following may be helpful.
+
+```javascript
+Function.prototype.bind = Function.prototype.bind || function (thisp) {
+  var fn = this;
+  return function () {
+    return fn.apply(thisp, arguments);
+  };
+};
+```
+
+### References
+
+  - https://github.com/masayuki0812/c3/issues/552#issuecomment-55269072
+  - https://github.com/masayuki0812/c3/issues/578#issuecomment-65115927
+
 ## Google Group
 For general C3.js-related discussion, please visit our [Google Group at https://groups.google.com/forum/#!forum/c3js](https://groups.google.com/forum/#!forum/c3js).
 
