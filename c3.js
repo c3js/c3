@@ -850,7 +850,7 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3$1 = { version: "0.4.12" };
+var c3$1 = { version: "0.4.13" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
@@ -1639,7 +1639,8 @@ c3_chart_internal_fn.initialOpacityForCircle = function (d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
 };
 c3_chart_internal_fn.opacityForCircle = function (d) {
-    var opacity = this.config.point_show ? 1 : 0;
+    var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
+    var opacity = isPointShouldBeShown ? 1 : 0;
     return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
 };
 c3_chart_internal_fn.opacityForText = function () {
@@ -4656,15 +4657,16 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
     }
     req.get(function (error, data) {
         var d;
+        var dataResponse = data.response || data.responseText; // Fixes IE9 XHR issue; see #1345
         if (!data) {
             throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
         }
         if (type === 'json') {
-            d = $$.convertJsonToData(JSON.parse(data.response), keys);
+            d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
         } else if (type === 'tsv') {
-            d = $$.convertTsvToData(data.response);
+            d = $$.convertTsvToData(dataResponse);
         } else {
-            d = $$.convertCsvToData(data.response);
+            d = $$.convertCsvToData(dataResponse);
         }
         done.call($$, d);
     });
@@ -5051,13 +5053,23 @@ c3_chart_internal_fn.mapTargetsToUniqueXs = function (targets) {
     return xs.sort(function (a, b) { return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN; });
 };
 c3_chart_internal_fn.addHiddenTargetIds = function (targetIds) {
-    this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds);
+    targetIds = (targetIds instanceof Array) ? targetIds : new Array(targetIds);
+    for (var i = 0; i < targetIds.length; i++) {
+        if (this.hiddenTargetIds.indexOf(targetIds[i]) < 0) {
+            this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds[i]);
+        }
+    }
 };
 c3_chart_internal_fn.removeHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
 };
 c3_chart_internal_fn.addHiddenLegendIds = function (targetIds) {
-    this.hiddenLegendIds = this.hiddenLegendIds.concat(targetIds);
+    targetIds = (targetIds instanceof Array) ? targetIds : new Array(targetIds);
+    for (var i = 0; i < targetIds.length; i++) {
+        if (this.hiddenLegendIds.indexOf(targetIds[i]) < 0) {
+            this.hiddenLegendIds = this.hiddenLegendIds.concat(targetIds[i]);
+        }
+    }
 };
 c3_chart_internal_fn.removeHiddenLegendIds = function (targetIds) {
     this.hiddenLegendIds = this.hiddenLegendIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
