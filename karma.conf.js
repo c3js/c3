@@ -20,7 +20,7 @@ module.exports = function(config) {
       reports: ['html', 'lcovonly', 'text-summary']
     },
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
     singleRun: true,
     browserNoActivityTimeout: 120000,
   })
