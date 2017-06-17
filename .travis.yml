@@ -1,7 +1,17 @@
-sudo: false
 language: node_js
 node_js:
 - 6
+dist: trusty
+sudo: false
+addons:
+  apt:
+    packages:
+      - google-chrome-stable
+
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start &
+  - sleep 3
 
 after_success:
 - npm run codecov

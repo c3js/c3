@@ -587,7 +587,7 @@ describe('c3 chart axis', function () {
                 var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect(),
                     height = chart.internal.getHorizontalAxisHeight('x');
                 expect(box.height).toBeGreaterThan(50);
-                expect(height).toBeCloseTo(76, -1); // @TODO make this test better
+                expect(height).toBeCloseTo(76, -1.3); // @TODO make this test better
             });
 
         });
