@@ -105,7 +105,7 @@ c3_chart_internal_fn.getArc = function (d, withoutUpdate, force) {
 
 
 c3_chart_internal_fn.transformForArcLabel = function (d) {
-    var $$ = this,
+    var $$ = this, config = $$.config,
         updated = $$.updateAngle(d), c, x, y, h, ratio, translate = "", hasGauge = $$.hasType('gauge');
     if (updated && !hasGauge) {
         c = this.svgArc.centroid(updated);
@@ -461,7 +461,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         backgroundArc = $$.arcs.select('g.' + CLASS.chartArcsBackground).selectAll('path.' + CLASS.chartArcsBackground).data($$.data.targets);
         backgroundArc.enter().append("path");
         backgroundArc
-            .attr("class", function (d, i) { return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground +'-'+ i})
+            .attr("class", function (d, i) { return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground +'-'+ i; })
             .attr("d", function (d1) {
                 if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) { return "M 0 0"; }
 

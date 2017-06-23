@@ -292,7 +292,7 @@ describe('c3 chart legend', function () {
                         values: [30, 80, 95]
                     }
                 }
-            }
+            };
         });
 
         // espacially for gauges with multiple arcs to have the same coloring between legend tiles, tooltip tiles and arc
@@ -305,7 +305,7 @@ describe('c3 chart legend', function () {
             expect(tileColor[1]).toBe('rgb(246, 198, 0)');
             expect(tileColor[2]).toBe('rgb(249, 118, 0)');
             expect(tileColor[3]).toBe('rgb(255, 0, 0)');
-        })
+        });
     });
 
     describe('legend item tile coloring without color_treshold', function () {
@@ -324,7 +324,7 @@ describe('c3 chart legend', function () {
                     }
                 },
                 type: 'gauge'
-            }
+            };
         });
 
         it('selects the color from data_colors, data_color or default', function () {
@@ -336,6 +336,6 @@ describe('c3 chart legend', function () {
             expect(tileColor[1]).toBe('rgb(31, 119, 180)');
             expect(tileColor[2]).toBe('rgb(255, 127, 14)');
             expect(tileColor[3]).toBe('rgb(139, 0, 139)');
-        })
+        });
     });
 });
