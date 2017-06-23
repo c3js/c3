@@ -1,11 +1,10 @@
 {
   "name": "c3",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
     "serve": "static -p 8080 htdocs/",
-    "prepublish": "npm run dist",
     "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
     "build": "npm run build:js && npm run build:css",
     "build:js": "npm run build:js:rollup && npm run build:js:uglify",
