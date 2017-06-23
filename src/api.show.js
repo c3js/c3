@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.show = function (targetIds, options) {
     var $$ = this.internal, targets;
 

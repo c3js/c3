@@ -33,64 +33,65 @@ describe('c3 chart axis', function () {
 
     describe('axis.y.tick.count', function () {
 
-        it('should update args to have only 1 tick on y axis', function () {
-            args.axis.y.tick.count = 1;
-            expect(true).toBeTruthy();
+        describe('with only 1 tick on y axis', function () {
+            beforeAll(function(){
+                args.axis.y.tick.count = 1;
+            });
+
+            it('should have only 1 tick on y axis', function () {
+                var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+                expect(ticksSize).toBe(1);
+            });
         });
 
-        it('should have only 1 tick on y axis', function () {
-            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
-            expect(ticksSize).toBe(1);
+        describe('with 2 ticks on y axis', function () {
+            beforeAll(function(){
+                args.axis.y.tick.count = 2;
+            });
+
+            it('should have 2 ticks on y axis', function () {
+                var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+                expect(ticksSize).toBe(2);
+            });
         });
 
-        it('should update args to have 2 ticks on y axis', function () {
-            args.axis.y.tick.count = 2;
-            expect(true).toBeTruthy();
-        });
+        describe('with 3 ticks on y axis', function () {
+            beforeAll(function(){
+                args.axis.y.tick.count = 3;
+            });
 
-        it('should have 2 ticks on y axis', function () {
-            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
-            expect(ticksSize).toBe(2);
+            it('should have 3 ticks on y axis', function () {
+                var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+                expect(ticksSize).toBe(3);
+            });
         });
-
-        it('should update args to have 3 ticks on y axis', function () {
-            args.axis.y.tick.count = 3;
-            expect(true).toBeTruthy();
-        });
-
-        it('should have 3 ticks on y axis', function () {
-            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
-            expect(ticksSize).toBe(3);
-        });
-
     });
 
     describe('axis.y.tick.values', function () {
 
         var values = [100, 500];
 
-        it('should update args to have only 2 ticks on y axis', function () {
-            args.axis.y.tick.values = values;
-            expect(true).toBeTruthy();
-        });
+        describe('with only 2 ticks on y axis', function () {
+            beforeAll(function(){
+                args.axis.y.tick.values = values;
+            });
 
-        it('should have only 2 tick on y axis', function () {
-            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
-            expect(ticksSize).toBe(2);
-        });
+            it('should have only 2 tick on y axis', function () {
+                var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+                expect(ticksSize).toBe(2);
+            });
 
-        it('should have specified tick texts', function () {
-            d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
-                var text = d3.select(this).select('text').text();
-                expect(+text).toBe(values[i]);
+            it('should have specified tick texts', function () {
+                d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
+                    var text = d3.select(this).select('text').text();
+                    expect(+text).toBe(values[i]);
+                });
             });
         });
-
     });
 
     describe('axis y timeseries', function () {
-
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -107,7 +108,6 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should have 7 ticks on y axis', function () {
@@ -126,34 +126,35 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to set axis.y.time', function () {
-            args.axis.y.tick.time = {
-                value : 'seconds',
-                interval : 60
-            };
-            expect(true).toBeTruthy();
-        });
+        describe('with axis.y.time', function () {
+            beforeAll(function(){
+                args.axis.y.tick.time = {
+                    value : 'seconds',
+                    interval : 60
+                };
+            });
 
-        it('should have 4 ticks on y axis', function () {
-            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
-            expect(ticksSize).toBe(4); // the count starts at initial value and increments by the set interval
-        });
+            it('should have 4 ticks on y axis', function () {
+                var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+                expect(ticksSize).toBe(4); // the count starts at initial value and increments by the set interval
+            });
 
-        it('should have specified 60 second intervals', function () {
-            var prevValue;
-            d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
-                if (i !== 0) {
-                    var result = d - prevValue;
-                    expect(result).toEqual(60000); // expressed in milliseconds
-                }
-                prevValue = d;
+            it('should have specified 60 second intervals', function () {
+                var prevValue;
+                d3.select('.c3-axis-y').selectAll('g.tick').each(function (d, i) {
+                    if (i !== 0) {
+                        var result = d - prevValue;
+                        expect(result).toEqual(60000); // expressed in milliseconds
+                    }
+                    prevValue = d;
+                });
             });
         });
     });
 
     describe('axis.x.tick.values', function () {
         describe('function is provided', function () {
-            var tickGenerator = function (/*domain*/) {
+            var tickGenerator = function () {
                 var values = [];
                 for (var i = 0; i <= 300; i += 50) {
                     values.push(i);
@@ -167,7 +168,7 @@ describe('c3 chart axis', function () {
                     }
                 };
                 chart = window.c3.generate(args);
-                window.generatedTicks = tickGenerator();
+                window.generatedTicks = tickGenerator(); // This should be removed from window
             });
 
             it('should use function to generate ticks', function () {
@@ -185,7 +186,7 @@ describe('c3 chart axis', function () {
 
             describe('not rotated', function () {
 
-                it('should update args successfully', function () {
+                beforeAll(function () {
                     args = {
                         data: {
                             columns: [
@@ -202,7 +203,6 @@ describe('c3 chart axis', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
                 });
 
                 it('should construct indexed x axis properly', function () {
@@ -222,95 +222,95 @@ describe('c3 chart axis', function () {
                     });
                 });
 
-                it('should set axis.x.tick.format', function () {
-                    args.axis.x = {
-                        tick: {
-                            format: function () {
-                                return 'very long tick text on x axis';
+                describe('should set axis.x.tick.format', function () {
+                    beforeAll(function(){
+                        args.axis.x = {
+                            tick: {
+                                format: function () {
+                                    return 'very long tick text on x axis';
+                                }
                             }
-                        }
-                    };
-                    expect(true).toBeTruthy();
-                });
+                        };
+                    });
 
-                it('should split x axis tick text to multiple lines', function () {
-                    var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                        expectedTexts = ['very long tick text', 'on x axis'],
-                        expectedX = '0';
-                    expect(ticks.size()).toBe(6);
-                    ticks.each(function () {
-                        var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(2);
-                        tspans.each(function (d, i) {
-                            var tspan = d3.select(this);
-                            expect(tspan.text()).toBe(expectedTexts[i]);
-                            expect(tspan.attr('x')).toBe(expectedX);
-                            if (i === 0) {
-                                expect(tspan.attr('dy')).toBe('.71em');
-                            } else {
-                                expect(tspan.attr('dy')).toBeGreaterThan(8);
-                            }
+                    it('should split x axis tick text to multiple lines', function () {
+                        var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
+                            expectedTexts = ['very long tick text', 'on x axis'],
+                            expectedX = '0';
+                        expect(ticks.size()).toBe(6);
+                        ticks.each(function () {
+                            var tspans = d3.select(this).selectAll('tspan');
+                            expect(tspans.size()).toBe(2);
+                            tspans.each(function (d, i) {
+                                var tspan = d3.select(this);
+                                expect(tspan.text()).toBe(expectedTexts[i]);
+                                expect(tspan.attr('x')).toBe(expectedX);
+                                if (i === 0) {
+                                    expect(tspan.attr('dy')).toBe('.71em');
+                                } else {
+                                    expect(tspan.attr('dy')).toBeGreaterThan(8);
+                                }
+                            });
+                        });
+                    });
+
+                    it('should construct y axis properly', function () {
+                        var ticks = chart.internal.main.select('.c3-axis-y').selectAll('g.tick'),
+                            expectedX = '-9',
+                            expectedDy = '3';
+                        expect(ticks.size()).toBe(9);
+                        ticks.each(function (d) {
+                            var tspans = d3.select(this).selectAll('tspan');
+                            expect(tspans.size()).toBe(1);
+                            tspans.each(function () {
+                                var tspan = d3.select(this);
+                                expect(tspan.text()).toBe(d + '');
+                                expect(tspan.attr('x')).toBe(expectedX);
+                                expect(tspan.attr('dy')).toBe(expectedDy);
+                            });
+                        });
+                    });
+
+                    it('should construct y2 axis properly', function () {
+                        var ticks = chart.internal.main.select('.c3-axis-y2').selectAll('g.tick'),
+                            expectedX = '9',
+                            expectedDy = '3';
+                        expect(ticks.size()).toBe(9);
+                        ticks.each(function (d) {
+                            var tspans = d3.select(this).selectAll('tspan');
+                            expect(tspans.size()).toBe(1);
+                            tspans.each(function () {
+                                var tspan = d3.select(this);
+                                expect(tspan.text()).toBe(d + '');
+                                expect(tspan.attr('x')).toBe(expectedX);
+                                expect(tspan.attr('dy')).toBe(expectedDy);
+                            });
                         });
                     });
                 });
 
-                it('should construct y axis properly', function () {
-                    var ticks = chart.internal.main.select('.c3-axis-y').selectAll('g.tick'),
-                        expectedX = '-9',
-                        expectedDy = '3';
-                    expect(ticks.size()).toBe(9);
-                    ticks.each(function (d) {
-                        var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
-                            var tspan = d3.select(this);
-                            expect(tspan.text()).toBe(d + '');
-                            expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
+                describe('should set big values in y', function () {
+                    beforeAll(function(){
+                        args.data.columns = [
+                            ['data1', 3000000000000000, 200, 100, 400, 150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25]
+                        ];
+                    });
+
+                    it('should not split y axis tick text to multiple lines', function () {
+                        var ticks = chart.internal.main.select('.c3-axis-y2').selectAll('g.tick');
+                        ticks.each(function () {
+                            var tspans = d3.select(this).selectAll('tspan');
+                            expect(tspans.size()).toBe(1);
                         });
                     });
                 });
-
-                it('should construct y2 axis properly', function () {
-                    var ticks = chart.internal.main.select('.c3-axis-y2').selectAll('g.tick'),
-                        expectedX = '9',
-                        expectedDy = '3';
-                    expect(ticks.size()).toBe(9);
-                    ticks.each(function (d) {
-                        var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                        tspans.each(function () {
-                            var tspan = d3.select(this);
-                            expect(tspan.text()).toBe(d + '');
-                            expect(tspan.attr('x')).toBe(expectedX);
-                            expect(tspan.attr('dy')).toBe(expectedDy);
-                        });
-                    });
-                });
-
-                it('should set big values in y', function () {
-                    args.data.columns = [
-                        ['data1', 3000000000000000, 200, 100, 400, 150, 250],
-                        ['data2', 50, 20, 10, 40, 15, 25]
-                    ];
-                    expect(true).toBeTruthy();
-                });
-
-                it('should not split y axis tick text to multiple lines', function () {
-                    var ticks = chart.internal.main.select('.c3-axis-y2').selectAll('g.tick');
-                    ticks.each(function () {
-                        var tspans = d3.select(this).selectAll('tspan');
-                        expect(tspans.size()).toBe(1);
-                    });
-                });
-
             });
 
             describe('rotated', function () {
 
-                it('should update args to rotate axis', function () {
+                beforeAll(function () {
                     args.axis.rotated = true;
-                    expect(true).toBeTruthy();
                 });
 
                 it('should split x axis tick text to multiple lines', function () {
@@ -367,7 +367,7 @@ describe('c3 chart axis', function () {
 
             describe('not rotated', function () {
 
-                it('should update args successfully', function () {
+                beforeAll(function () {
                     args = {
                         data: {
                             x: 'x',
@@ -383,7 +383,6 @@ describe('c3 chart axis', function () {
                             }
                         }
                     };
-                    expect(true).toBeTruthy();
                 });
 
                 it('should locate ticks properly', function () {
@@ -429,9 +428,8 @@ describe('c3 chart axis', function () {
 
             describe('rotated', function () {
 
-                it('should update args to rotate axis', function () {
+                beforeAll(function () {
                     args.axis.rotated = true;
-                    expect(true).toBeTruthy();
                 });
 
                 it('should locate ticks on rotated axis properly', function () {
@@ -480,11 +478,10 @@ describe('c3 chart axis', function () {
 
                 describe('as null', function () {
 
-                    it('should update args not to split ticks', function () {
+                    beforeAll(function () { //'without split ticks',
                         args.axis.x.tick = {
                             multiline: false
                         };
-                        expect(true).toBeTruthy();
                     });
 
                     it('should split x tick', function () {
@@ -497,11 +494,10 @@ describe('c3 chart axis', function () {
 
                 describe('as value', function () {
 
-                    it('should update args not to split ticks', function () {
+                    beforeAll(function () { // 'without split ticks',
                         args.axis.x.tick = {
                             width: 150
                         };
-                        expect(true).toBeTruthy();
                     });
 
                     it('should split x tick to 2 lines properly', function () {
@@ -531,11 +527,10 @@ describe('c3 chart axis', function () {
 
         describe('with axis.x.tick.format', function () {
 
-            it('should update args to use axis.x.tick.format', function () {
+            beforeAll(function () { // 'with axis.x.tick.format',
                 args.axis.x.tick.format = function () {
                     return ['this is a very long tick text', 'on category axis'];
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should have multiline tick text', function () {
@@ -556,7 +551,7 @@ describe('c3 chart axis', function () {
 
         describe('not rotated', function () {
 
-            it('should update args successfully', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'x',
@@ -575,7 +570,6 @@ describe('c3 chart axis', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should rotate tick texts', function () {
@@ -593,7 +587,49 @@ describe('c3 chart axis', function () {
                 var box = chart.internal.main.select('.c3-axis-x').node().getBoundingClientRect(),
                     height = chart.internal.getHorizontalAxisHeight('x');
                 expect(box.height).toBeGreaterThan(50);
-                expect(height).toBeCloseTo(70, -1);
+                expect(height).toBeCloseTo(76, -1.3); // @TODO make this test better
+            });
+
+        });
+    });
+
+    describe('axis.y.tick.rotate', function () {
+
+        describe('not rotated', function () {
+
+            beforeAll(function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, 200, 100, 400, 150, 250, 100, 600],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                        ]
+                    },
+                    axis: {
+                        rotated: true,
+                        y: {
+                            tick: {
+                                rotate: 45
+                            }
+                        }
+                    }
+                };
+            });
+
+            it('should rotate tick texts', function () {
+                chart.internal.main.selectAll('.c3-axis-y g.tick').each(function () {
+                    var tick = d3.select(this),
+                        text = tick.select('text'),
+                        tspan = text.select('tspan');
+                    expect(text.attr('transform')).toBe('rotate(45)');
+                    expect(text.attr('y')).toBe('4');
+                    expect(tspan.attr('dx')).toBeCloseTo('5.6', 0);
+                });
+            });
+
+            it('should have automatically calculated y axis width', function () {
+                var box = chart.internal.main.select('.c3-axis-y').node().getBoundingClientRect();
+                expect(box.width).toBeCloseTo(590, 1);
             });
 
         });
@@ -603,7 +639,7 @@ describe('c3 chart axis', function () {
 
         describe('axis.x.tick.fit = true', function () {
 
-            it('should set args for indexed data', function () {
+            beforeAll(function () { // 'should set args for indexed data',
                 args = {
                     data: {
                         columns: [
@@ -613,7 +649,6 @@ describe('c3 chart axis', function () {
                         ]
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should show fitted ticks on indexed data', function () {
@@ -621,9 +656,67 @@ describe('c3 chart axis', function () {
                 expect(ticks.size()).toBe(6);
             });
 
-            it('should set args for x-based data', function () {
-                args = {
-                    data: {
+            describe('should set args for x-based data', function () {
+                beforeAll(function(){
+                    args = {
+                        data: {
+                            x: 'x',
+                            columns: [
+                                ['x', 10, 20, 100, 110, 200, 1000],
+                                ['data1', 30, 200, 100, 400, 150, 250],
+                                ['data2', 50, 20, 10, 40, 15, 25],
+                                ['data3', 150, 120, 110, 140, 115, 125]
+                            ]
+                        }
+                    };
+                });
+
+                it('should show fitted ticks on indexed data', function () {
+                    var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                    expect(ticks.size()).toBe(6);
+                });
+
+                it('should show fitted ticks after hide and show', function () {
+                    chart.hide();
+                    chart.show();
+                    var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                    expect(ticks.size()).toBe(6);
+                });
+            });
+        });
+
+        describe('axis.x.tick.fit = false', function () {
+
+            describe('should set args for indexed data', function () {
+                beforeAll(function(){
+                    args = {
+                        data: {
+                            columns: [
+                                ['data1', 30, 200, 100, 400, 150, 250],
+                                ['data2', 50, 20, 10, 40, 15, 25],
+                                ['data3', 150, 120, 110, 140, 115, 125]
+                            ]
+                        },
+                        axis: {
+                            x: {
+                                tick: {
+                                    fit: false
+                                }
+                            }
+                        }
+                    };
+                });
+
+                it('should show fitted ticks on indexed data', function () {
+                    var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                    expect(ticks.size()).toBe(11);
+                });
+            });
+
+
+            describe('should set args for x-based data', function () {
+                beforeAll(function(){
+                    args.data = {
                         x: 'x',
                         columns: [
                             ['x', 10, 20, 100, 110, 200, 1000],
@@ -631,83 +724,27 @@ describe('c3 chart axis', function () {
                             ['data2', 50, 20, 10, 40, 15, 25],
                             ['data3', 150, 120, 110, 140, 115, 125]
                         ]
-                    }
-                };
-                expect(true).toBeTruthy();
+                    };
+                });
+
+                it('should show fitted ticks on indexed data', function () {
+                    var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                    expect(ticks.size()).toBe(10);
+                });
+
+                it('should show fitted ticks after hide and show', function () {
+                    chart.hide();
+                    chart.show();
+                    var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
+                    expect(ticks.size()).toBe(10);
+                });
             });
-
-            it('should show fitted ticks on indexed data', function () {
-                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
-                expect(ticks.size()).toBe(6);
-            });
-
-            it('should show fitted ticks after hide and show', function () {
-                chart.hide();
-                chart.show();
-                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
-                expect(ticks.size()).toBe(6);
-            });
-
-        });
-
-        describe('axis.x.tick.fit = false', function () {
-
-            it('should set args for indexed data', function () {
-                args = {
-                    data: {
-                        columns: [
-                            ['data1', 30, 200, 100, 400, 150, 250],
-                            ['data2', 50, 20, 10, 40, 15, 25],
-                            ['data3', 150, 120, 110, 140, 115, 125]
-                        ]
-                    },
-                    axis: {
-                        x: {
-                            tick: {
-                                fit: false
-                            }
-                        }
-                    }
-                };
-                expect(true).toBeTruthy();
-            });
-
-            it('should show fitted ticks on indexed data', function () {
-                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
-                expect(ticks.size()).toBe(11);
-            });
-
-            it('should set args for x-based data', function () {
-                args.data = {
-                    x: 'x',
-                    columns: [
-                        ['x', 10, 20, 100, 110, 200, 1000],
-                        ['data1', 30, 200, 100, 400, 150, 250],
-                        ['data2', 50, 20, 10, 40, 15, 25],
-                        ['data3', 150, 120, 110, 140, 115, 125]
-                    ]
-                };
-                expect(true).toBeTruthy();
-            });
-
-            it('should show fitted ticks on indexed data', function () {
-                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
-                expect(ticks.size()).toBe(10);
-            });
-
-            it('should show fitted ticks after hide and show', function () {
-                chart.hide();
-                chart.show();
-                var ticks = chart.internal.main.selectAll('.c3-axis-x g.tick');
-                expect(ticks.size()).toBe(10);
-            });
-
         });
     });
 
     describe('axis.y.inner', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -721,7 +758,6 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should not have inner y axis', function () {
@@ -733,25 +769,25 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to have inner y axis', function () {
-            args.axis.y.inner = true;
-            expect(true).toBeTruthy();
-        });
+        describe('with inner y axis', function () {
+            beforeAll(function(){
+                args.axis.y.inner = true;
+            });
 
-        it('should have inner y axis', function () {
-            var paddingLeft = chart.internal.getCurrentPaddingLeft(),
-                tickTexts = chart.internal.main.selectAll('.c3-axis-y g.tick text');
-            expect(paddingLeft).toBe(1);
-            tickTexts.each(function () {
-                expect(+d3.select(this).attr('x')).toBeGreaterThan(0);
+            it('should have inner y axis', function () {
+                var paddingLeft = chart.internal.getCurrentPaddingLeft(),
+                    tickTexts = chart.internal.main.selectAll('.c3-axis-y g.tick text');
+                expect(paddingLeft).toBe(1);
+                tickTexts.each(function () {
+                    expect(+d3.select(this).attr('x')).toBeGreaterThan(0);
+                });
             });
         });
-
     });
 
     describe('axis.y2.inner', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -766,7 +802,6 @@ describe('c3 chart axis', function () {
                     }
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should not have inner y axis', function () {
@@ -778,20 +813,20 @@ describe('c3 chart axis', function () {
             });
         });
 
-        it('should update args to have inner y axis', function () {
-            args.axis.y2.inner = true;
-            expect(true).toBeTruthy();
-        });
+        describe('with inner y axis', function () {
+            beforeAll(function(){
+                args.axis.y2.inner = true;
+            });
 
-        it('should have inner y axis', function () {
-            var paddingRight = chart.internal.getCurrentPaddingRight(),
-                tickTexts = chart.internal.main.selectAll('.c3-axis-2y g.tick text');
-            expect(paddingRight).toBe(2);
-            tickTexts.each(function () {
-                expect(+d3.select(this).attr('x')).toBeLessThan(0);
+            it('should have inner y axis', function () {
+                var paddingRight = chart.internal.getCurrentPaddingRight(),
+                    tickTexts = chart.internal.main.selectAll('.c3-axis-2y g.tick text');
+                expect(paddingRight).toBe(2);
+                tickTexts.each(function () {
+                    expect(+d3.select(this).attr('x')).toBeLessThan(0);
+                });
             });
         });
-
     });
 
 });

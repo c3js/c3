@@ -1,14 +1,18 @@
-var c3 = { version: "0.4.11-rc4" };
+import Axis from './axis';
+import CLASS from './class';
+import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
 
-var c3_chart_fn,
-    c3_chart_internal_fn,
-    c3_chart_internal_axis_fn;
+export var c3 = { version: "0.4.13" };
 
-function API(owner) {
+export var c3_chart_fn;
+export var c3_chart_internal_fn;
+export var c3_chart_internal_axis_fn;
+
+export function API(owner) {
     this.owner = owner;
 }
 
-function inherit(base, derived) {
+export function inherit(base, derived) {
 
     if (Object.create) {
         derived.prototype = Object.create(base.prototype);
@@ -81,7 +85,7 @@ c3_chart_internal_fn.init = function () {
     $$.initParams();
 
     if (config.data_url) {
-        $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_keys, $$.initWithData);
+        $$.convertUrlToData(config.data_url, config.data_mimeType, config.data_headers, config.data_keys, $$.initWithData);
     }
     else if (config.data_json) {
         $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));
@@ -253,6 +257,10 @@ c3_chart_internal_fn.initWithData = function (data) {
         .on('mouseenter', function () { return config.onmouseover.call($$); })
         .on('mouseleave', function () { return config.onmouseout.call($$); });
 
+    if ($$.config.svg_classname) {
+        $$.svg.attr('class', $$.config.svg_classname);
+    }
+
     // Define defs
     defs = $$.svg.append("defs");
     $$.clipChart = $$.appendClip(defs, $$.clipId);
@@ -416,7 +424,7 @@ c3_chart_internal_fn.updateSizes = function () {
     // for arc
     $$.arcWidth = $$.width - ($$.isLegendRight ? legendWidth + 10 : 0);
     $$.arcHeight = $$.height - ($$.isLegendRight ? 0 : 10);
-    if ($$.hasType('gauge')) {
+    if ($$.hasType('gauge') && !config.gauge_fullCircle) {
         $$.arcHeight += $$.height - $$.getGaugeLabelHeight();
     }
     if ($$.updateRadius) { $$.updateRadius(); }
@@ -784,7 +792,8 @@ c3_chart_internal_fn.initialOpacityForCircle = function (d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
 };
 c3_chart_internal_fn.opacityForCircle = function (d) {
-    var opacity = this.config.point_show ? 1 : 0;
+    var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
+    var opacity = isPointShouldBeShown ? 1 : 0;
     return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
 };
 c3_chart_internal_fn.opacityForText = function () {
@@ -1033,6 +1042,8 @@ c3_chart_internal_fn.parseDate = function (date) {
         parsedDate = date;
     } else if (typeof date === 'string') {
         parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
+    } else if (typeof date === 'object') {
+        parsedDate = new Date(+date);
     } else if (typeof date === 'number' && !isNaN(date)) {
         parsedDate = new Date(+date);
     }
@@ -1056,3 +1067,20 @@ c3_chart_internal_fn.isTabVisible = function () {
 
     return document[hidden] ? false : true;
 };
+
+c3_chart_internal_fn.isValue = isValue;
+c3_chart_internal_fn.isFunction = isFunction;
+c3_chart_internal_fn.isString = isString;
+c3_chart_internal_fn.isUndefined = isUndefined;
+c3_chart_internal_fn.isDefined = isDefined;
+c3_chart_internal_fn.ceil10 = ceil10;
+c3_chart_internal_fn.asHalfPixel = asHalfPixel;
+c3_chart_internal_fn.diffDomain = diffDomain;
+c3_chart_internal_fn.isEmpty = isEmpty;
+c3_chart_internal_fn.notEmpty = notEmpty;
+c3_chart_internal_fn.notEmpty = notEmpty;
+c3_chart_internal_fn.getOption = getOption;
+c3_chart_internal_fn.hasValue = hasValue;
+c3_chart_internal_fn.sanitise = sanitise;
+c3_chart_internal_fn.getPathBox = getPathBox;
+c3_chart_internal_fn.CLASS = CLASS;

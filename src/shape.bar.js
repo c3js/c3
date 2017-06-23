@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue } from './util';
+
 c3_chart_internal_fn.initBar = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")
@@ -42,7 +46,7 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
     return [
-        (withTransition ? this.mainBar.transition() : this.mainBar)
+        (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
             .attr('d', drawBar)
             .style("fill", this.color)
             .style("opacity", 1)

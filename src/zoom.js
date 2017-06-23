@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { diffDomain } from './util';
+
 c3_chart_internal_fn.initZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
 

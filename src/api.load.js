@@ -1,8 +1,14 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.load = function (args) {
     var $$ = this.internal, config = $$.config;
     // update xs if specified
     if (args.xs) {
         $$.addXs(args.xs);
+    }
+    // update names if exists
+    if ('names' in args) {
+        c3_chart_fn.data.names.bind(this)(args.names);
     }
     // update classes if exists
     if ('classes' in args) {

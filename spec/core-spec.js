@@ -4,6 +4,9 @@ describe('c3 chart', function () {
     var chart;
 
     var args = {
+        svg: {
+            classname: 'customclass'
+        },
         data: {
             columns: [
                 ['data1', 30, 200, 100, 400, 150, 250],
@@ -24,16 +27,23 @@ describe('c3 chart', function () {
             expect(svg).not.toBeNull();
         });
 
-        it('should set 3rd party property to Function', function () {
-            Function.prototype.$extIsFunction = true;
-            expect(true).toBeTruthy();
-        });
+        describe('should set 3rd party property to Function', function () {
+            beforeAll(function(){
+                Function.prototype.$extIsFunction = true;
+            });
 
-        it('should be created even if 3rd party property has been set', function () {
-            var svg = d3.select('#chart svg');
-            expect(svg).not.toBeNull();
-        });
 
+            it('should be created even if 3rd party property has been set', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg).not.toBeNull();
+            });
+
+            it('should be created with a custom class', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.attr('class')).not.toBeNull();
+                expect(svg.attr('class')).toBe('customclass');
+            });
+        });
     });
 
     describe('size', function () {
@@ -53,11 +63,11 @@ describe('c3 chart', function () {
     describe('bindto', function () {
 
         describe('selector', function () {
-            it('update args', function () {
+            beforeAll(function(){
                 d3.select('#chart').html('');
                 args.bindto = '#chart';
-                expect(true).toBeTruthy();
             });
+
             it('should be created', function () {
                 var svg = d3.select('#chart svg');
                 expect(svg.size()).toBe(1);
@@ -65,10 +75,9 @@ describe('c3 chart', function () {
         });
 
         describe('d3.selection object', function () {
-            it('update args', function () {
+            beforeAll(function () {
                 d3.select('#chart').html('');
                 args.bindto = d3.select('#chart');
-                expect(true).toBeTruthy();
             });
             it('should be created', function () {
                 var svg = d3.select('#chart svg');
@@ -77,11 +86,11 @@ describe('c3 chart', function () {
         });
 
         describe('null', function () {
-            it('update args', function () {
+            beforeAll(function () {
                 d3.select('#chart').html('');
                 args.bindto = null;
-                expect(true).toBeTruthy();
             });
+
             it('should not be created', function () {
                 var svg = d3.select('#chart svg');
                 expect(svg.size()).toBe(0);
@@ -89,22 +98,20 @@ describe('c3 chart', function () {
         });
 
         describe('empty string', function () {
-            it('update args', function () {
+            beforeAll(function () {
                 d3.select('#chart').html('');
                 args.bindto = '';
-                expect(true).toBeTruthy();
             });
+
             it('should not be created', function () {
                 var svg = d3.select('#chart svg');
                 expect(svg.size()).toBe(0);
             });
         });
-
     });
 
     describe('empty data', function () {
-
-        it('should upaate args for empty data', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -113,7 +120,6 @@ describe('c3 chart', function () {
                     ]
                 }
             };
-            expect(true).toBeTruthy();
         });
 
         it('should generate a chart', function () {
@@ -121,30 +127,30 @@ describe('c3 chart', function () {
             expect(ticks.size()).toBe(0);
         });
 
-        it('should upaate args for empty data', function () {
-            args = {
-                data: {
-                    x: 'x',
-                    columns: [
-                        ['x'],
-                        ['data1'],
-                        ['data2']
-                    ]
-                },
-                axis: {
-                    x: {
-                        type: 'timeseries'
+        describe('more empty data', function () {
+            beforeAll(function(){
+                args = {
+                    data: {
+                        x: 'x',
+                        columns: [
+                            ['x'],
+                            ['data1'],
+                            ['data2']
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries'
+                        }
                     }
-                }
-            };
-            expect(true).toBeTruthy();
-        });
+                };
+            });
 
-        it('should generate a chart', function () {
-            var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
-            expect(ticks.size()).toBe(0);
+            it('should generate a chart', function () {
+                var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick');
+                expect(ticks.size()).toBe(0);
+            });
         });
-
     });
 
 });

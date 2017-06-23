@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isDefined, isEmpty, getOption } from './util';
+
 c3_chart_internal_fn.initLegend = function () {
     var $$ = this;
     $$.legendItemTextBox = {};

@@ -12,7 +12,7 @@ describe('c3 chart shape bar', function () {
     describe('with groups', function () {
 
         describe('with indexed data', function () {
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         columns: [
@@ -25,7 +25,6 @@ describe('c3 chart shape bar', function () {
                         type: 'bar'
                     },
                 };
-                expect(true).toBeTruthy();
             });
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
@@ -37,7 +36,7 @@ describe('c3 chart shape bar', function () {
         });
 
         describe('with timeseries data', function () {
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'date',
@@ -57,7 +56,6 @@ describe('c3 chart shape bar', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
             });
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
@@ -69,7 +67,7 @@ describe('c3 chart shape bar', function () {
         });
 
         describe('with category data', function () {
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'date',
@@ -89,8 +87,8 @@ describe('c3 chart shape bar', function () {
                         }
                     }
                 };
-                expect(true).toBeTruthy();
             });
+
             it('should be stacked', function () {
                 var expectedBottom = [275, 293, 365, 281, 395, 290];
                 chart.internal.main.selectAll('.c3-bars-data1 .c3-bar').each(function (d, i) {
@@ -106,7 +104,7 @@ describe('c3 chart shape bar', function () {
 
         describe('with normal axis', function () {
 
-            it('should update args', function () {
+            beforeAll(function () {
                 args = {
                     data: {
                         columns: [
@@ -120,7 +118,6 @@ describe('c3 chart shape bar', function () {
                         rotated: false
                     }
                 };
-                expect(true).toBeTruthy();
             });
 
             it('should not be within bar', function () {
@@ -151,9 +148,8 @@ describe('c3 chart shape bar', function () {
 
         describe('with rotated axis', function () {
 
-            it('should change the chart as axis rotated', function () {
+            beforeAll(function () {
                 args.axis.rotated = true;
-                expect(true).toBeTruthy();
             });
 
             it('should not be within bar', function () {

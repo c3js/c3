@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { notEmpty } from './util';
+
 c3_chart_internal_fn.generateColor = function () {
     var $$ = this, config = $$.config, d3 = $$.d3,
         colors = config.data_colors,

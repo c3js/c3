@@ -378,11 +378,10 @@ describe('c3 api focus', function () {
 
     describe('when legend.show = false', function () {
 
-        it('should update args to hide legend', function () {
+        beforeAll(function () {
             args.legend = {
                 show: false
             };
-            expect(true).toBeTruthy();
         });
 
         it('should focus all targets without showing legend', function (done) {

@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.legend = function () {};
 c3_chart_fn.legend.show = function (targetIds) {
     var $$ = this.internal;

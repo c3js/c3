@@ -1,36 +1,68 @@
 {
   "name": "c3",
-  "version": "0.4.11-rc4",
+  "version": "0.4.13",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
-    "test": "grunt"
+    "serve": "static -p 8080 htdocs/",
+    "prepublish": "npm run dist",
+    "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "npm run build:js:rollup && npm run build:js:uglify",
+    "build:js:rollup": "rollup -f umd --name c3 --globals d3:d3 src/index.js > c3.js",
+    "build:js:uglify": "uglifyjs c3.js --compress --mangle -o c3.min.js",
+    "build:css": "npm run build:css:sass && npm run build:css:min",
+    "build:css:sass": "node-sass src/scss/main.scss > c3.css",
+    "build:css:min": "cleancss -o c3.min.css c3.css",
+    "test": "npm run build && npm run lint && karma start karma.conf.js",
+    "dist": "npm run build",
+    "codecov": "codecov"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/masayuki0812/c3.git"
+    "url": "git://github.com/c3js/c3.git"
   },
   "keywords": [
     "d3",
     "chart",
     "graph"
   ],
-  "author": "Masayuki Tanaka",
+  "authors": [
+    "Masayuki Tanaka",
+    "Ændrew Rininsland",
+    "Yoshiya Hinosawa"
+  ],
   "license": "MIT",
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
   "dependencies": {
-    "d3": "<=3.5.0"
+    "d3": "~3.5.0"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-concat": "~0.5.0",
-    "grunt-contrib-cssmin": "^0.10.0",
-    "grunt-contrib-jasmine": "~0.8.0",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-sass": "^0.17.0",
-    "load-grunt-tasks": "~0.2.0"
+    "babel-plugin-istanbul": "^4.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "clean-css-cli": "^4.1.3",
+    "codecov": "^2.2.0",
+    "jasmine-core": "^2.3.4",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.1.0",
+    "karma": "^1.7.0",
+    "karma-browserify": "^5.1.1",
+    "karma-chrome-launcher": "^2.1.1",
+    "karma-coverage-istanbul-reporter": "^1.3.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-spec-reporter": "0.0.31",
+    "node-sass": "^4.5.3",
+    "node-static": "^0.7.9",
+    "rollup": "^0.41.6",
+    "uglify-js": "^3.0.15",
+    "watchify": "^3.9.0"
+  },
+  "nyc": {
+    "exclude": [
+      "src/polyfill.js"
+    ]
   }
 }

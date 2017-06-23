@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue, isFunction, isUndefined, isDefined } from './util';
+
 c3_chart_internal_fn.initLine = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")
@@ -56,7 +60,7 @@ c3_chart_internal_fn.updateLine = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
     return [
-        (withTransition ? this.mainLine.transition() : this.mainLine)
+        (withTransition ? this.mainLine.transition(Math.random().toString()) : this.mainLine)
             .attr("d", drawLine)
             .style("stroke", this.color)
             .style("opacity", 1)
@@ -232,7 +236,7 @@ c3_chart_internal_fn.updateArea = function (durationForExit) {
 };
 c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
     return [
-        (withTransition ? this.mainArea.transition() : this.mainArea)
+        (withTransition ? this.mainArea.transition(Math.random().toString()) : this.mainArea)
             .attr("d", drawArea)
             .style("fill", this.color)
             .style("opacity", this.orgAreaOpacity)
@@ -250,7 +254,7 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
             return config.data_groups.length > 0 ? getPoints(d, i)[1][1] : yScaleGetter.call($$, d.id)(d.value);
         };
 
-    area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(value0).y1(value1);
+    area = config.axis_rotated ? area.x0(value0).x1(value1).y(xValue) : area.x(xValue).y0(config.area_above ? 0 : value0).y1(value1);
     if (!config.line_connectNull) {
         area = area.defined(function (d) { return d.value !== null; });
     }
@@ -315,12 +319,12 @@ c3_chart_internal_fn.updateCircle = function () {
 c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
     var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
     return [
-        (withTransition ? this.mainCircle.transition() : this.mainCircle)
+        (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
             .style('opacity', this.opacityForCircle.bind(this))
             .style("fill", this.color)
             .attr("cx", cx)
             .attr("cy", cy),
-        (withTransition ? selectedCircles.transition() : selectedCircles)
+        (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
             .attr("cx", cx)
             .attr("cy", cy)
     ];
@@ -372,7 +376,7 @@ c3_chart_internal_fn.pointExpandedR = function (d) {
 };
 c3_chart_internal_fn.pointSelectR = function (d) {
     var $$ = this, config = $$.config;
-    return config.point_select_r ? config.point_select_r : $$.pointR(d) * 4;
+    return isFunction(config.point_select_r) ? config.point_select_r(d) : ((config.point_select_r) ? config.point_select_r : $$.pointR(d) * 4);
 };
 c3_chart_internal_fn.isWithinCircle = function (that, r) {
     var d3 = this.d3,

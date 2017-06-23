@@ -1,6 +1,10 @@
+import { c3_chart_internal_fn } from './core';
+import { isDefined } from './util';
+
 c3_chart_internal_fn.getDefaultConfig = function () {
     var config = {
         bindto: '#chart',
+        svg_classname: undefined,
         size_width: undefined,
         size_height: undefined,
         padding_left: undefined,
@@ -17,6 +21,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         zoom_onzoomend: function () {},
         zoom_x_min: undefined,
         zoom_x_max: undefined,
+        interaction_brighten: true,
         interaction_enabled: true,
         onmouseover: function () {},
         onmouseout: function () {},
@@ -55,6 +60,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_onselected: function () {},
         data_onunselected: function () {},
         data_url: undefined,
+        data_headers: undefined,
         data_json: undefined,
         data_rows: undefined,
         data_columns: undefined,
@@ -119,6 +125,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_tick_format: undefined,
         axis_y_tick_outer: true,
         axis_y_tick_values: null,
+        axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
         axis_y_tick_time_value: undefined,
         axis_y_tick_time_interval: undefined,
@@ -165,17 +172,22 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         bar_zerobased: true,
         // area
         area_zerobased: true,
+        area_above: false,
         // pie
         pie_label_show: true,
         pie_label_format: undefined,
         pie_label_threshold: 0.05,
+        pie_label_ratio: undefined,
         pie_expand: {},
         pie_expand_duration: 50,
         // gauge
+        gauge_fullCircle: false,
         gauge_label_show: true,
         gauge_label_format: undefined,
         gauge_min: 0,
         gauge_max: 100,
+        gauge_startingAngle: -1 * Math.PI/2,
+        gauge_label_extents: undefined,
         gauge_units: undefined,
         gauge_width: undefined,
         gauge_arcs_minWidth: 5,
@@ -185,6 +197,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         donut_label_show: true,
         donut_label_format: undefined,
         donut_label_threshold: 0.05,
+        donut_label_ratio: undefined,
         donut_width: undefined,
         donut_title: "",
         donut_expand: {},
@@ -196,6 +209,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // tooltip - show when mouseover on each data
         tooltip_show: true,
         tooltip_grouped: true,
+        tooltip_order: undefined,
         tooltip_format_title: undefined,
         tooltip_format_name: undefined,
         tooltip_format_value: undefined,

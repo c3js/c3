@@ -1,3 +1,6 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.load = function (targets, args) {
     var $$ = this;
     if (targets) {
@@ -39,7 +42,7 @@ c3_chart_internal_fn.loadFromArgs = function (args) {
         $$.load($$.convertDataToTargets(args.data), args);
     }
     else if (args.url) {
-        $$.convertUrlToData(args.url, args.mimeType, args.keys, function (data) {
+        $$.convertUrlToData(args.url, args.mimeType, args.headers, args.keys, function (data) {
             $$.load($$.convertDataToTargets(data), args);
         });
     }
