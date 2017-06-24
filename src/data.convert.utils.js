@@ -6,21 +6,20 @@ import { isUndefined } from './util';
  * @return {any[][]}
  */
 export const convertRowsToData = (rows) => {
-    const new_rows = [];
+    const newRows = [];
     const keys = rows[0];
-    let new_row , i, j;
 
-    for (i = 1; i < rows.length; i++) {
-        new_row = {};
-        for (j = 0; j < rows[i].length; j++) {
+    for (let i = 1; i < rows.length; i++) {
+        const newRow = {};
+        for (let j = 0; j < rows[i].length; j++) {
             if (isUndefined(rows[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_row[keys[j]] = rows[i][j];
+            newRow[keys[j]] = rows[i][j];
         }
-        new_rows.push(new_row);
+        newRows.push(newRow);
     }
-    return new_rows;
+    return newRows;
 };
 
 /**
@@ -29,21 +28,20 @@ export const convertRowsToData = (rows) => {
  * @return {any[][]}
  */
 export const convertColumnsToData = (columns) => {
-    const new_rows = [];
-    let i, j, key;
+    const newRows = [];
 
-    for (i = 0; i < columns.length; i++) {
-        key = columns[i][0];
-        for (j = 1; j < columns[i].length; j++) {
-            if (isUndefined(new_rows[j - 1])) {
-                new_rows[j - 1] = {};
+    for (let i = 0; i < columns.length; i++) {
+        const key = columns[i][0];
+        for (let j = 1; j < columns[i].length; j++) {
+            if (isUndefined(newRows[j - 1])) {
+                newRows[j - 1] = {};
             }
             if (isUndefined(columns[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_rows[j - 1][key] = columns[i][j];
+            newRows[j - 1][key] = columns[i][j];
         }
     }
 
-    return new_rows;
+    return newRows;
 };
