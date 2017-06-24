@@ -1,9 +1,9 @@
 import { isUndefined } from './util';
 
 /**
- * Converts the rows to data.
+ * Converts the rows to normalized data.
  * @param {any[][]} rows The row data
- * @return {any[][]}
+ * @return {Object[]}
  */
 export const convertRowsToData = (rows) => {
     const newRows = [];
@@ -23,9 +23,9 @@ export const convertRowsToData = (rows) => {
 };
 
 /**
- * Converts the columns to data.
+ * Converts the columns to normalized data.
  * @param {any[][]} columns The column data
- * @return {any[][]}
+ * @return {Object[]}
  */
 export const convertColumnsToData = (columns) => {
     const newRows = [];
