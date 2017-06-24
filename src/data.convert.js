@@ -1,5 +1,6 @@
 import { c3_chart_internal_fn } from './core';
 import { isValue, isUndefined, isDefined, notEmpty } from './util';
+import { convertRowsToData, convertColumnsToData } from './data.convert.utils';
 
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
@@ -66,12 +67,12 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
             });
             new_rows.push(new_row);
         });
-        data = $$.convertRowsToData(new_rows);
+        data = convertRowsToData(new_rows);
     } else {
         Object.keys(json).forEach(function (key) {
             new_rows.push([key].concat(json[key]));
         });
-        data = $$.convertColumnsToData(new_rows);
+        data = convertColumnsToData(new_rows);
     }
     return data;
 };
@@ -89,36 +90,7 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
     }
     return object;
 };
-c3_chart_internal_fn.convertRowsToData = function (rows) {
-    var keys = rows[0], new_row = {}, new_rows = [], i, j;
-    for (i = 1; i < rows.length; i++) {
-        new_row = {};
-        for (j = 0; j < rows[i].length; j++) {
-            if (isUndefined(rows[i][j])) {
-                throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
-            }
-            new_row[keys[j]] = rows[i][j];
-        }
-        new_rows.push(new_row);
-    }
-    return new_rows;
-};
-c3_chart_internal_fn.convertColumnsToData = function (columns) {
-    var new_rows = [], i, j, key;
-    for (i = 0; i < columns.length; i++) {
-        key = columns[i][0];
-        for (j = 1; j < columns[i].length; j++) {
-            if (isUndefined(new_rows[j - 1])) {
-                new_rows[j - 1] = {};
-            }
-            if (isUndefined(columns[i][j])) {
-                throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
-            }
-            new_rows[j - 1][key] = columns[i][j];
-        }
-    }
-    return new_rows;
-};
+
 c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     var $$ = this, config = $$.config,
         ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),

@@ -1,5 +1,6 @@
 import CLASS from './class';
 import { c3_chart_internal_fn } from './core';
+import { convertRowsToData, convertColumnsToData } from './data.convert.utils';
 
 c3_chart_internal_fn.load = function (targets, args) {
     var $$ = this;
@@ -50,10 +51,10 @@ c3_chart_internal_fn.loadFromArgs = function (args) {
         $$.load($$.convertDataToTargets($$.convertJsonToData(args.json, args.keys)), args);
     }
     else if (args.rows) {
-        $$.load($$.convertDataToTargets($$.convertRowsToData(args.rows)), args);
+        $$.load($$.convertDataToTargets(convertRowsToData(args.rows)), args);
     }
     else if (args.columns) {
-        $$.load($$.convertDataToTargets($$.convertColumnsToData(args.columns)), args);
+        $$.load($$.convertDataToTargets(convertColumnsToData(args.columns)), args);
     }
     else {
         $$.load(null, args);
