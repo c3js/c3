@@ -63,7 +63,8 @@
   },
   "nyc": {
     "exclude": [
-      "src/polyfill.js"
+      "src/polyfill.js",
+      "spec/"
     ]
   }
 }
