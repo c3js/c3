@@ -1,8 +1,10 @@
-import { convertColumnsToData, convertRowsToData } from '../src/data.convert.utils';
+import c3 from '../src';
 
-describe('convertColumnsToData', () => {
+const $$ = c3.chart.internal.fn;
+
+describe('$$.convertColumnsToData', () => {
     it('converts column data to normalized data', () => {
-        const data = convertColumnsToData([
+        const data = $$.convertColumnsToData([
             ["cat1", "a", "b", "c", "d"],
             ["data1", 30, 200, 100, 400],
             ["cat2", "b", "a", "c", "d", "e", "f"],
@@ -39,16 +41,16 @@ describe('convertColumnsToData', () => {
     });
 
     it('throws when the column data contains undefined', () => {
-        expect(() => convertColumnsToData([
+        expect(() => $$.convertColumnsToData([
             ["cat1", "a", "b", "c", "d"],
             ["data1", undefined]
         ])).toThrowError(Error, /Source data is missing a component/);
     });
 });
 
-describe('convertRowsToData', () => {
+describe('$$.convertRowsToData', () => {
     it('converts the row data to normalized data', () => {
-        const data = convertRowsToData([
+        const data = $$.convertRowsToData([
             ['data1', 'data2', 'data3'],
             [90, 120, 300],
             [40, 160, 240],
@@ -86,7 +88,7 @@ describe('convertRowsToData', () => {
     });
 
     it('throws when the row data contains undefined', () => {
-        expect(() => convertRowsToData([
+        expect(() => $$.convertRowsToData([
             ['data1', 'data2', 'data3'],
             [40, 160, 240],
             [90, 120, undefined]

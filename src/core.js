@@ -1,7 +1,6 @@
 import Axis from './axis';
 import CLASS from './class';
 import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
-import { convertRowsToData, convertColumnsToData } from './data.convert.utils';
 
 export var c3 = { version: "0.4.14" };
 
@@ -92,10 +91,10 @@ c3_chart_internal_fn.init = function () {
         $$.initWithData($$.convertJsonToData(config.data_json, config.data_keys));
     }
     else if (config.data_rows) {
-        $$.initWithData(convertRowsToData(config.data_rows));
+        $$.initWithData($$.convertRowsToData(config.data_rows));
     }
     else if (config.data_columns) {
-        $$.initWithData(convertColumnsToData(config.data_columns));
+        $$.initWithData($$.convertColumnsToData(config.data_columns));
     }
     else {
         throw Error('url or json or rows or columns is required.');

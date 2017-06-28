@@ -1,7 +1,6 @@
 import CLASS from './class';
 import { c3_chart_fn, c3_chart_internal_fn } from './core';
 import { isValue, isDefined, diffDomain } from './util';
-import { convertRowsToData, convertColumnsToData } from './data.convert.utils';
 
 c3_chart_fn.flow = function (args) {
     var $$ = this.internal,
@@ -12,10 +11,10 @@ c3_chart_fn.flow = function (args) {
         data = $$.convertJsonToData(args.json, args.keys);
     }
     else if (args.rows) {
-        data = convertRowsToData(args.rows);
+        data = $$.convertRowsToData(args.rows);
     }
     else if (args.columns) {
-        data = convertColumnsToData(args.columns);
+        data = $$.convertColumnsToData(args.columns);
     }
     else {
         return;

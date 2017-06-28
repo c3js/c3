@@ -1,6 +1,5 @@
 import { c3_chart_internal_fn } from './core';
 import { isValue, isUndefined, isDefined, notEmpty } from './util';
-import { convertRowsToData, convertColumnsToData } from './data.convert.utils';
 
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
@@ -67,12 +66,12 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
             });
             new_rows.push(new_row);
         });
-        data = convertRowsToData(new_rows);
+        data = $$.convertRowsToData(new_rows);
     } else {
         Object.keys(json).forEach(function (key) {
             new_rows.push([key].concat(json[key]));
         });
-        data = convertColumnsToData(new_rows);
+        data = $$.convertColumnsToData(new_rows);
     }
     return data;
 };
@@ -89,6 +88,52 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
         }
     }
     return object;
+};
+
+/**
+ * Converts the rows to normalized data.
+ * @param {any[][]} rows The row data
+ * @return {Object[]}
+ */
+c3_chart_internal_fn.convertRowsToData = (rows) => {
+    const newRows = [];
+    const keys = rows[0];
+
+    for (let i = 1; i < rows.length; i++) {
+        const newRow = {};
+        for (let j = 0; j < rows[i].length; j++) {
+            if (isUndefined(rows[i][j])) {
+                throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
+            }
+            newRow[keys[j]] = rows[i][j];
+        }
+        newRows.push(newRow);
+    }
+    return newRows;
+};
+
+/**
+ * Converts the columns to normalized data.
+ * @param {any[][]} columns The column data
+ * @return {Object[]}
+ */
+c3_chart_internal_fn.convertColumnsToData = (columns) => {
+    const newRows = [];
+
+    for (let i = 0; i < columns.length; i++) {
+        const key = columns[i][0];
+        for (let j = 1; j < columns[i].length; j++) {
+            if (isUndefined(newRows[j - 1])) {
+                newRows[j - 1] = {};
+            }
+            if (isUndefined(columns[i][j])) {
+                throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
+            }
+            newRows[j - 1][key] = columns[i][j];
+        }
+    }
+
+    return newRows;
 };
 
 c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
