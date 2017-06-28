@@ -13,6 +13,9 @@
     "build:css": "npm run build:css:sass && npm run build:css:min",
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
     "build:css:min": "cleancss -o c3.min.css c3.css",
+    "watch": "nodemon -e js,scss --watch src -x 'npm run build:js:rollup && npm run build:css:sass'",
+    "watch:js": "nodemon -e js --watch src --ignore src/scss -x 'npm run build:js:rollup'",
+    "watch:css": "nodemon -e scss --watch src -x 'npm run build:css:sass'",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
     "dist": "npm run build",
     "codecov": "codecov"
@@ -55,6 +58,7 @@
     "karma-spec-reporter": "0.0.31",
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
+    "nodemon": "^1.11.0",
     "rollup": "^0.41.6",
     "uglify-js": "^3.0.15",
     "watchify": "^3.9.0"
