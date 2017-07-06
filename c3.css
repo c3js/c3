@@ -165,3 +165,20 @@
 .c3-chart-arc .c3-gauge-value {
   fill: #000;
   /*  font-size: 28px !important;*/ }
+
+
+/* inverted class, useful for displaying data on dark backgrounds */
+.inverted .c3 .c3-axis-x path,
+.inverted .c3 .c3-axis-x line,
+
+.inverted .c3 .c3-axis-y path,
+.inverted .c3 .c3-axis-y line {
+    stroke: white;
+}
+
+.inverted .c3 .c3-axis-x g,
+.inverted .c3 .c3-axis-y g,
+.inverted .c3 .c3-legend-item-data text {
+    fill: whitesmoke;
+}
+
