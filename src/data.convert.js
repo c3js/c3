@@ -89,36 +89,53 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
     }
     return object;
 };
-c3_chart_internal_fn.convertRowsToData = function (rows) {
-    var keys = rows[0], new_row = {}, new_rows = [], i, j;
-    for (i = 1; i < rows.length; i++) {
-        new_row = {};
-        for (j = 0; j < rows[i].length; j++) {
+
+/**
+ * Converts the rows to normalized data.
+ * @param {any[][]} rows The row data
+ * @return {Object[]}
+ */
+c3_chart_internal_fn.convertRowsToData = (rows) => {
+    const newRows = [];
+    const keys = rows[0];
+
+    for (let i = 1; i < rows.length; i++) {
+        const newRow = {};
+        for (let j = 0; j < rows[i].length; j++) {
             if (isUndefined(rows[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_row[keys[j]] = rows[i][j];
+            newRow[keys[j]] = rows[i][j];
         }
-        new_rows.push(new_row);
+        newRows.push(newRow);
     }
-    return new_rows;
+    return newRows;
 };
-c3_chart_internal_fn.convertColumnsToData = function (columns) {
-    var new_rows = [], i, j, key;
-    for (i = 0; i < columns.length; i++) {
-        key = columns[i][0];
-        for (j = 1; j < columns[i].length; j++) {
-            if (isUndefined(new_rows[j - 1])) {
-                new_rows[j - 1] = {};
+
+/**
+ * Converts the columns to normalized data.
+ * @param {any[][]} columns The column data
+ * @return {Object[]}
+ */
+c3_chart_internal_fn.convertColumnsToData = (columns) => {
+    const newRows = [];
+
+    for (let i = 0; i < columns.length; i++) {
+        const key = columns[i][0];
+        for (let j = 1; j < columns[i].length; j++) {
+            if (isUndefined(newRows[j - 1])) {
+                newRows[j - 1] = {};
             }
             if (isUndefined(columns[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_rows[j - 1][key] = columns[i][j];
+            newRows[j - 1][key] = columns[i][j];
         }
     }
-    return new_rows;
+
+    return newRows;
 };
+
 c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     var $$ = this, config = $$.config,
         ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
