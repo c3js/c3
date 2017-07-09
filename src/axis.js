@@ -153,24 +153,24 @@ c3_axis_internal_fn.updateTickLength = function () {
     var $$$ = this;
     $$$.tickLength = Math.max($$$.innerTickSize, 0) + $$$.tickPadding;
 };
-c3_axis_internal_fn.lineY2 = function (d, i) {
+c3_axis_internal_fn.lineY2 = function (d) {
     var $$$ = this,
         tickPosition = $$$.scale(d) + ($$$.tickCentered ? 0 : $$$.tickOffset);
     return $$$.range[0] < tickPosition && tickPosition < $$$.range[1] ? $$$.innerTickSize : 0;
 };
-c3_axis_internal_fn.textY = function (d, i){
+c3_axis_internal_fn.textY = function (){
     var $$$ = this, rotate = $$$.tickTextRotate;
     return rotate ? 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1) : $$$.tickLength;
 };
-c3_axis_internal_fn.textTransform = function (d, i) {
+c3_axis_internal_fn.textTransform = function () {
     var $$$ = this, rotate = $$$.tickTextRotate;
     return rotate ? "rotate(" + rotate + ")" : "";
 };
-c3_axis_internal_fn.textTextAnchor = function (d, i) {
+c3_axis_internal_fn.textTextAnchor = function () {
     var $$$ = this, rotate = $$$.tickTextRotate;
     return rotate ? (rotate > 0 ? "start" : "end") : "middle";
 };
-c3_axis_internal_fn.tspanDx = function (d, i) {
+c3_axis_internal_fn.tspanDx = function () {
     var $$$ = this, rotate = $$$.tickTextRotate;
     return rotate ? 8 * Math.sin(Math.PI * (rotate / 180)) : 0;
 };
