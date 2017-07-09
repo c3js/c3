@@ -71,7 +71,8 @@ c3_axis_internal_fn.copyScale = function () {
     return newScale;
 };
 c3_axis_internal_fn.textFormatted = function (v) {
-    var formatted = this.tickFormat ? this.tickFormat(v) : v;
+    var $$$ = this,
+        formatted = $$$.tickFormat ? $$$.tickFormat(v) : v;
     return typeof formatted !== 'undefined' ? formatted : '';
 };
 c3_axis_internal_fn.updateRange = function () {
@@ -88,7 +89,7 @@ c3_axis_internal_fn.updateTickTextCharSize = function (tick) {
         h: 11.5,
         w: 5.5
     };
-    tick.select('text').text($$$.textFormatted).each(function (d) {
+    tick.select('text').text(function(d) { return $$$.textFormatted(d); }).each(function (d) {
         var box = this.getBoundingClientRect(),
             text = $$$.textFormatted(d),
             h = box.height,
