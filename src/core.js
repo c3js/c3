@@ -6,10 +6,10 @@ export var c3 = { version: "0.4.14" };
 
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
-export var c3_chart_internal_axis_fn;
 
-export function API(owner) {
+export function Component(owner, componentKey, fn) {
     this.owner = owner;
+    c3.chart.internal[componentKey] = fn;
 }
 
 export function inherit(base, derived) {
@@ -64,14 +64,10 @@ c3.chart = {
     fn: Chart.prototype,
     internal: {
         fn: ChartInternal.prototype,
-        axis: {
-            fn: Axis.prototype
-        }
     }
 };
 c3_chart_fn = c3.chart.fn;
 c3_chart_internal_fn = c3.chart.internal.fn;
-c3_chart_internal_axis_fn = c3.chart.internal.axis.fn;
 
 c3_chart_internal_fn.beforeInit = function () {
     // can do something
