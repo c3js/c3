@@ -1,0 +1,42 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/c3/htdocs/css/c3.css">
+</head>
+<body>
+
+<div id="chart1"></div>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="/c3/htdocs/js/c3.js"></script>
+<script>
+
+    var chart1 = c3.generate({
+        bindto: '#chart1',
+        data: {
+            type: 'bar',
+            columns: [
+                ['linear', 318, 37, 0, 4, 0, 1],
+                ['log', 318, 37, 0, 4, 0, 1]
+            ],
+            axes: {
+                log: 'y2'
+            },
+        },
+        axis: {
+            y2: {
+                show: true,
+                tick: {
+                  format: function(v) {
+                      return Math.ceil(v);
+                  }
+                },
+                scale: {
+                    name: 'log'
+                }
+            }
+        },
+    });
+
+</script>
+</body>
+</html>
