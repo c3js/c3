@@ -70,5 +70,10 @@
       "src/polyfill.js",
       "spec/"
     ]
+  },
+  "greenkeeper": {
+    "ignore": [
+      "d3"
+    ]
   }
 }
