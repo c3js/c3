@@ -22,3 +22,11 @@
   fill: #000;
 /*  font-size: 28px !important;*/
 }
+
+.c3-chart-arc.c3-target g path {
+  opacity: 1;
+}
+
+.c3-chart-arc.c3-target.c3-focused g path {
+  opacity: 1;
+}
