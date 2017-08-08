@@ -61,7 +61,7 @@
     "node-static": "^0.7.9",
     "nodemon": "^1.11.0",
     "rollup": "^0.45.2",
-    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-babel": "^3.0.0",
     "uglify-js": "^3.0.15",
     "watchify": "^3.9.0"
   },
