@@ -896,7 +896,7 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3$1 = { version: "0.4.15" };
+var c3$1 = { version: "0.4.16" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
@@ -7702,7 +7702,7 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
     $$.mainBar.exit().transition().duration(durationForExit).remove();
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
-    return [(withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar).attr('d', drawBar).style("fill", this.color).style("opacity", 1)];
+    return [(withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar).attr('d', drawBar).style("stroke", this.color).style("fill", this.color).style("opacity", 1)];
 };
 c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
     var $$ = this,
