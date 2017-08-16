@@ -2,7 +2,8 @@
   "name": "c3",
   "version": "0.4.15",
   "description": "D3-based reusable chart library",
-  "main": "c3.js",
+  "main": "dist/c3.js",
+  "style": "dist/c3.css",
   "scripts": {
     "serve": "static -p 8080 htdocs/",
     "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
