@@ -46,6 +46,7 @@ c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
     return [
         (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
             .attr('d', drawBar)
+            .style("stroke", this.color)
             .style("fill", this.color)
             .style("opacity", 1)
     ];
