@@ -1,7 +1,12 @@
-c3 [![Build Status](https://travis-ci.org/c3js/c3.svg?branch=master)](https://travis-ci.org/c3js/c3) [![Dependency Status](https://david-dm.org/c3js/c3.svg)](https://david-dm.org/c3js/c3) [![devDependency Status](https://david-dm.org/c3js/c3/dev-status.svg)](https://david-dm.org/c3js/c3#info=devDependencies) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE) [![codecov.io](https://codecov.io/github/c3js/c3/coverage.svg?branch=master)](https://codecov.io/github/c3js/c3?branch=master)
-==
+# c3
 
-c3 is a D3-based reusable chart library that enables deeper integration of charts into web applications.
+[![Build Status](https://travis-ci.org/c3js/c3.svg?branch=master)](https://travis-ci.org/c3js/c3)
+[![devDependency Status](https://david-dm.org/c3js/c3/dev-status.svg)](https://david-dm.org/c3js/c3#info=devDependencies)
+[![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE)
+[![codecov.io](https://codecov.io/github/c3js/c3/coverage.svg?branch=master)](https://codecov.io/github/c3js/c3?branch=master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/c3js/c3.svg)](https://greenkeeper.io/)
+
+> c3 is a D3-based reusable chart library that enables deeper integration of charts into web applications.
 
 Follow the link for more information: [http://c3js.org](http://c3js.org/)
 

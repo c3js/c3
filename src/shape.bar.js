@@ -18,7 +18,6 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
         .attr('class', function (d) { return classChartBar(d) + classFocus(d); });
     mainBarEnter = mainBarUpdate.enter().append('g')
         .attr('class', classChartBar)
-        .style('opacity', 0)
         .style("pointer-events", "none");
     // Bars for each data
     mainBarEnter.append('g')
@@ -41,13 +40,13 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
     $$.mainBar
         .style("opacity", initialOpacity);
     $$.mainBar.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
         .remove();
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
     return [
         (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
             .attr('d', drawBar)
+            .style("stroke", this.color)
             .style("fill", this.color)
             .style("opacity", 1)
     ];
@@ -98,6 +97,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
         barY = $$.getShapeY(!!isSub),
         barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
+        barSpaceOffset = barW * ($$.config.bar_space / 2),
         yScale = isSub ? $$.getSubYScale : $$.getYScale;
     return function (d, i) {
         var y0 = yScale.call($$, d.id)(0),
@@ -109,10 +109,10 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         }
         // 4 points that make a bar
         return [
-            [posX, offset],
-            [posX, posY - (y0 - offset)],
-            [posX + barW, posY - (y0 - offset)],
-            [posX + barW, offset]
+            [posX + barSpaceOffset, offset],
+            [posX + barSpaceOffset, posY - (y0 - offset)],
+            [posX + barW - barSpaceOffset, posY - (y0 - offset)],
+            [posX + barW - barSpaceOffset, offset]
         ];
     };
 };

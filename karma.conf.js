@@ -6,10 +6,10 @@ module.exports = function(config) {
     files: [
       'c3.css',
       'spec/*-helper.js',
-      'spec/*-spec.js'
+      'spec/*.js'
     ],
     preprocessors: {
-      'spec/c3-helper.js': ['browserify']
+      'spec/*.js': ['browserify']
     },
     browserify: {
       debug: true,

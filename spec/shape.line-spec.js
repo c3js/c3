@@ -1,3 +1,5 @@
+import { parseSvgPath } from './svg-helper';
+
 describe('c3 chart shape line', function () {
     'use strict';
 
@@ -6,8 +8,6 @@ describe('c3 chart shape line', function () {
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
     });
-
-    var parseSvgPath = window.parseSvgPath;
 
     describe('shape-rendering for line chart', function () {
 

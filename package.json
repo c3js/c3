@@ -1,6 +1,6 @@
 {
   "name": "c3",
-  "version": "0.4.14",
+  "version": "0.4.17",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
     "build": "npm run build:js && npm run build:css",
     "build:js": "npm run build:js:rollup && npm run build:js:uglify",
-    "build:js:rollup": "rollup -f umd --name c3 --globals d3:d3 src/index.js > c3.js",
+    "build:js:rollup": "rollup -c > c3.js",
     "build:js:uglify": "uglifyjs c3.js --compress --mangle -o c3.min.js",
     "build:css": "npm run build:css:sass && npm run build:css:min",
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
@@ -41,6 +41,7 @@
     "d3": "~3.5.0"
   },
   "devDependencies": {
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-istanbul": "^4.1.4",
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^7.3.0",
@@ -59,13 +60,20 @@
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
     "nodemon": "^1.11.0",
-    "rollup": "^0.41.6",
+    "rollup": "^0.47.4",
+    "rollup-plugin-babel": "^3.0.0",
     "uglify-js": "^3.0.15",
     "watchify": "^3.9.0"
   },
   "nyc": {
     "exclude": [
-      "src/polyfill.js"
+      "src/polyfill.js",
+      "spec/"
+    ]
+  },
+  "greenkeeper": {
+    "ignore": [
+      "d3"
     ]
   }
 }
