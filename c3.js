@@ -896,7 +896,7 @@ Axis.prototype.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3$1 = { version: "0.4.16" };
+var c3$1 = { version: "0.4.17" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
@@ -5093,6 +5093,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         bar_width_ratio: 0.6,
         bar_width_max: undefined,
         bar_zerobased: true,
+        bar_space: 0,
         // area
         area_zerobased: true,
         area_above: false,
@@ -7750,6 +7751,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         barX = $$.getShapeX(barW, barTargetsNum, barIndices, !!isSub),
         barY = $$.getShapeY(!!isSub),
         barOffset = $$.getShapeOffset($$.isBarType, barIndices, !!isSub),
+        barSpaceOffset = barW * ($$.config.bar_space / 2),
         yScale = isSub ? $$.getSubYScale : $$.getYScale;
     return function (d, i) {
         var y0 = yScale.call($$, d.id)(0),
@@ -7764,7 +7766,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
             }
         }
         // 4 points that make a bar
-        return [[posX, offset], [posX, posY - (y0 - offset)], [posX + barW, posY - (y0 - offset)], [posX + barW, offset]];
+        return [[posX + barSpaceOffset, offset], [posX + barSpaceOffset, posY - (y0 - offset)], [posX + barW - barSpaceOffset, posY - (y0 - offset)], [posX + barW - barSpaceOffset, offset]];
     };
 };
 c3_chart_internal_fn.isWithinBar = function (that) {
