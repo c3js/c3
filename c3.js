@@ -88,6 +88,66 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
 var isValue = function isValue(v) {
     return v || v === 0;
 };
@@ -534,18 +594,29 @@ c3_axis_internal_fn.generateAxis = function () {
     return axis;
 };
 
-function Axis(owner) {
-    var fn = {
-        fn: c3_axis_fn,
-        internal: {
-            fn: c3_axis_internal_fn
-        }
-    };
-    this.d3 = owner.d3;
-    this.internal = AxisInternal;
-    Component.call(this, owner, 'axis', fn);
-}
-inherit(Component, Axis);
+var Axis = function (_Component) {
+    inherits(Axis, _Component);
+
+    function Axis(owner) {
+        classCallCheck(this, Axis);
+
+        var fn = {
+            fn: c3_axis_fn,
+            internal: {
+                fn: c3_axis_internal_fn
+            }
+        };
+
+        var _this = possibleConstructorReturn(this, (Axis.__proto__ || Object.getPrototypeOf(Axis)).call(this, owner, 'axis', fn));
+
+        _this.d3 = owner.d3;
+        _this.internal = AxisInternal;
+        return _this;
+    }
+
+    return Axis;
+}(Component);
+
 c3_axis_fn = Axis.prototype;
 
 c3_axis_fn.init = function init() {
@@ -938,21 +1009,6 @@ var c3_chart_internal_fn;
 function Component(owner, componentKey, fn) {
     this.owner = owner;
     c3$1.chart.internal[componentKey] = fn;
-}
-
-function inherit(base, derived) {
-
-    if (Object.create) {
-        derived.prototype = Object.create(base.prototype);
-    } else {
-        var f = function f() {};
-        f.prototype = base.prototype;
-        derived.prototype = new f();
-    }
-
-    derived.prototype.constructor = derived;
-
-    return derived;
 }
 
 function Chart(config) {

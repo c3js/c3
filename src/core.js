@@ -12,21 +12,6 @@ export function Component(owner, componentKey, fn) {
     c3.chart.internal[componentKey] = fn;
 }
 
-export function inherit(base, derived) {
-
-    if (Object.create) {
-        derived.prototype = Object.create(base.prototype);
-    } else {
-        var f = function f() {};
-        f.prototype = base.prototype;
-        derived.prototype = new f();
-    }
-
-    derived.prototype.constructor = derived;
-
-    return derived;
-}
-
 function Chart(config) {
     var $$ = this.internal = new ChartInternal(this);
     $$.loadConfig(config);

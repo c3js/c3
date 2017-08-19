@@ -1,5 +1,5 @@
 import CLASS from './class';
-import { inherit, Component } from './core';
+import { Component } from './core';
 import { isValue, isFunction, isString, isEmpty } from './util';
 
 export var c3_axis_fn;
@@ -366,18 +366,19 @@ c3_axis_internal_fn.generateAxis = function () {
     return axis;
 };
 
-export default function Axis(owner) {
-    var fn = {
-        fn: c3_axis_fn,
-        internal: {
-            fn: c3_axis_internal_fn
-        }
-    };
-    this.d3 = owner.d3;
-    this.internal = AxisInternal;
-    Component.call(this, owner, 'axis', fn);
+export default class Axis extends Component {
+    constructor (owner) {
+        var fn = {
+            fn: c3_axis_fn,
+            internal: {
+                fn: c3_axis_internal_fn
+            }
+        };
+        super(owner, 'axis', fn);
+        this.d3 = owner.d3;
+        this.internal = AxisInternal;
+    }
 }
-inherit(Component, Axis);
 c3_axis_fn = Axis.prototype;
 
 c3_axis_fn.init = function init() {
