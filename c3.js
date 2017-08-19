@@ -139,29 +139,29 @@ var c3_axis_fn;
 var c3_axis_internal_fn;
 
 function AxisInternal(component, params) {
-    var $$$ = this;
-    $$$.component = component;
-    $$$.params = params || {};
+    var internal = this;
+    internal.component = component;
+    internal.params = params || {};
 
-    $$$.d3 = component.d3;
-    $$$.scale = $$$.d3.scale.linear();
-    $$$.range;
-    $$$.orient = "bottom";
-    $$$.innerTickSize = 6;
-    $$$.outerTickSize = this.params.withOuterTick ? 6 : 0;
-    $$$.tickPadding = 3;
-    $$$.tickValues = null;
-    $$$.tickFormat;
-    $$$.tickArguments;
+    internal.d3 = component.d3;
+    internal.scale = internal.d3.scale.linear();
+    internal.range;
+    internal.orient = "bottom";
+    internal.innerTickSize = 6;
+    internal.outerTickSize = this.params.withOuterTick ? 6 : 0;
+    internal.tickPadding = 3;
+    internal.tickValues = null;
+    internal.tickFormat;
+    internal.tickArguments;
 
-    $$$.tickOffset = 0;
-    $$$.tickCulling = true;
-    $$$.tickCentered;
-    $$$.tickTextCharSize;
-    $$$.tickTextRotate = $$$.params.tickTextRotate;
-    $$$.tickLength;
+    internal.tickOffset = 0;
+    internal.tickCulling = true;
+    internal.tickCentered;
+    internal.tickTextCharSize;
+    internal.tickTextRotate = internal.params.tickTextRotate;
+    internal.tickLength;
 
-    $$$.axis = $$$.generateAxis();
+    internal.axis = internal.generateAxis();
 }
 c3_axis_internal_fn = AxisInternal.prototype;
 
@@ -180,10 +180,10 @@ c3_axis_internal_fn.scaleExtent = function (domain) {
     return start < stop ? [ start, stop ] : [ stop, start ];
 };
 c3_axis_internal_fn.generateTicks = function (scale) {
-    var $$$ = this;
+    var internal = this;
     var i, domain, ticks = [];
     if (scale.ticks) {
-        return scale.ticks.apply(scale, $$$.tickArguments);
+        return scale.ticks.apply(scale, internal.tickArguments);
     }
     domain = scale.domain();
     for (i = Math.ceil(domain[0]); i < domain[1]; i++) {
@@ -195,36 +195,36 @@ c3_axis_internal_fn.generateTicks = function (scale) {
     return ticks;
 };
 c3_axis_internal_fn.copyScale = function () {
-    var $$$ = this;
-    var newScale = $$$.scale.copy(), domain;
-    if ($$$.params.isCategory) {
-        domain = $$$.scale.domain();
+    var internal = this;
+    var newScale = internal.scale.copy(), domain;
+    if (internal.params.isCategory) {
+        domain = internal.scale.domain();
         newScale.domain([domain[0], domain[1] - 1]);
     }
     return newScale;
 };
 c3_axis_internal_fn.textFormatted = function (v) {
-    var $$$ = this,
-        formatted = $$$.tickFormat ? $$$.tickFormat(v) : v;
+    var internal = this,
+        formatted = internal.tickFormat ? internal.tickFormat(v) : v;
     return typeof formatted !== 'undefined' ? formatted : '';
 };
 c3_axis_internal_fn.updateRange = function () {
-    var $$$ = this;
-    $$$.range = $$$.scale.rangeExtent ? $$$.scale.rangeExtent() : $$$.scaleExtent($$$.scale.range());
-    return $$$.range;
+    var internal = this;
+    internal.range = internal.scale.rangeExtent ? internal.scale.rangeExtent() : internal.scaleExtent(internal.scale.range());
+    return internal.range;
 };
 c3_axis_internal_fn.updateTickTextCharSize = function (tick) {
-    var $$$ = this;
-    if ($$$.tickTextCharSize) {
-        return $$$.tickTextCharSize;
+    var internal = this;
+    if (internal.tickTextCharSize) {
+        return internal.tickTextCharSize;
     }
     var size = {
         h: 11.5,
         w: 5.5
     };
-    tick.select('text').text(function(d) { return $$$.textFormatted(d); }).each(function (d) {
+    tick.select('text').text(function(d) { return internal.textFormatted(d); }).each(function (d) {
         var box = this.getBoundingClientRect(),
-            text = $$$.textFormatted(d),
+            text = internal.textFormatted(d),
             h = box.height,
             w = text ? (box.width / text.length) : undefined;
         if (h && w) {
@@ -232,7 +232,7 @@ c3_axis_internal_fn.updateTickTextCharSize = function (tick) {
             size.w = w;
         }
     }).text('');
-    $$$.tickTextCharSize = size;
+    internal.tickTextCharSize = size;
     return size;
 };
 c3_axis_internal_fn.transitionise = function (selection) {
@@ -242,16 +242,16 @@ c3_axis_internal_fn.isVertical = function () {
     return this.orient === 'left' || this.orient === 'right';
 };
 c3_axis_internal_fn.tspanData = function (d, i, ticks, scale) {
-    var $$$ = this;
-    var splitted = $$$.params.tickMultiline ? $$$.splitTickText(d, ticks, scale) : [].concat($$$.textFormatted(d));
+    var internal = this;
+    var splitted = internal.params.tickMultiline ? internal.splitTickText(d, ticks, scale) : [].concat(internal.textFormatted(d));
     return splitted.map(function (s) {
         return { index: i, splitted: s, length: splitted.length };
     });
 };
 c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
-    var $$$ = this,
-        tickText = $$$.textFormatted(d),
-        maxWidth = $$$.params.tickWidth,
+    var internal = this,
+        tickText = internal.textFormatted(d),
+        maxWidth = internal.params.tickWidth,
         subtext, spaceIndex, textWidth, splitted = [];
 
     if (Object.prototype.toString.call(tickText) === "[object Array]") {
@@ -259,7 +259,7 @@ c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
     }
 
     if (!maxWidth || maxWidth <= 0) {
-        maxWidth = $$$.isVertical() ? 95 : $$$.params.isCategory ? (Math.ceil(scale(ticks[1]) - scale(ticks[0])) - 12) : 110;
+        maxWidth = internal.isVertical() ? 95 : internal.params.isCategory ? (Math.ceil(scale(ticks[1]) - scale(ticks[0])) - 12) : 110;
     }
 
     function split(splitted, text) {
@@ -269,7 +269,7 @@ c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
                 spaceIndex = i;
             }
             subtext = text.substr(0, i + 1);
-            textWidth = $$$.tickTextCharSize.w * subtext.length;
+            textWidth = internal.tickTextCharSize.w * subtext.length;
             // if text width gets over tick width, split by space index or crrent index
             if (maxWidth < textWidth) {
                 return split(
@@ -284,36 +284,36 @@ c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
     return split(splitted, tickText + "");
 };
 c3_axis_internal_fn.updateTickLength = function () {
-    var $$$ = this;
-    $$$.tickLength = Math.max($$$.innerTickSize, 0) + $$$.tickPadding;
+    var internal = this;
+    internal.tickLength = Math.max(internal.innerTickSize, 0) + internal.tickPadding;
 };
 c3_axis_internal_fn.lineY2 = function (d) {
-    var $$$ = this,
-        tickPosition = $$$.scale(d) + ($$$.tickCentered ? 0 : $$$.tickOffset);
-    return $$$.range[0] < tickPosition && tickPosition < $$$.range[1] ? $$$.innerTickSize : 0;
+    var internal = this,
+        tickPosition = internal.scale(d) + (internal.tickCentered ? 0 : internal.tickOffset);
+    return internal.range[0] < tickPosition && tickPosition < internal.range[1] ? internal.innerTickSize : 0;
 };
 c3_axis_internal_fn.textY = function (){
-    var $$$ = this, rotate = $$$.tickTextRotate;
-    return rotate ? 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1) : $$$.tickLength;
+    var internal = this, rotate = internal.tickTextRotate;
+    return rotate ? 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1) : internal.tickLength;
 };
 c3_axis_internal_fn.textTransform = function () {
-    var $$$ = this, rotate = $$$.tickTextRotate;
+    var internal = this, rotate = internal.tickTextRotate;
     return rotate ? "rotate(" + rotate + ")" : "";
 };
 c3_axis_internal_fn.textTextAnchor = function () {
-    var $$$ = this, rotate = $$$.tickTextRotate;
+    var internal = this, rotate = internal.tickTextRotate;
     return rotate ? (rotate > 0 ? "start" : "end") : "middle";
 };
 c3_axis_internal_fn.tspanDx = function () {
-    var $$$ = this, rotate = $$$.tickTextRotate;
+    var internal = this, rotate = internal.tickTextRotate;
     return rotate ? 8 * Math.sin(Math.PI * (rotate / 180)) : 0;
 };
 c3_axis_internal_fn.tspanDy = function (d, i) {
-    var $$$ = this,
-        dy = $$$.tickTextCharSize.h;
+    var internal = this,
+        dy = internal.tickTextCharSize.h;
     if (i === 0) {
-        if ($$$.isVertical()) {
-            dy = -((d.length - 1) * ($$$.tickTextCharSize.h / 2) - 3);
+        if (internal.isVertical()) {
+            dy = -((d.length - 1) * (internal.tickTextCharSize.h / 2) - 3);
         } else {
             dy = ".71em";
         }
@@ -323,106 +323,106 @@ c3_axis_internal_fn.tspanDy = function (d, i) {
 
 
 c3_axis_internal_fn.generateAxis = function () {
-    var $$$ = this, d3 = $$$.d3, params = $$$.params;
+    var internal = this, d3 = internal.d3, params = internal.params;
     function axis(g) {
         g.each(function () {
             var g = axis.g = d3.select(this);
 
-            var scale0 = this.__chart__ || $$$.scale,
-                scale1 = this.__chart__ = $$$.copyScale();
+            var scale0 = this.__chart__ || internal.scale,
+                scale1 = this.__chart__ = internal.copyScale();
 
-            var ticks = $$$.tickValues ? $$$.tickValues : $$$.generateTicks(scale1),
+            var ticks = internal.tickValues ? internal.tickValues : internal.generateTicks(scale1),
                 tick = g.selectAll(".tick").data(ticks, scale1),
                 tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = tick.exit().remove(),
-                tickUpdate = $$$.transitionise(tick).style("opacity", 1),
+                tickUpdate = internal.transitionise(tick).style("opacity", 1),
                 tickTransform, tickX, tickY;
 
             if (params.isCategory) {
-                $$$.tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
-                tickX = $$$.tickCentered ? 0 : $$$.tickOffset;
-                tickY = $$$.tickCentered ? $$$.tickOffset : 0;
+                internal.tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
+                tickX = internal.tickCentered ? 0 : internal.tickOffset;
+                tickY = internal.tickCentered ? internal.tickOffset : 0;
             } else {
-                $$$.tickOffset = tickX = 0;
+                internal.tickOffset = tickX = 0;
             }
 
             tickEnter.append("line");
             tickEnter.append("text");
 
-            $$$.updateRange();
-            $$$.updateTickLength();
-            $$$.updateTickTextCharSize(g.select('.tick'));
+            internal.updateRange();
+            internal.updateTickLength();
+            internal.updateTickTextCharSize(g.select('.tick'));
 
             var lineUpdate = tickUpdate.select("line"),
                 textUpdate = tickUpdate.select("text"),
                 tspanUpdate = tick.select("text").selectAll('tspan')
-                    .data(function (d, i) { return $$$.tspanData(d, i, ticks, scale1); });
+                    .data(function (d, i) { return internal.tspanData(d, i, ticks, scale1); });
 
             tspanUpdate.enter().append('tspan');
             tspanUpdate.exit().remove();
             tspanUpdate.text(function (d) { return d.splitted; });
 
             var path = g.selectAll(".domain").data([ 0 ]),
-                pathUpdate = (path.enter().append("path").attr("class", "domain"), $$$.transitionise(path));
+                pathUpdate = (path.enter().append("path").attr("class", "domain"), internal.transitionise(path));
 
-            // TODO: each attr should be one function and change its behavior by $$$.orient, probably
-            switch ($$$.orient) {
+            // TODO: each attr should be one function and change its behavior by internal.orient, probably
+            switch (internal.orient) {
             case "bottom":
                 {
-                    tickTransform = $$$.axisX;
+                    tickTransform = internal.axisX;
                     lineUpdate.attr("x1", tickX)
                         .attr("x2", tickX)
-                        .attr("y2", function (d, i) { return $$$.lineY2(d, i); });
+                        .attr("y2", function (d, i) { return internal.lineY2(d, i); });
                     textUpdate.attr("x", 0)
-                        .attr("y", function (d, i) { return $$$.textY(d, i); })
-                        .attr("transform", function (d, i) { return $$$.textTransform(d, i); })
-                        .style("text-anchor", function (d, i) { return $$$.textTextAnchor(d, i); });
+                        .attr("y", function (d, i) { return internal.textY(d, i); })
+                        .attr("transform", function (d, i) { return internal.textTransform(d, i); })
+                        .style("text-anchor", function (d, i) { return internal.textTextAnchor(d, i); });
                     tspanUpdate.attr('x', 0)
-                        .attr("dy", function (d, i) { return $$$.tspanDy(d, i); })
-                        .attr('dx', function (d, i) { return $$$.tspanDx(d, i); });
-                    pathUpdate.attr("d", "M" + $$$.range[0] + "," + $$$.outerTickSize + "V0H" + $$$.range[1] + "V" + $$$.outerTickSize);
+                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); })
+                        .attr('dx', function (d, i) { return internal.tspanDx(d, i); });
+                    pathUpdate.attr("d", "M" + internal.range[0] + "," + internal.outerTickSize + "V0H" + internal.range[1] + "V" + internal.outerTickSize);
                     break;
                 }
             case "top":
                 {
                     // TODO: rotated tick text
-                    tickTransform = $$$.axisX;
+                    tickTransform = internal.axisX;
                     lineUpdate.attr("x2", 0)
-                        .attr("y2", -$$$.innerTickSize);
+                        .attr("y2", -internal.innerTickSize);
                     textUpdate.attr("x", 0)
-                        .attr("y", -$$$.tickLength)
+                        .attr("y", -internal.tickLength)
                         .style("text-anchor", "middle");
                     tspanUpdate.attr('x', 0)
                         .attr("dy", "0em");
-                    pathUpdate.attr("d", "M" + $$$.range[0] + "," + -$$$.outerTickSize + "V0H" + $$$.range[1] + "V" + -$$$.outerTickSize);
+                    pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                     break;
                 }
             case "left":
                 {
-                    tickTransform = $$$.axisY;
-                    lineUpdate.attr("x2", -$$$.innerTickSize)
+                    tickTransform = internal.axisY;
+                    lineUpdate.attr("x2", -internal.innerTickSize)
                         .attr("y1", tickY)
                         .attr("y2", tickY);
-                    textUpdate.attr("x", -$$$.tickLength)
-                        .attr("y", $$$.tickOffset)
+                    textUpdate.attr("x", -internal.tickLength)
+                        .attr("y", internal.tickOffset)
                         .style("text-anchor", "end");
-                    tspanUpdate.attr('x', -$$$.tickLength)
-                        .attr("dy", function (d, i) { return $$$.tspanDy(d, i); });
-                    pathUpdate.attr("d", "M" + -$$$.outerTickSize + "," + $$$.range[0] + "H0V" + $$$.range[1] + "H" + -$$$.outerTickSize);
+                    tspanUpdate.attr('x', -internal.tickLength)
+                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
+                    pathUpdate.attr("d", "M" + -internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + -internal.outerTickSize);
                     break;
                 }
             case "right":
                 {
-                    tickTransform = $$$.axisY;
-                    lineUpdate.attr("x2", $$$.innerTickSize)
+                    tickTransform = internal.axisY;
+                    lineUpdate.attr("x2", internal.innerTickSize)
                         .attr("y2", 0);
-                    textUpdate.attr("x", $$$.tickLength)
+                    textUpdate.attr("x", internal.tickLength)
                         .attr("y", 0)
                         .style("text-anchor", "start");
-                    tspanUpdate.attr('x', $$$.tickLength)
-                        .attr("dy", function (d, i) { return $$$.tspanDy(d, i); });
-                    pathUpdate.attr("d", "M" + $$$.outerTickSize + "," + $$$.range[0] + "H0V" + $$$.range[1] + "H" + $$$.outerTickSize);
+                    tspanUpdate.attr('x', internal.tickLength)
+                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
+                    pathUpdate.attr("d", "M" + internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + internal.outerTickSize);
                     break;
                 }
             }
@@ -434,65 +434,65 @@ c3_axis_internal_fn.generateAxis = function () {
             } else if (scale0.rangeBand) {
                 scale0 = scale1;
             } else {
-                tickExit.call(tickTransform, scale1, $$$.tickOffset);
+                tickExit.call(tickTransform, scale1, internal.tickOffset);
             }
-            tickEnter.call(tickTransform, scale0, $$$.tickOffset);
-            tickUpdate.call(tickTransform, scale1, $$$.tickOffset);
+            tickEnter.call(tickTransform, scale0, internal.tickOffset);
+            tickUpdate.call(tickTransform, scale1, internal.tickOffset);
         });
     }
     axis.scale = function (x) {
-        if (!arguments.length) { return $$$.scale; }
-        $$$.scale = x;
+        if (!arguments.length) { return internal.scale; }
+        internal.scale = x;
         return axis;
     };
     axis.orient = function (x) {
-        if (!arguments.length) { return $$$.orient; }
-        $$$.orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
+        if (!arguments.length) { return internal.orient; }
+        internal.orient = x in {top: 1, right: 1, bottom: 1, left: 1} ? x + "" : "bottom";
         return axis;
     };
     axis.tickFormat = function (format) {
-        if (!arguments.length) { return $$$.tickFormat; }
-        $$$.tickFormat = format;
+        if (!arguments.length) { return internal.tickFormat; }
+        internal.tickFormat = format;
         return axis;
     };
     axis.tickCentered = function (isCentered) {
-        if (!arguments.length) { return $$$.tickCentered; }
-        $$$.tickCentered = isCentered;
+        if (!arguments.length) { return internal.tickCentered; }
+        internal.tickCentered = isCentered;
         return axis;
     };
     axis.tickOffset = function () {
-        return $$$.tickOffset;
+        return internal.tickOffset;
     };
     axis.tickInterval = function () {
         var interval, length;
         if (params.isCategory) {
-            interval = $$$.tickOffset * 2;
+            interval = internal.tickOffset * 2;
         }
         else {
-            length = axis.g.select('path.domain').node().getTotalLength() - $$$.outerTickSize * 2;
+            length = axis.g.select('path.domain').node().getTotalLength() - internal.outerTickSize * 2;
             interval = length / axis.g.selectAll('line').size();
         }
         return interval === Infinity ? 0 : interval;
     };
     axis.ticks = function () {
-        if (!arguments.length) { return $$$.tickArguments; }
-        $$$.tickArguments = arguments;
+        if (!arguments.length) { return internal.tickArguments; }
+        internal.tickArguments = arguments;
         return axis;
     };
     axis.tickCulling = function (culling) {
-        if (!arguments.length) { return $$$.tickCulling; }
-        $$$.tickCulling = culling;
+        if (!arguments.length) { return internal.tickCulling; }
+        internal.tickCulling = culling;
         return axis;
     };
     axis.tickValues = function (x) {
         if (typeof x === 'function') {
-            $$$.tickValues = function () {
-                return x($$$.scale.domain());
+            internal.tickValues = function () {
+                return x(internal.scale.domain());
             };
         }
         else {
-            if (!arguments.length) { return $$$.tickValues; }
-            $$$.tickValues = x;
+            if (!arguments.length) { return internal.tickValues; }
+            internal.tickValues = x;
         }
         return axis;
     };
