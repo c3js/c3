@@ -22,7 +22,6 @@ import './api.x';
 import './api.zoom';
 import './arc';
 import './axis';
-import './c3.axis';
 import './cache';
 import './category';
 import './class';

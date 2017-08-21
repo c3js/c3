@@ -1094,7 +1094,7 @@ describe('c3 chart data', function () {
 
                     it('should have y domain with proper padding', function () {
                         var domain = chart.internal.y.domain();
-                        expect(domain[0]).toBeCloseTo(-259, -1);
+                        expect(domain[0]).toBeCloseTo(-253, -1);
                         expect(domain[1]).toBeCloseTo(260, -1);
                     });
 
@@ -1117,7 +1117,7 @@ describe('c3 chart data', function () {
 
                     it('should have y domain with proper padding', function () {
                         var domain = chart.internal.y.domain();
-                        expect(domain[0]).toBeCloseTo(-259, -1);
+                        expect(domain[0]).toBeCloseTo(-253, -1);
                         expect(domain[1]).toBeCloseTo(260, -1);
                     });
 
@@ -1349,8 +1349,8 @@ describe('c3 chart data', function () {
 
                     it('should have y domain with proper padding', function () {
                         var domain = chart.internal.y.domain();
-                        expect(domain[0]).toBeCloseTo(-899, -1);
-                        expect(domain[1]).toBeCloseTo(101, -1.2);
+                        expect(domain[0]).toBeCloseTo(-893, -1);
+                        expect(domain[1]).toBeCloseTo(93, -1);
                     });
 
                     it('should locate labels above each data point', function () {
