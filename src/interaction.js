@@ -247,6 +247,10 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .on('mouseout', function () {
             if (!$$.config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
+            if ($$.mouseover){
+              config.data_onmouseout.call($$.api, $$.mouseover);
+              $$.mouseover = undefined;
+            }
             mouseout();
         })
         .on('mousemove', function () {
