@@ -259,7 +259,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
 
-            if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
+            if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id || closest.index !== $$.mouseover.index)) {
                 config.data_onmouseout.call($$.api, $$.mouseover);
                 $$.mouseover = undefined;
             }
