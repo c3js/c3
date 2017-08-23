@@ -51,6 +51,10 @@ ChartInternal.prototype.redrawEventRect = function () {
         .on('mouseout',  config.interaction_enabled ? function () {
             if (!config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
+            if ($$.mouseover){
+              config.data_onmouseout.call($$.api, $$.mouseover);
+              $$.mouseover = undefined;
+            }
             mouseout();
         } : null)
         .on('mousemove', config.interaction_enabled ? function () {
