@@ -1,5 +1,5 @@
 # c3
-
+mod by satya
 [![Build Status](https://travis-ci.org/c3js/c3.svg?branch=master)](https://travis-ci.org/c3js/c3)
 [![devDependency Status](https://david-dm.org/c3js/c3/dev-status.svg)](https://david-dm.org/c3js/c3#info=devDependencies)
 [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE)
