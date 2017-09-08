@@ -236,21 +236,31 @@ c3_chart_internal_fn.isOrderAsc = function () {
     var config = this.config;
     return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'asc';
 };
-c3_chart_internal_fn.orderTargets = function (targets) {
+c3_chart_internal_fn.getOrderFunction = function() {
     var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
     if (orderAsc || orderDesc) {
-        targets.sort(function (t1, t2) {
+        return function (t1, t2) {
             var reducer = function (p, c) { return p + Math.abs(c.value); };
             var t1Sum = t1.values.reduce(reducer, 0),
                 t2Sum = t2.values.reduce(reducer, 0);
-            return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
-        });
+            return orderDesc ? t2Sum - t1Sum : t1Sum - t2Sum;
+        };
     } else if (isFunction(config.data_order)) {
-        targets.sort(config.data_order);
+        return config.data_order;
     } else if (isArray(config.data_order)) {
-        targets.sort(function (t1, t2) {
-            return config.data_order.indexOf(t1.id) - config.data_order.indexOf(t2.id);
-        });
+        var order = config.data_order;
+        return function (t1, t2) {
+            return order.indexOf(t1.id) - order.indexOf(t2.id);
+        };
+    }
+};
+c3_chart_internal_fn.orderTargets = function (targets) {
+    var fct = this.getOrderFunction();
+    if (fct) {
+        targets.sort(fct);
+        if (this.isOrderAsc() || this.isOrderDesc()) {
+            targets.reverse();
+        }
     }
     return targets;
 };

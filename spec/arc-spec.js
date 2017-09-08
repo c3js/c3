@@ -97,6 +97,82 @@ describe('c3 chart arc', function () {
         });
     });
 
+    describe('sort pie chart', function() {
+
+        var createPie = function(order) {
+            return {
+                data: {
+                    order: order,
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 150],
+                        ['data3', 120]
+                    ],
+                    type: 'pie'
+                }
+            };
+        };
+
+        var collectArcs = function() {
+            return d3.selectAll('.c3-arc')
+                .data()
+                .sort(function(a, b) {
+                    return a.startAngle - b.startAngle;
+                })
+                .map(function(item) {
+                    return item.data.id;
+                });
+        };
+
+        it('should update data_order to desc', function () {
+            args = createPie('desc');
+            expect(true).toBeTruthy();
+        });
+
+        it('it should have descending ordering', function () {
+            expect(collectArcs()).toEqual([ 'data2', 'data3', 'data1' ]);
+        });
+
+        it('should update data_order to asc', function () {
+            args = createPie('asc');
+            expect(true).toBeTruthy();
+        });
+
+        it('it should have ascending ordering', function () {
+            expect(collectArcs()).toEqual([ 'data1', 'data3', 'data2' ]);
+        });
+
+        it('should update data_order to NULL', function () {
+            args = createPie(null);
+            expect(true).toBeTruthy();
+        });
+
+        it('it should have no ordering', function () {
+            expect(collectArcs()).toEqual([ 'data1', 'data2', 'data3' ]);
+        });
+
+        it('should update data_order to Array', function () {
+            args = createPie([ 'data3', 'data2', 'data1' ]);
+            expect(true).toBeTruthy();
+        });
+
+        it('it should have array specified ordering', function () {
+            expect(collectArcs()).toEqual([ 'data3', 'data2', 'data1' ]);
+        });
+
+        it('should update data_order to Function', function () {
+            var names = [ 'data2', 'data1', 'data3' ];
+            args = createPie(function(a, b) {
+                return names.indexOf(a.id) - names.indexOf(b.id);
+            });
+            expect(true).toBeTruthy();
+        });
+
+        it('it should have array specified ordering', function () {
+            expect(collectArcs()).toEqual([ 'data2', 'data1', 'data3' ]);
+        });
+    });
+
     describe('show gauge', function () {
 
         describe('with a 180 degree gauge', function(){
