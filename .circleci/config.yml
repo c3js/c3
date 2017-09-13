@@ -21,7 +21,7 @@ jobs:
           name: Install dependencies
           command: npm install
       - save_cache:
-          key: v3-npm-dependencies-{{ .Branch }}-{{ checksum "package.json" }}
+          key: v1-npm-dependencies-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run:
