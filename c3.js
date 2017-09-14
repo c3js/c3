@@ -628,9 +628,9 @@ c3_axis_fn.init = function init() {
     $$.axes.y = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY).attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis).attr("transform", $$.getTranslate('y')).style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text").attr("class", CLASS.axisYLabel).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForYAxisLabel.bind(this));
 
-    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2)
+    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2
     // clip-path?
-    .attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
+    ).attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append("text").attr("class", CLASS.axisY2Label).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForY2AxisLabel.bind(this));
 };
 c3_axis_fn.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
@@ -1001,7 +1001,7 @@ c3_axis_fn.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3$1 = { version: "0.4.17" };
+var c3$1 = { version: "0.4.18" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
@@ -1287,8 +1287,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     /*-- Main Region --*/
 
     // text when empty
-    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
-    .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
+    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle" // horizontal centering of text at x position in all browsers.
+    ).attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
     // Regions
     $$.initRegion();
@@ -4319,16 +4319,13 @@ c3_chart_fn.zoom.range = function (range) {
 
 c3_chart_internal_fn.initPie = function () {
     var $$ = this,
-        d3 = $$.d3,
-        config = $$.config;
+        d3 = $$.d3;
     $$.pie = d3.layout.pie().value(function (d) {
         return d.values.reduce(function (a, b) {
             return a + b.value;
         }, 0);
     });
-    if (!config.data_order) {
-        $$.pie.sort(null);
-    }
+    $$.pie.sort($$.getOrderFunction() || null);
 };
 
 c3_chart_internal_fn.updateRadius = function () {
@@ -4720,8 +4717,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         };
     }).attr("transform", withTransform ? "scale(1)" : "").style("fill", function (d) {
         return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
-    }) // Where gauge reading color would receive customization.
-    .call($$.endall, function () {
+    } // Where gauge reading color would receive customization.
+    ).call($$.endall, function () {
         $$.transiting = false;
     });
     mainArc.exit().transition().duration(durationForExit).style('opacity', 0).remove();
@@ -5809,26 +5806,36 @@ c3_chart_internal_fn.isOrderAsc = function () {
     var config = this.config;
     return typeof config.data_order === 'string' && config.data_order.toLowerCase() === 'asc';
 };
-c3_chart_internal_fn.orderTargets = function (targets) {
+c3_chart_internal_fn.getOrderFunction = function () {
     var $$ = this,
         config = $$.config,
         orderAsc = $$.isOrderAsc(),
         orderDesc = $$.isOrderDesc();
     if (orderAsc || orderDesc) {
-        targets.sort(function (t1, t2) {
+        return function (t1, t2) {
             var reducer = function reducer(p, c) {
                 return p + Math.abs(c.value);
             };
             var t1Sum = t1.values.reduce(reducer, 0),
                 t2Sum = t2.values.reduce(reducer, 0);
-            return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
-        });
+            return orderDesc ? t2Sum - t1Sum : t1Sum - t2Sum;
+        };
     } else if (isFunction(config.data_order)) {
-        targets.sort(config.data_order);
+        return config.data_order;
     } else if (isArray(config.data_order)) {
-        targets.sort(function (t1, t2) {
-            return config.data_order.indexOf(t1.id) - config.data_order.indexOf(t2.id);
-        });
+        var order = config.data_order;
+        return function (t1, t2) {
+            return order.indexOf(t1.id) - order.indexOf(t2.id);
+        };
+    }
+};
+c3_chart_internal_fn.orderTargets = function (targets) {
+    var fct = this.getOrderFunction();
+    if (fct) {
+        targets.sort(fct);
+        if (this.isOrderAsc() || this.isOrderDesc()) {
+            targets.reverse();
+        }
     }
     return targets;
 };
@@ -7440,8 +7447,8 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     texts = $$.legend.selectAll('text').data(targetIds).text(function (id) {
         return isDefined(config.data_names[id]) ? config.data_names[id] : id;
-    }) // MEMO: needed for update
-    .each(function (id, i) {
+    } // MEMO: needed for update
+    ).each(function (id, i) {
         updatePositions(this, id, i);
     });
     (withTransition ? texts.transition() : texts).attr('x', xForLegendText).attr('y', yForLegendText);
@@ -8352,7 +8359,11 @@ c3_chart_internal_fn.pointR = function (d) {
 c3_chart_internal_fn.pointExpandedR = function (d) {
     var $$ = this,
         config = $$.config;
-    return config.point_focus_expand_enabled ? config.point_focus_expand_r ? config.point_focus_expand_r : $$.pointR(d) * 1.75 : $$.pointR(d);
+    if (config.point_focus_expand_enabled) {
+        return isFunction(config.point_focus_expand_r) ? config.point_focus_expand_r(d) : config.point_focus_expand_r ? config.point_focus_expand_r : $$.pointR(d) * 1.75;
+    } else {
+        return $$.pointR(d);
+    }
 };
 c3_chart_internal_fn.pointSelectR = function (d) {
     var $$ = this,
