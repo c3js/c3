@@ -402,7 +402,7 @@ describe('c3 chart axis', function () {
                     });
                 });
 
-                it('should split tick text properly', function () {
+                xit('should split tick text properly', function () {
                     var tick = chart.internal.main.select('.c3-axis-x').select('g.tick'),
                         tspans = tick.selectAll('tspan'),
                         expectedTickTexts = [
