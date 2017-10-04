@@ -133,7 +133,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         })
         .on('mouseout', function (d) {
             var index = d.index;
-            if (!$$.config) { return; } // chart is destroyed
+            if ($$.config.destroyed) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
             $$.hideXGridFocus();
             $$.hideTooltip();
@@ -245,7 +245,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         .attr('height', $$.height)
         .attr('class', CLASS.eventRect)
         .on('mouseout', function () {
-            if (!$$.config) { return; } // chart is destroyed
+            if ($$.config.destroyed) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
             mouseout();
         })

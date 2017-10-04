@@ -31,7 +31,7 @@ c3_chart_internal_fn.updateAngle = function (d) {
         found = false, index = 0,
         gMin, gMax, gTic, gValue;
 
-    if (!config) {
+    if (config.destroyed) { // chart is destroyed
         return null;
     }
 
