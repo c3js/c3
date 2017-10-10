@@ -180,11 +180,12 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
     // convert to target
     targets = ids.map(function (id, index) {
         var convertedId = config.data_idConverter(id);
+        var xKey = $$.getXKey(id);
         return {
             id: convertedId,
             id_org: id,
             values: data.map(function (d, i) {
-                var xKey = $$.getXKey(id), rawX = d[xKey],
+                var rawX = d[xKey],
                     value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                 // use x as categories if custom x and categorized
                 if ($$.isCustomX() && $$.isCategorized() && !isUndefined(rawX)) {
