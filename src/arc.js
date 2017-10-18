@@ -12,9 +12,11 @@ c3_chart_internal_fn.initPie = function () {
 
 c3_chart_internal_fn.updateRadius = function () {
     var $$ = this, config = $$.config,
-        w = config.gauge_width || config.donut_width;
+        w = config.gauge_width || config.donut_width,
+        expand = ( ($$.hasType('donut') && config.donut_expand) || ($$.hasType('guage') && config.gauge_expand) || ($$.hasType('pie') && config.pie_expand) );
+
     $$.radiusExpanded = Math.min($$.arcWidth, $$.arcHeight) / 2;
-    $$.radius = $$.radiusExpanded * 0.95;
+    $$.radius = $$.radiusExpanded * ( expand ? 0.95 : 1 );
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
     $$.innerRadius = $$.hasType('donut') || $$.hasType('gauge') ? $$.radius * $$.innerRadiusRatio : 0;
 };
