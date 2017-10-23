@@ -11,7 +11,7 @@ function AxisInternal(component, params) {
     internal.params = params || {};
 
     internal.d3 = component.d3;
-    internal.scale = component.d3_scaleLinear();
+    internal.scale = internal.d3_scaleLinear();
     internal.range;
     internal.orient = "bottom";
     internal.innerTickSize = 6;
