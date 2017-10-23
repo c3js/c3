@@ -68,7 +68,7 @@ c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
 };
 c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
     var $$ = this, config = $$.config,
-        line = $$.d3.svg.line(),
+        line = $$.d3_line(),
         getPoints = $$.generateGetLinePoints(lineIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
@@ -243,7 +243,7 @@ c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
     ];
 };
 c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
-    var $$ = this, config = $$.config, area = $$.d3.svg.area(),
+    var $$ = this, config = $$.config, area = $$.d3_area(),
         getPoints = $$.generateGetAreaPoints(areaIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },

@@ -219,7 +219,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
-                d3.behavior.drag().origin(Object)
+                $$.d3_dragSubject(Object)
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
@@ -319,7 +319,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
-                d3.behavior.drag().origin(Object)
+                $$.d3_dragSubject(Object)
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })

@@ -11,7 +11,7 @@ function AxisInternal(component, params) {
     internal.params = params || {};
 
     internal.d3 = component.d3;
-    internal.scale = internal.d3.scale.linear();
+    internal.scale = component.d3_scaleLinear();
     internal.range;
     internal.orient = "bottom";
     internal.innerTickSize = 6;
@@ -461,7 +461,7 @@ c3_axis_fn.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, w
         },
         axis = new this.internal(this, axisParams).axis.scale(scale).orient(orient).tickFormat(tickFormat);
     if ($$.isTimeSeriesY()) {
-        axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
+        axis.ticks($$.d3_timeIntervalLookup(config.axis_y_tick_time_value), config.axis_y_tick_time_interval);
     } else {
         axis.tickValues(tickValues);
     }
