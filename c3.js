@@ -1,7 +1,7 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.c3 = factory());
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global.c3 = factory());
 }(this, (function () { 'use strict';
 
 var CLASS = {
@@ -5097,6 +5097,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         legend_padding: 0,
         legend_item_tile_width: 10,
         legend_item_tile_height: 10,
+        legend_format: undefined,
         // axis
         axis_rotated: false,
         axis_x_show: true,
@@ -7431,8 +7432,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             $$.api.revert();
         }
     });
-    l.append('text').text(function (id) {
-        return isDefined(config.data_names[id]) ? config.data_names[id] : id;
+    l.append('text').text(function (id, index) {
+        if(config.legend_format && isFunction(config.legend_format)) {
+            return config.legend_format(id, index);
+        } else {
+            return isDefined(config.data_names[id]) ? config.data_names[id] : id;
+        }
     }).each(function (id, i) {
         updatePositions(this, id, i);
     }).style("pointer-events", "none").attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200).attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendText);
@@ -7445,8 +7450,12 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
         background = $$.legend.insert('g', '.' + CLASS.legendItem).attr("class", CLASS.legendBackground).append('rect');
     }
 
-    texts = $$.legend.selectAll('text').data(targetIds).text(function (id) {
-        return isDefined(config.data_names[id]) ? config.data_names[id] : id;
+    texts = $$.legend.selectAll('text').data(targetIds).text(function (id, index) {
+        if(config.legend_format && isFunction(config.legend_format)) {
+            return config.legend_format(id, index);
+        } else {
+            return isDefined(config.data_names[id]) ? config.data_names[id] : id;
+        }
     } // MEMO: needed for update
     ).each(function (id, i) {
         updatePositions(this, id, i);
