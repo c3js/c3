@@ -47,9 +47,10 @@ c3_chart_internal_fn.updateLine = function (durationForExit) {
     var $$ = this;
     $$.mainLine = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
-    $$.mainLine.enter().append('path')
+    $$.mainLine = $$.mainLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
-        .style("stroke", $$.color);
+        .style("stroke", $$.color)
+        .merge($$.mainLine);
     $$.mainLine
         .style("opacity", $$.initialOpacity.bind($$))
         .style('shape-rendering', function (d) { return $$.isStepType(d) ? 'crispEdges' : ''; })
@@ -68,7 +69,7 @@ c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
 };
 c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
     var $$ = this, config = $$.config,
-        line = $$.d3.svg.line(),
+        line = $$.d3.line(),
         getPoints = $$.generateGetLinePoints(lineIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
@@ -86,7 +87,7 @@ c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
                 path = $$.lineWithRegions(values, x, y, config.data_regions[d.id]);
             } else {
                 if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
-                path = line.interpolate($$.getInterpolate(d))(values);
+                path = line.curve($$.getInterpolate(d))(values);
             }
         } else {
             if (values[0]) {
@@ -224,10 +225,10 @@ c3_chart_internal_fn.updateArea = function (durationForExit) {
     var $$ = this, d3 = $$.d3;
     $$.mainArea = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
-    $$.mainArea.enter().append('path')
+    $$.mainArea = $$.mainArea.enter().append('path')
         .attr("class", $$.classArea.bind($$))
         .style("fill", $$.color)
-        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; }).merge($$.mainArea);
     $$.mainArea
         .style("opacity", $$.orgAreaOpacity);
     $$.mainArea.exit().transition().duration(durationForExit)
@@ -243,7 +244,7 @@ c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
     ];
 };
 c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
-    var $$ = this, config = $$.config, area = $$.d3.svg.area(),
+    var $$ = this, config = $$.config, area = $$.d3.area(),
         getPoints = $$.generateGetAreaPoints(areaIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
@@ -264,7 +265,7 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
             x0 = 0, y0 = 0, path;
         if ($$.isAreaType(d)) {
             if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
-            path = area.interpolate($$.getInterpolate(d))(values);
+            path = area.curve($$.getInterpolate(d))(values);
         } else {
             if (values[0]) {
                 x0 = $$.x(values[0].x);
@@ -308,10 +309,10 @@ c3_chart_internal_fn.updateCircle = function () {
     var $$ = this;
     $$.mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
-    $$.mainCircle.enter().append("circle")
+    $$.mainCircle = $$.mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
         .attr("r", $$.pointR.bind($$))
-        .style("fill", $$.color);
+        .style("fill", $$.color).merge($$.mainCircle);
     $$.mainCircle
         .style("opacity", $$.initialOpacityForCircle.bind($$));
     $$.mainCircle.exit().remove();

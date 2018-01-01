@@ -4,13 +4,23 @@ import { isFunction } from './util';
 
 c3_chart_internal_fn.initBrush = function () {
     var $$ = this, d3 = $$.d3;
-    $$.brush = d3.svg.brush().on("brush", function () { $$.redrawForBrush(); });
+    $$.brush = d3.brush().on("brush", function () { $$.redrawForBrush(); });
     $$.brush.update = function () {
         if ($$.context) { $$.context.select('.' + CLASS.brush).call(this); }
         return this;
     };
+    // TODO: fix
     $$.brush.scale = function (scale) {
-        return $$.config.axis_rotated ? this.y(scale) : this.x(scale);
+        if ($$.config.axis_rotated) {
+            d3.brushY().extent([[0, scale.range()[0]], [40, scale.range()[1]]]);
+        }
+        else {
+            d3.brushX().extent([[scale.range()[0], 0], [scale.range()[1], 40]]);
+        }
+    };
+    // TODO: fix
+    $$.brush.empty = function () {
+        return true;
     };
 };
 c3_chart_internal_fn.initSubchart = function () {

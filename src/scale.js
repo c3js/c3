@@ -1,7 +1,7 @@
 import { c3_chart_internal_fn } from './core';
 
 c3_chart_internal_fn.getScale = function (min, max, forTimeseries) {
-    return (forTimeseries ? this.d3.time.scale() : this.d3.scale.linear()).range([min, max]);
+    return (forTimeseries ? this.d3.time.scale() : this.d3.scaleLinear()).range([min, max]);
 };
 c3_chart_internal_fn.getX = function (min, max, domain, offset) {
     var $$ = this,

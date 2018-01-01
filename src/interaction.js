@@ -9,7 +9,7 @@ c3_chart_internal_fn.initEventRect = function () {
 };
 c3_chart_internal_fn.redrawEventRect = function () {
     var $$ = this, config = $$.config,
-        eventRectUpdate, maxDataCountTarget,
+        eventRectEnter, eventRectUpdate, maxDataCountTarget,
         isMultipleX = $$.isMultipleX();
 
     // rects for mouseover
@@ -21,29 +21,25 @@ c3_chart_internal_fn.redrawEventRect = function () {
     // clear old rects
     eventRects.selectAll('.' + CLASS.eventRect).remove();
 
-    // open as public variable
-    $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect);
-
     if (isMultipleX) {
-        eventRectUpdate = $$.eventRect.data([0]);
+        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect).data([0]);
         // enter : only one rect will be added
-        $$.generateEventRectsForMultipleXs(eventRectUpdate.enter());
+        eventRectEnter = $$.generateEventRectsForMultipleXs($$.eventRect.enter());
         // update
-        $$.updateEventRect(eventRectUpdate);
+        $$.updateEventRect(eventRectEnter.merge($$.eventRect));
         // exit : not needed because always only one rect exists
     }
     else {
         // Set data and update $$.eventRect
         maxDataCountTarget = $$.getMaxDataCountTarget($$.data.targets);
         eventRects.datum(maxDataCountTarget ? maxDataCountTarget.values : []);
-        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect);
-        eventRectUpdate = $$.eventRect.data(function (d) { return d; });
+        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect).data(function (d) { return d; });
         // enter
-        $$.generateEventRectsForSingleX(eventRectUpdate.enter());
+        eventRectEnter = $$.generateEventRectsForSingleX($$.eventRect.enter());
         // update
-        $$.updateEventRect(eventRectUpdate);
+        $$.updateEventRect(eventRectEnter.merge($$.eventRect));
         // exit
-        eventRectUpdate.exit().remove();
+        $$.eventRect.exit().remove();
     }
 };
 c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
@@ -113,7 +109,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
 };
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
-    eventRectEnter.append("rect")
+    return eventRectEnter.append("rect")
         .attr("class", $$.classEvent.bind($$))
         .style("cursor", config.data_selection_enabled && config.data_selection_grouped ? "pointer" : null)
         .on('mouseover', function (d) {
@@ -238,7 +234,7 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         $$.unexpandBars();
     }
 
-    eventRectEnter.append('rect')
+    return eventRectEnter.append('rect')
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', $$.width)

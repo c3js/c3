@@ -107,19 +107,18 @@ c3_chart_internal_fn.initParams = function () {
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
 
-    $$.dataTimeFormat = config.data_xLocaltime ? d3.time.format : d3.time.format.utc;
-    $$.axisTimeFormat = config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
-    $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
-        [".%L", function (d) { return d.getMilliseconds(); }],
-        [":%S", function (d) { return d.getSeconds(); }],
-        ["%I:%M", function (d) { return d.getMinutes(); }],
-        ["%I %p", function (d) { return d.getHours(); }],
-        ["%-m/%-d", function (d) { return d.getDay() && d.getDate() !== 1; }],
-        ["%-m/%-d", function (d) { return d.getDate() !== 1; }],
-        ["%-m/%-d", function (d) { return d.getMonth(); }],
-        ["%Y/%-m/%-d", function () { return true; }]
-    ]);
-
+    $$.dataTimeFormat = config.data_xLocaltime ? d3.timeFormat : d3.utcFormat;
+    $$.axisTimeFormat = config.axis_x_localtime ? d3.timeFormat : d3.utcFormat;
+    $$.defaultAxisTimeFormat = function (date) {
+        if (date.getMilliseconds()) { return d3.timeFormat(".%L")(date); }
+        if (date.getSeconds()) { return d3.timeFormat(":%S")(date); }
+        if (date.getMinutes()) { return d3.timeFormat("%I:%M")(date); }
+        if (date.getHours()) { return d3.timeFormat("%I %p")(date); }
+        if (date.getDay() && date.getDate() !== 1) { return d3.timeFormat("%-m/%-d")(date); }
+        if (date.getDate() !== 1) { return d3.timeFormat("%-m/%-d")(date); }
+        if (date.getMonth()) { return d3.timeFormat("%-m/%-d")(date); }
+        return d3.timeFormat("%Y/%-m/%-d")(date);
+    };
     $$.hiddenTargetIds = [];
     $$.hiddenLegendIds = [];
     $$.focusedTargetIds = [];

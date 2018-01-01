@@ -11,7 +11,7 @@ function AxisInternal(component, params) {
     internal.params = params || {};
 
     internal.d3 = component.d3;
-    internal.scale = internal.d3.scale.linear();
+    internal.scale = internal.d3.scaleLinear();
     internal.range;
     internal.orient = "bottom";
     internal.innerTickSize = 6;
@@ -103,7 +103,7 @@ c3_axis_internal_fn.updateTickTextCharSize = function (tick) {
     return size;
 };
 c3_axis_internal_fn.transitionise = function (selection) {
-    return this.params.withoutTransition ? selection : this.d3.transition(selection);
+    return this.params.withoutTransition ? selection : selection.transition();
 };
 c3_axis_internal_fn.isVertical = function () {
     return this.orient === 'left' || this.orient === 'right';
@@ -198,13 +198,15 @@ c3_axis_internal_fn.generateAxis = function () {
             var scale0 = this.__chart__ || internal.scale,
                 scale1 = this.__chart__ = internal.copyScale();
 
-            var ticks = internal.tickValues ? internal.tickValues : internal.generateTicks(scale1),
-                tick = g.selectAll(".tick").data(ticks, scale1),
-                tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
+            var ticksValues = internal.tickValues ? internal.tickValues : internal.generateTicks(scale1),
+                ticks = g.selectAll(".tick").data(ticksValues, scale1),
+                tickEnter = ticks.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
-                tickExit = tick.exit().remove(),
-                tickUpdate = internal.transitionise(tick).style("opacity", 1),
+                tickExit = ticks.exit().remove(),
+                tickUpdate = tickEnter.merge(ticks),
                 tickTransform, tickX, tickY;
+
+            internal.transitionise(tickUpdate).style('opacity', 1);
 
             if (params.isCategory) {
                 internal.tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
@@ -222,16 +224,17 @@ c3_axis_internal_fn.generateAxis = function () {
             internal.updateTickTextCharSize(g.select('.tick'));
 
             var lineUpdate = tickUpdate.select("line"),
-                textUpdate = tickUpdate.select("text"),
-                tspanUpdate = tick.select("text").selectAll('tspan')
-                    .data(function (d, i) { return internal.tspanData(d, i, ticks, scale1); });
+                textUpdate = tickUpdate.select("text");
 
-            tspanUpdate.enter().append('tspan');
-            tspanUpdate.exit().remove();
-            tspanUpdate.text(function (d) { return d.splitted; });
+            var tspans = tickUpdate.selectAll('text').selectAll('tspan').data(function (d, i) {
+                    return internal.tspanData(d, i, ticks, scale1);
+                }),
+                tspanEnter = tspans.enter().append('tspan'),
+                tspanExit = tspans.exit().remove(),
+                tspanUpdate = tspanEnter.merge(tspans).text(function (d) { return d.splitted; });
 
             var path = g.selectAll(".domain").data([ 0 ]),
-                pathUpdate = (path.enter().append("path").attr("class", "domain"), internal.transitionise(path));
+                pathUpdate = path.enter().append("path").merge(path).attr("class", "domain");
 
             // TODO: each attr should be one function and change its behavior by internal.orient, probably
             switch (internal.orient) {
