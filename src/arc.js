@@ -254,14 +254,14 @@ c3_chart_internal_fn.getArcTitle = function () {
 
 c3_chart_internal_fn.updateTargetsForArc = function (targets) {
     var $$ = this, main = $$.main,
-        mainPieUpdate, mainPieEnter,
+        mainPies, mainPieEnter,
         classChartArc = $$.classChartArc.bind($$),
         classArcs = $$.classArcs.bind($$),
         classFocus = $$.classFocus.bind($$);
-    mainPieUpdate = main.select('.' + CLASS.chartArcs).selectAll('.' + CLASS.chartArc)
+    mainPies = main.select('.' + CLASS.chartArcs).selectAll('.' + CLASS.chartArc)
         .data($$.pie(targets))
         .attr("class", function (d) { return classChartArc(d) + classFocus(d.data); });
-    mainPieEnter = mainPieUpdate.enter().append("g")
+    mainPieEnter = mainPies.enter().append("g")
         .attr("class", classChartArc);
     mainPieEnter.append('g')
         .attr('class', classArcs);
@@ -287,10 +287,10 @@ c3_chart_internal_fn.initArc = function () {
 
 c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransform) {
     var $$ = this, d3 = $$.d3, config = $$.config, main = $$.main,
-        mainArc;
-    mainArc = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
+        arcs, mainArc;
+    arcs = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
         .data($$.arcData.bind($$));
-    mainArc.enter().append('path')
+    mainArc = arcs.enter().append('path')
         .attr("class", $$.classArc.bind($$))
         .style("fill", function (d) { return $$.color(d.data); })
         .style("cursor", function (d) { return config.interaction_enabled && config.data_selection_isselectable(d) ? "pointer" : null; })
@@ -299,7 +299,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
                 d.startAngle = d.endAngle = config.gauge_startingAngle;
             }
             this._current = d;
-        });
+        })
+        .merge(arcs);
     mainArc
         .attr("transform", function (d) { return !$$.isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
         .on('mouseover', config.interaction_enabled ? function (d) {
@@ -385,7 +386,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         .call($$.endall, function () {
             $$.transiting = false;
         });
-    mainArc.exit().transition().duration(durationForExit)
+    arcs.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
     main.selectAll('.' + CLASS.chartArc).select('text')

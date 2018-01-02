@@ -999,7 +999,7 @@ c3_chart_internal_fn.endall = function (transition, callback) {
     var n = 0;
     transition
         .each(function () { ++n; })
-        .each("end", function () {
+        .on("end", function () {
             if (!--n) { callback.apply(this, arguments); }
         });
 };

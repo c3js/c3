@@ -48,28 +48,29 @@ c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
         'y2': $$.height
     };
 
-    $$.xgrid = $$.main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
+    var xgrids = $$.main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
         .data(xgridData);
-    $$.xgrid.enter().append('line').attr("class", CLASS.xgrid);
+    $$.xgrid = xgrids.enter().append('line').attr("class", CLASS.xgrid).merge(xgrids);
     if (!withoutUpdate) {
         $$.xgrid.attr($$.xgridAttr)
             .style("opacity", function () { return +d3.select(this).attr(config.axis_rotated ? 'y1' : 'x1') === (config.axis_rotated ? $$.height : 0) ? 0 : 1; });
     }
-    $$.xgrid.exit().remove();
+    xgrids.exit().remove();
 };
 
 c3_chart_internal_fn.updateYGrid = function () {
     var $$ = this, config = $$.config,
         gridValues = $$.yAxis.tickValues() || $$.y.ticks(config.grid_y_ticks);
-    $$.ygrid = $$.main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
+    var ygrids = $$.main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
         .data(gridValues);
-    $$.ygrid.enter().append('line')
-        .attr('class', CLASS.ygrid);
+    $$.ygrid = ygrids.enter().append('line')
+        .attr('class', CLASS.ygrid)
+        .merge(ygrids);
     $$.ygrid.attr("x1", config.axis_rotated ? $$.y : 0)
         .attr("x2", config.axis_rotated ? $$.y : $$.width)
         .attr("y1", config.axis_rotated ? 0 : $$.y)
         .attr("y2", config.axis_rotated ? $$.height : $$.y);
-    $$.ygrid.exit().remove();
+    ygrids.exit().remove();
     $$.smoothLines($$.ygrid, 'grid');
 };
 
@@ -87,7 +88,7 @@ c3_chart_internal_fn.yGridTextX = function (d) {
 };
 c3_chart_internal_fn.updateGrid = function (duration) {
     var $$ = this, main = $$.main, config = $$.config,
-        xgridLine, ygridLine, yv;
+        xgridLine, xgridLineEnter, ygridLine, ygridLineEnter, yv;
 
     // hide if arc type
     $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
@@ -96,23 +97,24 @@ c3_chart_internal_fn.updateGrid = function (duration) {
     if (config.grid_x_show) {
         $$.updateXGrid();
     }
-    $$.xgridLines = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
+    xgridLine = main.select('.' + CLASS.xgridLines).selectAll('.' + CLASS.xgridLine)
         .data(config.grid_x_lines);
     // enter
-    xgridLine = $$.xgridLines.enter().append('g')
+    xgridLineEnter = xgridLine.enter().append('g')
         .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
-    xgridLine.append('line')
+    xgridLineEnter.append('line')
         .style("opacity", 0);
-    xgridLine.append('text')
+    xgridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
         .attr('dx', $$.gridTextDx)
         .attr('dy', -5)
         .style("opacity", 0);
     // udpate
+    $$.xgridLines = xgridLineEnter.merge(xgridLine);
     // done in d3.transition() of the end of this function
     // exit
-    $$.xgridLines.exit().transition().duration(duration)
+    xgridLine.exit().transition().duration(duration)
         .style("opacity", 0)
         .remove();
 
@@ -120,20 +122,21 @@ c3_chart_internal_fn.updateGrid = function (duration) {
     if (config.grid_y_show) {
         $$.updateYGrid();
     }
-    $$.ygridLines = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
+    ygridLine = main.select('.' + CLASS.ygridLines).selectAll('.' + CLASS.ygridLine)
         .data(config.grid_y_lines);
     // enter
-    ygridLine = $$.ygridLines.enter().append('g')
+    ygridLineEnter = ygridLine.enter().append('g')
         .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
-    ygridLine.append('line')
+    ygridLineEnter.append('line')
         .style("opacity", 0);
-    ygridLine.append('text')
+    ygridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
         .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
         .attr('dx', $$.gridTextDx)
         .attr('dy', -5)
         .style("opacity", 0);
     // update
+    $$.ygridLines = ygridLineEnter.merge(ygridLine);
     yv = $$.yv.bind($$);
     $$.ygridLines.select('line')
       .transition().duration(duration)
@@ -149,7 +152,7 @@ c3_chart_internal_fn.updateGrid = function (duration) {
         .text(function (d) { return d.text; })
         .style("opacity", 1);
     // exit
-    $$.ygridLines.exit().transition().duration(duration)
+    ygridLine.exit().transition().duration(duration)
         .style("opacity", 0)
         .remove();
 };

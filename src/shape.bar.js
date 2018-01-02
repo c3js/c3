@@ -9,14 +9,14 @@ c3_chart_internal_fn.initBar = function () {
 };
 c3_chart_internal_fn.updateTargetsForBar = function (targets) {
     var $$ = this, config = $$.config,
-        mainBarUpdate, mainBarEnter,
+        mainBars, mainBarEnter,
         classChartBar = $$.classChartBar.bind($$),
         classBars = $$.classBars.bind($$),
         classFocus = $$.classFocus.bind($$);
-    mainBarUpdate = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+    mainBars = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
         .data(targets)
         .attr('class', function (d) { return classChartBar(d) + classFocus(d); });
-    mainBarEnter = mainBarUpdate.enter().append('g')
+    mainBarEnter = mainBars.enter().append('g')
         .attr('class', classChartBar)
         .style("pointer-events", "none");
     // Bars for each data
@@ -31,15 +31,16 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
         classBar = $$.classBar.bind($$),
         initialOpacity = $$.initialOpacity.bind($$),
         color = function (d) { return $$.color(d.id); };
-    $$.mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+    var bars = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data(barData);
-    $$.mainBar.enter().append('path')
+    $$.mainBar = bars.enter().append('path')
         .attr("class", classBar)
         .style("stroke", color)
-        .style("fill", color);
+        .style("fill", color)
+        .merge(bars);
     $$.mainBar
         .style("opacity", initialOpacity);
-    $$.mainBar.exit().transition().duration(durationForExit)
+    bars.exit().transition().duration(durationForExit)
         .remove();
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
