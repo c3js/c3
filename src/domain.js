@@ -214,7 +214,7 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
         if ($$.brush) { $$.brush.scale($$.subX); }
     }
     if (withUpdateXDomain) {
-        $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.extent());
+        $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.selectionAsValue());
         if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
     }
 

@@ -3,24 +3,40 @@ import { c3_chart_internal_fn } from './core';
 import { isFunction } from './util';
 
 c3_chart_internal_fn.initBrush = function () {
-    var $$ = this, d3 = $$.d3;
-    $$.brush = d3.brush().on("brush", function () { $$.redrawForBrush(); });
+    var $$ = this, d3 = $$.d3, currentScale;
+    // TODO: dynamically change brushY/brushX according to axis_rotated.
+    $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX()).on("brush", function () {
+        $$.redrawForBrush();
+    });
     $$.brush.update = function () {
-        if ($$.context) { $$.context.select('.' + CLASS.brush).call(this); }
+        var brush;
+        if ($$.context) {
+            $$.context.select('.' + CLASS.brush).call(this);
+        }
         return this;
     };
-    // TODO: fix
     $$.brush.scale = function (scale) {
+        currentScale = scale;
+        var range = scale.range(),
+            extent;
         if ($$.config.axis_rotated) {
-            d3.brushY().extent([[0, scale.range()[0]], [40, scale.range()[1]]]);
+            extent = [[0, range[0]], [$$.width2, range[1]]];
         }
         else {
-            d3.brushX().extent([[scale.range()[0], 0], [scale.range()[1], 40]]);
+            extent = [[range[0], 0], [range[1], $$.height2]];
         }
+        $$.brush.extent(extent).update();
     };
-    // TODO: fix
+    $$.brush.selection = function () {
+        return d3.brushSelection($$.context.select('.' + CLASS.brush).node());
+    };
+    $$.brush.selectionAsValue = function () {
+        var selection = $$.brush.selection() || [0,0];
+        return [currentScale.invert(selection[0]), currentScale.invert(selection[1])];
+    };
     $$.brush.empty = function () {
-        return true;
+        var selection = $$.brush.selection();
+        return !selection || selection[0] === selection[1];
     };
 };
 c3_chart_internal_fn.initSubchart = function () {
@@ -59,7 +75,7 @@ c3_chart_internal_fn.initSubchart = function () {
 };
 c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
     var $$ = this, context = $$.context, config = $$.config,
-        contextLineEnter, contextLineUpdate, contextBarEnter, contextBarUpdate,
+        contextLineEnter, contextLine, contextBarEnter, contextBar,
         classChartBar = $$.classChartBar.bind($$),
         classBars = $$.classBars.bind($$),
         classChartLine = $$.classChartLine.bind($$),
@@ -68,22 +84,22 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
 
     if (config.subchart_show) {
         //-- Bar --//
-        contextBarUpdate = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
-            .data(targets)
-            .attr('class', classChartBar);
-        contextBarEnter = contextBarUpdate.enter().append('g')
-            .style('opacity', 0)
+        contextBar = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+            .data(targets);
+        contextBarEnter = contextBar.enter().append('g')
+            .style('opacity', 0);
+        contextBarEnter.merge(contextBar)
             .attr('class', classChartBar);
         // Bars for each data
         contextBarEnter.append('g')
             .attr("class", classBars);
 
         //-- Line --//
-        contextLineUpdate = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
-            .data(targets)
-            .attr('class', classChartLine);
-        contextLineEnter = contextLineUpdate.enter().append('g')
-            .style('opacity', 0)
+        contextLine = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
+            .data(targets);
+        contextLineEnter = contextLine.enter().append('g')
+            .style('opacity', 0);
+        contextLineEnter.merge(contextLine)
             .attr('class', classChartLine);
         // Lines for each data
         contextLineEnter.append("g")
@@ -99,17 +115,17 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
 };
 c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
     var $$ = this;
-    $$.contextBar = $$.context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+    var contextBar = $$.context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data($$.barData.bind($$));
-    $$.contextBar.enter().append('path')
+    var contextBarEnter = contextBar.enter().append('path')
         .attr("class", $$.classBar.bind($$))
         .style("stroke", 'none')
         .style("fill", $$.color);
-    $$.contextBar
-        .style("opacity", $$.initialOpacity.bind($$));
-    $$.contextBar.exit().transition().duration(durationForExit)
+    var contextBarExit = contextBar.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
+    $$.contextBar = contextBarEnter.merge(contextBar)
+        .style("opacity", $$.initialOpacity.bind($$));
 };
 c3_chart_internal_fn.redrawBarForSubchart = function (drawBarOnSub, withTransition, duration) {
     (withTransition ? this.contextBar.transition(Math.random().toString()).duration(duration) : this.contextBar)
@@ -118,16 +134,16 @@ c3_chart_internal_fn.redrawBarForSubchart = function (drawBarOnSub, withTransiti
 };
 c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
     var $$ = this;
-    $$.contextLine = $$.context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+    var contextLine = $$.context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
-    $$.contextLine.enter().append('path')
+    var contextLineEnter = contextLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
         .style('stroke', $$.color);
-    $$.contextLine
-        .style("opacity", $$.initialOpacity.bind($$));
-    $$.contextLine.exit().transition().duration(durationForExit)
+    var contextLineExit = contextLine.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
+    $$.contextLine = contextLineEnter.merge(contextLine)
+        .style("opacity", $$.initialOpacity.bind($$));
 };
 c3_chart_internal_fn.redrawLineForSubchart = function (drawLineOnSub, withTransition, duration) {
     (withTransition ? this.contextLine.transition(Math.random().toString()).duration(duration) : this.contextLine)
@@ -136,17 +152,17 @@ c3_chart_internal_fn.redrawLineForSubchart = function (drawLineOnSub, withTransi
 };
 c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
     var $$ = this, d3 = $$.d3;
-    $$.contextArea = $$.context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+    var contextArea = $$.context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
-    $$.contextArea.enter().append('path')
+    var contextAreaEnter = contextArea.enter().append('path')
         .attr("class", $$.classArea.bind($$))
         .style("fill", $$.color)
         .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-    $$.contextArea
-        .style("opacity", 0);
-    $$.contextArea.exit().transition().duration(durationForExit)
+    var contextAreaExit = contextArea.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
+    $$.contextArea = contextAreaEnter.merge(contextArea)
+        .style("opacity", 0);
 };
 c3_chart_internal_fn.redrawAreaForSubchart = function (drawAreaOnSub, withTransition, duration) {
     (withTransition ? this.contextArea.transition(Math.random().toString()).duration(duration) : this.contextArea)
