@@ -168,10 +168,6 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     $$.axis = new Axis($$);
 
-    if ($$.initPie) { $$.initPie(); }
-    if ($$.initBrush) { $$.initBrush(); }
-    if ($$.initZoom) { $$.initZoom(); }
-
     if (!config.bindto) {
         $$.selectChart = d3.selectAll([]);
     }
@@ -224,10 +220,6 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Save original x domain for zoom update
     $$.orgXDomain = $$.x.domain();
 
-    // Set initialized scales to brush and zoom
-    if ($$.brush) { $$.brush.scale($$.subX); }
-    if (config.zoom_enabled) { $$.zoom.scale($$.x); }
-
     /*-- Basic Elements --*/
 
     // Define svgs
@@ -252,10 +244,16 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define regions
     main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
 
+    if ($$.initPie) { $$.initPie(); }
     if ($$.initSubchart) { $$.initSubchart(); }
     if ($$.initTooltip) { $$.initTooltip(); }
     if ($$.initLegend) { $$.initLegend(); }
     if ($$.initTitle) { $$.initTitle(); }
+    if ($$.initZoom) { $$.initZoom(); }
+
+    // Update extent based on size and scale
+    // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
+    if ($$.initSubchartBrush) { $$.initSubchartBrush(); }
 
     /*-- Main Region --*/
 
@@ -281,18 +279,11 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Cover whole with rects for events
     $$.initEventRect();
+    // TODO: fix
+    $$.main.select('.' + CLASS.eventRect).call($$.zoom).on("dblclick.zoom", null);
 
     // Define g for chart
     $$.initChartElements();
-
-    // if zoom privileged, insert rect to forefront
-    // TODO: is this needed?
-    main.insert('rect', config.zoom_privileged ? null : 'g.' + CLASS.regions)
-        .attr('class', CLASS.zoomRect)
-        .attr('width', $$.width)
-        .attr('height', $$.height)
-        .style('opacity', 0)
-        .on("dblclick.zoom", null);
 
     // Set default extent if defined
     if (config.axis_x_extent) { $$.brush.extent($$.getDefaultExtent()); }
@@ -604,8 +595,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
 
     // event rects will redrawn when flow called
     if (config.interaction_enabled && !options.flow && withEventRect) {
-        $$.redrawEventRect();
-        if ($$.updateZoom) { $$.updateZoom(); }
+        $$.updateEventRect();
     }
 
     // update circleY based on updated parameters
@@ -693,8 +683,8 @@ c3_chart_internal_fn.updateAndRedraw = function (options) {
     options.withTransform = getOption(options, "withTransform", false);
     options.withLegend = getOption(options, "withLegend", false);
     // NOT same with redraw
-    options.withUpdateXDomain = true;
-    options.withUpdateOrgXDomain = true;
+    options.withUpdateXDomain = getOption(options, "withUpdateXDomain", true);
+    options.withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", true);
     options.withTransitionForExit = false;
     options.withTransitionForTransform = getOption(options, "withTransitionForTransform", options.withTransition);
     // MEMO: this needs to be called before updateLegend and it means this ALWAYS needs to be called)
@@ -854,9 +844,6 @@ c3_chart_internal_fn.updateSvgSize = function () {
     $$.svg.select('#' + $$.clipIdForSubchart).select('rect')
         .attr('width', $$.width)
         .attr('height', brush.size() ? brush.attr('height') : 0);
-    $$.svg.select('.' + CLASS.zoomRect)
-        .attr('width', $$.width)
-        .attr('height', $$.height);
     // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
     $$.selectChart.style('max-height', $$.currentHeight + "px");
 };
@@ -929,7 +916,14 @@ c3_chart_internal_fn.bindResize = function () {
             }
             $$.resizeTimeout = window.setTimeout(function () {
                 delete $$.resizeTimeout;
-                $$.api.flush();
+                $$.updateAndRedraw({
+                    withUpdateXDomain: false,
+                    withUpdateOrgXDomain: false,
+                    withTransition: false,
+                    withTransitionForTransform: false,
+                    withLegend: true,
+                });
+                if ($$.brush) { $$.brush.update(); }
             }, 100);
         });
     }

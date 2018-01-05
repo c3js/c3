@@ -83,8 +83,7 @@ c3_chart_internal_fn.updateScales = function () {
 
     // Set initialized scales to brush and zoom
     if (!forInit) {
-        if ($$.brush) { $$.brush.scale($$.subX); }
-        if (config.zoom_enabled) { $$.zoom.scale($$.x); }
+        if ($$.brush) { $$.brush.updateScale($$.subX); }
     }
     // update for arc
     if ($$.updateArc) { $$.updateArc(); }

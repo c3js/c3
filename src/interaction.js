@@ -6,10 +6,11 @@ c3_chart_internal_fn.initEventRect = function () {
     $$.main.select('.' + CLASS.chart).append("g")
         .attr("class", CLASS.eventRects)
         .style('fill-opacity', 0);
+    $$.redrawEventRect();
 };
 c3_chart_internal_fn.redrawEventRect = function () {
     var $$ = this, config = $$.config,
-        eventRectEnter, eventRectUpdate, maxDataCountTarget,
+        eventRect, eventRectEnter, maxDataCountTarget,
         isMultipleX = $$.isMultipleX();
 
     // rects for mouseover
@@ -18,28 +19,30 @@ c3_chart_internal_fn.redrawEventRect = function () {
             .classed(CLASS.eventRectsMultiple, isMultipleX)
             .classed(CLASS.eventRectsSingle, !isMultipleX);
 
-    // clear old rects
-    eventRects.selectAll('.' + CLASS.eventRect).remove();
-
     if (isMultipleX) {
-        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect).data([0]);
+        eventRect = eventRects.selectAll('.' + CLASS.eventRect).data([0]);
         // enter : only one rect will be added
-        eventRectEnter = $$.generateEventRectsForMultipleXs($$.eventRect.enter());
+        eventRectEnter = $$.generateEventRectsForMultipleXs(eventRect.enter());
         // update
-        $$.updateEventRect(eventRectEnter.merge($$.eventRect));
+        $$.eventRect = eventRectEnter.merge(eventRect);
+        $$.updateEventRect();
         // exit : not needed because always only one rect exists
     }
+    // DUPLICATED: this will be removed because it seems to be unable to work with zoom...
     else {
+        // clear old rects
+        eventRects.selectAll('.' + CLASS.eventRect).remove();
         // Set data and update $$.eventRect
         maxDataCountTarget = $$.getMaxDataCountTarget($$.data.targets);
-        eventRects.datum(maxDataCountTarget ? maxDataCountTarget.values : []);
-        $$.eventRect = eventRects.selectAll('.' + CLASS.eventRect).data(function (d) { return d; });
+        eventRect.datum(maxDataCountTarget ? maxDataCountTarget.values : []);
+        eventRect = eventRects.selectAll('.' + CLASS.eventRect).data(function (d) { return d; });
         // enter
-        eventRectEnter = $$.generateEventRectsForSingleX($$.eventRect.enter());
+        eventRectEnter = $$.generateEventRectsForSingleX(eventRect.enter());
         // update
-        $$.updateEventRect(eventRectEnter.merge($$.eventRect));
+        $$.eventRect = eventRectEnter.merge(eventRect);
+        $$.updateEventRect();
         // exit
-        $$.eventRect.exit().remove();
+        eventRect.exit().remove();
     }
 };
 c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
@@ -47,7 +50,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         x, y, w, h, rectW, rectX;
 
     // set update selection if null
-    eventRectUpdate = eventRectUpdate || $$.eventRect.data(function (d) { return d; });
+    eventRectUpdate = eventRectUpdate || $$.eventRect;
 
     if ($$.isMultipleX()) {
         // TODO: rotated not supported yet
@@ -56,6 +59,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         w = $$.width;
         h = $$.height;
     }
+    // DUPLICATED: this will be removed because it seems to be unable to work with zoom...
     else {
         if (($$.isCustomX() || $$.isTimeSeries()) && !$$.isCategorized()) {
 
@@ -107,6 +111,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         .attr("width", w)
         .attr("height", h);
 };
+// DUPLICATED: this will be removed because it seems to be unable to work with zoom...
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
     return eventRectEnter.append("rect")
@@ -215,14 +220,13 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
-                d3.behavior.drag().origin(Object)
+                d3.drag()
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
-                    .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
-                    .on('dragend', function () { $$.dragend(); })
+                    .on('start', function () { $$.dragstart(d3.mouse(this)); })
+                    .on('end', function () { $$.dragend(); })
             ) : function () {}
         );
 };
-
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
 
@@ -315,10 +319,10 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
-                d3.behavior.drag().origin(Object)
+                d3.drag()
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
-                    .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
-                    .on('dragend', function () { $$.dragend(); })
+                    .on('start', function () { $$.dragstart(d3.mouse(this)); })
+                    .on('end', function () { $$.dragend(); })
             ) : function () {}
         );
 };

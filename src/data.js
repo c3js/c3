@@ -48,10 +48,12 @@ c3_chart_internal_fn.addXs = function (xs) {
     });
 };
 c3_chart_internal_fn.hasMultipleX = function (xs) {
-    return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
+//    return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
+    return true;
 };
 c3_chart_internal_fn.isMultipleX = function () {
-    return notEmpty(this.config.data_xs) || !this.config.data_xSort || this.hasType('scatter');
+//    return notEmpty(this.config.data_xs) || !this.config.data_xSort || this.hasType('scatter');
+    return true;
 };
 c3_chart_internal_fn.addName = function (data) {
     var $$ = this, name;

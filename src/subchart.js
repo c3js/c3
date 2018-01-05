@@ -2,48 +2,66 @@ import CLASS from './class';
 import { c3_chart_internal_fn } from './core';
 import { isFunction } from './util';
 
-c3_chart_internal_fn.initBrush = function () {
-    var $$ = this, d3 = $$.d3, currentScale;
+c3_chart_internal_fn.initBrush = function (scale) {
+    var $$ = this, d3 = $$.d3;
     // TODO: dynamically change brushY/brushX according to axis_rotated.
     $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX()).on("brush", function () {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") { return; }
+
+        // TODO: fix
+        var s = d3.event.selection || $$.brush.scale.range();
+        $$.main.select('.' + CLASS.eventRect).call($$.zoom.transform, d3.zoomIdentity
+                                 .scale($$.width / (s[1] - s[0]))
+                                 .translate(-s[0], 0));
+
         $$.redrawForBrush();
     });
-    $$.brush.update = function () {
-        var brush;
-        if ($$.context) {
-            $$.context.select('.' + CLASS.brush).call(this);
-        }
-        return this;
-    };
-    $$.brush.scale = function (scale) {
-        currentScale = scale;
-        var range = scale.range(),
-            extent;
+    $$.brush.updateExtent = function () {
+        var range = this.scale.range(), extent;
         if ($$.config.axis_rotated) {
             extent = [[0, range[0]], [$$.width2, range[1]]];
         }
         else {
             extent = [[range[0], 0], [range[1], $$.height2]];
         }
-        $$.brush.extent(extent).update();
+        this.extent(extent);
+        return this;
+    };
+    $$.brush.updateScale = function (scale) {
+        this.scale = scale;
+        return this;
+    };
+    $$.brush.update = function (scale) {
+        this.updateScale(scale || $$.subX).updateExtent();
+        $$.context.select('.' + CLASS.brush).call(this);
     };
     $$.brush.selection = function () {
         return d3.brushSelection($$.context.select('.' + CLASS.brush).node());
     };
-    $$.brush.selectionAsValue = function () {
-        var selection = $$.brush.selection() || [0,0];
-        return [currentScale.invert(selection[0]), currentScale.invert(selection[1])];
+    $$.brush.selectionAsValue = function (selectionAsValue) {
+        var selection;
+        if (selectionAsValue) {
+            if ($$.context) {
+                selection = [this.scale(selectionAsValue[0]), this.scale(selectionAsValue[1])];
+                $$.brush.move($$.context.select('.' + CLASS.brush), selection);
+            }
+            return [];
+        }
+        selection = $$.brush.selection() || [0,0];
+        return [this.scale.invert(selection[0]), this.scale.invert(selection[1])];
     };
     $$.brush.empty = function () {
         var selection = $$.brush.selection();
         return !selection || selection[0] === selection[1];
     };
+    return $$.brush.updateScale(scale);
 };
 c3_chart_internal_fn.initSubchart = function () {
     var $$ = this, config = $$.config,
         context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context')),
         visibility = config.subchart_show ? 'visible' : 'hidden';
 
+    // set style
     context.style('visibility', visibility);
 
     // Define g for chart area
@@ -62,8 +80,7 @@ c3_chart_internal_fn.initSubchart = function () {
     // Add extent rect for Brush
     context.append("g")
         .attr("clip-path", $$.clipPath)
-        .attr("class", CLASS.brush)
-        .call($$.brush);
+        .attr("class", CLASS.brush);
 
     // ATTENTION: This must be called AFTER chart added
     // Add Axis
@@ -72,6 +89,12 @@ c3_chart_internal_fn.initSubchart = function () {
         .attr("transform", $$.getTranslate('subx'))
         .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis)
         .style("visibility", config.subchart_axis_x_show ? visibility : 'hidden');
+};
+c3_chart_internal_fn.initSubchartBrush = function () {
+    var $$ = this;
+    // Add extent rect for Brush
+    $$.initBrush($$.subX).updateExtent();
+    $$.context.select('.' + CLASS.brush).call($$.brush);
 };
 c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
     var $$ = this, context = $$.context, config = $$.config,
@@ -180,14 +203,13 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
     if (config.subchart_show) {
         // reflect main chart to extent on subchart if zoomed
         if (d3.event && d3.event.type === 'zoom') {
-            $$.brush.extent($$.x.orgDomain()).update();
+            $$.brush.selectionAsValue($$.x.orgDomain());
         }
         // update subchart elements if needed
         if (withSubchart) {
-
             // extent rect
             if (!$$.brush.empty()) {
-                $$.brush.extent($$.x.orgDomain()).update();
+                $$.brush.selectionAsValue($$.x.orgDomain());
             }
             // setup drawer - MEMO: this must be called after axis updated
             drawAreaOnSub = $$.generateDrawArea(areaIndices, true);
@@ -211,6 +233,7 @@ c3_chart_internal_fn.redrawForBrush = function () {
         withY: $$.config.zoom_rescale,
         withSubchart: false,
         withUpdateXDomain: true,
+        withEventRect: false,
         withDimension: false
     });
     $$.config.subchart_onbrush.call($$.api, x.orgDomain());

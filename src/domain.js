@@ -209,13 +209,12 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     if (withUpdateOrgXDomain) {
         $$.x.domain(domain ? domain : $$.d3.extent($$.getXDomain(targets)));
         $$.orgXDomain = $$.x.domain();
-        if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
+        if (config.zoom_enabled) { $$.zoom.update(); }
         $$.subX.domain($$.x.domain());
-        if ($$.brush) { $$.brush.scale($$.subX); }
+        if ($$.brush) { $$.brush.updateScale($$.subX); }
     }
     if (withUpdateXDomain) {
         $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.selectionAsValue());
-        if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
     }
 
     // Trim domain when too big by zoom mousemove event
