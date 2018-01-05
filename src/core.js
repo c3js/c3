@@ -107,7 +107,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
 
-    $$.dataTimeFormat = config.data_xLocaltime ? d3.timeFormat : d3.utcFormat;
+    $$.dataTimeParse = (config.data_xLocaltime ? d3.timeParse : d3.utcParse)($$.config.data_xFormat);
     $$.axisTimeFormat = config.axis_x_localtime ? d3.timeFormat : d3.utcFormat;
     $$.defaultAxisTimeFormat = function (date) {
         if (date.getMilliseconds()) { return d3.timeFormat(".%L")(date); }
@@ -1030,7 +1030,7 @@ c3_chart_internal_fn.parseDate = function (date) {
     if (date instanceof Date) {
         parsedDate = date;
     } else if (typeof date === 'string') {
-        parsedDate = $$.dataTimeFormat($$.config.data_xFormat).parse(date);
+        parsedDate = $$.dataTimeParse(date);
     } else if (typeof date === 'object') {
         parsedDate = new Date(+date);
     } else if (typeof date === 'number' && !isNaN(date)) {
