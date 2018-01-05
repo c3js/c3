@@ -7,14 +7,10 @@ c3_chart_internal_fn.initBrush = function (scale) {
     // TODO: dynamically change brushY/brushX according to axis_rotated.
     $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX()).on("brush", function () {
         if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") { return; }
-
-        // TODO: fix
-        var s = d3.event.selection || $$.brush.scale.range();
-        $$.main.select('.' + CLASS.eventRect).call($$.zoom.transform, d3.zoomIdentity
-                                 .scale($$.width / (s[1] - s[0]))
-                                 .translate(-s[0], 0));
-
         $$.redrawForBrush();
+    }).on("end", function () {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") { return; }
+        if ($$.brush.empty() && d3.event.sourceEvent.type !== 'end') { $$.brush.clear(); }
     });
     $$.brush.updateExtent = function () {
         var range = this.scale.range(), extent;
@@ -34,6 +30,9 @@ c3_chart_internal_fn.initBrush = function (scale) {
     $$.brush.update = function (scale) {
         this.updateScale(scale || $$.subX).updateExtent();
         $$.context.select('.' + CLASS.brush).call(this);
+    };
+    $$.brush.clear = function () {
+        $$.context.select('.' + CLASS.brush).call($$.brush.move, null);
     };
     $$.brush.selection = function () {
         return d3.brushSelection($$.context.select('.' + CLASS.brush).node());
@@ -227,7 +226,7 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
     }
 };
 c3_chart_internal_fn.redrawForBrush = function () {
-    var $$ = this, x = $$.x;
+    var $$ = this, x = $$.x, d3 = $$.d3, s;
     $$.redraw({
         withTransition: false,
         withY: $$.config.zoom_rescale,
@@ -236,6 +235,11 @@ c3_chart_internal_fn.redrawForBrush = function () {
         withEventRect: false,
         withDimension: false
     });
+    // update zoom transation binded to event rect
+    s = d3.event.selection || $$.brush.scale.range();
+    $$.main.select('.' + CLASS.eventRect).call($$.zoom.transform, d3.zoomIdentity
+                                               .scale($$.width / (s[1] - s[0]))
+                                               .translate(-s[0], 0));
     $$.config.subchart_onbrush.call($$.api, x.orgDomain());
 };
 c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
