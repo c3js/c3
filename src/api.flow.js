@@ -250,7 +250,10 @@ c3_chart_internal_fn.generateFlow = function (args) {
             // draw again for removing flowed elements and reverting attr
             xgrid
                 .attr('transform', null)
-                .attr($$.xgridAttr);
+                .attr('x1', $$.xgridAttr.x1)
+                .attr('x2', $$.xgridAttr.x2)
+                .attr('y1', $$.xgridAttr.y1)
+                .attr('y2', $$.xgridAttr.y2);
             xgridLines
                 .attr('transform', null);
             xgridLines.select('line')

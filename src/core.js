@@ -279,8 +279,10 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Cover whole with rects for events
     $$.initEventRect();
-    // TODO: fix
-    $$.main.select('.' + CLASS.eventRect).call($$.zoom).on("dblclick.zoom", null);
+    // event rect handle zoom event as well
+    if (config.zoom_enabled) {
+        $$.main.select('.' + CLASS.eventRect).call($$.zoom).on("dblclick.zoom", null);
+    }
 
     // Define g for chart
     $$.initChartElements();

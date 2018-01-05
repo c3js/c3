@@ -48,29 +48,36 @@ c3_chart_internal_fn.updateXGrid = function (withoutUpdate) {
         'y2': $$.height
     };
 
-    var xgrids = $$.main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
+    var xgrid = $$.main.select('.' + CLASS.xgrids).selectAll('.' + CLASS.xgrid)
         .data(xgridData);
-    $$.xgrid = xgrids.enter().append('line').attr("class", CLASS.xgrid).merge(xgrids);
+    var xgridEnter = xgrid.enter().append('line')
+        .attr("class", CLASS.xgrid);
+    $$.xgrid = xgridEnter.merge(xgrid);
     if (!withoutUpdate) {
-        $$.xgrid.attr($$.xgridAttr)
+        $$.xgrid
+            .attr('x1', $$.xgridAttr.x1)
+            .attr('x2', $$.xgridAttr.x2)
+            .attr('y1', $$.xgridAttr.y1)
+            .attr('y2', $$.xgridAttr.y2)
             .style("opacity", function () { return +d3.select(this).attr(config.axis_rotated ? 'y1' : 'x1') === (config.axis_rotated ? $$.height : 0) ? 0 : 1; });
     }
-    xgrids.exit().remove();
+    xgrid.exit().remove();
 };
 
 c3_chart_internal_fn.updateYGrid = function () {
     var $$ = this, config = $$.config,
         gridValues = $$.yAxis.tickValues() || $$.y.ticks(config.grid_y_ticks);
-    var ygrids = $$.main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
+    var ygrid = $$.main.select('.' + CLASS.ygrids).selectAll('.' + CLASS.ygrid)
         .data(gridValues);
-    $$.ygrid = ygrids.enter().append('line')
-        .attr('class', CLASS.ygrid)
-        .merge(ygrids);
-    $$.ygrid.attr("x1", config.axis_rotated ? $$.y : 0)
+    var ygridEnter = ygrid.enter().append('line')
+        .attr('class', CLASS.ygrid);
+    $$.ygrid = ygridEnter.merge(ygrid);
+    $$.ygrid
+        .attr("x1", config.axis_rotated ? $$.y : 0)
         .attr("x2", config.axis_rotated ? $$.y : $$.width)
         .attr("y1", config.axis_rotated ? 0 : $$.y)
         .attr("y2", config.axis_rotated ? $$.height : $$.y);
-    ygrids.exit().remove();
+    ygrid.exit().remove();
     $$.smoothLines($$.ygrid, 'grid');
 };
 

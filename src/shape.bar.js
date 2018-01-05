@@ -31,17 +31,16 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
         classBar = $$.classBar.bind($$),
         initialOpacity = $$.initialOpacity.bind($$),
         color = function (d) { return $$.color(d.id); };
-    var bars = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+    var mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data(barData);
-    $$.mainBar = bars.enter().append('path')
+    var mainBarEnter = mainBar.enter().append('path')
         .attr("class", classBar)
         .style("stroke", color)
-        .style("fill", color)
-        .merge(bars);
-    $$.mainBar
+        .style("fill", color);
+    $$.mainBar = mainBarEnter.merge(mainBar)
         .style("opacity", initialOpacity);
-    bars.exit().transition().duration(durationForExit)
-        .remove();
+    mainBar.exit().transition().duration(durationForExit)
+        .style("opacity", 0);
 };
 c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
     return [

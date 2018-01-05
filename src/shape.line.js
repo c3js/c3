@@ -45,19 +45,17 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
 };
 c3_chart_internal_fn.updateLine = function (durationForExit) {
     var $$ = this;
-    var lines = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+    var mainLine = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
-    $$.mainLine = lines.enter().append('path')
+    var mainLineEnter = mainLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
-        .style("stroke", $$.color)
-        .merge(lines);
-    $$.mainLine
+        .style("stroke", $$.color);
+    $$.mainLine = mainLineEnter.merge(mainLine)
         .style("opacity", $$.initialOpacity.bind($$))
         .style('shape-rendering', function (d) { return $$.isStepType(d) ? 'crispEdges' : ''; })
         .attr('transform', null);
-    lines.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    mainLine.exit().transition().duration(durationForExit)
+        .style('opacity', 0);
 };
 c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
     return [
@@ -223,17 +221,16 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
 
 c3_chart_internal_fn.updateArea = function (durationForExit) {
     var $$ = this, d3 = $$.d3;
-    var areas = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+    var mainArea = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
-    $$.mainArea = areas.enter().append('path')
+    var mainAreaEnter = mainArea.enter().append('path')
         .attr("class", $$.classArea.bind($$))
         .style("fill", $$.color)
-        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; }).merge(areas);
-    $$.mainArea
+        .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
+    $$.mainArea = mainAreaEnter.merge(mainArea)
         .style("opacity", $$.orgAreaOpacity);
-    areas.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    mainArea.exit().transition().duration(durationForExit)
+        .style('opacity', 0);
 };
 c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
     return [
@@ -307,15 +304,16 @@ c3_chart_internal_fn.generateGetAreaPoints = function (areaIndices, isSub) { // 
 
 c3_chart_internal_fn.updateCircle = function () {
     var $$ = this;
-    $$.mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
+    var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
-    $$.mainCircle = $$.mainCircle.enter().append("circle")
+    var mainCircleEnter = mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
         .attr("r", $$.pointR.bind($$))
-        .style("fill", $$.color).merge($$.mainCircle);
-    $$.mainCircle
+        .style("fill", $$.color);
+    $$.mainCircle = mainCircleEnter.merge(mainCircle)
         .style("opacity", $$.initialOpacityForCircle.bind($$));
-    $$.mainCircle.exit().remove();
+    mainCircle.exit()
+        .style("opacity", 0);
 };
 c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
     var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
