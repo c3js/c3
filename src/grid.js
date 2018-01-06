@@ -95,7 +95,9 @@ c3_chart_internal_fn.yGridTextX = function (d) {
 };
 c3_chart_internal_fn.updateGrid = function (duration) {
     var $$ = this, main = $$.main, config = $$.config,
-        xgridLine, xgridLineEnter, ygridLine, ygridLineEnter, yv;
+        xgridLine, xgridLineEnter, ygridLine, ygridLineEnter,
+        xv = $$.xv.bind($$), yv = $$.yv.bind($$),
+        xGridTextX = $$.xGridTextX.bind($$), yGridTextX = $$.yGridTextX.bind($$);
 
     // hide if arc type
     $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
@@ -110,10 +112,16 @@ c3_chart_internal_fn.updateGrid = function (duration) {
     xgridLineEnter = xgridLine.enter().append('g')
         .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
     xgridLineEnter.append('line')
+        .attr("x1", config.axis_rotated ? 0 : xv)
+        .attr("x2", config.axis_rotated ? $$.width : xv)
+        .attr("y1", config.axis_rotated ? xv : 0)
+        .attr("y2", config.axis_rotated ? xv : $$.height)
         .style("opacity", 0);
     xgridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
+        .attr("x", config.axis_rotated ? yGridTextX : xGridTextX)
+        .attr("y", xv)
         .attr('dx', $$.gridTextDx)
         .attr('dy', -5)
         .style("opacity", 0);
@@ -135,16 +143,21 @@ c3_chart_internal_fn.updateGrid = function (duration) {
     ygridLineEnter = ygridLine.enter().append('g')
         .attr("class", function (d) { return CLASS.ygridLine + (d['class'] ? ' ' + d['class'] : ''); });
     ygridLineEnter.append('line')
+        .attr("x1", config.axis_rotated ? yv : 0)
+        .attr("x2", config.axis_rotated ? yv : $$.width)
+        .attr("y1", config.axis_rotated ? 0 : yv)
+        .attr("y2", config.axis_rotated ? $$.height : yv)
         .style("opacity", 0);
     ygridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
         .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
+        .attr("x", config.axis_rotated ? xGridTextX : yGridTextX)
+        .attr("y", yv)
         .attr('dx', $$.gridTextDx)
         .attr('dy', -5)
         .style("opacity", 0);
     // update
     $$.ygridLines = ygridLineEnter.merge(ygridLine);
-    yv = $$.yv.bind($$);
     $$.ygridLines.select('line')
       .transition().duration(duration)
         .attr("x1", config.axis_rotated ? yv : 0)
