@@ -191,7 +191,8 @@ c3_axis_internal_fn.tspanDy = function (d, i) {
 
 c3_axis_internal_fn.generateAxis = function () {
     var internal = this, d3 = internal.d3, params = internal.params;
-    function axis(g) {
+    function axis(g, transition) {
+        var self;
         g.each(function () {
             var g = axis.g = d3.select(this);
 
@@ -203,10 +204,8 @@ c3_axis_internal_fn.generateAxis = function () {
                 tickEnter = ticks.enter().insert("g", ".domain").attr("class", "tick").style("opacity", 1e-6),
                 // MEMO: No exit transition. The reason is this transition affects max tick width calculation because old tick will be included in the ticks.
                 tickExit = ticks.exit().remove(),
-                tickUpdate = tickEnter.merge(ticks),
+                tickUpdate = ticks.merge(tickEnter),
                 tickTransform, tickX, tickY;
-
-            internal.transitionise(tickUpdate).style('opacity', 1);
 
             if (params.isCategory) {
                 internal.tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
@@ -216,15 +215,12 @@ c3_axis_internal_fn.generateAxis = function () {
                 internal.tickOffset = tickX = 0;
             }
 
-            tickEnter.append("line");
-            tickEnter.append("text");
-
             internal.updateRange();
             internal.updateTickLength();
             internal.updateTickTextCharSize(g.select('.tick'));
 
-            var lineUpdate = tickUpdate.select("line"),
-                textUpdate = tickUpdate.select("text");
+            var lineUpdate = tickUpdate.select("line").merge(tickEnter.append("line")),
+                textUpdate = tickUpdate.select("text").merge(tickEnter.append("text"));
 
             var tspans = tickUpdate.selectAll('text').selectAll('tspan').data(function (d, i) {
                     return internal.tspanData(d, i, ticks, scale1);
@@ -307,8 +303,11 @@ c3_axis_internal_fn.generateAxis = function () {
                 tickExit.call(tickTransform, scale1, internal.tickOffset);
             }
             tickEnter.call(tickTransform, scale0, internal.tickOffset);
-            tickUpdate.call(tickTransform, scale1, internal.tickOffset);
+            self = (transition ? tickUpdate.transition(transition) : tickUpdate)
+                .style('opacity', 1)
+                .call(tickTransform, scale1, internal.tickOffset);
         });
+        return self;
     }
     axis.scale = function (x) {
         if (!arguments.length) { return internal.scale; }
@@ -749,14 +748,11 @@ c3_axis_fn.generateTransitions = function generateTransitions(duration) {
         axisSubX: duration ? axes.subx.transition().duration(duration) : axes.subx
     };
 };
-c3_axis_fn.redraw = function redraw(transitions, isHidden) {
-    var $$ = this.owner;
-    $$.axes.x.style("opacity", isHidden ? 0 : 1);
-    $$.axes.y.style("opacity", isHidden ? 0 : 1);
-    $$.axes.y2.style("opacity", isHidden ? 0 : 1);
-    $$.axes.subx.style("opacity", isHidden ? 0 : 1);
-    transitions.axisX.call($$.xAxis);
-    transitions.axisY.call($$.yAxis);
-    transitions.axisY2.call($$.y2Axis);
-    transitions.axisSubX.call($$.subXAxis);
+c3_axis_fn.redraw = function redraw(duration, isHidden) {
+    var $$ = this.owner,
+        transition = duration ? $$.d3.transition().duration(duration) : null;
+    $$.axes.x.style("opacity", isHidden ? 0 : 1).call($$.xAxis, transition);
+    $$.axes.y.style("opacity", isHidden ? 0 : 1).call($$.yAxis, transition);
+    $$.axes.y2.style("opacity", isHidden ? 0 : 1).call($$.y2Axis, transition);
+    $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
 };

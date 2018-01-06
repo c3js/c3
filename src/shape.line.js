@@ -57,9 +57,9 @@ c3_chart_internal_fn.updateLine = function (durationForExit) {
     mainLine.exit().transition().duration(durationForExit)
         .style('opacity', 0);
 };
-c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
+c3_chart_internal_fn.redrawLine = function (drawLine, withTransition, transition) {
     return [
-        (withTransition ? this.mainLine.transition(Math.random().toString()) : this.mainLine)
+        (withTransition ? this.mainLine.transition(transition) : this.mainLine)
             .attr("d", drawLine)
             .style("stroke", this.color)
             .style("opacity", 1)
@@ -232,9 +232,9 @@ c3_chart_internal_fn.updateArea = function (durationForExit) {
     mainArea.exit().transition().duration(durationForExit)
         .style('opacity', 0);
 };
-c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
+c3_chart_internal_fn.redrawArea = function (drawArea, withTransition, transition) {
     return [
-        (withTransition ? this.mainArea.transition(Math.random().toString()) : this.mainArea)
+        (withTransition ? this.mainArea.transition(transition) : this.mainArea)
             .attr("d", drawArea)
             .style("fill", this.color)
             .style("opacity", this.orgAreaOpacity)
@@ -302,12 +302,14 @@ c3_chart_internal_fn.generateGetAreaPoints = function (areaIndices, isSub) { // 
 };
 
 
-c3_chart_internal_fn.updateCircle = function () {
+c3_chart_internal_fn.updateCircle = function (cx, cy) {
     var $$ = this;
     var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
     var mainCircleEnter = mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
+        .attr("cx", cx)
+        .attr("cy", cy)
         .attr("r", $$.pointR.bind($$))
         .style("fill", $$.color);
     $$.mainCircle = mainCircleEnter.merge(mainCircle)
@@ -315,15 +317,16 @@ c3_chart_internal_fn.updateCircle = function () {
     mainCircle.exit()
         .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
-    var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
+c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition, transition) {
+    var $$ = this,
+        selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle);
     return [
-        (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
-            .style('opacity', this.opacityForCircle.bind(this))
-            .style("fill", this.color)
+        (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
+            .style('opacity', this.opacityForCircle.bind($$))
+            .style("fill", $$.color)
             .attr("cx", cx)
             .attr("cy", cy),
-        (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
+        (withTransition ? selectedCircles.transition(transition) : selectedCircles)
             .attr("cx", cx)
             .attr("cy", cy)
     ];

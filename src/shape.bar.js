@@ -42,9 +42,9 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
     mainBar.exit().transition().duration(durationForExit)
         .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
+c3_chart_internal_fn.redrawBar = function (drawBar, withTransition, transition) {
     return [
-        (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
+        (withTransition ? this.mainBar.transition(transition) : this.mainBar)
             .attr('d', drawBar)
             .style("stroke", this.color)
             .style("fill", this.color)

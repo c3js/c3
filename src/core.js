@@ -446,7 +446,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     var hideAxis = $$.hasArcType();
     var drawArea, drawBar, drawLine, xForText, yForText;
     var duration, durationForExit, durationForAxis;
-    var waitForDraw, flow;
+    var transitionsToWait, waitForDraw, flow, transition;
     var targetsToShow = $$.filterTargetsToShow($$.data.targets), tickValues, i, intervalForCulling, xDomainForZoom;
     var xv = $$.xv.bind($$), cx, cy;
 
@@ -510,7 +510,7 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     }
 
     // axes
-    $$.axis.redraw(transitions, hideAxis);
+    $$.axis.redraw(durationForAxis, hideAxis);
 
     // Update axis label
     $$.axis.updateLabels(withTransition);
@@ -542,6 +542,12 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     xForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, true);
     yForText = $$.generateXYForText(areaIndices, barIndices, lineIndices, false);
 
+    // update circleY based on updated parameters
+    $$.updateCircleY();
+    // generate circle x/y functions depending on updated params
+    cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$);
+    cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
+
     // Update sub domain
     if (withY) {
         $$.subY.domain($$.getYDomain(targetsToShow, 'y'));
@@ -571,11 +577,11 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     // lines, areas and cricles
     $$.updateLine(durationForExit);
     $$.updateArea(durationForExit);
-    $$.updateCircle();
+    $$.updateCircle(cx, cy);
 
     // text
     if ($$.hasDataLabel()) {
-        $$.updateText(durationForExit);
+        $$.updateText(xForText, yForText, durationForExit);
     }
 
     // title
@@ -600,13 +606,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         $$.updateEventRect();
     }
 
-    // update circleY based on updated parameters
-    $$.updateCircleY();
-
-    // generate circle x/y functions depending on updated params
-    cx = ($$.config.axis_rotated ? $$.circleY : $$.circleX).bind($$);
-    cy = ($$.config.axis_rotated ? $$.circleX : $$.circleY).bind($$);
-
     if (options.flow) {
         flow = $$.generateFlow({
             targets: targetsToShow,
@@ -623,51 +622,44 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         });
     }
 
-    if ((duration || flow) && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
-        // transition should be derived from one transition
-        d3.transition().duration(duration).each(function () {
-            var transitionsToWait = [];
-
-            // redraw and gather transitions
+    if ($$.isTabVisible()) { // Only use transition if tab visible. See #938.
+        if (duration) {
+            // transition should be derived from one transition
+            transition = d3.transition().duration(duration);
+            transitionsToWait = [];
             [
-                $$.redrawBar(drawBar, true),
-                $$.redrawLine(drawLine, true),
-                $$.redrawArea(drawArea, true),
-                $$.redrawCircle(cx, cy, true),
-                $$.redrawText(xForText, yForText, options.flow, true),
-                $$.redrawRegion(true),
-                $$.redrawGrid(true),
+                $$.redrawBar(drawBar, true, transition),
+                $$.redrawLine(drawLine, true, transition),
+                $$.redrawArea(drawArea, true, transition),
+                $$.redrawCircle(cx, cy, true, transition),
+                $$.redrawText(xForText, yForText, options.flow, true, transition),
+                $$.redrawRegion(true, transition),
+                $$.redrawGrid(true, transition),
             ].forEach(function (transitions) {
                 transitions.forEach(function (transition) {
                     transitionsToWait.push(transition);
                 });
             });
-
             // Wait for end of transitions to call flow and onrendered callback
             waitForDraw = $$.generateWait();
             transitionsToWait.forEach(function (t) {
                 waitForDraw.add(t);
             });
-        })
-        .call(waitForDraw, function () {
-            if (flow) {
-                flow();
-            }
-            if (config.onrendered) {
-                config.onrendered.call($$);
-            }
-        });
-    }
-    else {
-        $$.redrawBar(drawBar);
-        $$.redrawLine(drawLine);
-        $$.redrawArea(drawArea);
-        $$.redrawCircle(cx, cy);
-        $$.redrawText(xForText, yForText, options.flow);
-        $$.redrawRegion();
-        $$.redrawGrid();
-        if (config.onrendered) {
-            config.onrendered.call($$);
+            waitForDraw(function () {
+                if (flow) { flow(); }
+                if (config.onrendered) { config.onrendered.call($$); }
+            });
+        }
+        else {
+            $$.redrawBar(drawBar);
+            $$.redrawLine(drawLine);
+            $$.redrawArea(drawArea);
+            $$.redrawCircle(cx, cy);
+            $$.redrawText(xForText, yForText, options.flow);
+            $$.redrawRegion();
+            $$.redrawGrid();
+            if (flow) { flow(); }
+            if (config.onrendered) { config.onrendered.call($$); }
         }
     }
 
@@ -1001,7 +993,7 @@ c3_chart_internal_fn.endall = function (transition, callback) {
 };
 c3_chart_internal_fn.generateWait = function () {
     var transitionsToWait = [],
-        f = function (transition, callback) {
+        f = function (callback) {
             var timer = setInterval(function () {
                 var done = 0;
                 transitionsToWait.forEach(function (t) {
@@ -1019,7 +1011,7 @@ c3_chart_internal_fn.generateWait = function () {
                     clearInterval(timer);
                     if (callback) { callback(); }
                 }
-            }, 10);
+            }, 50);
         };
     f.add = function (transition) {
         transitionsToWait.push(transition);

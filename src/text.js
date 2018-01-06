@@ -23,7 +23,7 @@ c3_chart_internal_fn.updateTargetsForText = function (targets) {
     var mainTextUpdate = mainTextEnter.merge(mainText)
         .attr('class', function (d) { return classChartText(d) + classFocus(d); });
 };
-c3_chart_internal_fn.updateText = function (durationForExit) {
+c3_chart_internal_fn.updateText = function (xForText, yForText, durationForExit) {
     var $$ = this, config = $$.config,
         barOrLineData = $$.barOrLineData.bind($$),
         classText = $$.classText.bind($$);
@@ -33,6 +33,8 @@ c3_chart_internal_fn.updateText = function (durationForExit) {
         .attr("class", classText)
         .attr('text-anchor', function (d) { return config.axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
         .style("stroke", 'none')
+        .attr('x', xForText)
+        .attr('y', yForText)
         .style("fill", function (d) { return $$.color(d); })
         .style("fill-opacity", 0);
     $$.mainText = mainTextEnter.merge(mainText)
@@ -42,9 +44,9 @@ c3_chart_internal_fn.updateText = function (durationForExit) {
         .style('fill-opacity', 0)
         .remove();
 };
-c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
+c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition, transition) {
     return [
-        (withTransition ? this.mainText.transition() : this.mainText)
+        (withTransition ? this.mainText.transition(transition) : this.mainText)
             .attr('x', xForText)
             .attr('y', yForText)
             .style("fill", this.color)

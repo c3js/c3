@@ -29,9 +29,9 @@ c3_chart_internal_fn.updateRegion = function (duration) {
         .style("opacity", 0)
         .remove();
 };
-c3_chart_internal_fn.redrawRegion = function (withTransition) {
+c3_chart_internal_fn.redrawRegion = function (withTransition, transition) {
     var $$ = this, regions = $$.mainRegion;
-    return [(withTransition ? regions.transition() : regions)
+    return [(withTransition ? regions.transition(transition) : regions)
             .attr("x", $$.regionX.bind($$))
             .attr("y", $$.regionY.bind($$))
             .attr("width", $$.regionWidth.bind($$))
