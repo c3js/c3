@@ -253,11 +253,11 @@ c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
     $$.context.attr("transform", $$.getTranslate('context'));
     subXAxis.attr("transform", $$.getTranslate('subx'));
 };
-c3_chart_internal_fn.getDefaultExtent = function () {
+c3_chart_internal_fn.getDefaultSelection = function () {
     var $$ = this, config = $$.config,
-        extent = isFunction(config.axis_x_extent) ? config.axis_x_extent($$.getXDomain($$.data.targets)) : config.axis_x_extent;
+        selection = isFunction(config.axis_x_selection) ? config.axis_x_selection($$.getXDomain($$.data.targets)) : config.axis_x_selection;
     if ($$.isTimeSeries()) {
-        extent = [$$.parseDate(extent[0]), $$.parseDate(extent[1])];
+        selection = [$$.parseDate(selection[0]), $$.parseDate(selection[1])];
     }
-    return extent;
+    return selection;
 };

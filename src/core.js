@@ -283,14 +283,14 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define g for chart
     $$.initChartElements();
 
-    // Set default extent if defined
-    if (config.axis_x_extent) { $$.brush.extent($$.getDefaultExtent()); }
-
     // Add Axis
     $$.axis.init();
 
     // Set targets
     $$.updateTargets($$.data.targets);
+
+    // Set default extent if defined
+    if (config.axis_x_selection) { $$.brush.selectionAsValue($$.getDefaultSelection()); }
 
     // Draw with targets
     if (binding) {
