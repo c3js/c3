@@ -45,6 +45,11 @@ c3_chart_internal_fn.initZoom = function () {
 
     return $$.zoom.updateExtent();
 };
+c3_chart_internal_fn.zoomTransform = function (range) {
+    var $$ = this, s = [$$.x(range[0]), $$.x(range[1])];
+    return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0);
+};
+
 c3_chart_internal_fn.getZoomDomain = function () {
     var $$ = this, config = $$.config, d3 = $$.d3,
         min = d3.min([$$.orgXDomain[0], config.zoom_x_min]),
@@ -72,7 +77,7 @@ c3_chart_internal_fn.redrawForZoom = function () {
         withEventRect: false,
         withDimension: false
     });
-    if (d3.event.sourceEvent.type === 'mousemove') {
+    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
     config.zoom_onzoom.call($$.api, x.orgDomain());

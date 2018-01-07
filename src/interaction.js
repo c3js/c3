@@ -12,7 +12,13 @@ c3_chart_internal_fn.initEventRect = function () {
 
     // event rect handle zoom event as well
     if (config.zoom_enabled && $$.zoom) {
-        $$.main.select('.' + CLASS.eventRect).call($$.zoom).on("dblclick.zoom", null);
+        $$.eventRect.call($$.zoom).on("dblclick.zoom", null);
+        if (config.zoom_initialRange) {
+            // WORKAROUND: Add transition to apply transform immediately when no subchart
+            $$.eventRect.transition().duration(0).call(
+                $$.zoom.transform, $$.zoomTransform(config.zoom_initialRange)
+            );
+        }
     }
 };
 c3_chart_internal_fn.redrawEventRect = function () {
@@ -124,9 +130,9 @@ c3_chart_internal_fn.redrawEventRect = function () {
             ) : function () {}
         );
 };
-c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
+c3_chart_internal_fn.dispatchEvent = function (type, mouse) {
     var $$ = this,
-        selector = '.' + CLASS.eventRect + (!$$.isMultipleX() ? '-' + index : ''),
+        selector = '.' + CLASS.eventRect,
         eventRect = $$.main.select(selector).node(),
         box = eventRect.getBoundingClientRect(),
         x = box.left + (mouse ? mouse[0] : 0),
