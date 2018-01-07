@@ -279,10 +279,6 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Cover whole with rects for events
     $$.initEventRect();
-    // event rect handle zoom event as well
-    if (config.zoom_enabled) {
-        $$.main.select('.' + CLASS.eventRect).call($$.zoom).on("dblclick.zoom", null);
-    }
 
     // Define g for chart
     $$.initChartElements();
@@ -565,6 +561,9 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
       .transition()
         .style('opacity', targetsToShow.length ? 0 : 1);
 
+    // event rect
+    if (withEventRect) { $$.redrawEventRect(); }
+
     // grid
     $$.updateGrid(duration);
 
@@ -600,11 +599,6 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
         .filter($$.isBarType.bind($$))
         .selectAll('circle')
         .remove();
-
-    // event rects will redrawn when flow called
-    if (config.interaction_enabled && !options.flow && withEventRect) {
-        $$.updateEventRect();
-    }
 
     if (options.flow) {
         flow = $$.generateFlow({

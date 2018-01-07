@@ -240,18 +240,16 @@ c3_chart_internal_fn.generateFlow = function (args) {
         wait.add(xgrid.transition(flowTransition).attr('transform', transform));
         wait.add(xgridLines.transition(flowTransition).attr('transform', transform));
         wait(function () {
-            var i, shapes = [], texts = [], eventRects = [];
+            var i, shapes = [], texts = [];
 
             // remove flowed elements
             if (flowLength) {
                 for (i = 0; i < flowLength; i++) {
                     shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
                     texts.push('.' + CLASS.text + '-' + (flowIndex + i));
-                    eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
                 }
                 $$.svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
                 $$.svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
-                $$.svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
                 $$.svg.select('.' + CLASS.xgrid).remove();
             }
 
@@ -294,10 +292,6 @@ c3_chart_internal_fn.generateFlow = function (args) {
             mainRegion.filter($$.isRegionOnX)
                 .attr("x", $$.regionX.bind($$))
                 .attr("width", $$.regionWidth.bind($$));
-
-            if (config.interaction_enabled) {
-                $$.redrawEventRect();
-            }
 
             // callback for end of flow
             done();
