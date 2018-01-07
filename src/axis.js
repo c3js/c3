@@ -108,14 +108,14 @@ c3_axis_internal_fn.transitionise = function (selection) {
 c3_axis_internal_fn.isVertical = function () {
     return this.orient === 'left' || this.orient === 'right';
 };
-c3_axis_internal_fn.tspanData = function (d, i, ticks, scale) {
+c3_axis_internal_fn.tspanData = function (d, i, scale) {
     var internal = this;
-    var splitted = internal.params.tickMultiline ? internal.splitTickText(d, ticks, scale) : [].concat(internal.textFormatted(d));
+    var splitted = internal.params.tickMultiline ? internal.splitTickText(d, scale) : [].concat(internal.textFormatted(d));
     return splitted.map(function (s) {
         return { index: i, splitted: s, length: splitted.length };
     });
 };
-c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
+c3_axis_internal_fn.splitTickText = function (d, scale) {
     var internal = this,
         tickText = internal.textFormatted(d),
         maxWidth = internal.params.tickWidth,
@@ -126,7 +126,7 @@ c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
     }
 
     if (!maxWidth || maxWidth <= 0) {
-        maxWidth = internal.isVertical() ? 95 : internal.params.isCategory ? (Math.ceil(scale(ticks[1]) - scale(ticks[0])) - 12) : 110;
+        maxWidth = internal.isVertical() ? 95 : internal.params.isCategory ? (Math.ceil(scale(1) - scale(0)) - 12) : 110;
     }
 
     function split(splitted, text) {
@@ -223,7 +223,7 @@ c3_axis_internal_fn.generateAxis = function () {
                 textUpdate = tickUpdate.select("text").merge(tickEnter.append("text"));
 
             var tspans = tickUpdate.selectAll('text').selectAll('tspan').data(function (d, i) {
-                    return internal.tspanData(d, i, ticks, scale1);
+                    return internal.tspanData(d, i, scale1);
                 }),
                 tspanEnter = tspans.enter().append('tspan'),
                 tspanExit = tspans.exit().remove(),
