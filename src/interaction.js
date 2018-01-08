@@ -87,7 +87,10 @@ c3_chart_internal_fn.redrawEventRect = function () {
 
             // expand points
             if (config.point_focus_expand_enabled) {
-                $$.expandCircles(closest.index, closest.id, true);
+                $$.unexpandCircles();
+                selectedData.forEach(function (d) {
+                    $$.expandCircles(d.index, d.id, false);
+                });
             }
             $$.expandBars(closest.index, closest.id, true);
 
