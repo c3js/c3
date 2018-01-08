@@ -42,14 +42,6 @@ c3_chart_internal_fn.addXs = function (xs) {
         $$.config.data_xs[id] = xs[id];
     });
 };
-c3_chart_internal_fn.hasMultipleX = function (xs) {
-//    return this.d3.set(Object.keys(xs).map(function (id) { return xs[id]; })).size() > 1;
-    return true;
-};
-c3_chart_internal_fn.isMultipleX = function () {
-//    return notEmpty(this.config.data_xs) || !this.config.data_xSort || this.hasType('scatter');
-    return true;
-};
 c3_chart_internal_fn.addName = function (data) {
     var $$ = this, name;
     if (data) {
@@ -101,47 +93,9 @@ c3_chart_internal_fn.cloneTarget = function (target) {
         })
     };
 };
-c3_chart_internal_fn.updateXs = function () {
-    var $$ = this;
-    if ($$.data.targets.length) {
-        $$.xs = [];
-        $$.data.targets[0].values.forEach(function (v) {
-            $$.xs[v.index] = v.x;
-        });
-    }
-};
-c3_chart_internal_fn.getPrevX = function (i) {
-    var x = this.xs[i - 1];
-    return typeof x !== 'undefined' ? x : null;
-};
-c3_chart_internal_fn.getNextX = function (i) {
-    var x = this.xs[i + 1];
-    return typeof x !== 'undefined' ? x : null;
-};
 c3_chart_internal_fn.getMaxDataCount = function () {
     var $$ = this;
     return $$.d3.max($$.data.targets, function (t) { return t.values.length; });
-};
-c3_chart_internal_fn.getMaxDataCountTarget = function (targets) {
-    var length = targets.length, max = 0, maxTarget;
-    if (length > 1) {
-        targets.forEach(function (t) {
-            if (t.values.length > max) {
-                maxTarget = t;
-                max = t.values.length;
-            }
-        });
-    } else {
-        maxTarget = length ? targets[0] : null;
-    }
-    return maxTarget;
-};
-c3_chart_internal_fn.getEdgeX = function (targets) {
-    var $$ = this;
-    return !targets.length ? [0, 0] : [
-        $$.d3.min(targets, function (t) { return t.values[0].x; }),
-        $$.d3.max(targets, function (t) { return t.values[t.values.length - 1].x; })
-    ];
 };
 c3_chart_internal_fn.mapToIds = function (targets) {
     return targets.map(function (d) { return d.id; });
@@ -306,19 +260,6 @@ c3_chart_internal_fn.isNoneArc = function (d) {
 c3_chart_internal_fn.isArc = function (d) {
     return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
 };
-c3_chart_internal_fn.findSameXOfValues = function (values, index) {
-    var i, targetX = values[index].x, sames = [];
-    for (i = index - 1; i >= 0; i--) {
-        if (targetX !== values[i].x) { break; }
-        sames.push(values[i]);
-    }
-    for (i = index; i < values.length; i++) {
-        if (targetX !== values[i].x) { break; }
-        sames.push(values[i]);
-    }
-    return sames;
-};
-
 c3_chart_internal_fn.findClosestFromTargets = function (targets, pos) {
     var $$ = this, candidates;
 

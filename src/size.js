@@ -114,6 +114,3 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
 };
 
-c3_chart_internal_fn.getEventRectWidth = function () {
-    return Math.max(0, this.xAxis.tickInterval());
-};

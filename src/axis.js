@@ -102,9 +102,6 @@ c3_axis_internal_fn.updateTickTextCharSize = function (tick) {
     internal.tickTextCharSize = size;
     return size;
 };
-c3_axis_internal_fn.transitionise = function (selection) {
-    return this.params.withoutTransition ? selection : selection.transition();
-};
 c3_axis_internal_fn.isVertical = function () {
     return this.orient === 'left' || this.orient === 'right';
 };
