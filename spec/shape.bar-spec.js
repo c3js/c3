@@ -1,5 +1,3 @@
-var setMouseEvent = window.setMouseEvent;
-
 describe('c3 chart shape bar', function () {
     'use strict';
 

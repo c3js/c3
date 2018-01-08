@@ -677,7 +677,6 @@ c3_axis_fn.updateXAxisTickValues = function updateXAxisTickValues(targets, axis)
 c3_axis_fn.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
     var $$ = this.owner,
         config = $$.config,
-        d3 = $$.d3,
         axisParams = {
         withOuterTick: withOuterTick,
         withoutTransition: withoutTransition,
