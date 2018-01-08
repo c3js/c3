@@ -1,5 +1,4 @@
 import { c3_chart_fn } from './core';
-import { isValue } from './util';
 
 c3_chart_fn.tooltip = function () {};
 c3_chart_fn.tooltip.show = function (args) {

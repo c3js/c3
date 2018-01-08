@@ -98,13 +98,13 @@ c3_chart_internal_fn.getInterpolate = function (d) {
         type;
 
     if ($$.isSplineType(d)) {
-        type = types[$$.config.spline_interpolation_type] || types['cardinal'];
+        type = types[$$.config.spline_interpolation_type] || types.cardinal;
     }
     else if ($$.isStepType(d)) {
         type = types[$$.config.line_step_type];
     }
     else {
-        type = types["linear"];
+        type = types.linear;
     }
     return type;
 };

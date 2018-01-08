@@ -223,8 +223,8 @@ c3_axis_internal_fn.generateAxis = function () {
                     return internal.tspanData(d, i, scale1);
                 }),
                 tspanEnter = tspans.enter().append('tspan'),
-                tspanExit = tspans.exit().remove(),
                 tspanUpdate = tspanEnter.merge(tspans).text(function (d) { return d.splitted; });
+            tspans.exit().remove();
 
             var path = g.selectAll(".domain").data([ 0 ]),
                 pathUpdate = path.enter().append("path").merge(path).attr("class", "domain");

@@ -20,7 +20,7 @@ c3_chart_internal_fn.updateTargetsForText = function (targets) {
         .style("pointer-events", "none");
     mainTextEnter.append('g')
         .attr('class', classTexts);
-    var mainTextUpdate = mainTextEnter.merge(mainText)
+    mainTextEnter.merge(mainText)
         .attr('class', function (d) { return classChartText(d) + classFocus(d); });
 };
 c3_chart_internal_fn.updateText = function (xForText, yForText, durationForExit) {

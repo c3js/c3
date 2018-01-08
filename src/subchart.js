@@ -143,7 +143,7 @@ c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
         .attr("class", $$.classBar.bind($$))
         .style("stroke", 'none')
         .style("fill", $$.color);
-    var contextBarExit = contextBar.exit().transition().duration(durationForExit)
+    contextBar.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
     $$.contextBar = contextBarEnter.merge(contextBar)
@@ -161,7 +161,7 @@ c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
     var contextLineEnter = contextLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
         .style('stroke', $$.color);
-    var contextLineExit = contextLine.exit().transition().duration(durationForExit)
+    contextLine.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
     $$.contextLine = contextLineEnter.merge(contextLine)
@@ -180,7 +180,7 @@ c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
         .attr("class", $$.classArea.bind($$))
         .style("fill", $$.color)
         .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-    var contextAreaExit = contextArea.exit().transition().duration(durationForExit)
+    contextArea.exit().transition().duration(durationForExit)
         .style('opacity', 0)
         .remove();
     $$.contextArea = contextAreaEnter.merge(contextArea)
