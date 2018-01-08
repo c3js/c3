@@ -107,7 +107,7 @@ c3_chart_internal_fn.redrawEventRect = function () {
             }
         } : null)
         .on('click', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest;
+            var targetsToShow, mouse, closest, sameXData;
             if ($$.hasArcType(targetsToShow)) { return; }
 
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
@@ -116,11 +116,18 @@ c3_chart_internal_fn.redrawEventRect = function () {
             if (! closest) { return; }
             // select if selection enabled
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
-                    if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
-                        $$.toggleShape(this, closest, closest.index);
-                        config.data_onclick.call($$.api, closest, this);
-                    }
+                if ($$.isScatterType(closest) || !config.data_selection_grouped) {
+                    sameXData = [closest];
+                } else {
+                    sameXData = $$.filterByX(targetsToShow, closest.x);
+                }
+                sameXData.forEach(function (d) {
+                    $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
+                        if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                            $$.toggleShape(this, d, d.index);
+                            config.data_onclick.call($$.api, d, this);
+                        }
+                    });
                 });
             }
         } : null)
