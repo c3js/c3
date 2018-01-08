@@ -73,7 +73,7 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
         isWithin = $$.isStepType(d) ? $$.isWithinStep(that, $$.getYScale(d.id)(d.value)) : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
     }
     else if (that.nodeName === 'path') {
-        isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar(that) : true;
+        isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar($$.d3.mouse(that), that) : true;
     }
     return isWithin;
 };
@@ -91,8 +91,7 @@ c3_chart_internal_fn.getInterpolate = function (d) {
             'cardinal': d3.curveCardinal,
             'cardinal-open': d3.curveCardinalOpen,
             'cardinal-closed': d3.curveCardinalClosed,
-            'monotone-x': d3.curveMonotoneX,
-            'monotone-y': d3.curveMonotoneY,
+            'monotone': d3.curveMonotoneX,
             'step': d3.curveStep,
         },
         type;

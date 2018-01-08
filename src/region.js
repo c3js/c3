@@ -16,8 +16,7 @@ c3_chart_internal_fn.updateRegion = function (duration) {
 
     var mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
-    var mainRegionEnter = mainRegion.enter().append('g')
-      .append('rect')
+    var mainRegionEnter = mainRegion.enter().append('rect')
         .attr("x", $$.regionX.bind($$))
         .attr("y", $$.regionY.bind($$))
         .attr("width", $$.regionWidth.bind($$))

@@ -127,7 +127,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
         axis_y_tick_count: undefined,
-        axis_y_tick_time_value: undefined,
+        axis_y_tick_time_type: undefined,
         axis_y_tick_time_interval: undefined,
         axis_y_padding: {},
         axis_y_default: undefined,

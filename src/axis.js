@@ -452,7 +452,7 @@ c3_axis_fn.updateXAxisTickValues = function updateXAxisTickValues(targets, axis)
     return tickValues;
 };
 c3_axis_fn.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    var $$ = this.owner, config = $$.config,
+    var $$ = this.owner, config = $$.config, d3 = $$.d3,
         axisParams = {
             withOuterTick: withOuterTick,
             withoutTransition: withoutTransition,
@@ -460,7 +460,7 @@ c3_axis_fn.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, w
         },
         axis = new this.internal(this, axisParams).axis.scale(scale).orient(orient).tickFormat(tickFormat);
     if ($$.isTimeSeriesY()) {
-        axis.ticks($$.d3.time[config.axis_y_tick_time_value], config.axis_y_tick_time_interval);
+        axis.ticks(config.axis_y_tick_time_type, config.axis_y_tick_time_interval);
     } else {
         axis.tickValues(tickValues);
     }

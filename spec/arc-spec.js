@@ -41,9 +41,9 @@ describe('c3 chart arc', function () {
         });
 
         it('should have correct d', function () {
-            expect(d3.select('.c3-arc-data1').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+ 0 0,1 -3\..+,-211\..+L0,0Z/);
-            expect(d3.select('.c3-arc-data2').attr('d')).toMatch(/M1\..+,-211\..+A211\..+,211\..+ 0 0,1 1\..+,211\..+L0,0Z/);
-            expect(d3.select('.c3-arc-data3').attr('d')).toMatch(/M1\..+,211\..+A211\..+,211\..+ 0 0,1 -124\..+,-171\..+L0,0Z/);
+            expect(d3.select('.c3-arc-data1').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+,0,0,1,-3\..+,-211\..+L0,0Z/);
+            expect(d3.select('.c3-arc-data2').attr('d')).toMatch(/M1\..+,-211\..+211\..+,211\..+,0,0,1,1\..+,211\..+L0,0Z/);
+            expect(d3.select('.c3-arc-data3').attr('d')).toMatch(/M1\..+,211\..+211\..+,211\..+,0,0,1,-124\..+,-171\..+L0,0Z/);
         });
 
         describe('with data id that can be converted to a color', function () {
@@ -57,7 +57,7 @@ describe('c3 chart arc', function () {
 
             it('should have correct d even if data id can be converted to a color', function (done) {
                 setTimeout(function () {
-                    expect(d3.select('.c3-arc-black').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+ 0 0,1 -3\..+,-211\..+L0,0Z/);
+                    expect(d3.select('.c3-arc-black').attr('d')).toMatch(/M-124\..+,-171\..+A211\..+,211\..+,0,0,1,-3\..+,-211\..+L0,0Z/);
                     done();
                 }, 500);
             });
@@ -198,7 +198,7 @@ describe('c3 chart arc', function () {
                         .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
                         .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
-                expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304 0 0,1 245\..+,-178\..+L237\..+,-172\..+A294,294 0 0,0 -294,-3\..+Z/);
+                expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304,0,0,1,245\..+,-178\..+L237\..+,-172\..+A294,294,0,0,0,-294,-3\..+Z/);
             });
         });
 
@@ -229,7 +229,7 @@ describe('c3 chart arc', function () {
                         .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
                 // This test has bee updated to make tests pass. @TODO double-check this test is accurate.
-                expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*? 0 1,1 -68.*?,210.*?L-65.*?,201.*?A211.*?,211.*? 0 1,0 -211.*?,-2.*?Z/);
+                expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*?,0,1,1,-68.*?,210.*?L-65.*?,201.*?A211.*?,211.*?,0,1,0,-211.*?,-2.*?Z/);
             });
 
             describe('with labels use custom text', function() {

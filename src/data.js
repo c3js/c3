@@ -277,7 +277,7 @@ c3_chart_internal_fn.findClosest = function (values, pos) {
     // find mouseovering bar
     values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
         var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
-        if (!closest && $$.isWithinBar(shape)) {
+        if (!closest && $$.isWithinBar($$.d3.mouse(shape), shape)) {
             closest = v;
         }
     });

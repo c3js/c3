@@ -176,7 +176,7 @@ describe('c3 chart shape line', function () {
         });
 
         it('updates interpolation function', function() {
-            expect(chart.internal.getInterpolate(chart.data()[0])).toBe('monotone');
+            expect(chart.internal.getInterpolate(chart.data()[0])).toBe(d3.curveMonotoneX);
         });
 
         describe('should not use a non-valid interpolation', function () {
@@ -185,7 +185,7 @@ describe('c3 chart shape line', function () {
             });
 
             it('should use cardinal interpolation when given option is not valid', function() {
-                expect(chart.internal.getInterpolate(chart.data()[0])).toBe('cardinal');
+                expect(chart.internal.getInterpolate(chart.data()[0])).toBe(d3.curveCardinal);
             });
         });
     });
