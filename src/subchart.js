@@ -6,11 +6,13 @@ c3_chart_internal_fn.initBrush = function (scale) {
     var $$ = this, d3 = $$.d3;
     // TODO: dynamically change brushY/brushX according to axis_rotated.
     $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX()).on("brush", function () {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") { return; }
+        var event = d3.event.sourceEvent;
+        if (event && event.type === "zoom") { return; }
         $$.redrawForBrush();
     }).on("end", function () {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") { return; }
-        if ($$.brush.empty() && d3.event.sourceEvent.type !== 'end') { $$.brush.clear(); }
+        var event = d3.event.sourceEvent;
+        if (event && event.type === "zoom") { return; }
+        if ($$.brush.empty() && event && event.type !== 'end') { $$.brush.clear(); }
     });
     $$.brush.updateExtent = function () {
         var range = this.scale.range(), extent;
@@ -42,7 +44,7 @@ c3_chart_internal_fn.initBrush = function (scale) {
         if (selectionAsValue) {
             if ($$.context) {
                 selection = [this.scale(selectionAsValue[0]), this.scale(selectionAsValue[1])];
-                $$.brush.move($$.context.select('.' + CLASS.brush), selection);
+                $$.brush.move($$.context.select('.' + CLASS.brush).transition(), selection);
             }
             return [];
         }
@@ -86,8 +88,7 @@ c3_chart_internal_fn.initSubchart = function () {
     $$.axes.subx = context.append("g")
         .attr("class", CLASS.axisX)
         .attr("transform", $$.getTranslate('subx'))
-        .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis)
-        .style("visibility", config.subchart_axis_x_show ? visibility : 'hidden');
+        .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis);
 };
 c3_chart_internal_fn.initSubchartBrush = function () {
     var $$ = this;

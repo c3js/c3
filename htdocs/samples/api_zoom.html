@@ -1,0 +1,76 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/css/c3.css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script src="/js/c3.js"></script>
+    <script>
+
+      var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+          columns: [
+            generateData(100)
+          ],
+        },
+        zoom: {
+          enabled: true,
+          initialRange: [30, 60],
+          onzoomstart: function (event) {
+            console.log("onzoomstart", event);
+          },
+          onzoom: function (domain) {
+            console.log("onzoom", domain);
+          },
+          onzoomend: function (domain) {
+            console.log("onzoomend", domain);
+          },
+        },
+        subchart: { show: true }
+      });
+
+      function generateData(n) {
+        var column = ['sample'];
+        for (var i = 0; i < n; i++) {
+          column.push(Math.random() * 500);
+        }
+        return column;
+      }
+
+     // with subchart
+     setTimeout(function () {
+         chart.zoom([45,75]);
+     }, 1000);
+
+     setTimeout(function () {
+         chart.zoom([25,90]);
+     }, 2000);
+
+     setTimeout(function () {
+         chart.unzoom();
+     }, 3000);
+
+     // without subchart
+     setTimeout(function () {
+         chart.internal.config.subchart_show = false;
+         chart.flush();
+     }, 4000);
+
+     setTimeout(function () {
+         chart.zoom([45,75]);
+     }, 5000);
+
+     setTimeout(function () {
+         chart.zoom([25,90]);
+     }, 6000);
+
+     setTimeout(function () {
+         chart.unzoom();
+     }, 7000);
+
+    </script>
+  </body>
+</html>
