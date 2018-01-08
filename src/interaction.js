@@ -133,6 +133,10 @@ c3_chart_internal_fn.redrawEventRect = function () {
             ) : function () {}
         );
 };
+c3_chart_internal_fn.getMousePosition = function (data) {
+    var $$ = this;
+    return [$$.x(data.x), $$.getYScale(data.id)(data.value)];
+};
 c3_chart_internal_fn.dispatchEvent = function (type, mouse) {
     var $$ = this,
         selector = '.' + CLASS.eventRect,

@@ -23,11 +23,6 @@ c3_chart_internal_fn.getXValuesOfXKey = function (key, targets) {
     });
     return xValues;
 };
-c3_chart_internal_fn.getIndexByX = function (x) {
-    var $$ = this,
-        data = $$.filterByX($$.data.targets, x);
-    return data.length ? data[0].index : null;
-};
 c3_chart_internal_fn.getXValue = function (id, i) {
     var $$ = this;
     return id in $$.data.xs && $$.data.xs[id] && isValue($$.data.xs[id][i]) ? $$.data.xs[id][i] : i;

@@ -3,36 +3,32 @@ import { isValue } from './util';
 
 c3_chart_fn.tooltip = function () {};
 c3_chart_fn.tooltip.show = function (args) {
-    var $$ = this.internal, index, mouse;
+    var $$ = this.internal, targets, data, mouse = {};
 
     // determine mouse position on the chart
     if (args.mouse) {
         mouse = args.mouse;
     }
-
-    // determine focus data
-    if (args.data) {
-        if ($$.isMultipleX()) {
-            // if multiple xs, target point will be determined by mouse
-            mouse = [$$.x(args.data.x), $$.getYScale(args.data.id)(args.data.value)];
-            index = null;
-        } else {
-            // TODO: when tooltip_grouped = false
-            index = isValue(args.data.index) ? args.data.index : $$.getIndexByX(args.data.x);
+    else {
+        // determine focus data
+        if (args.data) {
+            data = args.data;
         }
-    }
-    else if (typeof args.x !== 'undefined') {
-        index = $$.getIndexByX(args.x);
-    }
-    else if (typeof args.index !== 'undefined') {
-        index = args.index;
+        else if (typeof args.x !== 'undefined') {
+            if (args.id) {
+                targets = $$.data.targets.filter(function(t){ return t.id === args.id; });
+            } else {
+                targets = $$.data.targets;
+            }
+            data = $$.filterByX(targets, args.x).slice(0,1)[0];
+        }
+        mouse = data ? $$.getMousePosition(data) : null;
     }
 
     // emulate mouse events to show
-    $$.dispatchEvent('mouseover', index, mouse);
-    $$.dispatchEvent('mousemove', index, mouse);
+    $$.dispatchEvent('mousemove', mouse);
 
-    $$.config.tooltip_onshow.call($$, args.data);
+    $$.config.tooltip_onshow.call($$, data);
 };
 c3_chart_fn.tooltip.hide = function () {
     // TODO: get target data by checking the state of focus
