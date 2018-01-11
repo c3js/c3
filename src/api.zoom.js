@@ -8,7 +8,7 @@ c3_chart_fn.zoom = function (domain) {
             domain = domain.map(function (x) { return $$.parseDate(x); });
         }
         if ($$.config.subchart_show) {
-            $$.brush.selectionAsValue(domain);
+            $$.brush.selectionAsValue(domain, true);
         }
         else {
             $$.updateXDomain(null, true, false, false, domain);

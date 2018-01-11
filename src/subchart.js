@@ -39,12 +39,14 @@ c3_chart_internal_fn.initBrush = function (scale) {
     $$.brush.selection = function () {
         return d3.brushSelection($$.context.select('.' + CLASS.brush).node());
     };
-    $$.brush.selectionAsValue = function (selectionAsValue) {
-        var selection;
+    $$.brush.selectionAsValue = function (selectionAsValue, withTransition) {
+        var selection, brush;
         if (selectionAsValue) {
             if ($$.context) {
                 selection = [this.scale(selectionAsValue[0]), this.scale(selectionAsValue[1])];
-                $$.brush.move($$.context.select('.' + CLASS.brush).transition(), selection);
+                brush = $$.context.select('.' + CLASS.brush);
+                if (withTransition) { brush = brush.transition(); }
+                $$.brush.move(brush, selection);
             }
             return [];
         }
