@@ -17,13 +17,10 @@ jobs:
             echo "$(google-chrome --version)"
       - restore_cache:
           key: v1-npm-dependencies-{{ .Branch }}-{{ checksum "package.json" }}
-      - run:
-          name: Install dependencies
-          command: npm install
+      - run: npm install
       - save_cache:
           key: v1-npm-dependencies-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: Run Tests
-          command: npm run test
+      - run: npm test
+      - run: npm run codecov
