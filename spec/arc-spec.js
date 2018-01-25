@@ -198,7 +198,7 @@ describe('c3 chart arc', function () {
                         .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
                         .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
-                expect(data.attr('d')).toMatch(/M-304,-3\..+A304,304 0 0,1 245\..+,-178\..+L237\..+,-172\..+A294,294 0 0,0 -294,-3\..+Z/);
+                expect(data.attr('d')).toMatch(/-258.4,-3\..+A258.4,258.4 0 0,1 209\..+,-151\..+L200\..+,-146\..+A248.39999999999998,248.39999999999998 0 0,0 -248.39999999999998,-3\..+Z/);
             });
         });
 
@@ -229,7 +229,7 @@ describe('c3 chart arc', function () {
                         .select('path.c3-shape.c3-shape.c3-arc.c3-arc-data');
 
                 // This test has bee updated to make tests pass. @TODO double-check this test is accurate.
-                expect(data.attr('d')).toMatch(/M-221.*?,-2\..+A221.*?,221.*? 0 1,1 -68.*?,210.*?L-65.*?,201.*?A211.*?,211.*? 0 1,0 -211.*?,-2.*?Z/);
+                expect(data.attr('d')).toMatch(/M-180.*?,-2\..+A180.*?,180.*? 0 1,1 -55.*?,171.*?L-52.*?,161.*?A170.*?,170.*? 0 1,0 -170.*?,-2.*?Z/);
             });
 
             describe('with labels use custom text', function() {
@@ -266,6 +266,99 @@ describe('c3 chart arc', function () {
 
                     expect(min.text()).toMatch('Min: 0%');
                     expect(max.text()).toMatch('Max: 100%');
+                });
+            });
+        });
+
+        describe('with more than one data_column ', function () {
+            beforeAll(function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['padded1', 100],
+                            ['padded2', 90],
+                            ['padded3', 50],
+                            ['padded4', 20]
+                        ]
+                    },
+                    type: 'gauge',
+                    color: {
+                        pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+                        threshold: {
+                            values: [30, 80, 95]
+                        }
+                    }
+                };
+            });
+            var arcColor = ['#60b044', '#f6c600', '#f97600', '#ff0000'];
+
+            describe('should contain arcs ', function () {
+                it('each data_column should have one arc', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc').each(function (d, i) {
+                        expect(d3.select(this).classed('c3-chart-data-' + args.data.columns[i][0])).toBeTruthy();
+                    });
+                });
+
+                it('each arc should have the color from color_pattern if color_treshold is given ', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc').each(function (d, i) {
+                        expect(d3.select(this).style('fill')).toBe(arcColor[i]);
+                    });
+                });
+            });
+
+            describe('should contain backgrounds ', function () {
+                it('each data_column should have one background', function () {
+                    chart.internal.main.selectAll('.c3-chart-arcs path.c3-chart-arcs-background').each(function (d, i) {
+                        expect(d3.select(this).classed('c3-chart-arcs-background-'+ i)).toBeTruthy();
+                    });
+                });
+
+                it('each background should have tbe same color', function () {
+                    chart.internal.main.selectAll('.c3-chart-arcs path.c3-chart-arcs-background').each(function () {
+                        expect(d3.select(this).style('fill')).toBe('#e0e0e0');
+                    });
+                });
+            });
+
+            describe('should contain labels', function () {
+                it('each data_column should have a label', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-gauge-value').each(function (d, i) {
+                        expect(d3.select(this).text()).toBe(args.data.columns[i][1]);
+                    });
+                });
+
+                it('each label should have the same color', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-gauge-value').each(function () {
+                        expect(d3.select(this).style('fill')).toBe('#000');
+                    });
+
+                });
+
+                it('if only one data_column is visible the label should have "" for transform', function () {
+                    setTimeout(function () {
+                        var textBeforeHide = chart.internal.main.select('.c3-chart-arc.c3-target.c3-target-padded4 text');
+                        expect(textBeforeHide.attr('transform')).not.toBe('');
+                    },1000);
+                    chart.hide(['padded1', 'padded2', 'padded3']);
+                    setTimeout(function () {
+                        var textAfterHide = chart.internal.main.select('.c3-chart-arc.c3-target.c3-target-padded4 text');
+                        expect(textAfterHide.attr('transform')).toBe('');
+                    },1000);
+
+                });
+            });
+
+            describe('should contain labellines', function () {
+                it('each data_column should have a labelline', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc-label-line').each(function (d, i) {
+                        expect(d3.select(this).classed('c3-data-' + args.data.columns[i][0])).toBeTruthy();
+                    });
+                });
+
+                it('each labelline should have the color from color_pattern if color_treshold is given', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc-label-line').each(function (d, i) {
+                        expect(d3.select(this).style('fill')).toBe(arcColor[i]);
+                    });
                 });
             });
         });
