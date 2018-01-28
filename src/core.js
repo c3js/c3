@@ -318,7 +318,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
 
     // Bind resize event
-    $$.bindResize();
+    // MEMORY LEAK SOURCE
+    // $$.bindResize();
 
     // export element of the chart
     $$.api.element = $$.selectChart.node();
@@ -937,7 +938,7 @@ c3_chart_internal_fn.bindResize = function () {
     $$.resizeFunction.add(function () {
         config.onresized.call($$);
     });
-    
+
     var resizeIfElementDisplayed = function() {
         // if element not displayed skip it
         if (!$$.api.element.offsetParent) {
