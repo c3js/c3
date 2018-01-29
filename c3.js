@@ -628,9 +628,9 @@ c3_axis_fn.init = function init() {
     $$.axes.y = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY).attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis).attr("transform", $$.getTranslate('y')).style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text").attr("class", CLASS.axisYLabel).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForYAxisLabel.bind(this));
 
-    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2
+    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2)
     // clip-path?
-    ).attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
+    .attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append("text").attr("class", CLASS.axisY2Label).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForY2AxisLabel.bind(this));
 };
 c3_axis_fn.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
@@ -1001,14 +1001,14 @@ c3_axis_fn.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3$1 = { version: "0.4.18" };
+var c3 = { version: "0.4.18" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
 
 function Component(owner, componentKey, fn) {
     this.owner = owner;
-    c3$1.chart.internal[componentKey] = fn;
+    c3.chart.internal[componentKey] = fn;
 }
 
 function Chart(config) {
@@ -1040,18 +1040,18 @@ function ChartInternal(api) {
     $$.axes = {};
 }
 
-c3$1.generate = function (config) {
+c3.generate = function (config) {
     return new Chart(config);
 };
 
-c3$1.chart = {
+c3.chart = {
     fn: Chart.prototype,
     internal: {
         fn: ChartInternal.prototype
     }
 };
-c3_chart_fn = c3$1.chart.fn;
-c3_chart_internal_fn = c3$1.chart.internal.fn;
+c3_chart_fn = c3.chart.fn;
+c3_chart_internal_fn = c3.chart.internal.fn;
 
 c3_chart_internal_fn.beforeInit = function () {
     // can do something
@@ -1287,8 +1287,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     /*-- Main Region --*/
 
     // text when empty
-    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle" // horizontal centering of text at x position in all browsers.
-    ).attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
+    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
+    .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
     // Regions
     $$.initRegion();
@@ -1980,10 +1980,19 @@ c3_chart_internal_fn.bindResize = function () {
         config.onresized.call($$);
     });
 
+    var resizeIfElementDisplayed = function resizeIfElementDisplayed() {
+        // if element not displayed skip it
+        if (!$$.api.element.offsetParent) {
+            return;
+        }
+
+        $$.resizeFunction();
+    };
+
     if (window.attachEvent) {
-        window.attachEvent('onresize', $$.resizeFunction);
+        window.attachEvent('onresize', resizeIfElementDisplayed);
     } else if (window.addEventListener) {
-        window.addEventListener('resize', $$.resizeFunction, false);
+        window.addEventListener('resize', resizeIfElementDisplayed, false);
     } else {
         // fallback to this, if this is a very old browser
         var wrapper = window.onresize;
@@ -1997,7 +2006,14 @@ c3_chart_internal_fn.bindResize = function () {
         }
         // add this graph to the wrapper, we will be removed if the user calls destroy
         wrapper.add($$.resizeFunction);
-        window.onresize = wrapper;
+        window.onresize = function () {
+            // if element not displayed skip it
+            if (!$$.api.element.offsetParent) {
+                return;
+            }
+
+            wrapper();
+        };
     }
 };
 
@@ -2149,8 +2165,6 @@ if (!Function.prototype.bind) {
 // changes which were implemented in Firefox 43 and Chrome 46.
 
 (function () {
-    "use strict";
-
     if (!("SVGPathSeg" in window)) {
         // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSeg
         window.SVGPathSeg = function (type, typeAsLetter, owningPathSegList) {
@@ -4266,7 +4280,7 @@ c3_chart_fn.zoom = function (domain) {
         $$.redraw({ withUpdateXDomain: true, withY: $$.config.zoom_rescale });
         $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
     }
-    return $$.brush.extent();
+    return $$.x.domain();
 };
 c3_chart_fn.zoom.enable = function (enabled) {
     var $$ = this.internal;
@@ -4717,8 +4731,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         };
     }).attr("transform", withTransform ? "scale(1)" : "").style("fill", function (d) {
         return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
-    } // Where gauge reading color would receive customization.
-    ).call($$.endall, function () {
+    }) // Where gauge reading color would receive customization.
+    .call($$.endall, function () {
         $$.transiting = false;
     });
     mainArc.exit().transition().duration(durationForExit).style('opacity', 0).remove();
@@ -7447,8 +7461,8 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     texts = $$.legend.selectAll('text').data(targetIds).text(function (id) {
         return isDefined(config.data_names[id]) ? config.data_names[id] : id;
-    } // MEMO: needed for update
-    ).each(function (id, i) {
+    }) // MEMO: needed for update
+    .each(function (id, i) {
         updatePositions(this, id, i);
     });
     (withTransition ? texts.transition() : texts).attr('x', xForLegendText).attr('y', yForLegendText);
@@ -9231,6 +9245,6 @@ c3_chart_internal_fn.redrawForZoom = function () {
     config.zoom_onzoom.call($$.api, x.orgDomain());
 };
 
-return c3$1;
+return c3;
 
 })));

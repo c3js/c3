@@ -24,6 +24,14 @@ describe('c3 api zoom', function () {
             };
         });
 
+        it('should return the correct extent', function () {
+            var zoomDomain = chart.zoom(),
+            expectedDomain = chart.internal.x.domain();
+
+            expect(+zoomDomain[0]).toBe(+expectedDomain[0]);
+            expect(+zoomDomain[1]).toBe(+expectedDomain[1]);
+        });
+
         it('should be zoomed properly', function () {
             var target = [3, 5], domain;
             chart.zoom(target);
