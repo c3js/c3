@@ -319,7 +319,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Bind resize event
     // MEMORY LEAK SOURCE
-    // $$.bindResize();
+    $$.bindResize();
 
     // export element of the chart
     $$.api.element = $$.selectChart.node();
@@ -919,7 +919,7 @@ c3_chart_internal_fn.observeInserted = function (selection) {
 c3_chart_internal_fn.bindResize = function () {
     var $$ = this, config = $$.config;
 
-    $$.resizeFunction = $$.generateResize();
+    $$.resizeFunction = $$.generateResize(); // need to call .remove
 
     $$.resizeFunction.add(function () {
         config.onresize.call($$);
@@ -939,9 +939,9 @@ c3_chart_internal_fn.bindResize = function () {
         config.onresized.call($$);
     });
 
-    var resizeIfElementDisplayed = function() {
+    $$.resizeIfElementDisplayed = function() {
         // if element not displayed skip it
-        if (!$$.api.element.offsetParent) {
+        if ($$.api == null || !$$.api.element.offsetParent) {
             return;
         }
 
@@ -949,9 +949,9 @@ c3_chart_internal_fn.bindResize = function () {
     };
 
     if (window.attachEvent) {
-        window.attachEvent('onresize', resizeIfElementDisplayed);
+        window.attachEvent('onresize', $$.resizeIfElementDisplayed);
     } else if (window.addEventListener) {
-        window.addEventListener('resize', resizeIfElementDisplayed, false);
+        window.addEventListener('resize', $$.resizeIfElementDisplayed, false);
     } else {
         // fallback to this, if this is a very old browser
         var wrapper = window.onresize;
