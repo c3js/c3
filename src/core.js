@@ -318,7 +318,6 @@ c3_chart_internal_fn.initWithData = function (data) {
     }
 
     // Bind resize event
-    // MEMORY LEAK SOURCE
     $$.bindResize();
 
     // export element of the chart
