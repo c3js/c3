@@ -1,3 +1,7 @@
+# Alooma C3
+- customized library for alooma.com with major memory leak fixes and optimization
+- [Alooma](https://www.alooma.com/)
+
 # c3
 
 [![CircleCI](https://circleci.com/gh/c3js/c3.svg?style=svg)](https://circleci.com/gh/c3js/c3)

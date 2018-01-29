@@ -1,5 +1,5 @@
 {
-  "name": "c3",
+  "name": "alooma-c3",
   "version": "0.4.18",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/c3js/c3.git"
+    "url": "git://github.com/Aloomaio/c3"
   },
   "keywords": [
     "d3",
