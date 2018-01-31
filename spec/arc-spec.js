@@ -279,9 +279,9 @@ describe('c3 chart arc', function () {
                             ['padded2', 90],
                             ['padded3', 50],
                             ['padded4', 20]
-                        ]
+                        ],
+                        type: 'gauge'
                     },
-                    type: 'gauge',
                     color: {
                         pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
                         threshold: {
@@ -290,12 +290,12 @@ describe('c3 chart arc', function () {
                     }
                 };
             });
-            var arcColor = ['#60b044', '#f6c600', '#f97600', '#ff0000'];
+            var arcColor = ['rgb(96, 176, 68)', 'rgb(246, 198, 0)', 'rgb(249, 118, 0)', 'rgb(255, 0, 0)'];
 
             describe('should contain arcs ', function () {
                 it('each data_column should have one arc', function () {
                     chart.internal.main.selectAll('.c3-chart-arc .c3-arc').each(function (d, i) {
-                        expect(d3.select(this).classed('c3-chart-data-' + args.data.columns[i][0])).toBeTruthy();
+                        expect(d3.select(this).classed('c3-arc-' + args.data.columns[i][0])).toBeTruthy();
                     });
                 });
 
@@ -315,7 +315,7 @@ describe('c3 chart arc', function () {
 
                 it('each background should have tbe same color', function () {
                     chart.internal.main.selectAll('.c3-chart-arcs path.c3-chart-arcs-background').each(function () {
-                        expect(d3.select(this).style('fill')).toBe('#e0e0e0');
+                        expect(d3.select(this).style('fill')).toBe('rgb(224, 224, 224)');
                     });
                 });
             });
@@ -323,35 +323,33 @@ describe('c3 chart arc', function () {
             describe('should contain labels', function () {
                 it('each data_column should have a label', function () {
                     chart.internal.main.selectAll('.c3-chart-arc .c3-gauge-value').each(function (d, i) {
-                        expect(d3.select(this).text()).toBe(args.data.columns[i][1]);
+                        expect(d3.select(this).text()).toBe(chart.internal.defaultArcValueFormat(null, args.data.columns[i][1] / 100));
                     });
                 });
 
                 it('each label should have the same color', function () {
                     chart.internal.main.selectAll('.c3-chart-arc .c3-gauge-value').each(function () {
-                        expect(d3.select(this).style('fill')).toBe('#000');
+                        expect(d3.select(this).style('fill')).toBe('rgb(0, 0, 0)');
                     });
 
                 });
 
-                it('if only one data_column is visible the label should have "" for transform', function () {
-                    setTimeout(function () {
-                        var textBeforeHide = chart.internal.main.select('.c3-chart-arc.c3-target.c3-target-padded4 text');
-                        expect(textBeforeHide.attr('transform')).not.toBe('');
-                    },1000);
+                it('if only one data_column is visible the label should have "" for transform', function (done) {
+                    var textBeforeHide = chart.internal.main.select('.c3-chart-arc.c3-target.c3-target-padded4 text');
+                    expect(textBeforeHide.attr('transform')).not.toBe('');
                     chart.hide(['padded1', 'padded2', 'padded3']);
                     setTimeout(function () {
                         var textAfterHide = chart.internal.main.select('.c3-chart-arc.c3-target.c3-target-padded4 text');
                         expect(textAfterHide.attr('transform')).toBe('');
-                    },1000);
-
+                        done();
+                    }, 1000);
                 });
             });
 
             describe('should contain labellines', function () {
                 it('each data_column should have a labelline', function () {
                     chart.internal.main.selectAll('.c3-chart-arc .c3-arc-label-line').each(function (d, i) {
-                        expect(d3.select(this).classed('c3-data-' + args.data.columns[i][0])).toBeTruthy();
+                        expect(d3.select(this).classed('c3-target-' + args.data.columns[i][0])).toBeTruthy();
                     });
                 });
 
