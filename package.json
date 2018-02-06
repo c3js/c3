@@ -38,7 +38,7 @@
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
   "dependencies": {
-    "d3": "~3.5.0"
+    "d3": "^4.11.0"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",

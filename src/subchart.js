@@ -4,7 +4,7 @@ import { isFunction } from './util';
 
 c3_chart_internal_fn.initBrush = function () {
     var $$ = this, d3 = $$.d3;
-    $$.brush = d3.svg.brush().on("brush", function () { $$.redrawForBrush(); });
+    $$.brush = $$.d3_brush().on("brush", function () { $$.redrawForBrush(); });
     $$.brush.update = function () {
         if ($$.context) { $$.context.select('.' + CLASS.brush).call(this); }
         return this;

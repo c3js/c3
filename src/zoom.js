@@ -5,7 +5,7 @@ import { diffDomain } from './util';
 c3_chart_internal_fn.initZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
 
-    $$.zoom = d3.behavior.zoom()
+    $$.zoom = $$.d3_zoom()
         .on("zoomstart", function () {
             startEvent = d3.event.sourceEvent;
             $$.zoom.altDomain = d3.event.sourceEvent.altKey ? $$.x.orgDomain() : null;

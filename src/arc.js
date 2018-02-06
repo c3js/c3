@@ -4,7 +4,7 @@ import { isFunction } from './util';
 
 c3_chart_internal_fn.initPie = function () {
     var $$ = this, d3 = $$.d3;
-    $$.pie = d3.layout.pie().value(function (d) {
+    $$.pie = $$.d3_pie().value(function (d) {
         return d.values.reduce(function (a, b) { return a + b.value; }, 0);
     });
     $$.pie.sort($$.getOrderFunction() || null);
@@ -62,7 +62,7 @@ c3_chart_internal_fn.updateAngle = function (d) {
 
 c3_chart_internal_fn.getSvgArc = function () {
     var $$ = this,
-        arc = $$.d3.svg.arc().outerRadius($$.radius).innerRadius($$.innerRadius),
+        arc = $$.d3_arc().outerRadius($$.radius).innerRadius($$.innerRadius),
         newArc = function (d, withoutUpdate) {
             var updated;
             if (withoutUpdate) { return arc(d); } // for interpolate
@@ -76,7 +76,7 @@ c3_chart_internal_fn.getSvgArc = function () {
 
 c3_chart_internal_fn.getSvgArcExpanded = function (rate) {
     var $$ = this,
-        arc = $$.d3.svg.arc().outerRadius($$.radiusExpanded * (rate ? rate : 1)).innerRadius($$.innerRadius);
+        arc = $$.d3_arc().outerRadius($$.radiusExpanded * (rate ? rate : 1)).innerRadius($$.innerRadius);
     return function (d) {
         var updated = $$.updateAngle(d);
         return updated ? arc(updated) : "M 0 0";

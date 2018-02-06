@@ -107,8 +107,8 @@ c3_chart_internal_fn.initParams = function () {
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
 
-    $$.dataTimeFormat = config.data_xLocaltime ? d3.time.format : d3.time.format.utc;
-    $$.axisTimeFormat = config.axis_x_localtime ? d3.time.format : d3.time.format.utc;
+    $$.dataTimeFormat = config.data_xLocaltime ? $$.d3_timeFormat : $$.d3_utcFormat;
+    $$.axisTimeFormat = config.axis_x_localtime ? $$.d3_timeFormat : $$.d3_utcFormat;
     $$.defaultAxisTimeFormat = $$.axisTimeFormat.multi([
         [".%L", function (d) { return d.getMilliseconds(); }],
         [":%S", function (d) { return d.getSeconds(); }],
@@ -937,7 +937,7 @@ c3_chart_internal_fn.bindResize = function () {
     $$.resizeFunction.add(function () {
         config.onresized.call($$);
     });
-    
+
     var resizeIfElementDisplayed = function() {
         // if element not displayed skip it
         if (!$$.api.element.offsetParent) {
@@ -1063,6 +1063,92 @@ c3_chart_internal_fn.isTabVisible = function () {
 
     return document[hidden] ? false : true;
 };
+
+// D3 v3/4 compatiblity
+c3_chart_internal_fn.d3_scaleCategory10 = function () {
+    return d3.schemeCategory10 ?
+        d3.scaleOrdinal(d3.schemeCategory10) :
+        d3.scale.category10();
+};
+
+c3_chart_internal_fn.d3_scaleLinear = function () {
+    return d3.scaleLinear ?
+        d3.scaleLinear() :
+        d3.scale.linear();
+};
+
+c3_chart_internal_fn.d3_pie = function () {
+    return d3.pie ?
+        d3.pie() :
+        d3.layout.pie();
+};
+
+c3_chart_internal_fn.d3_arc = function () {
+    return d3.arc ?
+        d3.arc() :
+        d3.svg.arc();
+};
+
+c3_chart_internal_fn.d3_timeFormat = function (specifier) {
+    return d3.timeFormat ?
+        d3.timeFormat(specifier) :
+        d3.time.format(specifier);
+};
+
+c3_chart_internal_fn.d3_utcFormat = function (specifier) {
+    return d3.utcFormat ?
+        d3.utcFormat(specifier) :
+        d3.time.format.utc(specifier);
+};
+
+c3_chart_internal_fn.d3_scaleTime = function () {
+    return d3.scaleTime ?
+        d3.scaleTime() :
+        d3.time.scale();
+};
+
+c3_chart_internal_fn.d3_timeIntervalLookup = function (name) {
+    return d3['time' + name.charAt(0).toUpperCase() + name.slice(1)];
+};
+
+c3_chart_internal_fn.d3_request = function (url) {
+    return d3.request ?
+        d3.request(url) :
+        d3.xhr(url);
+};
+
+c3_chart_internal_fn.d3_dragSubject = function (Obj) {
+    return d3.drag ?
+        d3.drag().subject(Obj) :
+        d3.behavior.drag().origin(Obj);
+};
+
+c3_chart_internal_fn.d3_line = function () {
+    return d3.line ?
+        d3.line() :
+        d3.svg.line();
+};
+
+c3_chart_internal_fn.d3_area = function () {
+    return d3.area ?
+        d3.area() :
+        d3.svg.area();
+};
+
+// TODO: check with docs at https://github.com/d3/d3/blob/master/CHANGES.md#brushes-d3-brush
+c3_chart_internal_fn.d3_brush = function () {
+    return d3.brush ?
+        d3.brush() :
+        d3.svg.brush();
+};
+
+// TODO: check with docs at https://github.com/d3/d3/blob/master/CHANGES.md#zooming-d3-zoom
+c3_chart_internal_fn.d3_zoom = function () {
+    return d3.zoom ?
+        d3.zoom() :
+        d3.d3.behavior.zoom();
+};
+
 
 c3_chart_internal_fn.isValue = isValue;
 c3_chart_internal_fn.isFunction = isFunction;
