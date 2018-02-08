@@ -205,11 +205,6 @@ c3_chart_internal_fn.initWithData = function (data) {
         $$.addHiddenLegendIds(config.legend_hide === true ? $$.mapToIds($$.data.targets) : config.legend_hide);
     }
 
-    // when gauge, hide legend // TODO: fix
-    if ($$.hasType('gauge')) {
-        config.legend_show = false;
-    }
-
     // Init sizes and scales
     $$.updateSizes();
     $$.updateScales();
@@ -761,7 +756,7 @@ c3_chart_internal_fn.getTranslate = function (target) {
         y = config.axis_rotated ? 0 : $$.height2;
     } else if (target === 'arc') {
         x = $$.arcWidth / 2;
-        y = $$.arcHeight / 2;
+        y = $$.arcHeight / 2 - ($$.hasType('gauge') ? 6 : 0);// to prevent wrong display of min and max label
     }
     return "translate(" + x + "," + y + ")";
 };
