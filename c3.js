@@ -1960,7 +1960,7 @@ c3_chart_internal_fn.bindResize = function () {
     var $$ = this,
         config = $$.config;
 
-    $$.resizeFunction = $$.generateResize();
+    $$.resizeFunction = $$.generateResize(); // need to call .remove
 
     $$.resizeFunction.add(function () {
         config.onresize.call($$);
@@ -1980,10 +1980,19 @@ c3_chart_internal_fn.bindResize = function () {
         config.onresized.call($$);
     });
 
+    $$.resizeIfElementDisplayed = function () {
+        // if element not displayed skip it
+        if ($$.api == null || !$$.api.element.offsetParent) {
+            return;
+        }
+
+        $$.resizeFunction();
+    };
+
     if (window.attachEvent) {
-        window.attachEvent('onresize', $$.resizeFunction);
+        window.attachEvent('onresize', $$.resizeIfElementDisplayed);
     } else if (window.addEventListener) {
-        window.addEventListener('resize', $$.resizeFunction, false);
+        window.addEventListener('resize', $$.resizeIfElementDisplayed, false);
     } else {
         // fallback to this, if this is a very old browser
         var wrapper = window.onresize;
@@ -1997,7 +2006,14 @@ c3_chart_internal_fn.bindResize = function () {
         }
         // add this graph to the wrapper, we will be removed if the user calls destroy
         wrapper.add($$.resizeFunction);
-        window.onresize = wrapper;
+        window.onresize = function () {
+            // if element not displayed skip it
+            if (!$$.api.element.offsetParent) {
+                return;
+            }
+
+            wrapper();
+        };
     }
 };
 
@@ -3472,9 +3488,9 @@ c3_chart_fn.destroy = function () {
     }
 
     if (window.detachEvent) {
-        window.detachEvent('onresize', $$.resizeFunction);
+        window.detachEvent('onresize', $$.resizeIfElementDisplayed);
     } else if (window.removeEventListener) {
-        window.removeEventListener('resize', $$.resizeFunction);
+        window.removeEventListener('resize', $$.resizeIfElementDisplayed);
     } else {
         var wrapper = window.onresize;
         // check if no one else removed our wrapper and remove our resizeFunction from it
@@ -3482,6 +3498,9 @@ c3_chart_fn.destroy = function () {
             wrapper.remove($$.resizeFunction);
         }
     }
+
+    // remove the inner resize functions
+    $$.resizeFunction.remove();
 
     $$.selectChart.classed('c3', false).html("");
 

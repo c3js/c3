@@ -22,9 +22,9 @@ c3_chart_fn.destroy = function () {
     }
 
     if (window.detachEvent) {
-        window.detachEvent('onresize', $$.resizeFunction);
+        window.detachEvent('onresize', $$.resizeIfElementDisplayed);
     } else if (window.removeEventListener) {
-        window.removeEventListener('resize', $$.resizeFunction);
+        window.removeEventListener('resize', $$.resizeIfElementDisplayed);
     } else {
         var wrapper = window.onresize;
         // check if no one else removed our wrapper and remove our resizeFunction from it
@@ -32,6 +32,9 @@ c3_chart_fn.destroy = function () {
             wrapper.remove($$.resizeFunction);
         }
     }
+
+    // remove the inner resize functions
+    $$.resizeFunction.remove();
 
     $$.selectChart.classed('c3', false).html("");
 
