@@ -1,4 +1,4 @@
-/* @license C3.js v0.4.19 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.4.20 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -1002,7 +1002,7 @@ c3_axis_fn.redraw = function redraw(transitions, isHidden) {
     transitions.axisSubX.call($$.subXAxis);
 };
 
-var c3 = { version: "0.4.19" };
+var c3 = { version: "0.4.20" };
 
 var c3_chart_fn;
 var c3_chart_internal_fn;
@@ -4754,7 +4754,7 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
             var d = {
                 data: [{ value: config.gauge_max }],
                 startAngle: config.gauge_startingAngle,
-                endAngle: -1 * config.gauge_startingAngle
+                endAngle: -1 * config.gauge_startingAngle * (config.gauge_fullCircle ? Math.PI : 1)
             };
             return $$.getArc(d, true, true);
         });
