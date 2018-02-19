@@ -1,0 +1,13 @@
+.c3-drag-zoom.enabled{
+  pointer-events: all!important;
+  visibility: visible;
+}
+
+.c3-drag-zoom.disabled{
+    pointer-events: none!important;
+    visibility: hidden;
+}
+
+.c3-drag-zoom .extent {
+    fill-opacity: .1;
+}

@@ -248,6 +248,7 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Define regions
     main = $$.main = $$.svg.append("g").attr("transform", $$.getTranslate('main'));
 
+    if ($$.initDragZoom) { $$.initDragZoom(); }
     if ($$.initSubchart) { $$.initSubchart(); }
     if ($$.initTooltip) { $$.initTooltip(); }
     if ($$.initLegend) { $$.initLegend(); }
