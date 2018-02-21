@@ -625,14 +625,14 @@ c3_axis_fn.init = function init() {
     var $$ = this.owner,
         config = $$.config,
         main = $$.main;
-    $$.axes.x = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisX).attr("clip-path", $$.clipPathForXAxis).attr("transform", $$.getTranslate('x')).style("visibility", config.axis_x_show ? 'visible' : 'hidden');
+    $$.axes.x = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisX).attr("clip-path", config.axis_x_inner ? "" : $$.clipPathForXAxis).attr("transform", $$.getTranslate('x')).style("visibility", config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append("text").attr("class", CLASS.axisXLabel).attr("transform", config.axis_rotated ? "rotate(-90)" : "").style("text-anchor", this.textAnchorForXAxisLabel.bind(this));
     $$.axes.y = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY).attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis).attr("transform", $$.getTranslate('y')).style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text").attr("class", CLASS.axisYLabel).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForYAxisLabel.bind(this));
 
-    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2)
+    $$.axes.y2 = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY2
     // clip-path?
-    .attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
+    ).attr("transform", $$.getTranslate('y2')).style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
     $$.axes.y2.append("text").attr("class", CLASS.axisY2Label).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForY2AxisLabel.bind(this));
 };
 c3_axis_fn.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
@@ -844,7 +844,7 @@ c3_axis_fn.dyForXAxisLabel = function dyForXAxisLabel() {
         config = $$.config,
         position = this.getXAxisLabelPosition();
     if (config.axis_rotated) {
-        return position.isInner ? "1.2em" : -25 - this.getMaxTickWidth('x');
+        return position.isInner ? "1.2em" : -25 - ($$.config.axis_x_inner ? 0 : this.getMaxTickWidth('x'));
     } else {
         return position.isInner ? "-0.5em" : config.axis_x_height ? config.axis_x_height - 10 : "3em";
     }
@@ -1122,7 +1122,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
 
-    $$.xOrient = config.axis_rotated ? "left" : "bottom";
+    $$.xOrient = config.axis_rotated ? config.axis_x_inner ? "right" : "left" : config.axis_x_inner ? "top" : "bottom";
     $$.yOrient = config.axis_rotated ? config.axis_y_inner ? "top" : "bottom" : config.axis_y_inner ? "right" : "left";
     $$.y2Orient = config.axis_rotated ? config.axis_y2_inner ? "bottom" : "top" : config.axis_y2_inner ? "left" : "right";
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";
@@ -1284,8 +1284,8 @@ c3_chart_internal_fn.initWithData = function (data) {
     /*-- Main Region --*/
 
     // text when empty
-    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle") // horizontal centering of text at x position in all browsers.
-    .attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
+    main.append("text").attr("class", CLASS.text + ' ' + CLASS.empty).attr("text-anchor", "middle" // horizontal centering of text at x position in all browsers.
+    ).attr("dominant-baseline", "middle"); // vertical centering of text at y position in all browsers, except IE.
 
     // Regions
     $$.initRegion();
@@ -4787,8 +4787,8 @@ c3_chart_internal_fn.redrawArc = function (duration, durationForExit, withTransf
         };
     }).attr("transform", withTransform ? "scale(1)" : "").style("fill", function (d) {
         return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
-    }) // Where gauge reading color would receive customization.
-    .call($$.endall, function () {
+    } // Where gauge reading color would receive customization.
+    ).call($$.endall, function () {
         $$.transiting = false;
     });
     mainArc.exit().transition().duration(durationForExit).style('opacity', 0).remove();
@@ -5202,6 +5202,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_x_height: undefined,
         axis_x_extent: undefined,
         axis_x_label: {},
+        axis_x_inner: undefined,
         axis_y_show: true,
         axis_y_type: undefined,
         axis_y_max: undefined,
@@ -7531,8 +7532,8 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
 
     texts = $$.legend.selectAll('text').data(targetIds).text(function (id) {
         return isDefined(config.data_names[id]) ? config.data_names[id] : id;
-    }) // MEMO: needed for update
-    .each(function (id, i) {
+    } // MEMO: needed for update
+    ).each(function (id, i) {
         updatePositions(this, id, i);
     });
     (withTransition ? texts.transition() : texts).attr('x', xForLegendText).attr('y', yForLegendText);
@@ -8498,7 +8499,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return !config.axis_x_show || config.axis_x_inner ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) {
         // && !config.axis_rotated
         return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;

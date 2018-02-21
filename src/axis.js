@@ -385,7 +385,7 @@ c3_axis_fn.init = function init() {
     var $$ = this.owner, config = $$.config, main = $$.main;
     $$.axes.x = main.append("g")
         .attr("class", CLASS.axis + ' ' + CLASS.axisX)
-        .attr("clip-path", $$.clipPathForXAxis)
+        .attr("clip-path", config.axis_x_inner ? "" : $$.clipPathForXAxis)
         .attr("transform", $$.getTranslate('x'))
         .style("visibility", config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append("text")
@@ -606,7 +606,7 @@ c3_axis_fn.dyForXAxisLabel = function dyForXAxisLabel() {
     var $$ = this.owner, config = $$.config,
         position = this.getXAxisLabelPosition();
     if (config.axis_rotated) {
-        return position.isInner ? "1.2em" : -25 - this.getMaxTickWidth('x');
+        return position.isInner ? "1.2em" : -25 - ($$.config.axis_x_inner ? 0 : this.getMaxTickWidth('x'));
     } else {
         return position.isInner ? "-0.5em" : config.axis_x_height ? config.axis_x_height - 10 : "3em";
     }

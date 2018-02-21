@@ -125,7 +125,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
 
-    $$.xOrient = config.axis_rotated ? "left" : "bottom";
+    $$.xOrient = config.axis_rotated ? (config.axis_x_inner ? "right" : "left") : (config.axis_x_inner ? "top" : "bottom");
     $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
     $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_inner ? "left" : "right");
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";
