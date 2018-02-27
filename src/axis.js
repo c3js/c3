@@ -255,13 +255,16 @@ c3_axis_internal_fn.generateAxis = function () {
                 {
                     // TODO: rotated tick text
                     tickTransform = internal.axisX;
-                    lineUpdate.attr("x2", 0)
-                        .attr("y2", -internal.innerTickSize);
+                    lineUpdate.attr("x1", tickX)
+                        .attr("x2", tickX)
+                        .attr("y2", function (d, i) { return -1 * internal.lineY2(d, i); });
                     textUpdate.attr("x", 0)
-                        .attr("y", -internal.tickLength)
-                        .style("text-anchor", "middle");
+                        .attr("y", function (d, i) { return -1 * internal.textY(d, i) - (params.isCategory ? 2 : (internal.tickLength - 2)); })
+                        .attr("transform", function (d, i) { return internal.textTransform(d, i); })
+                        .style("text-anchor", function (d, i) { return internal.textTextAnchor(d, i); });
                     tspanUpdate.attr('x', 0)
-                        .attr("dy", "0em");
+                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); })
+                        .attr('dx', function (d, i) { return internal.tspanDx(d, i); });
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                     break;
                 }
@@ -283,9 +286,10 @@ c3_axis_internal_fn.generateAxis = function () {
                 {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", internal.innerTickSize)
-                        .attr("y2", 0);
+                        .attr("y1", tickY)
+                        .attr("y2", tickY);
                     textUpdate.attr("x", internal.tickLength)
-                        .attr("y", 0)
+                        .attr("y", internal.tickOffset)
                         .style("text-anchor", "start");
                     tspanUpdate.attr('x', internal.tickLength)
                         .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
