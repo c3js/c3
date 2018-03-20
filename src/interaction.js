@@ -112,7 +112,27 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
         .attr("height", h);
 };
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
-    var $$ = this, d3 = $$.d3, config = $$.config;
+    var $$ = this, d3 = $$.d3, config = $$.config,
+        tap = false, tapX;
+
+    function click(shape, d) {
+        var index = d.index;
+        if ($$.hasArcType() || !$$.toggleShape) { return; }
+        if ($$.cancelClick) {
+            $$.cancelClick = false;
+            return;
+        }
+        if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(shape)[0] < $$.x($$.getXValue(d.id, index))) {
+            index -= 1;
+        }
+        $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
+            if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                $$.toggleShape(this, d, index);
+                $$.config.data_onclick.call($$.api, d, this);
+            }
+        });
+    }
+
     eventRectEnter.append("rect")
         .attr("class", $$.classEvent.bind($$))
         .style("cursor", config.data_selection_enabled && config.data_selection_grouped ? "pointer" : null)
@@ -201,22 +221,34 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 });
         })
         .on('click', function (d) {
-            var index = d.index;
-            if ($$.hasArcType() || !$$.toggleShape) { return; }
-            if ($$.cancelClick) {
-                $$.cancelClick = false;
+            //click event was simulated via a 'tap' touch event, cancel regular click
+            if (tap) {
                 return;
             }
-            if ($$.isStepType(d) && config.line_step_type === 'step-after' && d3.mouse(this)[0] < $$.x($$.getXValue(d.id, index))) {
-                index -= 1;
-            }
-            $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
-                    $$.toggleShape(this, d, index);
-                    $$.config.data_onclick.call($$.api, d, this);
-                }
-            });
+
+            click(this, d);
+
         })
+        .on('touchstart', function(d) {
+            //store current X selection for comparison during touch end event
+            tapX = d.x;
+        })
+        .on('touchend', function(d) {
+            var finalX = d.x;
+
+            //If end is not the same as the start, event doesn't count as a tap
+            if (tapX !== finalX) {
+                return;
+            }
+            
+
+            click(this, d);
+
+            //indictate tap event fired to prevent click;
+            tap = true;
+            setTimeout(function() { tap = false; }, config.touch_tap_delay);
+        })
+
         .call(
             config.data_selection_draggable && $$.drag ? (
                 d3.behavior.drag().origin(Object)
@@ -228,7 +260,8 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
 };
 
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
-    var $$ = this, d3 = $$.d3, config = $$.config;
+    var $$ = this, d3 = $$.d3, config = $$.config,
+        tap = false, tapX, tapY;
 
     function mouseout() {
         $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
@@ -236,6 +269,25 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         $$.hideTooltip();
         $$.unexpandCircles();
         $$.unexpandBars();
+    }
+
+    function click(shape) {
+        var targetsToShow = $$.filterTargetsToShow($$.data.targets);
+        var mouse, closest;
+        if ($$.hasArcType(targetsToShow)) { return; }
+
+        mouse = d3.mouse(shape);
+        closest = $$.findClosestFromTargets(targetsToShow, mouse);
+        if (! closest) { return; }
+        // select if selection enabled
+        if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
+            $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
+                if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
+                    $$.toggleShape(this, closest, closest.index);
+                    $$.config.data_onclick.call($$.api, closest, this);
+                }
+            });
+        }
     }
 
     eventRectEnter.append('rect')
@@ -300,22 +352,35 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
             }
         })
         .on('click', function () {
-            var targetsToShow = $$.filterTargetsToShow($$.data.targets);
-            var mouse, closest;
-            if ($$.hasArcType(targetsToShow)) { return; }
-
-            mouse = d3.mouse(this);
-            closest = $$.findClosestFromTargets(targetsToShow, mouse);
-            if (! closest) { return; }
-            // select if selection enabled
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).selectAll('.' + CLASS.shape + '-' + closest.index).each(function () {
-                    if (config.data_selection_grouped || $$.isWithinShape(this, closest)) {
-                        $$.toggleShape(this, closest, closest.index);
-                        $$.config.data_onclick.call($$.api, closest, this);
-                    }
-                });
+            //click event was simulated via a 'tap' touch event, cancel regular click
+            if (tap) {
+                return;
             }
+
+            click(this);
+        })
+        .on('touchstart', function(){
+            var mouse = d3.mouse(this);
+            //store starting coordinates for distance comparision during touch end event
+            tapX = mouse[0];
+            tapY = mouse[1];
+
+        })
+        .on('touchend', function(){
+            var mouse = d3.mouse(this),
+                x = mouse[0],
+                y = mouse[1];
+
+            //If end is too far from start, event doesn't count as a tap
+            if (Math.abs(x - tapX) > config.touch_tap_radius || Math.abs(y - tapY) > config.touch_tap_radius) {
+                return;
+            }
+
+            click(this);
+
+            //indictate tap event fired to prevent click;
+            tap = true;
+            setTimeout(function() { tap = false; }, config.touch_tap_delay);
         })
         .call(
             config.data_selection_draggable && $$.drag ? (
