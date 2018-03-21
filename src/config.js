@@ -55,6 +55,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         data_selection_multiple: true,
         data_selection_draggable: false,
         data_onclick: function () {},
+        data_ondblclick: function () {},
         data_onmouseover: function () {},
         data_onmouseout: function () {},
         data_onselected: function () {},
