@@ -14,6 +14,9 @@ c3_chart_fn.flush = function () {
 
 c3_chart_fn.destroy = function () {
     var $$ = this.internal;
+    var defaultConfig = $$.getDefaultConfig();
+    //subsequent checks to config should check this instead of !config
+    defaultConfig.destroyed = true;
 
     window.clearInterval($$.intervalForObserveInserted);
 
@@ -40,7 +43,20 @@ c3_chart_fn.destroy = function () {
 
     // MEMO: this is needed because the reference of some elements will not be released, then memory leak will happen.
     Object.keys($$).forEach(function (key) {
-        $$[key] = null;
+        if(key === "config")
+        {
+            $$[key] = defaultConfig;
+        }
+        else if(key === "data")
+        {
+            $$[key] = {
+                targets: []
+            };
+        }
+        else
+        {
+            $$[key] = null;
+        }
     });
 
     return null;
