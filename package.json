@@ -1,6 +1,6 @@
 {
   "name": "c3",
-  "version": "0.4.18",
+  "version": "0.4.21",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "npm run build:js && npm run build:css",
     "build:js": "npm run build:js:rollup && npm run build:js:uglify",
     "build:js:rollup": "rollup -c > c3.js",
-    "build:js:uglify": "uglifyjs c3.js --compress --mangle -o c3.min.js",
+    "build:js:uglify": "uglifyjs c3.js --compress --mangle --comments -o c3.min.js",
     "build:css": "npm run build:css:sass && npm run build:css:min",
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
     "build:css:min": "cleancss -o c3.min.css c3.css",
@@ -42,11 +42,12 @@
     "d3": "~4.12.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-istanbul": "^4.1.4",
     "babel-preset-es2015": "^6.24.1",
-    "babelify": "^7.3.0",
-    "browserify": "^15.0.0",
+    "babelify": "^8.0.0",
+    "browserify": "^16.0.0",
     "clean-css-cli": "^4.1.3",
     "codecov": "^3.0.0",
     "jasmine-core": "^2.3.4",
@@ -61,8 +62,8 @@
     "node-sass": "^4.5.3",
     "node-static": "^0.7.9",
     "nodemon": "^1.11.0",
-    "rollup": "^0.54.0",
-    "rollup-plugin-babel": "^3.0.0",
+    "rollup": "^0.57.0",
+    "rollup-plugin-babel": "^3.0.3",
     "uglify-js": "^3.0.15",
     "watchify": "^3.9.0"
   },

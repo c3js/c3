@@ -140,7 +140,7 @@ c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, el
   // Determin tooltip position
     if (forArc) {
         tooltipLeft = (($$.width - ($$.isLegendRight ? $$.getLegendWidth() : 0)) / 2) + mouse[0];
-        tooltipTop = ($$.height / 2) + mouse[1] + 20;
+        tooltipTop = ($$.hasType('gauge') ? $$.height : $$.height / 2) + mouse[1] + 20;
     } else {
         svgLeft = $$.getSvgLeft(true);
         if (config.axis_rotated) {

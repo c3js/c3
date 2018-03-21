@@ -1,6 +1,6 @@
 # c3
 
-[![CircleCI](https://circleci.com/gh/c3js/c3.svg?style=svg)](https://circleci.com/gh/c3js/c3)
+[![CircleCI](https://circleci.com/gh/c3js/c3.svg?style=shield)](https://circleci.com/gh/c3js/c3)
 [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE)
 [![codecov.io](https://codecov.io/github/c3js/c3/coverage.svg?branch=master)](https://codecov.io/github/c3js/c3?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/c3js/c3.svg)](https://greenkeeper.io/)

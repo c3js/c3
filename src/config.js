@@ -184,6 +184,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         // gauge
         gauge_fullCircle: false,
         gauge_label_show: true,
+        gauge_labelLine_show: true,
         gauge_label_format: undefined,
         gauge_min: 0,
         gauge_max: 100,
@@ -191,6 +192,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         gauge_label_extents: undefined,
         gauge_units: undefined,
         gauge_width: undefined,
+        gauge_arcs_minWidth: 5,
         gauge_expand: {},
         gauge_expand_duration: 50,
         // donut
