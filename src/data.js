@@ -239,11 +239,11 @@ c3_chart_internal_fn.isOrderAsc = function () {
 c3_chart_internal_fn.getOrderFunction = function() {
     var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
     if (orderAsc || orderDesc) {
+        var reducer = function (p, c) { return p + Math.abs(c.value); };
         return function (t1, t2) {
-            var reducer = function (p, c) { return p + Math.abs(c.value); };
             var t1Sum = t1.values.reduce(reducer, 0),
                 t2Sum = t2.values.reduce(reducer, 0);
-            return orderDesc ? t2Sum - t1Sum : t1Sum - t2Sum;
+            return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
         };
     } else if (isFunction(config.data_order)) {
         return config.data_order;
@@ -258,9 +258,6 @@ c3_chart_internal_fn.orderTargets = function (targets) {
     var fct = this.getOrderFunction();
     if (fct) {
         targets.sort(fct);
-        if (this.isOrderAsc() || this.isOrderDesc()) {
-            targets.reverse();
-        }
     }
     return targets;
 };
