@@ -90,31 +90,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
-
-
-
-
-
-
-
-
-
-
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
-
-
-
-
-
-
-
-
-
-
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -131,16 +111,6 @@ var inherits = function (subClass, superClass) {
   });
   if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
-
-
-
-
-
-
-
-
-
-
 
 var possibleConstructorReturn = function (self, call) {
   if (!self) {
@@ -481,9 +451,21 @@ c3_axis_internal_fn.generateAxis = function () {
                     {
                         // TODO: rotated tick text
                         tickTransform = internal.axisX;
-                        lineUpdate.attr("x2", 0).attr("y2", -internal.innerTickSize);
-                        textUpdate.attr("x", 0).attr("y", -internal.tickLength).style("text-anchor", "middle");
-                        tspanUpdate.attr('x', 0).attr("dy", "0em");
+                        lineUpdate.attr("x1", tickX).attr("x2", tickX).attr("y2", function (d, i) {
+                            return -1 * internal.lineY2(d, i);
+                        });
+                        textUpdate.attr("x", 0).attr("y", function (d, i) {
+                            return -1 * internal.textY(d, i) - (params.isCategory ? 2 : internal.tickLength - 2);
+                        }).attr("transform", function (d, i) {
+                            return internal.textTransform(d, i);
+                        }).style("text-anchor", function (d, i) {
+                            return internal.textTextAnchor(d, i);
+                        });
+                        tspanUpdate.attr('x', 0).attr("dy", function (d, i) {
+                            return internal.tspanDy(d, i);
+                        }).attr('dx', function (d, i) {
+                            return internal.tspanDx(d, i);
+                        });
                         pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                         break;
                     }
@@ -501,8 +483,8 @@ c3_axis_internal_fn.generateAxis = function () {
                 case "right":
                     {
                         tickTransform = internal.axisY;
-                        lineUpdate.attr("x2", internal.innerTickSize).attr("y2", 0);
-                        textUpdate.attr("x", internal.tickLength).attr("y", 0).style("text-anchor", "start");
+                        lineUpdate.attr("x2", internal.innerTickSize).attr("y1", tickY).attr("y2", tickY);
+                        textUpdate.attr("x", internal.tickLength).attr("y", internal.tickOffset).style("text-anchor", "start");
                         tspanUpdate.attr('x', internal.tickLength).attr("dy", function (d, i) {
                             return internal.tspanDy(d, i);
                         });
@@ -625,7 +607,7 @@ c3_axis_fn.init = function init() {
     var $$ = this.owner,
         config = $$.config,
         main = $$.main;
-    $$.axes.x = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisX).attr("clip-path", $$.clipPathForXAxis).attr("transform", $$.getTranslate('x')).style("visibility", config.axis_x_show ? 'visible' : 'hidden');
+    $$.axes.x = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisX).attr("clip-path", config.axis_x_inner ? "" : $$.clipPathForXAxis).attr("transform", $$.getTranslate('x')).style("visibility", config.axis_x_show ? 'visible' : 'hidden');
     $$.axes.x.append("text").attr("class", CLASS.axisXLabel).attr("transform", config.axis_rotated ? "rotate(-90)" : "").style("text-anchor", this.textAnchorForXAxisLabel.bind(this));
     $$.axes.y = main.append("g").attr("class", CLASS.axis + ' ' + CLASS.axisY).attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis).attr("transform", $$.getTranslate('y')).style("visibility", config.axis_y_show ? 'visible' : 'hidden');
     $$.axes.y.append("text").attr("class", CLASS.axisYLabel).attr("transform", config.axis_rotated ? "" : "rotate(-90)").style("text-anchor", this.textAnchorForYAxisLabel.bind(this));
@@ -844,7 +826,7 @@ c3_axis_fn.dyForXAxisLabel = function dyForXAxisLabel() {
         config = $$.config,
         position = this.getXAxisLabelPosition();
     if (config.axis_rotated) {
-        return position.isInner ? "1.2em" : -25 - this.getMaxTickWidth('x');
+        return position.isInner ? "1.2em" : -25 - ($$.config.axis_x_inner ? 0 : this.getMaxTickWidth('x'));
     } else {
         return position.isInner ? "-0.5em" : config.axis_x_height ? config.axis_x_height - 10 : "3em";
     }
@@ -1122,7 +1104,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
 
-    $$.xOrient = config.axis_rotated ? "left" : "bottom";
+    $$.xOrient = config.axis_rotated ? config.axis_x_inner ? "right" : "left" : config.axis_x_inner ? "top" : "bottom";
     $$.yOrient = config.axis_rotated ? config.axis_y_inner ? "top" : "bottom" : config.axis_y_inner ? "right" : "left";
     $$.y2Orient = config.axis_rotated ? config.axis_y2_inner ? "bottom" : "top" : config.axis_y2_inner ? "left" : "right";
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";
@@ -2162,6 +2144,7 @@ if (!Function.prototype.bind) {
 // changes which were implemented in Firefox 43 and Chrome 46.
 
 (function () {
+
     if (!("SVGPathSeg" in window)) {
         // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSeg
         window.SVGPathSeg = function (type, typeAsLetter, owningPathSegList) {
@@ -5202,6 +5185,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_x_height: undefined,
         axis_x_extent: undefined,
         axis_x_label: {},
+        axis_x_inner: undefined,
         axis_y_show: true,
         axis_y_type: undefined,
         axis_y_max: undefined,
@@ -8498,7 +8482,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return !config.axis_x_show || config.axis_x_inner ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) {
         // && !config.axis_rotated
         return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
