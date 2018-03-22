@@ -1,5 +1,5 @@
 import { c3_chart_internal_fn } from './core';
-import { isValue, isUndefined, isDefined, notEmpty } from './util';
+import { isValue, isUndefined, isDefined, notEmpty, isArray } from './util';
 
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
@@ -26,22 +26,20 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
     });
 };
 c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-    var rows = parser(xsv), d;
-    if (rows.length === 1) {
-        d = [{}];
-        rows[0].forEach(function (id) {
-            d[0][id] = null;
-        });
+    var [ keys, ...rows ] = parser.parseRows(xsv);
+    if (rows.length === 0) {
+        return { keys, rows: [ keys.reduce((row, key) => Object.assign(row, { [key]: null }), {}) ] };
     } else {
-        d = parser(xsv);
+        // [].concat() is to convert result into a plain array otherwise
+        // test is not happy because rows have properties.
+        return { keys, rows: [].concat(parser.parse(xsv)) };
     }
-    return d;
 };
 c3_chart_internal_fn.convertCsvToData = function (csv) {
-    return this.convertXsvToData(csv, this.d3.csvParse);
+    return this.convertXsvToData(csv, { parse: this.d3.csvParse, parseRows: this.d3.csvParseRows });
 };
 c3_chart_internal_fn.convertTsvToData = function (tsv) {
-    return this.convertXsvToData(tsv, this.d3.tsvParse);
+    return this.convertXsvToData(tsv, { parse: this.d3.tsvParse, parseRows: this.d3.tsvParseRows });
 };
 c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     var $$ = this,
@@ -93,7 +91,7 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
 /**
  * Converts the rows to normalized data.
  * @param {any[][]} rows The row data
- * @return {Object[]}
+ * @return {Object}
  */
 c3_chart_internal_fn.convertRowsToData = (rows) => {
     const newRows = [];
@@ -109,16 +107,17 @@ c3_chart_internal_fn.convertRowsToData = (rows) => {
         }
         newRows.push(newRow);
     }
-    return newRows;
+    return { keys, rows: newRows };
 };
 
 /**
  * Converts the columns to normalized data.
  * @param {any[][]} columns The column data
- * @return {Object[]}
+ * @return {Object}
  */
 c3_chart_internal_fn.convertColumnsToData = (columns) => {
     const newRows = [];
+    const keys = [];
 
     for (let i = 0; i < columns.length; i++) {
         const key = columns[i][0];
@@ -131,16 +130,33 @@ c3_chart_internal_fn.convertColumnsToData = (columns) => {
             }
             newRows[j - 1][key] = columns[i][j];
         }
+        keys.push(key);
     }
 
-    return newRows;
+    return { keys, rows: newRows };
 };
 
+/**
+ * Converts the data format into the target format.
+ * @param {!Object} data
+ * @param {!Array} data.keys Ordered list of target IDs.
+ * @param {!Array} data.rows Rows of data to convert.
+ * @param {boolean} appendXs True to append to $$.data.xs, False to replace.
+ * @return {!Array}
+ */
 c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
-    var $$ = this, config = $$.config,
-        ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
-        xs = $$.d3.keys(data[0]).filter($$.isX, $$),
-        targets;
+    var $$ = this, config = $$.config, targets, ids, xs, keys;
+
+    // handles format where keys are not orderly provided
+    if (isArray(data)) {
+        keys = Object.keys(data[ 0 ]);
+    } else {
+        keys = data.keys;
+        data = data.rows;
+    }
+
+    ids = keys.filter($$.isNotX, $$);
+    xs = keys.filter($$.isX, $$);
 
     // save x for update data by load when custom x and c3.x API
     ids.forEach(function (id) {
