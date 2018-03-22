@@ -5,6 +5,7 @@ c3_chart_internal_fn.initEventRect = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")
         .attr("class", CLASS.eventRects)
+        .attr('aria-controls', $$.tooltipId + ' ' + $$.xgridFocusId)
         .style('fill-opacity', 0);
 };
 c3_chart_internal_fn.redrawEventRect = function () {

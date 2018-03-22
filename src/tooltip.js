@@ -114,7 +114,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
 
         if (! text) {
             title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
-            text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<thead><tr><th colspan='2'>" + title + "</th></tr></thead>" : "");
+            text = "<table id='" + $$.tooltipId + "' class='" + $$.CLASS.tooltip + "' role='tooltip'>" + (title || title === 0 ? "<thead><tr><th colspan='2'>" + title + "</th></tr></thead>" : "");
         }
 
         value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));

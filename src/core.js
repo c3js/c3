@@ -86,7 +86,8 @@ c3_chart_internal_fn.initParams = function () {
     var $$ = this, d3 = $$.d3, config = $$.config;
 
     // MEMO: clipId needs to be unique because it conflicts when multiple charts exist
-    $$.clipId = "c3-" + (+new Date()) + '-clip',
+    $$.chartId = "c3-" + (+new Date()),
+    $$.clipId = $$.chartId + '-clip',
     $$.clipIdForXAxis = $$.clipId + '-xaxis',
     $$.clipIdForYAxis = $$.clipId + '-yaxis',
     $$.clipIdForGrid = $$.clipId + '-grid',
@@ -96,6 +97,8 @@ c3_chart_internal_fn.initParams = function () {
     $$.clipPathForYAxis = $$.getClipPath($$.clipIdForYAxis);
     $$.clipPathForGrid = $$.getClipPath($$.clipIdForGrid),
     $$.clipPathForSubchart = $$.getClipPath($$.clipIdForSubchart),
+    $$.tooltipId = $$.chartId + '-tooltip',
+    $$.xgridFocusId = $$.chartId + '-xgrid',
 
     $$.dragStart = null;
     $$.dragging = false;
