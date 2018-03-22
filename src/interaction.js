@@ -107,6 +107,7 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
 
     eventRectUpdate
         .attr('class', $$.classEvent.bind($$))
+        .select('rect')
         .attr("x", x)
         .attr("y", y)
         .attr("width", w)
@@ -114,8 +115,10 @@ c3_chart_internal_fn.updateEventRect = function (eventRectUpdate) {
 };
 c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
     var $$ = this, d3 = $$.d3, config = $$.config;
-    eventRectEnter.append("rect")
+    eventRectEnter.append("a")
         .attr("class", $$.classEvent.bind($$))
+        .attr("xlink:href", '')
+        .attr("aria-describedby", $$.tooltipId)
         .style("cursor", config.data_selection_enabled && config.data_selection_grouped ? "pointer" : null)
         .on('mouseover', function (d) {
             var index = d.index;
@@ -131,6 +134,13 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
             $$.main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
                 config.data_onmouseover.call($$.api, d);
             });
+        })
+        .on('focus', function(d) {
+             $$.dispatchEvent('mouseover', d.index);
+             $$.dispatchEvent('mousemove', d.index);
+        })
+        .on('blur', function(d) {
+             $$.dispatchEvent('mouseout', d.index);
         })
         .on('mouseout', function (d) {
             var index = d.index;
@@ -202,6 +212,7 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                 });
         })
         .on('click', function (d) {
+            d3.event.preventDefault();
             var index = d.index;
             if ($$.hasArcType() || !$$.toggleShape) { return; }
             if ($$.cancelClick) {
@@ -225,7 +236,8 @@ c3_chart_internal_fn.generateEventRectsForSingleX = function (eventRectEnter) {
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
             ) : function () {}
-        );
+        )
+        .append('rect');
 };
 
 c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter) {
@@ -239,12 +251,10 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
         $$.unexpandBars();
     }
 
-    eventRectEnter.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', $$.width)
-        .attr('height', $$.height)
+    eventRectEnter.append('a')
         .attr('class', CLASS.eventRect)
+        .attr('xlink:href', '')
+        .attr("aria-describedby", $$.tooltipId)
         .on('mouseout', function () {
             if (!$$.config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
@@ -300,7 +310,14 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
                 }
             }
         })
+        .on('focus', function() {
+             $$.dispatchEvent('mousemove');
+        })
+        .on('blur', function() {
+             $$.dispatchEvent('mouseout');
+        })
         .on('click', function () {
+            d3.event.preventDefault();
             var targetsToShow = $$.filterTargetsToShow($$.data.targets);
             var mouse, closest;
             if ($$.hasArcType(targetsToShow)) { return; }
@@ -325,7 +342,11 @@ c3_chart_internal_fn.generateEventRectsForMultipleXs = function (eventRectEnter)
                     .on('dragstart', function () { $$.dragstart(d3.mouse(this)); })
                     .on('dragend', function () { $$.dragend(); })
             ) : function () {}
-        );
+        ).append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', $$.width)
+        .attr('height', $$.height);
 };
 c3_chart_internal_fn.dispatchEvent = function (type, index, mouse) {
     var $$ = this,
