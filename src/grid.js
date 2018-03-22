@@ -16,6 +16,7 @@ c3_chart_internal_fn.initGrid = function () {
     if (config.grid_focus_show) {
         $$.grid.append('g')
             .attr("class", CLASS.xgridFocus)
+            .attr("id", $$.xgridFocusId)
             .append('line')
             .attr('class', CLASS.xgridFocus);
     }

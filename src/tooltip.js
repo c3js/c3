@@ -114,7 +114,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
 
         if (! text) {
             title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
-            text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+            text = "<table id='" + $$.tooltipId + "' class='" + $$.CLASS.tooltip + "' role='tooltip'>" + (title || title === 0 ? "<thead><tr><th colspan='2'>" + title + "</th></tr></thead>" : "");
         }
 
         value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
@@ -125,7 +125,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
 
             text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";
-            text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
+            text += "<th scope='row' class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</th>";
             text += "<td class='value'>" + value + "</td>";
             text += "</tr>";
         }

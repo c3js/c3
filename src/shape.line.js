@@ -20,6 +20,7 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
         .attr('class', function (d) { return classChartLine(d) + classFocus(d); });
     mainLineEnter = mainLineUpdate.enter().append('g')
         .attr('class', classChartLine)
+        .attr('role', 'graphics-object group')
         .style('opacity', 0)
         .style("pointer-events", "none");
     // Lines for each data
@@ -309,6 +310,7 @@ c3_chart_internal_fn.updateCircle = function () {
     $$.mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
     $$.mainCircle.enter().append("circle")
+        .attr("role", "graphics-symbol img")
         .attr("class", $$.classCircle.bind($$))
         .attr("r", $$.pointR.bind($$))
         .style("fill", $$.color);
