@@ -21,13 +21,15 @@
   text-align:left;
   color:#FFF;
 }
-.c3-tooltip td {
+.c3-tooltip td, .c3-tooltip th[scope='row'] {
   font-size:13px;
   padding: 3px 6px;
   background-color:#fff;
   border-left:1px dotted #999;
+  color: black;
+  font-weight: normal;
 }
-.c3-tooltip td > span {
+.c3-tooltip td > span, , .c3-tooltip th[scope='row'] > span {
   display: inline-block;
   width: 10px;
   height: 10px;
