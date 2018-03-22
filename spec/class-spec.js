@@ -17,32 +17,42 @@ describe('c3 chart class', function () {
         chart = window.initChart(chart, args, done);
     });
 
-    describe('internal.getTargetSelectorSuffix', function () {
+    describe('internal.generateTargetClass', function () {
 
         it('should not replace any characters', function () {
             var input = 'data1',
                 expected = '-' + input,
-                suffix = chart.internal.getTargetSelectorSuffix(input);
+                suffix = chart.internal.generateTargetClass(input);
             expect(suffix).toBe(expected);
         });
 
         it('should replace space to "-"', function () {
             var input = 'data1 suffix',
                 expected = '-data1-suffix',
-                suffix = chart.internal.getTargetSelectorSuffix(input);
+                suffix = chart.internal.generateTargetClass(input);
             expect(suffix).toBe(expected);
         });
 
         it('should replace space to "-" with multibyte characters', function () {
             var input = 'data1 suffix 日本語',
                 expected = '-data1-suffix-日本語',
-                suffix = chart.internal.getTargetSelectorSuffix(input);
+                suffix = chart.internal.generateTargetClass(input);
             expect(suffix).toBe(expected);
         });
 
-        it('should replace special charactors to "-"', function () {
+        it('should not replace special characters', function () {
             var input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
-                expected = '-data1--------------------------------',
+                expected = '-data1-!@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
+                suffix = chart.internal.generateTargetClass(input);
+            expect(suffix).toBe(expected);
+        });
+    });
+
+    describe('internal.getTargetSelectorSuffix', function () {
+
+        it('should escape special characters', function () {
+            var input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
+                expected = '-data1-\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\_\\=\\+\\,\\.\\<\\>\\"\\\'\\:\\;\\[\\]\\/\\|\\?\\~\\`\\{\\}\\\\',
                 suffix = chart.internal.getTargetSelectorSuffix(input);
             expect(suffix).toBe(expected);
         });
