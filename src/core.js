@@ -231,6 +231,7 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Define svgs
     $$.svg = $$.selectChart.append("svg")
+        .attr('role', 'graphics-document document')
         .style("overflow", "hidden")
         .on('mouseenter', function () { return config.onmouseover.call($$); })
         .on('mouseleave', function () { return config.onmouseout.call($$); });
