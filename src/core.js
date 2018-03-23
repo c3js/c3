@@ -2,7 +2,7 @@ import Axis from './axis';
 import CLASS from './class';
 import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
 
-export var c3 = { version: "0.4.21" };
+export var c3 = { version: "0.4.22" };
 
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
@@ -124,7 +124,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.focusedTargetIds = [];
     $$.defocusedTargetIds = [];
 
-    $$.xOrient = config.axis_rotated ? "left" : "bottom";
+    $$.xOrient = config.axis_rotated ? (config.axis_x_inner ? "right" : "left") : (config.axis_x_inner ? "top" : "bottom");
     $$.yOrient = config.axis_rotated ? (config.axis_y_inner ? "top" : "bottom") : (config.axis_y_inner ? "right" : "left");
     $$.y2Orient = config.axis_rotated ? (config.axis_y2_inner ? "bottom" : "top") : (config.axis_y2_inner ? "left" : "right");
     $$.subXOrient = config.axis_rotated ? "left" : "bottom";

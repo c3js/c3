@@ -29,7 +29,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return (!config.axis_x_show || config.axis_x_inner) ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
         return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
