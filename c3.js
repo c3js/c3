@@ -1,4 +1,4 @@
-/* @license C3.js v0.5.0 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.5.1 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -978,7 +978,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.5.0" };
+    var c3 = { version: "0.5.1" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -4319,7 +4319,18 @@
                 return a + b.value;
             }, 0);
         });
-        $$.pie.sort($$.getOrderFunction() || null);
+
+        var orderFct = $$.getOrderFunction();
+
+        // we need to reverse the returned order if asc or desc to have the slice in expected order.
+        if (orderFct && ($$.isOrderAsc() || $$.isOrderDesc())) {
+            var defaultSort = orderFct;
+            orderFct = function orderFct(t1, t2) {
+                return defaultSort(t1, t2) * -1;
+            };
+        }
+
+        $$.pie.sort(orderFct || null);
     };
 
     c3_chart_internal_fn.updateRadius = function () {
@@ -5826,13 +5837,13 @@
             orderAsc = $$.isOrderAsc(),
             orderDesc = $$.isOrderDesc();
         if (orderAsc || orderDesc) {
+            var reducer = function reducer(p, c) {
+                return p + Math.abs(c.value);
+            };
             return function (t1, t2) {
-                var reducer = function reducer(p, c) {
-                    return p + Math.abs(c.value);
-                };
                 var t1Sum = t1.values.reduce(reducer, 0),
                     t2Sum = t2.values.reduce(reducer, 0);
-                return orderDesc ? t2Sum - t1Sum : t1Sum - t2Sum;
+                return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum;
             };
         } else if (isFunction(config.data_order)) {
             return config.data_order;
@@ -5847,9 +5858,6 @@
         var fct = this.getOrderFunction();
         if (fct) {
             targets.sort(fct);
-            if (this.isOrderAsc() || this.isOrderDesc()) {
-                targets.reverse();
-            }
         }
         return targets;
     };
@@ -8312,11 +8320,11 @@
         }
         // Calculate x axis height when tick rotated
         if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
-            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - Math.abs(config.axis_x_tick_rotate)) / 180);
         }
         // Calculate y axis height when tick rotated
         if (axisId === 'y' && config.axis_rotated && config.axis_y_tick_rotate) {
-            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_y_tick_rotate) / 180);
+            h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - Math.abs(config.axis_y_tick_rotate)) / 180);
         }
         return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
     };
