@@ -48,10 +48,10 @@ If you choose to submit a pull request, please do not bump the version number un
 
 ## Playground
 Please fork this fiddle:
-+ [http://jsfiddle.net/masayuki0812/7kYJu/](http://jsfiddle.net/masayuki0812/7kYJu/)
++ http://jsfiddle.net/7kYJu/4742/
 
 ## Dependency
-+ [D3.js](https://github.com/mbostock/d3) `~3.5.0`
++ [D3.js](https://github.com/mbostock/d3) `^4.12.0`
 
 ## License
 MIT
