@@ -171,14 +171,14 @@ c3_chart_internal_fn.generateFlow = function (args) {
             done = flow.done || function () {},
             wait = $$.generateWait();
 
-        var xgrid = $$.xgrid || d3.selectAll([]),
-            xgridLines = $$.xgridLines || d3.selectAll([]),
-            mainRegion = $$.mainRegion || d3.selectAll([]),
-            mainText = $$.mainText || d3.selectAll([]),
-            mainBar = $$.mainBar || d3.selectAll([]),
-            mainLine = $$.mainLine || d3.selectAll([]),
-            mainArea = $$.mainArea || d3.selectAll([]),
-            mainCircle = $$.mainCircle || d3.selectAll([]);
+        var xgrid,
+            xgridLines,
+            mainRegion,
+            mainText,
+            mainBar,
+            mainLine,
+            mainArea,
+            mainCircle;
 
         // set flag
         $$.flowing = true;
@@ -192,6 +192,15 @@ c3_chart_internal_fn.generateFlow = function (args) {
         domain = $$.updateXDomain(targets, true, true);
         // update elements related to x scale
         if ($$.updateXGrid) { $$.updateXGrid(true); }
+
+        xgrid = $$.xgrid || d3.selectAll([]); // xgrid needs to be obtained after updateXGrid
+        xgridLines = $$.xgridLines || d3.selectAll([]);
+        mainRegion = $$.mainRegion || d3.selectAll([]);
+        mainText = $$.mainText || d3.selectAll([]);
+        mainBar = $$.mainBar || d3.selectAll([]);
+        mainLine = $$.mainLine || d3.selectAll([]);
+        mainArea = $$.mainArea || d3.selectAll([]);
+        mainCircle = $$.mainCircle || d3.selectAll([]);
 
         // generate transform to flow
         if (!flow.orgDataCount) { // if empty
@@ -220,37 +229,38 @@ c3_chart_internal_fn.generateFlow = function (args) {
 
         $$.hideXGridFocus();
 
-        d3.transition().ease('linear').duration(durationForFlow).each(function () {
-            wait.add($$.axes.x.transition().call($$.xAxis));
-            wait.add(mainBar.transition().attr('transform', transform));
-            wait.add(mainLine.transition().attr('transform', transform));
-            wait.add(mainArea.transition().attr('transform', transform));
-            wait.add(mainCircle.transition().attr('transform', transform));
-            wait.add(mainText.transition().attr('transform', transform));
-            wait.add(mainRegion.filter($$.isRegionOnX).transition().attr('transform', transform));
-            wait.add(xgrid.transition().attr('transform', transform));
-            wait.add(xgridLines.transition().attr('transform', transform));
-        })
-        .call(wait, function () {
-            var i, shapes = [], texts = [], eventRects = [];
+        var flowTransition = d3.transition().ease(d3.easeLinear).duration(durationForFlow);
+        wait.add($$.xAxis($$.axes.x, flowTransition));
+        wait.add(mainBar.transition(flowTransition).attr('transform', transform));
+        wait.add(mainLine.transition(flowTransition).attr('transform', transform));
+        wait.add(mainArea.transition(flowTransition).attr('transform', transform));
+        wait.add(mainCircle.transition(flowTransition).attr('transform', transform));
+        wait.add(mainText.transition(flowTransition).attr('transform', transform));
+        wait.add(mainRegion.filter($$.isRegionOnX).transition(flowTransition).attr('transform', transform));
+        wait.add(xgrid.transition(flowTransition).attr('transform', transform));
+        wait.add(xgridLines.transition(flowTransition).attr('transform', transform));
+        wait(function () {
+            var i, shapes = [], texts = [];
 
             // remove flowed elements
             if (flowLength) {
                 for (i = 0; i < flowLength; i++) {
                     shapes.push('.' + CLASS.shape + '-' + (flowIndex + i));
                     texts.push('.' + CLASS.text + '-' + (flowIndex + i));
-                    eventRects.push('.' + CLASS.eventRect + '-' + (flowIndex + i));
                 }
                 $$.svg.selectAll('.' + CLASS.shapes).selectAll(shapes).remove();
                 $$.svg.selectAll('.' + CLASS.texts).selectAll(texts).remove();
-                $$.svg.selectAll('.' + CLASS.eventRects).selectAll(eventRects).remove();
                 $$.svg.select('.' + CLASS.xgrid).remove();
             }
 
             // draw again for removing flowed elements and reverting attr
             xgrid
                 .attr('transform', null)
-                .attr($$.xgridAttr);
+                .attr('x1', $$.xgridAttr.x1)
+                .attr('x2', $$.xgridAttr.x2)
+                .attr('y1', $$.xgridAttr.y1)
+                .attr('y2', $$.xgridAttr.y2)
+                .style("opacity", $$.xgridAttr.opacity);
             xgridLines
                 .attr('transform', null);
             xgridLines.select('line')
@@ -279,13 +289,9 @@ c3_chart_internal_fn.generateFlow = function (args) {
                 .style('fill-opacity', $$.opacityForText.bind($$));
             mainRegion
                 .attr('transform', null);
-            mainRegion.select('rect').filter($$.isRegionOnX)
+            mainRegion.filter($$.isRegionOnX)
                 .attr("x", $$.regionX.bind($$))
                 .attr("width", $$.regionWidth.bind($$));
-
-            if (config.interaction_enabled) {
-                $$.redrawEventRect();
-            }
 
             // callback for end of flow
             done();

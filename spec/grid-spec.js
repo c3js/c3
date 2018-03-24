@@ -67,13 +67,13 @@ describe('c3 chart grid', function () {
                 var ygrids = chart.internal.main.select('.c3-ygrids'),
                     expectedYs = [];
                 ygrids.selectAll('.c3-ygrid').each(function (d, i) {
-                    expectedYs[i] = +d3.select(this).attr('y1');
+                    expectedYs[i] = Math.ceil(+d3.select(this).attr('y1'));
                 });
                 expect(ygrids.size()).toBe(1);
                 expect(ygrids.selectAll('.c3-ygrid').size()).toBe(5);
                 chart.internal.main.select('.c3-axis-y').selectAll('.tick').each(function (d, i) {
-                    var t = d3.transform(d3.select(this).attr('transform'));
-                    expect(t.translate[1]).toBe(expectedYs[i]);
+                    var t = d3.select(this).attr('transform');
+                    expect(t).toBe('translate(0,' + expectedYs[i] + ')');
                 });
             });
         });

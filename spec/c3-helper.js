@@ -21,7 +21,6 @@ window.setMouseEvent = function(chart, name, x, y, element) {
     event.initMouseEvent(name, true, true, window,
                        0, 0, 0, x + paddingLeft, y + 5,
                        false, false, false, false, 0, null);
-    chart.internal.d3.event = event;
     if (element) { element.dispatchEvent(event); }
 };
 

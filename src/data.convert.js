@@ -3,7 +3,7 @@ import { isValue, isUndefined, isDefined, notEmpty } from './util';
 
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
-    var req = $$.d3.xhr(url);
+    var req = $$.d3.request(url);
     if (headers) {
         Object.keys(headers).forEach(function (header) {
             req.header(header, headers[header]);
@@ -26,22 +26,22 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
     });
 };
 c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-    var rows = parser.parseRows(xsv), d;
+    var rows = parser(xsv), d;
     if (rows.length === 1) {
         d = [{}];
         rows[0].forEach(function (id) {
             d[0][id] = null;
         });
     } else {
-        d = parser.parse(xsv);
+        d = parser(xsv);
     }
     return d;
 };
 c3_chart_internal_fn.convertCsvToData = function (csv) {
-    return this.convertXsvToData(csv, this.d3.csv);
+    return this.convertXsvToData(csv, this.d3.csvParse);
 };
 c3_chart_internal_fn.convertTsvToData = function (tsv) {
-    return this.convertXsvToData(tsv, this.d3.tsv);
+    return this.convertXsvToData(tsv, this.d3.tsvParse);
 };
 c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     var $$ = this,

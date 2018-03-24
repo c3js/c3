@@ -129,7 +129,7 @@ describe('c3 chart axis', function () {
         describe('with axis.y.time', function () {
             beforeAll(function(){
                 args.axis.y.tick.time = {
-                    value : 'seconds',
+                    type : d3.timeSecond,
                     interval : 60
                 };
             });
@@ -235,7 +235,7 @@ describe('c3 chart axis', function () {
 
                     it('should split x axis tick text to multiple lines', function () {
                         var ticks = chart.internal.main.select('.c3-axis-x').selectAll('g.tick'),
-                            expectedTexts = ['very long tick text on x', 'axis'],
+                            expectedTexts = ['very long tick text', 'on x axis'],
                             expectedX = '0';
                         expect(ticks.size()).toBe(6);
                         ticks.each(function () {

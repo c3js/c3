@@ -10,13 +10,9 @@ describe('c3 chart zoom', function () {
                 ['data2', 50, 20, 10, 40, 15, 6025]
             ]
         },
-        axis: {
-            x: {
-                extent: [1, 2]
-            }
-        },
         zoom: {
-            enable: true
+            enabled: true,
+            initialRange: [1, 2]
         },
         subchart: {
             show: true
@@ -54,10 +50,10 @@ describe('c3 chart zoom', function () {
         describe('main chart domain', function () {
 
             it('should have specified brush extent', function () {
-                var brushExtent = chart.internal.brush.extent(),
-                    expectedBrushExtent = [1, 2];
-                expect(brushExtent[0]).toBe(expectedBrushExtent[0]);
-                expect(brushExtent[1]).toBe(expectedBrushExtent[1]);
+                var brushSelection = chart.internal.brush.selectionAsValue(),
+                    expectedBrushSelection = [1, 2];
+                expect(brushSelection[0]).toBeCloseTo(expectedBrushSelection[0], 1);
+                expect(brushSelection[1]).toBeCloseTo(expectedBrushSelection[1], 1);
             });
 
         });

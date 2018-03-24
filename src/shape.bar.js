@@ -9,14 +9,14 @@ c3_chart_internal_fn.initBar = function () {
 };
 c3_chart_internal_fn.updateTargetsForBar = function (targets) {
     var $$ = this, config = $$.config,
-        mainBarUpdate, mainBarEnter,
+        mainBars, mainBarEnter,
         classChartBar = $$.classChartBar.bind($$),
         classBars = $$.classBars.bind($$),
         classFocus = $$.classFocus.bind($$);
-    mainBarUpdate = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
+    mainBars = $$.main.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar)
         .data(targets)
         .attr('class', function (d) { return classChartBar(d) + classFocus(d); });
-    mainBarEnter = mainBarUpdate.enter().append('g')
+    mainBarEnter = mainBars.enter().append('g')
         .attr('class', classChartBar)
         .style("pointer-events", "none");
     // Bars for each data
@@ -31,20 +31,20 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
         classBar = $$.classBar.bind($$),
         initialOpacity = $$.initialOpacity.bind($$),
         color = function (d) { return $$.color(d.id); };
-    $$.mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
+    var mainBar = $$.main.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data(barData);
-    $$.mainBar.enter().append('path')
+    var mainBarEnter = mainBar.enter().append('path')
         .attr("class", classBar)
         .style("stroke", color)
         .style("fill", color);
-    $$.mainBar
+    $$.mainBar = mainBarEnter.merge(mainBar)
         .style("opacity", initialOpacity);
-    $$.mainBar.exit().transition().duration(durationForExit)
-        .remove();
+    mainBar.exit().transition().duration(durationForExit)
+        .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawBar = function (drawBar, withTransition) {
+c3_chart_internal_fn.redrawBar = function (drawBar, withTransition, transition) {
     return [
-        (withTransition ? this.mainBar.transition(Math.random().toString()) : this.mainBar)
+        (withTransition ? this.mainBar.transition(transition) : this.mainBar)
             .attr('d', drawBar)
             .style("stroke", this.color)
             .style("fill", this.color)
@@ -116,8 +116,8 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         ];
     };
 };
-c3_chart_internal_fn.isWithinBar = function (that) {
-    var mouse = this.d3.mouse(that), box = that.getBoundingClientRect(),
+c3_chart_internal_fn.isWithinBar = function (mouse, that) {
+    var box = that.getBoundingClientRect(),
         seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
         x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
         w = box.width, h = box.height, offset = 2,
