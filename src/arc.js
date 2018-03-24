@@ -7,7 +7,16 @@ c3_chart_internal_fn.initPie = function () {
     $$.pie = d3.pie().value(function (d) {
         return d.values.reduce(function (a, b) { return a + b.value; }, 0);
     });
-    $$.pie.sort($$.getOrderFunction() || null);
+
+    let orderFct = $$.getOrderFunction();
+
+    // we need to reverse the returned order if asc or desc to have the slice in expected order.
+    if (orderFct && ($$.isOrderAsc() || $$.isOrderDesc())) {
+        let defaultSort = orderFct;
+        orderFct = (t1, t2) => defaultSort(t1, t2) * -1;
+    }
+
+    $$.pie.sort(orderFct || null);
 };
 
 c3_chart_internal_fn.updateRadius = function () {
