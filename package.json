@@ -4,7 +4,7 @@
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "scripts": {
-    "serve": "static -p 8080 htdocs/",
+    "start": "static -p 8080 htdocs/",
     "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
     "build": "npm run build:js && npm run build:css",
     "build:js": "npm run build:js:rollup && npm run build:js:uglify",
