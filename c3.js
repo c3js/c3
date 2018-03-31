@@ -1,4 +1,4 @@
-/* @license C3.js v0.5.1 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.5.2 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -978,7 +978,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.5.1" };
+    var c3 = { version: "0.5.2" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -4861,8 +4861,11 @@
         return i < config.axis_x_categories.length ? config.axis_x_categories[i] : i;
     };
 
+    c3_chart_internal_fn.generateTargetClass = function (targetId) {
+        return targetId || targetId === 0 ? ('-' + targetId).replace(/\s/g, '-') : '';
+    };
     c3_chart_internal_fn.generateClass = function (prefix, targetId) {
-        return " " + prefix + " " + prefix + this.getTargetSelectorSuffix(targetId);
+        return " " + prefix + " " + prefix + this.generateTargetClass(targetId);
     };
     c3_chart_internal_fn.classText = function (d) {
         return this.generateClass(CLASS.text, d.index);
@@ -4943,7 +4946,7 @@
         return CLASS.chartArc + this.classTarget(d.data.id);
     };
     c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
-        return targetId || targetId === 0 ? ('-' + targetId).replace(/[\s?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\]/g, '-') : '';
+        return this.generateTargetClass(targetId).replace(/([?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
     };
     c3_chart_internal_fn.selectorTarget = function (id, prefix) {
         return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);
@@ -7864,7 +7867,7 @@
         }
         return function (d) {
             var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
-                x = isSub ? $$.x : $$.subX,
+                x = isSub ? $$.subX : $$.x,
                 y = yScaleGetter.call($$, d.id),
                 x0 = 0,
                 y0 = 0,
