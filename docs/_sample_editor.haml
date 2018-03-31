@@ -1,0 +1,36 @@
+= javascript_include_tag "ace/ace.js"
+= javascript_include_tag "ace/mode-javascript.js"
+= javascript_include_tag "ace/theme-tomorrow.js"
+:javascript
+  var editor = ace.edit('#{type}-editor'),
+      error  = document.getElementById('ace-error');
+
+  function debounce(func, wait) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        func.apply(context, args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  editor.on('change', debounce(function(e) {
+    try {
+      eval(editor.getValue());
+      error.innerHTML = '';
+    }
+    catch(e) {
+      error.innerHTML = e;
+    }
+  }, 300));
+
+  editor.setOption("maxLines", 100);
+  editor.setOption("showLineNumbers", false);
+  editor.setOption("showGutter", false);
+
+  editor.setTheme("ace/theme/tomorrow");
+  editor.getSession().setMode("ace/mode/#{type}");
+  editor.commands.removeCommand('gotoline') // Disables the override of Command-L

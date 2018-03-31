@@ -1,0 +1,21 @@
+section p {
+    margin-bottom: 0;
+}
+section h5 {
+    margin-top: 1rem;
+}
+section code {
+    padding-left: 0;
+}
+.sourcecode {
+    margin-bottom: 1.25rem;
+    padding: 6px 10px;
+    background-color: #f4f4f4;
+}
+.sourcecode pre {
+    padding: 0;
+    font-size: 1em;
+}
+.sourcecode pre code {
+    background-color: #f4f4f4;
+}

@@ -1,0 +1,22 @@
+:javascript
+  $(function(){
+    function scrollToHash() {
+      var hash = document.location.hash,
+          target = $('.column-content a[href^=' + hash + ']'),
+          position;
+      if (target.length) {
+        position = target.offset().top - 60;
+        $("html, body").animate({scrollTop:position}, 250, "swing");
+      }
+    }
+    $(window).on('hashchange', scrollToHash);
+
+    // When clicked
+    $('a[href^=#]').click(function(){
+      document.location.hash = $(this).attr("href");
+      return false;
+    });
+
+    // When loaded
+    $(window).trigger('hashchange');
+  });
