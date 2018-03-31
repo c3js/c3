@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class='no-js'>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='D3 based reusable chart library' name='description'>
+<meta content='c3js.org' name='author'>
+<meta content='width=device-width' name='viewport'>
+<title>C3.js | D3-based reusable chart library</title>
+<link href="/css/normalize-e465cb86.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/foundation.min-978d4ce8.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/tomorrow-d7cf0921.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/c3-57883d58.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/style-99fb8989.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/gettingstarted-a623cc6b.css" media="screen" rel="stylesheet" type="text/css" />
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-42896059-3', 'c3js.org');
+  ga('send', 'pageview');
+</script>
+<script src="/js/vendor/modernizr-2.6.1.min-68fdcc99.js" type="text/javascript"></script>
+</head>
+<body class='antialiased'>
+<div class='sticky'>
+<nav class='top-bar' data-options='sticky_on: large' data-topbar>
+<ul class='title-area'>
+<li class='name'>
+<h1>
+<a href='/'>C3.js | D3-based reusable chart library</a>
+</h1>
+</li>
+<li class='toggle-topbar menu-icon'>
+<a href='#'>
+<span>Menu</span>
+</a>
+</li>
+</ul>
+<section class='top-bar-section'>
+<ul class='right'>
+<li class='has-form'>
+<a class='button' href='/gettingstarted.html'>Getting Started</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/examples.html'>Examples</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/reference.html'>Reference</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://groups.google.com/forum/#!forum/c3js' target='_blank'>Forum</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://github.com/c3js/c3' target='_blank'>Source</a>
+</li>
+</ul>
+</section>
+</nav>
+</div>
+<div class='container sidemenu'>
+<div class='row'>
+<div class='large-3 medium-4 columns column-menu'>
+<div class='side-bar'>
+<ul class='side-nav'>
+<li>GETTING STARTED</li>
+<li>
+<a href='#setup'>1. Setup</a>
+</li>
+<li>
+<a href='#generate'>2. Generate chart</a>
+</li>
+<li>
+<a href='#customize'>3. Customize chart</a>
+</li>
+<li>
+<a href='#api'>4. Use APIs</a>
+</li>
+<li>
+<a href='#style'>5. Customize style</a>
+</li>
+<li>
+<a href='#more'>6. And more..</a>
+</li>
+</ul>
+</div>
+</div>
+<div class='large-9 medium-8 columns column-content'>
+<section>
+<h2>Getting Started</h2>
+<p>In this guide, we are going to show you how to get started with C3.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#setup'>1. Setup</a>
+</h3>
+<p>Download the latest version here:</p>
+<ul>
+<li><a href="https://github.com/c3js/c3/releases/latest" target="_blank">https://github.com/c3js/c3/releases/latest</a></li>
+</ul>
+<p>Installing by Bower/Component is also available with the name <span class="code">c3</span>.</p>
+<p>Then, load the scripts and css:</p>
+<div class='sourcecode highlight'>
+<pre><code class='html xml'><span class="comment">&lt;!-- Load c3.css --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"/path/to/c3.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span>&gt;</span>&#x000A;&#x000A;<span class="comment">&lt;!-- Load d3.js and c3.js --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/d3.v3.min.js"</span> <span class="attribute">charset</span>=<span class="value">"utf-8"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/c3.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;</code></pre>
+</div>
+<p>C3 depends on D3, so please load D3 too.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#generate'>2. Generate Chart</a>
+</h3>
+<p>C3 generates a chart by calling <span class="code">generate()</span> with the argument object, and an element including the chart will insert into the element specified as a selector in that argument as <span class="code">bindto</span>.</p>
+<p>Prepare the element to bind the chart:</p>
+<div class='sourcecode highlight'>
+<pre><code class='html xml'><span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"chart"</span>&gt;&lt;/<span class="title">div</span>&gt;</span>&#x000A;</code></pre>
+</div>
+<p>And, call <span class="code">generate()</span> with arguments:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>var chart = c3.generate({&#x000A;    bindto: '#chart',&#x000A;    data: {&#x000A;      columns: [&#x000A;        ['data1', 30, 200, 100, 400, 150, 250],&#x000A;        ['data2', 50, 20, 10, 40, 15, 25]&#x000A;      ]&#x000A;    }&#x000A;});&#x000A;</code></pre>
+</div>
+<p>C3 supports the asynchronous module definition (AMD) API. If you use <a href="http://requirejs.org/" target="_blank">RequireJS</a>, you can load like this:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>require.config({&#x000A;  baseUrl: '/js',&#x000A;  paths: {&#x000A;    d3: "http://d3js.org/d3.v3.min"&#x000A;  }&#x000A;});&#x000A;&#x000A;require(["d3", "c3"], function(d3, c3) {&#x000A;  c3.generate({&#x000A;    ...&#x000A;  });&#x000A;});&#x000A;</code></pre>
+</div>
+<p>Then, you will see the chart:</p>
+<div id='chart2_1'></div>
+<br>
+<p>Data can be loaded as <a href="/samples/data_columned.html">columned data</a> / <a href="/samples/data_rowed.html">rowed data</a> / <a href="/samples/data_url.html">csv in URL</a>.</p>
+<p>There are serveral options to customize the chart and you can see those here:</p>
+<ul>
+<li><a href="/examples.html">Examples</a></li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#customize'>3. Customize Chart</a>
+</h3>
+<p>The chart can be customize by giving some options when generating. We will introduce some of them here.</p>
+<h4>1. Additional Axis</h4>
+<p>Introduce additional axis for <span class="code">data2</span>. Add <span class="code">data.axes</span> and <span class="code">axis.y2.show</span> as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>var chart = c3.generate({&#x000A;    bindto: '#chart',&#x000A;    data: {&#x000A;      columns: [&#x000A;        ['data1', 30, 200, 100, 400, 150, 250],&#x000A;        ['data2', 50, 20, 10, 40, 15, 25]&#x000A;      ],&#x000A;      axes: {&#x000A;        data2: 'y2' // ADD&#x000A;      }&#x000A;    },&#x000A;    axis: {&#x000A;      y2: {&#x000A;        show: true // ADD&#x000A;      }&#x000A;    }&#x000A;});&#x000A;</code></pre>
+</div>
+<p>Then, the chart will be like this:</p>
+<div id='chart3_1'></div>
+<br>
+<h4>2. Show Axis Label</h4>
+<p>Show labels for each axis. Add <span class="code">axis.y.label</span> and <span class="code">axis.y2.label</span> as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>var chart = c3.generate({&#x000A;    bindto: '#chart',&#x000A;    data: {&#x000A;      columns: [&#x000A;        ['data1', 30, 200, 100, 400, 150, 250],&#x000A;        ['data2', 50, 20, 10, 40, 15, 25]&#x000A;      ],&#x000A;      axes: {&#x000A;        data2: 'y2'&#x000A;      }&#x000A;    },&#x000A;    axis: {&#x000A;      y: {&#x000A;        label: { // ADD&#x000A;          text: 'Y Label',&#x000A;          position: 'outer-middle'&#x000A;        }&#x000A;      },&#x000A;      y2: {&#x000A;        show: true,&#x000A;        label: { // ADD&#x000A;          text: 'Y2 Label',&#x000A;          position: 'outer-middle'&#x000A;        }&#x000A;      }&#x000A;    }&#x000A;});&#x000A;</code></pre>
+</div>
+<p>Then, the chart will be like this:</p>
+<div id='chart3_2'></div>
+<br>
+<h4>3. Change Chart Type</h4>
+<p>Show <span class="code">data2</span> as Bar chart. Add <span class="code">data.types</span> as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>var chart = c3.generate({&#x000A;    bindto: '#chart',&#x000A;    data: {&#x000A;      columns: [&#x000A;        ['data1', 30, 200, 100, 400, 150, 250],&#x000A;        ['data2', 50, 20, 10, 40, 15, 25]&#x000A;      ],&#x000A;      axes: {&#x000A;        data2: 'y2'&#x000A;      },&#x000A;      types: {&#x000A;        data2: 'bar' // ADD&#x000A;      }&#x000A;    },&#x000A;    axis: {&#x000A;      y: {&#x000A;        label: {&#x000A;          text: 'Y Label',&#x000A;          position: 'outer-middle'&#x000A;        }&#x000A;      },&#x000A;      y2: {&#x000A;        show: true,&#x000A;        label: {&#x000A;          text: 'Y2 Label',&#x000A;          position: 'outer-middle'&#x000A;        }&#x000A;      }&#x000A;    }&#x000A;});&#x000A;</code></pre>
+</div>
+<p>Then, the chart will be like this:</p>
+<div id='chart3_3'></div>
+<br>
+<h4>4. Format values</h4>
+<p>Format the values of each data. Add <span class="code">axis.y.tick.format</span> as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>var chart = c3.generate({&#x000A;    bindto: '#chart',&#x000A;    data: {&#x000A;      columns: [&#x000A;        ['data1', 30, 200, 100, 400, 150, 250],&#x000A;        ['data2', 50, 20, 10, 40, 15, 25]&#x000A;      ],&#x000A;      axes: {&#x000A;        data2: 'y2'&#x000A;      },&#x000A;      types: {&#x000A;        data2: 'bar'&#x000A;      }&#x000A;    },&#x000A;    axis: {&#x000A;      y: {&#x000A;        label: {&#x000A;          text: 'Y Label',&#x000A;          position: 'outer-middle'&#x000A;        },&#x000A;        tick: {&#x000A;          format: d3.format("$,") // ADD&#x000A;        }&#x000A;      },&#x000A;      y2: {&#x000A;        show: true,&#x000A;        label: {&#x000A;          text: 'Y2 Label',&#x000A;          position: 'outer-middle'&#x000A;        }&#x000A;      }&#x000A;    }&#x000A;});&#x000A;</code></pre>
+</div>
+<p>Then, the chart will be like this:</p>
+<div id='chart3_4'></div>
+<br>
+<p>More information about the options, please see <a href="/examples.html">Examples</a>. (We'll add the reference soon)</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api'>4. Use APIs</a>
+</h3>
+<p>By using APIs, you can update the chart after it's been rendered. We will introduce some of APIs here. APIs can be called through the object returned from <span class="code">generate()</span>.</p>
+<h4>1. Load Data</h4>
+<p>By using <span class="code">load()</span> API, you can load data and update the chart dynamically as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>// var chart = c3.generate({ ... });&#x000A;&#x000A;chart.load({&#x000A;  columns: [&#x000A;    ['data1', 300, 100, 250, 150, 300, 150, 500],&#x000A;    ['data2', 100, 200, 150, 50, 100, 250]&#x000A;  ]&#x000A;});&#x000A;</code></pre>
+</div>
+<p>If you push the button "Load" below, this code will run and the chart will be updated.</p>
+<button class='small' onclick='example4_1();'>Load</button>
+<div id='chart4_1'></div>
+<br>
+<h4>2. Unload Data</h4>
+<p>By using <span class="code">unload()</span> API, you can unload the data dynamically as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>// var chart = c3.generate({ ... });&#x000A;&#x000A;chart.unload({&#x000A;    ids: ['data2', 'data3']&#x000A;});&#x000A;</code></pre>
+</div>
+<p>If you push the button "Unload" below, this code will run and the chart will be updated.</p>
+<button class='small' onclick='example4_2();'>Unload</button>
+<div id='chart4_2'></div>
+<br>
+<p>Please use <span class="code">unload</span> param in <span class="code">load()</span> API if load and unload need to run simultaneously. Please see <a href="/samples/data_load.html">this example</a>.</p>
+<h4>3. Show/Hide Data</h4>
+<p>By using <span class="code">show()</span> and <span class="code">hide()</span> API, you can show/hide the data dynamically as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='javascript'>// var chart = c3.generate({ ... });&#x000A;&#x000A;chart.hide(['data2', 'data3']);&#x000A;chart.show(['data2', 'data3']);&#x000A;</code></pre>
+</div>
+<p>If you push the button "Show" and "Hide" below, this code will run and the chart will be updated.</p>
+<button class='small' onclick='example4_3_2();'>Hide</button>
+<button class='small' onclick='example4_3_1();'>Show</button>
+<div id='chart4_3'></div>
+<br>
+<p>The documentation about APIs is poor now, so please check the <a href="https://github.com/c3js/c3/issues?state=open">issues on github</a>. There might be some hints about what you want to do. (We will add the document soon)</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#style'>5. Customize Style</a>
+</h3>
+<p>C3 give some classes for each element when generating. So, you can change the style of the elements by using those classes.</p>
+<h4>1. Line style</h4>
+<p>The lines have <span class="code">c3-line-[id]</span> class, so this class can be used to define the style in css as follows:</p>
+<div class='sourcecode highlight'>
+<pre><code class='css'>#chart .c3-line-data2 {&#x000A;  stroke-width: 5px;&#x000A;}&#x000A;</code></pre>
+</div>
+<div id='chart5_1'></div>
+<br>
+<p>Please check the class for each element if you want to change the style. Web Inspector would be useful. (We will add the document for class definition soon)</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#more'>6. And More..</a>
+</h3>
+<p>Please check the <a href="/examples.html">examples</a> and the <a href="https://github.com/c3js/c3/issues?state=open">issues</a> on github for more information. Sorry for the poor documentation. We're working on now and please give me some time. Thank you.</p>
+</section>
+</div>
+</div>
+<footer>
+<hr>
+<p>&copy Masayuki Tanaka 2014</p>
+</footer>
+
+</div>
+<script src="/js/jquery-1.11.0.min-910066fb.js" type="text/javascript"></script>
+<script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
+<script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
+<script src="/js/d3-4.13.0.min-1190977b.js" type="text/javascript"></script>
+<script src="/js/c3.min-2c29991b.js" type="text/javascript"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  $(document).foundation();
+</script>
+
+<script>
+  $(function(){
+    function scrollToHash() {
+      var hash = document.location.hash,
+          target = $('.column-content a[href^=' + hash + ']'),
+          position;
+      if (target.length) {
+        position = target.offset().top - 60;
+        $("html, body").animate({scrollTop:position}, 250, "swing");
+      }
+    }
+    $(window).on('hashchange', scrollToHash);
+  
+    // When clicked
+    $('a[href^=#]').click(function(){
+      document.location.hash = $(this).attr("href");
+      return false;
+    });
+  
+    // When loaded
+    $(window).trigger('hashchange');
+  });
+</script>
+
+<script src="/js/gettingstarted-43b85b49.js" type="text/javascript"></script>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html class='no-js'>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='D3 based reusable chart library' name='description'>
+<meta content='c3js.org' name='author'>
+<meta content='width=device-width' name='viewport'>
+<title>C3.js | D3-based reusable chart library</title>
+<link href="/css/normalize-e465cb86.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/foundation.min-978d4ce8.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/tomorrow-d7cf0921.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/c3-57883d58.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/style-99fb8989.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/index-da39a3ee.css" media="screen" rel="stylesheet" type="text/css" />
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-42896059-3', 'c3js.org');
+  ga('send', 'pageview');
+</script>
+<script src="/js/vendor/modernizr-2.6.1.min-68fdcc99.js" type="text/javascript"></script>
+</head>
+<body class='antialiased'>
+<div class='sticky'>
+<nav class='top-bar' data-options='sticky_on: large' data-topbar>
+<ul class='title-area'>
+<li class='name'>
+<h1>
+<a href='/'>C3.js | D3-based reusable chart library</a>
+</h1>
+</li>
+<li class='toggle-topbar menu-icon'>
+<a href='#'>
+<span>Menu</span>
+</a>
+</li>
+</ul>
+<section class='top-bar-section'>
+<ul class='right'>
+<li class='has-form'>
+<a class='button' href='/gettingstarted.html'>Getting Started</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/examples.html'>Examples</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/reference.html'>Reference</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://groups.google.com/forum/#!forum/c3js' target='_blank'>Forum</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://github.com/c3js/c3' target='_blank'>Source</a>
+</li>
+</ul>
+</section>
+</nav>
+</div>
+<div class='container'>
+<h1 class='title'>
+C3.js
+<small>D3-based reusable chart library</small>
+</h1>
+<div class='chart'>
+<div id='message'>
+<a class='button small' onclick='startDemo();'>Start Demo</a>
+</div>
+<div id='chart'></div>
+</div>
+<hr class='large'>
+<h2 class='text-center'>Why C3?</h2>
+<div class='row text-center features'>
+<div class='medium-4 large-4 columns supporticons'>
+<h3>Comfortable</h3>
+<p>
+C3 makes it easy to generate D3-based charts by wrapping the code required to construct the entire chart. We don't need to write D3 code any more.
+</p>
+</div>
+<div class='medium-4 large-4 columns supporticons'>
+<h3>Customizable</h3>
+<p>
+C3 gives some classes to each element when generating, so you can define a custom style by the class and it's possible to extend the structure directly by D3.
+</p>
+</div>
+<div class='medium-4 large-4 columns supporticons'>
+<h3>Controllable</h3>
+<p>
+C3 provides a variety of APIs and callbacks to access the state of the chart. By using them, you can update the chart even after it's rendered.
+</p>
+</div>
+</div>
+<h3 class='text-center sub'>
+C3 enables deeper integration of charts into your application.
+</h3>
+<br>
+<div class='text-center'>
+<a class='button' href='/gettingstarted.html'>Getting Started</a>
+</div>
+<hr>
+<h3>Change Log</h3>
+<ul>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.5.2">v0.5.2</a><span class="gray">&nbsp;-&nbsp;2018-03-31</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.5.1">v0.5.1</a><span class="gray">&nbsp;-&nbsp;2018-03-25</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.5.0">v0.5.0</a><span class="gray">&nbsp;-&nbsp;2018-03-24</span>
+<ul>
+<li>Update D3 dependency to version 4.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.22">v0.4.22</a><span class="gray">&nbsp;-&nbsp;2018-03-21</span>
+<ul>
+<li>Add axis.x.inner option.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.21">v0.4.21</a><span class="gray">&nbsp;-&nbsp;2018-02-15</span>
+<ul>
+<li>Multi arc gauge chart.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.20">v0.4.20</a><span class="gray">&nbsp;-&nbsp;2018-02-11</span>
+<ul>
+<li>Fix gauge chart with fullCircle option.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.19">v0.4.19</a><span class="gray">&nbsp;-&nbsp;2018-02-10</span>
+<ul>
+<li>Do not call resize functions when chart is hidden.</li>
+<li>Switched CI environment.</li>
+<li>Have license in minified bundle.</li>
+<li>Fixed a memory leak.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.18">v0.4.18</a><span class="gray">&nbsp;-&nbsp;2017-09-14</span>
+<ul>
+<li>point.focus.expand.r takes a function.</li>
+<li>Pie and donuts really handle data.order correctly.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.17">v0.4.17</a><span class="gray">&nbsp;-&nbsp;2017-08-19</span>
+<ul>
+<li>Added bar.space option.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.16">v0.4.16</a><span class="gray">&nbsp;-&nbsp;2017-08-16</span>
+<ul>
+<li>Bug fix of bar chart.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.15">v0.4.15</a><span class="gray">&nbsp;-&nbsp;2017-07-20</span>
+<ul>
+<li>Move some style handling to css.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.14">v0.4.14</a><span class="gray">&nbsp;-&nbsp;2017-06-24</span>
+<ul>
+<li>Bug fix.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.13">v0.4.13</a><span class="gray">&nbsp;-&nbsp;2017-06-11</span>
+<ul>
+<li>New option and bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/v0.4.12">v0.4.12</a><span class="gray">&nbsp;-&nbsp;2017-05-28</span>
+<ul>
+<li>Performance improvement and bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.11">v0.4.11</a><span class="gray">&nbsp;-&nbsp;2016-05-01</span>
+<ul>
+<li>New features, performance improvement and bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.10">v0.4.10</a><span class="gray">&nbsp;-&nbsp;2015-03-17</span>
+<ul>
+<li>New features, performance improvement and bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.9">v0.4.9</a><span class="gray">&nbsp;-&nbsp;2015-01-18</span>
+<ul>
+<li>New features, performance improvement and bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.8">v0.4.8</a><span class="gray">&nbsp;-&nbsp;2014-12-14</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.7">v0.4.7</a><span class="gray">&nbsp;-&nbsp;2014-12-02</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.6">v0.4.6</a><span class="gray">&nbsp;-&nbsp;2014-12-01</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.5">v0.4.5</a><span class="gray">&nbsp;-&nbsp;2014-11-30</span>
+<ul>
+<li>Bug fixes.</li>
+<li>Performance improvement.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.4">v0.4.4</a><span class="gray">&nbsp;-&nbsp;2014-11-21</span>
+<ul>
+<li>New features (e.g. <span class="code">axis.y/y2.inner</span>, <span class="code">legend.hide</span> options)</li>
+<li>Bug fixes.</li>
+<li>Performance improvement.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.3">v0.4.3</a><span class="gray">&nbsp;-&nbsp;2014-11-18</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.2">v0.4.2</a><span class="gray">&nbsp;-&nbsp;2014-11-17</span>
+<ul>
+<li>Bug fixes.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.1">v0.4.1</a><span class="gray">&nbsp;-&nbsp;2014-11-16</span>
+<ul>
+<li>Fixed class suffix.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.4.0">v0.4.0</a><span class="gray">&nbsp;-&nbsp;2014-11-15</span>
+<ul>
+<li>A lot of bug fixes and new features</li>
+<li>Introduce unit test (it's not enough though)</li>
+<li><a href="https://github.com/c3js/c3/releases/tag/0.4.0">and more...</a></li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.3.0">v0.3.0</a><span class="gray">&nbsp;-&nbsp;2014-08-22</span>
+<ul>
+<li>Introduced new architecture so that we can extend this library more easily.</li>
+<li>Modified some options such as <span class="code">data.xFormat</span> and <span class="code">data.xLocaltime</span>.</li>
+<li>Splitted source file into small ones.</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.5">v0.2.5</a><span class="gray">&nbsp;-&nbsp;2014-08-09</span>
+<ul>
+<li>Modified to use <span class="code">data.onclick</span>, <span class="code">data.onmouseover</span> and <span class="code">data.onmouseout</span> on pie/donut/gauge instead of its callbacks</li>
+<li>Modified <span class="code">unload</span> interface</li>
+<li>Bug fixes</li>
+<li><a href="https://github.com/c3js/c3/releases/tag/0.2.5">and more...</a></li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.4">v0.2.4</a><span class="gray">&nbsp;-&nbsp;2014-06-16</span>
+<ul>
+<li>Added new options such as <span class="code">pie.sort</span>, <span class="code">donut.sort</span>, <span class="code">bar.zerobased</span>, <span class="code">area.zerobased</span></li>
+<li>Added new API such as <span class="code">category</span>, <span class="code">categories</span></li>
+<li>Bug fixes</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.3">v0.2.3</a><span class="gray">&nbsp;-&nbsp;2014-06-04</span>
+<ul>
+<li>Renamed callbacks (onend/onenter/onleave)</li>
+<li>Added extension for zoom with reduction (by <a href="https://github.com/danelkhen">@danelkhen</a> Thank you!)</li>
+<li>Bug fixes</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.2">v0.2.2</a><span class="gray">&nbsp;-&nbsp;2014-06-03</span>
+<ul>
+<li>Supported ungrouped tooltip</li>
+<li>Added zoom.enable API</li>
+<li>Bug fixes</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.1">v0.2.1</a><span class="gray">&nbsp;-&nbsp;2014-06-02</span>
+<ul>
+<li>Bug fixes</li>
+</ul>
+</li>
+<li>
+<a href="https://github.com/c3js/c3/releases/tag/0.2.0">v0.2.0</a><span class="gray">&nbsp;-&nbsp;2014-05-30</span>
+<ul>
+<li>Supported step line/area, stacked line/area, stacked line/area, gauge chart</li>
+<li>Supported JSON as input</li>
+<li>Added flow API</li>
+<li>etc</li>
+</ul>
+</li>
+<li><a href="https://github.com/c3js/c3/releases/tag/0.1.42">v0.1.42</a><span class="gray">&nbsp;-&nbsp;2014-05-18</span></li>
+</ul>
+<h3>Browser Support</h3>
+<p>Because of the dependence on D3, C3 supports only modern browsers D3 supports. Please see <a href="https://github.com/mbostock/d3/wiki#browser--platform-support">the description in D3</a>.</p>
+<p>Note: For IE9 and IE10, polyfill is required because c3 uses <span class="code">MutationObserver</span>, which is not supported in those versions. However, it's not required if charts always will be binded to the DOM specified by <span class="code">bindto</span> because <span class="code">MutationObserver</span> is not called in that case.</p>
+<h3>Dependency</h3>
+<ul>
+<li><a href="https://github.com/mbostock/d3" target="_blank">D3.js</a> <span class="code">^4.12.0</span></li>
+</ul>
+<p>Note: If you need to use D3 v3.x, please use C3 <a href="https://unpkg.com/c3@0.4.22/c3.js">v0.4.22</a>, which is compatible with D3 v3.x.</p>
+<h3>License</h3>
+<p>MIT</p>
+<footer>
+<hr>
+<p>&copy Masayuki Tanaka 2014</p>
+</footer>
+
+</div>
+<script src="/js/jquery-1.11.0.min-910066fb.js" type="text/javascript"></script>
+<script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
+<script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
+<script src="/js/d3-4.13.0.min-1190977b.js" type="text/javascript"></script>
+<script src="/js/c3.min-2c29991b.js" type="text/javascript"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  $(document).foundation();
+</script>
+
+<script src="/js/index-d5877282.js" type="text/javascript"></script>
+
+</body>
+</html>

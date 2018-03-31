@@ -1,0 +1,18 @@
+.c3-xgrid-line line {
+    stroke: blue;
+}
+.c3-xgrid-line.grid4 line {
+    stroke: pink;
+}
+.c3-xgrid-line.grid4 text {
+    fill: pink;
+}
+.c3-ygrid-line line {
+    stroke: red;
+}
+.c3-ygrid-line.grid800 line {
+    stroke: green;
+}
+.c3-ygrid-line.grid800 text {
+    fill: green;
+}

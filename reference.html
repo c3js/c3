@@ -1,0 +1,6653 @@
+<!DOCTYPE html>
+<html class='no-js'>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='D3 based reusable chart library' name='description'>
+<meta content='c3js.org' name='author'>
+<meta content='width=device-width' name='viewport'>
+<title>C3.js | D3-based reusable chart library</title>
+<link href="/css/normalize-e465cb86.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/foundation.min-978d4ce8.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/tomorrow-d7cf0921.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/c3-57883d58.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/style-99fb8989.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/reference-c1e7962f.css" media="screen" rel="stylesheet" type="text/css" />
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-42896059-3', 'c3js.org');
+  ga('send', 'pageview');
+</script>
+<script src="/js/vendor/modernizr-2.6.1.min-68fdcc99.js" type="text/javascript"></script>
+</head>
+<body class='antialiased'>
+<div class='sticky'>
+<nav class='top-bar' data-options='sticky_on: large' data-topbar>
+<ul class='title-area'>
+<li class='name'>
+<h1>
+<a href='/'>C3.js | D3-based reusable chart library</a>
+</h1>
+</li>
+<li class='toggle-topbar menu-icon'>
+<a href='#'>
+<span>Menu</span>
+</a>
+</li>
+</ul>
+<section class='top-bar-section'>
+<ul class='right'>
+<li class='has-form'>
+<a class='button' href='/gettingstarted.html'>Getting Started</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/examples.html'>Examples</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='/reference.html'>Reference</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://groups.google.com/forum/#!forum/c3js' target='_blank'>Forum</a>
+</li>
+<li class='divider'></li>
+<li>
+<a href='https://github.com/c3js/c3' target='_blank'>Source</a>
+</li>
+</ul>
+</section>
+</nav>
+</div>
+<div class='container sidemenu'>
+<div class='row'>
+<div class='large-3 medium-4 columns column-menu'>
+<div class='side-bar'>
+<ul class='side-nav'>
+<li>
+<strong>OPTIONS</strong>
+</li>
+<li>Chart</li>
+<li>
+<a href='#bindto'>bindto</a>
+
+</li>
+
+<li>
+<a href='#size-width'>size.width</a>
+
+</li>
+
+<li>
+<a href='#size-height'>size.height</a>
+
+</li>
+
+<li>
+<a href='#padding-top'>padding.top</a>
+
+</li>
+
+<li>
+<a href='#padding-right'>padding.right</a>
+
+</li>
+
+<li>
+<a href='#padding-bottom'>padding.bottom</a>
+
+</li>
+
+<li>
+<a href='#padding-left'>padding.left</a>
+
+</li>
+
+<li>
+<a href='#color-pattern'>color.pattern</a>
+
+</li>
+
+<li>
+<a href='#color-threshold'>color.threshold</a>
+
+</li>
+
+<li>
+<a href='#interaction-enabled'>interaction.enabled</a>
+
+</li>
+
+<li>
+<a href='#transition-duration'>transition.duration</a>
+
+</li>
+
+<li>
+<a href='#oninit'>oninit</a>
+
+</li>
+
+<li>
+<a href='#onrendered'>onrendered</a>
+
+</li>
+
+<li>
+<a href='#onmouseover'>onmouseover</a>
+
+</li>
+
+<li>
+<a href='#onmouseout'>onmouseout</a>
+
+</li>
+
+<li>
+<a href='#onresize'>onresize</a>
+
+</li>
+
+<li>
+<a href='#onresized'>onresized</a>
+
+</li>
+
+<li>Data</li>
+<li>
+<a href='#data-url'>data.url</a>
+
+</li>
+
+<li>
+<a href='#data-json'>data.json</a>
+
+</li>
+
+<li>
+<a href='#data-rows'>data.rows</a>
+
+</li>
+
+<li>
+<a href='#data-columns'>data.columns</a>
+
+</li>
+
+<li>
+<a href='#data-mimeType'>data.mimeType</a>
+
+</li>
+
+<li>
+<a href='#data-keys'>data.keys</a>
+
+</li>
+
+<li>
+<a href='#data-x'>data.x</a>
+
+</li>
+
+<li>
+<a href='#data-xs'>data.xs</a>
+
+</li>
+
+<li>
+<a href='#data-xFormat'>data.xFormat</a>
+
+</li>
+
+<li>
+<a href='#data-xLocaltime'>data.xLocaltime</a>
+
+</li>
+
+<li>
+<a href='#data-xSort'>data.xSort</a>
+
+</li>
+
+<li>
+<a href='#data-names'>data.names</a>
+
+</li>
+
+<li>
+<a href='#data-classes'>data.classes</a>
+
+</li>
+
+<li>
+<a href='#data-groups'>data.groups</a>
+
+</li>
+
+<li>
+<a href='#data-axes'>data.axes</a>
+
+</li>
+
+<li>
+<a href='#data-type'>data.type</a>
+
+</li>
+
+<li>
+<a href='#data-types'>data.types</a>
+
+</li>
+
+<li>
+<a href='#data-labels'>data.labels</a>
+
+</li>
+
+<li>
+<a href='#data-order'>data.order</a>
+
+</li>
+
+<li>
+<a href='#data-regions'>data.regions</a>
+
+</li>
+
+<li>
+<a href='#data-color'>data.color</a>
+
+</li>
+
+<li>
+<a href='#data-colors'>data.colors</a>
+
+</li>
+
+<li>
+<a href='#data-hide'>data.hide</a>
+
+</li>
+
+<li>
+<a href='#data-empty-label-text'>data.empty.label.text</a>
+
+</li>
+
+<li>
+<a href='#data-selection-enabled'>data.selection.enabled</a>
+
+</li>
+
+<li>
+<a href='#data-selection-grouped'>data.selection.grouped</a>
+
+</li>
+
+<li>
+<a href='#data-selection-multiple'>data.selection.multiple</a>
+
+</li>
+
+<li>
+<a href='#data-selection-draggable'>data.selection.draggable</a>
+
+</li>
+
+<li>
+<a href='#data-selection-isselectable'>data.selection.isselectable</a>
+
+</li>
+
+<li>
+<a href='#data-onclick'>data.onclick</a>
+
+</li>
+
+<li>
+<a href='#data-onmouseover'>data.onmouseover</a>
+
+</li>
+
+<li>
+<a href='#data-onmouseout'>data.onmouseout</a>
+
+</li>
+
+<li>
+<a href='#data-onselected'>data.onselected</a>
+
+</li>
+
+<li>
+<a href='#data-onunselected'>data.onunselected</a>
+
+</li>
+
+<li>Axis</li>
+<li>
+<a href='#axis-rotated'>axis.rotated</a>
+
+</li>
+
+<li>
+<a href='#axis-x-show'>axis.x.show</a>
+
+</li>
+
+<li>
+<a href='#axis-x-type'>axis.x.type</a>
+
+</li>
+
+<li>
+<a href='#axis-x-localtime'>axis.x.localtime</a>
+
+</li>
+
+<li>
+<a href='#axis-x-categories'>axis.x.categories</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-centered'>axis.x.tick.centered</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-format'>axis.x.tick.format</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-culling'>axis.x.tick.culling</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-culling-max'>axis.x.tick.culling.max</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-count'>axis.x.tick.count</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-fit'>axis.x.tick.fit</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-values'>axis.x.tick.values</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-rotate'>axis.x.tick.rotate</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-outer'>axis.x.tick.outer</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-multiline'>axis.x.tick.multiline</a>
+
+</li>
+
+<li>
+<a href='#axis-x-tick-width'>axis.x.tick.width</a>
+
+</li>
+
+<li>
+<a href='#axis-x-max'>axis.x.max</a>
+
+</li>
+
+<li>
+<a href='#axis-x-min'>axis.x.min</a>
+
+</li>
+
+<li>
+<a href='#axis-x-padding'>axis.x.padding</a>
+
+</li>
+
+<li>
+<a href='#axis-x-height'>axis.x.height</a>
+
+</li>
+
+<li>
+<a href='#axis-x-extent'>axis.x.extent</a>
+
+</li>
+
+<li>
+<a href='#axis-x-label'>axis.x.label</a>
+
+</li>
+
+<li>
+<a href='#axis-y-show'>axis.y.show</a>
+
+</li>
+
+<li>
+<a href='#axis-y-type'>axis.y.type</a>
+
+</li>
+
+<li>
+<a href='#axis-y-inner'>axis.y.inner</a>
+
+</li>
+
+<li>
+<a href='#axis-y-max'>axis.y.max</a>
+
+</li>
+
+<li>
+<a href='#axis-y-min'>axis.y.min</a>
+
+</li>
+
+<li>
+<a href='#axis-y-inverted'>axis.y.inverted</a>
+
+</li>
+
+<li>
+<a href='#axis-y-center'>axis.y.center</a>
+
+</li>
+
+<li>
+<a href='#axis-y-label'>axis.y.label</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-format'>axis.y.tick.format</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-outer'>axis.y.tick.outer</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-values'>axis.y.tick.values</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-count'>axis.y.tick.count</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-time-value'>axis.y.tick.time.value</a>
+
+</li>
+
+<li>
+<a href='#axis-y-tick-time-interval'>axis.y.tick.time.interval</a>
+
+</li>
+
+<li>
+<a href='#axis-y-padding'>axis.y.padding</a>
+
+</li>
+
+<li>
+<a href='#axis-y-default'>axis.y.default</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-show'>axis.y2.show</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-inner'>axis.y2.inner</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-max'>axis.y2.max</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-min'>axis.y2.min</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-inverted'>axis.y2.inverted</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-center'>axis.y2.center</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-label'>axis.y2.label</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-tick-format'>axis.y2.tick.format</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-tick-outer'>axis.y2.tick.outer</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-tick-values'>axis.y2.tick.values</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-tick-count'>axis.y2.tick.count</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-padding'>axis.y2.padding</a>
+
+</li>
+
+<li>
+<a href='#axis-y2-default'>axis.y2.default</a>
+
+</li>
+
+<li>Grid</li>
+<li>
+<a href='#grid-x-show'>grid.x.show</a>
+
+</li>
+
+<li>
+<a href='#grid-x-lines'>grid.x.lines</a>
+
+</li>
+
+<li>
+<a href='#grid-y-show'>grid.y.show</a>
+
+</li>
+
+<li>
+<a href='#grid-y-lines'>grid.y.lines</a>
+
+</li>
+
+<li>
+<a href='#grid-y-ticks'>grid.y.ticks</a>
+
+</li>
+
+<li>
+<a href='#grid-focus-show'>grid.focus.show</a>
+
+</li>
+
+<li>
+<a href='#grid-lines-front'>grid.lines.front</a>
+
+</li>
+
+<li>Region</li>
+<li>
+<a href='#regions'>regions</a>
+
+</li>
+
+<li>Legend</li>
+<li>
+<a href='#legend-show'>legend.show</a>
+
+</li>
+
+<li>
+<a href='#legend-hide'>legend.hide</a>
+
+</li>
+
+<li>
+<a href='#legend-position'>legend.position</a>
+
+</li>
+
+<li>
+<a href='#legend-inset'>legend.inset</a>
+
+</li>
+
+<li>
+<a href='#legend-item-onclick'>legend.item.onclick</a>
+
+</li>
+
+<li>
+<a href='#legend-item-onmouseover'>legend.item.onmouseover</a>
+
+</li>
+
+<li>
+<a href='#legend-item-onmouseout'>legend.item.onmouseout</a>
+
+</li>
+
+<li>Tooltip</li>
+<li>
+<a href='#tooltip-show'>tooltip.show</a>
+
+</li>
+
+<li>
+<a href='#tooltip-grouped'>tooltip.grouped</a>
+
+</li>
+
+<li>
+<a href='#tooltip-format-title'>tooltip.format.title</a>
+
+</li>
+
+<li>
+<a href='#tooltip-format-name'>tooltip.format.name</a>
+
+</li>
+
+<li>
+<a href='#tooltip-format-value'>tooltip.format.value</a>
+
+</li>
+
+<li>
+<a href='#tooltip-position'>tooltip.position</a>
+
+</li>
+
+<li>
+<a href='#tooltip-contents'>tooltip.contents</a>
+
+</li>
+
+<li>Subchart</li>
+<li>
+<a href='#subchart-show'>subchart.show</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#subchart-size-height'>subchart.size.height</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#subchart-onbrush'>subchart.onbrush</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>Zoom</li>
+<li>
+<a href='#zoom-enabled'>zoom.enabled</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-rescale'>zoom.rescale</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-extent'>zoom.extent</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-onzoom'>zoom.onzoom</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-onzoomstart'>zoom.onzoomstart</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-onzoomend'>zoom.onzoomend</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>Point</li>
+<li>
+<a href='#point-show'>point.show</a>
+
+</li>
+
+<li>
+<a href='#point-r'>point.r</a>
+
+</li>
+
+<li>
+<a href='#point-focus-expand-enabled'>point.focus.expand.enabled</a>
+
+</li>
+
+<li>
+<a href='#point-focus-expand-r'>point.focus.expand.r</a>
+
+</li>
+
+<li>
+<a href='#point-select-r'>point.select.r</a>
+
+</li>
+
+<li>Line</li>
+<li>
+<a href='#line-connectNull'>line.connectNull</a>
+
+</li>
+
+<li>
+<a href='#line-step-type'>line.step.type</a>
+
+</li>
+
+<li>Area</li>
+<li>
+<a href='#area-zerobased'>area.zerobased</a>
+
+</li>
+
+<li>Bar</li>
+<li>
+<a href='#bar-width'>bar.width</a>
+
+</li>
+
+<li>
+<a href='#bar-width-ratio'>bar.width.ratio</a>
+
+</li>
+
+<li>
+<a href='#bar-zerobased'>bar.zerobased</a>
+
+</li>
+
+<li>Pie</li>
+<li>
+<a href='#pie-label-show'>pie.label.show</a>
+
+</li>
+
+<li>
+<a href='#pie-label-format'>pie.label.format</a>
+
+</li>
+
+<li>
+<a href='#pie-label-threshold'>pie.label.threshold</a>
+
+</li>
+
+<li>
+<a href='#pie-expand'>pie.expand</a>
+
+</li>
+
+<li>Donut</li>
+<li>
+<a href='#donut-label-show'>donut.label.show</a>
+
+</li>
+
+<li>
+<a href='#donut-label-format'>donut.label.format</a>
+
+</li>
+
+<li>
+<a href='#donut-label-threshold'>donut.label.threshold</a>
+
+</li>
+
+<li>
+<a href='#donut-expand'>donut.expand</a>
+
+</li>
+
+<li>
+<a href='#donut-width'>donut.width</a>
+
+</li>
+
+<li>
+<a href='#donut-title'>donut.title</a>
+
+</li>
+
+<li>Gauge</li>
+<li>
+<a href='#gauge-label-show'>gauge.label.show</a>
+
+</li>
+
+<li>
+<a href='#gauge-label-format'>gauge.label.format</a>
+
+</li>
+
+<li>
+<a href='#gauge-expand'>gauge.expand</a>
+
+</li>
+
+<li>
+<a href='#gauge-min'>gauge.min</a>
+
+</li>
+
+<li>
+<a href='#gauge-max'>gauge.max</a>
+
+</li>
+
+<li>
+<a href='#gauge-units'>gauge.units</a>
+
+</li>
+
+<li>
+<a href='#gauge-width'>gauge.width</a>
+
+</li>
+
+<li class='margin-medium-top'>
+<strong>API</strong>
+</li>
+<li>
+<a href='#api-focus'>focus</a>
+
+</li>
+
+<li>
+<a href='#api-defocus'>defocus</a>
+
+</li>
+
+<li>
+<a href='#api-revert'>revert</a>
+
+</li>
+
+<li>
+<a href='#api-show'>show</a>
+
+</li>
+
+<li>
+<a href='#api-hide'>hide</a>
+
+</li>
+
+<li>
+<a href='#api-toggle'>toggle</a>
+
+</li>
+
+<li>
+<a href='#api-load'>load</a>
+
+</li>
+
+<li>
+<a href='#api-unload'>unload</a>
+
+</li>
+
+<li>
+<a href='#api-flow'>flow</a>
+
+</li>
+
+<li>
+<a href='#api-select'>select</a>
+
+</li>
+
+<li>
+<a href='#api-unselect'>unselect</a>
+
+</li>
+
+<li>
+<a href='#api-selected'>selected</a>
+
+</li>
+
+<li>
+<a href='#api-transform'>transform</a>
+
+</li>
+
+<li>
+<a href='#api-groups'>groups</a>
+
+</li>
+
+<li>
+<a href='#api-xgrids'>xgrids</a>
+
+</li>
+
+<li>
+<a href='#api-xgrids-add'>xgrids.add</a>
+
+</li>
+
+<li>
+<a href='#api-xgrids-remove'>xgrids.remove</a>
+
+</li>
+
+<li>
+<a href='#api-ygrids'>ygrids</a>
+
+</li>
+
+<li>
+<a href='#api-ygrids-add'>ygrids.add</a>
+
+</li>
+
+<li>
+<a href='#api-ygrids-remove'>ygrids.remove</a>
+
+</li>
+
+<li>
+<a href='#api-regions'>regions</a>
+
+</li>
+
+<li>
+<a href='#api-regions-add'>regions.add</a>
+
+</li>
+
+<li>
+<a href='#api-regions-remove'>regions.remove</a>
+
+</li>
+
+<li>
+<a href='#api-data'>data</a>
+
+</li>
+
+<li>
+<a href='#api-data-shown'>data.shown</a>
+
+</li>
+
+<li>
+<a href='#api-data-values'>data.values</a>
+
+</li>
+
+<li>
+<a href='#api-data-names'>data.names</a>
+
+</li>
+
+<li>
+<a href='#api-data-colors'>data.colors</a>
+
+</li>
+
+<li>
+<a href='#api-data-axes'>data.axes</a>
+
+</li>
+
+<li>
+<a href='#api-category'>category</a>
+
+</li>
+
+<li>
+<a href='#api-categories'>categories</a>
+
+</li>
+
+<li>
+<a href='#api-x'>x</a>
+
+</li>
+
+<li>
+<a href='#api-xs'>xs</a>
+
+</li>
+
+<li>
+<a href='#api-axis-labels'>axis.labels</a>
+
+</li>
+
+<li>
+<a href='#api-axis-min'>axis.min</a>
+
+</li>
+
+<li>
+<a href='#api-axis-max'>axis.max</a>
+
+</li>
+
+<li>
+<a href='#api-axis-range'>axis.range</a>
+
+</li>
+
+<li>
+<a href='#api-legend-show'>legend.show</a>
+
+</li>
+
+<li>
+<a href='#api-legend-hide'>legend.hide</a>
+
+</li>
+
+<li>
+<a href='#api-tooltip-show'>tooltip.show</a>
+
+</li>
+
+<li>
+<a href='#api-tooltip-hide'>tooltip.hide</a>
+
+</li>
+
+<li>
+<a href='#api-zoom'>zoom</a>
+
+</li>
+
+<li>
+<a href='#api-unzoom'>unzoom</a>
+
+</li>
+
+<li>
+<a href='#api-zoom-enable'>zoom.enable</a>
+
+</li>
+
+<li>
+<a href='#api-resize'>resize</a>
+
+</li>
+
+<li>
+<a href='#api-flush'>flush</a>
+
+</li>
+
+<li>
+<a href='#api-destroy'>destroy</a>
+
+</li>
+
+<li class='margin-medium-top'>
+<strong>CLASS</strong>
+</li>
+<li>
+<a href='#class-c3-chart'>c3-chart</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-line'>c3-chart-line</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-lines'>c3-chart-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-bar'>c3-chart-bar</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-bars'>c3-chart-bars</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-text'>c3-chart-text</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-texts'>c3-chart-texts</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arc'>c3-chart-arc</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs'>c3-chart-arcs</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs-title'>c3-chart-arcs-title</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs-background'>c3-chart-arcs-background</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs-gauge-unit'>c3-chart-arcs-gauge-unit</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs-gauge-max'>c3-chart-arcs-gauge-max</a>
+
+</li>
+
+<li>
+<a href='#class-c3-chart-arcs-gauge-min'>c3-chart-arcs-gauge-min</a>
+
+</li>
+
+<li>
+<a href='#class-c3-selected-circle'>c3-selected-circle</a>
+
+</li>
+
+<li>
+<a href='#class-c3-selected-circles'>c3-selected-circles</a>
+
+</li>
+
+<li>
+<a href='#class-c3-event-rect'>c3-event-rect</a>
+
+</li>
+
+<li>
+<a href='#class-c3-event-rects'>c3-event-rects</a>
+
+</li>
+
+<li>
+<a href='#class-c3-event-rects-single'>c3-event-rects-single</a>
+
+</li>
+
+<li>
+<a href='#class-c3-event-rects-multiple'>c3-event-rects-multiple</a>
+
+</li>
+
+<li>
+<a href='#class-c3-zoom-rect'>c3-zoom-rect</a>
+
+</li>
+
+<li>
+<a href='#class-c3-brush'>c3-brush</a>
+
+</li>
+
+<li>
+<a href='#class-c3-focused'>c3-focused</a>
+
+</li>
+
+<li>
+<a href='#class-c3-region'>c3-region</a>
+
+</li>
+
+<li>
+<a href='#class-c3-regions'>c3-regions</a>
+
+</li>
+
+<li>
+<a href='#class-c3-tooltip'>c3-tooltip</a>
+
+</li>
+
+<li>
+<a href='#class-c3-tooltip-name'>c3-tooltip-name</a>
+
+</li>
+
+<li>
+<a href='#class-c3-shape'>c3-shape</a>
+
+</li>
+
+<li>
+<a href='#class-c3-shapes'>c3-shapes</a>
+
+</li>
+
+<li>
+<a href='#class-c3-line'>c3-line</a>
+
+</li>
+
+<li>
+<a href='#class-c3-lines'>c3-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-bar'>c3-bar</a>
+
+</li>
+
+<li>
+<a href='#class-c3-bars'>c3-bars</a>
+
+</li>
+
+<li>
+<a href='#class-c3-circle'>c3-circle</a>
+
+</li>
+
+<li>
+<a href='#class-c3-circles'>c3-circles</a>
+
+</li>
+
+<li>
+<a href='#class-c3-arc'>c3-arc</a>
+
+</li>
+
+<li>
+<a href='#class-c3-arcs'>c3-arcs</a>
+
+</li>
+
+<li>
+<a href='#class-c3-area'>c3-area</a>
+
+</li>
+
+<li>
+<a href='#class-c3-areas'>c3-areas</a>
+
+</li>
+
+<li>
+<a href='#class-c3-empty'>c3-empty</a>
+
+</li>
+
+<li>
+<a href='#class-c3-text'>c3-text</a>
+
+</li>
+
+<li>
+<a href='#class-c3-texts'>c3-texts</a>
+
+</li>
+
+<li>
+<a href='#class-c3-gauge-value'>c3-gauge-value</a>
+
+</li>
+
+<li>
+<a href='#class-c3-grid'>c3-grid</a>
+
+</li>
+
+<li>
+<a href='#class-c3-xgrid'>c3-xgrid</a>
+
+</li>
+
+<li>
+<a href='#class-c3-xgrids'>c3-xgrids</a>
+
+</li>
+
+<li>
+<a href='#class-c3-xgrid-line'>c3-xgrid-line</a>
+
+</li>
+
+<li>
+<a href='#class-c3-xgrid-lines'>c3-xgrid-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-xgrid-focus'>c3-xgrid-focus</a>
+
+</li>
+
+<li>
+<a href='#class-c3-ygrid'>c3-ygrid</a>
+
+</li>
+
+<li>
+<a href='#class-c3-ygrids'>c3-ygrids</a>
+
+</li>
+
+<li>
+<a href='#class-c3-ygrid-line'>c3-ygrid-line</a>
+
+</li>
+
+<li>
+<a href='#class-c3-ygrid-lines'>c3-ygrid-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis'>c3-axis</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-x'>c3-axis-x</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-x-label'>c3-axis-x-label</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-y'>c3-axis-y</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-y-label'>c3-axis-y-label</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-y2'>c3-axis-y2</a>
+
+</li>
+
+<li>
+<a href='#class-c3-axis-y2-label'>c3-axis-y2-label</a>
+
+</li>
+
+<li>
+<a href='#class-c3-legend-item'>c3-legend-item</a>
+
+</li>
+
+<li>
+<a href='#class-c3-legend-item-event'>c3-legend-item-event</a>
+
+</li>
+
+<li>
+<a href='#class-c3-legend-item-tile'>c3-legend-item-tile</a>
+
+</li>
+
+<li>
+<a href='#class-c3-legend-item-hidden'>c3-legend-item-hidden</a>
+
+</li>
+
+<li>
+<a href='#class-c3-legend-item-focused'>c3-legend-item-focused</a>
+
+</li>
+
+</ul>
+</div>
+</div>
+<div class='large-9 medium-8 columns column-content'>
+<h2>Options</h2>
+<hr>
+<section>
+<h3>
+<a href='#bindto'>bindto</a>
+
+</h3>
+<p>The CSS selector or the element which the chart will be set to. D3 selection object can be specified. If other chart is set already, it will be replaced with the new one (only one chart can be set in one element).</p>
+<br>
+<p>If this option is not specified, the chart will be generated but not be set. Instead, we can access the element by <span class="code">chart.element</span> and set it by ourselves.</p>
+<h5>Note:</h5>
+<p>When chart is not binded, c3 starts observing if <span class="code">chart.element</span> is binded by <span class="code">MutationObserver</span>. In this case, polyfill is required in IE9 and IE10 because they do not support <span class="code">MutationObserver</span>. On the other hand, if chart always will be binded, polyfill will not be required because <span class="code">MutationObserver</span> will never be called.</p>
+<h5>Default:</h5>
+<code>#chart</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>bindto: '#myContainer'
+// or element
+bindto: document.getElementById('myContainer')
+// or D3 selection object
+bindto: d3.select('#myContainer')</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#size-width'>size.width</a>
+
+</h3>
+<p>The desired width of the chart element.</p>
+<br>
+<p>If this option is not specified, the width of the chart will be calculated by the size of the parent element it's appended to.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>size: {
+&nbsp;&nbsp;width: 640
+}</code></pre>
+</div>
+<h5>Note:</h5>
+<p>This option should be specified if possible because it can improve its performance because some size calculations will be skipped by an explicit value.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#size-height'>size.height</a>
+
+</h3>
+<p>The desired height of the chart element.</p>
+<br>
+<p>If this option is not specified, the height of the chart will be calculated by the size of the parent element it's appended to.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>size: {
+&nbsp;&nbsp;height: 480
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#padding-top'>padding.top</a>
+
+</h3>
+<p>The padding on the top of the chart.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>padding: {
+&nbsp;&nbsp;top: 20
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_padding.html'>Padding for the chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#padding-right'>padding.right</a>
+
+</h3>
+<p>The padding on the right of the chart.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>padding: {
+&nbsp;&nbsp;right: 20
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_padding.html'>Padding for the chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#padding-bottom'>padding.bottom</a>
+
+</h3>
+<p>The padding on the bottom of the chart.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>padding: {
+&nbsp;&nbsp;bottom: 20
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_padding.html'>Padding for the chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#padding-left'>padding.left</a>
+
+</h3>
+<p>The padding on the left of the chart.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>padding: {
+&nbsp;&nbsp;left: 20
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_padding.html'>Padding for the chart</a>
+</li>
+</ul>
+<h5>Note:</h5>
+<p>This option should be specified if possible because it can improve its performance because some size calculations will be skipped by an explicit value.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#color-pattern'>color.pattern</a>
+
+</h3>
+<p>Set custom color pattern.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>color: {
+&nbsp;&nbsp;pattern: ['#1f77b4', '#aec7e8', ...]
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_color.html'>Custom color pattern</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#color-threshold'>color.threshold</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#interaction-enabled'>interaction.enabled</a>
+
+</h3>
+<p>Indicate if the chart should have interactions.</p>
+<br>
+<p>If <code>false</code> is set, all of interactions (showing/hiding tooltip, selection, mouse events, etc) will be disabled.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>interaction: {
+&nbsp;&nbsp;enabled: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#transition-duration'>transition.duration</a>
+
+</h3>
+<p>Set duration of transition (in milliseconds) for chart animation.</p>
+<h5>Note:</h5>
+<p>If <span class="code">0</span> or <span class="code">null</span> set, transition will be skipped. So, this makes initial rendering faster especially in case you have a lot of data.</p>
+<h5>Default:</h5>
+<code>350</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>transition: {
+&nbsp;&nbsp;duration: 500
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/transition_duration.html'>Change the duration of transition</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#oninit'>oninit</a>
+
+</h3>
+<p>Set a callback to execute when the chart is initialized.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>oninit: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#onrendered'>onrendered</a>
+
+</h3>
+<p>Set a callback which is executed when the chart is rendered. Basically, this callback will be called in each time when the chart is redrawed.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>onrendered: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#onmouseover'>onmouseover</a>
+
+</h3>
+<p>Set a callback to execute when mouse enters the chart.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>onmouseover: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#onmouseout'>onmouseout</a>
+
+</h3>
+<p>Set a callback to execute when mouse leaves the chart.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>onmouseout: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#onresize'>onresize</a>
+
+</h3>
+<p>Set a callback to execute when user resizes the screen.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>onresize: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#onresized'>onresized</a>
+
+</h3>
+<p>Set a callback to execute when screen resize finished.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>onresized: function () { ... }</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-url'>data.url</a>
+
+</h3>
+<p>Load a CSV or JSON file from a URL. Note that this will not work if loading via the "file://" protocol as the most browsers will block XMLHTTPRequests.</p>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>var chart = c3.generate({
+&nbsp;&nbsp;data: {
+&nbsp;&nbsp;&nbsp;&nbsp;url: '/data/c3_test.csv'
+&nbsp;&nbsp;}
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-json'>data.json</a>
+
+</h3>
+<p>Parse a JSON object for data. See also data.keys.</p>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>var chart = c3.generate({
+&nbsp;&nbsp;data: {
+&nbsp;&nbsp;&nbsp;&nbsp;json: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site1.com', upload: 200, download: 200, total: 400},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site2.com', upload: 100, download: 300, total: 400},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site3.com', upload: 300, download: 200, total: 500},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site4.com', upload: 400, download: 100, total: 500}
+&nbsp;&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;&nbsp;keys: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// x: 'name', // it's possible to specify 'x' when category axis
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value: ['upload', 'download']
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;axis: {
+&nbsp;&nbsp;&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// type: 'category'
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-rows'>data.rows</a>
+
+</h3>
+<p>Load data from a multidimensional array, with the first element containing the data names, the following containing related data in that order.</p>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>rows: [
+&nbsp;&nbsp;['data1', 'data2', 'data3'],
+&nbsp;&nbsp;[90, 120, 300],
+&nbsp;&nbsp;[40, 160, 240],
+&nbsp;&nbsp;[50, 200, 290],
+&nbsp;&nbsp;[120, 160, 230],
+&nbsp;&nbsp;[80, 130, 300],
+&nbsp;&nbsp;[90, 220, 320]
+]</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-columns'>data.columns</a>
+
+</h3>
+<p>Load data from a multidimensional array, with each element containing an array consisting of a datum name and associated data values.</p>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>columns: [
+&nbsp;&nbsp;['data1', 30, 20, 50, 40, 60, 50],
+&nbsp;&nbsp;['data2', 200, 130, 90, 240, 130, 220],
+&nbsp;&nbsp;['data3', 300, 200, 160, 400, 250, 250]
+]</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-mimeType'>data.mimeType</a>
+
+</h3>
+<p>Used if loading JSON via data.url:</p>
+<div class='sourcecode'>
+<pre><code class='html javascript'>{data: {mimeType: 'json'}}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-keys'>data.keys</a>
+
+</h3>
+<p>Choose which JSON object keys correspond to desired data.</p>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>var chart = c3.generate({
+&nbsp;&nbsp;data: {
+&nbsp;&nbsp;&nbsp;&nbsp;json: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site1.com', upload: 200, download: 200, total: 400},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site2.com', upload: 100, download: 300, total: 400},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site3.com', upload: 300, download: 200, total: 500},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{name: 'www.site4.com', upload: 400, download: 100, total: 500}
+&nbsp;&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;&nbsp;keys: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// x: 'name', // it's possible to specify 'x' when category axis
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value: ['upload', 'download']
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;axis: {
+&nbsp;&nbsp;&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// type: 'category'
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-x'>data.x</a>
+
+</h3>
+<p>Specify the key of x values in the data.</p>
+<br>
+<p>We can show the data with non-index x values by this option. This option is required when the type of x axis is timeseries. If this option is set on category axis, the values of the data on the key will be used for category names.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;x: 'date'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/simple_xy.html'>XY Chart</a>
+</li>
+<li>
+<a href='/samples/timeseries.html'>Timeseries Chart</a>
+</li>
+<li>
+<a href='/samples/data_stringx.html'>Category Names</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-xs'>data.xs</a>
+
+</h3>
+<p>Specify the keys of the x values for each data.</p>
+<br>
+<p>This option can be used if we want to show the data that has different x values.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;xs: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: 'x1',
+&nbsp;&nbsp;&nbsp;&nbsp;data2: 'x2'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/simple_xy_multiple.html'>Multiple XY Chart</a>
+</li>
+</ul>
+<h5>Note:</h5>
+<p><a href="#data-x">data.x</a> should be used if the all of data have same x values.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-xFormat'>data.xFormat</a>
+
+</h3>
+<p>Set a format to parse string specified as x.</p>
+<h5>Default:</h5>
+<code>%Y-%m-%d</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;xFormat: '%Y-%m-%d %H:%M:%S'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/timeseries.html'>Timeseries Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-xLocaltime'>data.xLocaltime</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-xSort'>data.xSort</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-names'>data.names</a>
+
+</h3>
+<p>Set custom data name.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;names: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: 'Data Name 1',
+&nbsp;&nbsp;&nbsp;&nbsp;data2: 'Data Name 2'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_name.html'>Data Name</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-classes'>data.classes</a>
+
+</h3>
+<p>Set custom data class.</p>
+<br>
+<p>If this option is specified, the element <span class="code">g</span> for the data has an additional class that has the prefix <span class="code">c3-target-</span> (e.g. <span class="code">c3-target-additional-data1-class</span>).</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;classes: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: 'additional-data1-class',
+&nbsp;&nbsp;&nbsp;&nbsp;data2: 'additional-data2-class'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-groups'>data.groups</a>
+
+</h3>
+<p>Set groups for the data for stacking.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;groups: [
+&nbsp;&nbsp;&nbsp;&nbsp;['data1', 'data2'],
+&nbsp;&nbsp;&nbsp;&nbsp;['data3']
+&nbsp;&nbsp;]
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_bar_stacked.html'>Stacked Bar Chart</a>
+</li>
+<li>
+<a href='/samples/chart_area_stacked.html'>Stacked Area Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-axes'>data.axes</a>
+
+</h3>
+<p>Set y axis the data related to. <span class="code">y</span> and <span class="code">y2</span> can be used.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;axes: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: 'y',
+&nbsp;&nbsp;&nbsp;&nbsp;data2: 'y2'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_y2.html'>Additional Y Axis</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-type'>data.type</a>
+
+</h3>
+<p>Set chart type at once.</p>
+<br>
+<p>If this option is specified, the type will be applied to every data. This setting can be overwritten by <a href="#data-types">data.types</a>.</p>
+<h5>Available Values:</h5>
+<ul>
+<li>line</li>
+<li>spline</li>
+<li>step</li>
+<li>area</li>
+<li>area-spline</li>
+<li>area-step</li>
+<li>bar</li>
+<li>scatter</li>
+<li>pie</li>
+<li>donut</li>
+<li>gauge</li>
+</ul>
+<h5>Default:</h5>
+<code>line</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;type: 'bar'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_spline.html'>Spline Chart</a>
+</li>
+<li>
+<a href='/samples/chart_step.html'>Step Chart</a>
+</li>
+<li>
+<a href='/samples/chart_area.html'>Area Chart</a>
+</li>
+<li>
+<a href='/samples/chart_bar.html'>Bar Chart</a>
+</li>
+<li>
+<a href='/samples/chart_scatter.html'>Scatter Chart</a>
+</li>
+<li>
+<a href='/samples/chart_pie.html'>Pie Chart</a>
+</li>
+<li>
+<a href='/samples/chart_donut.html'>Donut Chart</a>
+</li>
+<li>
+<a href='/samples/chart_gauge.html'>Gauge Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-types'>data.types</a>
+
+</h3>
+<p>Set chart type for each data.</p>
+<br>
+<p>This setting overwrites <a href="#data-type">data.type</a> setting.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;types: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: 'bar'
+&nbsp;&nbsp;&nbsp;&nbsp;data2: 'spline'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_combination.html'>Combination Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-labels'>data.labels</a>
+
+</h3>
+<p>Show labels on each data points.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;labels: true
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_label.html'>Data Label</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-labels-format'>data.labels.format</a>
+
+</h3>
+<p>Set formatter function for data labels.</p>
+<br>
+<p>The formatter function receives 4 arguments such as <span class="code">v</span>, <span class="code">id</span>, <span class="code">i</span>, <span class="code">j</span> and it must return a string that will be shown as the label. The arguments are:</p>
+<br>
+<ul>
+<li><span class="code">v</span> is the value of the data point where the label is shown.</li>
+<li><span class="code">id</span> is the id of the data where the label is shown.</li>
+<li><span class="code">i</span> is the index of the data point where the label is shown.</li>
+<li><span class="code">j</span> is the sub index of the data point where the label is shown.</li>
+</ul>
+<p>Formatter function can be defined for each data by specifying as an object and D3 formatter function can be set (e.g. <span class="code">d3.format('$')</span>)</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;labels: {
+&nbsp;&nbsp;&nbsp;&nbsp;format: function (v, id, i, j) { ... }
+&nbsp;&nbsp;&nbsp;&nbsp;// it's possible to set for each data
+&nbsp;&nbsp;&nbsp;&nbsp;//format: {
+&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;data1: function (v, id, i, j) { ... },
+&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;...
+&nbsp;&nbsp;&nbsp;&nbsp;//}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_label_format.html'>Data Label Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-order'>data.order</a>
+
+</h3>
+<p>Define the order of the data.</p>
+<br>
+<p>This option changes the order of stacking the data and pieces of pie/donut. If <code>null</code> specified, it will be the order the data loaded. If function specified, it will be used to sort the data and it will receive the data as argument.</p>
+<h5>Available Values:</h5>
+<ul>
+<li>desc</li>
+<li>asc</li>
+<li><span class="code">function (data1, data2) { ... }</span></li>
+<li><code>null</code></li>
+</ul>
+<h5>Default:</h5>
+<code>desc</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;order: 'asc'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_order.html'>Data Order</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-regions'>data.regions</a>
+
+</h3>
+<p>Define regions for each data.</p>
+<br>
+<p>The values must be an array for each data and it should include an object that has <span class="code">start</span>, <span class="code">end</span>, <span class="code">style</span>. If <span class="code">start</span> is not set, the start will be the first data point. If <span class="code">end</span> is not set, the end will be the last data point.</p>
+<br>
+<p>Currently this option supports only line chart and dashed style. If this option specified, the line will be dashed only in the regions.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;regions: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: [{'start':1, 'end':2, 'style':'dashed'},{'start':3}],
+&nbsp;&nbsp;&nbsp;&nbsp;...
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/simple_regions.html'>Line Chart with Region</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-color'>data.color</a>
+
+</h3>
+<p>Set color converter function.</p>
+<br>
+<p>This option should a function and the specified function receives <span class="code">color</span> (e.g. '#ff0000') and <span class="code">d</span> that has data parameters like id, value, index, etc. And it must return a string that represents color (e.g. '#00ff00').</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;color: function (color, d) { ... }
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_color.html'>Data Color</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-colors'>data.colors</a>
+
+</h3>
+<p>Set color for each data.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;colors: {
+&nbsp;&nbsp;&nbsp;&nbsp;data1: '#ff0000',
+&nbsp;&nbsp;&nbsp;&nbsp;...
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/data_color.html'>Data Color</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-hide'>data.hide</a>
+
+</h3>
+<p>Hide each data when the chart appears.</p>
+<br>
+<p>If <code>true</code> specified, all of data will be hidden. If multiple ids specified as an array, those will be hidden.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;// all of data will be hidden
+&nbsp;&nbsp;hide: true
+&nbsp;&nbsp;// specified data will be hidden
+&nbsp;&nbsp;hide: ['data1', ...]
+}</code></pre>
+</div>
+<h5>Note:</h5>
+<p>This option does not hide legends, so we need to use <a href="#legend-hide">legend.hide</a> option together if we want to hide legend too.</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-empty-label-text'>data.empty.label.text</a>
+
+</h3>
+<p>Set text displayed when empty data.</p>
+<h5>Default:</h5>
+<code>""</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;empty: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: "No Data"
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-selection-enabled'>data.selection.enabled</a>
+
+</h3>
+<p>Set data selection enabled.</p>
+<br>
+<p>If this option is set <code>true</code>, we can select the data points and get/set its state of selection by API (e.g. <a>select</a>, <a>unselect</a>, <a>selected</a>).</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;selection: {
+&nbsp;&nbsp;&nbsp;&nbsp;enabled: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-selection-grouped'>data.selection.grouped</a>
+
+</h3>
+<p>Set grouped selection enabled.</p>
+<br>
+<p>If this option set <code>true</code>, multiple data points that have same x value will be selected by one selection.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;selection: {
+&nbsp;&nbsp;&nbsp;&nbsp;grouped: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-selection-multiple'>data.selection.multiple</a>
+
+</h3>
+<p>Set multiple data points selection enabled.</p>
+<br>
+<p>If this option set <code>true</code>, multiple data points can have the selected state at the same time. If <code>false</code> set, only one data point can have the selected state and the others will be unselected when the new data point is selected.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;selection: {
+&nbsp;&nbsp;&nbsp;&nbsp;multiple: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-selection-draggable'>data.selection.draggable</a>
+
+</h3>
+<p>Enable to select data points by dragging.</p>
+<br>
+<p>If this option set <code>true</code>, data points can be selected by dragging.</p>
+<h5>Note:</h5>
+<p>If this option set <code>true</code>, scrolling on the chart will be disabled because dragging event will handle the event.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;selection: {
+&nbsp;&nbsp;&nbsp;&nbsp;draggable: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-selection-isselectable'>data.selection.isselectable</a>
+
+</h3>
+<p>Set a callback for each data point to determine if it's selectable or not.</p>
+<br>
+<p>The callback will receive <span class="code">d</span> as an argument and it has some parameters like <span class="code">id</span>, <span class="code">value</span>, <span class="code">index</span>. This callback should return <span class="code">boolean</span>.</p>
+<h5>Default:</h5>
+<code>function () { return true; }</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;selection: {
+&nbsp;&nbsp;&nbsp;&nbsp;isselectable: function (d) { ... }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-onclick'>data.onclick</a>
+
+</h3>
+<p>Set a callback for click event on each data point.</p>
+<br>
+<p>This callback will be called when each data point clicked and will receive <span class="code">d</span> and <span class="code">element</span> as the arguments. <span class="code">d</span> is the data clicked and <span class="code">element</span> is the element clicked. In this callback, <span class="code">this</span> will be the <span class="code">Chart</span> object.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;onclick: function (d, element) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-onmouseover'>data.onmouseover</a>
+
+</h3>
+<p>Set a callback for mouseover event on each data point.</p>
+<br>
+<p>This callback will be called when mouse cursor moves onto each data point and will receive <span class="code">d</span> as the argument. <span class="code">d</span> is the data where mouse cursor moves onto. In this callback, <span class="code">this</span> will be the <span class="code">Chart</span> object.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;onmouseover: function (d) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-onmouseout'>data.onmouseout</a>
+
+</h3>
+<p>Set a callback for mouseout event on each data point.</p>
+<br>
+<p>This callback will be called when mouse cursor moves out each data point and will receive <span class="code">d</span> as the argument. <span class="code">d</span> is the data where mouse cursor moves out. In this callback, <span class="code">this</span> will be the <span class="code">Chart</span> object.</p>
+<h5>Default:</h5>
+<code>function () {}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;onmouseout: function (d) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-onselected'>data.onselected</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-onunselected'>data.onunselected</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-ondragstart'>data.ondragstart</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-ondragend'>data.ondragend</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-rotated'>axis.rotated</a>
+
+</h3>
+<p>Switch x and y axis position.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;rotated: true
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_rotated.html'>Rotated Axis</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-show'>axis.x.show</a>
+
+</h3>
+<p>Show or hide x axis.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-type'>axis.x.type</a>
+
+</h3>
+<p>Set type of x axis.</p>
+<h5>Available Values</h5>
+<ul>
+<li>timeseries</li>
+<li>category</li>
+<li>indexed</li>
+</ul>
+<h5>Default:</h5>
+<code>indexed</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'timeseries'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/timeseries.html'>Timeseries Chart</a>
+</li>
+<li>
+<a href='/samples/categorized.html'>Category Axis</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-localtime'>axis.x.localtime</a>
+
+</h3>
+<p>Set how to treat the timezone of x values.</p>
+<br>
+<p>If true, treat x value as localtime. If false, convert to UTC internally.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;localtime: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_localtime.html'>X Axis Timezone</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-categories'>axis.x.categories</a>
+
+</h3>
+<p>Set category names on category axis.</p>
+<br>
+<p>This must be an array that includes category names in string. If category names are included in the date by <span class="code">data.x</span> option, this is not required.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;categories: ['Category 1', 'Category 2', ...]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/categorized.html'>Category Axis</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-centered'>axis.x.tick.centered</a>
+
+</h3>
+<p>Centerise ticks on category axis.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;centered: true
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-format'>axis.x.tick.format</a>
+
+</h3>
+<p>A function to format tick value. Format string is also available for timeseries data.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;format: function (x) { return x.getFullYear(); }
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-culling'>axis.x.tick.culling</a>
+
+</h3>
+<p>Setting for culling ticks.</p>
+<br>
+<p>If <code>true</code> is set, the ticks will be culled, then only limitted tick text will be shown. This option does not hide the tick lines. If <code>false</code> is set, all of ticks will be shown.</p>
+<br>
+<p>We can change the number of ticks to be shown by <a href="#axis-x-tick-culling-max">axis.x.tick.culling.max</a>.</p>
+<h5>Default:</h5>
+<ul>
+<li><code>true</code> for indexed axis and timeseries axis</li>
+<li><code>false</code> for category axis</li>
+</ul>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;culling: false
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_culling.html'>X Axis Tick Culling</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-culling-max'>axis.x.tick.culling.max</a>
+
+</h3>
+<p>The number of tick texts will be adjusted to less than this value.</p>
+<h5>Default:</h5>
+<code>10</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;culling: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max: 5
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_culling.html'>X Axis Tick Culling</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-count'>axis.x.tick.count</a>
+
+</h3>
+<p>The number of x axis ticks to show.</p>
+<br>
+<p>This option hides tick lines together with tick text. If this option is used on timeseries axis, the ticks position will be determined precisely and not nicely positioned (e.g. it will have rough second value).</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count: 5
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_count.html'>X Axis Tick Count</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-fit'>axis.x.tick.fit</a>
+
+</h3>
+<p>Fit x axis ticks.</p>
+<br>
+<p>If <code>true</code> set, the ticks will be positioned nicely. If <code>false</code> set, the ticks will be positioned according to x value of the data points.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fit: true
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_fit.html'>X Axis Tick Fit</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-values'>axis.x.tick.values</a>
+
+</h3>
+<p>Set the x values of ticks manually.</p>
+<br>
+<p>If this option is provided, the position of the ticks will be determined based on those values. This option works with timeseries data and the x values will be parsed accoding to the type of the value and <a href="#data-xFormat">data.xFormat</a> option.</p>
+<h5>Default:</h5>
+<code>null</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values: [1, 2, 4, 8, 16, 32, ...]
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_values.html'>X Axis Tick Values</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-rotate'>axis.x.tick.rotate</a>
+
+</h3>
+<p>Rotate x axis tick text.</p>
+<br>
+<p>If you set negative value, it will rotate to opposite direction.</p>
+<h5>Default:</h5>
+<code>0</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rotate: 60
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_x_tick_rotate.html'>Rotate X Axis Tick Text</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-outer'>axis.x.tick.outer</a>
+
+</h3>
+<p>Show x axis outer tick.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer: false
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-multiline'>axis.x.tick.multiline</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-width'>axis.x.tick.width</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-max'>axis.x.max</a>
+
+</h3>
+<p>Set max value of x axis range.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;max: 100
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-min'>axis.x.min</a>
+
+</h3>
+<p>Set min value of x axis range.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;min: -100
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-padding'>axis.x.padding</a>
+
+</h3>
+<p>Set padding for x axis.</p>
+<br>
+<p>If this option is set, the range of x axis will increase/decrease according to the values. If no padding is needed in the ragen of x axis, <code>0</code> should be set. On category axis, this option will be ignored.</p>
+<h5>Default:</h5>
+<code>{}</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;padding: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left: 0,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;right: 0
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-height'>axis.x.height</a>
+
+</h3>
+<p>Set height of x axis.</p>
+<br>
+<p>The height of x axis can be set manually by this option. If you need more space for x axis, please use this option for that. The unit is <code>pixel</code>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;height: 20
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-extent'>axis.x.extent</a>
+
+</h3>
+<p>Set default extent for subchart and zoom. This can be an array or function that returns an array.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;extent: [5, 10]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-label'>axis.x.label</a>
+
+</h3>
+<p>Set label on x axis.</p>
+<br>
+<p>You can set x axis label and change its position by this option. <code>string</code> and <code>object</code> can be passed and we can change the poisiton by passing <code>object</code> that has <span class="code">position</span> key. Available position differs according to the axis direction (vertical or horizontal). If <code>string</code> set, the position will be the default.</p>
+<br>
+<p>If it's horizontal axis:</p>
+<ul>
+<li>inner-right <code>[default]</code></li>
+<li>inner-center</li>
+<li>inner-left</li>
+<li>outer-right</li>
+<li>outer-center</li>
+<li>outer-left</li>
+</ul>
+<p>If it's vertical axis:</p>
+<ul>
+<li>inner-top <code>[default]</code></li>
+<li>inner-middle</li>
+<li>inner-bottom</li>
+<li>outer-top</li>
+<li>outer-middle</li>
+<li>outer-bottom</li>
+</ul>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: 'Your X Axis'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: 'Your X Axis',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position: 'outer-center'
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_label.html'>Axis Label</a>
+</li>
+<li>
+<a href='/samples/axes_label_position.html'>Axis Label Position</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-show'>axis.y.show</a>
+
+</h3>
+<p>Show or hide y axis.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: false
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-inner'>axis.y.inner</a>
+
+</h3>
+<p>Show y axis inside of the chart.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;inner: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-type'>axis.y.type</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-max'>axis.y.max</a>
+
+</h3>
+<p>Set max value of y axis.</p>
+<h5>Note:</h5>
+<p>Padding will be added based on this value, so if you don't need the padding, please set <span class="code">axis.y.padding</span> to disable it (e.g. <span class="code">axis.y.padding = 0</span>).</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;max: 1000
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_y_range.html'>Y Axis Range</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-min'>axis.y.min</a>
+
+</h3>
+<p>Set min value of y axis.</p>
+<h5>Note:</h5>
+<p>Padding will be added based on this value, so if you don't need the padding, please set <span class="code">axis.y.padding</span> to disable it (e.g. <span class="code">axis.y.padding = 0</span>).</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;min: 1000
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_y_range.html'>Y Axis Range</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-inverted'>axis.y.inverted</a>
+
+</h3>
+<p>Change the direction of y axis.</p>
+<br>
+<p>If <code>true</code> set, the direction will be from the top to the bottom.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;inverted: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-center'>axis.y.center</a>
+
+</h3>
+<p>Set center value of y axis.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;center: 0
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-label'>axis.y.label</a>
+
+</h3>
+<p>Set label on y axis.</p>
+<br>
+<p>You can set y axis label and change its position by this option. This option works in the same way as <a href="#axis-x-label">axis.x.label</a>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: 'Your Y Axis'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: 'Your Y Axis',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position: 'outer-middle'
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_label.html'>Axis Label</a>
+</li>
+<li>
+<a href='/samples/axes_label_position.html'>Axis Label Position</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-format'>axis.y.tick.format</a>
+
+</h3>
+<p>Set formatter for y axis tick text.</p>
+<br>
+<p>This option accepts <span class="code">d3.format</span> object as well as a function you define.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;format: d3.format('$,')
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//or format: function (d) { return '$' + d; }
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_y_tick_format.html'>Y Axis Tick Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-outer'>axis.y.tick.outer</a>
+
+</h3>
+<p>Show or hide outer tick.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer: false
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-values'>axis.y.tick.values</a>
+
+</h3>
+<p>Set y axis tick values manually.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values: [100, 1000, 10000]
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-count'>axis.y.tick.count</a>
+
+</h3>
+<p>Set the number of y axis ticks.</p>
+<h5>Note:</h5>
+<p>The position of the ticks will be calculated precisely, so the values on the ticks will not be rounded nicely. In the case, <span class="code">axis.y.tick.format</span> or <span class="code">axis.y.tick.values</span> will be helpful.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count: 5
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-time-value'>axis.y.tick.time.value</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-tick-time-interval'>axis.y.tick.time.interval</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-padding'>axis.y.padding</a>
+
+</h3>
+<p>Set padding for y axis.</p>
+<br>
+<p>You can set padding for y axis to create more space on the edge of the axis. This option accepts <code>object</code> and it can include <span class="code">top</span> and <span class="code">bottom</span>. <span class="code">top</span>, <span class="code">bottom</span> will be treated as pixels.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;padding: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top: 100,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bottom: 100
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_y_padding.html'>Y Axis Tick Padding</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y-default'>axis.y.default</a>
+
+</h3>
+<p>Set default range of y axis.</p>
+<br>
+<p>This option set the default value for y axis when there is no data on init.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;default: [0, 1000]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-show'>axis.y2.show</a>
+
+</h3>
+<p>Show or hide y2 axis.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-inner'>axis.y2.inner</a>
+
+</h3>
+<p>Show y2 axis inside of the chart.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;inner: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-max'>axis.y2.max</a>
+
+</h3>
+<p>Set max value of y2 axis.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;max: 1000
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-min'>axis.y2.min</a>
+
+</h3>
+<p>Set min value of y2 axis.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;min: -1000
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-inverted'>axis.y2.inverted</a>
+
+</h3>
+<p>Change the direction of y2 axis.</p>
+<br>
+<p>If <code>true</code> set, the direction will be from the top to the bottom.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;inverted: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-center'>axis.y2.center</a>
+
+</h3>
+<p>Set center value of y2 axis.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;center: 0
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-label'>axis.y2.label</a>
+
+</h3>
+<p>Set label on y2 axis.</p>
+<br>
+<p>You can set y2 axis label and change its position by this option. This option works in the same way as <a href="#axis-x-label">axis.x.label</a>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: 'Your Y2 Axis'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: 'Your Y2 Axis',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position: 'outer-middle'
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/axes_label.html'>Axis Label</a>
+</li>
+<li>
+<a href='/samples/axes_label_position.html'>Axis Label Position</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-tick-format'>axis.y2.tick.format</a>
+
+</h3>
+<p>Set formatter for y axis tick text.</p>
+<br>
+<p>This option works in the same way as <a href="#axis-y-format">axis.y.format</a>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;format: d3.format('$,')
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//or format: function (d) { return '$' + d; }
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-tick-outer'>axis.y2.tick.outer</a>
+
+</h3>
+<p>Show or hide y2 axis outer tick.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer: false
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-tick-values'>axis.y2.tick.values</a>
+
+</h3>
+<p>Set y2 axis tick values manually.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values: [100, 1000, 10000]
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-tick-count'>axis.y2.tick.count</a>
+
+</h3>
+<p>Set the number of y2 axis ticks.</p>
+<h5>Note:</h5>
+<p>This works in the same way as <a href="#axis-y-tick-count">axis.y.tick.count</a>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count: 5
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-padding'>axis.y2.padding</a>
+
+</h3>
+<p>Set padding for y2 axis.</p>
+<br>
+<p>This works in the same way as <a href="#axis-y-padding">axis.y.padding</a>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;padding: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top: 100,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bottom: 100
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-default'>axis.y2.default</a>
+
+</h3>
+<p>Set default range of y2 axis.</p>
+<br>
+<p>This option set the default value for y2 axis when there is no data on init.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;default: [0, 1000]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#grid-x-show'>grid.x.show</a>
+
+</h3>
+<p>Show grids along x axis.</p>
+<br>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>grid: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_gridline.html'>Grid Lines</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#grid-x-lines'>grid.x.lines</a>
+
+</h3>
+<p>Show additional grid lines along x axis.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">value</span>, <span class="code">text</span>, <span class="code">position</span> and <span class="code">class</span>. <span class="code">text</span>, <span class="code">position</span> and <span class="code">class</span> are optional. For <span class="code">position</span>, <span class="code">start</span>, <span class="code">middle</span> and <span class="code">end</span> (default) are available.</p>
+<p>If x axis is category axis, <span class="code">value</span> can be category name. If x axis is timeseries axis, <span class="code">value</span> can be date string, Date object and unixtime integer.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>grid: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;lines: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 2, text: 'Label on 2'},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 5, text: 'Label on 5', class: 'label-5'},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 6, text: 'Label on 6', position: 'start'}
+&nbsp;&nbsp;&nbsp;&nbsp;]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/grid_x_lines.html'>Additional X Grid Lines</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#grid-y-show'>grid.y.show</a>
+
+</h3>
+<p>Show grids along y axis.</p>
+<br>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>grid: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_gridline.html'>Grid Lines</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#grid-y-lines'>grid.y.lines</a>
+
+</h3>
+<p>Show additional grid lines along y axis.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">value</span>, <span class="code">text</span>, <span class="code">position</span> and <span class="code">class</span>.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>grid: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;lines: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 100, text: 'Label on 100'},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 200, text: 'Label on 200', class: 'label-200'},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{value: 300, text: 'Label on 300', position: 'middle'}
+&nbsp;&nbsp;&nbsp;&nbsp;]
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/grid_y_lines.html'>Additional Y Grid Lines</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#grid-y-ticks'>grid.y.ticks</a>
+
+</h3>
+<p>not yet</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#regions'>regions</a>
+
+</h3>
+<p>Show rectangles inside the chart.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">axis</span>, <span class="code">start</span>, <span class="code">end</span> and <span class="code">class</span>. The keys <span class="code">start</span>, <span class="code">end</span> and <span class="code">class</span> are optional.</p>
+<p><span class="code">axis</span> must be <span class="code">x</span>, <span class="code">y</span> or <span class="code">y2</span>. <span class="code">start</span> and <span class="code">end</span> should be the value where regions start and end. If not specified, the edge values will be used. If timeseries x axis, date string, Date object and unixtime integer can be used. If <span class="code">class</span> is set, the region element will have it as class.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>regions: [
+&nbsp;&nbsp;{axis: 'x', start: 1, end: 4, class: 'region-1-4'}
+]</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/region.html'>Regions</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-show'>legend.show</a>
+
+</h3>
+<p>Show or hide legend.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;show: true
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_legend.html'>Hide Legend</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-hide'>legend.hide</a>
+
+</h3>
+<p>Hide legend</p>
+<br>
+<p>If <code>true</code> given, all legend will be hidden. If <code>string</code> or <code>array</code> given, only the legend that has the id will be hidden.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;hide: true
+&nbsp;&nbsp;//or hide: 'data1'
+&nbsp;&nbsp;//or hide: ['data1', 'data2']
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-position'>legend.position</a>
+
+</h3>
+<p>Change the position of legend.</p>
+<br>
+<p>Currently <span class="code">bottom</span>, <span class="code">right</span> and <span class="code">inset</span> are supported.</p>
+<h5>Default:</h5>
+<code>bottom</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;position: 'bottom'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/legend_position.html'>Legend Position</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-inset'>legend.inset</a>
+
+</h3>
+<p>Change inset legend attributes.</p>
+<br>
+<p>This option accepts <code>object</code> that has the keys <span class="code">anchor</span>, <span class="code">x</span>, <span class="code">y</span> and <span class="code">step</span>.</p>
+<p><span class="code">anchor</span> decides the position of the legend. These anchors are available:</p>
+<ul>
+<li>top-left</li>
+<li>top-right</li>
+<li>bottom-left</li>
+<li>bottom-right</li>
+</ul>
+<p><span class="code">x</span> and <span class="code">y</span> set the position of the legend based on the anchor.</p>
+<p><span class="code">step</span> defines the max step the legend has (e.g. If 2 set and legend has 3 legend item, the legend 2 columns).</p>
+<h5>Default:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>{
+&nbsp;&nbsp;anchor: 'top-left',
+&nbsp;&nbsp;x: 10,
+&nbsp;&nbsp;y: 0,
+&nbsp;&nbsp;step: undefined
+}</code></pre>
+</div>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;inset: {
+&nbsp;&nbsp;&nbsp;&nbsp;anchor: 'top-right',
+&nbsp;&nbsp;&nbsp;&nbsp;x: 20,
+&nbsp;&nbsp;&nbsp;&nbsp;y: 10,
+&nbsp;&nbsp;&nbsp;&nbsp;step: 2
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-item-onclick'>legend.item.onclick</a>
+
+</h3>
+<p>Set click event handler to the legend item.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;item: {
+&nbsp;&nbsp;&nbsp;&nbsp;onclick: function (id) { ... }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/legend_custom.html'>Custom Legend</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-item-onmouseover'>legend.item.onmouseover</a>
+
+</h3>
+<p>Set mouseover event handler to the legend item.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;item: {
+&nbsp;&nbsp;&nbsp;&nbsp;onmouseover: function (id) { ... }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/legend_custom.html'>Custom Legend</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#legend-item-onmouseout'>legend.item.onmouseout</a>
+
+</h3>
+<p>Set mouseout event handler to the legend item.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>legend: {
+&nbsp;&nbsp;item: {
+&nbsp;&nbsp;&nbsp;&nbsp;onmouseout: function (id) { ... }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/legend_custom.html'>Custom Legend</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-show'>tooltip.show</a>
+
+</h3>
+<p>Show or hide tooltip.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;show: false
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/tooltip_show.html'>Hide Tooltip</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-grouped'>tooltip.grouped</a>
+
+</h3>
+<p>Set if tooltip is grouped or not for the data points.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;grouped: false
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/tooltip_grouped.html'>Tooltip Grouping</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-format-title'>tooltip.format.title</a>
+
+</h3>
+<p>Set format for the title of tooltip.</p>
+<br>
+<p>Specified function receives <span class="code">x</span> of the data point to show.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;format: {
+&nbsp;&nbsp;&nbsp;&nbsp;title: function (x) { return 'Data ' + x; }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/tooltip_format.html'>Tooltip Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-format-name'>tooltip.format.name</a>
+
+</h3>
+<p>Set format for the name of each data in tooltip.</p>
+<br>
+<p>Specified function receives <span class="code">name</span>, <span class="code">ratio</span>, <span class="code">id</span> and <span class="code">index</span> of the data point to show. <span class="code">ratio</span> will be <code>undefined</code> if the chart is not donut/pie/gauge.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;format: {
+&nbsp;&nbsp;&nbsp;&nbsp;name: function (name, ratio, id, index) { return name; }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/tooltip_format.html'>Tooltip Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-format-value'>tooltip.format.value</a>
+
+</h3>
+<p>Set format for the value of each data in tooltip.</p>
+<br>
+<p>Specified function receives <span class="code">name</span>, <span class="code">ratio</span>, <span class="code">id</span> and <span class="code">index</span> of the data point to show. <span class="code">ratio</span> will be <code>undefined</code> if the chart is not donut/pie/gauge.</p>
+<p>If <code>undefined</code> returned, the row of that value will be skipped.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;format: {
+&nbsp;&nbsp;&nbsp;&nbsp;value: function (value, ratio, id, index) { return ratio; }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/tooltip_format.html'>Tooltip Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-position'>tooltip.position</a>
+
+</h3>
+<p>Set custom position for the tooltip.</p>
+<br>
+<p>This option can be used to modify the tooltip position by returning <code>object</code> that has <span class="code">top</span> and <span class="code">left</span>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;position: function (data, width, height, element) {
+&nbsp;&nbsp;&nbsp;&nbsp;return {top: 0, left: 0};
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Reference:</h5>
+<ul>
+<li>
+<a href='https://github.com/c3js/c3/pull/833'>Introduce tooltip.position callback function #833</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#tooltip-contents'>tooltip.contents</a>
+
+</h3>
+<p>Set custom HTML for the tooltip.</p>
+<br>
+<p>Specified function receives <span class="code">data</span>, <span class="code">defaultTitleFormat</span>, <span class="code">defaultValueFormat</span> and <span class="code">color</span> of the data point to show. If <span class="code">tooltip.grouped</span> is <code>true</code>, <span class="code">data</span> includes multiple data points.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>tooltip: {
+&nbsp;&nbsp;contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+&nbsp;&nbsp;&nbsp;&nbsp;return ... // formatted html as you want
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#subchart-show'>subchart.show</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Show sub chart on the bottom of the chart.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>subchart: {
+&nbsp;&nbsp;show: true
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/options_subchart.html'>Subchart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#subchart-size-height'>subchart.size.height</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Change the height of the subchart.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>subchart: {
+&nbsp;&nbsp;size: {
+&nbsp;&nbsp;&nbsp;&nbsp;height: 20
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#subchart-onbrush'>subchart.onbrush</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Set callback for brush event.</p>
+<br>
+<p>Specified function receives the current zoomed x domain.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>subchart: {
+&nbsp;&nbsp;onbrush: function (domain) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-enabled'>zoom.enabled</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Enable zooming.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;enabled: false
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/interaction_zoom.html'>Zoom</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-rescale'>zoom.rescale</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Enable to rescale after zooming.</p>
+<br>
+<p>If <code>true</code> set, y domain will be updated according to the zoomed region.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;rescale: true
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-extent'>zoom.extent</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Change zoom extent.</p>
+<h5>Default:</h5>
+<code>[1, 10]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;extent: [1, 100] // enable more zooming
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-onzoom'>zoom.onzoom</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Set callback that is called when the chart is zooming.</p>
+<br>
+<p>Specified function receives the zoomed domain.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;onzoom: function (domain) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-onzoomstart'>zoom.onzoomstart</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Set callback that is called when zooming starts.</p>
+<br>
+<p>Specified function receives the zoom event.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;onzoomstart: function (event) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-onzoomend'>zoom.onzoomend</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Set callback that is called when zooming ends.</p>
+<br>
+<p>Specified function receives the zoomed domain.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;onzoomend: function (domain) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#point-show'>point.show</a>
+
+</h3>
+<p>Whether to show each point in line.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>point: {
+&nbsp;&nbsp;show: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#point-r'>point.r</a>
+
+</h3>
+<p>The radius size of each point.</p>
+<h5>Default:</h5>
+<code>2.5</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>point: {
+&nbsp;&nbsp;r: 5
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#point-focus-expand-enabled'>point.focus.expand.enabled</a>
+
+</h3>
+<p>Whether to expand each point on focus.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>point: {
+&nbsp;&nbsp;focus: {
+&nbsp;&nbsp;&nbsp;&nbsp;expand: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enabled: true
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#point-focus-expand-r'>point.focus.expand.r</a>
+
+</h3>
+<p>The radius size of each point on focus.</p>
+<h5>Default:</h5>
+<code>point.r * 1.75</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>point: {
+&nbsp;&nbsp;focus: {
+&nbsp;&nbsp;&nbsp;&nbsp;expand: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r: 1
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#point-select-r'>point.select.r</a>
+
+</h3>
+<p>The radius size of each point on selected.</p>
+<h5>Default:</h5>
+<code>point.r * 4</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>point: {
+&nbsp;&nbsp;select: {
+&nbsp;&nbsp;&nbsp;&nbsp;r: 3
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#line-connectNull'>line.connectNull</a>
+
+</h3>
+<p>Set if null data point will be connected or not.</p>
+<br>
+<p>If <code>true</code> set, the region of null data will be connected without any data point. If <code>false</code> set, the region of null data will not be connected and get empty.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>line: {
+&nbsp;&nbsp;connectNull: true
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#line-step-type'>line.step.type</a>
+
+</h3>
+<p>Change step type for step chart.</p>
+<br>
+<p><span class="code">step</span>, <span class="code">step-before</span> and <span class="code">step-after</span> can be used.</p>
+<h5>Default:</h5>
+<code>'step'</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>line: {
+&nbsp;&nbsp;step: {
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'step-after'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#area-zerobased'>area.zerobased</a>
+
+</h3>
+<p>Set if min or max value will be 0 on area chart.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>area: {
+&nbsp;&nbsp;zerobased: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#bar-width'>bar.width</a>
+
+</h3>
+<p>Change the width of bar chart.</p>
+<h5>Default:</h5>
+<code>auto</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>bar: {
+&nbsp;&nbsp;width: 10
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_bar.html'>Bar Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#bar-width-ratio'>bar.width.ratio</a>
+
+</h3>
+<p>Change the width of bar chart by ratio.</p>
+<h5>Default:</h5>
+<code>0.6</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>bar: {
+&nbsp;&nbsp;width: {
+&nbsp;&nbsp;&nbsp;&nbsp;ratio: 0.2
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_bar.html'>Bar Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#bar-zerobased'>bar.zerobased</a>
+
+</h3>
+<p>Set if min or max value will be 0 on bar chart.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>bar: {
+&nbsp;&nbsp;zerobased: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#pie-label-show'>pie.label.show</a>
+
+</h3>
+<p>Show or hide label on each pie piece.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>pie: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: false
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#pie-label-format'>pie.label.format</a>
+
+</h3>
+<p>Set formatter for the label on each pie piece.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>pie: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;format: function (value, ratio, id) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return d3.format('$')(value);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/pie_label_format.html'>Pie Label Format</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#pie-label-threshold'>pie.label.threshold</a>
+
+</h3>
+<p>Set threshold to show/hide labels.</p>
+<h5>Default:</h5>
+<code>0.05</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>pie: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;threshold: 0.1
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#pie-expand'>pie.expand</a>
+
+</h3>
+<p>Enable or disable expanding pie pieces.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>pie: {
+&nbsp;&nbsp;expand: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-label-show'>donut.label.show</a>
+
+</h3>
+<p>Show or hide label on each donut piece.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: false
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-label-format'>donut.label.format</a>
+
+</h3>
+<p>Set formatter for the label on each donut piece.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;format: function (value, ratio, id) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return d3.format('$')(value);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-label-threshold'>donut.label.threshold</a>
+
+</h3>
+<p>Set threshold to show/hide labels.</p>
+<h5>Default:</h5>
+<code>0.05</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;threshold: 0.1
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-expand'>donut.expand</a>
+
+</h3>
+<p>Enable or disable expanding donut pieces.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;expand: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-width'>donut.width</a>
+
+</h3>
+<p>Set width of donut chart.</p>
+<h5>Default:</h5>
+<code>auto</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;width: 10
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#donut-title'>donut.title</a>
+
+</h3>
+<p>Set title of donut chart.</p>
+<h5>Default:</h5>
+<code>''</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>donut: {
+&nbsp;&nbsp;title: 'Title'
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-label-show'>gauge.label.show</a>
+
+</h3>
+<p>Show or hide label on gauge.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;show: false
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-label-format'>gauge.label.format</a>
+
+</h3>
+<p>Set formatter for the label on gauge.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;label: {
+&nbsp;&nbsp;&nbsp;&nbsp;format: function (value, ratio) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return value;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_gauge.html'>Gauge Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-expand'>gauge.expand</a>
+
+</h3>
+<p>Enable or disable expanding gauge.</p>
+<h5>Default:</h5>
+<code>true</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;expand: false
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-min'>gauge.min</a>
+
+</h3>
+<p>Set min value of the gauge.</p>
+<h5>Default:</h5>
+<code>0</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;min: -100
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-max'>gauge.max</a>
+
+</h3>
+<p>Set max value of the gauge.</p>
+<h5>Default:</h5>
+<code>100</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;max: 200
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-units'>gauge.units</a>
+
+</h3>
+<p>Set units of the gauge.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;units: ' %'
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#gauge-width'>gauge.width</a>
+
+</h3>
+<p>Set width of gauge chart.</p>
+<h5>Default:</h5>
+<code>auto</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>gauge: {
+&nbsp;&nbsp;width: 10
+}</code></pre>
+</div>
+</section>
+<hr>
+<br>
+<section>
+<h2>API</h2>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-focus'>focus</a>
+
+</h3>
+<p>This API highlights specified targets and fade out the others.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be highlighted.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.focus(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be highlighted.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be highlighted and the others will be faded out
+chart.focus('data1');
+
+// data1 and data2 will be highlighted and the others will be faded out
+chart.focus(['data1', 'data2']);
+
+// all targets will be highlighted
+chart.focus();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-defocus'>defocus</a>
+
+</h3>
+<p>This API fades out specified targets and reverts the others.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be faded out.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.defocus(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be faded out.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be faded out and the others will be reverted.
+chart.defocus('data1');
+
+// data1 and data2 will be faded out and the others will be reverted.
+chart.defocus(['data1', 'data2']);
+
+// all targets will be faded out.
+chart.defocus();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-revert'>revert</a>
+
+</h3>
+<p>This API reverts specified targets.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be reverted.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.revert(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be reverted.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be reverted.
+chart.revert('data1');
+
+// data1 and data2 will be reverted.
+chart.revert(['data1', 'data2']);
+
+// all targets will be reverted.
+chart.revert();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-show'>show</a>
+
+</h3>
+<p>This API shows specified targets.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be shown.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.show(targetIds, options)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be shown.</p>
+<br>
+<p><span class="code">options</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">withLegend</span> is set <code>true</code>, legend will be shown together with the specified data.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be shown.
+chart.show('data1');
+
+// data1 and data2 will be shown.
+chart.show(['data1', 'data2']);
+
+// all targets will be shown.
+chart.show();
+
+// data1 will be shown together with its legend.
+chart.show('data1', {withLegend: true});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-hide'>hide</a>
+
+</h3>
+<p>This API hides specified targets.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be hidden.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.hide(targetIds, options)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be hidden.</p>
+<br>
+<p><span class="code">options</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">withLegend</span> is set <code>true</code>, legend will be hidden together with the specified data.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be hidden.
+chart.hide('data1');
+
+// data1 and data2 will be hidden.
+chart.hide(['data1', 'data2']);
+
+// all targets will be hidden.
+chart.hide();
+
+// data1 will be hidden together with its legend.
+chart.hide('data1', {withLegend: true});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-toggle'>toggle</a>
+
+</h3>
+<p>This API toggles (shows or hides) specified targets.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be toggles.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.toggle(targetIds, options)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Target ids to be toggled.</p>
+<br>
+<p><span class="code">options</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">withLegend</span> is set <code>true</code>, legend will be toggled together with the specified data.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 will be toggled.
+chart.toggle('data1');
+
+// data1 and data2 will be toggled.
+chart.toggle(['data1', 'data2']);
+
+// all targets will be toggled.
+chart.toggle();
+
+// data1 will be toggled together with its legend.
+chart.toggle('data1', {withLegend: true});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-load'>load</a>
+
+</h3>
+<p>Load data to the chart.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be toggles.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.load(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">url</span>, <span class="code">json</span>, <span class="code">rows</span> and <span class="code">columns</span> given, the data will be loaded. If data that has the same target id is given, the chart will be updated. Otherwise, new target will be added.</p>
+<br>
+<p>If <span class="code">classes</span> given, the classes specified by <span class="code">data.classes</span> will be updated. <span class="code">classes</span> must be <code>Object</code> that has target id as keys.</p>
+<br>
+<p>If <span class="code">categories</span> given, the categories specified by <span class="code">axis.x.categories</span> or <span class="code">data.x</span> will be updated. <span class="code">categories</span> must be <code>Array</code>.</p>
+<br>
+<p>If <span class="code">axes</span> given, the axes specified by <span class="code">data.axes</span> will be updated. <span class="code">axes</span> must be <code>Object</code> that has target id as keys.</p>
+<br>
+<p>If <span class="code">colors</span> given, the colors specified by <span class="code">data.colors</span> will be updated. <span class="code">colors</span> must be <code>Object</code> that has target id as keys.</p>
+<br>
+<p>If <span class="code">type</span> or <span class="code">types</span> given, the type of targets will be updated. <span class="code">type</span> must be <code>String</code> and <span class="code">types</span> must be <code>Object</code>.</p>
+<br>
+<p>If <span class="code">unload</span> given, data will be unloaded before loading new data. If <code>true</code> given, all of data will be unloaded. If target ids given as <code>String</code> or <code>Array</code>, specified targets will be unloaded.</p>
+<br>
+<p>If <span class="code">done</span> given, the specified function will be called after data loded.</p>
+<h5>Note:</h5>
+<p><span class="code">unload</span> should be used if some data needs to be unloaded simultaneously. If you call <span class="code">unload</span> API soon after/before <span class="code">load</span> instead of <span class="code">unload</span> param, chart will not be rendered properly because of cancel of animation.</p>
+<br>
+<p><span class="code">done</span> will be called after data loaded, but it's not after rendering. It's because rendering will finish after some transition and there is some time lag between loading and rendering.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Load data1 and unload data2 and data3
+chart.load({
+&nbsp;&nbsp;columns: [
+&nbsp;&nbsp;&nbsp;&nbsp;['data1, 100, 200, 150, ...],
+&nbsp;&nbsp;&nbsp;&nbsp;...
+&nbsp;&nbsp;],
+&nbsp;&nbsp;unload: ['data2', 'data3']
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/data_load.html'>Load Data</a>
+</li>
+<li>
+<a href='/samples/data_stringx.html'>Load Category Data</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-unload'>unload</a>
+
+</h3>
+<p>Unload data to the chart.</p>
+<br>
+<p>You can specify multiple targets by giving an array that includes <span class="code">id</span> as <code>String</code>. If no argument is given, all of targets will be toggles.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.unload(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">ids</span> given, the data that has specified target id will be unloaded. <span class="code">ids</span> should be <code>String</code> or <code>Array</code>. If <span class="code">ids</span> is not specified, all data will be unloaded.</p>
+<br>
+<p>If <span class="code">done</span> given, the specified function will be called after data loded.</p>
+<h5>Note:</h5>
+<p>If you call <span class="code">load</span> API soon after/before <span class="code">unload</span>, <span class="code">unload</span> param of <span class="code">load</span> should be used. Otherwise chart will not be rendered properly because of cancel of animation.</p>
+<br>
+<p><span class="code">done</span> will be called after data loaded, but it's not after rendering. It's because rendering will finish after some transition and there is some time lag between loading and rendering.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Unload data2 and data3
+chart.unload({
+&nbsp;&nbsp;ids: ['data2', 'data3']
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-flow'>flow</a>
+
+</h3>
+<p>Flow data to the chart.</p>
+<br>
+<p>By this API, you can append new data points to the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.flow(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">json</span>, <span class="code">rows</span> and <span class="code">columns</span> given, the data will be loaded. If data that has the same target id is given, the chart will be appended. Otherwise, new target will be added. One of these is required when calling. If <span class="code">json</span> specified, <span class="code">keys</span> is required as well as <a href="#data-json">data.json</a></p>
+<br>
+<p>If <span class="code">to</span> is given, the lower x edge will move to that point. If not given, the lower x edge will move by the number of given data points.</p>
+<br>
+<p>If <span class="code">length</span> is given, the lower x edge will move by the number of this argument.</p>
+<br>
+<p>If <span class="code">duration</span> is given, the duration of the transition will be specified value. If not given, <a href="#transition-duration">transition.duration</a> will be used as default.</p>
+<br>
+<p>If <span class="code">done</span> is given, the specified function will be called when flow ends.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// 2 data points will be apprended to the tail and popped from the head.
+// After that, 4 data points will be appended and no data points will be poppoed.
+chart.flow({
+&nbsp;&nbsp;columns: [
+&nbsp;&nbsp;&nbsp;&nbsp;['x', '2013-01-11', '2013-01-21'],
+&nbsp;&nbsp;&nbsp;&nbsp;['data1', 500, 200],
+&nbsp;&nbsp;&nbsp;&nbsp;['data2', 100, 300],
+&nbsp;&nbsp;&nbsp;&nbsp;['data3', 200, 120]
+&nbsp;&nbsp;],
+&nbsp;&nbsp;done: function () {
+&nbsp;&nbsp;&nbsp;&nbsp;chart.flow({
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;columns: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['x', '2013-02-11', '2013-02-12', '2013-02-13', '2013-02-14'],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['data1', 200, 300, 100, 250],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['data2', 100, 90, 40, 120],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['data3', 100, 100, 300, 500]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;length: 0
+&nbsp;&nbsp;&nbsp;&nbsp;});
+&nbsp;&nbsp;}
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_flow.html'>Flow</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-select'>select</a>
+
+</h3>
+<p>Change data point state to selected.</p>
+<br>
+<p>By this API, you can select data points. To use this API, <a href="#data-selection-enabled">data.selection.enabled</a> needs to be set <code>true</code>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.select(ids, indices, resetOthers)</code></pre>
+</div>
+<p><span class="code">ids</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>Specify target ids to be selected. If this argument is not given, all targets will be the candidate.</p>
+<br>
+<p><span class="code">indices</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>Specify indices to be selected. If this argument is not given, all data points will be the candidate.</p>
+<br>
+<p><span class="code">resetOthers</span>&nbsp;&nbsp;<code>boolean</code></p>
+<p>If this argument is set <code>true</code>, the data points that are not specified by <span class="code">ids</span>, <span class="code">indices</span> will be unselected.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// all data points of data1 will be selected.
+chart.select(['data1']);
+
+// 3 data points on index 1, 3, 5 of data1 will be selected.
+chart.select(['data1'], [1,3,5]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-unselect'>unselect</a>
+
+</h3>
+<p>Change data point state to unselected.</p>
+<br>
+<p>By this API, you can unselect data points. To use this API, <a href="#data-selection-enabled">data.selection.enabled</a> needs to be set <code>true</code>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.unselect(ids, indices)</code></pre>
+</div>
+<p><span class="code">ids</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>Specify target ids to be unselected. If this argument is not given, all targets will be the candidate.</p>
+<br>
+<p><span class="code">indices</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>Specify indices to be unselected. If this argument is not given, all data points will be the candidate.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// all data points of data1 will be unselected.
+chart.unselect(['data1']);
+
+// 3 data points on index 1, 3, 5 of data1 will be unselected.
+chart.unselect(['data1'], [1,3,5]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-selected'>selected</a>
+
+</h3>
+<p>Get selected data points.</p>
+<br>
+<p>By this API, you can get selected data points information. To use this API, <a href="#data-selection-enabled">data.selection.enabled</a> needs to be set <code>true</code>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.selected(targetId)</code></pre>
+</div>
+<p><span class="code">targetId</span>&nbsp;&nbsp;<code>String</code></p>
+<p>You can filter the result by giving target id that you want to get. If not given, all of data points will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// all selected data points will be returned.
+chart.selected();
+
+// all selected data points of data1 will be returned.
+chart.selected('data1');</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-transform'>transform</a>
+
+</h3>
+<p>Change the type of the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.transform(type, targetIds)</code></pre>
+</div>
+<p><span class="code">type</span>&nbsp;&nbsp;<code>String</code></p>
+<p>Specify the type to be transformed. The types listed in <a href="#data-type">data.type</a> can be used.</p>
+<br>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>Specify targets to be transformed. If not given, all targets will be the candidate.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// all targets will be bar chart.
+chart.transform('bar');
+
+// only data1 will be bar chart.
+chart.transform('bar', 'data1');
+
+// only data1 and data2 will be bar chart.
+chart.transform('bar', ['data1', 'data2']);</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/transform_line.html'>Transform to Line Chart</a>
+<a href='/samples/transform_bar.html'>Transform to Bar Chart</a>
+<a href='/samples/transform_pie.html'>Transform to Pie Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-groups'>groups</a>
+
+</h3>
+<p>Update groups for the targets.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.groups(groups)</code></pre>
+</div>
+<p><span class="code">groups</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>This argument needs to be an <code>Array</code> that includes one or more <code>Array</code> that includes target ids to be grouped.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// data1 and data2 will be a new group.
+chart.groups([['data1', 'data2']]);</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/chart_bar_stacked.html'>Stacked Bar Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-xgrids'>xgrids</a>
+
+</h3>
+<p>Update x grid lines.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.xgrids(grids)</code></pre>
+</div>
+<p><span class="code">grids</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>X grid lines will be replaced with this argument. The format of this argument is the same as <a href="#grid-x-lines">grid.x.lines</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Show 2 x grid lines
+chart.xgrids([
+&nbsp;&nbsp;{value: 1, text:'Label 1'},
+&nbsp;&nbsp;{value: 4, text: 'Label 4'}
+]);</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_grid_x.html'>X Grids</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-xgrids-add'>xgrids.add</a>
+
+</h3>
+<p>Add x grid lines.</p>
+<br>
+<p>This API adds new x grid lines instead of replacing like <a href="#api-xgrids">xgrids</a>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.xgrids.add(grids)</code></pre>
+</div>
+<p><span class="code">grids</span>&nbsp;&nbsp;<code>Array</code> or <code>Object</code></p>
+<p>New x grid lines will be added. The format of this argument is the same as <a href="#grid-x-lines">grid.x.lines</a> and it's possible to give an <code>Object</code> if only one line will be added.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Add a new x grid line
+chart.xgrids.add(
+&nbsp;&nbsp;{value: 4, text: 'Label 4'}
+);
+
+// Add new x grid lines
+chart.xgrids.add([
+&nbsp;&nbsp;{value: 2, text: 'Label 2'},
+&nbsp;&nbsp;{value: 4, text: 'Label 4'}
+]);</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_grid_x.html'>X Grids</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-xgrids-remove'>xgrids.remove</a>
+
+</h3>
+<p>Remove x grid lines.</p>
+<br>
+<p>This API removes x grid lines.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.xgrids.remove(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>This argument should include <span class="code">value</span> or <span class="code">class</span>. If <span class="code">value</span> is given, the x grid lines that have specified x value will be removed. If <span class="code">class</span> is given, the x grid lines that have specified class will be removed. If <span class="code">args</span> is not given, all of x grid lines will be removed.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// x grid line on x = 2 will be removed
+chart.xgrids.remove({value: 2});
+
+// x grid lines that have 'grid-A' will be removed
+chart.xgrids.remove({class: 'grid-A'});
+
+// all of x grid lines will be removed
+chart.xgrids.remove();</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_grid_x.html'>X Grids</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-ygrids'>ygrids</a>
+
+</h3>
+<p>Update y grid lines.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.ygrids(grids)</code></pre>
+</div>
+<p><span class="code">grids</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>X grid lines will be replaced with this argument. The format of this argument is the same as <a href="#grid-y-lines">grid.y.lines</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Show 2 y grid lines
+chart.ygrids([
+&nbsp;&nbsp;{value: 100, text:'Label 1'},
+&nbsp;&nbsp;{value: 400, text: 'Label 4'}
+]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-ygrids-add'>ygrids.add</a>
+
+</h3>
+<p>Add y grid lines.</p>
+<br>
+<p>This API adds new y grid lines instead of replacing like <a href="#api-ygrids">ygrids</a>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.ygrids.add(grids)</code></pre>
+</div>
+<p><span class="code">grids</span>&nbsp;&nbsp;<code>Array</code> or <code>Object</code></p>
+<p>New y grid lines will be added. The format of this argument is the same as <a href="#grid-y-lines">grid.y.lines</a> and it's possible to give an <code>Object</code> if only one line will be added.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Add a new y grid line
+chart.ygrids.add(
+&nbsp;&nbsp;{value: 400, text: 'Label 4'}
+);
+
+// Add new y grid lines
+chart.ygrids.add([
+&nbsp;&nbsp;{value: 200, text: 'Label 2'},
+&nbsp;&nbsp;{value: 400, text: 'Label 4'}
+]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-ygrids-remove'>ygrids.remove</a>
+
+</h3>
+<p>Remove y grid lines.</p>
+<br>
+<p>This API removes y grid lines.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.ygrids.remove(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>This argument should include <span class="code">value</span> or <span class="code">class</span>. If <span class="code">value</span> is given, the y grid lines that have specified y value will be removed. If <span class="code">class</span> is given, the y grid lines that have specified class will be removed. If <span class="code">args</span> is not given, all of y grid lines will be removed.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// y grid line on y = 200 will be removed
+chart.ygrids.remove({value: 200});
+
+// y grid lines that have 'grid-A' will be removed
+chart.ygrids.remove({class: 'grid-A'});
+
+// all of y grid lines will be removed
+chart.ygrids.remove();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-regions'>regions</a>
+
+</h3>
+<p>Update regions.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.regions(regions)</code></pre>
+</div>
+<p><span class="code">regions</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>Regions will be replaced with this argument. The format of this argument is the same as <a href="#regions">regions</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Show 2 regions
+chart.regions([
+&nbsp;&nbsp;{axis: 'x', start: 5, class: 'regionX'},
+&nbsp;&nbsp;{axis: 'y', end: 50, class: 'regionY'}
+]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-regions-add'>regions.add</a>
+
+</h3>
+<p>Add new region.</p>
+<br>
+<p>This API adds new region instead of replacing like <a href="#api-regions">regions</a>.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.regions.add(regions)</code></pre>
+</div>
+<p><span class="code">regions</span>&nbsp;&nbsp;<code>Array</code> or <code>Object</code></p>
+<p>New region will be added. The format of this argument is the same as <a href="#regions">regions</a> and it's possible to give an <code>Object</code> if only one region will be added.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Add a new region
+chart.regions.add(
+&nbsp;&nbsp;{axis: 'x', start: 5, class: 'regionX'}
+);
+
+// Add new regions
+chart.regions.add([
+&nbsp;&nbsp;{axis: 'x', start: 5, class: 'regionX'},
+&nbsp;&nbsp;{axis: 'y', end: 50, class: 'regionY'}
+]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-regions-remove'>regions.remove</a>
+
+</h3>
+<p>Remove regions.</p>
+<br>
+<p>This API removes regions.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.regions.remove(args)</code></pre>
+</div>
+<p><span class="code">args</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>This argument should include <span class="code">classes</span>. If <span class="code">classes</span> is given, the regions that have one of the specified classes will be removed. If <span class="code">args</span> is not given, all of regions will be removed.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// regions that have 'region-A' or 'region-B' will be removed.
+chart.regions.remove({classes: ['region-A', 'region-B']});
+
+// all of regions will be removed.
+chart.regions.remove();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data'>data</a>
+
+</h3>
+<p>Get data loaded in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>If this argument is given, this API returns the specified target data. If this argument is not given, all of data will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get only data1 data
+chart.data('data1');
+
+// Get data1 and data2 data
+chart.data(['data1', 'data2']);
+
+// Get all data
+chart.data();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data-shown'>data.shown</a>
+
+</h3>
+<p>Get data shown in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data.shown(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>String</code> or <code>Array</code></p>
+<p>If this argument is given, this API filters the data with specified target ids. If this argument is not given, all shown data will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get shown data by filtering to include only data1 data
+chart.data.shown('data1');
+
+// Get shown data by filtering to include data1 and data2 data
+chart.data.shown(['data1', 'data2']);
+
+// Get all shown data
+chart.data.shown();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data-values'>data.values</a>
+
+</h3>
+<p>Get values of the data loaded in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data.values(targetId)</code></pre>
+</div>
+<p><span class="code">targetId</span>&nbsp;&nbsp;<code>String</code></p>
+<p>This API returns the values of specified target. If this argument is not given, <code>null</code> will be retruned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get data1 values
+chart.data.values('data1');</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data-names'>data.names</a>
+
+</h3>
+<p>Get and set names of the data loaded in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data.names(names)</code></pre>
+</div>
+<p><span class="code">names</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If this argument is given, the names of data will be updated. If not given, the current names will be returned. The format of this argument is the same as <a href="#data-names">data.names</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get current names
+chart.data.names();
+
+// Update names
+chart.data.names({
+&nbsp;&nbsp;data1: 'New Name 1',
+&nbsp;&nbsp;data2: 'New Name 2'
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data-colors'>data.colors</a>
+
+</h3>
+<p>Get and set colors of the data loaded in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data.colors(colors)</code></pre>
+</div>
+<p><span class="code">colors</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If this argument is given, the colors of data will be updated. If not given, the current colors will be returned. The format of this argument is the same as <a href="#data-colors">data.colors</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get current colors
+chart.data.colors();
+
+// Update colors
+chart.data.colors({
+&nbsp;&nbsp;data1: '#FFFFFF',
+&nbsp;&nbsp;data2: '#000000'
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-data-axes'>data.axes</a>
+
+</h3>
+<p>Get and set axes of the data loaded in the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.data.axes(axes)</code></pre>
+</div>
+<p><span class="code">axes</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If this argument is given, the axes of data will be updated. If not given, the current axes will be returned. The format of this argument is the same as <a href="#data-axes">data.axes</a>.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get current axes
+chart.data.axes();
+
+// Update axes
+chart.data.axes({
+&nbsp;&nbsp;data1: 'y',
+&nbsp;&nbsp;data2: 'y2'
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-x'>x</a>
+
+</h3>
+<p>Get and set x values for the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.x(x)</code></pre>
+</div>
+<p><span class="code">x</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>If <span class="code">x</span> is given, x values of every target will be updated. If no argument is given, current x values will be returned as an <code>Object</code> whose keys are the target ids.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get current x values
+chart.x();
+
+// Update x values for all targets
+chart.x([100, 200, 300, 400, ...]);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-xs'>xs</a>
+
+</h3>
+<p>Get and set x values for the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.xs(xs)</code></pre>
+</div>
+<p><span class="code">xs</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">xs</span> is given, specified target's x values will be updated. If no argument is given, current x values will be returned as an <code>Object</code> whose keys are the target ids.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Get current x values
+chart.xs();
+
+// Update x values for all targets
+chart.xs({
+&nbsp;&nbsp;data1: [10, 20, 30, 40, ...],
+&nbsp;&nbsp;data2: [100, 200, 300, 400, ...]
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-axis-labels'>axis.labels</a>
+
+</h3>
+<p>Get and set axis labels.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.axis.labels(labels)</code></pre>
+</div>
+<p><span class="code">labels</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">labels</span> is given, specified axis' label will be updated.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Update axis' label
+chart.axis.labels({
+&nbsp;&nbsp;x: 'New X Axis Label',
+&nbsp;&nbsp;y: 'New Y Axis Label'
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_axis_label.html'>Update Axis Label</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-axis-min'>axis.min</a>
+
+</h3>
+<p>Get and set axis min value.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.axis.min(min)</code></pre>
+</div>
+<p><span class="code">min</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">min</span> is given, specified axis' min value will be updated. If no argument is given, the current min values for each axis will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Update axis' min
+chart.axis.min({
+&nbsp;&nbsp;x: -10,
+&nbsp;&nbsp;y: 1000,
+&nbsp;&nbsp;y2: 100
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_axis_range.html'>Update Axis Range</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-axis-max'>axis.max</a>
+
+</h3>
+<p>Get and set axis max value.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.axis.max(max)</code></pre>
+</div>
+<p><span class="code">max</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">max</span> is given, specified axis' max value will be updated. If no argument is given, the current max values for each axis will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Update axis' max
+chart.axis.max({
+&nbsp;&nbsp;x: 100,
+&nbsp;&nbsp;y: 1000,
+&nbsp;&nbsp;y2: 10000
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_axis_range.html'>Update Axis Range</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-axis-range'>axis.range</a>
+
+</h3>
+<p>Get and set axis min and max value.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.axis.range(range)</code></pre>
+</div>
+<p><span class="code">range</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">range</span> is given, specified axis' min and max value will be updated. If no argument is given, the current min and max values for each axis will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Update axis' min and max values
+chart.axis.range({
+&nbsp;&nbsp;min: {
+&nbsp;&nbsp;&nbsp;&nbsp;x: -10,
+&nbsp;&nbsp;&nbsp;&nbsp;y: -1000,
+&nbsp;&nbsp;&nbsp;&nbsp;y2: -10000
+&nbsp;&nbsp;},
+&nbsp;&nbsp;max: {
+&nbsp;&nbsp;&nbsp;&nbsp;x: 100,
+&nbsp;&nbsp;&nbsp;&nbsp;y: 1000,
+&nbsp;&nbsp;&nbsp;&nbsp;y2: 10000
+&nbsp;&nbsp;}
+});</code></pre>
+</div>
+<ul>
+<li>
+<a href='/samples/api_axis_range.html'>Update Axis Range</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-legend-show'>legend.show</a>
+
+</h3>
+<p>Show legend for each target.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.legend.show(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>Array</code> or <code>String</code></p>
+<p>If <span class="code">targetIds</span> is given, specified target's legend will be shown. If only one target is the candidate, <code>String</code> can be passed. If no argument is given, all of target's legend will be shown.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Show legend for data1.
+chart.legend.show('data1');
+
+// Show legend for data1 and data2.
+chart.legend.show(['data1', 'data2']);
+
+// Show all legend.
+chart.legend.show();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-legend-hide'>legend.hide</a>
+
+</h3>
+<p>Hide legend for each target.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.legend.hide(targetIds)</code></pre>
+</div>
+<p><span class="code">targetIds</span>&nbsp;&nbsp;<code>Array</code> or <code>String</code></p>
+<p>If <span class="code">targetIds</span> is given, specified target's legend will be hidden. If only one target is the candidate, <code>String</code> can be passed. If no argument is given, all of target's legend will be hidden.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Hide legend for data1.
+chart.legend.hide('data1');
+
+// Hide legend for data1 and data2.
+chart.legend.hide(['data1', 'data2']);
+
+// Hide all legend.
+chart.legend.hide();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-zoom'>zoom</a>
+
+</h3>
+<p>Zoom by giving x domain.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.zoom(domain)</code></pre>
+</div>
+<p><span class="code">domain</span>&nbsp;&nbsp;<code>Array</code></p>
+<p>If <span class="code">domain</span> is given, the chart will be zoomed to the given domain. If no argument is given, the current zoomed domain will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Zoom to specified domain
+chart.zoom([10, 20]);
+
+// Get the current zoomed domain
+chart.zoom();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-unzoom'>unzoom</a>
+
+</h3>
+<p>Unzoom to the original domain.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.unzoom()</code></pre>
+</div>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Unzoom to the original domain
+chart.unzoom();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-zoom-enable'>zoom.enable</a>
+
+</h3>
+<p>Enable and disable zooming.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.zoom.enable(enabled)</code></pre>
+</div>
+<p><span class="code">enabled</span>&nbsp;&nbsp;<code>Boolean</code></p>
+<p>If <span class="code">enabled</span> is <code>true</code>, the feature of zooming will be enabled. If <code>false</code> is given, it will be disabled.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Enable zooming
+chart.zoom.enable(true);</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-resize'>resize</a>
+
+</h3>
+<p>Resize the chart.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.resize(size)</code></pre>
+</div>
+<p><span class="code">size</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>This argument should include <span class="code">width</span> and <span class="code">height</span> in pixels.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Resize to 640x480
+chart.resize({
+&nbsp;&nbsp;height: 640,
+&nbsp;&nbsp;width: 480
+});</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-flush'>flush</a>
+
+</h3>
+<p>Force to redraw.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.flush()</code></pre>
+</div>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Force to redraw
+chart.flush();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-destroy'>destroy</a>
+
+</h3>
+<p>Reset the chart object and remove element and events completely.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.destroy()</code></pre>
+</div>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Destroy the chart
+chart.destroy();
+
+// If you have a reference to the chart make sure to call destroy in the following manner
+chart = chart.destroy();</code></pre>
+</div>
+</section>
+<hr>
+<br>
+<section>
+<h2>CLASS</h2>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart'>c3-chart</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-line'>c3-chart-line</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-lines'>c3-chart-lines</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-bar'>c3-chart-bar</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-bars'>c3-chart-bars</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-text'>c3-chart-text</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-texts'>c3-chart-texts</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arc'>c3-chart-arc</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs'>c3-chart-arcs</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs-title'>c3-chart-arcs-title</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs-background'>c3-chart-arcs-background</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs-gauge-unit'>c3-chart-arcs-gauge-unit</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs-gauge-max'>c3-chart-arcs-gauge-max</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-chart-arcs-gauge-min'>c3-chart-arcs-gauge-min</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-selected-circle'>c3-selected-circle</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-selected-circles'>c3-selected-circles</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-event-rect'>c3-event-rect</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-event-rects'>c3-event-rects</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-event-rects-single'>c3-event-rects-single</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-event-rects-multiple'>c3-event-rects-multiple</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-zoom-rect'>c3-zoom-rect</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-brush'>c3-brush</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-focused'>c3-focused</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-region'>c3-region</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-regions'>c3-regions</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-tooltip'>c3-tooltip</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-tooltip-name'>c3-tooltip-name</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-shape'>c3-shape</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-shapes'>c3-shapes</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-line'>c3-line</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-lines'>c3-lines</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-bar'>c3-bar</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-bars'>c3-bars</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-circle'>c3-circle</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-circles'>c3-circles</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-arc'>c3-arc</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-arcs'>c3-arcs</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-area'>c3-area</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-areas'>c3-areas</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-empty'>c3-empty</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-text'>c3-text</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-texts'>c3-texts</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-gauge-value'>c3-gauge-value</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-grid'>c3-grid</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-xgrid'>c3-xgrid</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-xgrids'>c3-xgrids</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-xgrid-line'>c3-xgrid-line</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-xgrid-lines'>c3-xgrid-lines</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-xgrid-focus'>c3-xgrid-focus</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-ygrid'>c3-ygrid</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-ygrids'>c3-ygrids</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-ygrid-line'>c3-ygrid-line</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-ygrid-lines'>c3-ygrid-lines</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis'>c3-axis</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-x'>c3-axis-x</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-x-label'>c3-axis-x-label</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-y'>c3-axis-y</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-y-label'>c3-axis-y-label</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-y2'>c3-axis-y2</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-axis-y2-label'>c3-axis-y2-label</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-legend-item'>c3-legend-item</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-legend-item-event'>c3-legend-item-event</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-legend-item-tile'>c3-legend-item-tile</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-legend-item-hidden'>c3-legend-item-hidden</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-legend-item-focused'>c3-legend-item-focused</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+</div>
+</div>
+<footer>
+<hr>
+<p>&copy Masayuki Tanaka 2014</p>
+</footer>
+
+</div>
+<script src="/js/jquery-1.11.0.min-910066fb.js" type="text/javascript"></script>
+<script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
+<script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
+<script src="/js/d3-4.13.0.min-1190977b.js" type="text/javascript"></script>
+<script src="/js/c3.min-2c29991b.js" type="text/javascript"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  $(document).foundation();
+</script>
+
+<script>
+  $(function(){
+    function scrollToHash() {
+      var hash = document.location.hash,
+          target = $('.column-content a[href^=' + hash + ']'),
+          position;
+      if (target.length) {
+        position = target.offset().top - 60;
+        $("html, body").animate({scrollTop:position}, 250, "swing");
+      }
+    }
+    $(window).on('hashchange', scrollToHash);
+  
+    // When clicked
+    $('a[href^=#]').click(function(){
+      document.location.hash = $(this).attr("href");
+      return false;
+    });
+  
+    // When loaded
+    $(window).trigger('hashchange');
+  });
+</script>
+
+
+</body>
+</html>
