@@ -10,14 +10,14 @@
   .sourcecode.margin-medium-v.margin-small-h
     %h3 # #{id}.js
     #javascript-editor.c3-editor
-      = js_as_plain id
+      = File.read "docs/js/samples/#{id}"
 
   - if defined? other_css
     .sourcecode
       %h3 # #{other_css}
       %pre
         %code.css
-          = css_as_plain other_css
+          = File.read "docs/css/samples/#{other_css}"
 
   - if defined? other_files
     - other_files.each do |f|
@@ -25,7 +25,7 @@
         %h3 # #{f}
         %pre
           %code.html
-            = data_as_plain f
+            = File.read "docs/data/#{f}"
 
   = partial :footer
 
