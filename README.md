@@ -12,11 +12,11 @@ Follow the link for more information: [http://c3js.org](http://c3js.org/)
 
 ## Tutorial and Examples
 
-+ [Getting Started](http://c3js.org/gettingstarted.html)
-+ [Examples](http://c3js.org/examples.html)
+- [Getting Started](http://c3js.org/gettingstarted.html)
+- [Examples](http://c3js.org/examples.html)
 
 Additional samples can be found in this repository:
-+ [https://github.com/c3js/c3/tree/master/htdocs/samples](https://github.com/c3js/c3/tree/master/htdocs/samples)
+- [https://github.com/c3js/c3/tree/master/htdocs/samples](https://github.com/c3js/c3/tree/master/htdocs/samples)
 
 You can run these samples as:
 ```
@@ -49,12 +49,32 @@ If you choose to submit a pull request, please do not bump the version number un
 ## Playground
 Please fork this fiddle:
 
-+ http://jsfiddle.net/7kYJu/4742/
+- http://jsfiddle.net/7kYJu/4742/
 
-## Dependency
+## Build the documentation site.
 
-+ [D3.js](https://github.com/mbostock/d3) `^4.12.0`
+First you need ruby and [bundler][] to build the documentation site.
+
+```console
+$ gem install bundler
+```
+
+Then you need to install bundler dependencies.
+
+```console
+$ bundle install
+```
+
+Then hit the following command to build the site.
+
+```console
+$ npm run watch:docs
+```
+
+Then access `http://0.0.0.0:4567`.
 
 ## License
 
 MIT
+
+[bundler]: http://bundler.io
