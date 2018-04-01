@@ -2,46 +2,36 @@ import { c3_chart_internal_fn } from './core';
 import { isValue, isUndefined, isDefined, notEmpty } from './util';
 
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
-    var $$ = this, type = mimeType ? mimeType : 'csv';
-    var req = $$.d3.request(url);
-    if (headers) {
-        Object.keys(headers).forEach(function (header) {
-            req.header(header, headers[header]);
-        });
+    var $$ = this, type = mimeType ? mimeType : 'csv', f, converter;
+
+    if (type === 'json') {
+        f = $$.d3.json;
+        converter = $$.convertJsonToData;
+    } else if (type === 'tsv') {
+        f = $$.d3.tsv;
+        converter = $$.convertXsvToData;
+    } else {
+        f = $$.d3.csv;
+        converter = $$.convertXsvToData;
     }
-    req.get(function (error, data) {
-        var d;
-        var dataResponse = data.response || data.responseText; // Fixes IE9 XHR issue; see #1345
-        if (!data) {
-            throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
-        }
-        if (type === 'json') {
-            d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
-        } else if (type === 'tsv') {
-            d = $$.convertTsvToData(dataResponse);
-        } else {
-            d = $$.convertCsvToData(dataResponse);
-        }
-        done.call($$, d);
+
+    f(url, headers).then(function (data) {
+        done.call($$, converter.call($$, data, keys));
+    }).catch(function (error) {
+        throw error;
     });
 };
-c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-    var rows = parser(xsv), d;
-    if (rows.length === 1) {
+c3_chart_internal_fn.convertXsvToData = function (xsv) {
+    var d;
+    if (xsv.length === 1) {
         d = [{}];
-        rows[0].forEach(function (id) {
+        xsv[0].forEach(function (id) {
             d[0][id] = null;
         });
     } else {
-        d = parser(xsv);
+        d = xsv;
     }
     return d;
-};
-c3_chart_internal_fn.convertCsvToData = function (csv) {
-    return this.convertXsvToData(csv, this.d3.csvParse);
-};
-c3_chart_internal_fn.convertTsvToData = function (tsv) {
-    return this.convertXsvToData(tsv, this.d3.tsvParse);
 };
 c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     var $$ = this,

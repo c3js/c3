@@ -5,7 +5,7 @@
   "version": "0.5.2",
   "keywords": [],
   "dependencies": {
-    "mbostock/d3": "v3.5.6"
+    "mbostock/d3": "v5.0.0"
   },
   "development": {},
   "license": "MIT",
