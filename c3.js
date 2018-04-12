@@ -1,4 +1,4 @@
-/* @license C3.js v0.5.2 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.5.3 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -96,6 +96,21 @@
       }
     };
 
+    var defineProperty = function (obj, key, value) {
+      if (key in obj) {
+        Object.defineProperty(obj, key, {
+          value: value,
+          enumerable: true,
+          configurable: true,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+
+      return obj;
+    };
+
     var inherits = function (subClass, superClass) {
       if (typeof superClass !== "function" && superClass !== null) {
         throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
@@ -118,6 +133,10 @@
       }
 
       return call && (typeof call === "object" || typeof call === "function") ? call : self;
+    };
+
+    var toArray = function (arr) {
+      return Array.isArray(arr) ? arr : Array.from(arr);
     };
 
     var isValue = function isValue(v) {
@@ -978,7 +997,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.5.2" };
+    var c3 = { version: "0.5.3" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -5383,23 +5402,26 @@
         });
     };
     c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-        var rows = parser(xsv),
-            d;
-        if (rows.length === 1) {
-            d = [{}];
-            rows[0].forEach(function (id) {
-                d[0][id] = null;
-            });
+        var _parser$parseRows = parser.parseRows(xsv),
+            _parser$parseRows2 = toArray(_parser$parseRows),
+            keys = _parser$parseRows2[0],
+            rows = _parser$parseRows2.slice(1);
+
+        if (rows.length === 0) {
+            return { keys: keys, rows: [keys.reduce(function (row, key) {
+                    return Object.assign(row, defineProperty({}, key, null));
+                }, {})] };
         } else {
-            d = parser(xsv);
+            // [].concat() is to convert result into a plain array otherwise
+            // test is not happy because rows have properties.
+            return { keys: keys, rows: [].concat(parser.parse(xsv)) };
         }
-        return d;
     };
     c3_chart_internal_fn.convertCsvToData = function (csv) {
-        return this.convertXsvToData(csv, this.d3.csvParse);
+        return this.convertXsvToData(csv, { parse: this.d3.csvParse, parseRows: this.d3.csvParseRows });
     };
     c3_chart_internal_fn.convertTsvToData = function (tsv) {
-        return this.convertXsvToData(tsv, this.d3.tsvParse);
+        return this.convertXsvToData(tsv, { parse: this.d3.tsvParse, parseRows: this.d3.tsvParseRows });
     };
     c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         var $$ = this,
@@ -5454,7 +5476,7 @@
     /**
      * Converts the rows to normalized data.
      * @param {any[][]} rows The row data
-     * @return {Object[]}
+     * @return {Object}
      */
     c3_chart_internal_fn.convertRowsToData = function (rows) {
         var newRows = [];
@@ -5470,16 +5492,17 @@
             }
             newRows.push(newRow);
         }
-        return newRows;
+        return { keys: keys, rows: newRows };
     };
 
     /**
      * Converts the columns to normalized data.
      * @param {any[][]} columns The column data
-     * @return {Object[]}
+     * @return {Object}
      */
     c3_chart_internal_fn.convertColumnsToData = function (columns) {
         var newRows = [];
+        var keys = [];
 
         for (var i = 0; i < columns.length; i++) {
             var key = columns[i][0];
@@ -5492,17 +5515,38 @@
                 }
                 newRows[j - 1][key] = columns[i][j];
             }
+            keys.push(key);
         }
 
-        return newRows;
+        return { keys: keys, rows: newRows };
     };
 
+    /**
+     * Converts the data format into the target format.
+     * @param {!Object} data
+     * @param {!Array} data.keys Ordered list of target IDs.
+     * @param {!Array} data.rows Rows of data to convert.
+     * @param {boolean} appendXs True to append to $$.data.xs, False to replace.
+     * @return {!Array}
+     */
     c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
         var $$ = this,
             config = $$.config,
-            ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
-            xs = $$.d3.keys(data[0]).filter($$.isX, $$),
-            targets;
+            targets,
+            ids,
+            xs,
+            keys;
+
+        // handles format where keys are not orderly provided
+        if (isArray(data)) {
+            keys = Object.keys(data[0]);
+        } else {
+            keys = data.keys;
+            data = data.rows;
+        }
+
+        ids = keys.filter($$.isNotX, $$);
+        xs = keys.filter($$.isX, $$);
 
         // save x for update data by load when custom x and c3.x API
         ids.forEach(function (id) {
