@@ -107,7 +107,7 @@
 <p>Installing by Bower/Component is also available with the name <span class="code">c3</span>.</p>
 <p>Then, load the scripts and css:</p>
 <div class='sourcecode highlight'>
-<pre><code class='html xml'><span class="comment">&lt;!-- Load c3.css --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"/path/to/c3.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span>&gt;</span>&#x000A;&#x000A;<span class="comment">&lt;!-- Load d3.js and c3.js --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/d3.v3.min.js"</span> <span class="attribute">charset</span>=<span class="value">"utf-8"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/c3.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;</code></pre>
+<pre><code class='html xml'><span class="comment">&lt;!-- Load c3.css --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"/path/to/c3.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span>&gt;</span>&#x000A;&#x000A;<span class="comment">&lt;!-- Load d3.js and c3.js --&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/d3.v4.min.js"</span> <span class="attribute">charset</span>=<span class="value">"utf-8"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/c3.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>&#x000A;</code></pre>
 </div>
 <p>C3 depends on D3, so please load D3 too.</p>
 </section>
@@ -127,7 +127,7 @@
 </div>
 <p>C3 supports the asynchronous module definition (AMD) API. If you use <a href="http://requirejs.org/" target="_blank">RequireJS</a>, you can load like this:</p>
 <div class='sourcecode highlight'>
-<pre><code class='javascript'>require.config({&#x000A;  baseUrl: '/js',&#x000A;  paths: {&#x000A;    d3: "http://d3js.org/d3.v3.min"&#x000A;  }&#x000A;});&#x000A;&#x000A;require(["d3", "c3"], function(d3, c3) {&#x000A;  c3.generate({&#x000A;    ...&#x000A;  });&#x000A;});&#x000A;</code></pre>
+<pre><code class='javascript'>require.config({&#x000A;  baseUrl: '/js',&#x000A;  paths: {&#x000A;    d3: "http://d3js.org/d3.v4.min"&#x000A;  }&#x000A;});&#x000A;&#x000A;require(["d3", "c3"], function(d3, c3) {&#x000A;  c3.generate({&#x000A;    ...&#x000A;  });&#x000A;});&#x000A;</code></pre>
 </div>
 <p>Then, you will see the chart:</p>
 <div id='chart2_1'></div>
@@ -249,7 +249,7 @@
 <script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
 <script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
 <script src="/js/d3-4.13.0.min-1190977b.js" type="text/javascript"></script>
-<script src="/js/c3.min-2c29991b.js" type="text/javascript"></script>
+<script src="/js/c3.min-01c2aef0.js" type="text/javascript"></script>
 <script>
   hljs.initHighlightingOnLoad();
   $(document).foundation();
