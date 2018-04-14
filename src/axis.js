@@ -475,8 +475,15 @@ c3_axis_fn.getId = function getId(id) {
     return id in config.data_axes ? config.data_axes[id] : 'y';
 };
 c3_axis_fn.getXAxisTickFormat = function getXAxisTickFormat() {
-    var $$ = this.owner, config = $$.config,
-        format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) { return v < 0 ? v.toFixed(0) : v; };
+    // #2251 previously set any negative values to a whole number, 
+    // however both should be truncated according to the users format specification
+    var $$ = this.owner, config = $$.config;
+    let format = ($$.isTimeSeries()) 
+        ? $$.defaultAxisTimeFormat 
+        : ($$.isCategorized()) 
+            ? $$.categoryName 
+            : function (v) { return v; };
+            
     if (config.axis_x_tick_format) {
         if (isFunction(config.axis_x_tick_format)) {
             format = config.axis_x_tick_format;
