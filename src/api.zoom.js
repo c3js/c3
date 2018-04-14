@@ -15,8 +15,10 @@ c3_chart_fn.zoom = function (domain) {
             $$.redraw({withY: $$.config.zoom_rescale, withSubchart: false});
         }
         $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
+        return domain;
+    } else {
+        return $$.x.domain();
     }
-    return domain;
 };
 c3_chart_fn.zoom.enable = function (enabled) {
     var $$ = this.internal;
