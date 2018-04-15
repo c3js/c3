@@ -264,7 +264,13 @@ c3_chart_internal_fn.updateLegend = function (targetIds, options, transitions) {
             }
         });
     l.append('text')
-        .text(function (id) { return isDefined(config.data_names[id]) ? config.data_names[id] : id; })
+        .text(function (id, index) {
+            if(config.legend_format && isFunction(config.legend_format)) {
+                return config.legend_format(id, index);
+            } else {
+                return isDefined(config.data_names[id]) ? config.data_names[id] : id;
+            }
+        })
         .each(function (id, i) { updatePositions(this, id, i); })
         .style("pointer-events", "none")
         .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
