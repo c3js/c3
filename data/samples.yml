@@ -1,0 +1,315 @@
+simple_multiple:
+  title: 'Line Chart'
+  desc: 'Line chart with sequential data.'
+
+timeseries:
+  title: Timeseries Chart
+  desc: Simple line chart with timeseries data.
+
+chart_spline:
+  title: Spline Chart
+  desc: Display as Spline Chart.
+
+simple_xy:
+  title: Simple XY Line Chart
+  desc: Simple line chart with custom x.
+
+simple_xy_multiple:
+  title: Multiple XY Line Chart
+  desc: Multiple line chart with multiple custom x.
+
+simple_regions:
+  title: Line Chart with Regions
+  desc: Set regions for each data with style.
+
+chart_bar:
+  title: Bar Chart
+  desc: Display as Bar Chart.
+
+chart_bar_stacked:
+  title: Stacked Bar Chart
+  desc: Display as Stacked Bar Chart.
+
+chart_scatter:
+  title: Scatter Plot
+  desc: Display as Scatter Plot.
+
+chart_pie:
+  title: Pie Chart
+  desc: Display as Pie Chart.
+
+chart_donut:
+  title: Donut Chart
+  desc: Display as Donut Chart.
+
+chart_gauge:
+  title: Gauge Chart
+  desc: Display as Gauge Chart.
+
+chart_step:
+  title: Step Chart
+  desc: Display as Step Chart.
+
+chart_area:
+  title: Area Chart
+  desc: Display as Area Chart.
+
+chart_area_stacked:
+  title: Stacked Area Chart
+  desc: Display as Stacked Area Chart.
+
+chart_combination:
+  title: Combination Chart
+  desc: Display all kinda charts up in here.
+
+categorized:
+  title: Category Axis
+  desc: Show ticks as categorized by each data.
+
+axes_y2:
+  title: Additional Y Axis
+  desc: Additional y axis can be added.
+
+axes_rotated:
+  title: Rotated Axis
+  desc: Switch x and y axis position.
+
+axes_x_localtime:
+  title: X Axis Timezone
+  desc: Convert time to UTC.
+
+axes_x_tick_rotate:
+  title: Rotate X Axis Tick Text
+  desc: Rotate x axis tick text.
+
+axes_x_tick_format:
+  title: X Axis Tick Format
+  desc: Format x axis tick text.
+
+axes_y_tick_format:
+  title: Y Axis Tick Format
+  desc: Format y axis tick text.
+
+axes_x_tick_culling:
+  title: X Axis Tick Culling
+  desc: Set cull ticks or not on X Axis.
+
+axes_x_tick_values:
+  title: X Axis Tick Values
+  desc: Set tick texts on X Axis.
+
+axes_x_tick_count:
+  title: X Axis Tick Count
+  desc: Set the number of ticks on X Axis.
+
+axes_x_tick_fit:
+  title: X Axis Tick Fitting
+  desc: Set ticks position to x of data.
+
+axes_label:
+  title: Axis Label
+  desc: Set label for axis.
+
+axes_label_position:
+  title: Axis Label Position
+  desc: Set axis label position.
+
+axes_y_padding:
+  title: Padding for Y Axis
+  desc: Set padding for y axis.
+
+axes_y_range:
+  title: Range for Y Axis
+  desc: Set range for y axis.
+
+data_columned:
+  title: Column Oriented Data
+  desc: Column-oriented data can be used as input.
+
+data_rowed:
+  title: Row Oriented Data
+  desc: Row-oriented data can be used as input.
+
+data_json:
+  title: JSON Data
+  desc: JSON can be used as input.
+
+data_url:
+  title: Data from URL
+  desc: Data from URL can be used as input.
+
+data_load:
+  title: Load Data
+  desc: Load data dynamically.
+
+data_name:
+  title: Data Name
+  desc: Set name for each data.
+
+data_stringx:
+  title: Category Data
+  desc: Load data with x values on category axis.
+
+data_order:
+  title: Data Order
+  desc: Define data order. This will be used for stacked bar chart.
+
+data_label:
+  title: Data Label
+  desc: Show label of data.
+
+data_label_format:
+  title: Data Label Format
+  desc: Format label of data.
+
+data_number_format_l10n:
+  title: Number Format Localization
+  desc: Number format localization using D3 locale settings.
+
+data_color:
+  title: Data Color
+  desc: Set color according to data.
+
+options_legend:
+  title: Hide Legend
+  desc: Set visibility of legend.
+
+legend_position:
+  title: Legend Position
+  desc: Show legend on bottom or right side.
+
+legend_custom:
+  title: Custom Legend
+  desc: Build custom legend
+
+tooltip_show:
+  title: Hide Tooltip
+  desc: Set visibility of tooltip.
+
+tooltip_grouped:
+  title: Tooltip Grouping
+  desc: Show tooltips as grouped or not.
+
+tooltip_format:
+  title: Tooltip Format
+  desc: Set format for title and value on tooltip.
+
+options_gridline:
+  title: Grid Lines
+  desc: Show grid lines for x and y axis.
+
+grid_x_lines:
+  title: Optional X Grid Lines
+  desc: Add optional grid lines on x grid.
+
+grid_y_lines:
+  title: Optional Y Grid Lines
+  desc: Add optional grid lines on y grid.
+
+options_subchart:
+  title: Sub Chart
+  desc: Show sub chart for zoom and selection range.
+
+interaction_zoom:
+  title: Zoom
+  desc: Zoom by mouse wheel event and slide by drag.
+
+region:
+  title: Region
+  desc: Show rects on chart.
+
+region_timeseries:
+  title: Region with Timeseries
+  desc: Show rects on timeseries chart.
+
+options_size:
+  title: Chart Size
+  desc: Set chart size in px.
+
+options_color:
+  title: Color Pattern
+  desc: Set custom color pattern.
+
+options_padding:
+  title: Padding
+  desc: Change padding for the chart.
+
+point_show:
+  title: Hide points
+  desc: Hide points on line chart
+
+pie_label_format:
+  title: Pie Label Format
+  desc: Change label format on Pie chart
+
+transition_duration:
+  title: Duration of Transition
+  desc: Set duration of transition for chart animation.
+
+api_flow:
+  title: Flow
+  desc: Load/Unload data as flowing
+
+api_resize:
+  title: Resize
+  desc: Resize chart.
+
+api_data_name:
+  title: Data Name
+  desc: Update data names.
+
+api_data_color:
+  title: Data Color
+  desc: Update data colors.
+
+api_axis_label:
+  title: Axis Label
+  desc: Update axis labels.
+
+api_axis_range:
+  title: Axis Range
+  desc: Update axis range.
+
+api_grid_x:
+  title: X Grid
+  desc: Update custom x grids.
+
+transform_line:
+  title: To Line Chart
+  desc: Transform to line chart.
+
+transform_spline:
+  title: To Spline Chart
+  desc: Transform to spline chart.
+
+transform_bar:
+  title: To Bar Chart
+  desc: Transform to bar chart.
+
+transform_area:
+  title: To Area Chart
+  desc: Transform to area chart.
+
+transform_areaspline:
+  title: To Area Spline Chart
+  desc: Transform to area spline chart.
+
+transform_scatter:
+  title: To Scatter Plot
+  desc: Transform to scatter plot.
+
+transform_pie:
+  title: To Pie Chart
+  desc: Transform to pie chart.
+
+transform_donut:
+  title: To Donut Chart
+  desc: Transform to donut chart.
+
+style_region:
+  title: Style for Region
+  desc: Set style for regions.
+
+style_grid:
+  title: Style for Grid
+  desc: Set style for grids.

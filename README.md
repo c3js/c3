@@ -1,7 +1,6 @@
 # c3
 
-[![Build Status](https://travis-ci.org/c3js/c3.svg?branch=master)](https://travis-ci.org/c3js/c3)
-[![devDependency Status](https://david-dm.org/c3js/c3/dev-status.svg)](https://david-dm.org/c3js/c3#info=devDependencies)
+[![CircleCI](https://circleci.com/gh/c3js/c3.svg?style=shield)](https://circleci.com/gh/c3js/c3)
 [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE)
 [![codecov.io](https://codecov.io/github/c3js/c3/coverage.svg?branch=master)](https://codecov.io/github/c3js/c3?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/c3js/c3.svg)](https://greenkeeper.io/)
@@ -21,7 +20,7 @@ Additional samples can be found in this repository:
 
 You can run these samples as:
 ```
-$ npm run serve
+$ npm start
 ```
 
 ## Google Group
@@ -49,10 +48,13 @@ If you choose to submit a pull request, please do not bump the version number un
 
 ## Playground
 Please fork this fiddle:
-+ [http://jsfiddle.net/masayuki0812/7kYJu/](http://jsfiddle.net/masayuki0812/7kYJu/)
+
++ http://jsfiddle.net/7kYJu/4742/
 
 ## Dependency
-+ [D3.js](https://github.com/mbostock/d3) `~3.5.0`
+
++ [D3.js](https://github.com/mbostock/d3) `^4.12.0`
 
 ## License
+
 MIT

@@ -9,16 +9,16 @@ c3_chart_internal_fn.initLine = function () {
 };
 c3_chart_internal_fn.updateTargetsForLine = function (targets) {
     var $$ = this, config = $$.config,
-        mainLineUpdate, mainLineEnter,
+        mainLines, mainLineEnter,
         classChartLine = $$.classChartLine.bind($$),
         classLines = $$.classLines.bind($$),
         classAreas = $$.classAreas.bind($$),
         classCircles = $$.classCircles.bind($$),
         classFocus = $$.classFocus.bind($$);
-    mainLineUpdate = $$.main.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
+    mainLines = $$.main.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine)
         .data(targets)
         .attr('class', function (d) { return classChartLine(d) + classFocus(d); });
-    mainLineEnter = mainLineUpdate.enter().append('g')
+    mainLineEnter = mainLines.enter().append('g')
         .attr('class', classChartLine)
         .style('opacity', 0)
         .style("pointer-events", "none");
@@ -45,22 +45,21 @@ c3_chart_internal_fn.updateTargetsForLine = function (targets) {
 };
 c3_chart_internal_fn.updateLine = function (durationForExit) {
     var $$ = this;
-    $$.mainLine = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
+    var mainLine = $$.main.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
-    $$.mainLine.enter().append('path')
+    var mainLineEnter = mainLine.enter().append('path')
         .attr('class', $$.classLine.bind($$))
         .style("stroke", $$.color);
-    $$.mainLine
+    $$.mainLine = mainLineEnter.merge(mainLine)
         .style("opacity", $$.initialOpacity.bind($$))
         .style('shape-rendering', function (d) { return $$.isStepType(d) ? 'crispEdges' : ''; })
         .attr('transform', null);
-    $$.mainLine.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    mainLine.exit().transition().duration(durationForExit)
+        .style('opacity', 0);
 };
-c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
+c3_chart_internal_fn.redrawLine = function (drawLine, withTransition, transition) {
     return [
-        (withTransition ? this.mainLine.transition(Math.random().toString()) : this.mainLine)
+        (withTransition ? this.mainLine.transition(transition) : this.mainLine)
             .attr("d", drawLine)
             .style("stroke", this.color)
             .style("opacity", 1)
@@ -68,7 +67,7 @@ c3_chart_internal_fn.redrawLine = function (drawLine, withTransition) {
 };
 c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
     var $$ = this, config = $$.config,
-        line = $$.d3.svg.line(),
+        line = $$.d3.line(),
         getPoints = $$.generateGetLinePoints(lineIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
@@ -80,13 +79,13 @@ c3_chart_internal_fn.generateDrawLine = function (lineIndices, isSub) {
     if (!config.line_connectNull) { line = line.defined(function (d) { return d.value != null; }); }
     return function (d) {
         var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
-            x = isSub ? $$.x : $$.subX, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
+            x = isSub ? $$.subX : $$.x, y = yScaleGetter.call($$, d.id), x0 = 0, y0 = 0, path;
         if ($$.isLineType(d)) {
             if (config.data_regions[d.id]) {
                 path = $$.lineWithRegions(values, x, y, config.data_regions[d.id]);
             } else {
                 if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
-                path = line.interpolate($$.getInterpolate(d))(values);
+                path = line.curve($$.getInterpolate(d))(values);
             }
         } else {
             if (values[0]) {
@@ -222,28 +221,27 @@ c3_chart_internal_fn.lineWithRegions = function (d, x, y, _regions) {
 
 c3_chart_internal_fn.updateArea = function (durationForExit) {
     var $$ = this, d3 = $$.d3;
-    $$.mainArea = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
+    var mainArea = $$.main.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
-    $$.mainArea.enter().append('path')
+    var mainAreaEnter = mainArea.enter().append('path')
         .attr("class", $$.classArea.bind($$))
         .style("fill", $$.color)
         .style("opacity", function () { $$.orgAreaOpacity = +d3.select(this).style('opacity'); return 0; });
-    $$.mainArea
+    $$.mainArea = mainAreaEnter.merge(mainArea)
         .style("opacity", $$.orgAreaOpacity);
-    $$.mainArea.exit().transition().duration(durationForExit)
-        .style('opacity', 0)
-        .remove();
+    mainArea.exit().transition().duration(durationForExit)
+        .style('opacity', 0);
 };
-c3_chart_internal_fn.redrawArea = function (drawArea, withTransition) {
+c3_chart_internal_fn.redrawArea = function (drawArea, withTransition, transition) {
     return [
-        (withTransition ? this.mainArea.transition(Math.random().toString()) : this.mainArea)
+        (withTransition ? this.mainArea.transition(transition) : this.mainArea)
             .attr("d", drawArea)
             .style("fill", this.color)
             .style("opacity", this.orgAreaOpacity)
     ];
 };
 c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
-    var $$ = this, config = $$.config, area = $$.d3.svg.area(),
+    var $$ = this, config = $$.config, area = $$.d3.area(),
         getPoints = $$.generateGetAreaPoints(areaIndices, isSub),
         yScaleGetter = isSub ? $$.getSubYScale : $$.getYScale,
         xValue = function (d) { return (isSub ? $$.subxx : $$.xx).call($$, d); },
@@ -264,7 +262,7 @@ c3_chart_internal_fn.generateDrawArea = function (areaIndices, isSub) {
             x0 = 0, y0 = 0, path;
         if ($$.isAreaType(d)) {
             if ($$.isStepType(d)) { values = $$.convertValuesToStep(values); }
-            path = area.interpolate($$.getInterpolate(d))(values);
+            path = area.curve($$.getInterpolate(d))(values);
         } else {
             if (values[0]) {
                 x0 = $$.x(values[0].x);
@@ -304,27 +302,31 @@ c3_chart_internal_fn.generateGetAreaPoints = function (areaIndices, isSub) { // 
 };
 
 
-c3_chart_internal_fn.updateCircle = function () {
+c3_chart_internal_fn.updateCircle = function (cx, cy) {
     var $$ = this;
-    $$.mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
+    var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
         .data($$.lineOrScatterData.bind($$));
-    $$.mainCircle.enter().append("circle")
+    var mainCircleEnter = mainCircle.enter().append("circle")
         .attr("class", $$.classCircle.bind($$))
+        .attr("cx", cx)
+        .attr("cy", cy)
         .attr("r", $$.pointR.bind($$))
         .style("fill", $$.color);
-    $$.mainCircle
+    $$.mainCircle = mainCircleEnter.merge(mainCircle)
         .style("opacity", $$.initialOpacityForCircle.bind($$));
-    $$.mainCircle.exit().remove();
+    mainCircle.exit()
+        .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition) {
-    var selectedCircles = this.main.selectAll('.' + CLASS.selectedCircle);
+c3_chart_internal_fn.redrawCircle = function (cx, cy, withTransition, transition) {
+    var $$ = this,
+        selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle);
     return [
-        (withTransition ? this.mainCircle.transition(Math.random().toString()) : this.mainCircle)
-            .style('opacity', this.opacityForCircle.bind(this))
-            .style("fill", this.color)
+        (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
+            .style('opacity', this.opacityForCircle.bind($$))
+            .style("fill", $$.color)
             .attr("cx", cx)
             .attr("cy", cy),
-        (withTransition ? selectedCircles.transition(Math.random().toString()) : selectedCircles)
+        (withTransition ? selectedCircles.transition(transition) : selectedCircles)
             .attr("cx", cx)
             .attr("cy", cy)
     ];

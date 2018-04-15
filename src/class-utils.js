@@ -1,8 +1,12 @@
 import CLASS from './class';
 import { c3_chart_internal_fn } from './core';
 
+
+c3_chart_internal_fn.generateTargetClass = function (targetId) {
+    return targetId || targetId === 0 ? ('-' + targetId).replace(/\s/g, '-') : '';
+};
 c3_chart_internal_fn.generateClass = function (prefix, targetId) {
-    return " " + prefix + " " + prefix + this.getTargetSelectorSuffix(targetId);
+    return " " + prefix + " " + prefix + this.generateTargetClass(targetId);
 };
 c3_chart_internal_fn.classText = function (d) {
     return this.generateClass(CLASS.text, d.index);
@@ -82,7 +86,8 @@ c3_chart_internal_fn.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
 };
 c3_chart_internal_fn.getTargetSelectorSuffix = function (targetId) {
-    return targetId || targetId === 0 ? ('-' + targetId).replace(/[\s?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\]/g, '-') : '';
+    return this.generateTargetClass(targetId)
+        .replace(/([?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
 };
 c3_chart_internal_fn.selectorTarget = function (id, prefix) {
     return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);

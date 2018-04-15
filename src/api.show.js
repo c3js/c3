@@ -10,6 +10,7 @@ c3_chart_fn.show = function (targetIds, options) {
     targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
     targets.transition()
+        .style('display', 'initial', 'important')
         .style('opacity', 1, 'important')
         .call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
@@ -35,6 +36,7 @@ c3_chart_fn.hide = function (targetIds, options) {
         .style('opacity', 0, 'important')
         .call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 0);
+            targets.style('display', 'none');
         });
 
     if (options.withLegend) {

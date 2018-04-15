@@ -24,13 +24,13 @@ describe('c3 chart interaction', function () {
                 };
             });
 
-            it('should have 4 event rects properly', function () {
-                var lefts = [78, 138, 205.5, 407.5],
-                    widths = [60, 67.5, 202, 194];
-                d3.selectAll('.c3-event-rect').each(function (d, i) {
+            it('should have only 1 event rect properly', function () {
+                var eventRects = d3.selectAll('.c3-event-rect');
+                expect(eventRects.size()).toBe(1);
+                eventRects.each(function () {
                     var box = d3.select(this).node().getBoundingClientRect();
-                    expect(box.left).toBeCloseTo(lefts[i], -2);
-                    expect(box.width).toBeCloseTo(widths[i], -2);
+                    expect(box.left).toBeCloseTo(40.5, -2);
+                    expect(box.width).toBeCloseTo(598, -2);
                 });
             });
 
@@ -73,15 +73,14 @@ describe('c3 chart interaction', function () {
                 };
             });
 
-            it('should have 4 event rects properly', function () {
-                var lefts = [43.5, 193, 353, 500],
-                    widths = [149.5, 160, 147, 136];
-                d3.selectAll('.c3-event-rect').each(function (d, i) {
+            it('should have only 1 event rect properly', function () {
+                var eventRects = d3.selectAll('.c3-event-rect');
+                expect(eventRects.size()).toBe(1);
+                eventRects.each(function () {
                     var box = d3.select(this).node().getBoundingClientRect();
-                    expect(box.left).toBeCloseTo(lefts[i], -2);
-                    expect(box.width).toBeCloseTo(widths[i], -2);
+                    expect(box.left).toBeCloseTo(40.5, -2);
+                    expect(box.width).toBeCloseTo(598, -2);
                 });
-
             });
 
             describe('should generate line chart with only 1 data timeseries', function () {

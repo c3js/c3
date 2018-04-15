@@ -1,5 +1,3 @@
-var setMouseEvent = window.setMouseEvent;
-
 describe('c3 chart shape bar', function () {
     'use strict';
 
@@ -122,28 +120,23 @@ describe('c3 chart shape bar', function () {
 
             it('should not be within bar', function () {
                 var bar = d3.select('.c3-target-data1 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 0, 0);
-                expect(chart.internal.isWithinBar(bar)).toBeFalsy();
+                expect(chart.internal.isWithinBar([0, 0], bar)).toBeFalsy();
             });
 
             it('should be within bar', function () {
                 var bar = d3.select('.c3-target-data1 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 31, 280);
-                expect(chart.internal.isWithinBar(bar)).toBeTruthy();
+                expect(chart.internal.isWithinBar([31, 280], bar)).toBeTruthy();
             });
 
             it('should not be within bar of negative value', function () {
                 var bar = d3.select('.c3-target-data3 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 68, 280);
-                expect(chart.internal.isWithinBar(bar)).toBeFalsy();
+                expect(chart.internal.isWithinBar([68, 280], bar)).toBeFalsy();
             });
 
             it('should be within bar of negative value', function () {
                 var bar = d3.select('.c3-target-data3 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 68, 350);
-                expect(chart.internal.isWithinBar(bar)).toBeTruthy();
+                expect(chart.internal.isWithinBar([68, 350], bar)).toBeTruthy();
             });
-
         });
 
         describe('with rotated axis', function () {
@@ -154,20 +147,17 @@ describe('c3 chart shape bar', function () {
 
             it('should not be within bar', function () {
                 var bar = d3.select('.c3-target-data1 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 0, 0);
-                expect(chart.internal.isWithinBar(bar)).toBeFalsy();
+                expect(chart.internal.isWithinBar([0, 0], bar)).toBeFalsy();
             });
 
             it('should be within bar', function () {
                 var bar = d3.select('.c3-target-data1 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 190, 20);
-                expect(chart.internal.isWithinBar(bar)).toBeTruthy();
+                expect(chart.internal.isWithinBar([190, 20], bar)).toBeTruthy();
             });
 
             it('should be within bar of negative value', function () {
                 var bar = d3.select('.c3-target-data3 .c3-bar-0').node();
-                setMouseEvent(chart, 'click', 68, 50);
-                expect(chart.internal.isWithinBar(bar)).toBeTruthy();
+                expect(chart.internal.isWithinBar([68, 50], bar)).toBeTruthy();
             });
 
         });
