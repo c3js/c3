@@ -3,9 +3,6 @@ jobs:
   test:
     docker:
       - image: circleci/node:6-browsers
-        env:
-          - DISPLAY=:99
-          - CHROME_BIN=/usr/bin/google-chrome
     steps:
       - checkout
       - run: |
@@ -13,10 +10,10 @@ jobs:
           echo "npm v$(npm --version)"
           echo "$(google-chrome --version)"
       - restore_cache:
-          key: deps-npm-{{ checksum "package.json" }}
+          key: npm-1-{{ checksum "package.json" }}
       - run: npm install
       - save_cache:
-          key: deps-npm-{{ checksum "package.json" }}
+          key: npm-1-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run: npm test
@@ -38,10 +35,10 @@ jobs:
             - vendor/bundle
 
       - restore_cache:
-          key: deps-npm-{{ checksum "package.json" }}
+          key: npm-2-{{ checksum "package.json" }}
       - run: npm install
       - save_cache:
-          key: deps-npm-{{ checksum "package.json" }}
+          key: npm-2-{{ checksum "package.json" }}
           paths:
             - ./node_modules
 
