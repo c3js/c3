@@ -163,12 +163,7 @@ describe('c3 chart tooltip', function () {
             dataGroups = [ [ 'data1', 'data2', 'data3' ]];
         });
 
-<<<<<<< HEAD
-        it('should display each tooltip value descending order', function() {
-            window.setMouseEvent(chart, 'mousemove', 100, 100, d3.select('.c3-event-rect-2').node());
 
-            var classes = d3.selectAll('.c3-tooltip tr')[0].map(function(node) {
-=======
         it('should display each data in ascending order', function() {
             var eventRect = d3.select('.c3-event-rect').node(),
                 x = chart.internal.x(2),
@@ -176,16 +171,10 @@ describe('c3 chart tooltip', function () {
             window.setMouseEvent(chart, 'mousemove', x, y, eventRect);
 
             var classes = d3.selectAll('.c3-tooltip tr').nodes().map(function(node) {
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
                 return node.className;
             });
 
             expect(classes[0]).toBe(''); // header
-<<<<<<< HEAD
-            expect(classes[1]).toBe('c3-tooltip-name--data3'); // 110
-            expect(classes[2]).toBe('c3-tooltip-name--data1'); // 100
-            expect(classes[3]).toBe('c3-tooltip-name--data2'); // 10
-=======
             expect(classes[1]).toBe('c3-tooltip-name--data2'); // 160
             expect(classes[2]).toBe('c3-tooltip-name--data3'); // 760
             expect(classes[3]).toBe('c3-tooltip-name--data1'); // 1130
@@ -267,7 +256,6 @@ describe('c3 chart tooltip', function () {
     describe('tooltip with data_order as desc with un-grouped data', function() {
         beforeAll(function() {
             dataOrder = 'desc';
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
         });
     });
 
@@ -277,17 +265,6 @@ describe('c3 chart tooltip', function () {
                 order: 'asc'
             };
 
-<<<<<<< HEAD
-            // this should be ignored
-            dataOrder = 'desc';
-            dataGroups = [ [ 'data1', 'data2', 'data3' ]];
-        });
-
-        it('should display each tooltip value in ascending order', function() {
-            window.setMouseEvent(chart, 'mousemove', 100, 100, d3.select('.c3-event-rect-2').node());
-
-            var classes = d3.selectAll('.c3-tooltip tr')[0].map(function(node) {
-=======
         it('should display each tooltip value descending order', function() {
             var eventRect = d3.select('.c3-event-rect').node(),
                 x = chart.internal.x(2),
@@ -339,7 +316,6 @@ describe('c3 chart tooltip', function () {
             window.setMouseEvent(chart, 'mousemove', x, y, eventRect);
 
             var classes = d3.selectAll('.c3-tooltip tr').nodes().map(function(node) {
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
                 return node.className;
             });
 

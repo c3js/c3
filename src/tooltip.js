@@ -69,11 +69,7 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
                     } : null, b ? {
                         id: b.id,
                         values: [ b ]
-<<<<<<< HEAD
-                    } : null)
-=======
                     } : null);
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
                 };
             }
 
@@ -82,11 +78,7 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
         } else if (isArray(order)) {
             return function(a, b) {
                 return order.indexOf(a.id) - order.indexOf(b.id);
-<<<<<<< HEAD
-            }
-=======
             };
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
         }
     } else {
         // if data are grouped, we follow the order of grouped targets
@@ -102,11 +94,7 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
 
         return function(a, b) {
             return ids.indexOf(a.id) - ids.indexOf(b.id);
-<<<<<<< HEAD
-        }
-=======
         };
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
     }
 };
 c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
@@ -117,11 +105,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         text, i, title, value, name, bgcolor;
 
     var tooltipSortFunction = this.getTooltipSortFunction();
-<<<<<<< HEAD
-    if (tooltipSortFunction) {
-=======
     if(tooltipSortFunction) {
->>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
         d.sort(tooltipSortFunction);
     }
 
