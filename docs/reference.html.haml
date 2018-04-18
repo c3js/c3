@@ -256,6 +256,8 @@
           = partial :reference_menu_item, locals: { id: 'api.unzoom' }
           = partial :reference_menu_item, locals: { id: 'api.zoom.enable' }
           = partial :reference_menu_item, locals: { id: 'api.resize' }
+          = partial :reference_menu_item, locals: { id: 'api.width' }
+          = partial :reference_menu_item, locals: { id: 'api.height' }
           = partial :reference_menu_item, locals: { id: 'api.flush' }
           = partial :reference_menu_item, locals: { id: 'api.destroy' }
 
@@ -4603,6 +4605,56 @@
               &nbsp;&nbsp;width: 480
               });
       %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.width' }
+        %p Set or get chart width. If you need to change both width and height, use resize instead.
+        %h5 Arguments:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \.width(size)
+        %p <span class="code">size</span>&nbsp;&nbsp;<code>Int</code>
+        %p Width in pixels. If width is called with no arguments, it returns current chart width
+
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Change width to 640
+              chart.width(640);
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Get width
+              var width = chart.width();
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.height' }
+        %p Set or get chart height. If you need to change both width and height, use resize instead.
+        %h5 Arguments:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \.height(size)
+        %p <span class="code">size</span>&nbsp;&nbsp;<code>Int</code>
+        %p Height in pixels. If height is called with no arguments, it returns current chart height
+
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Change height to 480
+              chart.width(480);
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Get height
+              var height = chart.height();
 
       %section
         %h3
