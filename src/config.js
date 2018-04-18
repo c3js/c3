@@ -211,7 +211,6 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         regions: [],
         // tooltip - show when mouseover on each data
         tooltip_show: true,
-        tooltip_order: undefined,
         tooltip_grouped: true,
         tooltip_order: undefined,
         tooltip_format_title: undefined,
@@ -235,9 +234,6 @@ c3_chart_internal_fn.getDefaultConfig = function () {
             left: 0
         },
         title_position: 'top-center',
-        //TouchEvent configuration
-        touch_tap_radius : 20,  //touch movement must be less than this to be a 'tap'
-        touch_tap_delay : 500,  //clicks are suppressed for this many ms after a tap
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {

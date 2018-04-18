@@ -163,7 +163,6 @@ describe('c3 chart tooltip', function () {
             dataGroups = [ [ 'data1', 'data2', 'data3' ]];
         });
 
-
         it('should display each data in ascending order', function() {
             var eventRect = d3.select('.c3-event-rect').node(),
                 x = chart.internal.x(2),
@@ -257,13 +256,6 @@ describe('c3 chart tooltip', function () {
         beforeAll(function() {
             dataOrder = 'desc';
         });
-    });
-
-    describe('tooltip with tooltip_order as asc', function() {
-        beforeAll(function() {
-            tooltipConfiguration = {
-                order: 'asc'
-            };
 
         it('should display each tooltip value descending order', function() {
             var eventRect = d3.select('.c3-event-rect').node(),
