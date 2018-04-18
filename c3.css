@@ -22,6 +22,10 @@
 .c3-chart-arc path {
   stroke: #fff; }
 
+.c3-chart-arc rect {
+  stroke: white;
+  stroke-width: 1; }
+
 .c3-chart-arc text {
   fill: #fff;
   font-size: 13px; }
@@ -60,6 +64,7 @@
   stroke-width: 0; }
 
 .c3-bar._expanded_ {
+  fill-opacity: 1;
   fill-opacity: 0.75; }
 
 /*-- Focus --*/
@@ -150,7 +155,7 @@
 
 .c3-chart-arcs .c3-chart-arcs-background {
   fill: #e0e0e0;
-  stroke: none; }
+  stroke: #FFF; }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-unit {
   fill: #000;
@@ -165,3 +170,9 @@
 .c3-chart-arc .c3-gauge-value {
   fill: #000;
   /*  font-size: 28px !important;*/ }
+
+.c3-chart-arc.c3-target g path {
+  opacity: 1; }
+
+.c3-chart-arc.c3-target.c3-focused g path {
+  opacity: 1; }

@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.category = function (i, category) {
     var $$ = this.internal, config = $$.config;
     if (arguments.length > 1) {

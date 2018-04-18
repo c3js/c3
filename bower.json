@@ -20,12 +20,12 @@
     "bower_components",
     "htdocs",
     "spec",
-    "src",
+    "src/**/*.js",
     "package.json",
     "component.json",
     "Gruntfile.*"
   ],
   "dependencies": {
-    "d3": "~3.5.0"
+    "d3": "^4.12.0"
   }
 }

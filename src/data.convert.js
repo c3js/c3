@@ -1,6 +1,9 @@
+import { c3_chart_internal_fn } from './core';
+import { isValue, isUndefined, isDefined, notEmpty, isArray } from './util';
+
 c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv';
-    var req = $$.d3.xhr(url);
+    var req = $$.d3.request(url);
     if (headers) {
         Object.keys(headers).forEach(function (header) {
             req.header(header, headers[header]);
@@ -8,36 +11,35 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
     }
     req.get(function (error, data) {
         var d;
+        var dataResponse = data.response || data.responseText; // Fixes IE9 XHR issue; see #1345
         if (!data) {
             throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
         }
         if (type === 'json') {
-            d = $$.convertJsonToData(JSON.parse(data.response), keys);
+            d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
         } else if (type === 'tsv') {
-            d = $$.convertTsvToData(data.response);
+            d = $$.convertTsvToData(dataResponse);
         } else {
-            d = $$.convertCsvToData(data.response);
+            d = $$.convertCsvToData(dataResponse);
         }
         done.call($$, d);
     });
 };
 c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-    var rows = parser.parseRows(xsv), d;
-    if (rows.length === 1) {
-        d = [{}];
-        rows[0].forEach(function (id) {
-            d[0][id] = null;
-        });
+    var [ keys, ...rows ] = parser.parseRows(xsv);
+    if (rows.length === 0) {
+        return { keys, rows: [ keys.reduce((row, key) => Object.assign(row, { [key]: null }), {}) ] };
     } else {
-        d = parser.parse(xsv);
+        // [].concat() is to convert result into a plain array otherwise
+        // test is not happy because rows have properties.
+        return { keys, rows: [].concat(parser.parse(xsv)) };
     }
-    return d;
 };
 c3_chart_internal_fn.convertCsvToData = function (csv) {
-    return this.convertXsvToData(csv, this.d3.csv);
+    return this.convertXsvToData(csv, { parse: this.d3.csvParse, parseRows: this.d3.csvParseRows });
 };
 c3_chart_internal_fn.convertTsvToData = function (tsv) {
-    return this.convertXsvToData(tsv, this.d3.tsv);
+    return this.convertXsvToData(tsv, { parse: this.d3.tsvParse, parseRows: this.d3.tsvParseRows });
 };
 c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     var $$ = this,
@@ -85,41 +87,76 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
     }
     return object;
 };
-c3_chart_internal_fn.convertRowsToData = function (rows) {
-    var keys = rows[0], new_row = {}, new_rows = [], i, j;
-    for (i = 1; i < rows.length; i++) {
-        new_row = {};
-        for (j = 0; j < rows[i].length; j++) {
+
+/**
+ * Converts the rows to normalized data.
+ * @param {any[][]} rows The row data
+ * @return {Object}
+ */
+c3_chart_internal_fn.convertRowsToData = (rows) => {
+    const newRows = [];
+    const keys = rows[0];
+
+    for (let i = 1; i < rows.length; i++) {
+        const newRow = {};
+        for (let j = 0; j < rows[i].length; j++) {
             if (isUndefined(rows[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_row[keys[j]] = rows[i][j];
+            newRow[keys[j]] = rows[i][j];
         }
-        new_rows.push(new_row);
+        newRows.push(newRow);
     }
-    return new_rows;
+    return { keys, rows: newRows };
 };
-c3_chart_internal_fn.convertColumnsToData = function (columns) {
-    var new_rows = [], i, j, key;
-    for (i = 0; i < columns.length; i++) {
-        key = columns[i][0];
-        for (j = 1; j < columns[i].length; j++) {
-            if (isUndefined(new_rows[j - 1])) {
-                new_rows[j - 1] = {};
+
+/**
+ * Converts the columns to normalized data.
+ * @param {any[][]} columns The column data
+ * @return {Object}
+ */
+c3_chart_internal_fn.convertColumnsToData = (columns) => {
+    const newRows = [];
+    const keys = [];
+
+    for (let i = 0; i < columns.length; i++) {
+        const key = columns[i][0];
+        for (let j = 1; j < columns[i].length; j++) {
+            if (isUndefined(newRows[j - 1])) {
+                newRows[j - 1] = {};
             }
             if (isUndefined(columns[i][j])) {
                 throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
             }
-            new_rows[j - 1][key] = columns[i][j];
+            newRows[j - 1][key] = columns[i][j];
         }
+        keys.push(key);
     }
-    return new_rows;
+
+    return { keys, rows: newRows };
 };
+
+/**
+ * Converts the data format into the target format.
+ * @param {!Object} data
+ * @param {!Array} data.keys Ordered list of target IDs.
+ * @param {!Array} data.rows Rows of data to convert.
+ * @param {boolean} appendXs True to append to $$.data.xs, False to replace.
+ * @return {!Array}
+ */
 c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
-    var $$ = this, config = $$.config,
-        ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
-        xs = $$.d3.keys(data[0]).filter($$.isX, $$),
-        targets;
+    var $$ = this, config = $$.config, targets, ids, xs, keys;
+
+    // handles format where keys are not orderly provided
+    if (isArray(data)) {
+        keys = Object.keys(data[ 0 ]);
+    } else {
+        keys = data.keys;
+        data = data.rows;
+    }
+
+    ids = keys.filter($$.isNotX, $$);
+    xs = keys.filter($$.isX, $$);
 
     // save x for update data by load when custom x and c3.x API
     ids.forEach(function (id) {
@@ -166,7 +203,7 @@ c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
                 var xKey = $$.getXKey(id), rawX = d[xKey],
                     value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
                 // use x as categories if custom x and categorized
-                if ($$.isCustomX() && $$.isCategorized() && index === 0 && !isUndefined(rawX)) {
+                if ($$.isCustomX() && $$.isCategorized() && !isUndefined(rawX)) {
                     if (index === 0 && i === 0) {
                         config.axis_x_categories = [];
                     }

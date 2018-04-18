@@ -3,8 +3,7 @@
  * @param  {String} d SvgPath d attribute.]
  * @return {Array} an array of drawing commands.
  */
-
-function parseSvgPath(d) { //jshint ignore:line
+export function parseSvgPath(d) { //jshint ignore:line
     'use strict';
 
     var commands = [];

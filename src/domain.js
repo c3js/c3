@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isValue, isDefined, diffDomain, notEmpty } from './util';
+
 c3_chart_internal_fn.getYDomainMin = function (targets) {
     var $$ = this, config = $$.config,
         ids = $$.mapToIds(targets), ys = $$.getValuesAsIdKeyed(targets),
@@ -206,13 +209,12 @@ c3_chart_internal_fn.updateXDomain = function (targets, withUpdateXDomain, withU
     if (withUpdateOrgXDomain) {
         $$.x.domain(domain ? domain : $$.d3.extent($$.getXDomain(targets)));
         $$.orgXDomain = $$.x.domain();
-        if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
+        if (config.zoom_enabled) { $$.zoom.update(); }
         $$.subX.domain($$.x.domain());
-        if ($$.brush) { $$.brush.scale($$.subX); }
+        if ($$.brush) { $$.brush.updateScale($$.subX); }
     }
     if (withUpdateXDomain) {
-        $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.extent());
-        if (config.zoom_enabled) { $$.zoom.scale($$.x).updateScaleExtent(); }
+        $$.x.domain(domain ? domain : (!$$.brush || $$.brush.empty()) ? $$.orgXDomain : $$.brush.selectionAsValue());
     }
 
     // Trim domain when too big by zoom mousemove event

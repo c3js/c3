@@ -1,3 +1,5 @@
+import { c3_chart_fn } from './core';
+
 c3_chart_fn.data = function (targetIds) {
     var targets = this.internal.data.targets;
     return typeof targetIds === 'undefined' ? targets : targets.filter(function (t) {

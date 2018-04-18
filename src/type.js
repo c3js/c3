@@ -1,3 +1,6 @@
+import { c3_chart_internal_fn } from './core';
+import { isString } from './util';
+
 c3_chart_internal_fn.setTargetType = function (targetIds, type) {
     var $$ = this, config = $$.config;
     $$.mapToTargetIds(targetIds).forEach(function (id) {
@@ -88,7 +91,4 @@ c3_chart_internal_fn.lineOrScatterData = function (d) {
 };
 c3_chart_internal_fn.barOrLineData = function (d) {
     return this.isBarType(d) || this.isLineType(d) ? d.values : [];
-};
-c3_chart_internal_fn.isInterpolationType = function (type) {
-    return ['linear', 'linear-closed', 'basis', 'basis-open', 'basis-closed', 'bundle', 'cardinal', 'cardinal-open', 'cardinal-closed', 'monotone'].indexOf(type) >= 0;
 };

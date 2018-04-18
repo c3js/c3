@@ -1,14 +1,24 @@
+import { c3_chart_fn } from './core';
+import { isDefined } from './util';
+
 c3_chart_fn.zoom = function (domain) {
     var $$ = this.internal;
     if (domain) {
         if ($$.isTimeSeries()) {
             domain = domain.map(function (x) { return $$.parseDate(x); });
         }
-        $$.brush.extent(domain);
-        $$.redraw({withUpdateXDomain: true, withY: $$.config.zoom_rescale});
+        if ($$.config.subchart_show) {
+            $$.brush.selectionAsValue(domain, true);
+        }
+        else {
+            $$.updateXDomain(null, true, false, false, domain);
+            $$.redraw({withY: $$.config.zoom_rescale, withSubchart: false});
+        }
         $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
+        return domain;
+    } else {
+        return $$.x.domain();
     }
-    return $$.brush.extent();
 };
 c3_chart_fn.zoom.enable = function (enabled) {
     var $$ = this.internal;
@@ -17,8 +27,13 @@ c3_chart_fn.zoom.enable = function (enabled) {
 };
 c3_chart_fn.unzoom = function () {
     var $$ = this.internal;
-    $$.brush.clear().update();
-    $$.redraw({withUpdateXDomain: true});
+    if ($$.config.subchart_show) {
+        $$.brush.clear();
+    }
+    else {
+        $$.updateXDomain(null, true, false, false, $$.subX.domain());
+        $$.redraw({withY: $$.config.zoom_rescale, withSubchart: false});
+    }
 };
 
 c3_chart_fn.zoom.max = function (max) {

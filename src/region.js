@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue } from './util';
+
 c3_chart_internal_fn.initRegion = function () {
     var $$ = this;
     $$.region = $$.main.append('g')
@@ -10,36 +14,27 @@ c3_chart_internal_fn.updateRegion = function (duration) {
     // hide if arc type
     $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
 
-    $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
+    var mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
-    $$.mainRegion.enter().append('g')
-      .append('rect')
+    var mainRegionEnter = mainRegion.enter().append('rect')
+        .attr("x", $$.regionX.bind($$))
+        .attr("y", $$.regionY.bind($$))
+        .attr("width", $$.regionWidth.bind($$))
+        .attr("height", $$.regionHeight.bind($$))
         .style("fill-opacity", 0);
-    $$.mainRegion
+    $$.mainRegion = mainRegionEnter.merge(mainRegion)
         .attr('class', $$.classRegion.bind($$));
-    $$.mainRegion.exit().transition().duration(duration)
+    mainRegion.exit().transition().duration(duration)
         .style("opacity", 0)
         .remove();
 };
-c3_chart_internal_fn.redrawRegion = function (withTransition) {
-    var $$ = this,
-        regions = $$.mainRegion.selectAll('rect').each(function () {
-            // data is binded to g and it's not transferred to rect (child node) automatically,
-            // then data of each rect has to be updated manually.
-            // TODO: there should be more efficient way to solve this?
-            var parentData = $$.d3.select(this.parentNode).datum();
-            $$.d3.select(this).datum(parentData);
-        }),
-        x = $$.regionX.bind($$),
-        y = $$.regionY.bind($$),
-        w = $$.regionWidth.bind($$),
-        h = $$.regionHeight.bind($$);
-    return [
-        (withTransition ? regions.transition() : regions)
-            .attr("x", x)
-            .attr("y", y)
-            .attr("width", w)
-            .attr("height", h)
+c3_chart_internal_fn.redrawRegion = function (withTransition, transition) {
+    var $$ = this, regions = $$.mainRegion;
+    return [(withTransition ? regions.transition(transition) : regions)
+            .attr("x", $$.regionX.bind($$))
+            .attr("y", $$.regionY.bind($$))
+            .attr("width", $$.regionWidth.bind($$))
+            .attr("height", $$.regionHeight.bind($$))
             .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
     ];
 };

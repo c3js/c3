@@ -1,0 +1,212 @@
+.container
+  .section
+    = partial :index_item_title, locals: { id: 'chart', name: 'Chart' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'simple_multiple' }
+        = partial :index_item, locals: { id: 'timeseries' }
+        = partial :index_item, locals: { id: 'chart_spline' }
+      .row
+        = partial :index_item, locals: { id: 'simple_xy' }
+        = partial :index_item, locals: { id: 'simple_xy_multiple' }
+        = partial :index_item, locals: { id: 'simple_regions' }
+      .row
+        = partial :index_item, locals: { id: 'chart_step' }
+        = partial :index_item, locals: { id: 'chart_area' }
+        = partial :index_item, locals: { id: 'chart_area_stacked' }
+      .row
+        = partial :index_item, locals: { id: 'chart_bar' }
+        = partial :index_item, locals: { id: 'chart_bar_stacked' }
+        = partial :index_item, locals: { id: 'chart_scatter' }
+      .row
+        = partial :index_item, locals: { id: 'chart_pie' }
+        = partial :index_item, locals: { id: 'chart_donut' }
+        = partial :index_item, locals: { id: 'chart_gauge' }
+      .row
+        = partial :index_item, locals: { id: 'chart_combination' }
+        .large-4.columns
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'axis', name: 'Axis' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'categorized' }
+        = partial :index_item, locals: { id: 'axes_rotated' }
+        = partial :index_item, locals: { id: 'axes_y2' }
+      .row
+        = partial :index_item, locals: { id: 'axes_x_tick_format' }
+        = partial :index_item, locals: { id: 'axes_x_tick_count' }
+        = partial :index_item, locals: { id: 'axes_x_tick_values' }
+      .row
+        = partial :index_item, locals: { id: 'axes_x_tick_culling' }
+        = partial :index_item, locals: { id: 'axes_x_tick_fit' }
+        = partial :index_item, locals: { id: 'axes_x_localtime' }
+      .row
+        = partial :index_item, locals: { id: 'axes_x_tick_rotate' }
+        = partial :index_item, locals: { id: 'axes_y_tick_format' }
+        = partial :index_item, locals: { id: 'axes_y_padding' }
+      .row
+        = partial :index_item, locals: { id: 'axes_y_range' }
+        = partial :index_item, locals: { id: 'axes_label' }
+        = partial :index_item, locals: { id: 'axes_label_position' }
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'data', name: 'Data' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'data_columned' }
+        = partial :index_item, locals: { id: 'data_rowed' }
+        = partial :index_item, locals: { id: 'data_json' }
+      .row
+        = partial :index_item, locals: { id: 'data_url' }
+        = partial :index_item, locals: { id: 'data_stringx' }
+        = partial :index_item, locals: { id: 'data_load' }
+      .row
+        = partial :index_item, locals: { id: 'data_name' }
+        = partial :index_item, locals: { id: 'data_color' }
+        = partial :index_item, locals: { id: 'data_order' }
+      .row
+        = partial :index_item, locals: { id: 'data_label' }
+        = partial :index_item, locals: { id: 'data_label_format' }
+        = partial :index_item, locals: { id: 'data_number_format_l10n' }
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'grid', name: 'Grid' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'options_gridline' }
+        = partial :index_item, locals: { id: 'grid_x_lines' }
+        = partial :index_item, locals: { id: 'grid_y_lines' }
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'region', name: 'Region' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'region' }
+        = partial :index_item, locals: { id: 'region_timeseries' }
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'interaction', name: 'Interaction' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'options_subchart' }
+        = partial :index_item, locals: { id: 'interaction_zoom' }
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'legend', name: 'Legend' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'options_legend' }
+        = partial :index_item, locals: { id: 'legend_position' }
+        = partial :index_item, locals: { id: 'legend_custom' }
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'tooltip', name: 'Tooltip' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'tooltip_show' }
+        = partial :index_item, locals: { id: 'tooltip_grouped' }
+        = partial :index_item, locals: { id: 'tooltip_format' }
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'chart_options', name: 'Chart Options' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'options_size' }
+        = partial :index_item, locals: { id: 'options_padding' }
+        = partial :index_item, locals: { id: 'options_color' }
+      .row
+        = partial :index_item, locals: { id: 'transition_duration' }
+        .large-4.columns
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'line_chart_options', name: 'Line Chart Options' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'point_show' }
+        .large-4.columns
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'pie_chart_options', name: 'Pie Chart Options' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'pie_label_format' }
+        .large-4.columns
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'api', name: 'API' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'api_flow' }
+        = partial :index_item, locals: { id: 'api_data_name' }
+        = partial :index_item, locals: { id: 'api_data_color' }
+      .row
+        = partial :index_item, locals: { id: 'api_axis_label' }
+        = partial :index_item, locals: { id: 'api_axis_range' }
+        = partial :index_item, locals: { id: 'api_resize' }
+      .row
+        = partial :index_item, locals: { id: 'api_grid_x' }
+        .large-4.columns
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'transform', name: 'Transform' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'transform_line' }
+        = partial :index_item, locals: { id: 'transform_spline' }
+        = partial :index_item, locals: { id: 'transform_bar' }
+      .row
+        = partial :index_item, locals: { id: 'transform_area' }
+        = partial :index_item, locals: { id: 'transform_areaspline' }
+        = partial :index_item, locals: { id: 'transform_scatter' }
+      .row
+        = partial :index_item, locals: { id: 'transform_pie' }
+        = partial :index_item, locals: { id: 'transform_donut' }
+        .large-4.columns
+
+  %hr.medium
+
+  .section
+    = partial :index_item_title, locals: { id: 'style', name: 'Style' }
+    %div
+      .row
+        = partial :index_item, locals: { id: 'style_region' }
+        = partial :index_item, locals: { id: 'style_grid' }
+        .large-4.columns
+
+  = partial :footer
+
+= partial :script

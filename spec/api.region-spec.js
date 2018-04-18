@@ -9,7 +9,7 @@ describe('c3 api region', function () {
 
     describe('api.region', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -31,10 +31,9 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
-        it('should update regions', function (done) {
+        it('updates regions', function (done) {
             var main = chart.internal.main,
                 expectedRegions = [
                     {
@@ -60,9 +59,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = 'red',
                         unexpectedClass = 'green',
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
@@ -84,7 +82,7 @@ describe('c3 api region', function () {
 
     describe('api.region.add', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -106,7 +104,6 @@ describe('c3 api region', function () {
                     }
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
         it('should add regions', function (done) {
@@ -153,9 +150,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = expectedClasses[i],
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
                         expectedEnd = Math.round(chart.internal.y(expectedRegions[i].end)),
@@ -175,7 +171,7 @@ describe('c3 api region', function () {
 
     describe('api.region.remove', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -203,7 +199,6 @@ describe('c3 api region', function () {
                     },
                 ]
             };
-            expect(true).toBeTruthy();
         });
 
         it('should remove regions', function (done) {
@@ -227,9 +222,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = expectedClasses[i],
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
                         expectedEnd = Math.round(chart.internal.y(expectedRegions[i].end)),

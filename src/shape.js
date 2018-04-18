@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isUndefined } from './util';
+
 c3_chart_internal_fn.getShapeIndices = function (typeFilter) {
     var $$ = this, config = $$.config,
         indices = {}, i = 0, j, k;
@@ -69,14 +73,37 @@ c3_chart_internal_fn.isWithinShape = function (that, d) {
         isWithin = $$.isStepType(d) ? $$.isWithinStep(that, $$.getYScale(d.id)(d.value)) : $$.isWithinCircle(that, $$.pointSelectR(d) * 1.5);
     }
     else if (that.nodeName === 'path') {
-        isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar(that) : true;
+        isWithin = shape.classed(CLASS.bar) ? $$.isWithinBar($$.d3.mouse(that), that) : true;
     }
     return isWithin;
 };
 
 
 c3_chart_internal_fn.getInterpolate = function (d) {
-    var $$ = this,
-        interpolation = $$.isInterpolationType($$.config.spline_interpolation_type) ? $$.config.spline_interpolation_type : 'cardinal';
-    return $$.isSplineType(d) ? interpolation : $$.isStepType(d) ? $$.config.line_step_type : "linear";
+    var $$ = this, d3 = $$.d3,
+        types = {
+            'linear': d3.curveLinear,
+            'linear-closed': d3.curveLinearClosed,
+            'basis': d3.curveBasis,
+            'basis-open': d3.curveBasisOpen,
+            'basis-closed': d3.curveBasisClosed,
+            'bundle': d3.curveBundle,
+            'cardinal': d3.curveCardinal,
+            'cardinal-open': d3.curveCardinalOpen,
+            'cardinal-closed': d3.curveCardinalClosed,
+            'monotone': d3.curveMonotoneX,
+            'step': d3.curveStep,
+        },
+        type;
+
+    if ($$.isSplineType(d)) {
+        type = types[$$.config.spline_interpolation_type] || types.cardinal;
+    }
+    else if ($$.isStepType(d)) {
+        type = types[$$.config.line_step_type];
+    }
+    else {
+        type = types.linear;
+    }
+    return type;
 };

@@ -1,3 +1,6 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.initText = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")
@@ -5,42 +8,45 @@ c3_chart_internal_fn.initText = function () {
     $$.mainText = $$.d3.selectAll([]);
 };
 c3_chart_internal_fn.updateTargetsForText = function (targets) {
-    var $$ = this, mainTextUpdate, mainTextEnter,
+    var $$ = this,
         classChartText = $$.classChartText.bind($$),
         classTexts = $$.classTexts.bind($$),
         classFocus = $$.classFocus.bind($$);
-    mainTextUpdate = $$.main.select('.' + CLASS.chartTexts).selectAll('.' + CLASS.chartText)
-        .data(targets)
-        .attr('class', function (d) { return classChartText(d) + classFocus(d); });
-    mainTextEnter = mainTextUpdate.enter().append('g')
+    var mainText = $$.main.select('.' + CLASS.chartTexts).selectAll('.' + CLASS.chartText)
+        .data(targets);
+    var mainTextEnter = mainText.enter().append('g')
         .attr('class', classChartText)
         .style('opacity', 0)
         .style("pointer-events", "none");
     mainTextEnter.append('g')
         .attr('class', classTexts);
+    mainTextEnter.merge(mainText)
+        .attr('class', function (d) { return classChartText(d) + classFocus(d); });
 };
-c3_chart_internal_fn.updateText = function (durationForExit) {
+c3_chart_internal_fn.updateText = function (xForText, yForText, durationForExit) {
     var $$ = this, config = $$.config,
         barOrLineData = $$.barOrLineData.bind($$),
         classText = $$.classText.bind($$);
-    $$.mainText = $$.main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
+    var mainText = $$.main.selectAll('.' + CLASS.texts).selectAll('.' + CLASS.text)
         .data(barOrLineData);
-    $$.mainText.enter().append('text')
+    var mainTextEnter = mainText.enter().append('text')
         .attr("class", classText)
         .attr('text-anchor', function (d) { return config.axis_rotated ? (d.value < 0 ? 'end' : 'start') : 'middle'; })
         .style("stroke", 'none')
+        .attr('x', xForText)
+        .attr('y', yForText)
         .style("fill", function (d) { return $$.color(d); })
         .style("fill-opacity", 0);
-    $$.mainText
+    $$.mainText = mainTextEnter.merge(mainText)
         .text(function (d, i, j) { return $$.dataLabelFormat(d.id)(d.value, d.id, i, j); });
-    $$.mainText.exit()
+    mainText.exit()
         .transition().duration(durationForExit)
         .style('fill-opacity', 0)
         .remove();
 };
-c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition) {
+c3_chart_internal_fn.redrawText = function (xForText, yForText, forFlow, withTransition, transition) {
     return [
-        (withTransition ? this.mainText.transition() : this.mainText)
+        (withTransition ? this.mainText.transition(transition) : this.mainText)
             .attr('x', xForText)
             .attr('y', yForText)
             .style("fill", this.color)

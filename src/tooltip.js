@@ -1,3 +1,7 @@
+import CLASS from './class';
+import { c3_chart_internal_fn } from './core';
+import { isValue, isFunction, isArray, isString, sanitise } from './util';
+
 c3_chart_internal_fn.initTooltip = function () {
     var $$ = this, config = $$.config, i;
     $$.tooltip = $$.selectChart
@@ -65,7 +69,11 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
                     } : null, b ? {
                         id: b.id,
                         values: [ b ]
+<<<<<<< HEAD
                     } : null)
+=======
+                    } : null);
+>>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
                 };
             }
 
@@ -74,7 +82,11 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
         } else if (isArray(order)) {
             return function(a, b) {
                 return order.indexOf(a.id) - order.indexOf(b.id);
+<<<<<<< HEAD
             }
+=======
+            };
+>>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
         }
     } else {
         // if data are grouped, we follow the order of grouped targets
@@ -90,7 +102,11 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
 
         return function(a, b) {
             return ids.indexOf(a.id) - ids.indexOf(b.id);
+<<<<<<< HEAD
         }
+=======
+        };
+>>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
     }
 };
 c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
@@ -101,7 +117,11 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
         text, i, title, value, name, bgcolor;
 
     var tooltipSortFunction = this.getTooltipSortFunction();
+<<<<<<< HEAD
     if (tooltipSortFunction) {
+=======
+    if(tooltipSortFunction) {
+>>>>>>> c45b30fe3190872f6760875840587bd2a2d9371b
         d.sort(tooltipSortFunction);
     }
 
@@ -136,7 +156,7 @@ c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, el
   // Determin tooltip position
     if (forArc) {
         tooltipLeft = (($$.width - ($$.isLegendRight ? $$.getLegendWidth() : 0)) / 2) + mouse[0];
-        tooltipTop = ($$.height / 2) + mouse[1] + 20;
+        tooltipTop = ($$.hasType('gauge') ? $$.height : $$.height / 2) + mouse[1] + 20;
     } else {
         svgLeft = $$.getSvgLeft(true);
         if (config.axis_rotated) {

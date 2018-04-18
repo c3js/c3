@@ -9,7 +9,7 @@ describe('c3 api grid', function () {
 
     describe('ygrid.add and ygrid.remove', function () {
 
-        it('should update args', function () {
+        beforeAll(function () {
             args = {
                 data: {
                     columns: [
@@ -17,10 +17,9 @@ describe('c3 api grid', function () {
                     ]
                 }
             };
-            expect(true).toBeTruthy();
         });
 
-        it('should update y grids', function (done) {
+        it('updates y grids', function (done) {
             var main = chart.internal.main,
                 expectedGrids = [
                     {
@@ -62,7 +61,7 @@ describe('c3 api grid', function () {
             }, 1200);
         });
 
-        it("should update x ygrids even if it's zoomed", function (done) {
+        it('updates x ygrids even if zoomed', function (done) {
             var main = chart.internal.main,
                 expectedGrids = [
                     {

@@ -1,0 +1,384 @@
+.container.sidemenu
+  .row
+    .large-3.medium-4.columns.column-menu
+      .side-bar
+        %ul.side-nav
+          %li GETTING STARTED
+          %li
+            %a( href="#setup" ) 1. Setup
+          %li
+            %a( href="#generate" ) 2. Generate chart
+          %li
+            %a( href="#customize" ) 3. Customize chart
+          %li
+            %a( href="#api" ) 4. Use APIs
+          %li
+            %a( href="#style" ) 5. Customize style
+          %li
+            %a( href="#more" ) 6. And more..
+
+    .large-9.medium-8.columns.column-content
+      %section
+        %h2 Getting Started
+        %p In this guide, we are going to show you how to get started with C3.
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#setup" ) 1. Setup
+        %p Download the latest version here:
+        %ul
+          %li <a href="https://github.com/c3js/c3/releases/latest" target="_blank">https://github.com/c3js/c3/releases/latest</a>
+        %p Installing by Bower/Component is also available with the name <span class="code">c3</span>.
+
+        %p Then, load the scripts and css:
+
+        .sourcecode.highlight
+          %pre
+            %code.html.xml
+              :preserve
+                <span class="comment">&lt;!-- Load c3.css --&gt;</span>
+                <span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"/path/to/c3.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span>&gt;</span>
+
+                <span class="comment">&lt;!-- Load d3.js and c3.js --&gt;</span>
+                <span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/d3.v4.min.js"</span> <span class="attribute">charset</span>=<span class="value">"utf-8"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+                <span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"/path/to/c3.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+
+        %p C3 depends on D3, so please load D3 too.
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#generate" ) 2. Generate Chart
+        %p C3 generates a chart by calling <span class="code">generate()</span> with the argument object, and an element including the chart will insert into the element specified as a selector in that argument as <span class="code">bindto</span>.
+
+        %p Prepare the element to bind the chart:
+        .sourcecode.highlight
+          %pre
+            %code.html.xml
+              :preserve
+                <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"chart"</span>&gt;&lt;/<span class="title">div</span>&gt;</span>
+
+        %p And, call <span class="code">generate()</span> with arguments:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                var chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                      ]
+                    }
+                });
+
+        %p C3 supports the asynchronous module definition (AMD) API. If you use <a href="http://requirejs.org/" target="_blank">RequireJS</a>, you can load like this:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                require.config({
+                  baseUrl: '/js',
+                  paths: {
+                    d3: "http://d3js.org/d3.v4.min"
+                  }
+                });
+
+                require(["d3", "c3"], function(d3, c3) {
+                  c3.generate({
+                    ...
+                  });
+                });
+
+        %p Then, you will see the chart:
+
+        #chart2_1
+        %br
+
+        %p Data can be loaded as <a href="/samples/data_columned.html">columned data</a> / <a href="/samples/data_rowed.html">rowed data</a> / <a href="/samples/data_url.html">csv in URL</a>.
+        %p There are serveral options to customize the chart and you can see those here:
+        %ul
+          %li <a href="/examples.html">Examples</a>
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#customize" ) 3. Customize Chart
+        %p The chart can be customize by giving some options when generating. We will introduce some of them here.
+
+        %h4 1. Additional Axis
+        %p Introduce additional axis for <span class="code">data2</span>. Add <span class="code">data.axes</span> and <span class="code">axis.y2.show</span> as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                var chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                      ],
+                      axes: {
+                        data2: 'y2' // ADD
+                      }
+                    },
+                    axis: {
+                      y2: {
+                        show: true // ADD
+                      }
+                    }
+                });
+
+        %p Then, the chart will be like this:
+
+        #chart3_1
+        %br
+
+        %h4 2. Show Axis Label
+        %p Show labels for each axis. Add <span class="code">axis.y.label</span> and <span class="code">axis.y2.label</span> as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                var chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                      ],
+                      axes: {
+                        data2: 'y2'
+                      }
+                    },
+                    axis: {
+                      y: {
+                        label: { // ADD
+                          text: 'Y Label',
+                          position: 'outer-middle'
+                        }
+                      },
+                      y2: {
+                        show: true,
+                        label: { // ADD
+                          text: 'Y2 Label',
+                          position: 'outer-middle'
+                        }
+                      }
+                    }
+                });
+
+        %p Then, the chart will be like this:
+
+        #chart3_2
+        %br
+
+        %h4 3. Change Chart Type
+        %p Show <span class="code">data2</span> as Bar chart. Add <span class="code">data.types</span> as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                var chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                      ],
+                      axes: {
+                        data2: 'y2'
+                      },
+                      types: {
+                        data2: 'bar' // ADD
+                      }
+                    },
+                    axis: {
+                      y: {
+                        label: {
+                          text: 'Y Label',
+                          position: 'outer-middle'
+                        }
+                      },
+                      y2: {
+                        show: true,
+                        label: {
+                          text: 'Y2 Label',
+                          position: 'outer-middle'
+                        }
+                      }
+                    }
+                });
+
+        %p Then, the chart will be like this:
+
+        #chart3_3
+        %br
+
+        %h4 4. Format values
+        %p Format the values of each data. Add <span class="code">axis.y.tick.format</span> as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                var chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 50, 20, 10, 40, 15, 25]
+                      ],
+                      axes: {
+                        data2: 'y2'
+                      },
+                      types: {
+                        data2: 'bar'
+                      }
+                    },
+                    axis: {
+                      y: {
+                        label: {
+                          text: 'Y Label',
+                          position: 'outer-middle'
+                        },
+                        tick: {
+                          format: d3.format("$,") // ADD
+                        }
+                      },
+                      y2: {
+                        show: true,
+                        label: {
+                          text: 'Y2 Label',
+                          position: 'outer-middle'
+                        }
+                      }
+                    }
+                });
+
+        %p Then, the chart will be like this:
+
+        #chart3_4
+        %br
+
+        %p More information about the options, please see <a href="/examples.html">Examples</a>. (We'll add the reference soon)
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#api" ) 4. Use APIs
+        %p By using APIs, you can update the chart after it's been rendered. We will introduce some of APIs here. APIs can be called through the object returned from <span class="code">generate()</span>.
+
+        %h4 1. Load Data
+        %p By using <span class="code">load()</span> API, you can load data and update the chart dynamically as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                // var chart = c3.generate({ ... });
+
+                chart.load({
+                  columns: [
+                    ['data1', 300, 100, 250, 150, 300, 150, 500],
+                    ['data2', 100, 200, 150, 50, 100, 250]
+                  ]
+                });
+
+        %p If you push the button "Load" below, this code will run and the chart will be updated.
+
+        %button.small( onclick="example4_1();" ) Load
+
+        #chart4_1
+        %br
+
+        %h4 2. Unload Data
+        %p By using <span class="code">unload()</span> API, you can unload the data dynamically as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                // var chart = c3.generate({ ... });
+
+                chart.unload({
+                    ids: ['data2', 'data3']
+                });
+
+        %p If you push the button "Unload" below, this code will run and the chart will be updated.
+
+        %button.small( onclick="example4_2();" ) Unload
+
+        #chart4_2
+        %br
+
+        %p Please use <span class="code">unload</span> param in <span class="code">load()</span> API if load and unload need to run simultaneously. Please see <a href="/samples/data_load.html">this example</a>.
+
+        %h4 3. Show/Hide Data
+        %p By using <span class="code">show()</span> and <span class="code">hide()</span> API, you can show/hide the data dynamically as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.javascript
+              :preserve
+                // var chart = c3.generate({ ... });
+
+                chart.hide(['data2', 'data3']);
+                chart.show(['data2', 'data3']);
+
+        %p If you push the button "Show" and "Hide" below, this code will run and the chart will be updated.
+
+        %button.small( onclick="example4_3_2();" ) Hide
+        %button.small( onclick="example4_3_1();" ) Show
+
+        #chart4_3
+        %br
+
+        %p The documentation about APIs is poor now, so please check the <a href="https://github.com/c3js/c3/issues?state=open">issues on github</a>. There might be some hints about what you want to do. (We will add the document soon)
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#style" ) 5. Customize Style
+        %p C3 give some classes for each element when generating. So, you can change the style of the elements by using those classes.
+        %h4 1. Line style
+        %p The lines have <span class="code">c3-line-[id]</span> class, so this class can be used to define the style in css as follows:
+
+        .sourcecode.highlight
+          %pre
+            %code.css
+              :preserve
+                #chart .c3-line-data2 {
+                  stroke-width: 5px;
+                }
+
+        #chart5_1
+        %br
+
+        %p Please check the class for each element if you want to change the style. Web Inspector would be useful. (We will add the document for class definition soon)
+
+      %hr
+
+      %section
+        %h3
+          %a( href="#more" ) 6. And More..
+        %p Please check the <a href="/examples.html">examples</a> and the <a href="https://github.com/c3js/c3/issues?state=open">issues</a> on github for more information. Sorry for the poor documentation. We're working on now and please give me some time. Thank you.
+
+  = partial :footer
+
+= partial :script
+= partial :script_scroll
+= javascript_include_tag 'gettingstarted.js'

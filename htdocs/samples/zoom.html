@@ -7,7 +7,7 @@
     <button onclick="load()">Load</button>
     <div id="chart2"></div>
 
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
 
@@ -18,13 +18,9 @@
             generateData(100)
           ],
         },
-        axis: {
-          x: {
-            default: [30, 60]
-          }
-        },
         zoom: {
           enabled: true,
+          initialRange: [30, 60],
           onzoomstart: function (event) {
             console.log("onzoomstart", event);
           },
@@ -44,10 +40,12 @@
         },
         axis: {
           x: {
-            default: [30, 60]
           }
         },
-        zoom: { enabled: true },
+        zoom: {
+            enabled: true,
+            initialRange: [30, 60],
+        },
       });
 
       function load() {

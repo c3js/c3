@@ -1,5 +1,7 @@
+import { c3_chart_internal_fn } from './core';
+
 c3_chart_internal_fn.getScale = function (min, max, forTimeseries) {
-    return (forTimeseries ? this.d3.time.scale() : this.d3.scale.linear()).range([min, max]);
+    return (forTimeseries ? this.d3.scaleTime() : this.d3.scaleLinear()).range([min, max]);
 };
 c3_chart_internal_fn.getX = function (min, max, domain, offset) {
     var $$ = this,
@@ -81,8 +83,7 @@ c3_chart_internal_fn.updateScales = function () {
 
     // Set initialized scales to brush and zoom
     if (!forInit) {
-        if ($$.brush) { $$.brush.scale($$.subX); }
-        if (config.zoom_enabled) { $$.zoom.scale($$.x); }
+        if ($$.brush) { $$.brush.updateScale($$.subX); }
     }
     // update for arc
     if ($$.updateArc) { $$.updateArc(); }
