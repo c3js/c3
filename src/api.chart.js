@@ -16,7 +16,7 @@ c3_chart_fn.width = function(width){
 
     config.size_width = width;
     this.flush();
-}
+};
 
 c3_chart_fn.height = function(height){
     var $$ = this.internal, config = $$.config;
@@ -27,8 +27,7 @@ c3_chart_fn.height = function(height){
 
     config.size_height = height;
     this.flush();
-}
-
+};
 
 c3_chart_fn.flush = function () {
     var $$ = this.internal;
