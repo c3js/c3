@@ -1,4 +1,4 @@
-/* @license C3.js v0.5.2 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.5.3 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -94,6 +94,21 @@
       if (!(instance instanceof Constructor)) {
         throw new TypeError("Cannot call a class as a function");
       }
+    };
+
+    var defineProperty = function (obj, key, value) {
+      if (key in obj) {
+        Object.defineProperty(obj, key, {
+          value: value,
+          enumerable: true,
+          configurable: true,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+
+      return obj;
     };
 
     var inherits = function (subClass, superClass) {
@@ -679,11 +694,14 @@
         return id in config.data_axes ? config.data_axes[id] : 'y';
     };
     c3_axis_fn.getXAxisTickFormat = function getXAxisTickFormat() {
+        // #2251 previously set any negative values to a whole number,
+        // however both should be truncated according to the users format specification
         var $$ = this.owner,
-            config = $$.config,
-            format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
-            return v < 0 ? v.toFixed(0) : v;
+            config = $$.config;
+        var format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
+            return v;
         };
+
         if (config.axis_x_tick_format) {
             if (isFunction(config.axis_x_tick_format)) {
                 format = config.axis_x_tick_format;
@@ -978,7 +996,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.5.2" };
+    var c3 = { version: "0.5.3" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -4127,7 +4145,7 @@
         $$.removeHiddenTargetIds(targetIds);
         targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
-        targets.transition().style('opacity', 1, 'important').call($$.endall, function () {
+        targets.transition().style('display', 'initial', 'important').style('opacity', 1, 'important').call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
         });
 
@@ -4150,6 +4168,7 @@
 
         targets.transition().style('opacity', 0, 'important').call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 0);
+            targets.style('display', 'none');
         });
 
         if (options.withLegend) {
@@ -4255,8 +4274,10 @@
                 $$.redraw({ withY: $$.config.zoom_rescale, withSubchart: false });
             }
             $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
+            return domain;
+        } else {
+            return $$.x.domain();
         }
-        return domain;
     };
     c3_chart_fn.zoom.enable = function (enabled) {
         var $$ = this.internal;
@@ -5381,16 +5402,17 @@
         });
     };
     c3_chart_internal_fn.convertXsvToData = function (xsv) {
-        var d;
-        if (xsv.length === 1) {
-            d = [{}];
-            xsv[0].forEach(function (id) {
-                d[0][id] = null;
-            });
+        var keys = xsv.columns,
+            rows = xsv;
+        if (rows.length === 0) {
+            return { keys: keys, rows: [keys.reduce(function (row, key) {
+                    return Object.assign(row, defineProperty({}, key, null));
+                }, {})] };
         } else {
-            d = xsv;
+            // [].concat() is to convert result into a plain array otherwise
+            // test is not happy because rows have properties.
+            return { keys: keys, rows: [].concat(xsv) };
         }
-        return d;
     };
     c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         var $$ = this,
@@ -5445,7 +5467,7 @@
     /**
      * Converts the rows to normalized data.
      * @param {any[][]} rows The row data
-     * @return {Object[]}
+     * @return {Object}
      */
     c3_chart_internal_fn.convertRowsToData = function (rows) {
         var newRows = [];
@@ -5461,16 +5483,17 @@
             }
             newRows.push(newRow);
         }
-        return newRows;
+        return { keys: keys, rows: newRows };
     };
 
     /**
      * Converts the columns to normalized data.
      * @param {any[][]} columns The column data
-     * @return {Object[]}
+     * @return {Object}
      */
     c3_chart_internal_fn.convertColumnsToData = function (columns) {
         var newRows = [];
+        var keys = [];
 
         for (var i = 0; i < columns.length; i++) {
             var key = columns[i][0];
@@ -5483,17 +5506,38 @@
                 }
                 newRows[j - 1][key] = columns[i][j];
             }
+            keys.push(key);
         }
 
-        return newRows;
+        return { keys: keys, rows: newRows };
     };
 
+    /**
+     * Converts the data format into the target format.
+     * @param {!Object} data
+     * @param {!Array} data.keys Ordered list of target IDs.
+     * @param {!Array} data.rows Rows of data to convert.
+     * @param {boolean} appendXs True to append to $$.data.xs, False to replace.
+     * @return {!Array}
+     */
     c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
         var $$ = this,
             config = $$.config,
-            ids = $$.d3.keys(data[0]).filter($$.isNotX, $$),
-            xs = $$.d3.keys(data[0]).filter($$.isX, $$),
-            targets;
+            targets,
+            ids,
+            xs,
+            keys;
+
+        // handles format where keys are not orderly provided
+        if (isArray(data)) {
+            keys = Object.keys(data[0]);
+        } else {
+            keys = data.keys;
+            data = data.rows;
+        }
+
+        ids = keys.filter($$.isNotX, $$);
+        xs = keys.filter($$.isX, $$);
 
         // save x for update data by load when custom x and c3.x API
         ids.forEach(function (id) {

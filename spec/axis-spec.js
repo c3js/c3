@@ -153,6 +153,25 @@ describe('c3 chart axis', function () {
     });
 
     describe('axis.x.tick.values', function () {
+        describe('formatted correctly when negative', function() {
+            var xValues = [-3.3, -2.2, -1.1, 1.1, 2.2, 3.3];
+            beforeEach(function() {
+                args.data = {
+                    x: 'x',
+                    columns: [
+                        ['x'].concat(xValues),
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                    ]
+                };
+            });
+
+            it ('should not generate whole number for negative values', function() {
+                var tickValues = [];
+                d3.select('.c3-axis-x').selectAll('g.tick').selectAll('tspan').each(function(d, i) { expect(tickValues.push(parseFloat(d.splitted)) === xValues[i]); });
+
+            });
+        });
+
         describe('function is provided', function () {
             var tickGenerator = function () {
                 var values = [];
