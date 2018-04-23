@@ -1,4 +1,4 @@
-/* @license C3.js v0.5.3 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.5.4 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -698,11 +698,14 @@
         return id in config.data_axes ? config.data_axes[id] : 'y';
     };
     c3_axis_fn.getXAxisTickFormat = function getXAxisTickFormat() {
+        // #2251 previously set any negative values to a whole number,
+        // however both should be truncated according to the users format specification
         var $$ = this.owner,
-            config = $$.config,
-            format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
-            return v < 0 ? v.toFixed(0) : v;
+            config = $$.config;
+        var format = $$.isTimeSeries() ? $$.defaultAxisTimeFormat : $$.isCategorized() ? $$.categoryName : function (v) {
+            return v;
         };
+
         if (config.axis_x_tick_format) {
             if (isFunction(config.axis_x_tick_format)) {
                 format = config.axis_x_tick_format;
@@ -997,7 +1000,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.5.3" };
+    var c3 = { version: "0.5.4" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -4146,7 +4149,7 @@
         $$.removeHiddenTargetIds(targetIds);
         targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
-        targets.transition().style('opacity', 1, 'important').call($$.endall, function () {
+        targets.transition().style('display', 'initial', 'important').style('opacity', 1, 'important').call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
         });
 
@@ -4169,6 +4172,7 @@
 
         targets.transition().style('opacity', 0, 'important').call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 0);
+            targets.style('display', 'none');
         });
 
         if (options.withLegend) {
@@ -4274,8 +4278,10 @@
                 $$.redraw({ withY: $$.config.zoom_rescale, withSubchart: false });
             }
             $$.config.zoom_onzoom.call(this, $$.x.orgDomain());
+            return domain;
+        } else {
+            return $$.x.domain();
         }
-        return domain;
     };
     c3_chart_fn.zoom.enable = function (enabled) {
         var $$ = this.internal;
