@@ -272,6 +272,9 @@ c3_chart_internal_fn.initWithData = function (data) {
     // Grid lines
     if (config.grid_lines_front) { $$.initGridLines(); }
 
+    // Cover whole with rects for events
+    $$.initEventRect();
+
     // Define g for chart
     $$.initChartElements();
 
@@ -280,9 +283,6 @@ c3_chart_internal_fn.initWithData = function (data) {
 
     // Set targets
     $$.updateTargets($$.data.targets);
-
-    // Cover whole with rects for events
-    $$.initEventRect();
 
     // Set default extent if defined
     if (config.axis_x_selection) { $$.brush.selectionAsValue($$.getDefaultSelection()); }
