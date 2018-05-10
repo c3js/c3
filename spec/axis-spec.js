@@ -541,6 +541,33 @@ describe('c3 chart axis', function () {
                         });
                     });
                 });
+
+                describe('with multiline.max', function() {
+                    beforeAll(function() {
+                        args.axis.x.tick = {
+                            multiline: {
+                                enabled: true,
+                                max: 2,
+                            }
+                        };
+                    });
+
+                    it('should ellipsify x tick properly', function() {
+                        var tick = chart.internal.main.select('.c3-axis-x').select('g.tick');
+                        var tspans = tick.selectAll('tspan');
+                        var expectedTickText = [
+                            'this is a very long',
+                            'tick text on categ...',
+                        ];
+
+                        expect(tspans.size()).toBe(2);
+
+                        tspans.each(function (d, i) {
+                            var tspan = d3.select(this);
+                            expect(tspan.text()).toBe(expectedTickText[i]);
+                        });
+                    });
+                });
             });
         });
 
