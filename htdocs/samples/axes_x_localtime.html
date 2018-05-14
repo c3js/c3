@@ -5,7 +5,7 @@
   <body>
     <div id="chart"></div>
 
-    <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v5.min.js" charset="utf-8"></script>
     <script src="/js/c3.js"></script>
     <script>
 
@@ -40,7 +40,7 @@
 
       var data4 = {
           x : 'date',
-          x_format : '%Y%m%d',
+          xFormat : '%Y%m%d',
           columns: [
             ['date', '20130101', '20130102', '20130103', '20130104', '20130105'],
             ['sample', 1030, 1200, 1100, 1400, 1150],
@@ -50,7 +50,7 @@
 
       var data5 = {
           x : 'date',
-          x_format : '%Y%m%d %H:%M:%S',
+          xFormat : '%Y%m%d %H:%M:%S',
           columns: [
             ['date', '20130101 00:00:00', '20130102 00:00:00', '20130103 00:00:00', '20130104 00:00:00', '20130105 00:00:00'],
             ['sample', 30, 200, 100, 400, 150],

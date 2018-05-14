@@ -135,10 +135,6 @@
       return call && (typeof call === "object" || typeof call === "function") ? call : self;
     };
 
-    var toArray = function (arr) {
-      return Array.isArray(arr) ? arr : Array.from(arr);
-    };
-
     var isValue = function isValue(v) {
         return v || v === 0;
     };
@@ -5384,35 +5380,30 @@
 
     c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
         var $$ = this,
-            type = mimeType ? mimeType : 'csv';
-        var req = $$.d3.request(url);
-        if (headers) {
-            Object.keys(headers).forEach(function (header) {
-                req.header(header, headers[header]);
-            });
+            type = mimeType ? mimeType : 'csv',
+            f,
+            converter;
+
+        if (type === 'json') {
+            f = $$.d3.json;
+            converter = $$.convertJsonToData;
+        } else if (type === 'tsv') {
+            f = $$.d3.tsv;
+            converter = $$.convertXsvToData;
+        } else {
+            f = $$.d3.csv;
+            converter = $$.convertXsvToData;
         }
-        req.get(function (error, data) {
-            var d;
-            var dataResponse = data.response || data.responseText; // Fixes IE9 XHR issue; see #1345
-            if (!data) {
-                throw new Error(error.responseURL + ' ' + error.status + ' (' + error.statusText + ')');
-            }
-            if (type === 'json') {
-                d = $$.convertJsonToData(JSON.parse(dataResponse), keys);
-            } else if (type === 'tsv') {
-                d = $$.convertTsvToData(dataResponse);
-            } else {
-                d = $$.convertCsvToData(dataResponse);
-            }
-            done.call($$, d);
+
+        f(url, headers).then(function (data) {
+            done.call($$, converter.call($$, data, keys));
+        }).catch(function (error) {
+            throw error;
         });
     };
-    c3_chart_internal_fn.convertXsvToData = function (xsv, parser) {
-        var _parser$parseRows = parser.parseRows(xsv),
-            _parser$parseRows2 = toArray(_parser$parseRows),
-            keys = _parser$parseRows2[0],
-            rows = _parser$parseRows2.slice(1);
-
+    c3_chart_internal_fn.convertXsvToData = function (xsv) {
+        var keys = xsv.columns,
+            rows = xsv;
         if (rows.length === 0) {
             return { keys: keys, rows: [keys.reduce(function (row, key) {
                     return Object.assign(row, defineProperty({}, key, null));
@@ -5420,14 +5411,8 @@
         } else {
             // [].concat() is to convert result into a plain array otherwise
             // test is not happy because rows have properties.
-            return { keys: keys, rows: [].concat(parser.parse(xsv)) };
+            return { keys: keys, rows: [].concat(xsv) };
         }
-    };
-    c3_chart_internal_fn.convertCsvToData = function (csv) {
-        return this.convertXsvToData(csv, { parse: this.d3.csvParse, parseRows: this.d3.csvParseRows });
-    };
-    c3_chart_internal_fn.convertTsvToData = function (tsv) {
-        return this.convertXsvToData(tsv, { parse: this.d3.tsvParse, parseRows: this.d3.tsvParseRows });
     };
     c3_chart_internal_fn.convertJsonToData = function (json, keys) {
         var $$ = this,

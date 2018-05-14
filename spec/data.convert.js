@@ -105,17 +105,35 @@ describe('data.convert', () => {
         });
     });
 
-    describe('$$.convertCsvToData', () => {
+    describe('$$.convertXsvToData', () => {
         it('converts the csv data to normalized data', () => {
-            const data = $$.convertCsvToData(`data1,data2,data3
-90,120,300
-40,160,240
-50,200,290
-120,160,230
-80,130,300
-90,220,320`);
-
-            expect(data).toEqual({
+            const data = [{
+                    data1: '90',
+                    data2: '120',
+                    data3: '300'
+                }, {
+                    data1: '40',
+                    data2: '160',
+                    data3: '240'
+                }, {
+                    data1: '50',
+                    data2: '200',
+                    data3: '290'
+                }, {
+                    data1: '120',
+                    data2: '160',
+                    data3: '230'
+                }, {
+                    data1: '80',
+                    data2: '130',
+                    data3: '300'
+                }, {
+                    data1: '90',
+                    data2: '220',
+                    data3: '320'
+                }];
+            data.columns = ['data1', 'data2', 'data3'];
+            expect($$.convertXsvToData(data)).toEqual({
                 keys: ['data1', 'data2', 'data3'],
                 rows: [{
                     data1: '90',
@@ -146,63 +164,9 @@ describe('data.convert', () => {
         });
 
         it('converts one lined CSV data', () => {
-            const data = $$.convertCsvToData(`data1,data2,data3`);
-
-            expect(data).toEqual({
-                keys: ['data1', 'data2', 'data3'],
-                rows: [{
-                    data1: null,
-                    data2: null,
-                    data3: null
-                }]
-            });
-        });
-    });
-
-    describe('$$.convertTsvToData', () => {
-        it('converts the tsv data to normalized data', () => {
-            const data = $$.convertTsvToData(`data1\tdata2\tdata3
-90\t120\t300
-40\t160\t240
-50\t200\t290
-120\t160\t230
-80\t130\t300
-90\t220\t320`);
-
-            expect(data).toEqual({
-                keys: ['data1', 'data2', 'data3'],
-                rows: [{
-                    data1: '90',
-                    data2: '120',
-                    data3: '300'
-                }, {
-                    data1: '40',
-                    data2: '160',
-                    data3: '240'
-                }, {
-                    data1: '50',
-                    data2: '200',
-                    data3: '290'
-                }, {
-                    data1: '120',
-                    data2: '160',
-                    data3: '230'
-                }, {
-                    data1: '80',
-                    data2: '130',
-                    data3: '300'
-                }, {
-                    data1: '90',
-                    data2: '220',
-                    data3: '320'
-                }]
-            });
-        });
-
-        it('converts one lined TSV data', () => {
-            const data = $$.convertTsvToData(`data1\tdata2\tdata3`);
-
-            expect(data).toEqual({
+            const data = [];
+            data.columns = ['data1', 'data2', 'data3'];
+            expect($$.convertXsvToData(data)).toEqual({
                 keys: ['data1', 'data2', 'data3'],
                 rows: [{
                     data1: null,
