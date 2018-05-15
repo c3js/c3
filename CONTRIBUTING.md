@@ -64,3 +64,5 @@ Then access `http://0.0.0.0:4567`.
 ## Contributing your changes
 
 Add something about PRs here, indicate that PRs should not bump the version number & the build output files (`c3.js`, `c3.min.js`, `c3.css` & `c3.min.css`) should be excluded
+
+[bundler]: https://bundler.io
