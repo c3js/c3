@@ -446,8 +446,8 @@ c3_axis_fn.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, w
         axisParams = {
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
-            tickMultiline: typeof config.axis_x_tick_multiline === 'object' ? Boolean(config.axis_x_tick_multiline.enabled) : config.axis_x_tick_multiline,
-            tickMultilineMax: typeof config.axis_x_tick_multiline === 'object' ? Number(config.axis_x_tick_multiline.max) : 0,
+            tickMultiline: config.axis_x_tick_multiline,
+            tickMultilineMax: config.axis_x_tick_multiline ? Number(config.axis_x_tick_multilineMax) : 0,
             tickWidth: config.axis_x_tick_width,
             tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
             withoutTransition: withoutTransition,

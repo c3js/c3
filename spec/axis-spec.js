@@ -542,13 +542,11 @@ describe('c3 chart axis', function () {
                     });
                 });
 
-                describe('with multiline.max', function() {
+                describe('with multilineMax', function() {
                     beforeAll(function() {
                         args.axis.x.tick = {
-                            multiline: {
-                                enabled: true,
-                                max: 2,
-                            }
+                            multiline: true,
+                            multilineMax: 2,
                         };
                     });
 
