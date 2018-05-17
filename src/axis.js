@@ -111,6 +111,11 @@ c3_axis_internal_fn.isVertical = function () {
 c3_axis_internal_fn.tspanData = function (d, i, ticks, scale) {
     var internal = this;
     var splitted = internal.params.tickMultiline ? internal.splitTickText(d, ticks, scale) : [].concat(internal.textFormatted(d));
+
+    if (internal.params.tickMultiline && internal.params.tickMultilineMax > 0) {
+        splitted = internal.ellipsify(splitted, internal.params.tickMultilineMax);
+    }
+
     return splitted.map(function (s) {
         return { index: i, splitted: s, length: splitted.length };
     });
@@ -149,6 +154,27 @@ c3_axis_internal_fn.splitTickText = function (d, ticks, scale) {
     }
 
     return split(splitted, tickText + "");
+};
+c3_axis_internal_fn.ellipsify = function(splitted, max) {
+    if (splitted.length <= max) {
+        return splitted;
+    }
+
+    var ellipsified = splitted.slice(0, max);
+    var remaining = 3;
+    for (var i = max-1 ; i >= 0 ; i--) {
+        var available = ellipsified[i].length;
+
+        ellipsified[i] = ellipsified[i].substr(0, available-remaining).padEnd(available, '.');
+
+        remaining -= available;
+
+        if (remaining <= 0) {
+            break;
+        }
+    }
+
+    return ellipsified;
 };
 c3_axis_internal_fn.updateTickLength = function () {
     var internal = this;
@@ -422,6 +448,7 @@ c3_axis_fn.getXAxis = function getXAxis(scale, orient, tickFormat, tickValues, w
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
             tickMultiline: config.axis_x_tick_multiline,
+            tickMultilineMax: config.axis_x_tick_multiline ? Number(config.axis_x_tick_multilineMax) : 0,
             tickWidth: config.axis_x_tick_width,
             tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
             withoutTransition: withoutTransition,
