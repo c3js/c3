@@ -22,7 +22,8 @@
     "watch:docs": "bundle exec middleman",
     "test:only": "karma start karma.conf.js",
     "test": "npm run build && npm run lint && karma start karma.conf.js",
-    "dist": "npm run build",
+    "dist": "npm run build && npm run copy-to-docs",
+    "copy-to-docs": "cp c3.min.js docs/js/ && cp c3.css docs/css/",
     "codecov": "codecov"
   },
   "repository": {
