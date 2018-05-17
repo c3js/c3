@@ -405,6 +405,11 @@
 </li>
 
 <li>
+<a href='#axis-x-tick-multilineMax'>axis.x.tick.multilineMax</a>
+
+</li>
+
+<li>
 <a href='#axis-x-tick-width'>axis.x.tick.width</a>
 
 </li>
@@ -2948,7 +2953,43 @@ bindto: d3.select('#myContainer')</code></pre>
 <a href='#axis-x-tick-multiline'>axis.x.tick.multiline</a>
 
 </h3>
-<p>not yet</p>
+<p>Enable multiline.</p>
+<br>
+<p>If this option is set <code>true</code>, when a tick's text on the x-axis is too long, it splits the text into multiple lines in order to avoid text overlapping.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multiline: true
+&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-x-tick-multilineMax'>axis.x.tick.multilineMax</a>
+
+</h3>
+<p>If this option is set and is above <code>0</code>, the number of lines will be adjusted to less than this value and tick's text is ellipsified.</p>
+<br>
+<h5>Default:</h5>
+<code>0</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;x: {
+&nbsp;&nbsp;&nbsp;&nbsp;tick: {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multiline: true,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multilineMax: 2,
+&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
 </section>
 <hr>
 <section>
@@ -6618,7 +6659,7 @@ chart = chart.destroy();</code></pre>
 <script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
 <script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
 <script src="/js/d3-5.4.0.min-e9c75f0e.js" type="text/javascript"></script>
-<script src="/js/c3.min-2b0c6008.js" type="text/javascript"></script>
+<script src="/js/c3.min-c6f0a732.js" type="text/javascript"></script>
 <script>
   hljs.initHighlightingOnLoad();
   $(document).foundation();
