@@ -43,6 +43,8 @@ If you want to see specs running live in browser (e.g., for debugging), simply o
 
 First you need ruby and [bundler][] to build the documentation site.
 
+**Note:** Currently the site doesn't build with ruby 2.5.x, so you need ruby 2.4.4 or below. ([rbenv][] is useful for switching between ruby versions.)
+
 ```console
 $ gem install bundler
 ```
@@ -66,3 +68,4 @@ Then access `http://0.0.0.0:4567`.
 Add something about PRs here, indicate that PRs should not bump the version number & the build output files (`c3.js`, `c3.min.js`, `c3.css` & `c3.min.css`) should be excluded
 
 [bundler]: https://bundler.io
+[rbenv]: https://github.com/rbenv/rbenv
