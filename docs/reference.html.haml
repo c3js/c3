@@ -79,6 +79,7 @@
           = partial :reference_menu_item, locals: { id: 'axis.x.tick.rotate' }
           = partial :reference_menu_item, locals: { id: 'axis.x.tick.outer' }
           = partial :reference_menu_item, locals: { id: 'axis.x.tick.multiline' }
+          = partial :reference_menu_item, locals: { id: 'axis.x.tick.multilineMax' }
           = partial :reference_menu_item, locals: { id: 'axis.x.tick.width' }
           = partial :reference_menu_item, locals: { id: 'axis.x.max' }
           = partial :reference_menu_item, locals: { id: 'axis.x.min' }
@@ -1655,7 +1656,43 @@
       %section
         %h3
           = partial :reference_item_link, locals: { id: 'axis.x.tick.multiline' }
-        %p not yet
+        %p Enable multiline.
+        %br
+        %p If this option is set <code>true</code>, when a tick's text on the x-axis is too long, it splits the text into multiple lines in order to avoid text overlapping.
+        %h5 Default:
+        <code>false</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              axis: {
+              &nbsp;&nbsp;x: {
+              &nbsp;&nbsp;&nbsp;&nbsp;tick: {
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multiline: true
+              &nbsp;&nbsp;&nbsp;}
+              &nbsp;&nbsp;}
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'axis.x.tick.multilineMax' }
+        %p If this option is set and is above <code>0</code>, the number of lines will be adjusted to less than this value and tick's text is ellipsified.
+        %br
+        %h5 Default:
+        <code>0</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              axis: {
+              &nbsp;&nbsp;x: {
+              &nbsp;&nbsp;&nbsp;&nbsp;tick: {
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multiline: true,
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multilineMax: 2,
+              &nbsp;&nbsp;&nbsp;}
+              &nbsp;&nbsp;}
+              }
       %hr
 
       %section

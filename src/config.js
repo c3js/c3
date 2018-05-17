@@ -107,6 +107,7 @@ c3_chart_internal_fn.getDefaultConfig = function () {
         axis_x_tick_rotate: 0,
         axis_x_tick_outer: true,
         axis_x_tick_multiline: true,
+        axis_x_tick_multilineMax: 0,
         axis_x_tick_width: null,
         axis_x_max: undefined,
         axis_x_min: undefined,
