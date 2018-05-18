@@ -1,4 +1,4 @@
-/* @license C3.js v0.4.22 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.4.23 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -291,6 +291,11 @@
     c3_axis_internal_fn.tspanData = function (d, i, ticks, scale) {
         var internal = this;
         var splitted = internal.params.tickMultiline ? internal.splitTickText(d, ticks, scale) : [].concat(internal.textFormatted(d));
+
+        if (internal.params.tickMultiline && internal.params.tickMultilineMax > 0) {
+            splitted = internal.ellipsify(splitted, internal.params.tickMultilineMax);
+        }
+
         return splitted.map(function (s) {
             return { index: i, splitted: s, length: splitted.length };
         });
@@ -329,6 +334,27 @@
         }
 
         return split(splitted, tickText + "");
+    };
+    c3_axis_internal_fn.ellipsify = function (splitted, max) {
+        if (splitted.length <= max) {
+            return splitted;
+        }
+
+        var ellipsified = splitted.slice(0, max);
+        var remaining = 3;
+        for (var i = max - 1; i >= 0; i--) {
+            var available = ellipsified[i].length;
+
+            ellipsified[i] = ellipsified[i].substr(0, available - remaining).padEnd(available, '.');
+
+            remaining -= available;
+
+            if (remaining <= 0) {
+                break;
+            }
+        }
+
+        return ellipsified;
     };
     c3_axis_internal_fn.updateTickLength = function () {
         var internal = this;
@@ -624,6 +650,7 @@
             isCategory: $$.isCategorized(),
             withOuterTick: withOuterTick,
             tickMultiline: config.axis_x_tick_multiline,
+            tickMultilineMax: config.axis_x_tick_multiline ? Number(config.axis_x_tick_multilineMax) : 0,
             tickWidth: config.axis_x_tick_width,
             tickTextRotate: withoutRotateTickText ? 0 : config.axis_x_tick_rotate,
             withoutTransition: withoutTransition
@@ -985,7 +1012,7 @@
         transitions.axisSubX.call($$.subXAxis);
     };
 
-    var c3 = { version: "0.4.22" };
+    var c3 = { version: "0.4.23" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -3342,6 +3369,26 @@
         }
     })();
 
+    // String.padEnd polyfill for IE11
+    //
+    // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd
+    if (!String.prototype.padEnd) {
+        String.prototype.padEnd = function padEnd(targetLength, padString) {
+            targetLength = targetLength >> 0; //floor if number or convert non-number to 0;
+            padString = String(typeof padString !== 'undefined' ? padString : ' ');
+            if (this.length > targetLength) {
+                return String(this);
+            } else {
+                targetLength = targetLength - this.length;
+                if (targetLength > padString.length) {
+                    padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
+                }
+                return String(this) + padString.slice(0, targetLength);
+            }
+        };
+    }
+
     /* jshint ignore:end */
 
     c3_chart_fn.axis = function () {};
@@ -5178,6 +5225,7 @@
             axis_x_tick_rotate: 0,
             axis_x_tick_outer: true,
             axis_x_tick_multiline: true,
+            axis_x_tick_multilineMax: 0,
             axis_x_tick_width: null,
             axis_x_max: undefined,
             axis_x_min: undefined,
