@@ -12,6 +12,7 @@ c3_chart_internal_fn.drag = function (mouse) {
 
     sx = $$.dragStart[0];
     sy = $$.dragStart[1];
+    $$.dragCurrent = mouse;
     mx = mouse[0];
     my = mouse[1];
     minX = Math.min(sx, mx);
@@ -71,7 +72,11 @@ c3_chart_internal_fn.dragstart = function (mouse) {
 };
 
 c3_chart_internal_fn.dragend = function () {
-    var $$ = this, config = $$.config;
+    var $$ = this, config = $$.config,
+    sx = $$.dragStart[0],
+    mx = $$.dragCurrent ? $$.dragCurrent[0] : sx,
+    minX = Math.min(sx, mx),
+    maxX = Math.max(sx, mx);
     if ($$.hasArcType()) { return; }
     if (! config.data_selection_enabled) { return; } // do nothing if not selectable
     $$.main.select('.' + CLASS.dragarea)
@@ -80,5 +85,9 @@ c3_chart_internal_fn.dragend = function () {
         .remove();
     $$.main.selectAll('.' + CLASS.shape)
         .classed(CLASS.INCLUDED, false);
+    if (config.data_ondragend) {
+        var drag_extent = [this.x.invert(minX), this.x.invert(maxX)];
+        config.data_ondragend(drag_extent);
+    }  
     $$.dragging = false;
 };

@@ -98,6 +98,7 @@ c3_chart_internal_fn.initParams = function () {
     $$.clipPathForSubchart = $$.getClipPath($$.clipIdForSubchart),
 
     $$.dragStart = null;
+    $$.dragCurrent = null;
     $$.dragging = false;
     $$.flowing = false;
     $$.cancelClick = false;
