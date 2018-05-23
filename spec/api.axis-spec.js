@@ -50,4 +50,28 @@ describe('c3 api axis', function () {
         });
 
     });
+
+	describe('axis.cullingMax',function(){
+		it('should set max culling',function(){
+
+			chart.axis.cullingMax(2);
+			var tickCount = 0;
+			var ticks = document.querySelector('.c3-axis').querySelectorAll('.c3-axis-x .tick ');
+			
+			for(var i=0;i<ticks.length;i++){
+				var tickText = ticks[i].querySelector('text');
+				if(tickText && tickText.style){
+					if(tickText.style.display === 'block'){
+						tickCount++;
+					}
+				}
+			}
+			expect(tickCount).toBe(2);
+		});
+
+		it('should return max culling',function(){
+			chart.axis.cullingMax(1);
+			expect(chart.axis.cullingMax()).toBe(1);
+		});
+	});
 });
