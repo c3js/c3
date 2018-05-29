@@ -330,14 +330,15 @@ c3_axis_internal_fn.generateAxis = function () {
     axis.tickOffset = function () {
         return internal.tickOffset;
     };
-    axis.tickInterval = function (tickCount) {
+    axis.tickInterval = function (maxUniqueXValues) {
         var interval, length;
         if (params.isCategory) {
             interval = internal.tickOffset * 2;
         }
         else {
             length = axis.g.select('path.domain').node().getTotalLength() - internal.outerTickSize * 2;
-            var intervalDivisor = tickCount || axis.g.selectAll('line').size();
+            var tickCount = axis.g.selectAll('line').size();
+            var intervalDivisor = Math.max(maxUniqueXValues, tickCount) || tickCount;
             interval = length / intervalDivisor;
         }
         return interval === Infinity ? 0 : interval;
