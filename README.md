@@ -53,7 +53,7 @@ Please fork this fiddle:
 
 ## Dependency
 
-+ [D3.js](https://github.com/mbostock/d3) `^4.12.0`
++ [D3.js](https://github.com/mbostock/d3) `^5.0.0`
 
 ## License
 
