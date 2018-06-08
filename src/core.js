@@ -2,7 +2,7 @@ import Axis from './axis';
 import CLASS from './class';
 import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
 
-export var c3 = { version: "0.6.1" };
+export var c3 = { version: "0.6.2" };
 
 export var c3_chart_fn;
 export var c3_chart_internal_fn;

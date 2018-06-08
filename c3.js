@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.1 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.2 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -1023,7 +1023,7 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.6.1" };
+    var c3 = { version: "0.6.2" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -7865,7 +7865,9 @@
             'cardinal-open': d3.curveCardinalOpen,
             'cardinal-closed': d3.curveCardinalClosed,
             'monotone': d3.curveMonotoneX,
-            'step': d3.curveStep
+            'step': d3.curveStep,
+            'step-before': d3.curveStepBefore,
+            'step-after': d3.curveStepAfter
         },
             type;
 
