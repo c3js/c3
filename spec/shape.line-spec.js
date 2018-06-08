@@ -80,7 +80,7 @@ describe('c3 chart shape line', function () {
 					expect(style).toBe('crispedges');
 				});
 			});
-		});
+        });
 
         describe('should change to spline chart', function () {
             beforeAll(function(){
