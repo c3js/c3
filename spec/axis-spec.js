@@ -89,7 +89,144 @@ describe('c3 chart axis', function () {
             });
         });
     });
+    
+    describe('axis x timeseries with seconds', function () {
+        beforeAll(function () {
+            args = {
+                data: {
+                    type:'line',
+                    columns: [
+                        ["epoch", 1401879600000, 1401883200000, 1401886800000],
+                        ["y", 1955, 2419, 2262]
+                    ],
+                    xs: {
+                        y: "epoch"
+                    }
+                },
+                axis: {
+                    x: {
+                        type: "timeseries",
+                        min: new Date(1401879600000),
+                        max: new Date(1401969600000),
+                        localtime:false
+                    }
+                }
+            };
+        });
 
+        it('should have 3 ticks on x axis', function () {
+            var ticksSize = d3.select('.c3-axis-x').selectAll('g.tick').size();
+            expect(ticksSize).toBe(3);
+        });
+
+        it('should have specified 1 hour intervals', function () {
+            var prevValue;
+            d3.select('.c3-axis-x').selectAll('g.tick').each(function (d, i) {
+                if (i !== 0) {
+                    var result = d - prevValue;
+                    expect(result).toEqual(3600000); // expressed in milliseconds
+                }
+                prevValue = d;
+            });
+        });
+
+       describe('changing min x time and columns', function () {
+            beforeAll(function(){
+                 args.axis.x.min = new Date(1401876000000);
+                 args.axis.x.max = new Date(1401876075000);
+                 args.data.columns= [
+                    ["epoch", 1401876000000, 1401876015000, 1401876030000, 1401876045000, 1401876060000, 1401876075000],
+                    ["y", 1968, 1800, 1955, 2419, 2262, 1940]
+                 ];
+            });
+
+            it('should have 6 ticks on x axis', function () {
+                var ticksSize = d3.select('.c3-axis-x').selectAll('g.tick').size();
+                expect(ticksSize).toBe(6); // the count starts at initial value and increments by the set interval
+            });
+
+            it('should have specified 15 seconds intervals', function () {
+                var prevValue;
+                d3.select('.c3-axis-x').selectAll('g.tick').each(function (d, i) {
+                    if (i !== 0) {
+                        var result = d - prevValue;
+                        expect(result).toEqual(15000); // expressed in milliseconds
+                    }
+                    prevValue = d;
+                });
+            });
+
+            describe('with axis.x.time.format %Y-%m-%d %H:%M:%S', function () {
+                beforeAll(function(){
+                     args.axis.x.tick = {
+                         format : "%M:%S" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+                     }
+                });
+
+                var textDates=[
+                    '00:00', 
+                    '00:15', 
+                    '00:30', 
+                    '00:45', 
+                    '01:00', 
+                    '01:15'
+                 ];
+
+
+                it('should format x ticks as dates with time', function () {
+                    var ticks = d3.select('.c3-axis-x').selectAll('g.tick').selectAll('tspan').each(function(d, i) { 
+                        expect(d.splitted).toEqual(textDates[d.index]);
+                    });
+                });
+            });
+        });
+    });
+
+    describe('axis x timeseries with iso dates', function () {
+        beforeAll(function () {
+            args = {
+                data: {
+                    type:'line',
+                    columns: [
+                        ["epoch", 1527811200000, 1527897600000, 1527984000000],
+                        ["y", 1955, 2419, 2262]
+                    ],
+                    xs: {
+                        y: "epoch"
+                    }
+                },
+                axis: {
+                    x: {
+                        type: "timeseries",
+                        min: new Date('2018-06-01'),
+                        max: new Date('2018-06-03'),
+                        localtime:false,
+                        tick:{
+                             format : "%Y-%m-%dT%H:%M:%S" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+                        }
+                    }
+                }
+            };
+        });    
+        var textDates=[
+            '2018-06-01T00:00:00',
+            '2018-06-02T00:00:00',
+            '2018-06-03T00:00:00'
+        ];
+
+              
+
+        it('should format x ticks as dates', function () {
+            var ticks = d3.select('.c3-axis-x').selectAll('g.tick').selectAll('tspan').each(function(d, i) { 
+                expect(d.splitted).toEqual(textDates[d.index]);
+            });
+        });
+
+       
+    });
+
+
+    
     describe('axis y timeseries', function () {
         beforeAll(function () {
             args = {
