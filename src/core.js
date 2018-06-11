@@ -1,56 +1,28 @@
 import Axis from './axis';
 import CLASS from './class';
-import { isValue, isFunction, isString, isUndefined, isDefined, ceil10, asHalfPixel, diffDomain, isEmpty, notEmpty, getOption, hasValue, sanitise, getPathBox } from './util';
+import {
+    c3,
+    isEmpty,
+    notEmpty,
+    isValue,
+    isFunction,
+    isString,
+    isUndefined,
+    isDefined,
+    ceil10,
+    asHalfPixel,
+    diffDomain,
+    getOption,
+    hasValue,
+    sanitise,
+    getPathBox 
+} from './util';
 
-export var c3 = { version: "0.6.2" };
+export {c3};
 
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
 
-export function Component(owner, componentKey, fn) {
-    this.owner = owner;
-    c3.chart.internal[componentKey] = fn;
-}
-
-function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
-    $$.loadConfig(config);
-
-    $$.beforeInit(config);
-    $$.init();
-    $$.afterInit(config);
-
-    // bind "this" to nested API
-    (function bindThis(fn, target, argThis) {
-        Object.keys(fn).forEach(function (key) {
-            target[key] = fn[key].bind(argThis);
-            if (Object.keys(fn[key]).length > 0) {
-                bindThis(fn[key], target[key], argThis);
-            }
-        });
-    })(c3_chart_fn, this, this);
-}
-
-function ChartInternal(api) {
-    var $$ = this;
-    $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
-    $$.api = api;
-    $$.config = $$.getDefaultConfig();
-    $$.data = {};
-    $$.cache = {};
-    $$.axes = {};
-}
-
-c3.generate = function (config) {
-    return new Chart(config);
-};
-
-c3.chart = {
-    fn: Chart.prototype,
-    internal: {
-        fn: ChartInternal.prototype,
-    }
-};
 c3_chart_fn = c3.chart.fn;
 c3_chart_internal_fn = c3.chart.internal.fn;
 

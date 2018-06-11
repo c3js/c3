@@ -1,6 +1,5 @@
 import CLASS from './class';
-import { Component } from './core';
-import { isValue, isFunction, isString, isEmpty } from './util';
+import {isValue, isFunction, isString, isEmpty, Component } from './util';
 
 export var c3_axis_fn;
 export var c3_axis_internal_fn;
