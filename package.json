@@ -9,7 +9,7 @@
     "docs": "bundle exec middleman",
     "build": "npm run build:js && npm run build:css",
     "build:js": "npm run build:js:rollup && npm run build:js:uglify",
-    "build:js:rollup": "rollup -c > c3.js",
+    "build:js:rollup": "rollup -c",
     "build:js:uglify": "uglifyjs c3.js --compress --mangle --comments -o c3.min.js",
     "build:css": "npm run build:css:sass && npm run build:css:min",
     "build:css:sass": "node-sass src/scss/main.scss > c3.css",
