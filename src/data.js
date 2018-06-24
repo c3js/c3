@@ -290,6 +290,36 @@ c3_chart_internal_fn.findClosest = function (values, pos) {
 
     return closest;
 };
+
+c3_chart_internal_fn.findClosestToPosFromTargets = function(targets, pos) {
+    var $$ = this, candidates;
+
+    // map to array of closest points of each target
+    candidates = targets.map(function (target) {
+        return $$.findClosestToPos(target.values, pos);
+    });
+
+    // decide closest point and return
+    return $$.findClosestToPos(candidates, pos);
+};
+c3_chart_internal_fn.findClosestToPos = function(values, pos) {
+    var $$ = this,
+        closest = values[0],
+        closestDist = $$.dist(closest, pos);
+
+    values.forEach(function(v) {
+        var d = $$.dist(v, pos);
+        if (d < closestDist) {
+            closest = v;
+            closestDist = d;
+        }
+    });
+
+    $$.addName(closest);
+
+    return closest;
+};
+
 c3_chart_internal_fn.dist = function (data, pos) {
     var $$ = this, config = $$.config,
         xIndex = config.axis_rotated ? 1 : 0,

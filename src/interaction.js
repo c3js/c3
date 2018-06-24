@@ -136,7 +136,7 @@ c3_chart_internal_fn.redrawEventRect = function () {
                 d3.drag()
                     .on('drag', function () { $$.drag(d3.mouse(this)); })
                     .on('start', function () { $$.dragstart(d3.mouse(this)); })
-                    .on('end', function () { $$.dragend(); })
+                    .on('end', function () { $$.dragend(d3.mouse(this)); })
             ) : function () {}
         );
 };
