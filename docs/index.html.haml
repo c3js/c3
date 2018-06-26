@@ -1,0 +1,237 @@
+.container
+
+  %h1.title
+    C3.js
+    %small D3-based reusable chart library
+
+  .chart
+    #message
+      %a.button.small( onclick="startDemo();") Start Demo
+    #chart
+
+  %hr.large
+
+  %h2.text-center Why C3?
+  .row.text-center.features
+    .medium-4.large-4.columns.supporticons
+      %h3 Comfortable
+      %p
+        C3 makes it easy to generate D3-based charts by wrapping the code required to construct the entire chart. We don't need to write D3 code any more.
+    .medium-4.large-4.columns.supporticons
+      %h3 Customizable
+      %p
+        C3 gives some classes to each element when generating, so you can define a custom style by the class and it's possible to extend the structure directly by D3.
+
+    .medium-4.large-4.columns.supporticons
+      %h3 Controllable
+      %p
+        C3 provides a variety of APIs and callbacks to access the state of the chart. By using them, you can update the chart even after it's rendered.
+
+  %h3.text-center.sub
+    C3 enables deeper integration of charts into your application.
+  %br
+
+  .text-center
+    %a.button( href="/gettingstarted.html" ) Getting Started
+
+  %hr
+
+  %h3 Change Log
+  %ul
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.6.2">v0.6.2</a><span class="gray">&nbsp;-&nbsp;2018-06-08</span>
+      %ul
+        %li Add step-before and step-after for line.step.type option.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.23">v0.4.23</a><span class="gray">&nbsp;-&nbsp;2018-05-18</span>
+      %ul
+        %li Add axis.x.tick.multilineMax option (0.4 branch).
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.6.1">v0.6.1</a><span class="gray">&nbsp;-&nbsp;2018-05-17</span>
+      %ul
+        %li Add axis.x.tick.multilineMax option.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.6.0">v0.6.0</a><span class="gray">&nbsp;-&nbsp;2018-05-14</span>
+      %ul
+        %li Update D3 dependency to v5.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.5.4">v0.5.4</a><span class="gray">&nbsp;-&nbsp;2018-04-23</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.5.3">v0.5.3</a><span class="gray">&nbsp;-&nbsp;2018-04-12</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.5.2">v0.5.2</a><span class="gray">&nbsp;-&nbsp;2018-03-31</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.5.1">v0.5.1</a><span class="gray">&nbsp;-&nbsp;2018-03-25</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.5.0">v0.5.0</a><span class="gray">&nbsp;-&nbsp;2018-03-24</span>
+      %ul
+        %li Update D3 dependency to version 4.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.22">v0.4.22</a><span class="gray">&nbsp;-&nbsp;2018-03-21</span>
+      %ul
+        %li Add axis.x.inner option.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.21">v0.4.21</a><span class="gray">&nbsp;-&nbsp;2018-02-15</span>
+      %ul
+        %li Multi arc gauge chart.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.20">v0.4.20</a><span class="gray">&nbsp;-&nbsp;2018-02-11</span>
+      %ul
+        %li Fix gauge chart with fullCircle option.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.19">v0.4.19</a><span class="gray">&nbsp;-&nbsp;2018-02-10</span>
+      %ul
+        %li Do not call resize functions when chart is hidden.
+        %li Switched CI environment.
+        %li Have license in minified bundle.
+        %li Fixed a memory leak.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.18">v0.4.18</a><span class="gray">&nbsp;-&nbsp;2017-09-14</span>
+      %ul
+        %li point.focus.expand.r takes a function.
+        %li Pie and donuts really handle data.order correctly.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.17">v0.4.17</a><span class="gray">&nbsp;-&nbsp;2017-08-19</span>
+      %ul
+        %li Added bar.space option.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.16">v0.4.16</a><span class="gray">&nbsp;-&nbsp;2017-08-16</span>
+      %ul
+        %li Bug fix of bar chart.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.15">v0.4.15</a><span class="gray">&nbsp;-&nbsp;2017-07-20</span>
+      %ul
+        %li Move some style handling to css.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.14">v0.4.14</a><span class="gray">&nbsp;-&nbsp;2017-06-24</span>
+      %ul
+        %li Bug fix.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.13">v0.4.13</a><span class="gray">&nbsp;-&nbsp;2017-06-11</span>
+      %ul
+        %li New option and bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/v0.4.12">v0.4.12</a><span class="gray">&nbsp;-&nbsp;2017-05-28</span>
+      %ul
+        %li Performance improvement and bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.11">v0.4.11</a><span class="gray">&nbsp;-&nbsp;2016-05-01</span>
+      %ul
+        %li New features, performance improvement and bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.10">v0.4.10</a><span class="gray">&nbsp;-&nbsp;2015-03-17</span>
+      %ul
+        %li New features, performance improvement and bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.9">v0.4.9</a><span class="gray">&nbsp;-&nbsp;2015-01-18</span>
+      %ul
+        %li New features, performance improvement and bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.8">v0.4.8</a><span class="gray">&nbsp;-&nbsp;2014-12-14</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.7">v0.4.7</a><span class="gray">&nbsp;-&nbsp;2014-12-02</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.6">v0.4.6</a><span class="gray">&nbsp;-&nbsp;2014-12-01</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.5">v0.4.5</a><span class="gray">&nbsp;-&nbsp;2014-11-30</span>
+      %ul
+        %li Bug fixes.
+        %li Performance improvement.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.4">v0.4.4</a><span class="gray">&nbsp;-&nbsp;2014-11-21</span>
+      %ul
+        %li New features (e.g. <span class="code">axis.y/y2.inner</span>, <span class="code">legend.hide</span> options)
+        %li Bug fixes.
+        %li Performance improvement.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.3">v0.4.3</a><span class="gray">&nbsp;-&nbsp;2014-11-18</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.2">v0.4.2</a><span class="gray">&nbsp;-&nbsp;2014-11-17</span>
+      %ul
+        %li Bug fixes.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.1">v0.4.1</a><span class="gray">&nbsp;-&nbsp;2014-11-16</span>
+      %ul
+        %li Fixed class suffix.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.4.0">v0.4.0</a><span class="gray">&nbsp;-&nbsp;2014-11-15</span>
+      %ul
+        %li A lot of bug fixes and new features
+        %li Introduce unit test (it's not enough though)
+        %li <a href="https://github.com/c3js/c3/releases/tag/0.4.0">and more...</a>
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.3.0">v0.3.0</a><span class="gray">&nbsp;-&nbsp;2014-08-22</span>
+      %ul
+        %li Introduced new architecture so that we can extend this library more easily.
+        %li Modified some options such as <span class="code">data.xFormat</span> and <span class="code">data.xLocaltime</span>.
+        %li Splitted source file into small ones.
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.5">v0.2.5</a><span class="gray">&nbsp;-&nbsp;2014-08-09</span>
+      %ul
+        %li Modified to use <span class="code">data.onclick</span>, <span class="code">data.onmouseover</span> and <span class="code">data.onmouseout</span> on pie/donut/gauge instead of its callbacks
+        %li Modified <span class="code">unload</span> interface
+        %li Bug fixes
+        %li <a href="https://github.com/c3js/c3/releases/tag/0.2.5">and more...</a>
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.4">v0.2.4</a><span class="gray">&nbsp;-&nbsp;2014-06-16</span>
+      %ul
+        %li Added new options such as <span class="code">pie.sort</span>, <span class="code">donut.sort</span>, <span class="code">bar.zerobased</span>, <span class="code">area.zerobased</span>
+        %li Added new API such as <span class="code">category</span>, <span class="code">categories</span>
+        %li Bug fixes
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.3">v0.2.3</a><span class="gray">&nbsp;-&nbsp;2014-06-04</span>
+      %ul
+        %li Renamed callbacks (onend/onenter/onleave)
+        %li Added extension for zoom with reduction (by <a href="https://github.com/danelkhen">@danelkhen</a> Thank you!)
+        %li Bug fixes
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.2">v0.2.2</a><span class="gray">&nbsp;-&nbsp;2014-06-03</span>
+      %ul
+        %li Supported ungrouped tooltip
+        %li Added zoom.enable API
+        %li Bug fixes
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.1">v0.2.1</a><span class="gray">&nbsp;-&nbsp;2014-06-02</span>
+      %ul
+        %li Bug fixes
+    %li
+      <a href="https://github.com/c3js/c3/releases/tag/0.2.0">v0.2.0</a><span class="gray">&nbsp;-&nbsp;2014-05-30</span>
+      %ul
+        %li Supported step line/area, stacked line/area, stacked line/area, gauge chart
+        %li Supported JSON as input
+        %li Added flow API
+        %li etc
+    %li <a href="https://github.com/c3js/c3/releases/tag/0.1.42">v0.1.42</a><span class="gray">&nbsp;-&nbsp;2014-05-18</span>
+
+  %h3 Browser Support
+  %p Because of the dependence on D3, C3 supports only modern browsers D3 supports. Please see <a href="https://github.com/mbostock/d3/wiki#browser--platform-support">the description in D3</a>.
+  %p Note: For IE9 and IE10, polyfill is required because c3 uses <span class="code">MutationObserver</span>, which is not supported in those versions. However, it's not required if charts always will be binded to the DOM specified by <span class="code">bindto</span> because <span class="code">MutationObserver</span> is not called in that case.
+
+  %h3 Dependency
+  %ul
+    %li <a href="https://github.com/mbostock/d3" target="_blank">D3.js</a> <span class="code">^4.12.0</span>
+  %p Note: If you need to use D3 v3.x, please use C3 <a href="https://unpkg.com/c3@0.4.22/c3.js">v0.4.22</a>, which is compatible with D3 v3.x.
+
+  %h3 License
+  %p MIT
+
+  = partial :footer
+
+= partial :script
+= javascript_include_tag 'index'

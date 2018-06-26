@@ -29,7 +29,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return !config.axis_x_show ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return (!config.axis_x_show || config.axis_x_inner) ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
         return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
@@ -105,15 +105,12 @@ c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
     if (axisId === 'y2' && !config.axis_y2_show) { return $$.rotated_padding_top; }
     // Calculate x axis height when tick rotated
     if (axisId === 'x' && !config.axis_rotated && config.axis_x_tick_rotate) {
-        h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_x_tick_rotate) / 180);
+        h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - Math.abs(config.axis_x_tick_rotate)) / 180);
     }
     // Calculate y axis height when tick rotated
     if (axisId === 'y' && config.axis_rotated && config.axis_y_tick_rotate) {
-        h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - config.axis_y_tick_rotate) / 180);
+        h = 30 + $$.axis.getMaxTickWidth(axisId) * Math.cos(Math.PI * (90 - Math.abs(config.axis_y_tick_rotate)) / 180);
     }
     return h + ($$.axis.getLabelPositionById(axisId).isInner ? 0 : 10) + (axisId === 'y2' ? -10 : 0);
 };
 
-c3_chart_internal_fn.getEventRectWidth = function () {
-    return Math.max(0, this.xAxis.tickInterval());
-};

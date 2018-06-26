@@ -39,6 +39,33 @@ This command will automatically run the specification suite and report its resul
 
 If you want to see specs running live in browser (e.g., for debugging), simply open `http://localhost:9876/` in your browser when phantomjs starts.
 
+## Building the document site (c3js.org)
+
+First you need ruby and [bundler][] to build the documentation site.
+
+**Note:** Currently the site doesn't build with ruby 2.5.x, so you need ruby 2.4.4 or below. ([rbenv][] is useful for switching between ruby versions.)
+
+```console
+$ gem install bundler
+```
+
+Then you need to install bundler dependencies.
+
+```console
+$ bundle install
+```
+
+Then hit the following command to build the site.
+
+```console
+$ npm run watch:docs
+```
+
+Then access `http://0.0.0.0:4567`.
+
 ## Contributing your changes
 
 Add something about PRs here, indicate that PRs should not bump the version number & the build output files (`c3.js`, `c3.min.js`, `c3.css` & `c3.min.css`) should be excluded
+
+[bundler]: https://bundler.io
+[rbenv]: https://github.com/rbenv/rbenv

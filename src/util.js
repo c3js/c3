@@ -1,4 +1,41 @@
-import { c3_chart_internal_fn } from './core';
+import {ChartInternal} from './chart-internal';
+
+export var c3 = { version: "0.6.2" ,
+    chart: {
+        fn: Chart.prototype,
+        internal: {
+            fn: ChartInternal.prototype,
+        }
+    }
+};
+
+export function Chart(config) {
+    var $$ = this.internal = new ChartInternal(this);
+    $$.loadConfig(config);
+
+    $$.beforeInit(config);
+    $$.init();
+    $$.afterInit(config);
+
+    // bind "this" to nested API
+    (function bindThis(fn, target, argThis) {
+        Object.keys(fn).forEach(function (key) {
+            target[key] = fn[key].bind(argThis);
+            if (Object.keys(fn[key]).length > 0) {
+                bindThis(fn[key], target[key], argThis);
+            }
+        });
+    })(c3.chart.fn, this, this);
+}
+
+c3.generate = function (config) {
+    return new Chart(config);
+};
+
+export function Component(owner, componentKey, fn) {
+    this.owner = owner;
+    c3.chart.internal[componentKey] = fn;
+}
 
 export var isValue = function (v) {
     return v || v === 0;
@@ -13,7 +50,7 @@ export var isString = function (o) {
     return typeof o === 'string';
 };
 export var isUndefined = function (v) {
-return typeof v === 'undefined';
+    return typeof v === 'undefined';
 };
 export var isDefined = function (v) {
     return typeof v !== 'undefined';
@@ -31,7 +68,7 @@ export var isEmpty = function (o) {
     return typeof o === 'undefined' || o === null || (isString(o) && o.length === 0) || (typeof o === 'object' && Object.keys(o).length === 0);
 };
 export var notEmpty = function (o) {
-    return !c3_chart_internal_fn.isEmpty(o);
+    return !c3.chart.internal.fn.isEmpty(o);
 };
 export var getOption = function (options, key, defaultValue) {
     return isDefined(options[key]) ? options[key] : defaultValue;

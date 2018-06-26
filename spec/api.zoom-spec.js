@@ -24,6 +24,14 @@ describe('c3 api zoom', function () {
             };
         });
 
+        it('should return the correct extent', function () {
+            var zoomDomain = chart.zoom(),
+                expectedDomain = chart.internal.x.domain();
+
+            expect(+zoomDomain[0]).toBe(+expectedDomain[0]);
+            expect(+zoomDomain[1]).toBe(+expectedDomain[1]);
+        });
+
         it('should be zoomed properly', function () {
             var target = [3, 5], domain;
             chart.zoom(target);
@@ -38,6 +46,17 @@ describe('c3 api zoom', function () {
             domain = chart.internal.x.domain();
             expect(domain[0]).toBe(target[0]);
             expect(domain[1]).toBe(target[1]);
+        });
+
+
+        it('should set the max zoom properly', function () {
+            chart.zoom.max(100);
+            expect(chart.zoom.max()).toBe(100);
+        });
+
+        it('should set the min zoom properly', function () {
+            chart.zoom.min(-1);
+            expect(chart.zoom.min()).toBe(-1);
         });
 
         describe('with timeseries data', function () {

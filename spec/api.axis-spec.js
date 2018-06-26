@@ -49,5 +49,29 @@ describe('c3 api axis', function () {
             expect(label.attr('dy')).toBe('-0.5em');
         });
 
+         it('updates axis max values', function () {
+            chart.axis.max({x: 100, y: 300, y2: 100});
+            var max_values = chart.axis.max();
+            expect(max_values.x).toBe(100);
+            expect(max_values.y).toBe(300);
+            expect(max_values.y2).toBe(100);
+        });
+
+         it('updates axis min values', function () {
+            chart.axis.min({x: 0, y: 20, y2: 50});
+            var min_values = chart.axis.min();
+            expect(min_values.x).toBe(0);
+            expect(min_values.y).toBe(20);
+            expect(min_values.y2).toBe(50);
+        });
+
+        it('updates axis range', function () {
+            chart.axis.range({min: 5, max: 250});
+            var range = chart.axis.range();
+            expect(range.max.y).toBe(250);
+            expect(range.min.y).toBe(5);
+        });
+
+
     });
 });

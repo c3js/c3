@@ -7,8 +7,7 @@ c3_chart_internal_fn.drag = function (mouse) {
     var sx, sy, mx, my, minX, maxX, minY, maxY;
 
     if ($$.hasArcType()) { return; }
-    if (! config.data_selection_enabled) { return; } // do nothing if not selectable
-    if (config.zoom_enabled && ! $$.zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
+    if (!config.data_selection_enabled) { return; } // do nothing if not selectable
     if (!config.data_selection_multiple) { return; } // skip when single selection because drag is used for multiple selection
 
     sx = $$.dragStart[0];

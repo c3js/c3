@@ -1,4 +1,7 @@
 <!--
+
+This is not a catch-all support forum, for general support enquiries, please use the Google Group at https://groups.google.com/forum/#!forum/c3js.
+ 
 Thank you for reporting an issue.
 
 Please fill in as much of the template below as you're able.

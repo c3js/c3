@@ -274,4 +274,68 @@ describe('c3 chart legend', function () {
         });
     });
 
+    describe('legend item tile coloring with color_treshold', function () {
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['padded1', 100],
+                        ['padded2', 90],
+                        ['padded3', 50],
+                        ['padded4', 20]
+                    ]
+                },
+                type: 'gauge',
+                color: {
+                    pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+                    threshold: {
+                        values: [30, 80, 95]
+                    }
+                }
+            };
+        });
+
+        // espacially for gauges with multiple arcs to have the same coloring between legend tiles, tooltip tiles and arc
+        it('selects the color from color_pattern if color_treshold is given', function () {
+            var tileColor = [];
+            d3.selectAll('.c3-legend-item-tile').each(function () {
+                tileColor.push(d3.select(this).style('stroke'));
+            });
+            expect(tileColor[0]).toBe('rgb(96, 176, 68)');
+            expect(tileColor[1]).toBe('rgb(246, 198, 0)');
+            expect(tileColor[2]).toBe('rgb(249, 118, 0)');
+            expect(tileColor[3]).toBe('rgb(255, 0, 0)');
+        });
+    });
+
+    describe('legend item tile coloring without color_treshold', function () {
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['padded1', 100],
+                        ['padded2', 90],
+                        ['padded3', 50],
+                        ['padded4', 20]
+                    ],
+                    colors: {
+                        'padded1': '#60b044',
+                        'padded4': '#8b008b'
+                    }
+                },
+                type: 'gauge'
+            };
+        });
+
+        it('selects the color from data_colors, data_color or default', function () {
+            var tileColor = [];
+            d3.selectAll('.c3-legend-item-tile').each(function () {
+                tileColor.push(d3.select(this).style('stroke'));
+            });
+            expect(tileColor[0]).toBe('rgb(96, 176, 68)');
+            expect(tileColor[1]).toBe('rgb(31, 119, 180)');
+            expect(tileColor[2]).toBe('rgb(255, 127, 14)');
+            expect(tileColor[3]).toBe('rgb(139, 0, 139)');
+        });
+    });
 });

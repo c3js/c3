@@ -1,0 +1,5 @@
+%li
+  - if defined? experimental
+    = partial :reference_item_link, locals: { id: id, experimental: experimental }
+  - else
+    = partial :reference_item_link, locals: { id: id }

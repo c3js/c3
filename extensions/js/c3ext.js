@@ -19,7 +19,7 @@ c3ext.generate = function (options) {
     var _zoom2_maxItems;
 
     if (_zoom2_maxItems == null) {
-        var el = d3.select(options.bindto)[0][0];
+        var el = d3.select(options.bindto).node();
         if (el != null) {
             var availWidth = el.clientWidth;
 

@@ -59,9 +59,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = 'red',
                         unexpectedClass = 'green',
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
@@ -151,9 +150,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = expectedClasses[i],
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
                         expectedEnd = Math.round(chart.internal.y(expectedRegions[i].end)),
@@ -224,9 +222,8 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
-                        rect = region.select('rect'),
-                        y = +rect.attr('y'),
-                        height = +rect.attr('height'),
+                        y = +region.attr('y'),
+                        height = +region.attr('height'),
                         expectedClass = expectedClasses[i],
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
                         expectedEnd = Math.round(chart.internal.y(expectedRegions[i].end)),

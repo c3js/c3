@@ -20,7 +20,12 @@ describe('c3 chart shape line', function () {
                         ['data3', -150, 120, 110, 140, 115, 125]
                     ],
                     type: 'line'
-                }
+                },
+				line: {
+					step: {
+					  type: 'step'
+					}
+				}
             };
         });
 
@@ -51,6 +56,30 @@ describe('c3 chart shape line', function () {
                     expect(style).toBe('crispedges');
                 });
             });
+		});
+		
+		describe('should change to step chart with step-after', function () {
+			beforeAll(function(){
+				args.line.step.type = 'step-after';
+			});
+			it("should have shape-rendering = crispedges when it's step chart", function () {
+				d3.selectAll('.c3-line').each(function () {
+					var style = d3.select(this).style('shape-rendering').toLowerCase();
+					expect(style).toBe('crispedges');
+				});
+			});
+		});
+
+		describe('should change to step chart with step-before', function () {
+			beforeAll(function(){
+				args.line.step.type = 'step-before';
+			});
+			it("should have shape-rendering = crispedges when it's step chart", function () {
+				d3.selectAll('.c3-line').each(function () {
+					var style = d3.select(this).style('shape-rendering').toLowerCase();
+					expect(style).toBe('crispedges');
+				});
+			});
         });
 
         describe('should change to spline chart', function () {
@@ -176,7 +205,7 @@ describe('c3 chart shape line', function () {
         });
 
         it('updates interpolation function', function() {
-            expect(chart.internal.getInterpolate(chart.data()[0])).toBe('monotone');
+            expect(chart.internal.getInterpolate(chart.data()[0])).toBe(d3.curveMonotoneX);
         });
 
         describe('should not use a non-valid interpolation', function () {
@@ -185,7 +214,7 @@ describe('c3 chart shape line', function () {
             });
 
             it('should use cardinal interpolation when given option is not valid', function() {
-                expect(chart.internal.getInterpolate(chart.data()[0])).toBe('cardinal');
+                expect(chart.internal.getInterpolate(chart.data()[0])).toBe(d3.curveCardinal);
             });
         });
     });

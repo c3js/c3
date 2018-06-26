@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/node:6-browsers
+    steps:
+      - checkout
+      - run: |
+          echo "node $(node -v)"
+          echo "npm v$(npm --version)"
+          echo "$(google-chrome --version)"
+      - restore_cache:
+          key: npm-1-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: npm-1-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run: npm test
+      - run: npm run codecov
+  publish-docs:
+    docker:
+      - image: circleci/ruby:2.4-node
+        env:
+          BUNDLE_PATH: vendor/bundle
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: deps-bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle install
+      - save_cache:
+          key: deps-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      - restore_cache:
+          key: npm-2-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: npm-2-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+
+      - run: npm run publish-docs
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
+  publish-docs:
+    jobs:
+      - publish-docs:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
