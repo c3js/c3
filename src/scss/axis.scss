@@ -1,4 +1,7 @@
 .c3-axis-x .tick {
+  &.culled text {
+    display: none;
+  }
 }
 .c3-axis-x-label {
 }

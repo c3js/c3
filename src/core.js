@@ -487,14 +487,14 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
                     break;
                 }
             }
-            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function (e) {
+            $$.svg.selectAll('.' + CLASS.axisX + ' .tick').each(function (e) {
                 var index = tickValues.indexOf(e);
                 if (index >= 0) {
-                    d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+                    d3.select(this).classed('culled', index % intervalForCulling);
                 }
             });
         } else {
-            $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').style('display', 'block');
+            $$.svg.selectAll('.' + CLASS.axisX + ' .tick').classed('culled', false);
         }
     }
 
