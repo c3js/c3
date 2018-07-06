@@ -1,5 +1,9 @@
+import {ChartInternal} from './chart-internal';
+import {Chart} from './chart';
+
 import Axis from './axis';
 import CLASS from './class';
+
 import {
     c3,
     isEmpty,
@@ -23,7 +27,7 @@ export {c3};
 export var c3_chart_fn;
 export var c3_chart_internal_fn;
 
-c3_chart_fn = c3.chart.fn;
+c3_chart_fn = Chart.prototype;
 c3_chart_internal_fn = c3.chart.internal.fn;
 
 c3_chart_internal_fn.beforeInit = function () {
