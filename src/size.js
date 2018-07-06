@@ -1,17 +1,17 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isValue, ceil10 } from './util';
 
-c3_chart_internal_fn.getCurrentWidth = function () {
+ChartInternal.prototype.getCurrentWidth = function () {
     var $$ = this, config = $$.config;
     return config.size_width ? config.size_width : $$.getParentWidth();
 };
-c3_chart_internal_fn.getCurrentHeight = function () {
+ChartInternal.prototype.getCurrentHeight = function () {
     var $$ = this, config = $$.config,
         h = config.size_height ? config.size_height : $$.getParentHeight();
     return h > 0 ? h : 320 / ($$.hasType('gauge') && !config.gauge_fullCircle ? 2 : 1);
 };
-c3_chart_internal_fn.getCurrentPaddingTop = function () {
+ChartInternal.prototype.getCurrentPaddingTop = function () {
     var $$ = this,
         config = $$.config,
         padding = isValue(config.padding_top) ? config.padding_top : 0;
@@ -20,11 +20,11 @@ c3_chart_internal_fn.getCurrentPaddingTop = function () {
     }
     return padding;
 };
-c3_chart_internal_fn.getCurrentPaddingBottom = function () {
+ChartInternal.prototype.getCurrentPaddingBottom = function () {
     var config = this.config;
     return isValue(config.padding_bottom) ? config.padding_bottom : 0;
 };
-c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
+ChartInternal.prototype.getCurrentPaddingLeft = function (withoutRecompute) {
     var $$ = this, config = $$.config;
     if (isValue(config.padding_left)) {
         return config.padding_left;
@@ -36,7 +36,7 @@ c3_chart_internal_fn.getCurrentPaddingLeft = function (withoutRecompute) {
         return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
     }
 };
-c3_chart_internal_fn.getCurrentPaddingRight = function () {
+ChartInternal.prototype.getCurrentPaddingRight = function () {
     var $$ = this, config = $$.config,
         defaultPadding = 10, legendWidthOnRight = $$.isLegendRight ? $$.getLegendWidth() + 20 : 0;
     if (isValue(config.padding_right)) {
@@ -50,7 +50,7 @@ c3_chart_internal_fn.getCurrentPaddingRight = function () {
     }
 };
 
-c3_chart_internal_fn.getParentRectValue = function (key) {
+ChartInternal.prototype.getParentRectValue = function (key) {
     var parent = this.selectChart.node(), v;
     while (parent && parent.tagName !== 'BODY') {
         try {
@@ -69,16 +69,16 @@ c3_chart_internal_fn.getParentRectValue = function (key) {
     }
     return v;
 };
-c3_chart_internal_fn.getParentWidth = function () {
+ChartInternal.prototype.getParentWidth = function () {
     return this.getParentRectValue('width');
 };
-c3_chart_internal_fn.getParentHeight = function () {
+ChartInternal.prototype.getParentHeight = function () {
     var h = this.selectChart.style('height');
     return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
 };
 
 
-c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
+ChartInternal.prototype.getSvgLeft = function (withoutRecompute) {
     var $$ = this, config = $$.config,
         hasLeftAxisRect = config.axis_rotated || (!config.axis_rotated && !config.axis_y_inner),
         leftAxisClass = config.axis_rotated ? CLASS.axisX : CLASS.axisY,
@@ -91,11 +91,11 @@ c3_chart_internal_fn.getSvgLeft = function (withoutRecompute) {
 };
 
 
-c3_chart_internal_fn.getAxisWidthByAxisId = function (id, withoutRecompute) {
+ChartInternal.prototype.getAxisWidthByAxisId = function (id, withoutRecompute) {
     var $$ = this, position = $$.axis.getLabelPositionById(id);
     return $$.axis.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
 };
-c3_chart_internal_fn.getHorizontalAxisHeight = function (axisId) {
+ChartInternal.prototype.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;
     if (axisId === 'x' && !config.axis_x_show) { return 8; }
     if (axisId === 'x' && config.axis_x_height) { return config.axis_x_height; }

@@ -1,8 +1,8 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isValue, isFunction, isArray, isString, sanitise } from './util';
 
-c3_chart_internal_fn.initTooltip = function () {
+ChartInternal.prototype.initTooltip = function () {
     var $$ = this, config = $$.config, i;
     $$.tooltip = $$.selectChart
         .style("position", "relative")
@@ -28,7 +28,7 @@ c3_chart_internal_fn.initTooltip = function () {
             .style("display", "block");
     }
 };
-c3_chart_internal_fn.getTooltipSortFunction = function() {
+ChartInternal.prototype.getTooltipSortFunction = function() {
     var $$ = this, config = $$.config;
 
     if (config.data_groups.length === 0 || config.tooltip_order !== undefined) {
@@ -97,7 +97,7 @@ c3_chart_internal_fn.getTooltipSortFunction = function() {
         };
     }
 };
-c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
+ChartInternal.prototype.getTooltipContent = function (d, defaultTitleFormat, defaultValueFormat, color) {
     var $$ = this, config = $$.config,
         titleFormat = config.tooltip_format_title || defaultTitleFormat,
         nameFormat = config.tooltip_format_name || function (name) { return name; },
@@ -132,7 +132,7 @@ c3_chart_internal_fn.getTooltipContent = function (d, defaultTitleFormat, defaul
     }
     return text + "</table>";
 };
-c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, element) {
+ChartInternal.prototype.tooltipPosition = function (dataToShow, tWidth, tHeight, element) {
     var $$ = this, config = $$.config, d3 = $$.d3;
     var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
     var forArc = $$.hasArcType(),
@@ -168,12 +168,12 @@ c3_chart_internal_fn.tooltipPosition = function (dataToShow, tWidth, tHeight, el
     }
     return {top: tooltipTop, left: tooltipLeft};
 };
-c3_chart_internal_fn.showTooltip = function (selectedData, element) {
+ChartInternal.prototype.showTooltip = function (selectedData, element) {
     var $$ = this, config = $$.config;
     var tWidth, tHeight, position;
     var forArc = $$.hasArcType(),
         dataToShow = selectedData.filter(function (d) { return d && isValue(d.value); }),
-        positionFunction = config.tooltip_position || c3_chart_internal_fn.tooltipPosition;
+        positionFunction = config.tooltip_position || ChartInternal.prototype.tooltipPosition;
     if (dataToShow.length === 0 || !config.tooltip_show) {
         return;
     }
@@ -189,6 +189,6 @@ c3_chart_internal_fn.showTooltip = function (selectedData, element) {
         .style("top", position.top + "px")
         .style("left", position.left + 'px');
 };
-c3_chart_internal_fn.hideTooltip = function () {
+ChartInternal.prototype.hideTooltip = function () {
     this.tooltip.style("display", "none");
 };

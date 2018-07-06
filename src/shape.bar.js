@@ -1,13 +1,13 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isValue } from './util';
 
-c3_chart_internal_fn.initBar = function () {
+ChartInternal.prototype.initBar = function () {
     var $$ = this;
     $$.main.select('.' + CLASS.chart).append("g")
         .attr("class", CLASS.chartBars);
 };
-c3_chart_internal_fn.updateTargetsForBar = function (targets) {
+ChartInternal.prototype.updateTargetsForBar = function (targets) {
     var $$ = this, config = $$.config,
         mainBars, mainBarEnter,
         classChartBar = $$.classChartBar.bind($$),
@@ -25,7 +25,7 @@ c3_chart_internal_fn.updateTargetsForBar = function (targets) {
         .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; });
 
 };
-c3_chart_internal_fn.updateBar = function (durationForExit) {
+ChartInternal.prototype.updateBar = function (durationForExit) {
     var $$ = this,
         barData = $$.barData.bind($$),
         classBar = $$.classBar.bind($$),
@@ -42,7 +42,7 @@ c3_chart_internal_fn.updateBar = function (durationForExit) {
     mainBar.exit().transition().duration(durationForExit)
         .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawBar = function (drawBar, withTransition, transition) {
+ChartInternal.prototype.redrawBar = function (drawBar, withTransition, transition) {
     return [
         (withTransition ? this.mainBar.transition(transition) : this.mainBar)
             .attr('d', drawBar)
@@ -51,25 +51,25 @@ c3_chart_internal_fn.redrawBar = function (drawBar, withTransition, transition) 
             .style("opacity", 1)
     ];
 };
-c3_chart_internal_fn.getBarW = function (axis, barTargetsNum) {
+ChartInternal.prototype.getBarW = function (axis, barTargetsNum) {
     var $$ = this, config = $$.config,
         w = typeof config.bar_width === 'number' ? config.bar_width : barTargetsNum ? (axis.tickInterval() * config.bar_width_ratio) / barTargetsNum : 0;
     return config.bar_width_max && w > config.bar_width_max ? config.bar_width_max : w;
 };
-c3_chart_internal_fn.getBars = function (i, id) {
+ChartInternal.prototype.getBars = function (i, id) {
     var $$ = this;
     return (id ? $$.main.selectAll('.' + CLASS.bars + $$.getTargetSelectorSuffix(id)) : $$.main).selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''));
 };
-c3_chart_internal_fn.expandBars = function (i, id, reset) {
+ChartInternal.prototype.expandBars = function (i, id, reset) {
     var $$ = this;
     if (reset) { $$.unexpandBars(); }
     $$.getBars(i, id).classed(CLASS.EXPANDED, true);
 };
-c3_chart_internal_fn.unexpandBars = function (i) {
+ChartInternal.prototype.unexpandBars = function (i) {
     var $$ = this;
     $$.getBars(i).classed(CLASS.EXPANDED, false);
 };
-c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
+ChartInternal.prototype.generateDrawBar = function (barIndices, isSub) {
     var $$ = this, config = $$.config,
         getPoints = $$.generateGetBarPoints(barIndices, isSub);
     return function (d, i) {
@@ -89,7 +89,7 @@ c3_chart_internal_fn.generateDrawBar = function (barIndices, isSub) {
         return path;
     };
 };
-c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
+ChartInternal.prototype.generateGetBarPoints = function (barIndices, isSub) {
     var $$ = this,
         axis = isSub ? $$.subXAxis : $$.xAxis,
         barTargetsNum = barIndices.__max__ + 1,
@@ -116,7 +116,7 @@ c3_chart_internal_fn.generateGetBarPoints = function (barIndices, isSub) {
         ];
     };
 };
-c3_chart_internal_fn.isWithinBar = function (mouse, that) {
+ChartInternal.prototype.isWithinBar = function (mouse, that) {
     var box = that.getBoundingClientRect(),
         seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
         x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),

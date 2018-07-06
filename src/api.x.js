@@ -1,6 +1,6 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.x = function (x) {
+Chart.prototype.x = function (x) {
     var $$ = this.internal;
     if (arguments.length) {
         $$.updateTargetX($$.data.targets, x);
@@ -8,7 +8,7 @@ c3_chart_fn.x = function (x) {
     }
     return $$.data.xs;
 };
-c3_chart_fn.xs = function (xs) {
+Chart.prototype.xs = function (xs) {
     var $$ = this.internal;
     if (arguments.length) {
         $$.updateTargetXs($$.data.targets, xs);

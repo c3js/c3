@@ -1,14 +1,14 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isValue } from './util';
 
-c3_chart_internal_fn.initRegion = function () {
+ChartInternal.prototype.initRegion = function () {
     var $$ = this;
     $$.region = $$.main.append('g')
         .attr("clip-path", $$.clipPath)
         .attr("class", CLASS.regions);
 };
-c3_chart_internal_fn.updateRegion = function (duration) {
+ChartInternal.prototype.updateRegion = function (duration) {
     var $$ = this, config = $$.config;
 
     // hide if arc type
@@ -28,7 +28,7 @@ c3_chart_internal_fn.updateRegion = function (duration) {
         .style("opacity", 0)
         .remove();
 };
-c3_chart_internal_fn.redrawRegion = function (withTransition, transition) {
+ChartInternal.prototype.redrawRegion = function (withTransition, transition) {
     var $$ = this, regions = $$.mainRegion;
     return [(withTransition ? regions.transition(transition) : regions)
             .attr("x", $$.regionX.bind($$))
@@ -38,7 +38,7 @@ c3_chart_internal_fn.redrawRegion = function (withTransition, transition) {
             .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
     ];
 };
-c3_chart_internal_fn.regionX = function (d) {
+ChartInternal.prototype.regionX = function (d) {
     var $$ = this, config = $$.config,
         xPos, yScale = d.axis === 'y' ? $$.y : $$.y2;
     if (d.axis === 'y' || d.axis === 'y2') {
@@ -48,7 +48,7 @@ c3_chart_internal_fn.regionX = function (d) {
     }
     return xPos;
 };
-c3_chart_internal_fn.regionY = function (d) {
+ChartInternal.prototype.regionY = function (d) {
     var $$ = this, config = $$.config,
         yPos, yScale = d.axis === 'y' ? $$.y : $$.y2;
     if (d.axis === 'y' || d.axis === 'y2') {
@@ -58,7 +58,7 @@ c3_chart_internal_fn.regionY = function (d) {
     }
     return yPos;
 };
-c3_chart_internal_fn.regionWidth = function (d) {
+ChartInternal.prototype.regionWidth = function (d) {
     var $$ = this, config = $$.config,
         start = $$.regionX(d), end, yScale = d.axis === 'y' ? $$.y : $$.y2;
     if (d.axis === 'y' || d.axis === 'y2') {
@@ -68,7 +68,7 @@ c3_chart_internal_fn.regionWidth = function (d) {
     }
     return end < start ? 0 : end - start;
 };
-c3_chart_internal_fn.regionHeight = function (d) {
+ChartInternal.prototype.regionHeight = function (d) {
     var $$ = this, config = $$.config,
         start = this.regionY(d), end, yScale = d.axis === 'y' ? $$.y : $$.y2;
     if (d.axis === 'y' || d.axis === 'y2') {
@@ -78,6 +78,6 @@ c3_chart_internal_fn.regionHeight = function (d) {
     }
     return end < start ? 0 : end - start;
 };
-c3_chart_internal_fn.isRegionOnX = function (d) {
+ChartInternal.prototype.isRegionOnX = function (d) {
     return !d.axis || d.axis === 'x';
 };

@@ -1,18 +1,18 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 
-c3_chart_internal_fn.initTitle = function () {
+ChartInternal.prototype.initTitle = function () {
     var $$ = this;
     $$.title = $$.svg.append("text")
           .text($$.config.title_text)
           .attr("class", $$.CLASS.title);
 };
-c3_chart_internal_fn.redrawTitle = function () {
+ChartInternal.prototype.redrawTitle = function () {
     var $$ = this;
     $$.title
           .attr("x", $$.xForTitle.bind($$))
           .attr("y", $$.yForTitle.bind($$));
 };
-c3_chart_internal_fn.xForTitle = function () {
+ChartInternal.prototype.xForTitle = function () {
     var $$ = this, config = $$.config, position = config.title_position || 'left', x;
     if (position.indexOf('right') >= 0) {
         x = $$.currentWidth - $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).width - config.title_padding.right;
@@ -23,11 +23,11 @@ c3_chart_internal_fn.xForTitle = function () {
     }
     return x;
 };
-c3_chart_internal_fn.yForTitle = function () {
+ChartInternal.prototype.yForTitle = function () {
     var $$ = this;
     return $$.config.title_padding.top + $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).height;
 };
-c3_chart_internal_fn.getTitlePadding = function() {
+ChartInternal.prototype.getTitlePadding = function() {
     var $$ = this;
     return $$.yForTitle() + $$.config.title_padding.bottom;
 };

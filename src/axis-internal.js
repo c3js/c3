@@ -1,7 +1,3 @@
-import CLASS from './class';
-import {isValue, isFunction, isString, isEmpty, Component } from './util';
-
-
 function AxisInternal(component, params) {
     var internal = this;
     internal.component = component;
@@ -27,7 +23,6 @@ function AxisInternal(component, params) {
 
     internal.axis = internal.generateAxis();
 }
-
 
 AxisInternal.prototype.axisX = function (selection, x, tickOffset) {
     selection.attr("transform", function (d) {
