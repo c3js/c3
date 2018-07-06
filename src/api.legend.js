@@ -9,5 +9,5 @@ Chart.prototype.legend.show = function (targetIds) {
 Chart.prototype.legend.hide = function (targetIds) {
     var $$ = this.internal;
     $$.hideLegend($$.mapToTargetIds(targetIds));
-    $$.updateAndRedraw({withLegend: true});
+    $$.updateAndRedraw({withLegend: false});
 };
