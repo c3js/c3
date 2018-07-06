@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.2 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.3 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -84,6 +84,16 @@
         INCLUDED: '_included_'
     };
 
+    function ChartInternal(api) {
+        var $$ = this;
+        $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
+        $$.api = api;
+        $$.config = $$.getDefaultConfig();
+        $$.data = {};
+        $$.cache = {};
+        $$.axes = {};
+    }
+
     var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
       return typeof obj;
     } : function (obj) {
@@ -135,6 +145,43 @@
       return call && (typeof call === "object" || typeof call === "function") ? call : self;
     };
 
+    var c3 = { version: "0.6.3",
+        chart: {
+            fn: Chart.prototype,
+            internal: {
+                fn: ChartInternal.prototype
+            }
+        }
+    };
+
+    function Chart(config) {
+        var $$ = this.internal = new ChartInternal(this);
+        $$.loadConfig(config);
+
+        $$.beforeInit(config);
+        $$.init();
+        $$.afterInit(config);
+
+        // bind "this" to nested API
+        (function bindThis(fn, target, argThis) {
+            Object.keys(fn).forEach(function (key) {
+                target[key] = fn[key].bind(argThis);
+                if (Object.keys(fn[key]).length > 0) {
+                    bindThis(fn[key], target[key], argThis);
+                }
+            });
+        })(c3.chart.fn, this, this);
+    }
+
+    c3.generate = function (config) {
+        return new Chart(config);
+    };
+
+    function Component(owner, componentKey, fn) {
+        this.owner = owner;
+        c3.chart.internal[componentKey] = fn;
+    }
+
     var isValue = function isValue(v) {
         return v || v === 0;
     };
@@ -166,7 +213,7 @@
         return typeof o === 'undefined' || o === null || isString(o) && o.length === 0 || (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && Object.keys(o).length === 0;
     };
     var notEmpty = function notEmpty(o) {
-        return !c3_chart_internal_fn.isEmpty(o);
+        return !c3.chart.internal.fn.isEmpty(o);
     };
     var getOption = function getOption(options, key, defaultValue) {
         return isDefined(options[key]) ? options[key] : defaultValue;
@@ -1023,55 +1070,9 @@
         $$.axes.subx.style("opacity", isHidden ? 0 : 1).call($$.subXAxis, transition);
     };
 
-    var c3 = { version: "0.6.2" };
-
     var c3_chart_fn;
     var c3_chart_internal_fn;
 
-    function Component(owner, componentKey, fn) {
-        this.owner = owner;
-        c3.chart.internal[componentKey] = fn;
-    }
-
-    function Chart(config) {
-        var $$ = this.internal = new ChartInternal(this);
-        $$.loadConfig(config);
-
-        $$.beforeInit(config);
-        $$.init();
-        $$.afterInit(config);
-
-        // bind "this" to nested API
-        (function bindThis(fn, target, argThis) {
-            Object.keys(fn).forEach(function (key) {
-                target[key] = fn[key].bind(argThis);
-                if (Object.keys(fn[key]).length > 0) {
-                    bindThis(fn[key], target[key], argThis);
-                }
-            });
-        })(c3_chart_fn, this, this);
-    }
-
-    function ChartInternal(api) {
-        var $$ = this;
-        $$.d3 = window.d3 ? window.d3 : typeof require !== 'undefined' ? require("d3") : undefined;
-        $$.api = api;
-        $$.config = $$.getDefaultConfig();
-        $$.data = {};
-        $$.cache = {};
-        $$.axes = {};
-    }
-
-    c3.generate = function (config) {
-        return new Chart(config);
-    };
-
-    c3.chart = {
-        fn: Chart.prototype,
-        internal: {
-            fn: ChartInternal.prototype
-        }
-    };
     c3_chart_fn = c3.chart.fn;
     c3_chart_internal_fn = c3.chart.internal.fn;
 
@@ -4603,9 +4604,7 @@
                 return;
             }
             $$.d3.select(this).selectAll('path').transition().duration($$.expandDuration(d.data.id)).attr("d", $$.svgArcExpanded).transition().duration($$.expandDuration(d.data.id) * 2).attr("d", $$.svgArcExpandedSub).each(function (d) {
-                if ($$.isDonutType(d.data)) {
-                    // callback here
-                }
+                if ($$.isDonutType(d.data)) ;
             });
         });
     };
@@ -4866,8 +4865,7 @@
         if (hasGaugeType) {
             var index = 0;
             backgroundArc = $$.arcs.select('g.' + CLASS.chartArcsBackground).selectAll('path.' + CLASS.chartArcsBackground).data($$.data.targets);
-            backgroundArc.enter().append("path");
-            backgroundArc.attr("class", function (d, i) {
+            backgroundArc.enter().append("path").attr("class", function (d, i) {
                 return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground + '-' + i;
             }).attr("d", function (d1) {
                 if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) {
