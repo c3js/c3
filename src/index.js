@@ -1,7 +1,6 @@
 import { c3 } from './core';
 
 import './polyfill';
-
 import './api.axis';
 import './api.category';
 import './api.chart';
