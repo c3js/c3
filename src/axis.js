@@ -1,6 +1,13 @@
 import CLASS from './class';
-import { isValue, isFunction, isString, isEmpty } from './util';
-import { AxisInternal } from './axis-internal';
+import {
+    isValue,
+    isFunction,
+    isString,
+    isEmpty
+} from './util';
+import {
+    AxisInternal
+} from './axis-internal';
 
 export default class Axis {
     constructor(owner) {
@@ -57,7 +64,9 @@ Axis.prototype.getXAxis = function getXAxis(scale, orient, tickFormat, tickValue
         axis = new this.internal(this, axisParams).axis.scale(scale).orient(orient);
 
     if ($$.isTimeSeries() && tickValues && typeof tickValues !== "function") {
-        tickValues = tickValues.map(function(v) { return $$.parseDate(v); });
+        tickValues = tickValues.map(function (v) {
+            return $$.parseDate(v);
+        });
     }
 
     // Set tick
@@ -111,18 +120,22 @@ Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
     // however both should be truncated according to the users format specification
     var $$ = this.owner,
         config = $$.config;
-    let format = ($$.isTimeSeries()) ? $$.defaultAxisTimeFormat : ($$.isCategorized()) ? $$.categoryName : function(v) { return v; };
+    let format = ($$.isTimeSeries()) ? $$.defaultAxisTimeFormat : ($$.isCategorized()) ? $$.categoryName : function (v) {
+        return v;
+    };
 
     if (config.axis_x_tick_format) {
         if (isFunction(config.axis_x_tick_format)) {
             format = config.axis_x_tick_format;
         } else if ($$.isTimeSeries()) {
-            format = function(date) {
+            format = function (date) {
                 return date ? $$.axisTimeFormat(config.axis_x_tick_format)(date) : "";
             };
         }
     }
-    return isFunction(format) ? function(v) { return format.call($$, v); } : format;
+    return isFunction(format) ? function (v) {
+        return format.call($$, v);
+    } : format;
 };
 Axis.prototype.getTickValues = function getTickValues(tickValues, axis) {
     return tickValues ? tickValues : axis ? axis.tickValues() : undefined;
@@ -307,10 +320,12 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         }
         dummy = $$.d3.select('body').append('div').classed('c3', true);
         svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
-            svg.append('g').call(axis).each(function() {
-                $$.d3.select(this).selectAll('text').each(function() {
+            svg.append('g').call(axis).each(function () {
+                $$.d3.select(this).selectAll('text').each(function () {
                     var box = this.getBoundingClientRect();
-                    if (maxWidth < box.width) { maxWidth = box.width; }
+                    if (maxWidth < box.width) {
+                        maxWidth = box.width;
+                    }
                 });
                 dummy.remove();
             });
@@ -380,7 +395,11 @@ Axis.prototype.generateTickValues = function generateTickValues(values, tickCoun
             tickValues.push(end);
         }
     }
-    if (!forTimeSeries) { tickValues = tickValues.sort(function(a, b) { return a - b; }); }
+    if (!forTimeSeries) {
+        tickValues = tickValues.sort(function (a, b) {
+            return a - b;
+        });
+    }
     return tickValues;
 };
 Axis.prototype.generateTransitions = function generateTransitions(duration) {

@@ -1,16 +1,26 @@
 import CLASS from './class';
-import { ChartInternal } from './core';
-import { isValue, isFunction, isArray, notEmpty, hasValue } from './util';
+import {
+    ChartInternal
+} from './core';
+import {
+    isValue,
+    isFunction,
+    isArray,
+    notEmpty,
+    hasValue
+} from './util';
 
 ChartInternal.prototype.isX = function (key) {
-    var $$ = this, config = $$.config;
+    var $$ = this,
+        config = $$.config;
     return (config.data_x && key === config.data_x) || (notEmpty(config.data_xs) && hasValue(config.data_xs, key));
 };
 ChartInternal.prototype.isNotX = function (key) {
     return !this.isX(key);
 };
 ChartInternal.prototype.getXKey = function (id) {
-    var $$ = this, config = $$.config;
+    var $$ = this,
+        config = $$.config;
     return config.data_x ? config.data_x : notEmpty(config.data_xs) ? config.data_xs[id] : null;
 };
 ChartInternal.prototype.getXValuesOfXKey = function (key, targets) {
@@ -43,7 +53,8 @@ ChartInternal.prototype.addXs = function (xs) {
     });
 };
 ChartInternal.prototype.addName = function (data) {
-    var $$ = this, name;
+    var $$ = this,
+        name;
     if (data) {
         name = $$.config.data_names[data.id];
         data.name = name !== undefined ? name : data.id;
@@ -51,7 +62,9 @@ ChartInternal.prototype.addName = function (data) {
     return data;
 };
 ChartInternal.prototype.getValueOnIndex = function (values, index) {
-    var valueOnIndex = values.filter(function (v) { return v.index === index; });
+    var valueOnIndex = values.filter(function (v) {
+        return v.index === index;
+    });
     return valueOnIndex.length ? valueOnIndex[0] : null;
 };
 ChartInternal.prototype.updateTargetX = function (targets, x) {
@@ -72,40 +85,48 @@ ChartInternal.prototype.updateTargetXs = function (targets, xs) {
     });
 };
 ChartInternal.prototype.generateTargetX = function (rawX, id, index) {
-    var $$ = this, x;
+    var $$ = this,
+        x;
     if ($$.isTimeSeries()) {
         x = rawX ? $$.parseDate(rawX) : $$.parseDate($$.getXValue(id, index));
-    }
-    else if ($$.isCustomX() && !$$.isCategorized()) {
+    } else if ($$.isCustomX() && !$$.isCategorized()) {
         x = isValue(rawX) ? +rawX : $$.getXValue(id, index);
-    }
-    else {
+    } else {
         x = index;
     }
     return x;
 };
 ChartInternal.prototype.cloneTarget = function (target) {
     return {
-        id : target.id,
-        id_org : target.id_org,
-        values : target.values.map(function (d) {
-            return {x: d.x, value: d.value, id: d.id};
+        id: target.id,
+        id_org: target.id_org,
+        values: target.values.map(function (d) {
+            return {
+                x: d.x,
+                value: d.value,
+                id: d.id
+            };
         })
     };
 };
 ChartInternal.prototype.getMaxDataCount = function () {
     var $$ = this;
-    return $$.d3.max($$.data.targets, function (t) { return t.values.length; });
+    return $$.d3.max($$.data.targets, function (t) {
+        return t.values.length;
+    });
 };
 ChartInternal.prototype.mapToIds = function (targets) {
-    return targets.map(function (d) { return d.id; });
+    return targets.map(function (d) {
+        return d.id;
+    });
 };
 ChartInternal.prototype.mapToTargetIds = function (ids) {
     var $$ = this;
     return ids ? [].concat(ids) : $$.mapToIds($$.data.targets);
 };
 ChartInternal.prototype.hasTarget = function (targets, id) {
-    var ids = this.mapToIds(targets), i;
+    var ids = this.mapToIds(targets),
+        i;
     for (i = 0; i < ids.length; i++) {
         if (ids[i] === id) {
             return true;
@@ -121,13 +142,25 @@ ChartInternal.prototype.isLegendToShow = function (targetId) {
 };
 ChartInternal.prototype.filterTargetsToShow = function (targets) {
     var $$ = this;
-    return targets.filter(function (t) { return $$.isTargetToShow(t.id); });
+    return targets.filter(function (t) {
+        return $$.isTargetToShow(t.id);
+    });
 };
 ChartInternal.prototype.mapTargetsToUniqueXs = function (targets) {
     var $$ = this;
-    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) { return t.values.map(function (v) { return +v.x; }); }))).values();
-    xs = $$.isTimeSeries() ? xs.map(function (x) { return new Date(+x); }) : xs.map(function (x) { return +x; });
-    return xs.sort(function (a, b) { return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN; });
+    var xs = $$.d3.set($$.d3.merge(targets.map(function (t) {
+        return t.values.map(function (v) {
+            return +v.x;
+        });
+    }))).values();
+    xs = $$.isTimeSeries() ? xs.map(function (x) {
+        return new Date(+x);
+    }) : xs.map(function (x) {
+        return +x;
+    });
+    return xs.sort(function (a, b) {
+        return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+    });
 };
 ChartInternal.prototype.addHiddenTargetIds = function (targetIds) {
     targetIds = (targetIds instanceof Array) ? targetIds : new Array(targetIds);
@@ -138,7 +171,9 @@ ChartInternal.prototype.addHiddenTargetIds = function (targetIds) {
     }
 };
 ChartInternal.prototype.removeHiddenTargetIds = function (targetIds) {
-    this.hiddenTargetIds = this.hiddenTargetIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
+    this.hiddenTargetIds = this.hiddenTargetIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
+    });
 };
 ChartInternal.prototype.addHiddenLegendIds = function (targetIds) {
     targetIds = (targetIds instanceof Array) ? targetIds : new Array(targetIds);
@@ -149,7 +184,9 @@ ChartInternal.prototype.addHiddenLegendIds = function (targetIds) {
     }
 };
 ChartInternal.prototype.removeHiddenLegendIds = function (targetIds) {
-    this.hiddenLegendIds = this.hiddenLegendIds.filter(function (id) { return targetIds.indexOf(id) < 0; });
+    this.hiddenLegendIds = this.hiddenLegendIds.filter(function (id) {
+        return targetIds.indexOf(id) < 0;
+    });
 };
 ChartInternal.prototype.getValuesAsIdKeyed = function (targets) {
     var ys = {};
@@ -162,7 +199,8 @@ ChartInternal.prototype.getValuesAsIdKeyed = function (targets) {
     return ys;
 };
 ChartInternal.prototype.checkValueInTargets = function (targets, checker) {
-    var ids = Object.keys(targets), i, j, values;
+    var ids = Object.keys(targets),
+        i, j, values;
     for (i = 0; i < ids.length; i++) {
         values = targets[ids[i]].values;
         for (j = 0; j < values.length; j++) {
@@ -174,23 +212,32 @@ ChartInternal.prototype.checkValueInTargets = function (targets, checker) {
     return false;
 };
 ChartInternal.prototype.hasNegativeValueInTargets = function (targets) {
-    return this.checkValueInTargets(targets, function (v) { return v < 0; });
+    return this.checkValueInTargets(targets, function (v) {
+        return v < 0;
+    });
 };
 ChartInternal.prototype.hasPositiveValueInTargets = function (targets) {
-    return this.checkValueInTargets(targets, function (v) { return v > 0; });
+    return this.checkValueInTargets(targets, function (v) {
+        return v > 0;
+    });
 };
 ChartInternal.prototype.isOrderDesc = function () {
     var config = this.config;
-    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'desc';
+    return typeof (config.data_order) === 'string' && config.data_order.toLowerCase() === 'desc';
 };
 ChartInternal.prototype.isOrderAsc = function () {
     var config = this.config;
-    return typeof(config.data_order) === 'string' && config.data_order.toLowerCase() === 'asc';
+    return typeof (config.data_order) === 'string' && config.data_order.toLowerCase() === 'asc';
 };
-ChartInternal.prototype.getOrderFunction = function() {
-    var $$ = this, config = $$.config, orderAsc = $$.isOrderAsc(), orderDesc = $$.isOrderDesc();
+ChartInternal.prototype.getOrderFunction = function () {
+    var $$ = this,
+        config = $$.config,
+        orderAsc = $$.isOrderAsc(),
+        orderDesc = $$.isOrderDesc();
     if (orderAsc || orderDesc) {
-        var reducer = function (p, c) { return p + Math.abs(c.value); };
+        var reducer = function (p, c) {
+            return p + Math.abs(c.value);
+        };
         return function (t1, t2) {
             var t1Sum = t1.values.reduce(reducer, 0),
                 t2Sum = t2.values.reduce(reducer, 0);
@@ -213,10 +260,16 @@ ChartInternal.prototype.orderTargets = function (targets) {
     return targets;
 };
 ChartInternal.prototype.filterByX = function (targets, x) {
-    return this.d3.merge(targets.map(function (t) { return t.values; })).filter(function (v) { return v.x - x === 0; });
+    return this.d3.merge(targets.map(function (t) {
+        return t.values;
+    })).filter(function (v) {
+        return v.x - x === 0;
+    });
 };
 ChartInternal.prototype.filterRemoveNull = function (data) {
-    return data.filter(function (d) { return isValue(d.value); });
+    return data.filter(function (d) {
+        return isValue(d.value);
+    });
 };
 ChartInternal.prototype.filterByXDomain = function (targets, xDomain) {
     return targets.map(function (t) {
@@ -240,11 +293,14 @@ ChartInternal.prototype.hasDataLabel = function () {
 };
 ChartInternal.prototype.getDataLabelLength = function (min, max, key) {
     var $$ = this,
-        lengths = [0, 0], paddingCoef = 1.3;
+        lengths = [0, 0],
+        paddingCoef = 1.3;
     $$.selectChart.select('svg').selectAll('.dummy')
         .data([min, max])
         .enter().append('text')
-        .text(function (d) { return $$.dataLabelFormat(d.id)(d); })
+        .text(function (d) {
+            return $$.dataLabelFormat(d.id)(d);
+        })
         .each(function (d, i) {
             lengths[i] = this.getBoundingClientRect()[key] * paddingCoef;
         })
@@ -252,13 +308,14 @@ ChartInternal.prototype.getDataLabelLength = function (min, max, key) {
     return lengths;
 };
 ChartInternal.prototype.isNoneArc = function (d) {
-    return this.hasTarget(this.data.targets, d.id);
-},
-ChartInternal.prototype.isArc = function (d) {
-    return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
-};
+        return this.hasTarget(this.data.targets, d.id);
+    },
+    ChartInternal.prototype.isArc = function (d) {
+        return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
+    };
 ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
-    var $$ = this, candidates;
+    var $$ = this,
+        candidates;
 
     // map to array of closest points of each target
     candidates = targets.map(function (target) {
@@ -269,10 +326,14 @@ ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
     return $$.findClosest(candidates, pos);
 };
 ChartInternal.prototype.findClosest = function (values, pos) {
-    var $$ = this, minDist = $$.config.point_sensitivity, closest;
+    var $$ = this,
+        minDist = $$.config.point_sensitivity,
+        closest;
 
     // find mouseovering bar
-    values.filter(function (v) { return v && $$.isBarType(v.id); }).forEach(function (v) {
+    values.filter(function (v) {
+        return v && $$.isBarType(v.id);
+    }).forEach(function (v) {
         var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
         if (!closest && $$.isWithinBar($$.d3.mouse(shape), shape)) {
             closest = v;
@@ -280,7 +341,9 @@ ChartInternal.prototype.findClosest = function (values, pos) {
     });
 
     // find closest point from non-bar
-    values.filter(function (v) { return v && !$$.isBarType(v.id); }).forEach(function (v) {
+    values.filter(function (v) {
+        return v && !$$.isBarType(v.id);
+    }).forEach(function (v) {
         var d = $$.dist(v, pos);
         if (d < minDist) {
             minDist = d;
@@ -291,7 +354,8 @@ ChartInternal.prototype.findClosest = function (values, pos) {
     return closest;
 };
 ChartInternal.prototype.dist = function (data, pos) {
-    var $$ = this, config = $$.config,
+    var $$ = this,
+        config = $$.config,
         xIndex = config.axis_rotated ? 1 : 0,
         yIndex = config.axis_rotated ? 0 : 1,
         y = $$.circleY(data, data.index),
@@ -299,7 +363,8 @@ ChartInternal.prototype.dist = function (data, pos) {
     return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
 };
 ChartInternal.prototype.convertValuesToStep = function (values) {
-    var converted = [].concat(values), i;
+    var converted = [].concat(values),
+        i;
 
     if (!this.isCategorized()) {
         return values;
@@ -323,11 +388,17 @@ ChartInternal.prototype.convertValuesToStep = function (values) {
     return converted;
 };
 ChartInternal.prototype.updateDataAttributes = function (name, attrs) {
-    var $$ = this, config = $$.config, current = config['data_' + name];
-    if (typeof attrs === 'undefined') { return current; }
+    var $$ = this,
+        config = $$.config,
+        current = config['data_' + name];
+    if (typeof attrs === 'undefined') {
+        return current;
+    }
     Object.keys(attrs).forEach(function (id) {
         current[id] = attrs[id];
     });
-    $$.redraw({withLegend: true});
+    $$.redraw({
+        withLegend: true
+    });
     return current;
 };
