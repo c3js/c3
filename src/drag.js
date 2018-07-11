@@ -67,10 +67,17 @@ c3_chart_internal_fn.dragstart = function (mouse) {
     $$.main.select('.' + CLASS.chart).append('rect')
         .attr('class', CLASS.dragarea)
         .style('opacity', 0.1);
+    if (typeof config.data_ondragstart === 'function') {
+        var closestDatum = $$.findClosestToPosFromTargets(
+            $$.filterTargetsToShow($$.data.targets),
+            mouse
+        );
+        config.data_ondragstart(closestDatum);
+    }
     $$.dragging = true;
 };
 
-c3_chart_internal_fn.dragend = function () {
+c3_chart_internal_fn.dragend = function (mouse) {
     var $$ = this, config = $$.config;
     if ($$.hasArcType()) { return; }
     if (! config.data_selection_enabled) { return; } // do nothing if not selectable
@@ -80,5 +87,12 @@ c3_chart_internal_fn.dragend = function () {
         .remove();
     $$.main.selectAll('.' + CLASS.shape)
         .classed(CLASS.INCLUDED, false);
+    if (typeof config.data_ondragend === 'function') {
+        var closestDatum = $$.findClosestToPosFromTargets(
+            $$.filterTargetsToShow($$.data.targets),
+            mouse
+        );
+        config.data_ondragend(closestDatum);
+    }
     $$.dragging = false;
 };

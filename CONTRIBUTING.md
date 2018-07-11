@@ -65,7 +65,8 @@ Then access `http://0.0.0.0:4567`.
 
 ## Contributing your changes
 
-Add something about PRs here, indicate that PRs should not bump the version number & the build output files (`c3.js`, `c3.min.js`, `c3.css` & `c3.min.css`) should be excluded
+Pull requests are welcome, though please post an issue first to see whether such a change is desirable.
+If you choose to submit a pull request, please do not bump the version number unless asked to, and please include test cases for any new features. Squash all your commits as well, please.
 
 [bundler]: https://bundler.io
 [rbenv]: https://github.com/rbenv/rbenv
