@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.3 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.4 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -145,7 +145,7 @@
       return call && (typeof call === "object" || typeof call === "function") ? call : self;
     };
 
-    var c3 = { version: "0.6.3",
+    var c3 = { version: "0.6.4",
         chart: {
             fn: Chart.prototype,
             internal: {
@@ -1322,6 +1322,9 @@
             $$.initGridLines();
         }
 
+        // Cover whole with rects for events
+        $$.initEventRect();
+
         // Define g for chart
         $$.initChartElements();
 
@@ -1330,9 +1333,6 @@
 
         // Set targets
         $$.updateTargets($$.data.targets);
-
-        // Cover whole with rects for events
-        $$.initEventRect();
 
         // Set default extent if defined
         if (config.axis_x_selection) {
