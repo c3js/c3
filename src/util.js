@@ -1,6 +1,6 @@
 import {ChartInternal} from './chart-internal';
 
-export var c3 = { version: "0.6.3" ,
+export var c3 = { version: "0.6.4" ,
     chart: {
         fn: Chart.prototype,
         internal: {
