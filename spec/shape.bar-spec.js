@@ -95,7 +95,6 @@ describe('c3 chart shape bar', function () {
                 });
            });
         });
-
     });
 
     describe('internal.isWithinBar', function () {
@@ -164,6 +163,18 @@ describe('c3 chart shape bar', function () {
 
     });
 
+    var getBBox = function(selector) {
+        return d3.select(selector).node().getBBox();
+    };
+
+    var getBarBBox = function(name, idx) {
+        return getBBox('.c3-target-' + name + ' .c3-bar-' + (idx || 0));
+    };
+
+    var getBarWidth = function(name, idx) {
+      return parseInt(getBarBBox(name, idx).width);
+    };
+
     describe('bar spacing', function() {
 
         var createArgs = function(spacing) {
@@ -189,24 +200,12 @@ describe('c3 chart shape bar', function () {
             };
         };
 
-        var getBBox = function(selector) {
-          return d3.select(selector).node().getBBox();
-        };
-
         var getBarContainerWidth = function() {
             return parseInt(getBBox('.c3-chart-bars').width);
         };
 
         var getBarContainerOffset = function() {
             return parseInt(getBBox('.c3-chart-bars').x);
-        };
-
-        var getBarBBox = function(name, idx) {
-            return getBBox('.c3-target-' + name + ' .c3-bar-' + (idx || 0));
-        };
-
-        var getBarWidth = function(name, idx) {
-          return parseInt(getBarBBox(name, idx).width);
         };
 
         var getBarOffset = function(name1, name2, idx) {
@@ -314,6 +313,63 @@ describe('c3 chart shape bar', function () {
             // the offsets from the first/last chart
             expect(getBarContainerWidth()).toEqual(396 - 15);
             expect(getBarContainerOffset()).toEqual(31 + parseInt(15 / 2));
+        });
+    });
+
+    describe('bar width', function () {
+        var createArgs = function(dataColumns) {
+            return {
+                size: {
+                    width: 500
+                },
+                data: {
+                    x: 'x',
+                    columns: dataColumns,
+                    groups: [
+                        ['data1', 'data2']
+                    ],
+                    type: 'bar',
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            fit: false,
+                            format: '%Y-%m-%d'
+                        }
+                    }
+                }
+            };
+        };
+
+        it('should set arguments with fewer unique x values than fit false ticks', function () {
+            var data = [
+                ['x', '2016-01-05', '2016-01-06', '2016-01-10'],
+                ['data1', 50, 56, 75],
+                ['data2', 2, 2, 2]
+            ];
+            args = createArgs(data);
+            expect(true).toBeTruthy();
+        });
+
+        it('should calculate bar width using tick count when there are more ticks than x axis values', function () {
+            expect(getBarWidth('data2', '0')).toEqual(34);
+        });
+
+        it('should set arguments with more unique x values than fit false ticks', function () {
+            var data = [
+                ['x', '2016-01-05', '2016-01-06','2016-01-07', '2016-01-08', '2016-01-09',
+                '2016-01-10', '2016-01-11','2016-01-12', '2016-01-13', '2016-01-14',
+                '2016-01-15', '2016-01-16', '2016-01-17','2016-01-18', '2016-01-19'],
+                ['data1', 50, 56, 75, null, null, null, 50, 56, 75, 50, 56, 75, 50, 56, 75],
+                ['data2', 2, 2, 2, null, null, null, 2, 2, 2, 50, 56, 75, 2, 2, 2]
+            ];
+            args = createArgs(data);
+            expect(true).toBeTruthy();
+        });
+
+        it('should calculate bar width using unique x value count when there are more x values than ticks', function () {
+            expect(getBarWidth('data2', '0')).toEqual(18);
         });
     });
 });
