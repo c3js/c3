@@ -1,8 +1,8 @@
 import CLASS from './class';
-import { c3_chart_fn, c3_chart_internal_fn } from './core';
+import { Chart, ChartInternal } from './core';
 import { isValue, isDefined, diffDomain } from './util';
 
-c3_chart_fn.flow = function (args) {
+Chart.prototype.flow = function (args) {
     var $$ = this.internal,
         targets, data, notfoundIds = [], orgDataCount = $$.getMaxDataCount(),
         dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
@@ -145,7 +145,7 @@ c3_chart_fn.flow = function (args) {
     });
 };
 
-c3_chart_internal_fn.generateFlow = function (args) {
+ChartInternal.prototype.generateFlow = function (args) {
     var $$ = this, config = $$.config, d3 = $$.d3;
 
     return function () {

@@ -1,7 +1,7 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isValue, isUndefined, isDefined, notEmpty, isArray } from './util';
 
-c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, done) {
+ChartInternal.prototype.convertUrlToData = function (url, mimeType, headers, keys, done) {
     var $$ = this, type = mimeType ? mimeType : 'csv', f, converter;
 
     if (type === 'json') {
@@ -21,7 +21,7 @@ c3_chart_internal_fn.convertUrlToData = function (url, mimeType, headers, keys, 
         throw error;
     });
 };
-c3_chart_internal_fn.convertXsvToData = function (xsv) {
+ChartInternal.prototype.convertXsvToData = function (xsv) {
     var keys = xsv.columns, rows = xsv;
     if (rows.length === 0) {
         return { keys, rows: [ keys.reduce((row, key) => Object.assign(row, { [key]: null }), {}) ] };
@@ -31,7 +31,7 @@ c3_chart_internal_fn.convertXsvToData = function (xsv) {
         return { keys, rows: [].concat(xsv) };
     }
 };
-c3_chart_internal_fn.convertJsonToData = function (json, keys) {
+ChartInternal.prototype.convertJsonToData = function (json, keys) {
     var $$ = this,
         new_rows = [], targetKeys, data;
     if (keys) { // when keys specified, json would be an array that includes objects
@@ -63,7 +63,7 @@ c3_chart_internal_fn.convertJsonToData = function (json, keys) {
     }
     return data;
 };
-c3_chart_internal_fn.findValueInJson = function (object, path) {
+ChartInternal.prototype.findValueInJson = function (object, path) {
     path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
     path = path.replace(/^\./, '');           // strip a leading dot
     var pathArray = path.split('.');
@@ -83,7 +83,7 @@ c3_chart_internal_fn.findValueInJson = function (object, path) {
  * @param {any[][]} rows The row data
  * @return {Object}
  */
-c3_chart_internal_fn.convertRowsToData = (rows) => {
+ChartInternal.prototype.convertRowsToData = (rows) => {
     const newRows = [];
     const keys = rows[0];
 
@@ -105,7 +105,7 @@ c3_chart_internal_fn.convertRowsToData = (rows) => {
  * @param {any[][]} columns The column data
  * @return {Object}
  */
-c3_chart_internal_fn.convertColumnsToData = (columns) => {
+ChartInternal.prototype.convertColumnsToData = (columns) => {
     const newRows = [];
     const keys = [];
 
@@ -134,7 +134,7 @@ c3_chart_internal_fn.convertColumnsToData = (columns) => {
  * @param {boolean} appendXs True to append to $$.data.xs, False to replace.
  * @return {!Array}
  */
-c3_chart_internal_fn.convertDataToTargets = function (data, appendXs) {
+ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
     var $$ = this, config = $$.config, targets, ids, xs, keys;
 
     // handles format where keys are not orderly provided

@@ -1,6 +1,6 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 
-c3_chart_internal_fn.initZoom = function () {
+ChartInternal.prototype.initZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
 
     $$.zoom = d3.zoom()
@@ -43,18 +43,18 @@ c3_chart_internal_fn.initZoom = function () {
 
     return $$.zoom.updateExtent();
 };
-c3_chart_internal_fn.zoomTransform = function (range) {
+ChartInternal.prototype.zoomTransform = function (range) {
     var $$ = this, s = [$$.x(range[0]), $$.x(range[1])];
     return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0);
 };
 
-c3_chart_internal_fn.getZoomDomain = function () {
+ChartInternal.prototype.getZoomDomain = function () {
     var $$ = this, config = $$.config, d3 = $$.d3,
         min = d3.min([$$.orgXDomain[0], config.zoom_x_min]),
         max = d3.max([$$.orgXDomain[1], config.zoom_x_max]);
     return [min, max];
 };
-c3_chart_internal_fn.redrawForZoom = function () {
+ChartInternal.prototype.redrawForZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
     if (!config.zoom_enabled) {
         return;

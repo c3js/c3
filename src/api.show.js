@@ -1,6 +1,6 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.show = function (targetIds, options) {
+Chart.prototype.show = function (targetIds, options) {
     var $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -23,7 +23,7 @@ c3_chart_fn.show = function (targetIds, options) {
     $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 };
 
-c3_chart_fn.hide = function (targetIds, options) {
+Chart.prototype.hide = function (targetIds, options) {
     var $$ = this.internal, targets;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -46,7 +46,7 @@ c3_chart_fn.hide = function (targetIds, options) {
     $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
 };
 
-c3_chart_fn.toggle = function (targetIds, options) {
+Chart.prototype.toggle = function (targetIds, options) {
     var that = this, $$ = this.internal;
     $$.mapToTargetIds(targetIds).forEach(function (targetId) {
         $$.isTargetToShow(targetId) ? that.hide(targetId, options) : that.show(targetId, options);

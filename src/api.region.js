@@ -1,21 +1,21 @@
 import CLASS from './class';
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.regions = function (regions) {
+Chart.prototype.regions = function (regions) {
     var $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = regions;
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.add = function (regions) {
+Chart.prototype.regions.add = function (regions) {
     var $$ = this.internal, config = $$.config;
     if (!regions) { return config.regions; }
     config.regions = config.regions.concat(regions);
     $$.redrawWithoutRescale();
     return config.regions;
 };
-c3_chart_fn.regions.remove = function (options) {
+Chart.prototype.regions.remove = function (options) {
     var $$ = this.internal, config = $$.config,
         duration, classes, regions;
 

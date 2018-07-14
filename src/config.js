@@ -1,7 +1,7 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isDefined } from './util';
 
-c3_chart_internal_fn.getDefaultConfig = function () {
+ChartInternal.prototype.getDefaultConfig = function () {
     var config = {
         bindto: '#chart',
         svg_classname: undefined,
@@ -243,9 +243,9 @@ c3_chart_internal_fn.getDefaultConfig = function () {
 
     return config;
 };
-c3_chart_internal_fn.additionalConfig = {};
+ChartInternal.prototype.additionalConfig = {};
 
-c3_chart_internal_fn.loadConfig = function (config) {
+ChartInternal.prototype.loadConfig = function (config) {
     var this_config = this.config, target, keys, read;
     function find() {
         var key = keys.shift();

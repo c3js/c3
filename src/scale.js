@@ -1,9 +1,9 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 
-c3_chart_internal_fn.getScale = function (min, max, forTimeseries) {
+ChartInternal.prototype.getScale = function (min, max, forTimeseries) {
     return (forTimeseries ? this.d3.scaleTime() : this.d3.scaleLinear()).range([min, max]);
 };
-c3_chart_internal_fn.getX = function (min, max, domain, offset) {
+ChartInternal.prototype.getX = function (min, max, domain, offset) {
     var $$ = this,
         scale = $$.getScale(min, max, $$.isTimeSeries()),
         _scale = domain ? scale.domain(domain) : scale, key;
@@ -40,18 +40,18 @@ c3_chart_internal_fn.getX = function (min, max, domain, offset) {
     }
     return scale;
 };
-c3_chart_internal_fn.getY = function (min, max, domain) {
+ChartInternal.prototype.getY = function (min, max, domain) {
     var scale = this.getScale(min, max, this.isTimeSeriesY());
     if (domain) { scale.domain(domain); }
     return scale;
 };
-c3_chart_internal_fn.getYScale = function (id) {
+ChartInternal.prototype.getYScale = function (id) {
     return this.axis.getId(id) === 'y2' ? this.y2 : this.y;
 };
-c3_chart_internal_fn.getSubYScale = function (id) {
+ChartInternal.prototype.getSubYScale = function (id) {
     return this.axis.getId(id) === 'y2' ? this.subY2 : this.subY;
 };
-c3_chart_internal_fn.updateScales = function () {
+ChartInternal.prototype.updateScales = function () {
     var $$ = this, config = $$.config,
         forInit = !$$.x;
     // update edges
