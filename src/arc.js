@@ -316,7 +316,7 @@ ChartInternal.prototype.initArc = function () {
 
 ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTransform) {
     var $$ = this, d3 = $$.d3, config = $$.config, main = $$.main,
-        arcs, mainArc, backgroundArc,
+        arcs, mainArc,
 	arcLabelLines, mainArcLabelLine,
 	hasGaugeType = $$.hasType('gauge');
     arcs = main.selectAll('.' + CLASS.arcs).selectAll('.' + CLASS.arc)
@@ -469,11 +469,15 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         .style("opacity", $$.hasType('donut') || hasGaugeType ? 1 : 0);
 
     if (hasGaugeType) {
-        var index = 0;
-        backgroundArc = $$.arcs.select('g.' + CLASS.chartArcsBackground).selectAll('path.' + CLASS.chartArcsBackground).data($$.data.targets);
-        backgroundArc.enter().append("path")
-            .attr("class", function (d, i) { return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground +'-'+ i; })
-            .attr("d", function (d1) {
+        let index = 0;
+        const backgroundArc = $$.arcs.select('g.' + CLASS.chartArcsBackground).selectAll('path.' + CLASS.chartArcsBackground).data($$.data.targets);
+
+        backgroundArc
+            .enter()
+            .append("path")
+            .attr("class", (d, i) => CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground +'-'+ i)
+            .merge(backgroundArc)
+            .attr("d", d1 => {
                 if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) { return "M 0 0"; }
 
                 var d = {
@@ -484,7 +488,10 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
                 };
                 return $$.getArc(d, true, true);
             });
-        backgroundArc.exit().remove();
+
+        backgroundArc
+            .exit()
+            .remove();
 
         $$.arcs.select('.' + CLASS.chartArcsGaugeUnit)
             .attr("dy", ".75em")
