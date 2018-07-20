@@ -1,6 +1,6 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.load = function (args) {
+Chart.prototype.load = function (args) {
     var $$ = this.internal, config = $$.config;
     // update xs if specified
     if (args.xs) {
@@ -8,7 +8,7 @@ c3_chart_fn.load = function (args) {
     }
     // update names if exists
     if ('names' in args) {
-        c3_chart_fn.data.names.bind(this)(args.names);
+        Chart.prototype.data.names.bind(this)(args.names);
     }
     // update classes if exists
     if ('classes' in args) {
@@ -48,7 +48,7 @@ c3_chart_fn.load = function (args) {
     }
 };
 
-c3_chart_fn.unload = function (args) {
+Chart.prototype.unload = function (args) {
     var $$ = this.internal;
     args = args || {};
     if (args instanceof Array) {

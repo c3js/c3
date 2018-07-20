@@ -7,6 +7,45 @@ describe('c3 chart shape bar', function () {
         chart = window.initChart(chart, args, done);
     });
 
+    describe('Path boxes', function () {
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30]
+                    ],
+                    type: 'bar',
+                },
+                bar: {
+                    width: {
+                        max: 40
+                    }
+                }
+            };
+        });
+
+        it('bars should have expected Path Box', function () {
+            var expected = {
+                x: 279,
+                y: 40,
+                width: 40,
+                height: 387
+            };
+
+            var shapes = chart.internal.main
+                .selectAll('.' + chart.internal.CLASS.shapes)
+                .selectAll('.' + chart.internal.CLASS.shape);
+            shapes.each(function () {
+                var pathBox = chart.internal.getPathBox(this);
+                expect(pathBox.x).toBeCloseTo(expected.x, -1);
+                expect(pathBox.y).toBeCloseTo(expected.y, -1);
+                expect(pathBox.width).toBeCloseTo(expected.width, -1);
+                expect(pathBox.height).toBeCloseTo(expected.height, -1);
+            });
+
+        });
+    });
+
     describe('with groups', function () {
 
         describe('with indexed data', function () {
@@ -30,7 +69,8 @@ describe('c3 chart shape bar', function () {
                     var rect = d3.select(this).node().getBoundingClientRect();
                     expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
                 });
-           });
+            });
+
         });
 
         describe('with timeseries data', function () {
@@ -61,7 +101,7 @@ describe('c3 chart shape bar', function () {
                     var rect = d3.select(this).node().getBoundingClientRect();
                     expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
                 });
-           });
+            });
         });
 
         describe('with category data', function () {
@@ -93,7 +133,7 @@ describe('c3 chart shape bar', function () {
                     var rect = d3.select(this).node().getBoundingClientRect();
                     expect(rect.bottom).toBeCloseTo(expectedBottom[i], -1);
                 });
-           });
+            });
         });
 
     });
@@ -164,23 +204,23 @@ describe('c3 chart shape bar', function () {
 
     });
 
-    describe('bar spacing', function() {
+    describe('bar spacing', function () {
 
-        var createArgs = function(spacing) {
+        var createArgs = function (spacing) {
             return {
                 size: {
-                  width: 500
+                    width: 500
                 },
                 data: {
                     columns: [
                         ['data1', 30, 200, 100],
                         ['data2', 50, 20, 10],
                         ['data3', 150, 120, 110],
-                        ['data4', 12, 24, 20 ]
+                        ['data4', 12, 24, 20]
                     ],
                     type: 'bar',
                     groups: [
-                        [ 'data1', 'data4' ]
+                        ['data1', 'data4']
                     ]
                 },
                 bar: {
@@ -189,27 +229,27 @@ describe('c3 chart shape bar', function () {
             };
         };
 
-        var getBBox = function(selector) {
-          return d3.select(selector).node().getBBox();
+        var getBBox = function (selector) {
+            return d3.select(selector).node().getBBox();
         };
 
-        var getBarContainerWidth = function() {
+        var getBarContainerWidth = function () {
             return parseInt(getBBox('.c3-chart-bars').width);
         };
 
-        var getBarContainerOffset = function() {
+        var getBarContainerOffset = function () {
             return parseInt(getBBox('.c3-chart-bars').x);
         };
 
-        var getBarBBox = function(name, idx) {
+        var getBarBBox = function (name, idx) {
             return getBBox('.c3-target-' + name + ' .c3-bar-' + (idx || 0));
         };
 
-        var getBarWidth = function(name, idx) {
-          return parseInt(getBarBBox(name, idx).width);
+        var getBarWidth = function (name, idx) {
+            return parseInt(getBarBBox(name, idx).width);
         };
 
-        var getBarOffset = function(name1, name2, idx) {
+        var getBarOffset = function (name1, name2, idx) {
             var bbox1 = getBarBBox(name1, idx);
             var bbox2 = getBarBBox(name2, idx);
             return parseInt(bbox2.x - (bbox1.x + bbox1.width));
