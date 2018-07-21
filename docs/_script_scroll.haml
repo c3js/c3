@@ -2,7 +2,7 @@
   $(function(){
     function scrollToHash() {
       var hash = document.location.hash,
-          target = $('.column-content a[href^=' + hash + ']'),
+          target = $('.column-content h3 a[href^=' + hash + ']'),
           position;
       if (target.length) {
         position = target.offset().top - 60;
