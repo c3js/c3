@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:6-browsers
+      - image: circleci/node:8-browsers
     steps:
       - checkout
       - run: |
@@ -10,10 +10,10 @@ jobs:
           echo "npm v$(npm --version)"
           echo "$(google-chrome --version)"
       - restore_cache:
-          key: npm-1-{{ checksum "package.json" }}
+          key: npm-1.1-{{ checksum "package.json" }}
       - run: npm install
       - save_cache:
-          key: npm-1-{{ checksum "package.json" }}
+          key: npm-1.1-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run: npm test
