@@ -4,8 +4,18 @@ bower_components
 d3.js
 d3.min.js
 components
-build
+
+# build
+/htdocs/js/c3.js
+/htdocs/js/c3.min.js
+/htdocs/css/c3.css
+/htdocs/css/c3.min.css
+/build
+
+# sass
 .sass-cache
+
+# jetbrains
 .idea/
 
 # coverage report
