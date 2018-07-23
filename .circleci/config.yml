@@ -18,6 +18,9 @@ jobs:
             - ./node_modules
       - run: npm test
       - run: npm run codecov
+      - store_artifacts:
+          path: htdocs
+          destination: htdocs
   publish-docs:
     docker:
       - image: circleci/ruby:2.4-node
