@@ -1,4 +1,4 @@
-/* @license C3.js v0.4.23 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.4.24 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -1012,7 +1012,7 @@
         transitions.axisSubX.call($$.subXAxis);
     };
 
-    var c3 = { version: "0.4.23" };
+    var c3 = { version: "0.4.24" };
 
     var c3_chart_fn;
     var c3_chart_internal_fn;
@@ -4574,9 +4574,7 @@
                 return;
             }
             $$.d3.select(this).selectAll('path').transition().duration($$.expandDuration(d.data.id)).attr("d", $$.svgArcExpanded).transition().duration($$.expandDuration(d.data.id) * 2).attr("d", $$.svgArcExpandedSub).each(function (d) {
-                if ($$.isDonutType(d.data)) {
-                    // callback here
-                }
+                if ($$.isDonutType(d.data)) ;
             });
         });
     };
@@ -8164,7 +8162,7 @@
         }
         return function (d) {
             var values = config.line_connectNull ? $$.filterRemoveNull(d.values) : d.values,
-                x = isSub ? $$.x : $$.subX,
+                x = isSub ? $$.subX : $$.x,
                 y = yScaleGetter.call($$, d.id),
                 x0 = 0,
                 y0 = 0,
