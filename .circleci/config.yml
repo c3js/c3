@@ -21,7 +21,6 @@ jobs:
       - store_artifacts:
           path: htdocs
           destination: htdocs
-      - run: npx status-back -s -c circleci/preview -r c3js/c3 "preview build succes!" "https://${CIRCLE_BUILD_NUM}-11496279-gh.circle-artifacts.com/0/preview/index.html"
   publish-docs:
     docker:
       - image: circleci/ruby:2.4-node
