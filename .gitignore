@@ -4,9 +4,16 @@ bower_components
 d3.js
 d3.min.js
 components
-build
-.sass-cache
-.idea/
+
+# build
+/build
+/tmp
+
+# sass
+/.sass-cache
+
+# jetbrains
+/.idea/
 
 # coverage report
 /coverage
