@@ -471,19 +471,20 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
     if (hasGaugeType) {
         var index = 0;
         backgroundArc = $$.arcs.select('g.' + CLASS.chartArcsBackground).selectAll('path.' + CLASS.chartArcsBackground).data($$.data.targets);
-        backgroundArc.enter().append("path")
-            .attr("class", function (d, i) { return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground +'-'+ i; })
-            .attr("d", function (d1) {
-                if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) { return "M 0 0"; }
+        backgroundArc = backgroundArc.enter().append("path").merge(backgroundArc);
+        backgroundArc.attr("class", function (d, i) {
+            return CLASS.chartArcsBackground + ' ' + CLASS.chartArcsBackground + '-' + i;
+        }).attr("d", function (d1) {
+            if ($$.hiddenTargetIds.indexOf(d1.id) >= 0) { return "M 0 0"; }
 
-                var d = {
-                    data: [{value: config.gauge_max}],
-                    startAngle: config.gauge_startingAngle,
-                    endAngle: -1 * config.gauge_startingAngle * (config.gauge_fullCircle ? Math.PI : 1),
-                    index: index++
-                };
-                return $$.getArc(d, true, true);
-            });
+            var d = {
+                data: [{ value: config.gauge_max }],
+                startAngle: config.gauge_startingAngle,
+                endAngle: -1 * config.gauge_startingAngle * (config.gauge_fullCircle ? Math.PI : 1),
+                index: index++
+            };
+            return $$.getArc(d, true, true);
+        });
         backgroundArc.exit().remove();
 
         $$.arcs.select('.' + CLASS.chartArcsGaugeUnit)
