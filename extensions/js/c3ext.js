@@ -1,4 +1,4 @@
-﻿var c3ext = {};
+var c3ext = {};
 c3ext.generate = function (options) {
 
     if (options.zoom2 != null) {
