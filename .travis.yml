@@ -1,11 +1,13 @@
-language: node_js
+language: ruby
+rvm:
+  - 2.4
 
 branches:
   only:
     - master
 
 script:
-  - npm run build:docs
+  - bundle exec middleman build
 
 deploy:
   provider: pages
