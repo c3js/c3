@@ -21,7 +21,7 @@ jobs:
       - store_artifacts:
           path: htdocs
           destination: htdocs
-  publish-docs:
+  docs:
     docker:
       - image: circleci/ruby:2.4-node
         env:
@@ -45,17 +45,15 @@ jobs:
           paths:
             - ./node_modules
 
-      - run: npm run publish-docs
+      - run: npm run build
+      - run: npm run copy-to-docs
+      - run: npm run build:docs
+      - store_artifacts:
+          path: build
+          destination: docs
 workflows:
   version: 2
   test:
     jobs:
       - test
-  publish-docs:
-    jobs:
-      - publish-docs:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+      - docs
