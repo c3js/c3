@@ -45,6 +45,7 @@
           = partial :reference_menu_item, locals: { id: 'data.type' }
           = partial :reference_menu_item, locals: { id: 'data.types' }
           = partial :reference_menu_item, locals: { id: 'data.labels' }
+          = partial :reference_menu_item, locals: { id: 'data.labels.format' }
           = partial :reference_menu_item, locals: { id: 'data.order' }
           = partial :reference_menu_item, locals: { id: 'data.regions' }
           = partial :reference_menu_item, locals: { id: 'data.color' }
@@ -62,6 +63,8 @@
           = partial :reference_menu_item, locals: { id: 'data.onmouseout' }
           = partial :reference_menu_item, locals: { id: 'data.onselected' }
           = partial :reference_menu_item, locals: { id: 'data.onunselected' }
+          = partial :reference_menu_item, locals: { id: 'data.ondragstart' }
+          = partial :reference_menu_item, locals: { id: 'data.ondragend' }
 
           %li Axis
           = partial :reference_menu_item, locals: { id: 'axis.rotated' }
@@ -88,8 +91,8 @@
           = partial :reference_menu_item, locals: { id: 'axis.x.extent' }
           = partial :reference_menu_item, locals: { id: 'axis.x.label' }
           = partial :reference_menu_item, locals: { id: 'axis.y.show' }
-          = partial :reference_menu_item, locals: { id: 'axis.y.type' }
           = partial :reference_menu_item, locals: { id: 'axis.y.inner' }
+          = partial :reference_menu_item, locals: { id: 'axis.y.type' }
           = partial :reference_menu_item, locals: { id: 'axis.y.max' }
           = partial :reference_menu_item, locals: { id: 'axis.y.min' }
           = partial :reference_menu_item, locals: { id: 'axis.y.inverted' }
@@ -124,8 +127,8 @@
           = partial :reference_menu_item, locals: { id: 'grid.y.show' }
           = partial :reference_menu_item, locals: { id: 'grid.y.lines' }
           = partial :reference_menu_item, locals: { id: 'grid.y.ticks' }
-          = partial :reference_menu_item, locals: { id: 'grid.focus.show' }
-          = partial :reference_menu_item, locals: { id: 'grid.lines.front' }
+          -#= partial :reference_menu_item, locals: { id: 'grid.focus.show' }
+          -#= partial :reference_menu_item, locals: { id: 'grid.lines.front' }
 
           %li Region
           = partial :reference_menu_item, locals: { id: 'regions' }
@@ -240,8 +243,8 @@
           = partial :reference_menu_item, locals: { id: 'api.data.names' }
           = partial :reference_menu_item, locals: { id: 'api.data.colors' }
           = partial :reference_menu_item, locals: { id: 'api.data.axes' }
-          = partial :reference_menu_item, locals: { id: 'api.category' }
-          = partial :reference_menu_item, locals: { id: 'api.categories' }
+          -#= partial :reference_menu_item, locals: { id: 'api.category' }
+          -#= partial :reference_menu_item, locals: { id: 'api.categories' }
           = partial :reference_menu_item, locals: { id: 'api.x' }
           = partial :reference_menu_item, locals: { id: 'api.xs' }
           -#= partial :reference_menu_item, locals: { id: 'api.color' }
@@ -251,8 +254,8 @@
           = partial :reference_menu_item, locals: { id: 'api.axis.range' }
           = partial :reference_menu_item, locals: { id: 'api.legend.show' }
           = partial :reference_menu_item, locals: { id: 'api.legend.hide' }
-          = partial :reference_menu_item, locals: { id: 'api.tooltip.show' }
-          = partial :reference_menu_item, locals: { id: 'api.tooltip.hide' }
+          -#= partial :reference_menu_item, locals: { id: 'api.tooltip.show' }
+          -#= partial :reference_menu_item, locals: { id: 'api.tooltip.hide' }
           = partial :reference_menu_item, locals: { id: 'api.zoom' }
           = partial :reference_menu_item, locals: { id: 'api.unzoom' }
           = partial :reference_menu_item, locals: { id: 'api.zoom.enable' }
