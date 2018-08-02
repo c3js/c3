@@ -1,4 +1,5 @@
 import { ChartInternal } from './core';
+import CLASS from './class';
 
 ChartInternal.prototype.initZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
@@ -61,71 +62,56 @@ ChartInternal.prototype.zoomTransform = function (range) {
 };
 
 ChartInternal.prototype.initDragZoom = function () {
-    if (this.config.zoom_type === 'drag' && this.config.zoom_enabled) {
-        var $$ = this, d3 = $$.d3, config = $$.config,
-            context = $$.context = $$.svg,
-            brushXPos, brushYPos;
-
-        $$.dragZoomBrush = d3.svg.brush()
-            .x($$.x)
-            .y($$.y)
-            .on("brushstart", function () {
-                config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
-            })
-            .on("brush", function () {
-                var extent = $$.dragZoomBrush.extent(),
-                    ar1 = [extent[0][0], $$.y.domain()[0]],
-                    ar2 = [extent[1][0], $$.y.domain()[1]];
-
-                $$.dragZoomBrush.extent([ar1, ar2]);
-                $$.svg.select("." + CLASS.dragZoom).call($$.dragZoomBrush);
-
-
-                config.zoom_onzoom.call($$.api, $$.x.orgDomain());
-            })
-            .on("brushend", function () {
-                var extent = $$.dragZoomBrush.extent();
-
-                if (!config.zoom_disableDefaultBehavior) {
-                    $$.api.zoom([extent[0][0], extent[1][0]]);
-                }
-                else {
-                    var ar1 = [$$.x.domain()[0], $$.y.domain()[0]],
-                        ar2 = [$$.x.domain()[1], $$.y.domain()[1]];
-                    $$.dragZoomBrush.extent([ar1, ar2]);
-                    $$.api.zoom([$$.x.domain()[0], $$.x.domain()[1]]);
-                }
-
-                d3.selectAll("." + CLASS.dragZoom)
-                    .attr("class", CLASS.dragZoom + " disabled");
-
-                $$.dragZoomBrush.clear();
-                $$.svg.select("." + CLASS.dragZoom).call($$.dragZoomBrush);
-
-                config.zoom_onzoomend.call($$.api, [extent[0][0], extent[1][0]]);
-            });
-
-        brushXPos = $$.margin.left + 20.5;
-        brushYPos = $$.margin.top + 0.5;
-        context.append("g")
-            .attr("clip-path", $$.clipPath)
-            .attr("class", CLASS.dragZoom + " disabled")
-            .attr("transform", "translate(" + brushXPos + "," + brushYPos + ")")
-            .call($$.dragZoomBrush);
-
-        $$.svg.on("mousedown", function () {
-            d3.selectAll("." + CLASS.dragZoom)
-                .attr("class", CLASS.dragZoom + " enabled");
-
-            var brush_elm = $$.svg.select("." + CLASS.dragZoom).node();
-            var new_click_event = new Event('mousedown');
-            new_click_event.pageX = d3.event.pageX;
-            new_click_event.clientX = d3.event.clientX;
-            new_click_event.pageY = d3.event.pageY;
-            new_click_event.clientY = d3.event.clientY;
-            brush_elm.dispatchEvent(new_click_event);
-        });
+    if (!(this.config.zoom_type === 'drag' && this.config.zoom_enabled)) {
+        return;
     }
+
+    const $$ = this;
+    const d3 = $$.d3;
+    const config = $$.config;
+    const context = $$.context = $$.svg;
+    const brushXPos = $$.margin.left + 20.5;
+    const brushYPos = $$.margin.top + 0.5;
+
+    const brush = $$.dragZoomBrush = d3.brushX()
+        .on("start", () => {
+            $$.api.unzoom();
+
+            $$.svg
+                .select("." + CLASS.dragZoom)
+                .classed("disabled", false);
+
+            config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
+        })
+        .on("brush", () => {
+            config.zoom_onzoom.call($$.api, $$.x.orgDomain());
+        })
+        .on("end", () => {
+            if (d3.event.selection == null) {
+                return
+            }
+
+            const [x0, x1] = d3.event.selection;
+
+            if (!config.zoom_disableDefaultBehavior) {
+                $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
+            } else {
+                $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
+            }
+
+            $$.svg
+                .select("." + CLASS.dragZoom)
+                .classed("disabled", true);
+
+            config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
+        });
+
+    context
+        .append("g")
+        .classed(CLASS.dragZoom, true)
+        .attr("clip-path", $$.clipPath)
+        .attr("transform", "translate(" + brushXPos + "," + brushYPos + ")")
+        .call(brush);
 };
 
 ChartInternal.prototype.getZoomDomain = function () {
