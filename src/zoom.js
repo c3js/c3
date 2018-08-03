@@ -62,16 +62,16 @@ ChartInternal.prototype.zoomTransform = function (range) {
 };
 
 ChartInternal.prototype.initDragZoom = function () {
-    if (!(this.config.zoom_type === 'drag' && this.config.zoom_enabled)) {
-        return;
-    }
-
     const $$ = this;
     const d3 = $$.d3;
     const config = $$.config;
     const context = $$.context = $$.svg;
     const brushXPos = $$.margin.left + 20.5;
     const brushYPos = $$.margin.top + 0.5;
+
+    if (!(config.zoom_type === 'drag' && config.zoom_enabled)) {
+        return;
+    }
 
     const brush = $$.dragZoomBrush = d3.brushX()
         .on("start", () => {
@@ -88,16 +88,12 @@ ChartInternal.prototype.initDragZoom = function () {
         })
         .on("end", () => {
             if (d3.event.selection == null) {
-                return
+                return;
             }
 
             const [x0, x1] = d3.event.selection;
 
-            if (!config.zoom_disableDefaultBehavior) {
-                $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
-            } else {
-                $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
-            }
+            $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
 
             $$.svg
                 .select("." + CLASS.dragZoom)

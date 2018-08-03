@@ -15,7 +15,6 @@ ChartInternal.prototype.getDefaultConfig = function () {
         zoom_enabled: false,
         zoom_initialRange: undefined,
         zoom_type: 'scroll',
-        zoom_disableDefaultBehavior: false,
         zoom_privileged: false,
         zoom_rescale: false,
         zoom_onzoom: function () {},
