@@ -13,7 +13,7 @@ module.exports = function(config) {
     },
     browserify: {
       debug: true,
-      transform: [['babelify', { presets: ['es2015'], plugins: ['istanbul'] }]]
+      transform: [['babelify', { presets: ['env'], plugins: ['istanbul'] }]]
     },
     reporters: ['spec', 'coverage-istanbul'],
     coverageIstanbulReporter: {

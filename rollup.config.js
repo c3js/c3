@@ -13,7 +13,7 @@ export default {
         }
     },
     plugins: [babel({
-        presets: [['es2015', {
+        presets: [['env', {
             modules: false
         }]],
         plugins: [
