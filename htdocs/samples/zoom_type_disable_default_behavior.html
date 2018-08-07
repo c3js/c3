@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../css/c3.css">
+  </head>
+  <body>
+    <p>Zoom Type Scroll with Zoom Behavior Disabled (See the console)</p>
+    <div id="chart1"></div>
+
+    <p>Zoom Type Drag with Zoom Behavior Disabled (See the console)</p>
+    <div id="chart2"></div>
+
+    <script src="https://d3js.org/d3.v5.js" charset="utf-8"></script>
+    <script src="../js/c3.js"></script>
+    <script>
+
+      var chart1 = c3.generate({
+          bindto: '#chart1',
+          data: {
+              columns: [
+                  generateData(100)
+              ]
+          },
+          zoom: {
+              enabled: true,
+              type: 'scroll',
+              disableDefaultBehavior: true,
+              onzoom: (d) => console.log(d),
+              onzoomend: (d) => console.log(d),
+          }
+      });
+
+      var chart2 = c3.generate({
+          bindto: '#chart2',
+          data: {
+              columns: [
+                  generateData(100)
+              ]
+          },
+          zoom: {
+              enabled: true,
+              type: 'drag',
+              disableDefaultBehavior: true,
+              onzoom: (d) => console.log(d),
+              onzoomend: (d) => console.log(d),
+          }
+      });
+
+      function load() {
+        chart1.load({
+          columns: [
+            generateData(Math.random() * 1000)
+          ]
+        });
+      }
+
+      function generateData(n) {
+        var column = ['sample'];
+        for (var i = 0; i < n; i++) {
+          column.push(Math.random() * 500);
+        }
+        return column;
+      }
+
+    </script>
+  </body>
+</html>
