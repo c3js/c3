@@ -73,6 +73,8 @@ ChartInternal.prototype.initDragZoom = function () {
         return;
     }
 
+    const getZoomedDomain = selection => selection && selection.map(x => $$.x.invert(x))
+
     const brush = $$.dragZoomBrush = d3.brushX()
         .on("start", () => {
             $$.api.unzoom();
@@ -81,25 +83,25 @@ ChartInternal.prototype.initDragZoom = function () {
                 .select("." + CLASS.dragZoom)
                 .classed("disabled", false);
 
-            config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
+            config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
         })
         .on("brush", () => {
-            config.zoom_onzoom.call($$.api, $$.x.orgDomain());
+            config.zoom_onzoom.call($$.api, getZoomedDomain(d3.event.selection));
         })
         .on("end", () => {
             if (d3.event.selection == null) {
                 return;
             }
 
-            const [x0, x1] = d3.event.selection;
+            const zoomedDomain = getZoomedDomain(d3.event.selection);
 
-            $$.api.zoom([$$.x.invert(x0), $$.x.invert(x1)]);
+            $$.api.zoom(zoomedDomain);
 
             $$.svg
                 .select("." + CLASS.dragZoom)
                 .classed("disabled", true);
 
-            config.zoom_onzoomstart.call($$.api, $$.x.orgDomain());
+            config.zoom_onzoomend.call($$.api, zoomedDomain);
         });
 
     context
