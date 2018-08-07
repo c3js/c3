@@ -23,9 +23,7 @@ ChartInternal.prototype.initZoom = function () {
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
 
-            if (!config.zoom_disableDefaultBehavior) {
-                $$.redrawForZoom.call($$);
-            }
+            $$.redrawForZoom();
 
             config.zoom_onzoom.call($$.api, $$.x.orgDomain());
         })
@@ -136,9 +134,14 @@ ChartInternal.prototype.redrawForZoom = function () {
 
     zoom.update();
 
+    if (config.zoom_disableDefaultBehavior) {
+        return;
+    }
+
     if ($$.isCategorized() && x.orgDomain()[0] === $$.orgXDomain[0]) {
         x.domain([$$.orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
     }
+
     $$.redraw({
         withTransition: false,
         withY: config.zoom_rescale,
@@ -146,6 +149,7 @@ ChartInternal.prototype.redrawForZoom = function () {
         withEventRect: false,
         withDimension: false
     });
+
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
