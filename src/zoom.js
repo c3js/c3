@@ -22,7 +22,12 @@ ChartInternal.prototype.initZoom = function () {
 
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
-            $$.redrawForZoom.call($$);
+
+            if (!config.zoom_disableDefaultBehavior) {
+                $$.redrawForZoom.call($$);
+            }
+
+            config.zoom_onzoom.call($$.api, $$.x.orgDomain());
         })
         .on('end', function () {
             if (config.zoom_type !== 'scroll') {
@@ -73,7 +78,7 @@ ChartInternal.prototype.initDragZoom = function () {
         return;
     }
 
-    const getZoomedDomain = selection => selection && selection.map(x => $$.x.invert(x))
+    const getZoomedDomain = selection => selection && selection.map(x => $$.x.invert(x));
 
     const brush = $$.dragZoomBrush = d3.brushX()
         .on("start", () => {
@@ -95,7 +100,9 @@ ChartInternal.prototype.initDragZoom = function () {
 
             const zoomedDomain = getZoomedDomain(d3.event.selection);
 
-            $$.api.zoom(zoomedDomain);
+            if (!config.zoom_disableDefaultBehavior) {
+              $$.api.zoom(zoomedDomain);
+            }
 
             $$.svg
                 .select("." + CLASS.dragZoom)
@@ -142,5 +149,4 @@ ChartInternal.prototype.redrawForZoom = function () {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
-    config.zoom_onzoom.call($$.api, x.orgDomain());
 };
