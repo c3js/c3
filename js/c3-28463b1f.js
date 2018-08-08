@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.6 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.7 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -479,6 +479,7 @@
         eventRectsMultiple: 'c3-event-rects-multiple',
         zoomRect: 'c3-zoom-rect',
         brush: 'c3-brush',
+        dragZoom: 'c3-drag-zoom',
         focused: 'c3-focused',
         defocused: 'c3-defocused',
         region: 'c3-region',
@@ -1009,7 +1010,7 @@
     };
 
     var c3 = {
-        version: "0.6.6",
+        version: "0.6.7",
         chart: {
             fn: Chart.prototype,
             internal: {
@@ -1240,6 +1241,9 @@
 
         if ($$.initPie) {
             $$.initPie();
+        }
+        if ($$.initDragZoom) {
+            $$.initDragZoom();
         }
         if ($$.initSubchart) {
             $$.initSubchart();
@@ -5466,6 +5470,8 @@
             resize_auto: true,
             zoom_enabled: false,
             zoom_initialRange: undefined,
+            zoom_type: 'scroll',
+            zoom_disableDefaultBehavior: false,
             zoom_privileged: false,
             zoom_rescale: false,
             zoom_onzoom: function zoom_onzoom() {},
@@ -9430,6 +9436,10 @@
             startEvent;
 
         $$.zoom = d3.zoom().on("start", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") {
                 return;
@@ -9437,12 +9447,23 @@
             startEvent = e;
             config.zoom_onzoomstart.call($$.api, e);
         }).on("zoom", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") {
                 return;
             }
-            $$.redrawForZoom.call($$);
+
+            $$.redrawForZoom();
+
+            config.zoom_onzoom.call($$.api, $$.x.orgDomain());
         }).on('end', function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") {
                 return;
@@ -9476,6 +9497,51 @@
         return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0);
     };
 
+    ChartInternal.prototype.initDragZoom = function () {
+        var $$ = this;
+        var d3 = $$.d3;
+        var config = $$.config;
+        var context = $$.context = $$.svg;
+        var brushXPos = $$.margin.left + 20.5;
+        var brushYPos = $$.margin.top + 0.5;
+
+        if (!(config.zoom_type === 'drag' && config.zoom_enabled)) {
+            return;
+        }
+
+        var getZoomedDomain = function getZoomedDomain(selection) {
+            return selection && selection.map(function (x) {
+                return $$.x.invert(x);
+            });
+        };
+
+        var brush = $$.dragZoomBrush = d3.brushX().on("start", function () {
+            $$.api.unzoom();
+
+            $$.svg.select("." + CLASS.dragZoom).classed("disabled", false);
+
+            config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
+        }).on("brush", function () {
+            config.zoom_onzoom.call($$.api, getZoomedDomain(d3.event.selection));
+        }).on("end", function () {
+            if (d3.event.selection == null) {
+                return;
+            }
+
+            var zoomedDomain = getZoomedDomain(d3.event.selection);
+
+            if (!config.zoom_disableDefaultBehavior) {
+                $$.api.zoom(zoomedDomain);
+            }
+
+            $$.svg.select("." + CLASS.dragZoom).classed("disabled", true);
+
+            config.zoom_onzoomend.call($$.api, zoomedDomain);
+        });
+
+        context.append("g").classed(CLASS.dragZoom, true).attr("clip-path", $$.clipPath).attr("transform", "translate(" + brushXPos + "," + brushYPos + ")").call(brush);
+    };
+
     ChartInternal.prototype.getZoomDomain = function () {
         var $$ = this,
             config = $$.config,
@@ -9499,9 +9565,14 @@
 
         zoom.update();
 
+        if (config.zoom_disableDefaultBehavior) {
+            return;
+        }
+
         if ($$.isCategorized() && x.orgDomain()[0] === $$.orgXDomain[0]) {
             x.domain([$$.orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
         }
+
         $$.redraw({
             withTransition: false,
             withY: config.zoom_rescale,
@@ -9509,10 +9580,10 @@
             withEventRect: false,
             withDimension: false
         });
+
         if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'mousemove') {
             $$.cancelClick = true;
         }
-        config.zoom_onzoom.call($$.api, x.orgDomain());
     };
 
     return c3;
