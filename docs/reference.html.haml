@@ -161,12 +161,13 @@
 
           %li Zoom
           = partial :reference_menu_item, locals: { id: 'zoom.enabled', experimental: true }
+          = partial :reference_menu_item, locals: { id: 'zoom.type', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.rescale', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.extent', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoom', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoomstart', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoomend', experimental: true }
-          -#= partial :reference_menu_item, locals: { id: 'zoom.privileged', experimental: true }
+          = partial :reference_menu_item, locals: { id: 'zoom.disableDefaultBehavior', experimental: true }
 
           %li Point
           = partial :reference_menu_item, locals: { id: 'point.show' }
@@ -2922,6 +2923,25 @@
 
       %section
         %h3
+          = partial :reference_item_link, locals: { id: 'zoom.type', experimental: true }
+        %p There are two types of zoom behavior: 'scroll' and 'drag'
+        %h5 Default:
+        <code>'scroll'</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              zoom: {
+              &nbsp;&nbsp;type: 'drag'
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/interaction_zoom_by_drag.html" ) Zoom by Drag
+      %hr
+
+      %section
+        %h3
           = partial :reference_item_link, locals: { id: 'zoom.rescale', experimental: true }
         %p Enable to rescale after zooming.
         %br
@@ -3000,6 +3020,24 @@
             %code.html.javascript
               zoom: {
               &nbsp;&nbsp;onzoomend: function (domain) { ... }
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'zoom.disableDefaultBehavior', experimental: true }
+        %p Disable the default animation of zoom. This option is useful when you want to get the zoomed domain by onzoom or onzoomend handlers and override the default animation behavior. See <a href="https://github.com/c3js/c3/pull/2439">#2439</a> for details.
+
+        %h5 Default:
+        <code>false</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              zoom: {
+              &nbsp;&nbsp;enabled: true,
+              &nbsp;&nbsp;disableDefaultBehavior: true,
+              &nbsp;&nbsp;onzoomend: d => console.log(d)
               }
       %hr
 

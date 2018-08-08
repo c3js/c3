@@ -214,6 +214,10 @@ interaction_zoom:
   title: Zoom
   desc: Zoom by mouse wheel event and slide by drag.
 
+interaction_zoom_by_drag:
+  title: Zoom by Drag
+  desc: Zoom by dragging area.
+
 region:
   title: Region
   desc: Show rects on chart.
