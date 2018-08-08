@@ -735,6 +735,12 @@
 </li>
 
 <li>
+<a href='#zoom-type'>zoom.type</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
 <a href='#zoom-rescale'>zoom.rescale</a>
 <span class="secondary label">Experimental</span>
 
@@ -760,6 +766,12 @@
 
 <li>
 <a href='#zoom-onzoomend'>zoom.onzoomend</a>
+<span class="secondary label">Experimental</span>
+
+</li>
+
+<li>
+<a href='#zoom-disableDefaultBehavior'>zoom.disableDefaultBehavior</a>
 <span class="secondary label">Experimental</span>
 
 </li>
@@ -4322,6 +4334,29 @@ bindto: d3.select('#myContainer')</code></pre>
 <hr>
 <section>
 <h3>
+<a href='#zoom-type'>zoom.type</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>There are two types of zoom behavior: 'scroll' and 'drag'</p>
+<h5>Default:</h5>
+<code>'scroll'</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;type: 'drag'
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/interaction_zoom_by_drag.html'>Zoom by Drag</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
 <a href='#zoom-rescale'>zoom.rescale</a>
 <span class="secondary label">Experimental</span>
 
@@ -4409,6 +4444,25 @@ bindto: d3.select('#myContainer')</code></pre>
 <div class='sourcecode'>
 <pre><code class='html javascript'>zoom: {
 &nbsp;&nbsp;onzoomend: function (domain) { ... }
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#zoom-disableDefaultBehavior'>zoom.disableDefaultBehavior</a>
+<span class="secondary label">Experimental</span>
+
+</h3>
+<p>Disable the default animation of zoom. This option is useful when you want to get the zoomed domain by onzoom or onzoomend handlers and override the default animation behavior. See <a href="https://github.com/c3js/c3/pull/2439">#2439</a> for details.</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>zoom: {
+&nbsp;&nbsp;enabled: true,
+&nbsp;&nbsp;disableDefaultBehavior: true,
+&nbsp;&nbsp;onzoomend: d => console.log(d)
 }</code></pre>
 </div>
 </section>
