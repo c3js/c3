@@ -63,7 +63,7 @@
     "clean-css-cli": "^4.1.11",
     "codecov": "^3.0.4",
     "gh-pages": "^1.2.0",
-    "jasmine-core": "^2.3.4",
+    "jasmine-core": "^3.2.1",
     "jshint": "^2.9.6",
     "jshint-stylish": "^2.1.0",
     "karma": "^3.0.0",
