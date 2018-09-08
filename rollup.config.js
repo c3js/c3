@@ -13,12 +13,9 @@ export default {
         }
     },
     plugins: [babel({
-        presets: [['env', {
+        presets: [['@babel/preset-env', {
             modules: false
-        }]],
-        plugins: [
-            'external-helpers'
-        ]
+        }]]
     })],
     external: ['d3'],
 };
