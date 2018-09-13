@@ -325,9 +325,17 @@ ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
     // decide closest point and return
     return $$.findClosest(candidates, pos);
 };
+ChartInternal.prototype.horizontalDistance = function(data, pos) {
+    var $$ = this,
+        config = $$.config,
+        xIndex = config.axis_rotated ? 1 : 0,
+        x = $$.x(data.x);
+
+        return Math.abs(x - pos[xIndex]);
+};
 ChartInternal.prototype.findClosest = function (values, pos) {
     var $$ = this,
-        minDist = $$.config.point_sensitivity,
+        minDist,
         closest;
 
     // find mouseovering bar
@@ -343,14 +351,13 @@ ChartInternal.prototype.findClosest = function (values, pos) {
     // find closest point from non-bar
     values.filter(function (v) {
         return v && !$$.isBarType(v.id);
-    }).forEach(function (v) {
-        var d = $$.dist(v, pos);
-        if (d < minDist) {
+    }).forEach(function (v) {            
+        var d = $$.horizontalDistance(v, pos);
+        if (d < minDist || !minDist) {
             minDist = d;
             closest = v;
         }
     });
-
     return closest;
 };
 ChartInternal.prototype.dist = function (data, pos) {
