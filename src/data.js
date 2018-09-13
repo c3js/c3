@@ -351,7 +351,7 @@ ChartInternal.prototype.findClosest = function (values, pos) {
     // find closest point from non-bar
     values.filter(function (v) {
         return v && !$$.isBarType(v.id);
-    }).forEach(function (v) {            
+    }).forEach(function (v) {
         var d = $$.horizontalDistance(v, pos);
         if (d < minDist || !minDist) {
             minDist = d;
