@@ -68,7 +68,7 @@ ChartInternal.prototype.redrawEventRect = function () {
                 $$.mouseover = undefined;
             }
 
-            if (! closest) {
+            if (!closest) {
                 mouseout();
                 return;
             }

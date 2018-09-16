@@ -307,12 +307,24 @@ ChartInternal.prototype.getDataLabelLength = function (min, max, key) {
         .remove();
     return lengths;
 };
+/**
+ * Returns true if the given data point is not arc type, otherwise false.
+ * @param {Object} d The data point
+ * @return {boolean}
+ */
 ChartInternal.prototype.isNoneArc = function (d) {
-        return this.hasTarget(this.data.targets, d.id);
-    },
-    ChartInternal.prototype.isArc = function (d) {
-        return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
-    };
+    return this.hasTarget(this.data.targets, d.id);
+};
+
+/**
+ * Returns true if the given data point is arc type, otherwise false.
+ * @param {Object} d The data point
+ * @return {boolean}
+ */
+ChartInternal.prototype.isArc = function (d) {
+    return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
+};
+
 ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
     var $$ = this,
         candidates;
