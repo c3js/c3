@@ -10,7 +10,8 @@
     "c3.min.css"
   ],
   "scripts": {
-    "start": "static -p 8080 htdocs/",
+    "start": "run-p serve-static watch",
+    "serve-static": "static -p 8080 htdocs/",
     "lint": "jshint --reporter=node_modules/jshint-stylish src/ spec/",
     "docs": "bundle exec middleman",
     "build": "run-s build:js build:css",
