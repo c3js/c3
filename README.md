@@ -20,7 +20,7 @@ Additional samples can be found in this repository:
 
 You can run these samples as:
 ```
-$ npm start
+$ npm run serve-static
 ```
 
 ## Google Group
