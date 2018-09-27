@@ -335,7 +335,7 @@ ChartInternal.prototype.horizontalDistance = function(data, pos) {
 };
 ChartInternal.prototype.findClosest = function (values, pos) {
     var $$ = this,
-        minDist,
+        minDist = Infinity,
         closest;
 
     // find mouseovering bar
@@ -353,7 +353,7 @@ ChartInternal.prototype.findClosest = function (values, pos) {
         return v && !$$.isBarType(v.id);
     }).forEach(function (v) {
         var d = $$.horizontalDistance(v, pos);
-        if (d < minDist || !minDist) {
+        if (d < minDist) {
             minDist = d;
             closest = v;
         }
