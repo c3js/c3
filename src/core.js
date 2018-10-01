@@ -336,8 +336,11 @@ ChartInternal.prototype.initWithData = function(data) {
         });
     }
 
-    // Bind resize event
+    // Bind to resize event
     $$.bindResize();
+
+    // Bind to window focus event
+    $$.bindWindowFocus();
 
     // export element of the chart
     $$.api.element = $$.selectChart.node();
@@ -979,6 +982,9 @@ ChartInternal.prototype.observeInserted = function(selection) {
     });
 };
 
+/**
+ * Binds handlers to the window resize event.
+ */
 ChartInternal.prototype.bindResize = function() {
     var $$ = this,
         config = $$.config;
@@ -1047,6 +1053,28 @@ ChartInternal.prototype.bindResize = function() {
             wrapper();
         };
     }
+};
+
+/**
+ * Binds handlers to the window focus event.
+ */
+ChartInternal.prototype.bindWindowFocus = function() {
+    if (this.windowFocusHandler) {
+        // The handler is already set
+        return;
+    }
+
+    this.windowFocusHandler = () => { this.redraw(); };
+
+    window.addEventListener('focus', this.windowFocusHandler);
+};
+
+/**
+ * Unbinds from the window focus event.
+ */
+ChartInternal.prototype.unbindWindowFocus = function () {
+    window.removeEventListener('focus', this.windowFocusHandler);
+    delete this.windowFocusHandler;
 };
 
 ChartInternal.prototype.generateResize = function() {

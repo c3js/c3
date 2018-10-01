@@ -33,8 +33,11 @@ Chart.prototype.destroy = function () {
         }
     }
 
-    // remove the inner resize functions
+    // Removes the inner resize functions
     $$.resizeFunction.remove();
+
+    // Unbinds from the window focus event
+    $$.unbindWindowFocus();
 
     $$.selectChart.classed('c3', false).html("");
 
