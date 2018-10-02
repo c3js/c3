@@ -131,7 +131,7 @@ ChartInternal.prototype.getTooltipContent = function (d, defaultTitleFormat, def
         }
 
         if (!text) {
-            title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
+          title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
             text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
         }
 
