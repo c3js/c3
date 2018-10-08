@@ -220,9 +220,9 @@ Axis.prototype.textForY2AxisLabel = function textForY2AxisLabel() {
 Axis.prototype.xForAxisLabel = function xForAxisLabel(forHorizontal, position) {
     var $$ = this.owner;
     if (forHorizontal) {
-        return position.isLeft ? 0 : position.isCenter ? $$.width / 2 : $$.width;
+        return position.isLeft ? 0 : position.isCenter || position.isMiddle ? $$.width / 2 : $$.width;
     } else {
-        return position.isBottom ? -$$.height : position.isMiddle ? -$$.height / 2 : 0;
+        return position.isBottom ? -$$.height : position.isMiddle || position.isCenter ? -$$.height / 2 : 0;
     }
 };
 Axis.prototype.dxForAxisLabel = function dxForAxisLabel(forHorizontal, position) {
@@ -234,9 +234,9 @@ Axis.prototype.dxForAxisLabel = function dxForAxisLabel(forHorizontal, position)
 };
 Axis.prototype.textAnchorForAxisLabel = function textAnchorForAxisLabel(forHorizontal, position) {
     if (forHorizontal) {
-        return position.isLeft ? 'start' : position.isCenter ? 'middle' : 'end';
+        return position.isLeft ? 'start' : position.isCenter || position.isMiddle ? 'middle' : 'end';
     } else {
-        return position.isBottom ? 'start' : position.isMiddle ? 'middle' : 'end';
+        return position.isBottom ? 'start' : position.isMiddle || position.isCenter ? 'middle' : 'end';
     }
 };
 Axis.prototype.xForXAxisLabel = function xForXAxisLabel() {
