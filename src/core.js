@@ -1132,18 +1132,7 @@ ChartInternal.prototype.parseDate = function(date) {
 };
 
 ChartInternal.prototype.isTabVisible = function() {
-    var hidden;
-    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
-        hidden = "hidden";
-    } else if (typeof document.mozHidden !== "undefined") {
-        hidden = "mozHidden";
-    } else if (typeof document.msHidden !== "undefined") {
-        hidden = "msHidden";
-    } else if (typeof document.webkitHidden !== "undefined") {
-        hidden = "webkitHidden";
-    }
-
-    return document[hidden] ? false : true;
+    return !document.hidden;
 };
 
 ChartInternal.prototype.getPathBox = getPathBox;
