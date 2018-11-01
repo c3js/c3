@@ -1,8 +1,8 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 import { isFunction } from './util';
 
-c3_chart_internal_fn.initBrush = function (scale) {
+ChartInternal.prototype.initBrush = function (scale) {
     var $$ = this, d3 = $$.d3;
     // TODO: dynamically change brushY/brushX according to axis_rotated.
     $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX()).on("brush", function () {
@@ -59,7 +59,7 @@ c3_chart_internal_fn.initBrush = function (scale) {
     };
     return $$.brush.updateScale(scale);
 };
-c3_chart_internal_fn.initSubchart = function () {
+ChartInternal.prototype.initSubchart = function () {
     var $$ = this, config = $$.config,
         context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context')),
         visibility = config.subchart_show ? 'visible' : 'hidden';
@@ -92,13 +92,13 @@ c3_chart_internal_fn.initSubchart = function () {
         .attr("transform", $$.getTranslate('subx'))
         .attr("clip-path", config.axis_rotated ? "" : $$.clipPathForXAxis);
 };
-c3_chart_internal_fn.initSubchartBrush = function () {
+ChartInternal.prototype.initSubchartBrush = function () {
     var $$ = this;
     // Add extent rect for Brush
     $$.initBrush($$.subX).updateExtent();
     $$.context.select('.' + CLASS.brush).call($$.brush);
 };
-c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
+ChartInternal.prototype.updateTargetsForSubchart = function (targets) {
     var $$ = this, context = $$.context, config = $$.config,
         contextLineEnter, contextLine, contextBarEnter, contextBar,
         classChartBar = $$.classChartBar.bind($$),
@@ -138,7 +138,7 @@ c3_chart_internal_fn.updateTargetsForSubchart = function (targets) {
             .attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
     }
 };
-c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
+ChartInternal.prototype.updateBarForSubchart = function (durationForExit) {
     var $$ = this;
     var contextBar = $$.context.selectAll('.' + CLASS.bars).selectAll('.' + CLASS.bar)
         .data($$.barData.bind($$));
@@ -152,12 +152,12 @@ c3_chart_internal_fn.updateBarForSubchart = function (durationForExit) {
     $$.contextBar = contextBarEnter.merge(contextBar)
         .style("opacity", $$.initialOpacity.bind($$));
 };
-c3_chart_internal_fn.redrawBarForSubchart = function (drawBarOnSub, withTransition, duration) {
+ChartInternal.prototype.redrawBarForSubchart = function (drawBarOnSub, withTransition, duration) {
     (withTransition ? this.contextBar.transition(Math.random().toString()).duration(duration) : this.contextBar)
         .attr('d', drawBarOnSub)
         .style('opacity', 1);
 };
-c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
+ChartInternal.prototype.updateLineForSubchart = function (durationForExit) {
     var $$ = this;
     var contextLine = $$.context.selectAll('.' + CLASS.lines).selectAll('.' + CLASS.line)
         .data($$.lineData.bind($$));
@@ -170,12 +170,12 @@ c3_chart_internal_fn.updateLineForSubchart = function (durationForExit) {
     $$.contextLine = contextLineEnter.merge(contextLine)
         .style("opacity", $$.initialOpacity.bind($$));
 };
-c3_chart_internal_fn.redrawLineForSubchart = function (drawLineOnSub, withTransition, duration) {
+ChartInternal.prototype.redrawLineForSubchart = function (drawLineOnSub, withTransition, duration) {
     (withTransition ? this.contextLine.transition(Math.random().toString()).duration(duration) : this.contextLine)
         .attr("d", drawLineOnSub)
         .style('opacity', 1);
 };
-c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
+ChartInternal.prototype.updateAreaForSubchart = function (durationForExit) {
     var $$ = this, d3 = $$.d3;
     var contextArea = $$.context.selectAll('.' + CLASS.areas).selectAll('.' + CLASS.area)
         .data($$.lineData.bind($$));
@@ -189,13 +189,13 @@ c3_chart_internal_fn.updateAreaForSubchart = function (durationForExit) {
     $$.contextArea = contextAreaEnter.merge(contextArea)
         .style("opacity", 0);
 };
-c3_chart_internal_fn.redrawAreaForSubchart = function (drawAreaOnSub, withTransition, duration) {
+ChartInternal.prototype.redrawAreaForSubchart = function (drawAreaOnSub, withTransition, duration) {
     (withTransition ? this.contextArea.transition(Math.random().toString()).duration(duration) : this.contextArea)
         .attr("d", drawAreaOnSub)
         .style("fill", this.color)
         .style("opacity", this.orgAreaOpacity);
 };
-c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
+ChartInternal.prototype.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
     var $$ = this, d3 = $$.d3, config = $$.config,
         drawAreaOnSub, drawBarOnSub, drawLineOnSub;
 
@@ -228,7 +228,7 @@ c3_chart_internal_fn.redrawSubchart = function (withSubchart, transitions, durat
         }
     }
 };
-c3_chart_internal_fn.redrawForBrush = function () {
+ChartInternal.prototype.redrawForBrush = function () {
     var $$ = this, x = $$.x, d3 = $$.d3, s;
     $$.redraw({
         withTransition: false,
@@ -245,7 +245,7 @@ c3_chart_internal_fn.redrawForBrush = function () {
                                                .translate(-s[0], 0));
     $$.config.subchart_onbrush.call($$.api, x.orgDomain());
 };
-c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
+ChartInternal.prototype.transformContext = function (withTransition, transitions) {
     var $$ = this, subXAxis;
     if (transitions && transitions.axisSubX) {
         subXAxis = transitions.axisSubX;
@@ -256,7 +256,7 @@ c3_chart_internal_fn.transformContext = function (withTransition, transitions) {
     $$.context.attr("transform", $$.getTranslate('context'));
     subXAxis.attr("transform", $$.getTranslate('subx'));
 };
-c3_chart_internal_fn.getDefaultSelection = function () {
+ChartInternal.prototype.getDefaultSelection = function () {
     var $$ = this, config = $$.config,
         selection = isFunction(config.axis_x_selection) ? config.axis_x_selection($$.getXDomain($$.data.targets)) : config.axis_x_selection;
     if ($$.isTimeSeries()) {

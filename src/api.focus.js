@@ -1,7 +1,7 @@
 import CLASS from './class';
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.focus = function (targetIds) {
+Chart.prototype.focus = function (targetIds) {
     var $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -21,7 +21,7 @@ c3_chart_fn.focus = function (targetIds) {
     });
 };
 
-c3_chart_fn.defocus = function (targetIds) {
+Chart.prototype.defocus = function (targetIds) {
     var $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);
@@ -39,7 +39,7 @@ c3_chart_fn.defocus = function (targetIds) {
     $$.defocusedTargetIds = targetIds;
 };
 
-c3_chart_fn.revert = function (targetIds) {
+Chart.prototype.revert = function (targetIds) {
     var $$ = this.internal, candidates;
 
     targetIds = $$.mapToTargetIds(targetIds);

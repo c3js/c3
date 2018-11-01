@@ -48,6 +48,17 @@ describe('c3 api zoom', function () {
             expect(domain[1]).toBe(target[1]);
         });
 
+
+        it('should set the max zoom properly', function () {
+            chart.zoom.max(100);
+            expect(chart.zoom.max()).toBe(100);
+        });
+
+        it('should set the min zoom properly', function () {
+            chart.zoom.min(-1);
+            expect(chart.zoom.min()).toBe(-1);
+        });
+
         describe('with timeseries data', function () {
             beforeAll(function(){
                 args = {

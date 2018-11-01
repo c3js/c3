@@ -1,18 +1,18 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.resize = function (size) {
+Chart.prototype.resize = function (size) {
     var $$ = this.internal, config = $$.config;
     config.size_width = size ? size.width : null;
     config.size_height = size ? size.height : null;
     this.flush();
 };
 
-c3_chart_fn.flush = function () {
+Chart.prototype.flush = function () {
     var $$ = this.internal;
     $$.updateAndRedraw({withLegend: true, withTransition: false, withTransitionForTransform: false});
 };
 
-c3_chart_fn.destroy = function () {
+Chart.prototype.destroy = function () {
     var $$ = this.internal;
 
     window.clearInterval($$.intervalForObserveInserted);
@@ -33,8 +33,11 @@ c3_chart_fn.destroy = function () {
         }
     }
 
-    // remove the inner resize functions
+    // Removes the inner resize functions
     $$.resizeFunction.remove();
+
+    // Unbinds from the window focus event
+    $$.unbindWindowFocus();
 
     $$.selectChart.classed('c3', false).html("");
 

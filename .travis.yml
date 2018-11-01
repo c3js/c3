@@ -1,0 +1,19 @@
+language: ruby
+rvm:
+  - 2.4
+
+branches:
+  only:
+    - master
+
+script:
+  - bundle exec middleman build
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local-dir: build
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: master

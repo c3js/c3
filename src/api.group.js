@@ -1,7 +1,7 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 import { isUndefined } from './util';
 
-c3_chart_fn.groups = function (groups) {
+Chart.prototype.groups = function (groups) {
     var $$ = this.internal, config = $$.config;
     if (isUndefined(groups)) { return config.data_groups; }
     config.data_groups = groups;

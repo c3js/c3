@@ -1,7 +1,7 @@
 import CLASS from './class';
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 
-c3_chart_internal_fn.initEventRect = function () {
+ChartInternal.prototype.initEventRect = function () {
     var $$ = this, config = $$.config;
 
     $$.main.select('.' + CLASS.chart).append("g")
@@ -21,7 +21,7 @@ c3_chart_internal_fn.initEventRect = function () {
         }
     }
 };
-c3_chart_internal_fn.redrawEventRect = function () {
+ChartInternal.prototype.redrawEventRect = function () {
     var $$ = this, d3 = $$.d3, config = $$.config,
         x, y, w, h;
 
@@ -68,7 +68,7 @@ c3_chart_internal_fn.redrawEventRect = function () {
                 $$.mouseover = undefined;
             }
 
-            if (! closest) {
+            if (!closest) {
                 mouseout();
                 return;
             }
@@ -140,11 +140,11 @@ c3_chart_internal_fn.redrawEventRect = function () {
             ) : function () {}
         );
 };
-c3_chart_internal_fn.getMousePosition = function (data) {
+ChartInternal.prototype.getMousePosition = function (data) {
     var $$ = this;
     return [$$.x(data.x), $$.getYScale(data.id)(data.value)];
 };
-c3_chart_internal_fn.dispatchEvent = function (type, mouse) {
+ChartInternal.prototype.dispatchEvent = function (type, mouse) {
     var $$ = this,
         selector = '.' + CLASS.eventRect,
         eventRect = $$.main.select(selector).node(),

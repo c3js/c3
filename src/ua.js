@@ -1,10 +1,10 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
 
-c3_chart_internal_fn.isSafari = function () {
+ChartInternal.prototype.isSafari = function () {
     var ua = window.navigator.userAgent;
     return ua.indexOf('Safari') >= 0 && ua.indexOf('Chrome') < 0;
 };
-c3_chart_internal_fn.isChrome = function () {
+ChartInternal.prototype.isChrome = function () {
     var ua = window.navigator.userAgent;
     return ua.indexOf('Chrome') >= 0;
 };

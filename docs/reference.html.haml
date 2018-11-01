@@ -45,6 +45,7 @@
           = partial :reference_menu_item, locals: { id: 'data.type' }
           = partial :reference_menu_item, locals: { id: 'data.types' }
           = partial :reference_menu_item, locals: { id: 'data.labels' }
+          = partial :reference_menu_item, locals: { id: 'data.labels.format' }
           = partial :reference_menu_item, locals: { id: 'data.order' }
           = partial :reference_menu_item, locals: { id: 'data.regions' }
           = partial :reference_menu_item, locals: { id: 'data.color' }
@@ -62,6 +63,8 @@
           = partial :reference_menu_item, locals: { id: 'data.onmouseout' }
           = partial :reference_menu_item, locals: { id: 'data.onselected' }
           = partial :reference_menu_item, locals: { id: 'data.onunselected' }
+          = partial :reference_menu_item, locals: { id: 'data.ondragstart' }
+          = partial :reference_menu_item, locals: { id: 'data.ondragend' }
 
           %li Axis
           = partial :reference_menu_item, locals: { id: 'axis.rotated' }
@@ -88,8 +91,8 @@
           = partial :reference_menu_item, locals: { id: 'axis.x.extent' }
           = partial :reference_menu_item, locals: { id: 'axis.x.label' }
           = partial :reference_menu_item, locals: { id: 'axis.y.show' }
-          = partial :reference_menu_item, locals: { id: 'axis.y.type' }
           = partial :reference_menu_item, locals: { id: 'axis.y.inner' }
+          = partial :reference_menu_item, locals: { id: 'axis.y.type' }
           = partial :reference_menu_item, locals: { id: 'axis.y.max' }
           = partial :reference_menu_item, locals: { id: 'axis.y.min' }
           = partial :reference_menu_item, locals: { id: 'axis.y.inverted' }
@@ -124,8 +127,8 @@
           = partial :reference_menu_item, locals: { id: 'grid.y.show' }
           = partial :reference_menu_item, locals: { id: 'grid.y.lines' }
           = partial :reference_menu_item, locals: { id: 'grid.y.ticks' }
-          = partial :reference_menu_item, locals: { id: 'grid.focus.show' }
-          = partial :reference_menu_item, locals: { id: 'grid.lines.front' }
+          -#= partial :reference_menu_item, locals: { id: 'grid.focus.show' }
+          -#= partial :reference_menu_item, locals: { id: 'grid.lines.front' }
 
           %li Region
           = partial :reference_menu_item, locals: { id: 'regions' }
@@ -158,12 +161,13 @@
 
           %li Zoom
           = partial :reference_menu_item, locals: { id: 'zoom.enabled', experimental: true }
+          = partial :reference_menu_item, locals: { id: 'zoom.type', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.rescale', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.extent', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoom', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoomstart', experimental: true }
           = partial :reference_menu_item, locals: { id: 'zoom.onzoomend', experimental: true }
-          -#= partial :reference_menu_item, locals: { id: 'zoom.privileged', experimental: true }
+          = partial :reference_menu_item, locals: { id: 'zoom.disableDefaultBehavior', experimental: true }
 
           %li Point
           = partial :reference_menu_item, locals: { id: 'point.show' }
@@ -240,8 +244,8 @@
           = partial :reference_menu_item, locals: { id: 'api.data.names' }
           = partial :reference_menu_item, locals: { id: 'api.data.colors' }
           = partial :reference_menu_item, locals: { id: 'api.data.axes' }
-          = partial :reference_menu_item, locals: { id: 'api.category' }
-          = partial :reference_menu_item, locals: { id: 'api.categories' }
+          -#= partial :reference_menu_item, locals: { id: 'api.category' }
+          -#= partial :reference_menu_item, locals: { id: 'api.categories' }
           = partial :reference_menu_item, locals: { id: 'api.x' }
           = partial :reference_menu_item, locals: { id: 'api.xs' }
           -#= partial :reference_menu_item, locals: { id: 'api.color' }
@@ -251,8 +255,8 @@
           = partial :reference_menu_item, locals: { id: 'api.axis.range' }
           = partial :reference_menu_item, locals: { id: 'api.legend.show' }
           = partial :reference_menu_item, locals: { id: 'api.legend.hide' }
-          = partial :reference_menu_item, locals: { id: 'api.tooltip.show' }
-          = partial :reference_menu_item, locals: { id: 'api.tooltip.hide' }
+          -#= partial :reference_menu_item, locals: { id: 'api.tooltip.show' }
+          -#= partial :reference_menu_item, locals: { id: 'api.tooltip.hide' }
           = partial :reference_menu_item, locals: { id: 'api.zoom' }
           = partial :reference_menu_item, locals: { id: 'api.unzoom' }
           = partial :reference_menu_item, locals: { id: 'api.zoom.enable' }
@@ -2919,6 +2923,25 @@
 
       %section
         %h3
+          = partial :reference_item_link, locals: { id: 'zoom.type', experimental: true }
+        %p There are two types of zoom behavior: 'scroll' and 'drag'
+        %h5 Default:
+        <code>'scroll'</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              zoom: {
+              &nbsp;&nbsp;type: 'drag'
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/interaction_zoom_by_drag.html" ) Zoom by Drag
+      %hr
+
+      %section
+        %h3
           = partial :reference_item_link, locals: { id: 'zoom.rescale', experimental: true }
         %p Enable to rescale after zooming.
         %br
@@ -2997,6 +3020,24 @@
             %code.html.javascript
               zoom: {
               &nbsp;&nbsp;onzoomend: function (domain) { ... }
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'zoom.disableDefaultBehavior', experimental: true }
+        %p Disable the default animation of zoom. This option is useful when you want to get the zoomed domain by onzoom or onzoomend handlers and override the default animation behavior. See <a href="https://github.com/c3js/c3/pull/2439">#2439</a> for details.
+
+        %h5 Default:
+        <code>false</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              zoom: {
+              &nbsp;&nbsp;enabled: true,
+              &nbsp;&nbsp;disableDefaultBehavior: true,
+              &nbsp;&nbsp;onzoomend: d => console.log(d)
               }
       %hr
 

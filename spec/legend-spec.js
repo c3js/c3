@@ -218,6 +218,38 @@ describe('c3 chart legend', function () {
 
     });
 
+    describe('with legend.show is true', function () {
+
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 200, 100, 250, 150]
+                    ]
+                },
+                legend: {
+                    show: true
+                }
+            };
+        });
+
+        it('should initially have rendered some legend items', function () {
+            expect(d3.selectAll('.c3-legend-item').empty()).toBe(false);
+        });
+
+        it('should remove rendered every legend items', function () {
+            chart.legend.hide();
+            d3.selectAll('.c3-legend-item').each(function () {
+                expect(d3.select(this).style('visibility')).toBe('hidden');
+                // This selects all the children, but we expect it to be empty
+                expect(d3.select(this).selectAll("*").length).toEqual(undefined);
+            });
+        });
+
+
+    });
+
     describe('custom legend size', function() {
         beforeAll(function () {
             args = {

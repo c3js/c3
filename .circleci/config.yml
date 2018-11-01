@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:6-browsers
+      - image: circleci/node:8-browsers
     steps:
       - checkout
       - run: |
@@ -10,15 +10,19 @@ jobs:
           echo "npm v$(npm --version)"
           echo "$(google-chrome --version)"
       - restore_cache:
-          key: npm-1-{{ checksum "package.json" }}
+          key: npm-1.1-{{ checksum "package-lock.json" }}
       - run: npm install
       - save_cache:
-          key: npm-1-{{ checksum "package.json" }}
+          key: npm-1.1-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
       - run: npm test
       - run: npm run codecov
-  publish-docs:
+      - store_artifacts:
+          path: htdocs
+          destination: htdocs
+      - run: npx status-back -s -c circleci/htdocs -r c3js/c3 "preview build succes!" "https://${CIRCLE_BUILD_NUM}-11496279-gh.circle-artifacts.com/0/htdocs/index.html"
+  docs:
     docker:
       - image: circleci/ruby:2.4-node
         env:
@@ -35,24 +39,22 @@ jobs:
             - vendor/bundle
 
       - restore_cache:
-          key: npm-2-{{ checksum "package.json" }}
+          key: npm-2-{{ checksum "package-lock.json" }}
       - run: npm install
       - save_cache:
-          key: npm-2-{{ checksum "package.json" }}
+          key: npm-2-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
 
-      - run: npm run publish-docs
+      - run: npm run build
+      - run: npm run copy-to-docs
+      - run: npm run build:docs
+      - store_artifacts:
+          path: build
+          destination: docs
 workflows:
   version: 2
   test:
     jobs:
       - test
-  publish-docs:
-    jobs:
-      - publish-docs:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+      - docs

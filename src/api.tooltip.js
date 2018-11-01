@@ -1,7 +1,7 @@
-import { c3_chart_fn } from './core';
+import { Chart } from './core';
 
-c3_chart_fn.tooltip = function () {};
-c3_chart_fn.tooltip.show = function (args) {
+Chart.prototype.tooltip = function () {};
+Chart.prototype.tooltip.show = function (args) {
     var $$ = this.internal, targets, data, mouse = {};
 
     // determine mouse position on the chart
@@ -29,7 +29,7 @@ c3_chart_fn.tooltip.show = function (args) {
 
     $$.config.tooltip_onshow.call($$, data);
 };
-c3_chart_fn.tooltip.hide = function () {
+Chart.prototype.tooltip.hide = function () {
     // TODO: get target data by checking the state of focus
     this.internal.dispatchEvent('mouseout', 0);
 

@@ -1,21 +1,37 @@
-import { c3_chart_internal_fn } from './core';
+import { ChartInternal } from './core';
+import CLASS from './class';
 
-c3_chart_internal_fn.initZoom = function () {
+ChartInternal.prototype.initZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, startEvent;
 
     $$.zoom = d3.zoom()
         .on("start", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
             startEvent = e;
             config.zoom_onzoomstart.call($$.api, e);
         })
         .on("zoom", function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
-            $$.redrawForZoom.call($$);
+
+            $$.redrawForZoom();
+
+            config.zoom_onzoom.call($$.api, $$.x.orgDomain());
         })
         .on('end', function () {
+            if (config.zoom_type !== 'scroll') {
+                return;
+            }
+
             var e = d3.event.sourceEvent;
             if (e && e.type === "brush") { return; }
             // if click, do nothing. otherwise, click interaction will be canceled.
@@ -43,18 +59,71 @@ c3_chart_internal_fn.initZoom = function () {
 
     return $$.zoom.updateExtent();
 };
-c3_chart_internal_fn.zoomTransform = function (range) {
+ChartInternal.prototype.zoomTransform = function (range) {
     var $$ = this, s = [$$.x(range[0]), $$.x(range[1])];
     return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0);
 };
 
-c3_chart_internal_fn.getZoomDomain = function () {
+ChartInternal.prototype.initDragZoom = function () {
+    const $$ = this;
+    const d3 = $$.d3;
+    const config = $$.config;
+    const context = $$.context = $$.svg;
+    const brushXPos = $$.margin.left + 20.5;
+    const brushYPos = $$.margin.top + 0.5;
+
+    if (!(config.zoom_type === 'drag' && config.zoom_enabled)) {
+        return;
+    }
+
+    const getZoomedDomain = selection => selection && selection.map(x => $$.x.invert(x));
+
+    const brush = $$.dragZoomBrush = d3.brushX()
+        .on("start", () => {
+            $$.api.unzoom();
+
+            $$.svg
+                .select("." + CLASS.dragZoom)
+                .classed("disabled", false);
+
+            config.zoom_onzoomstart.call($$.api, d3.event.sourceEvent);
+        })
+        .on("brush", () => {
+            config.zoom_onzoom.call($$.api, getZoomedDomain(d3.event.selection));
+        })
+        .on("end", () => {
+            if (d3.event.selection == null) {
+                return;
+            }
+
+            const zoomedDomain = getZoomedDomain(d3.event.selection);
+
+            if (!config.zoom_disableDefaultBehavior) {
+              $$.api.zoom(zoomedDomain);
+            }
+
+            $$.svg
+                .select("." + CLASS.dragZoom)
+                .classed("disabled", true);
+
+            config.zoom_onzoomend.call($$.api, zoomedDomain);
+        });
+
+    context
+        .append("g")
+        .classed(CLASS.dragZoom, true)
+        .attr("clip-path", $$.clipPath)
+        .attr("transform", "translate(" + brushXPos + "," + brushYPos + ")")
+        .call(brush);
+};
+
+ChartInternal.prototype.getZoomDomain = function () {
     var $$ = this, config = $$.config, d3 = $$.d3,
         min = d3.min([$$.orgXDomain[0], config.zoom_x_min]),
         max = d3.max([$$.orgXDomain[1], config.zoom_x_max]);
     return [min, max];
 };
-c3_chart_internal_fn.redrawForZoom = function () {
+ChartInternal.prototype.redrawForZoom = function () {
     var $$ = this, d3 = $$.d3, config = $$.config, zoom = $$.zoom, x = $$.x;
     if (!config.zoom_enabled) {
         return;
@@ -65,9 +134,14 @@ c3_chart_internal_fn.redrawForZoom = function () {
 
     zoom.update();
 
+    if (config.zoom_disableDefaultBehavior) {
+        return;
+    }
+
     if ($$.isCategorized() && x.orgDomain()[0] === $$.orgXDomain[0]) {
         x.domain([$$.orgXDomain[0] - 1e-10, x.orgDomain()[1]]);
     }
+
     $$.redraw({
         withTransition: false,
         withY: config.zoom_rescale,
@@ -75,8 +149,8 @@ c3_chart_internal_fn.redrawForZoom = function () {
         withEventRect: false,
         withDimension: false
     });
+
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'mousemove') {
         $$.cancelClick = true;
     }
-    config.zoom_onzoom.call($$.api, x.orgDomain());
 };

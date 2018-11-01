@@ -27,11 +27,24 @@ describe('c3 chart', function () {
             expect(svg).not.toBeNull();
         });
 
+        it('should bind to window focus event', done => {
+            const addEventListener = window.addEventListener;
+            window.addEventListener = (event, handler) => {
+                if (event === 'focus') {
+                    setTimeout(() => {
+                      expect(handler).toBe(chart.internal.windowFocusHandler);
+                      window.addEventListener = addEventListener; // restore the original
+                      done();
+                    }, 10);
+                }
+            };
+            chart = window.initChart(chart, args, () => {});
+        });
+
         describe('should set 3rd party property to Function', function () {
-            beforeAll(function(){
+            beforeAll(function () {
                 Function.prototype.$extIsFunction = true;
             });
-
 
             it('should be created even if 3rd party property has been set', function () {
                 var svg = d3.select('#chart svg');
@@ -60,10 +73,40 @@ describe('c3 chart', function () {
 
     });
 
+    describe('call resize and resized callbacks', function () {
+        beforeAll(function () {
+            args.bindto = '#chart';
+            args.axis = {
+                rotated: true
+            };
+            args.resize_var = false;
+            args.resized_var = false;
+
+            args.onresize = function () {
+                args.resize_var = true;
+            };
+            args.onresized = function () {
+                args.resized_var = true;
+            };
+
+        });
+
+        it('arbitrary parameters should be false before resize', function () {
+            expect(args.resize_var).toBe(false);
+            expect(args.resized_var).toBe(false);
+        });
+
+        it('arbitrary parameters should be true after resize', function () {
+            window.dispatchEvent(new Event('resize'));
+            expect(args.resize_var).toBe(true);
+            expect(args.resized_var).toBe(true);
+        });
+    });
+
     describe('bindto', function () {
 
         describe('selector', function () {
-            beforeAll(function(){
+            beforeAll(function () {
                 d3.select('#chart').html('');
                 args.bindto = '#chart';
             });
@@ -108,6 +151,19 @@ describe('c3 chart', function () {
                 expect(svg.size()).toBe(0);
             });
         });
+        describe('bind to selector with rotated axis', function () {
+            beforeAll(function () {
+                args.bindto = '#chart';
+                args.axis = {
+                    rotated: true
+                };
+            });
+
+            it('should be created', function () {
+                var svg = d3.select('#chart svg');
+                expect(svg.size()).toBe(1);
+            });
+        });
     });
 
     describe('empty data', function () {
@@ -128,7 +184,7 @@ describe('c3 chart', function () {
         });
 
         describe('more empty data', function () {
-            beforeAll(function(){
+            beforeAll(function () {
                 args = {
                     data: {
                         x: 'x',
@@ -152,5 +208,5 @@ describe('c3 chart', function () {
             });
         });
     });
-
 });
+
