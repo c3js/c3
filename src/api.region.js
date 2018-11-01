@@ -1,5 +1,6 @@
 import CLASS from './class';
 import { Chart } from './core';
+import { getOption } from './util';
 
 Chart.prototype.regions = function (regions) {
     var $$ = this.internal, config = $$.config;
@@ -20,8 +21,8 @@ Chart.prototype.regions.remove = function (options) {
         duration, classes, regions;
 
     options = options || {};
-    duration = $$.getOption(options, "duration", config.transition_duration);
-    classes = $$.getOption(options, "classes", [CLASS.region]);
+    duration = getOption(options, "duration", config.transition_duration);
+    classes = getOption(options, "classes", [CLASS.region]);
 
     regions = $$.main.select('.' + CLASS.regions).selectAll(classes.map(function (c) { return '.' + c; }));
     (duration ? regions.transition().duration(duration) : regions)
