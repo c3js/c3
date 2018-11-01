@@ -1,5 +1,6 @@
 import CLASS from './class';
 import { c3_chart_fn } from './core';
+import { getOption } from './util';
 
 c3_chart_fn.regions = function (regions) {
     var $$ = this.internal, config = $$.config;
@@ -20,8 +21,8 @@ c3_chart_fn.regions.remove = function (options) {
         duration, classes, regions;
 
     options = options || {};
-    duration = $$.getOption(options, "duration", config.transition_duration);
-    classes = $$.getOption(options, "classes", [CLASS.region]);
+    duration = getOption(options, "duration", config.transition_duration);
+    classes = getOption(options, "classes", [CLASS.region]);
 
     regions = $$.main.select('.' + CLASS.regions).selectAll(classes.map(function (c) { return '.' + c; }));
     (duration ? regions.transition().duration(duration) : regions)
