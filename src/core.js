@@ -903,7 +903,7 @@ ChartInternal.prototype.updateSvgSize = function() {
     var $$ = this,
         brush = $$.svg.select(".c3-brush .overlay");
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
-    $$.svg.selectAll(['#' + $$.clipId + ',#' + $$.clipIdForGrid]).select('rect')
+    $$.svg.selectAll('#' + $$.clipId + ',#' + $$.clipIdForGrid).select('rect')
         .attr('width', $$.width)
         .attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect')
