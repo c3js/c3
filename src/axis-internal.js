@@ -296,10 +296,9 @@ AxisInternal.prototype.generateAxis = function () {
                         .attr('dx', function (d, i) { return internal.tspanDx(d, i); });
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                     break;
-                  }
+                }
       
-                case "left":
-                  {
+                case "left": {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", -internal.innerTickSize)
                         .attr("y1", tickY)
@@ -313,10 +312,9 @@ AxisInternal.prototype.generateAxis = function () {
                         .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
                     pathUpdate.attr("d", "M" + -internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + -internal.outerTickSize);
                     break;
-                  }
+                }
       
-                case "right":
-                  {
+                case "right": {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", internal.innerTickSize)
                         .attr("y1", tickY)
@@ -327,10 +325,10 @@ AxisInternal.prototype.generateAxis = function () {
                         textUpdate.style("text-anchor", "start");
                     }
                     tspanUpdate.attr('x', internal.tickLength)
-                    .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
+                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
                     pathUpdate.attr("d", "M" + internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + internal.outerTickSize);
                     break;
-                  }
+                }
             }
             if (scale1.rangeBand) {
                 var x = scale1, dx = x.rangeBand() / 2;
