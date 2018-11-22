@@ -302,7 +302,7 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         config = $$.config,
         maxWidth = 0,
         targetsToShow, scale, axis, dummy, svg, useBBox;
-    if (withoutRecompute && $$.currentMaxTickWidths[id]) {
+    if ((withoutRecompute || config.axis_cacheTickWidths) && $$.currentMaxTickWidths[id]) {
         return $$.currentMaxTickWidths[id];
     }
     if ($$.svg) {

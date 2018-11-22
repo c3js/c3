@@ -99,6 +99,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_rotated: false,
         axis_predefinedTextCharSize: null,
         axis_appendTextAnchor: true,
+        axis_cacheTickWidths: false,
         axis_x_show: true,
         axis_x_type: 'indexed',
         axis_x_localtime: true,
