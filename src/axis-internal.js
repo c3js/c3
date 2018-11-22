@@ -74,6 +74,7 @@ AxisInternal.prototype.updateRange = function () {
 };
 AxisInternal.prototype.updateTickTextCharSize = function (tick) {
     var internal = this;
+    var config = internal.component.owner.config;
     if (internal.tickTextCharSize) {
         return internal.tickTextCharSize;
     }
@@ -81,6 +82,11 @@ AxisInternal.prototype.updateTickTextCharSize = function (tick) {
         h: 11.5,
         w: 5.5
     };
+    if (config.axis_predefinedTextCharSize && config.axis_predefinedTextCharSize[internal.orient]) {
+        size = config.axis_predefinedTextCharSize[internal.orient];
+        internal.tickTextCharSize = size;
+        return size;
+    }
     tick.select('text').text(function(d) { return internal.textFormatted(d); }).each(function (d) {
         var box = this.getBoundingClientRect(),
             text = internal.textFormatted(d),
@@ -206,6 +212,7 @@ AxisInternal.prototype.tspanDy = function (d, i) {
 
 AxisInternal.prototype.generateAxis = function () {
     var internal = this, d3 = internal.d3, params = internal.params;
+    var config = internal.component.owner.config;
     function axis(g, transition) {
         var self;
         g.each(function () {
@@ -249,24 +256,27 @@ AxisInternal.prototype.generateAxis = function () {
 
             // TODO: each attr should be one function and change its behavior by internal.orient, probably
             switch (internal.orient) {
-            case "bottom":
-                {
+                case "bottom": {
                     tickTransform = internal.axisX;
                     lineUpdate.attr("x1", tickX)
                         .attr("x2", tickX)
                         .attr("y2", function (d, i) { return internal.lineY2(d, i); });
                     textUpdate.attr("x", 0)
                         .attr("y", function (d, i) { return internal.textY(d, i); })
-                        .attr("transform", function (d, i) { return internal.textTransform(d, i); })
-                        .style("text-anchor", function (d, i) { return internal.textTextAnchor(d, i); });
+                        .attr("transform", function (d, i) { return internal.textTransform(d, i); });
+                    if (config.axis_appendTextAnchor) {
+                        textUpdate.style("text-anchor", function (d, i) {
+                            return internal.textTextAnchor(d, i);
+                        });
+                    }
                     tspanUpdate.attr('x', 0)
                         .attr("dy", function (d, i) { return internal.tspanDy(d, i); })
                         .attr('dx', function (d, i) { return internal.tspanDx(d, i); });
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + internal.outerTickSize + "V0H" + internal.range[1] + "V" + internal.outerTickSize);
                     break;
                 }
-            case "top":
-                {
+      
+                case "top": {
                     // TODO: rotated tick text
                     tickTransform = internal.axisX;
                     lineUpdate.attr("x1", tickX)
@@ -276,40 +286,51 @@ AxisInternal.prototype.generateAxis = function () {
                         .attr("y", function (d, i) { return -1 * internal.textY(d, i) - (params.isCategory ? 2 : (internal.tickLength - 2)); })
                         .attr("transform", function (d, i) { return internal.textTransform(d, i); })
                         .style("text-anchor", function (d, i) { return internal.textTextAnchor(d, i); });
+                    if (config.axis_appendTextAnchor) {
+                        textUpdate.style("text-anchor", function (d, i) {
+                            return internal.textTextAnchor(d, i);
+                        });
+                    }
                     tspanUpdate.attr('x', 0)
                         .attr("dy", function (d, i) { return internal.tspanDy(d, i); })
                         .attr('dx', function (d, i) { return internal.tspanDx(d, i); });
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                     break;
-                }
-            case "left":
-                {
+                  }
+      
+                case "left":
+                  {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", -internal.innerTickSize)
                         .attr("y1", tickY)
                         .attr("y2", tickY);
                     textUpdate.attr("x", -internal.tickLength)
-                        .attr("y", internal.tickOffset)
-                        .style("text-anchor", "end");
+                        .attr("y", internal.tickOffset);
+                    if (config.axis_appendTextAnchor) {
+                        textUpdate.style("text-anchor", "end");
+                    }
                     tspanUpdate.attr('x', -internal.tickLength)
                         .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
                     pathUpdate.attr("d", "M" + -internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + -internal.outerTickSize);
                     break;
-                }
-            case "right":
-                {
+                  }
+      
+                case "right":
+                  {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", internal.innerTickSize)
                         .attr("y1", tickY)
                         .attr("y2", tickY);
                     textUpdate.attr("x", internal.tickLength)
-                        .attr("y", internal.tickOffset)
-                        .style("text-anchor", "start");
+                        .attr("y", internal.tickOffset);
+                    if (config.axis_appendTextAnchor) {
+                        textUpdate.style("text-anchor", "start");
+                    }
                     tspanUpdate.attr('x', internal.tickLength)
-                        .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
+                    .attr("dy", function (d, i) { return internal.tspanDy(d, i); });
                     pathUpdate.attr("d", "M" + internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + internal.outerTickSize);
                     break;
-                }
+                  }
             }
             if (scale1.rangeBand) {
                 var x = scale1, dx = x.rangeBand() / 2;

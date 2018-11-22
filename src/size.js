@@ -15,7 +15,7 @@ ChartInternal.prototype.getCurrentPaddingTop = function () {
     var $$ = this,
         config = $$.config,
         padding = isValue(config.padding_top) ? config.padding_top : 0;
-    if ($$.title && $$.title.node()) {
+    if ($$.title && $$.title.node() && !config.title_ignore) {
         padding += $$.getTitlePadding();
     }
     return padding;
@@ -51,10 +51,18 @@ ChartInternal.prototype.getCurrentPaddingRight = function () {
 };
 
 ChartInternal.prototype.getParentRectValue = function (key) {
-    var parent = this.selectChart.node(), v;
+    var parent = this.selectChart.node(), v, cacheContainerSize = this.config.size_cacheContainerSize;
     while (parent && parent.tagName !== 'BODY') {
         try {
-            v = parent.getBoundingClientRect()[key];
+            if (cacheContainerSize) {
+                if (!this.cachedParentSizes) {
+                    this.cachedParentSizes = parent.getBoundingClientRect();
+                }
+                v = this.cachedParentSizes[key];
+            }
+            else {
+                v = parent.getBoundingClientRect()[key];
+            }
         } catch(e) {
             if (key === 'width') {
                 // In IE in certain cases getBoundingClientRect

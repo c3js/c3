@@ -32,7 +32,7 @@ ChartInternal.prototype.load = function (targets, args) {
     $$.updateTargets($$.data.targets);
 
     // Redraw with new targets
-    $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
+    $$.redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: !$$.config.legend_ignore});
 
     if (args.done) { args.done(); }
 };

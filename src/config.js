@@ -7,6 +7,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         svg_classname: undefined,
         size_width: undefined,
         size_height: undefined,
+        size_cacheContainerSize: false,
         padding_left: undefined,
         padding_right: undefined,
         padding_top: undefined,
@@ -93,8 +94,11 @@ ChartInternal.prototype.getDefaultConfig = function () {
         legend_padding: 0,
         legend_item_tile_width: 10,
         legend_item_tile_height: 10,
+        legend_ignore: false,
         // axis
         axis_rotated: false,
+        axis_predefinedTextCharSize: null,
+        axis_appendTextAnchor: true,
         axis_x_show: true,
         axis_x_type: 'indexed',
         axis_x_localtime: true,
@@ -107,6 +111,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_x_tick_fit: true,
         axis_x_tick_values: null,
         axis_x_tick_rotate: 0,
+        axis_x_tick_optimizeWidthCalculation: false,
         axis_x_tick_outer: true,
         axis_x_tick_multiline: true,
         axis_x_tick_multilineMax: 0,
@@ -127,6 +132,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_y_inner: undefined,
         axis_y_label: {},
         axis_y_tick_format: undefined,
+        axis_y_tick_optimizeWidthCalculation: false,
         axis_y_tick_outer: true,
         axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
@@ -143,6 +149,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_y2_inner: undefined,
         axis_y2_label: {},
         axis_y2_tick_format: undefined,
+        axis_y2_tick_optimizeWidthCalculation: false,
         axis_y2_tick_outer: true,
         axis_y2_tick_values: null,
         axis_y2_tick_count: undefined,
@@ -230,13 +237,14 @@ ChartInternal.prototype.getDefaultConfig = function () {
         tooltip_onhide: function () {},
         // title
         title_text: undefined,
+        title_ignore: false,
         title_padding: {
             top: 0,
             right: 0,
             bottom: 0,
             left: 0
         },
-        title_position: 'top-center',
+        title_position: 'top-center'
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {
