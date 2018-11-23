@@ -1070,7 +1070,12 @@ ChartInternal.prototype.bindWindowFocus = function() {
         return;
     }
 
-    this.windowFocusHandler = () => { this.redraw(); };
+    this.windowFocusHandler = () => {
+        if (this.api == null || !this.api.element.offsetParent) {
+            return;
+        }
+        this.redraw();
+    };
 
     window.addEventListener('focus', this.windowFocusHandler);
 };
