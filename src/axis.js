@@ -318,7 +318,7 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
             axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
-            useBBox = config.axis_y2_tick_optimizeWidthCalculation;
+            useBBox = config.axis_x_tick_optimizeWidthCalculation;
             this.updateXAxisTickValues(targetsToShow, axis);
         }
         dummy = $$.d3.select('body').append('div').classed('c3', true);
