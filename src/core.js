@@ -43,7 +43,13 @@ export {
 };
 
 ChartInternal.prototype.beforeInit = function() {
-    // can do something
+    var $$ = this;
+    if ($$.config.size_cacheContainerSize) {
+        $$.cachedParentSize = null;
+        window.addEventListener('resize', function () {
+            $$.cachedParentSize = null;
+        });
+    }
 };
 ChartInternal.prototype.afterInit = function() {
     // can do something
@@ -411,7 +417,7 @@ ChartInternal.prototype.updateSizes = function() {
         bottom: 0,
         left: 0
     };
-    if ($$.updateSizeForLegend) {
+    if ($$.updateSizeForLegend && !config.legend_ignore) {
         $$.updateSizeForLegend(legendHeight, legendWidth);
     }
 
@@ -527,7 +533,7 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     transitions = transitions || $$.axis.generateTransitions(durationForAxis);
 
     // update legend and transform each g
-    if (withLegend && config.legend_show) {
+    if (withLegend && config.legend_show && !config.legend_ignore) {
         $$.updateLegend($$.mapToIds($$.data.targets), options, transitions);
     } else if (withDimension) {
         // need to update dimension (e.g. axis.y.tick.values) because y tick values should change
@@ -645,7 +651,7 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     }
 
     // title
-    if ($$.redrawTitle) {
+    if ($$.redrawTitle && !config.title_ignore) {
         $$.redrawTitle();
     }
 

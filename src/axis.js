@@ -301,8 +301,8 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
     var $$ = this.owner,
         config = $$.config,
         maxWidth = 0,
-        targetsToShow, scale, axis, dummy, svg;
-    if (withoutRecompute && $$.currentMaxTickWidths[id]) {
+        targetsToShow, scale, axis, dummy, svg, useBBox;
+    if ((withoutRecompute || config.axis_cacheTickWidths) && $$.currentMaxTickWidths[id]) {
         return $$.currentMaxTickWidths[id];
     }
     if ($$.svg) {
@@ -310,19 +310,22 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         if (id === 'y') {
             scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
             axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true, true);
+            useBBox = config.axis_y_tick_optimizeWidthCalculation;
         } else if (id === 'y2') {
             scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
             axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true, true);
+            useBBox = config.axis_y2_tick_optimizeWidthCalculation;
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
             axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
+            useBBox = config.axis_x_tick_optimizeWidthCalculation;
             this.updateXAxisTickValues(targetsToShow, axis);
         }
         dummy = $$.d3.select('body').append('div').classed('c3', true);
         svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
-                    var box = this.getBoundingClientRect();
+                    var box = useBBox ? this.getBBox() : this.getBoundingClientRect();
                     if (maxWidth < box.width) {
                         maxWidth = box.width;
                     }

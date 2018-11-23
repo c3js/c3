@@ -7,6 +7,12 @@ ChartInternal.prototype.getDefaultConfig = function () {
         svg_classname: undefined,
         size_width: undefined,
         size_height: undefined,
+        /* 
+        * If set to true, enables caching of chart parent rect in ChartInternal.prototype.getParentRectValue.
+        * Cache invalidates on every window resized event.
+        * MS Edge performance optimization.
+        */
+        size_cacheContainerSize: false,
         padding_left: undefined,
         padding_right: undefined,
         padding_top: undefined,
@@ -93,8 +99,64 @@ ChartInternal.prototype.getDefaultConfig = function () {
         legend_padding: 0,
         legend_item_tile_width: 10,
         legend_item_tile_height: 10,
+        /* 
+        * If set to true, makes any resize/redraw operations carried over chart legend ignored.
+        * MS Edge performance optimization, use it if the chart doesn't have legend.
+        */
+        legend_ignore: false,
         // axis
         axis_rotated: false,
+        /* 
+        * If not empty, prevents recalculating of text ticks rect sizes in AxisInternal.prototype.updateTickTextCharSize.
+        * MS Edge performance optimization, use it if text ticks of the chart do not change dynamically.
+        * Example:
+        * bottom: {
+        *     h: 13,
+        *     w: 5.6
+        * },
+        * left: {
+        *     h: 11.5,
+        *     w: 5.5
+        * },
+        * right: {
+        *     h: 11.5,
+        *     w: 5.5
+        * },
+        * top: {
+        *     h: 11.5,
+        *     w: 5.5
+        * }
+        */ 
+        axis_predefinedTextCharSize: null,
+
+        /*
+        * If set to false, prevent "text-anchor" class from appending to text ticks of the chart axis.
+        * Used in AxisInternal.prototype.generateAxis.
+        * MS Edge performance optimization.
+        * In most of the cases, you can replace "text-anchor" class with your own CSS.
+        * For example:
+        * .c3-axis-y {
+        *     text {
+        *         text-anchor: end;
+        *     }
+        * }
+        *     
+        * .c3-axis-x {
+        *     text {
+        *         text-anchor: middle;
+        *     }
+        * }
+        * MS Edge permormance optimization.
+        */
+        axis_appendTextAnchor: true,
+
+        /*
+        * If set to true, forces taking text tick widths from cache, instead of recalculating them every time the chart is redrawn.
+        * Used in Axis.prototype.getMaxTickWidth.
+        * MS Edge performance optimization.
+        * Use it if width of text ticks is not changed during chart lifecycle.
+        */
+        axis_cacheTickWidths: false,
         axis_x_show: true,
         axis_x_type: 'indexed',
         axis_x_localtime: true,
@@ -107,6 +169,12 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_x_tick_fit: true,
         axis_x_tick_values: null,
         axis_x_tick_rotate: 0,
+        /*
+        * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+        * for text tick width calculation on x axis.
+        * MS Edge performance optimization.
+        */
+        axis_x_tick_optimizeWidthCalculation: false,
         axis_x_tick_outer: true,
         axis_x_tick_multiline: true,
         axis_x_tick_multilineMax: 0,
@@ -127,6 +195,12 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_y_inner: undefined,
         axis_y_label: {},
         axis_y_tick_format: undefined,
+        /*
+        * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+        * for text tick width calculation on y axis.
+        * MS Edge performance optimization.
+        */
+        axis_y_tick_optimizeWidthCalculation: false,
         axis_y_tick_outer: true,
         axis_y_tick_values: null,
         axis_y_tick_rotate: 0,
@@ -143,6 +217,12 @@ ChartInternal.prototype.getDefaultConfig = function () {
         axis_y2_inner: undefined,
         axis_y2_label: {},
         axis_y2_tick_format: undefined,
+        /*
+        * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+        * for text tick width calculation on y2 axis.
+        * MS Edge performance optimization.
+        */
+        axis_y2_tick_optimizeWidthCalculation: false,
         axis_y2_tick_outer: true,
         axis_y2_tick_values: null,
         axis_y2_tick_count: undefined,
@@ -230,13 +310,18 @@ ChartInternal.prototype.getDefaultConfig = function () {
         tooltip_onhide: function () {},
         // title
         title_text: undefined,
+        /* 
+        * If set to true, makes any resize/redraw operations carried over chart title ignored.
+        * MS Edge performance optimization, use it if the chart doesn't have title.
+        */
+        title_ignore: false,
         title_padding: {
             top: 0,
             right: 0,
             bottom: 0,
             left: 0
         },
-        title_position: 'top-center',
+        title_position: 'top-center'
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {
