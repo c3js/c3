@@ -55,10 +55,10 @@ ChartInternal.prototype.getParentRectValue = function (key) {
     while (parent && parent.tagName !== 'BODY') {
         try {
             if (cacheContainerSize) {
-                if (!this.cachedParentSizes) {
-                    this.cachedParentSizes = parent.getBoundingClientRect();
+                if (!this.cachedParentSize) {
+                    this.cachedParentSize = parent.getBoundingClientRect();
                 }
-                v = this.cachedParentSizes[key];
+                v = this.cachedParentSize[key];
             }
             else {
                 v = parent.getBoundingClientRect()[key];

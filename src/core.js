@@ -45,9 +45,9 @@ export {
 ChartInternal.prototype.beforeInit = function() {
     var $$ = this;
     if ($$.config.size_cacheContainerSize) {
-        $$.cachedParentSizes = null;
+        $$.cachedParentSize = null;
         window.addEventListener('resize', function () {
-            $$.cachedParentSizes = null;
+            $$.cachedParentSize = null;
         });
     }
 };
