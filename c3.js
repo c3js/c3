@@ -2234,6 +2234,10 @@
     }
 
     this.windowFocusHandler = function () {
+      if (_this.api == null || !_this.api.element.offsetParent) {
+        return;
+      }
+
       _this.redraw();
     };
 
