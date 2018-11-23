@@ -81,6 +81,10 @@ ChartInternal.prototype.getDefaultConfig = function () {
         subchart_size_height: 60,
         subchart_axis_x_show: true,
         subchart_onbrush: function () {},
+        /*
+        * IF set to false, prevents subchart d3 brush from initialization and rendering
+        */
+        subchart_brushEnabled: true,
         // color
         color_pattern: [],
         color_threshold: {},
