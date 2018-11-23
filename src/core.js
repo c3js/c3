@@ -284,7 +284,7 @@ ChartInternal.prototype.initWithData = function(data) {
 
     // Update selection based on size and scale
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
-    if ($$.initSubchartBrush) {
+    if ($$.initSubchartBrush && config.subchart_brushEnabled) {
         $$.initSubchartBrush();
     }
 

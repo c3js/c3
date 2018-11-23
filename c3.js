@@ -1447,7 +1447,7 @@
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
 
 
-    if ($$.initSubchartBrush) {
+    if ($$.initSubchartBrush && config.subchart_brushEnabled) {
       $$.initSubchartBrush();
     }
     /*-- Main Region --*/
@@ -6202,6 +6202,11 @@
       subchart_size_height: 60,
       subchart_axis_x_show: true,
       subchart_onbrush: function subchart_onbrush() {},
+
+      /*
+      * IF set to false, prevents subchart d3 brush from initialization and rendering
+      */
+      subchart_brushEnabled: true,
       // color
       color_pattern: [],
       color_threshold: {},
