@@ -68,7 +68,7 @@
     "jshint": "2.9.6",
     "jshint-stylish": "^2.1.0",
     "karma": "^3.0.0",
-    "karma-browserify": "^5.3.0",
+    "karma-browserify": "^6.0.0",
     "karma-chrome-launcher": "^2.1.1",
     "karma-coverage-istanbul-reporter": "^2.0.0",
     "karma-jasmine": "^1.1.0",
