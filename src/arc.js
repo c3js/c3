@@ -344,7 +344,7 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         }
         else {
             mainArcLabelLine
-                .style("fill", function (d) { return config.color_pattern.length > 0 ? $$.levelColor(d.data.values[0].value) : $$.color(d.data); })
+                .style("fill", function (d) { return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data); })
                 .style("display", config.gauge_labelLine_show ? "" : "none")
                 .each(function (d) {
                     var lineLength = 0, lineThickness = 2, x = 0, y = 0, transform = "";
