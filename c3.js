@@ -1182,7 +1182,7 @@
   };
 
   var c3 = {
-    version: "c3-labworks#0.6.11",
+    version: "0.6.10",
     chart: {
       fn: Chart.prototype,
       internal: {
