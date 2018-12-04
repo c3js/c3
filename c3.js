@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.9 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.10 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1147,7 +1147,7 @@
   };
 
   var c3 = {
-    version: "0.6.9",
+    version: "0.6.10",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -5592,7 +5592,7 @@
         mainArcLabelLine.style("display", "none");
       } else {
         mainArcLabelLine.style("fill", function (d) {
-          return config.color_pattern.length > 0 ? $$.levelColor(d.data.values[0].value) : $$.color(d.data);
+          return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data);
         }).style("display", config.gauge_labelLine_show ? "" : "none").each(function (d) {
           var lineLength = 0,
               lineThickness = 2,
@@ -6052,7 +6052,7 @@
         asValue = threshold.unit === 'value',
         values = threshold.values && threshold.values.length ? threshold.values : [],
         max = threshold.max || 100;
-    return notEmpty(config.color_threshold) ? function (value) {
+    return notEmpty(threshold) && notEmpty(colors) ? function (value) {
       var i,
           v,
           color = colors[colors.length - 1];
