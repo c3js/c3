@@ -1182,7 +1182,7 @@
   };
 
   var c3 = {
-    version: "0.6.10",
+    version: "c3-labworks#0.6.11",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -1493,18 +1493,10 @@
         withTransitionForAxis: false
       });
     } // Bind to resize event
-<<<<<<< HEAD
 
-=======
->>>>>>> 878933bb0f0a178fc22539a8e3cc15e74d851805
 
     $$.bindResize(); // Bind to window focus event
 
-<<<<<<< HEAD
-=======
-    $$.bindResize(); // Bind to window focus event
-
->>>>>>> 878933bb0f0a178fc22539a8e3cc15e74d851805
     $$.bindWindowFocus(); // export element of the chart
 
     $$.api.element = $$.selectChart.node();
@@ -2242,13 +2234,10 @@
     }
 
     this.windowFocusHandler = function () {
-<<<<<<< HEAD
       if (_this.api == null || !_this.api.element.offsetParent) {
         return;
       }
 
-=======
->>>>>>> 878933bb0f0a178fc22539a8e3cc15e74d851805
       _this.redraw();
     };
 
@@ -6135,7 +6124,7 @@
       size_width: undefined,
       size_height: undefined,
 
-      /*
+      /* 
       * If set to true, enables caching of chart parent rect in ChartInternal.prototype.getParentRectValue.
       * Cache invalidates on every window resized event.
       * MS Edge performance optimization.
@@ -6237,7 +6226,7 @@
       legend_item_tile_width: 10,
       legend_item_tile_height: 10,
 
-      /*
+      /* 
       * If set to true, makes any resize/redraw operations carried over chart legend ignored.
       * MS Edge performance optimization, use it if the chart doesn't have legend.
       */
@@ -6245,7 +6234,7 @@
       // axis
       axis_rotated: false,
 
-      /*
+      /* 
       * If not empty, prevents recalculating of text ticks rect sizes in AxisInternal.prototype.updateTickTextCharSize.
       * MS Edge performance optimization, use it if text ticks of the chart do not change dynamically.
       * Example:
@@ -6279,7 +6268,7 @@
       *         text-anchor: end;
       *     }
       * }
-      *
+      *     
       * .c3-axis-x {
       *     text {
       *         text-anchor: middle;
@@ -6456,7 +6445,7 @@
       // title
       title_text: undefined,
 
-      /*
+      /* 
       * If set to true, makes any resize/redraw operations carried over chart title ignored.
       * MS Edge performance optimization, use it if the chart doesn't have title.
       */
