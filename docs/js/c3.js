@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.8 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.10 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1147,7 +1147,7 @@
   };
 
   var c3 = {
-    version: "0.6.8",
+    version: "0.6.10",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -1449,10 +1449,12 @@
         withUpdateOrgXDomain: true,
         withTransitionForAxis: false
       });
-    } // Bind resize event
+    } // Bind to resize event
 
 
-    $$.bindResize(); // export element of the chart
+    $$.bindResize(); // Bind to window focus event
+
+    $$.bindWindowFocus(); // export element of the chart
 
     $$.api.element = $$.selectChart.node();
   };
@@ -2095,6 +2097,10 @@
       characterData: true
     });
   };
+  /**
+   * Binds handlers to the window resize event.
+   */
+
 
   ChartInternal.prototype.bindResize = function () {
     var $$ = this,
@@ -2170,6 +2176,34 @@
         wrapper();
       };
     }
+  };
+  /**
+   * Binds handlers to the window focus event.
+   */
+
+
+  ChartInternal.prototype.bindWindowFocus = function () {
+    var _this = this;
+
+    if (this.windowFocusHandler) {
+      // The handler is already set
+      return;
+    }
+
+    this.windowFocusHandler = function () {
+      _this.redraw();
+    };
+
+    window.addEventListener('focus', this.windowFocusHandler);
+  };
+  /**
+   * Unbinds from the window focus event.
+   */
+
+
+  ChartInternal.prototype.unbindWindowFocus = function () {
+    window.removeEventListener('focus', this.windowFocusHandler);
+    delete this.windowFocusHandler;
   };
 
   ChartInternal.prototype.generateResize = function () {
@@ -2265,20 +2299,7 @@
   };
 
   ChartInternal.prototype.isTabVisible = function () {
-    var hidden;
-
-    if (typeof document.hidden !== "undefined") {
-      // Opera 12.10 and Firefox 18 and later support
-      hidden = "hidden";
-    } else if (typeof document.mozHidden !== "undefined") {
-      hidden = "mozHidden";
-    } else if (typeof document.msHidden !== "undefined") {
-      hidden = "msHidden";
-    } else if (typeof document.webkitHidden !== "undefined") {
-      hidden = "webkitHidden";
-    }
-
-    return document[hidden] ? false : true;
+    return !document.hidden;
   };
 
   ChartInternal.prototype.getPathBox = getPathBox;
@@ -4258,10 +4279,12 @@
       if (wrapper && wrapper.add && wrapper.remove) {
         wrapper.remove($$.resizeFunction);
       }
-    } // remove the inner resize functions
+    } // Removes the inner resize functions
 
 
-    $$.resizeFunction.remove();
+    $$.resizeFunction.remove(); // Unbinds from the window focus event
+
+    $$.unbindWindowFocus();
     $$.selectChart.classed('c3', false).html(""); // MEMO: this is needed because the reference of some elements will not be released, then memory leak will happen.
 
     Object.keys($$).forEach(function (key) {
@@ -4856,8 +4879,8 @@
         classes,
         regions;
     options = options || {};
-    duration = $$.getOption(options, "duration", config.transition_duration);
-    classes = $$.getOption(options, "classes", [CLASS.region]);
+    duration = getOption(options, "duration", config.transition_duration);
+    classes = getOption(options, "classes", [CLASS.region]);
     regions = $$.main.select('.' + CLASS.regions).selectAll(classes.map(function (c) {
       return '.' + c;
     }));
@@ -5569,7 +5592,7 @@
         mainArcLabelLine.style("display", "none");
       } else {
         mainArcLabelLine.style("fill", function (d) {
-          return config.color_pattern.length > 0 ? $$.levelColor(d.data.values[0].value) : $$.color(d.data);
+          return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data);
         }).style("display", config.gauge_labelLine_show ? "" : "none").each(function (d) {
           var lineLength = 0,
               lineThickness = 2,
@@ -6029,7 +6052,7 @@
         asValue = threshold.unit === 'value',
         values = threshold.values && threshold.values.length ? threshold.values : [],
         max = threshold.max || 100;
-    return notEmpty(config.color_threshold) ? function (value) {
+    return notEmpty(threshold) && notEmpty(colors) ? function (value) {
       var i,
           v,
           color = colors[colors.length - 1];
