@@ -7,7 +7,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         svg_classname: undefined,
         size_width: undefined,
         size_height: undefined,
-        /* 
+        /*
         * If set to true, enables caching of chart parent rect in ChartInternal.prototype.getParentRectValue.
         * Cache invalidates on every window resized event.
         * MS Edge performance optimization.
@@ -103,14 +103,14 @@ ChartInternal.prototype.getDefaultConfig = function () {
         legend_padding: 0,
         legend_item_tile_width: 10,
         legend_item_tile_height: 10,
-        /* 
+        /*
         * If set to true, makes any resize/redraw operations carried over chart legend ignored.
         * MS Edge performance optimization, use it if the chart doesn't have legend.
         */
         legend_ignore: false,
         // axis
         axis_rotated: false,
-        /* 
+        /*
         * If not empty, prevents recalculating of text ticks rect sizes in AxisInternal.prototype.updateTickTextCharSize.
         * MS Edge performance optimization, use it if text ticks of the chart do not change dynamically.
         * Example:
@@ -130,7 +130,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         *     h: 11.5,
         *     w: 5.5
         * }
-        */ 
+        */
         axis_predefinedTextCharSize: null,
 
         /*
@@ -144,7 +144,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         *         text-anchor: end;
         *     }
         * }
-        *     
+        *
         * .c3-axis-x {
         *     text {
         *         text-anchor: middle;
@@ -161,6 +161,13 @@ ChartInternal.prototype.getDefaultConfig = function () {
         * Use it if width of text ticks is not changed during chart lifecycle.
         */
         axis_cacheTickWidths: false,
+        /*
+        * If set to true, makes taking max text ticks width depending on their inner html, instead of recalculating box size for each text tick.
+        * Used in Axis.prototype.getMaxTickWidth.
+        * MS Edge performance optimization.
+        * Use it if width of text ticks depends on their inner html only.
+        */
+        axis_optimizeMaxTickWidthCalculation: false,
         axis_x_show: true,
         axis_x_type: 'indexed',
         axis_x_localtime: true,
@@ -314,7 +321,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         tooltip_onhide: function () {},
         // title
         title_text: undefined,
-        /* 
+        /*
         * If set to true, makes any resize/redraw operations carried over chart title ignored.
         * MS Edge performance optimization, use it if the chart doesn't have title.
         */

@@ -300,7 +300,7 @@ Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
 Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
     var $$ = this.owner,
         config = $$.config,
-        maxWidth = 0,
+        maxWidth = 0, textWithMaxLength, textMaxLength,
         targetsToShow, scale, axis, dummy, svg, useBBox;
     if ((withoutRecompute || config.axis_cacheTickWidths) && $$.currentMaxTickWidths[id]) {
         return $$.currentMaxTickWidths[id];
@@ -325,11 +325,22 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
+                    if (config.axis_optimizeMaxTickWidthCalculation) {
+						var currentTextLength = this.childNodes[0].innerHTML.length;
+                        if (!textWithMaxLength || currentTextLength > textMaxLength) {
+                            textMaxLength = currentTextLength;
+                            textWithMaxLength = this;
+                        }
+                        return;
+					}
                     var box = useBBox ? this.getBBox() : this.getBoundingClientRect();
                     if (maxWidth < box.width) {
                         maxWidth = box.width;
                     }
                 });
+                if (config.axis_optimizeMaxTickWidthCalculation && textWithMaxLength) {
+					maxWidth = useBBox ? textWithMaxLength.getBBox().width : textWithMaxLength.getBoundingClientRect().width;
+				}
                 dummy.remove();
             });
     }
