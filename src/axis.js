@@ -326,21 +326,21 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
                     if (config.axis_optimizeMaxTickWidthCalculation) {
-						var currentTextLength = this.childNodes[0].innerHTML.length;
+                        var currentTextLength = this.childNodes[0].innerHTML.length;
                         if (!textWithMaxLength || currentTextLength > textMaxLength) {
                             textMaxLength = currentTextLength;
                             textWithMaxLength = this;
                         }
                         return;
-					}
+                    }
                     var box = useBBox ? this.getBBox() : this.getBoundingClientRect();
                     if (maxWidth < box.width) {
                         maxWidth = box.width;
                     }
                 });
                 if (config.axis_optimizeMaxTickWidthCalculation && textWithMaxLength) {
-					maxWidth = useBBox ? textWithMaxLength.getBBox().width : textWithMaxLength.getBoundingClientRect().width;
-				}
+                    maxWidth = useBBox ? textWithMaxLength.getBBox().width : textWithMaxLength.getBoundingClientRect().width;
+                }
                 dummy.remove();
             });
     }
