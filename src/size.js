@@ -73,8 +73,7 @@ ChartInternal.prototype.getParentWidth = function () {
     return this.getParentRectValue('width');
 };
 ChartInternal.prototype.getParentHeight = function () {
-    var h = this.selectChart.style('height');
-    return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
+    return this.getParentRectValue('height');
 };
 
 
