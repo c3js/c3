@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.10 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.11 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1147,7 +1147,7 @@
   };
 
   var c3 = {
-    version: "0.6.10",
+    version: "0.6.11",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -2028,9 +2028,7 @@
     $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect').attr('width', $$.width).attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect').attr('x', $$.getXAxisClipX.bind($$)).attr('y', $$.getXAxisClipY.bind($$)).attr('width', $$.getXAxisClipWidth.bind($$)).attr('height', $$.getXAxisClipHeight.bind($$));
     $$.svg.select('#' + $$.clipIdForYAxis).select('rect').attr('x', $$.getYAxisClipX.bind($$)).attr('y', $$.getYAxisClipY.bind($$)).attr('width', $$.getYAxisClipWidth.bind($$)).attr('height', $$.getYAxisClipHeight.bind($$));
-    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() ? brush.attr('height') : 0); // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
-
-    $$.selectChart.style('max-height', $$.currentHeight + "px");
+    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() ? brush.attr('height') : 0);
   };
 
   ChartInternal.prototype.updateDimension = function (withoutAxis) {
@@ -9689,8 +9687,7 @@
   };
 
   ChartInternal.prototype.getParentHeight = function () {
-    var h = this.selectChart.style('height');
-    return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
+    return this.getParentRectValue('height');
   };
 
   ChartInternal.prototype.getSvgLeft = function (withoutRecompute) {
