@@ -836,5 +836,100 @@ describe('c3 chart axis', function () {
         });
 
     });
+    describe('tick.countIsMax', function () {
+        it('add y, y2 axises and data', function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 33, 350, 400, 550, 750, 1000, 1300, 1700,2303],
+                        ['data2', 10, 20, 200, 204, 260, 375, 400, 1000, 1995,3100]
+                    ],
+                    axes: {
+                        data1: 'y',
+                        data2: 'y2'
+                    }
+                },
+                axis: {
+                    y: {
+                        show: true,
+                        tick: {
+                            count: 4,
+                            countIsMax: true
+                        }
+
+                    },
+                    y2: {
+                        show: true,
+                        tick: {
+                            count: 4,
+                            countIsMax: true
+                        }
+
+                    }
+                }
+            };
+            expect(true).toBeTruthy();
+        });
+
+        /*validating that the number of ticks is between max and 2 (minimum)*/
+        it('y axis should have not more then 4 ticks', function () {
+            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+            expect(ticksSize > 1 && ticksSize < 5).toBeTruthy();
+        });
+
+
+        it('y2 axis should have not more then 4 ticks', function () {
+            var ticksSize = d3.select('.c3-axis-y2').selectAll('g.tick').size();
+            expect(ticksSize > 1 && ticksSize < 5).toBeTruthy();
+        });
+
+        it('build a chart with very low values to validate minimums', function () {
+
+            args = {
+                data: {
+                    columns: [
+                        ['data1', -1000, 37],
+                        ['data2', -134, 109, 432,2,65,1000]
+                    ],
+                    axes: {
+                        data1: 'y',
+                        data2: 'y2'
+                    }
+                },
+                axis: {
+                    y: {
+                        show: true,
+                        tick: {
+                            count: 1,
+                            countIsMax: true
+                        }
+
+                    },
+                    y2: {
+                        show: true,
+                        tick: {
+                            count: 2,
+                            countIsMax: true
+                        }
+
+                    }
+                }
+            };
+
+            expect(true).toBeTruthy();
+        });
+
+        /*validating the minimum allowed ticks*/
+        it('should have minimum count of 2 on y axis', function () {
+            var ticksSize = d3.select('.c3-axis-y').selectAll('g.tick').size();
+            expect(ticksSize).toBe(2);
+        });
+
+        it('should have minimum count of 2 on y2 axis', function () {
+            var ticksSize = d3.select('.c3-axis-y2').selectAll('g.tick').size();
+            expect(ticksSize).toBe(2);
+        });
+
+    });
 
 });

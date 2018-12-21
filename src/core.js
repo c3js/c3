@@ -525,13 +525,21 @@ c3_chart_internal_fn.redraw = function (options, transitions) {
     $$.y.domain($$.getYDomain(targetsToShow, 'y', xDomainForZoom));
     $$.y2.domain($$.getYDomain(targetsToShow, 'y2', xDomainForZoom));
 
+    /*Generate either nice or bruteforce calculated ticks*/
     if (!config.axis_y_tick_values && config.axis_y_tick_count) {
-        $$.yAxis.tickValues($$.axis.generateTickValues($$.y.domain(), config.axis_y_tick_count));
+        if(config.axis_y_tick_countIsMax){
+            $$.yAxis.tickValues($$.axis.getTickValuesWithMaxTickCount($$, config.axis_y_tick_count, "y"));
+        }else{
+            $$.yAxis.tickValues($$.axis.generateTickValues($$.y.domain(), config.axis_y_tick_count));
+        }
     }
     if (!config.axis_y2_tick_values && config.axis_y2_tick_count) {
-        $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
+        if(config.axis_y2_tick_countIsMax) {
+            $$.y2Axis.tickValues($$.axis.getTickValuesWithMaxTickCount($$, config.axis_y2_tick_count, "y2"));
+        }else{
+            $$.y2Axis.tickValues($$.axis.generateTickValues($$.y2.domain(), config.axis_y2_tick_count));
+        }
     }
-
     // axes
     $$.axis.redraw(transitions, hideAxis);
 
