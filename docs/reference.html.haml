@@ -2742,7 +2742,7 @@
           = partial :reference_item_link, locals: { id: 'tooltip.format.title' }
         %p Set format for the title of tooltip.
         %br
-        %p Specified function receives <span class="code">x</span> of the data point to show.
+        %p Specified function receives <span class="code">x</span> and <span class="code">index</span> of the data point to show.
         %h5 Default:
         <code>undefined</code>
         %h5 Format:
@@ -2751,7 +2751,7 @@
             %code.html.javascript
               tooltip: {
               &nbsp;&nbsp;format: {
-              &nbsp;&nbsp;&nbsp;&nbsp;title: function (x) { return 'Data ' + x; }
+              &nbsp;&nbsp;&nbsp;&nbsp;title: function (x, index) { return 'Data ' + x; }
               &nbsp;&nbsp;}
               }
         %h5 Example:
