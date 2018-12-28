@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.11 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.12 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1147,7 +1147,7 @@
   };
 
   var c3 = {
-    version: "0.6.11",
+    version: "0.6.12",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -10299,7 +10299,7 @@
       }
 
       if (!text) {
-        title = sanitise(titleFormat ? titleFormat(d[i].x) : d[i].x);
+        title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
         text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
       }
 
