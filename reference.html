@@ -4130,14 +4130,14 @@ bindto: d3.select('#myContainer')</code></pre>
 </h3>
 <p>Set format for the title of tooltip.</p>
 <br>
-<p>Specified function receives <span class="code">x</span> of the data point to show.</p>
+<p>Specified function receives <span class="code">x</span> and <span class="code">index</span> of the data point to show.</p>
 <h5>Default:</h5>
 <code>undefined</code>
 <h5>Format:</h5>
 <div class='sourcecode'>
 <pre><code class='html javascript'>tooltip: {
 &nbsp;&nbsp;format: {
-&nbsp;&nbsp;&nbsp;&nbsp;title: function (x) { return 'Data ' + x; }
+&nbsp;&nbsp;&nbsp;&nbsp;title: function (x, index) { return 'Data ' + x; }
 &nbsp;&nbsp;}
 }</code></pre>
 </div>
