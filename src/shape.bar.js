@@ -103,10 +103,6 @@ ChartInternal.prototype.generateGetBarPoints = function (barIndices, isSub) {
         var y0 = yScale.call($$, d.id)(0),
             offset = barOffset(d, i) || y0, // offset is for stacked bar chart
             posX = barX(d), posY = barY(d);
-        // fix posY not to overflow opposite quadrant
-        if ($$.config.axis_rotated) {
-            if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
-        }
         // 4 points that make a bar
         return [
             [posX + barSpaceOffset, offset],

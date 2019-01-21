@@ -44,6 +44,60 @@ describe('c3 chart shape bar', function () {
             });
 
         });
+
+        describe('with rotated axis', function () {
+
+            beforeAll(function () {
+                args.axis = {rotated: true};
+            });
+
+            it('bars should have expected Path Box', function () {
+                var expected = {
+                    x: 0,
+                    y: 193,
+                    width: 536,
+                    height: 40
+                };
+    
+                var shapes = chart.internal.main
+                    .selectAll('.' + chart.internal.CLASS.shapes)
+                    .selectAll('.' + chart.internal.CLASS.shape);
+                shapes.each(function () {
+                    var pathBox = chart.internal.getPathBox(this);
+                    expect(pathBox.x).toBeCloseTo(expected.x, -1);
+                    expect(pathBox.y).toBeCloseTo(expected.y, -1);
+                    expect(pathBox.width).toBeCloseTo(expected.width, -1);
+                    expect(pathBox.height).toBeCloseTo(expected.height, -1);
+                });
+            });
+
+            describe('and inverted y axis', function () {
+
+                beforeAll(function () {
+                    args.axis.y = {inverted: true};
+                });
+
+                it('bars should have expected Path Box', function () {
+                    var expected = {
+                        x: 590,
+                        y: 193,
+                        width: 536,
+                        height: 40
+                    };
+        
+                    var shapes = chart.internal.main
+                        .selectAll('.' + chart.internal.CLASS.shapes)
+                        .selectAll('.' + chart.internal.CLASS.shape);
+                    shapes.each(function () {
+                        var pathBox = chart.internal.getPathBox(this);
+                        expect(pathBox.x).toBeCloseTo(expected.x, -1);
+                        expect(pathBox.y).toBeCloseTo(expected.y, -1);
+                        expect(pathBox.width).toBeCloseTo(expected.width, -1);
+                        expect(pathBox.height).toBeCloseTo(expected.height, -1);
+                    });
+                });
+            });
+        });
     });
 
     describe('with groups', function () {
