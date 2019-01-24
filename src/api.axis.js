@@ -58,3 +58,31 @@ c3_chart_fn.axis.range = function (range) {
         };
     }
 };
+
+c3_chart_fn.axis.isXShown = function(value){
+    var $$ = this.internal;
+
+    if(value === undefined){
+        return $$.config.axis_x_show;
+    }
+
+    $$.config.axis_x_show = !!value;
+    $$.axes.x.style("visibility", $$.config.axis_x_show ? 'visible' : 'hidden');
+
+    $$.redraw();
+};
+
+c3_chart_fn.axis.isYShown = function(value){
+    var $$ = this.internal;
+
+    if(value === undefined){
+        return $$.config.axis_y_show;
+    }
+
+    $$.config.axis_y_show = !!value;
+    $$.axes.y.style("visibility", $$.config.axis_y_show ? 'visible' : 'hidden');
+
+    $$.redraw();
+};
+
+
