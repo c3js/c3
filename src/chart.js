@@ -1,12 +1,17 @@
 import {ChartInternal} from './chart-internal';
 
+/**
+ * The Chart class
+ *
+ * The methods of this class is the public APIs of the chart object.
+ */
 export function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
-    $$.loadConfig(config);
+    this.internal = new ChartInternal(this);
+    this.internal.loadConfig(config);
 
-    $$.beforeInit(config);
-    $$.init();
-    $$.afterInit(config);
+    this.internal.beforeInit(config);
+    this.internal.init();
+    this.internal.afterInit(config);
 
     // bind "this" to nested API
     (function bindThis(fn, target, argThis) {
