@@ -1,10 +1,10 @@
-/* @license C3.js v0.6.12 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.13 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.c3 = factory());
-}(this, (function () { 'use strict';
+  (global = global || self, global.c3 = factory());
+}(this, function () { 'use strict';
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -51,12 +51,18 @@
     $$.axes = {};
   }
 
+  /**
+   * The Chart class
+   *
+   * The methods of this class is the public APIs of the chart object.
+   */
+
   function Chart(config) {
-    var $$ = this.internal = new ChartInternal(this);
-    $$.loadConfig(config);
-    $$.beforeInit(config);
-    $$.init();
-    $$.afterInit(config); // bind "this" to nested API
+    this.internal = new ChartInternal(this);
+    this.internal.loadConfig(config);
+    this.internal.beforeInit(config);
+    this.internal.init();
+    this.internal.afterInit(config); // bind "this" to nested API
 
     (function bindThis(fn, target, argThis) {
       Object.keys(fn).forEach(function (key) {
@@ -1148,7 +1154,7 @@
   };
 
   var c3 = {
-    version: "0.6.12",
+    version: "0.6.13",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -2029,7 +2035,9 @@
     $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect').attr('width', $$.width).attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect').attr('x', $$.getXAxisClipX.bind($$)).attr('y', $$.getXAxisClipY.bind($$)).attr('width', $$.getXAxisClipWidth.bind($$)).attr('height', $$.getXAxisClipHeight.bind($$));
     $$.svg.select('#' + $$.clipIdForYAxis).select('rect').attr('x', $$.getYAxisClipX.bind($$)).attr('y', $$.getYAxisClipY.bind($$)).attr('width', $$.getYAxisClipWidth.bind($$)).attr('height', $$.getYAxisClipHeight.bind($$));
-    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() ? brush.attr('height') : 0);
+    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() ? brush.attr('height') : 0); // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
+
+    $$.selectChart.style('max-height', $$.currentHeight + "px");
   };
 
   ChartInternal.prototype.updateDimension = function (withoutAxis) {
@@ -9688,7 +9696,8 @@
   };
 
   ChartInternal.prototype.getParentHeight = function () {
-    return this.getParentRectValue('height');
+    var h = this.selectChart.style('height');
+    return h.indexOf('px') > 0 ? +h.replace('px', '') : 0;
   };
 
   ChartInternal.prototype.getSvgLeft = function (withoutRecompute) {
@@ -10693,4 +10702,4 @@
 
   return c3;
 
-})));
+}));
