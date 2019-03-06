@@ -10,6 +10,11 @@ import {
     hasValue
 } from './util';
 
+ChartInternal.prototype.isEpochs = function (key) {
+    var $$ = this,
+        config = $$.config;
+    return (config.data_epochs && key === config.data_epochs);
+};
 ChartInternal.prototype.isX = function (key) {
     var $$ = this,
         config = $$.config;
@@ -17,6 +22,9 @@ ChartInternal.prototype.isX = function (key) {
 };
 ChartInternal.prototype.isNotX = function (key) {
     return !this.isX(key);
+};
+ChartInternal.prototype.isNotXAndNotEpochs = function (key) {
+    return !this.isX(key) && !this.isEpochs(key);
 };
 ChartInternal.prototype.getXKey = function (id) {
     var $$ = this,

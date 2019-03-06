@@ -130,20 +130,36 @@ ChartInternal.prototype.getTooltipContent = function (d, defaultTitleFormat, def
             continue;
         }
 
-        if (!text) {
-            title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
-            text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+        if($$.isStanfordGraphType()) {
+            // Custom tooltip for stanford plots
+            if (!text) {
+                title = $$.getStanfordTooltipTitle(d[i]);
+                text = "<table class='" + $$.CLASS.tooltip + "'>" + title;
+            }
+
+            bgcolor = $$.getStanfordPointColor(d[i]);
+            name = sanitise(config.data_epochs); // Epochs key name
+            value = d[i].epochs;
+        } else {
+            // Regular tooltip
+            if (!text) {
+                title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
+                text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+            }
+
+            value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
+            if (value !== undefined) {
+                // Skip elements when their name is set to null
+                if (d[i].name === null) {
+                    continue;
+                }
+
+                name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
+                bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
+            }
         }
 
-        value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
-        if (value !== undefined) {
-            // Skip elements when their name is set to null
-            if (d[i].name === null) {
-                continue;
-            }
-            name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
-            bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
-
+        if(value !== undefined) {
             text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";
             text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
             text += "<td class='value'>" + value + "</td>";

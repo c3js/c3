@@ -211,7 +211,7 @@ ChartInternal.prototype.showXGridFocus = function (selectedData) {
         xx = $$.xx.bind($$);
     if (! config.tooltip_show) { return; }
     // Hide when scatter plot exists
-    if ($$.hasType('scatter') || $$.hasArcType()) { return; }
+    if ($$.hasType('scatter') || $$.hasType('stanford') || $$.hasArcType()) { return; }
     focusEl
         .style("visibility", "visible")
         .data([dataToShow[0]])

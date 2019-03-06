@@ -212,6 +212,17 @@
           = partial :reference_menu_item, locals: { id: 'gauge.units' }
           = partial :reference_menu_item, locals: { id: 'gauge.width' }
 
+          %li Stanford
+          = partial :reference_menu_item, locals: { id: 'stanford.scaleMin' }
+          = partial :reference_menu_item, locals: { id: 'stanford.scaleMax' }
+          = partial :reference_menu_item, locals: { id: 'stanford.scaleWidth' }
+          = partial :reference_menu_item, locals: { id: 'stanford.scaleFormat' }
+          = partial :reference_menu_item, locals: { id: 'stanford.colors' }
+          = partial :reference_menu_item, locals: { id: 'stanford.padding' }
+          = partial :reference_menu_item, locals: { id: 'stanford.texts' }
+          = partial :reference_menu_item, locals: { id: 'stanford.lines' }
+          = partial :reference_menu_item, locals: { id: 'stanford.regions' }
+
           %li.margin-medium-top
             %strong API
 
@@ -320,6 +331,13 @@
           = partial :reference_menu_item, locals: { id: 'class.c3-ygrids' }
           = partial :reference_menu_item, locals: { id: 'class.c3-ygrid-line' }
           = partial :reference_menu_item, locals: { id: 'class.c3-ygrid-lines' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-elements' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-line' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-lines' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-region' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-regions' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-text' }
+          = partial :reference_menu_item, locals: { id: 'class.c3-stanford-texts' }
           = partial :reference_menu_item, locals: { id: 'class.c3-axis' }
           = partial :reference_menu_item, locals: { id: 'class.c3-axis-x' }
           = partial :reference_menu_item, locals: { id: 'class.c3-axis-x-label' }
@@ -917,6 +935,7 @@
           %li area-step
           %li bar
           %li scatter
+          %li stanford
           %li pie
           %li donut
           %li gauge
@@ -941,6 +960,8 @@
             %a( href="/samples/chart_bar.html" ) Bar Chart
           %li
             %a( href="/samples/chart_scatter.html" ) Scatter Chart
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
           %li
             %a( href="/samples/chart_pie.html" ) Pie Chart
           %li
@@ -3517,6 +3538,211 @@
               }
       %hr
 
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.scaleMin' }
+        %p Change the minimum value of the stanford color scale.
+        %h5 Default:
+        <code>auto</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;scaleMin: 1
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.scaleMax' }
+        %p Change the maximum value of the stanford color scale.
+        %h5 Default:
+        <code>auto</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;scaleMax: 10000
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.scaleWidth' }
+        %p Change the width of the stanford color scale.
+        %h5 Default:
+        <code>20</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;scaleWidth: 20
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.scaleFormat' }
+        %p Set formatter for stanford color scale axis tick text.
+        %br
+        %p This option accepts the string <span class="code">'pow10'</span>, a d3.format object and any function you define.
+        %h5 Default:
+        <code>d3.format("d")</code> - decimal notation, rounded to integer
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;scaleFormat: 'pow10'
+              &nbsp;&nbsp;// or d3.format("d")
+              &nbsp;&nbsp;// or a function
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.colors' }
+        %p Set the color interpolator for stanford color scale.
+        %br
+        %p This option is a d3.interpolate* object or any function you define that receives a value between 0 and 1, and returns a color as string.
+        %h5 Default:
+        <code>d3.interpolateHslLong(d3.hsl(250, 1, 0.5), d3.hsl(0, 1, 0.5))</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;colors: d3.interpolatePlasma
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.padding' }
+        %p Set the padding for the stanford color scale.
+
+        %p This option accepts <code>array</code> including <code>object</code> that has <span class="code">top</span>, <span class="code">right</span>, <span class="code">bottom</span> and <span class="code">left</span>.
+
+        %h5 Default:
+        <code>undefined</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;padding: {
+              &nbsp;&nbsp;&nbsp;&nbsp;top: 15,
+              &nbsp;&nbsp;&nbsp;&nbsp;right: 0,
+              &nbsp;&nbsp;&nbsp;&nbsp;bottom: 0,
+              &nbsp;&nbsp;&nbsp;&nbsp;left: 0
+              &nbsp;&nbsp;}
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'stanford.texts' }
+        %p Show text anywhere inside the chart.
+        %br
+        %p This option accepts <code>array</code> including <code>object</code> that has <span class="code">x</span>, <span class="code">y</span>, <span class="code">content</span> and <span class="code">class</span>. The key <span class="code">class</span> is optional.
+        %p <span class="code">x</span> and <span class="code">y</span> are the starting position of the text, <span class="code">content</span> is the text content to show. If <span class="code">class</span> is set, the text element will have it as class.
+        %h5 Default:
+        <code>[]</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;texts: [
+              &nbsp;&nbsp;&nbsp;&nbsp;{x: 1, y: 4, content: 'my custom text here', class: 'text-1-4'}
+              &nbsp;&nbsp;]
+              }
+        %hr
+
+        %section
+          %h3
+            = partial :reference_item_link, locals: { id: 'stanford.lines' }
+          %p Show lines anywhere inside the chart.
+          %br
+          %p This option accepts <code>array</code> including <code>object</code> that has <span class="code">value_x1</span>, <span class="code">value_y1</span>, <span class="code">value_x2</span>, <span class="code">value_y2</span> and <span class="code">class</span>. The key <span class="code">class</span> is optional.
+          %p <span class="code">value_x1</span> and <span class="code">value_y1</span> are the starting position of the line, <span class="code">value_x2</span> and <span class="code">value_y2</span> are the ending position of the line. If <span class="code">class</span> is set, the line element will have it as class.
+          %h5 Default:
+          <code>[]</code>
+          %h5 Format:
+          %div.sourcecode
+            %pre
+              %code.html.javascript
+                stanford: {
+                &nbsp;&nbsp;lines: [
+                &nbsp;&nbsp;&nbsp;&nbsp;{value_x1: 0, value_y1: 0, value_x2: 65, value_y2: 65, class: "line-0-65"}
+                &nbsp;&nbsp;]
+                }
+        %hr
+
+        %section
+          %h3
+            = partial :reference_item_link, locals: { id: 'stanford.regions' }
+          %p Show regions anywhere inside the chart.
+          %br
+          %p This option accepts <code>array</code> including <code>object</code> that has <span class="code">points</span>, <span class="code">text</span>, <span class="code">opacity</span> and <span class="code">class</span>. The keys <span class="code">text</span>, <span class="code">opacity</span> and <span class="code">class</span> are optional.
+          %p <span class="code">points</span> accepts <code>array</code> including <code>object</code> that has <span class="code">x</span> and <span class="code">y</span> that represent the coordinates of each point.
+          %p <span class="code">text</span> accepts <code>function</code> that returns a <code>string</code> with the text to show. If the current chart type is stanford the function receives <span class="code">value</span> and <span class="code">percentage</span> as parameters that represent the number of points in this region.
+          %p <span class="code">opacity</span> accepts a number between 0 and 1, the default <span class="code">opacity</span> is 0.2.
+          %p If <span class="code">class</span> is set, the line element will have it as class.
+          %b
+          %h5 Note:
+          %p Points should be added in  a counter-clockwise direction to close the polygon.
+          %h5 Default:
+          <code>[]</code>
+          %h5 Format:
+          %div.sourcecode
+            %pre
+              %code.html.javascript
+                stanford: {
+                &nbsp;&nbsp;regions: [
+                &nbsp;&nbsp;&nbsp;&nbsp;{
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points: [ // add points counter-clockwise
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 0, y: 0},
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 40, y: 40},
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 0, y: 40}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;],
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: function (value, percentage) {
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Normal Operations: " + value + " (" + percentage + "%)";
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;opacity: 0.2, // 0 to 1
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class: "region-triangle-1"
+                &nbsp;&nbsp;&nbsp;&nbsp;}
+                &nbsp;&nbsp;]
+                }
+      %hr
+
       %br
       %section
         %h2 API
@@ -4988,6 +5214,41 @@
       %section
         %h3
           = partial :reference_item_link, locals: { id: 'class.c3-ygrid-lines' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-elements' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-line' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-lines' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-region' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-regions' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-text' }
+        %p ...
+      %hr
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'class.c3-stanford-texts' }
         %p ...
       %hr
       %section

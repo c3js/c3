@@ -37,17 +37,24 @@ ChartInternal.prototype.getCurrentPaddingLeft = function (withoutRecompute) {
     }
 };
 ChartInternal.prototype.getCurrentPaddingRight = function () {
-    var $$ = this, config = $$.config,
+    var $$ = this, config = $$.config, padding = 0,
         defaultPadding = 10, legendWidthOnRight = $$.isLegendRight ? $$.getLegendWidth() + 20 : 0;
+
     if (isValue(config.padding_right)) {
-        return config.padding_right + 1; // 1 is needed not to hide tick line
+        padding = config.padding_right + 1; // 1 is needed not to hide tick line
     } else if (config.axis_rotated) {
-        return defaultPadding + legendWidthOnRight;
+        padding = defaultPadding + legendWidthOnRight;
     } else if (!config.axis_y2_show || config.axis_y2_inner) { // && !config.axis_rotated
-        return 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
+        padding = 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
-        return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
+        padding = ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
+
+    if ($$.colorScale && $$.colorScale.node()) {
+        padding += $$.getColorScalePadding();
+    }
+
+    return padding;
 };
 
 ChartInternal.prototype.getParentRectValue = function (key) {

@@ -73,7 +73,7 @@ ChartInternal.prototype.redrawEventRect = function () {
                 return;
             }
 
-            if ($$.isScatterType(closest) || !config.tooltip_grouped) {
+            if ($$.isScatterOrStanfordType(closest) || !config.tooltip_grouped) {
                 sameXData = [closest];
             } else {
                 sameXData = $$.filterByX(targetsToShow, closest.x);
@@ -116,7 +116,7 @@ ChartInternal.prototype.redrawEventRect = function () {
             if (! closest) { return; }
             // select if selection enabled
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                if ($$.isScatterType(closest) || !config.data_selection_grouped) {
+                if ($$.isScatterOrStanfordType(closest) || !config.data_selection_grouped) {
                     sameXData = [closest];
                 } else {
                     sameXData = $$.filterByX(targetsToShow, closest.x);
