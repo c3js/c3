@@ -219,6 +219,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         tooltip_format_title: undefined,
         tooltip_format_name: undefined,
         tooltip_format_value: undefined,
+        tooltip_horizontal: undefined,
         tooltip_position: undefined,
         tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
             return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
