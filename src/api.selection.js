@@ -7,6 +7,7 @@ Chart.prototype.selected = function (targetId) {
     return d3.merge(
         $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape)
             .filter(function () { return d3.select(this).classed(CLASS.SELECTED); })
+			.nodes()
             .map(function (d) { return d.map(function (d) { var data = d.__data__; return data.data ? data.data : data; }); })
     );
 };
