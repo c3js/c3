@@ -74,6 +74,15 @@ describe('drag behavior', function () {
             expect(unselected).toBe(9);
         });
 
+		describe('Selected api', function(){
+			it('should return 6 selected shapes', function () {
+
+				var selected = chart.selected().length;
+				expect(selected).toBe(6);
+			});
+
+		});
+
     });
 
 });
