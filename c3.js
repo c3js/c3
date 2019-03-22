@@ -2249,6 +2249,7 @@
   };
 
   ChartInternal.prototype.generateWait = function () {
+    var $$ = this;
     var transitionsToWait = [],
         f = function f(callback) {
       var timer = setInterval(function () {
