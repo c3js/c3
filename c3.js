@@ -2249,14 +2249,9 @@
   };
 
   ChartInternal.prototype.generateWait = function () {
-    var $$ = this;
     var transitionsToWait = [],
         f = function f(callback) {
       var timer = setInterval(function () {
-        if (!$$.isTabVisible()) {
-          return;
-        }
-
         var done = 0;
         transitionsToWait.forEach(function (t) {
           if (t.empty()) {
