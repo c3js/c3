@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.13 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.17 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2249,9 +2249,15 @@
   };
 
   ChartInternal.prototype.generateWait = function () {
+    var $$ = this;
+
     var transitionsToWait = [],
         f = function f(callback) {
       var timer = setInterval(function () {
+        if (!$$.isTabVisible()) {
+          return;
+        }
+
         var done = 0;
         transitionsToWait.forEach(function (t) {
           if (t.empty()) {
