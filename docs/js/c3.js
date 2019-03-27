@@ -1,4 +1,4 @@
-/* @license C3.js v0.6.17 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.6.14 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1153,7 +1153,7 @@
   };
 
   var c3 = {
-    version: "0.6.13",
+    version: "0.6.14",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -4917,14 +4917,12 @@
   Chart.prototype.selected = function (targetId) {
     var $$ = this.internal,
         d3 = $$.d3;
-    return d3.merge($$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape).filter(function () {
+    return $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId)).selectAll('.' + CLASS.shape).filter(function () {
       return d3.select(this).classed(CLASS.SELECTED);
-    }).map(function (d) {
-      return d.map(function (d) {
-        var data = d.__data__;
-        return data.data ? data.data : data;
-      });
-    }));
+    }).nodes().map(function (d) {
+      var data = d.__data__;
+      return data.data ? data.data : data;
+    });
   };
 
   Chart.prototype.select = function (ids, indices, resetOther) {
