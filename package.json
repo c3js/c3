@@ -91,7 +91,8 @@
   },
   "greenkeeper": {
     "ignore": [
-      "d3"
+      "d3",
+      "jasmine-core"
     ]
   }
 }
