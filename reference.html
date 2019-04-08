@@ -11,7 +11,7 @@
 <link href="/css/normalize-e465cb86.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="/css/foundation.min-978d4ce8.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="/css/tomorrow-d7cf0921.css" media="screen" rel="stylesheet" type="text/css" />
-<link href="/css/c3-bbe380ed.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/css/c3-0dada34f.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="/css/style-99fb8989.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="/css/reference-c1e7962f.css" media="screen" rel="stylesheet" type="text/css" />
 <script>
@@ -924,6 +924,52 @@
 
 </li>
 
+<li>Stanford</li>
+<li>
+<a href='#stanford-scaleMin'>stanford.scaleMin</a>
+
+</li>
+
+<li>
+<a href='#stanford-scaleMax'>stanford.scaleMax</a>
+
+</li>
+
+<li>
+<a href='#stanford-scaleWidth'>stanford.scaleWidth</a>
+
+</li>
+
+<li>
+<a href='#stanford-scaleFormat'>stanford.scaleFormat</a>
+
+</li>
+
+<li>
+<a href='#stanford-colors'>stanford.colors</a>
+
+</li>
+
+<li>
+<a href='#stanford-padding'>stanford.padding</a>
+
+</li>
+
+<li>
+<a href='#stanford-texts'>stanford.texts</a>
+
+</li>
+
+<li>
+<a href='#stanford-lines'>stanford.lines</a>
+
+</li>
+
+<li>
+<a href='#stanford-regions'>stanford.regions</a>
+
+</li>
+
 <li class='margin-medium-top'>
 <strong>API</strong>
 </li>
@@ -1407,6 +1453,41 @@
 
 <li>
 <a href='#class-c3-ygrid-lines'>c3-ygrid-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-elements'>c3-stanford-elements</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-line'>c3-stanford-line</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-lines'>c3-stanford-lines</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-region'>c3-stanford-region</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-regions'>c3-stanford-regions</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-text'>c3-stanford-text</a>
+
+</li>
+
+<li>
+<a href='#class-c3-stanford-texts'>c3-stanford-texts</a>
 
 </li>
 
@@ -2119,6 +2200,7 @@ bindto: d3.select('#myContainer')</code></pre>
 <li>area-step</li>
 <li>bar</li>
 <li>scatter</li>
+<li>stanford</li>
 <li>pie</li>
 <li>donut</li>
 <li>gauge</li>
@@ -2147,6 +2229,9 @@ bindto: d3.select('#myContainer')</code></pre>
 </li>
 <li>
 <a href='/samples/chart_scatter.html'>Scatter Chart</a>
+</li>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
 </li>
 <li>
 <a href='/samples/chart_pie.html'>Pie Chart</a>
@@ -4980,6 +5065,230 @@ bindto: d3.select('#myContainer')</code></pre>
 </div>
 </section>
 <hr>
+<section>
+<h3>
+<a href='#stanford-scaleMin'>stanford.scaleMin</a>
+
+</h3>
+<p>Change the minimum value of the stanford color scale.</p>
+<h5>Default:</h5>
+<code>auto</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;scaleMin: 1
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-scaleMax'>stanford.scaleMax</a>
+
+</h3>
+<p>Change the maximum value of the stanford color scale.</p>
+<h5>Default:</h5>
+<code>auto</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;scaleMax: 10000
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-scaleWidth'>stanford.scaleWidth</a>
+
+</h3>
+<p>Change the width of the stanford color scale.</p>
+<h5>Default:</h5>
+<code>20</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;scaleWidth: 20
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-scaleFormat'>stanford.scaleFormat</a>
+
+</h3>
+<p>Set formatter for stanford color scale axis tick text.</p>
+<br>
+<p>This option accepts the string <span class="code">'pow10'</span>, a d3.format object and any function you define.</p>
+<h5>Default:</h5>
+<code>d3.format("d")</code> - decimal notation, rounded to integer
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;scaleFormat: 'pow10'
+&nbsp;&nbsp;// or d3.format("d")
+&nbsp;&nbsp;// or a function
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-colors'>stanford.colors</a>
+
+</h3>
+<p>Set the color interpolator for stanford color scale.</p>
+<br>
+<p>This option is a d3.interpolate* object or any function you define that receives a value between 0 and 1, and returns a color as string.</p>
+<h5>Default:</h5>
+<code>d3.interpolateHslLong(d3.hsl(250, 1, 0.5), d3.hsl(0, 1, 0.5))</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;colors: d3.interpolatePlasma
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-padding'>stanford.padding</a>
+
+</h3>
+<p>Set the padding for the stanford color scale.</p>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">top</span>, <span class="code">right</span>, <span class="code">bottom</span> and <span class="code">left</span>.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;padding: {
+&nbsp;&nbsp;&nbsp;&nbsp;top: 15,
+&nbsp;&nbsp;&nbsp;&nbsp;right: 0,
+&nbsp;&nbsp;&nbsp;&nbsp;bottom: 0,
+&nbsp;&nbsp;&nbsp;&nbsp;left: 0
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-texts'>stanford.texts</a>
+
+</h3>
+<p>Show text anywhere inside the chart.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">x</span>, <span class="code">y</span>, <span class="code">content</span> and <span class="code">class</span>. The key <span class="code">class</span> is optional.</p>
+<p><span class="code">x</span> and <span class="code">y</span> are the starting position of the text, <span class="code">content</span> is the text content to show. If <span class="code">class</span> is set, the text element will have it as class.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;texts: [
+&nbsp;&nbsp;&nbsp;&nbsp;{x: 1, y: 4, content: 'my custom text here', class: 'text-1-4'}
+&nbsp;&nbsp;]
+}</code></pre>
+</div>
+<hr>
+<section>
+<h3>
+<a href='#stanford-lines'>stanford.lines</a>
+
+</h3>
+<p>Show lines anywhere inside the chart.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">value_x1</span>, <span class="code">value_y1</span>, <span class="code">value_x2</span>, <span class="code">value_y2</span> and <span class="code">class</span>. The key <span class="code">class</span> is optional.</p>
+<p><span class="code">value_x1</span> and <span class="code">value_y1</span> are the starting position of the line, <span class="code">value_x2</span> and <span class="code">value_y2</span> are the ending position of the line. If <span class="code">class</span> is set, the line element will have it as class.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;lines: [
+&nbsp;&nbsp;&nbsp;&nbsp;{value_x1: 0, value_y1: 0, value_x2: 65, value_y2: 65, class: "line-0-65"}
+&nbsp;&nbsp;]
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#stanford-regions'>stanford.regions</a>
+
+</h3>
+<p>Show regions anywhere inside the chart.</p>
+<br>
+<p>This option accepts <code>array</code> including <code>object</code> that has <span class="code">points</span>, <span class="code">text</span>, <span class="code">opacity</span> and <span class="code">class</span>. The keys <span class="code">text</span>, <span class="code">opacity</span> and <span class="code">class</span> are optional.</p>
+<p><span class="code">points</span> accepts <code>array</code> including <code>object</code> that has <span class="code">x</span> and <span class="code">y</span> that represent the coordinates of each point.</p>
+<p><span class="code">text</span> accepts <code>function</code> that returns a <code>string</code> with the text to show. If the current chart type is stanford the function receives <span class="code">value</span> and <span class="code">percentage</span> as parameters that represent the number of points in this region.</p>
+<p><span class="code">opacity</span> accepts a number between 0 and 1, the default <span class="code">opacity</span> is 0.2.</p>
+<p>If <span class="code">class</span> is set, the line element will have it as class.</p>
+<b></b>
+<h5>Note:</h5>
+<p>Points should be added in  a counter-clockwise direction to close the polygon.</p>
+<h5>Default:</h5>
+<code>[]</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;regions: [
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points: [ // add points counter-clockwise
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 0, y: 0},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 40, y: 40},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{x: 0, y: 40}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text: function (value, percentage) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Normal Operations: " + value + " (" + percentage + "%)";
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;opacity: 0.2, // 0 to 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class: "region-triangle-1"
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;]
+}</code></pre>
+</div>
+</section>
+</section>
+<hr>
 <br>
 <section>
 <h2>API</h2>
@@ -6593,6 +6902,62 @@ chart = chart.destroy();</code></pre>
 <hr>
 <section>
 <h3>
+<a href='#class-c3-stanford-elements'>c3-stanford-elements</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-line'>c3-stanford-line</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-lines'>c3-stanford-lines</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-region'>c3-stanford-region</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-regions'>c3-stanford-regions</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-text'>c3-stanford-text</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#class-c3-stanford-texts'>c3-stanford-texts</a>
+
+</h3>
+<p>...</p>
+</section>
+<hr>
+<section>
+<h3>
 <a href='#class-c3-axis'>c3-axis</a>
 
 </h3>
@@ -6698,8 +7063,8 @@ chart = chart.destroy();</code></pre>
 <script src="/js/jquery-1.11.0.min-910066fb.js" type="text/javascript"></script>
 <script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
 <script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
-<script src="/js/d3-5.4.0.min-e9c75f0e.js" type="text/javascript"></script>
-<script src="/js/c3.min-8c4de449.js" type="text/javascript"></script>
+<script src="/js/d3-5.8.2.min-c5268e33.js" type="text/javascript"></script>
+<script src="/js/c3.min-83024218.js" type="text/javascript"></script>
 <script>
   hljs.initHighlightingOnLoad();
   $(document).foundation();

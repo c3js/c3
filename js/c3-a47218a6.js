@@ -614,6 +614,14 @@
     ygrids: 'c3-ygrids',
     ygridLine: 'c3-ygrid-line',
     ygridLines: 'c3-ygrid-lines',
+    colorScale: 'c3-colorscale',
+    stanfordElements: 'c3-stanford-elements',
+    stanfordLine: 'c3-stanford-line',
+    stanfordLines: 'c3-stanford-lines',
+    stanfordRegion: 'c3-stanford-region',
+    stanfordRegions: 'c3-stanford-regions',
+    stanfordText: 'c3-stanford-text',
+    stanfordTexts: 'c3-stanford-texts',
     axis: 'c3-axis',
     axisX: 'c3-axis-x',
     axisXLabel: 'c3-axis-x-label',
@@ -1343,6 +1351,10 @@
 
     if (config.legend_hide) {
       $$.addHiddenLegendIds(config.legend_hide === true ? $$.mapToIds($$.data.targets) : config.legend_hide);
+    }
+
+    if ($$.isStanfordGraphType()) {
+      $$.initStanfordData();
     } // Init sizes and scales
 
 
@@ -1407,6 +1419,10 @@
 
     if ($$.initZoom) {
       $$.initZoom();
+    }
+
+    if ($$.isStanfordGraphType()) {
+      $$.drawColorScale();
     } // Update selection based on size and scale
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
 
@@ -1430,8 +1446,9 @@
 
     if (config.grid_lines_front) {
       $$.initGridLines();
-    } // Cover whole with rects for events
+    }
 
+    $$.initStanfordElements(); // Cover whole with rects for events
 
     $$.initEventRect(); // Define g for chart
 
@@ -1737,11 +1754,12 @@
     } // grid
 
 
-    $$.updateGrid(duration); // rect for regions
+    $$.updateGrid(duration);
+    $$.updateStanfordElements(duration); // rect for regions
 
     $$.updateRegion(duration); // bars
 
-    $$.updateBar(durationForExit); // lines, areas and cricles
+    $$.updateBar(durationForExit); // lines, areas and circles
 
     $$.updateLine(durationForExit);
     $$.updateArea(durationForExit);
@@ -1764,6 +1782,10 @@
 
     if ($$.redrawSubchart) {
       $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
+    }
+
+    if ($$.isStanfordGraphType()) {
+      $$.drawColorScale();
     } // circles for select
 
 
@@ -1937,7 +1959,7 @@
 
   ChartInternal.prototype.opacityForCircle = function (d) {
     var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
-    var opacity = isPointShouldBeShown ? 1 : 0;
+    var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0;
     return isValue(d.value) ? this.isScatterType(d) ? 0.5 : opacity : 0;
   };
 
@@ -1947,6 +1969,26 @@
 
   ChartInternal.prototype.xx = function (d) {
     return d ? this.x(d.x) : null;
+  };
+
+  ChartInternal.prototype.xvCustom = function (d, xyValue) {
+    var $$ = this,
+        value = xyValue ? d[xyValue] : d.value;
+
+    if ($$.isTimeSeries()) {
+      value = $$.parseDate(d.value);
+    } else if ($$.isCategorized() && typeof d.value === 'string') {
+      value = $$.config.axis_x_categories.indexOf(d.value);
+    }
+
+    return Math.ceil($$.x(value));
+  };
+
+  ChartInternal.prototype.yvCustom = function (d, xyValue) {
+    var $$ = this,
+        yScale = d.axis && d.axis === 'y2' ? $$.y2 : $$.y,
+        value = xyValue ? d[xyValue] : d.value;
+    return Math.ceil(yScale(value));
   };
 
   ChartInternal.prototype.xv = function (d) {
@@ -6112,6 +6154,7 @@
       oninit: function oninit() {},
       onrendered: function onrendered() {},
       transition_duration: 350,
+      data_epochs: 'epochs',
       data_x: undefined,
       data_xs: {},
       data_xFormat: '%Y-%m-%d',
@@ -6294,6 +6337,21 @@
       donut_expand_duration: 50,
       // spline
       spline_interpolation_type: 'cardinal',
+      // stanford
+      stanford_lines: [],
+      stanford_regions: [],
+      stanford_texts: [],
+      stanford_scaleMin: undefined,
+      stanford_scaleMax: undefined,
+      stanford_scaleWidth: undefined,
+      stanford_scaleFormat: undefined,
+      stanford_colors: undefined,
+      stanford_padding: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
       // region - region to change style
       regions: [],
       // tooltip - show when mouseover on each data
@@ -6548,7 +6606,8 @@
         targets,
         ids,
         xs,
-        keys; // handles format where keys are not orderly provided
+        keys,
+        epochs; // handles format where keys are not orderly provided
 
     if (isArray(data)) {
       keys = Object.keys(data[0]);
@@ -6557,8 +6616,19 @@
       data = data.rows;
     }
 
-    ids = keys.filter($$.isNotX, $$);
-    xs = keys.filter($$.isX, $$); // save x for update data by load when custom x and c3.x API
+    xs = keys.filter($$.isX, $$);
+
+    if (!$$.isStanfordGraphType()) {
+      ids = keys.filter($$.isNotX, $$);
+    } else {
+      epochs = keys.filter($$.isEpochs, $$);
+      ids = keys.filter($$.isNotXAndNotEpochs, $$);
+
+      if (xs.length !== 1 || epochs.length !== 1 || ids.length !== 1) {
+        throw new Error('You must define the \'x\' key name and the \'epochs\' for Stanford Diagrams');
+      }
+    } // save x for update data by load when custom x and c3.x API
+
 
     ids.forEach(function (id) {
       var xKey = $$.getXKey(id);
@@ -6601,7 +6671,8 @@
           var xKey = $$.getXKey(id),
               rawX = d[xKey],
               value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null,
-              x; // use x as categories if custom x and categorized
+              x,
+              returnData; // use x as categories if custom x and categorized
 
           if ($$.isCustomX() && $$.isCategorized() && !isUndefined(rawX)) {
             if (index === 0 && i === 0) {
@@ -6623,11 +6694,17 @@
             x = undefined;
           }
 
-          return {
+          returnData = {
             x: x,
             value: value,
             id: convertedId
           };
+
+          if ($$.isStanfordGraphType()) {
+            returnData.epochs = d[epochs];
+          }
+
+          return returnData;
         }).filter(function (v) {
           return isDefined(v.x);
         })
@@ -6672,6 +6749,12 @@
     return targets;
   };
 
+  ChartInternal.prototype.isEpochs = function (key) {
+    var $$ = this,
+        config = $$.config;
+    return config.data_epochs && key === config.data_epochs;
+  };
+
   ChartInternal.prototype.isX = function (key) {
     var $$ = this,
         config = $$.config;
@@ -6680,6 +6763,10 @@
 
   ChartInternal.prototype.isNotX = function (key) {
     return !this.isX(key);
+  };
+
+  ChartInternal.prototype.isNotXAndNotEpochs = function (key) {
+    return !this.isX(key) && !this.isEpochs(key);
   };
 
   ChartInternal.prototype.getXKey = function (id) {
@@ -7941,7 +8028,7 @@
     } // Hide when scatter plot exists
 
 
-    if ($$.hasType('scatter') || $$.hasArcType()) {
+    if ($$.hasType('scatter') || $$.hasType('stanford') || $$.hasArcType()) {
       return;
     }
 
@@ -8100,7 +8187,7 @@
         return;
       }
 
-      if ($$.isScatterType(closest) || !config.tooltip_grouped) {
+      if ($$.isScatterOrStanfordType(closest) || !config.tooltip_grouped) {
         sameXData = [closest];
       } else {
         sameXData = $$.filterByX(targetsToShow, closest.x);
@@ -8148,7 +8235,7 @@
 
 
       if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-        if ($$.isScatterType(closest) || !config.data_selection_grouped) {
+        if ($$.isScatterOrStanfordType(closest) || !config.data_selection_grouped) {
           sameXData = [closest];
         } else {
           sameXData = $$.filterByX(targetsToShow, closest.x);
@@ -9512,16 +9599,16 @@
 
   ChartInternal.prototype.updateCircle = function (cx, cy) {
     var $$ = this;
-    var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle).data($$.lineOrScatterData.bind($$));
-    var mainCircleEnter = mainCircle.enter().append("circle").attr("class", $$.classCircle.bind($$)).attr("cx", cx).attr("cy", cy).attr("r", $$.pointR.bind($$)).style("fill", $$.color);
-    $$.mainCircle = mainCircleEnter.merge(mainCircle).style("opacity", $$.initialOpacityForCircle.bind($$));
+    var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle).data($$.lineOrScatterOrStanfordData.bind($$));
+    var mainCircleEnter = mainCircle.enter().append("circle").attr('shape-rendering', 'crispEdges').attr("class", $$.classCircle.bind($$)).attr("cx", cx).attr("cy", cy).attr("r", $$.pointR.bind($$)).style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color);
+    $$.mainCircle = mainCircleEnter.merge(mainCircle).style("opacity", $$.isStanfordGraphType() ? 1 : $$.initialOpacityForCircle.bind($$));
     mainCircle.exit().style("opacity", 0);
   };
 
   ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transition) {
     var $$ = this,
         selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle);
-    return [(withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle).style('opacity', this.opacityForCircle.bind($$)).style("fill", $$.color).attr("cx", cx).attr("cy", cy), (withTransition ? selectedCircles.transition(transition) : selectedCircles).attr("cx", cx).attr("cy", cy)];
+    return [(withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle).style('opacity', this.opacityForCircle.bind($$)).style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color).attr("cx", cx).attr("cy", cy), (withTransition ? selectedCircles.transition(transition) : selectedCircles).attr("cx", cx).attr("cy", cy)];
   };
 
   ChartInternal.prototype.circleX = function (d) {
@@ -9655,19 +9742,26 @@
   ChartInternal.prototype.getCurrentPaddingRight = function () {
     var $$ = this,
         config = $$.config,
+        padding = 0,
         defaultPadding = 10,
         legendWidthOnRight = $$.isLegendRight ? $$.getLegendWidth() + 20 : 0;
 
     if (isValue(config.padding_right)) {
-      return config.padding_right + 1; // 1 is needed not to hide tick line
+      padding = config.padding_right + 1; // 1 is needed not to hide tick line
     } else if (config.axis_rotated) {
-      return defaultPadding + legendWidthOnRight;
+      padding = defaultPadding + legendWidthOnRight;
     } else if (!config.axis_y2_show || config.axis_y2_inner) {
       // && !config.axis_rotated
-      return 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
+      padding = 2 + legendWidthOnRight + ($$.axis.getY2AxisLabelPosition().isOuter ? 20 : 0);
     } else {
-      return ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
+      padding = ceil10($$.getAxisWidthByAxisId('y2')) + legendWidthOnRight;
     }
+
+    if ($$.colorScale && $$.colorScale.node()) {
+      padding += $$.getColorScalePadding();
+    }
+
+    return padding;
   };
 
   ChartInternal.prototype.getParentRectValue = function (key) {
@@ -10193,6 +10287,348 @@
     return $$.yForTitle() + $$.config.title_padding.bottom;
   };
 
+  function powerOfTen(d) {
+    return d / Math.pow(10, Math.ceil(Math.log(d) / Math.LN10 - 1e-12)) === 1;
+  }
+
+  ChartInternal.prototype.drawColorScale = function () {
+    var $$ = this,
+        d3 = $$.d3,
+        config = $$.config,
+        target = $$.data.targets[0],
+        barWidth,
+        barHeight,
+        axis,
+        points,
+        legendAxis,
+        axisScale,
+        inverseScale,
+        height;
+    barWidth = !isNaN(config.stanford_scaleWidth) ? config.stanford_scaleWidth : 20;
+    barHeight = 5;
+
+    if (barHeight < 0 || barWidth < 0) {
+      throw Error("Colorscale's barheight and barwidth must be greater than 0.");
+    }
+
+    height = $$.height - config.stanford_padding.bottom - config.stanford_padding.top;
+    points = d3.range(config.stanford_padding.bottom, height, barHeight);
+    inverseScale = d3.scaleSequential(target.colors).domain([points[points.length - 1], points[0]]);
+
+    if ($$.colorScale) {
+      $$.colorScale.remove();
+    }
+
+    $$.colorScale = $$.svg.append("g").attr('width', 50).attr('height', height).attr('class', CLASS.colorScale);
+    $$.colorScale.append('g').attr('transform', "translate(0, ".concat(config.stanford_padding.top, ")")).selectAll('bars').data(points).enter().append('rect').attr('y', function (d, i) {
+      return i * barHeight;
+    }).attr('x', 0).attr('width', barWidth).attr('height', barHeight).attr('fill', function (d) {
+      return inverseScale(d);
+    }); // Legend Axis
+
+    axisScale = d3.scaleLog().domain([target.minEpochs, target.maxEpochs]).domain([target.minEpochs, target.maxEpochs]).range([points[0] + config.stanford_padding.top + points[points.length - 1] + barHeight - 1, points[0] + config.stanford_padding.top]);
+    legendAxis = d3.axisRight(axisScale);
+
+    if (config.stanford_scaleFormat === 'pow10') {
+      legendAxis.tickValues([1, 10, 100, 1000, 10000, 100000, 1000000, 10000000]);
+    } else if (isFunction(config.stanford_scaleFormat)) {
+      legendAxis.tickFormat(config.stanford_scaleFormat);
+    } else {
+      legendAxis.tickFormat(d3.format("d"));
+    } // Draw Axis
+
+
+    axis = $$.colorScale.append("g").attr("class", "legend axis").attr("transform", "translate(".concat(barWidth, ",0)")).call(legendAxis);
+
+    if (config.stanford_scaleFormat === 'pow10') {
+      axis.selectAll(".tick text").text(null).filter(powerOfTen).text(10).append("tspan").attr("dy", "-.7em") // https://bl.ocks.org/mbostock/6738229
+      .text(function (d) {
+        return Math.round(Math.log(d) / Math.LN10);
+      });
+    }
+
+    $$.colorScale.attr('transform', "translate(".concat($$.currentWidth - $$.xForColorScale(), ", 0)"));
+  };
+
+  ChartInternal.prototype.xForColorScale = function () {
+    var $$ = this;
+    return $$.config.stanford_padding.right + $$.colorScale.node().getBBox().width;
+  };
+
+  ChartInternal.prototype.getColorScalePadding = function () {
+    var $$ = this;
+    return $$.xForColorScale() + $$.config.stanford_padding.left + 20;
+  };
+
+  ChartInternal.prototype.isStanfordGraphType = function () {
+    var $$ = this;
+    return $$.config.data_type === 'stanford';
+  };
+
+  ChartInternal.prototype.initStanfordData = function () {
+    var $$ = this,
+        d3 = $$.d3,
+        config = $$.config,
+        target = $$.data.targets[0],
+        epochs,
+        maxEpochs,
+        minEpochs; // Make larger values appear on top
+
+    target.values.sort(compareEpochs); // Get array of epochs
+
+    epochs = target.values.map(function (a) {
+      return a.epochs;
+    });
+    minEpochs = !isNaN(config.stanford_scaleMin) ? config.stanford_scaleMin : d3.min(epochs);
+    maxEpochs = !isNaN(config.stanford_scaleMax) ? config.stanford_scaleMax : d3.max(epochs);
+
+    if (minEpochs > maxEpochs) {
+      throw Error("Number of minEpochs has to be smaller than maxEpochs");
+    }
+
+    target.colors = isFunction(config.stanford_colors) ? config.stanford_colors : d3.interpolateHslLong(d3.hsl(250, 1, 0.5), d3.hsl(0, 1, 0.5));
+    target.colorscale = d3.scaleSequentialLog(target.colors).domain([minEpochs, maxEpochs]);
+    target.minEpochs = minEpochs;
+    target.maxEpochs = maxEpochs;
+  };
+
+  ChartInternal.prototype.getStanfordPointColor = function (d) {
+    var $$ = this,
+        target = $$.data.targets[0];
+    return target.colorscale(d.epochs);
+  }; // http://jsfiddle.net/Xotic750/KtzLq/
+
+
+  ChartInternal.prototype.getCentroid = function (points) {
+    var area = getRegionArea(points);
+    var x = 0,
+        y = 0,
+        i,
+        j,
+        f,
+        point1,
+        point2;
+
+    for (i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
+      point1 = points[i];
+      point2 = points[j];
+      f = point1.x * point2.y - point2.x * point1.y;
+      x += (point1.x + point2.x) * f;
+      y += (point1.y + point2.y) * f;
+    }
+
+    f = area * 6;
+    return {
+      x: x / f,
+      y: y / f
+    };
+  };
+
+  ChartInternal.prototype.getStanfordTooltipTitle = function (d) {
+    var $$ = this,
+        labelX = $$.axis.getLabelText('x'),
+        labelY = $$.axis.getLabelText('y');
+    return "\n      <tr><th>".concat(labelX ? sanitise(labelX) : "x", "</th><th class='value'>").concat(d.x, "</th></tr>\n      <tr><th>").concat(labelY ? sanitise(labelY) : "y", "</th><th class='value'>").concat(d.value, "</th></tr>\n    ");
+  };
+
+  ChartInternal.prototype.countEpochsInRegion = function (region) {
+    var $$ = this,
+        target = $$.data.targets[0],
+        total,
+        count;
+    total = target.values.reduce(function (accumulator, currentValue) {
+      return accumulator + Number(currentValue.epochs);
+    }, 0);
+    count = target.values.reduce(function (accumulator, currentValue) {
+      if (pointInRegion(currentValue, region)) {
+        return accumulator + Number(currentValue.epochs);
+      }
+
+      return accumulator;
+    }, 0);
+    return {
+      value: count,
+      percentage: count !== 0 ? (count / total * 100).toFixed(1) : 0
+    };
+  };
+
+  var getRegionArea = function getRegionArea(points) {
+    // thanks to: https://stackoverflow.com/questions/16282330/find-centerpoint-of-polygon-in-javascript
+    var area = 0,
+        i,
+        j,
+        point1,
+        point2;
+
+    for (i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
+      point1 = points[i];
+      point2 = points[j];
+      area += point1.x * point2.y;
+      area -= point1.y * point2.x;
+    }
+
+    area /= 2;
+    return area;
+  };
+  var pointInRegion = function pointInRegion(point, region) {
+    // thanks to: http://bl.ocks.org/bycoffe/5575904
+    // ray-casting algorithm based on
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    var xi,
+        yi,
+        yj,
+        xj,
+        intersect,
+        x = point.x,
+        y = point.value,
+        inside = false;
+
+    for (var i = 0, j = region.length - 1; i < region.length; j = i++) {
+      xi = region[i].x;
+      yi = region[i].y;
+      xj = region[j].x;
+      yj = region[j].y;
+      intersect = yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi;
+
+      if (intersect) {
+        inside = !inside;
+      }
+    }
+
+    return inside;
+  };
+  var compareEpochs = function compareEpochs(a, b) {
+    if (a.epochs < b.epochs) {
+      return -1;
+    }
+
+    if (a.epochs > b.epochs) {
+      return 1;
+    }
+
+    return 0;
+  };
+
+  ChartInternal.prototype.initStanfordElements = function () {
+    var $$ = this; // Avoid blocking eventRect
+
+    $$.stanfordElements = $$.main.select('.' + CLASS.chart).append('g').attr('class', CLASS.stanfordElements);
+    $$.stanfordElements.append('g').attr('class', CLASS.stanfordLines);
+    $$.stanfordElements.append('g').attr('class', CLASS.stanfordTexts);
+    $$.stanfordElements.append('g').attr('class', CLASS.stanfordRegions);
+  };
+
+  ChartInternal.prototype.updateStanfordElements = function (duration) {
+    var $$ = this,
+        main = $$.main,
+        config = $$.config,
+        stanfordLine,
+        stanfordLineEnter,
+        stanfordRegion,
+        stanfordRegionEnter,
+        stanfordText,
+        stanfordTextEnter,
+        xvCustom = $$.xvCustom.bind($$),
+        yvCustom = $$.yvCustom.bind($$),
+        countPointsInRegion = $$.countEpochsInRegion.bind($$); // Stanford-Lines
+
+    stanfordLine = main.select('.' + CLASS.stanfordLines).style('shape-rendering', 'geometricprecision').selectAll('.' + CLASS.stanfordLine).data(config.stanford_lines); // enter
+
+    stanfordLineEnter = stanfordLine.enter().append('g').attr("class", function (d) {
+      return CLASS.stanfordLine + (d['class'] ? ' ' + d['class'] : '');
+    });
+    stanfordLineEnter.append('line').attr("x1", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'value_y1') : xvCustom(d, 'value_x1');
+    }).attr("x2", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'value_y2') : xvCustom(d, 'value_x2');
+    }).attr("y1", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'value_x1') : yvCustom(d, 'value_y1');
+    }).attr("y2", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'value_x2') : yvCustom(d, 'value_y2');
+    }).style("opacity", 0); // update
+
+    $$.stanfordLines = stanfordLineEnter.merge(stanfordLine);
+    $$.stanfordLines.select('line').transition().duration(duration).attr("x1", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'value_y1') : xvCustom(d, 'value_x1');
+    }).attr("x2", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'value_y2') : xvCustom(d, 'value_x2');
+    }).attr("y1", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'value_x1') : yvCustom(d, 'value_y1');
+    }).attr("y2", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'value_x2') : yvCustom(d, 'value_y2');
+    }).style("opacity", 1); // exit
+
+    stanfordLine.exit().transition().duration(duration).style("opacity", 0).remove(); // Stanford-Text
+
+    stanfordText = main.select('.' + CLASS.stanfordTexts).selectAll('.' + CLASS.stanfordText).data(config.stanford_texts); // enter
+
+    stanfordTextEnter = stanfordText.enter().append('g').attr("class", function (d) {
+      return CLASS.stanfordText + (d['class'] ? ' ' + d['class'] : '');
+    });
+    stanfordTextEnter.append('text').attr("x", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'y') : xvCustom(d, 'x');
+    }).attr("y", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'x') : yvCustom(d, 'y');
+    }).style("opacity", 0); // update
+
+    $$.stanfordTexts = stanfordTextEnter.merge(stanfordText);
+    $$.stanfordTexts.select('text').transition().duration(duration).attr("x", function (d) {
+      return config.axis_rotated ? yvCustom(d, 'y') : xvCustom(d, 'x');
+    }).attr("y", function (d) {
+      return config.axis_rotated ? xvCustom(d, 'x') : yvCustom(d, 'y');
+    }).text(function (d) {
+      return d.content;
+    }).style("opacity", 1); // exit
+
+    stanfordText.exit().transition().duration(duration).style("opacity", 0).remove(); // Stanford-Regions
+
+    stanfordRegion = main.select('.' + CLASS.stanfordRegions).selectAll('.' + CLASS.stanfordRegion).data(config.stanford_regions); // enter
+
+    stanfordRegionEnter = stanfordRegion.enter().append('g').attr("class", function (d) {
+      return CLASS.stanfordRegion + (d['class'] ? ' ' + d['class'] : '');
+    });
+    stanfordRegionEnter.append('polygon').attr("points", function (d) {
+      return d.points.map(function (value) {
+        return [config.axis_rotated ? yvCustom(value, 'y') : xvCustom(value, 'x'), config.axis_rotated ? xvCustom(value, 'x') : yvCustom(value, 'y')].join(",");
+      }).join(" ");
+    }).style("opacity", 0);
+    stanfordRegionEnter.append('text').attr("x", function (d) {
+      return $$.getCentroid(d.points).x;
+    }).attr("y", function (d) {
+      return $$.getCentroid(d.points).y;
+    }).style("opacity", 0); // update
+
+    $$.stanfordRegions = stanfordRegionEnter.merge(stanfordRegion);
+    $$.stanfordRegions.select('polygon').transition().duration(duration).attr("points", function (d) {
+      return d.points.map(function (value) {
+        return [config.axis_rotated ? yvCustom(value, 'y') : xvCustom(value, 'x'), config.axis_rotated ? xvCustom(value, 'x') : yvCustom(value, 'y')].join(",");
+      }).join(" ");
+    }).style("opacity", function (d) {
+      return d.opacity ? d.opacity : 0.2;
+    });
+    $$.stanfordRegions.select('text').transition().duration(duration).attr("x", function (d) {
+      return config.axis_rotated ? yvCustom($$.getCentroid(d.points), 'y') : xvCustom($$.getCentroid(d.points), 'x');
+    }).attr("y", function (d) {
+      return config.axis_rotated ? xvCustom($$.getCentroid(d.points), 'x') : yvCustom($$.getCentroid(d.points), 'y');
+    }).text(function (d) {
+      if (d.text) {
+        var value, percentage, temp;
+
+        if ($$.isStanfordGraphType()) {
+          temp = countPointsInRegion(d.points);
+          value = temp.value;
+          percentage = temp.percentage;
+        }
+
+        return d.text(value, percentage);
+      }
+
+      return "";
+    }).attr("text-anchor", "middle").attr("dominant-baseline", "middle").style("opacity", 1); // exit
+
+    stanfordRegion.exit().transition().duration(duration).style("opacity", 0).remove();
+  };
+
   ChartInternal.prototype.initTooltip = function () {
     var $$ = this,
         config = $$.config,
@@ -10312,21 +10748,38 @@
         continue;
       }
 
-      if (!text) {
-        title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
-        text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
-      }
-
-      value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
-
-      if (value !== undefined) {
-        // Skip elements when their name is set to null
-        if (d[i].name === null) {
-          continue;
+      if ($$.isStanfordGraphType()) {
+        // Custom tooltip for stanford plots
+        if (!text) {
+          title = $$.getStanfordTooltipTitle(d[i]);
+          text = "<table class='" + $$.CLASS.tooltip + "'>" + title;
         }
 
-        name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
-        bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
+        bgcolor = $$.getStanfordPointColor(d[i]);
+        name = sanitise(config.data_epochs); // Epochs key name
+
+        value = d[i].epochs;
+      } else {
+        // Regular tooltip
+        if (!text) {
+          title = sanitise(titleFormat ? titleFormat(d[i].x, d[i].index) : d[i].x);
+          text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+        }
+
+        value = sanitise(valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d));
+
+        if (value !== undefined) {
+          // Skip elements when their name is set to null
+          if (d[i].name === null) {
+            continue;
+          }
+
+          name = sanitise(nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index));
+          bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
+        }
+      }
+
+      if (value !== undefined) {
         text += "<tr class='" + $$.CLASS.tooltipName + "-" + $$.getTargetSelectorSuffix(d[i].id) + "'>";
         text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
         text += "<td class='value'>" + value + "</td>";
@@ -10485,6 +10938,15 @@
     return this.config.data_types[id] === 'scatter';
   };
 
+  ChartInternal.prototype.isStanfordType = function (d) {
+    var id = isString(d) ? d : d.id;
+    return this.config.data_types[id] === 'stanford';
+  };
+
+  ChartInternal.prototype.isScatterOrStanfordType = function (d) {
+    return this.isScatterType(d) || this.isStanfordType(d);
+  };
+
   ChartInternal.prototype.isPieType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'pie';
@@ -10522,8 +10984,8 @@
     return this.isBarType(d) ? d.values : [];
   };
 
-  ChartInternal.prototype.lineOrScatterData = function (d) {
-    return this.isLineType(d) || this.isScatterType(d) ? d.values : [];
+  ChartInternal.prototype.lineOrScatterOrStanfordData = function (d) {
+    return this.isLineType(d) || this.isScatterType(d) || this.isStanfordType() ? d.values : [];
   };
 
   ChartInternal.prototype.barOrLineData = function (d) {
