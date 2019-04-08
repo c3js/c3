@@ -211,6 +211,10 @@ ChartInternal.prototype.initWithData = function(data) {
         $$.addHiddenLegendIds(config.legend_hide === true ? $$.mapToIds($$.data.targets) : config.legend_hide);
     }
 
+    if($$.isStanfordGraphType()) {
+        $$.initStanfordData();
+    }
+
     // Init sizes and scales
     $$.updateSizes();
     $$.updateScales();
@@ -275,6 +279,9 @@ ChartInternal.prototype.initWithData = function(data) {
     if ($$.initZoom) {
         $$.initZoom();
     }
+    if($$.isStanfordGraphType()) {
+        $$.drawColorScale();
+    }
 
     // Update selection based on size and scale
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
@@ -305,6 +312,8 @@ ChartInternal.prototype.initWithData = function(data) {
     if (config.grid_lines_front) {
         $$.initGridLines();
     }
+
+    $$.initStanfordElements();
 
     // Cover whole with rects for events
     $$.initEventRect();
@@ -628,13 +637,15 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     // grid
     $$.updateGrid(duration);
 
+    $$.updateStanfordElements(duration);
+
     // rect for regions
     $$.updateRegion(duration);
 
     // bars
     $$.updateBar(durationForExit);
 
-    // lines, areas and cricles
+    // lines, areas and circles
     $$.updateLine(durationForExit);
     $$.updateArea(durationForExit);
     $$.updateCircle(cx, cy);
@@ -657,6 +668,10 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     // subchart
     if ($$.redrawSubchart) {
         $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
+    }
+
+    if ($$.isStanfordGraphType()) {
+        $$.drawColorScale();
     }
 
     // circles for select
@@ -827,7 +842,7 @@ ChartInternal.prototype.initialOpacityForCircle = function(d) {
 };
 ChartInternal.prototype.opacityForCircle = function(d) {
     var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
-    var opacity = isPointShouldBeShown ? 1 : 0;
+    var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0;
     return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
 };
 ChartInternal.prototype.opacityForText = function() {
@@ -835,6 +850,22 @@ ChartInternal.prototype.opacityForText = function() {
 };
 ChartInternal.prototype.xx = function(d) {
     return d ? this.x(d.x) : null;
+};
+ChartInternal.prototype.xvCustom = function(d, xyValue) {
+    var $$ = this,
+        value = xyValue ? d[xyValue] : d.value;
+    if ($$.isTimeSeries()) {
+        value = $$.parseDate(d.value);
+    } else if ($$.isCategorized() && typeof d.value === 'string') {
+        value = $$.config.axis_x_categories.indexOf(d.value);
+    }
+    return Math.ceil($$.x(value));
+};
+ChartInternal.prototype.yvCustom = function(d, xyValue) {
+    var $$ = this,
+        yScale = d.axis && d.axis === 'y2' ? $$.y2 : $$.y,
+        value = xyValue ? d[xyValue] : d.value;
+    return Math.ceil(yScale(value));
 };
 ChartInternal.prototype.xv = function(d) {
     var $$ = this,

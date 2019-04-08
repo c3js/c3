@@ -305,15 +305,19 @@ ChartInternal.prototype.generateGetAreaPoints = function (areaIndices, isSub) { 
 ChartInternal.prototype.updateCircle = function (cx, cy) {
     var $$ = this;
     var mainCircle = $$.main.selectAll('.' + CLASS.circles).selectAll('.' + CLASS.circle)
-        .data($$.lineOrScatterData.bind($$));
+        .data($$.lineOrScatterOrStanfordData.bind($$));
+
     var mainCircleEnter = mainCircle.enter().append("circle")
+        .attr('shape-rendering', 'crispEdges')
         .attr("class", $$.classCircle.bind($$))
         .attr("cx", cx)
         .attr("cy", cy)
         .attr("r", $$.pointR.bind($$))
-        .style("fill", $$.color);
+        .style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color);
+
     $$.mainCircle = mainCircleEnter.merge(mainCircle)
-        .style("opacity", $$.initialOpacityForCircle.bind($$));
+        .style("opacity", $$.isStanfordGraphType() ? 1 : $$.initialOpacityForCircle.bind($$));
+
     mainCircle.exit()
         .style("opacity", 0);
 };
@@ -323,7 +327,7 @@ ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transit
     return [
         (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
             .style('opacity', this.opacityForCircle.bind($$))
-            .style("fill", $$.color)
+            .style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color)
             .attr("cx", cx)
             .attr("cy", cy),
         (withTransition ? selectedCircles.transition(transition) : selectedCircles)

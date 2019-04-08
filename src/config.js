@@ -32,6 +32,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         oninit: function () {},
         onrendered: function () {},
         transition_duration: 350,
+        data_epochs: 'epochs',
         data_x: undefined,
         data_xs: {},
         data_xFormat: '%Y-%m-%d',
@@ -210,6 +211,21 @@ ChartInternal.prototype.getDefaultConfig = function () {
         donut_expand_duration: 50,
         // spline
         spline_interpolation_type: 'cardinal',
+        // stanford
+        stanford_lines: [],
+        stanford_regions: [],
+        stanford_texts: [],
+        stanford_scaleMin: undefined,
+        stanford_scaleMax: undefined,
+        stanford_scaleWidth: undefined,
+        stanford_scaleFormat: undefined,
+        stanford_colors: undefined,
+        stanford_padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+        },
         // region - region to change style
         regions: [],
         // tooltip - show when mouseover on each data
@@ -236,7 +252,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
             bottom: 0,
             left: 0
         },
-        title_position: 'top-center',
+        title_position: 'top-center'
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {

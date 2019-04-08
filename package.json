@@ -24,7 +24,7 @@
     "build:css:min": "cleancss -o htdocs/css/c3.min.css htdocs/css/c3.css",
     "build:docs": "bundle exec middleman build",
     "publish-docs": "npm run build:docs && gh-pages -d build -m \"chore: update gh-pages [skip ci]\"",
-    "watch": "nodemon -e js,scss --watch src -x 'npm run build:js:rollup && npm run build:css:sass'",
+    "watch": "nodemon -e js,scss --watch src -x npm run build:js:rollup && npm run build:css:sass",
     "watch:js": "nodemon -e js --watch src --ignore src/scss -x 'npm run build:js:rollup'",
     "watch:css": "nodemon -e scss --watch src -x 'npm run build:css:sass'",
     "watch:docs": "bundle exec middleman",
@@ -53,7 +53,7 @@
   "gitHead": "84e03109d9a590f9c8ef687c03d751f666080c6f",
   "readmeFilename": "README.md",
   "dependencies": {
-    "d3": "^5.0.0"
+    "d3": "^5.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -81,7 +81,7 @@
     "sass": "^1.10.3",
     "status-back": "^1.1.0",
     "uglify-js": "^3.3.17",
-    "watchify": "^3.11.0"
+    "watchify": "^3.11.1"
   },
   "nyc": {
     "exclude": [
