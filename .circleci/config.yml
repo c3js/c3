@@ -1,27 +1,57 @@
 version: 2
-jobs:
-  test:
-    docker:
-      - image: circleci/node:8-browsers
-    steps:
-      - checkout
-      - run: |
+
+node8: &node8
+  working_directory: ~/c3
+  docker:
+    - image: circleci/node:8-browsers
+
+node10: &node10
+  working_directory: ~/c3
+  docker:
+    - image: circleci/node:10-browsers
+
+restore_modules_cache: &restore_modules_cache
+  restore_cache:
+    keys:
+    - npm-4-{{ checksum "package.json" }}
+    # fallback to using the latest cache if no exact match is found
+    - npm-4-
+
+save_modules_cache: &save_modules_cache
+  save_cache:
+    key: npm-4-{{ checksum "package.json" }}
+    paths: ./node_modules
+
+install_and_test: &install_and_test
+  steps:
+    - checkout
+    - run:
+        name: Display versions
+        command: |
           echo "node $(node -v)"
           echo "npm v$(npm --version)"
           echo "$(google-chrome --version)"
-      - restore_cache:
-          key: npm-3-{{ checksum "package.json" }}
-      - run: npm install
-      - save_cache:
-          key: npm-3-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-      - run: npm test
-      - run: npm run codecov
-      - store_artifacts:
-          path: htdocs
-          destination: htdocs
-      - run: npx status-back -s -c circleci/htdocs -r c3js/c3 "preview build succes!" "https://${CIRCLE_BUILD_NUM}-11496279-gh.circle-artifacts.com/0/htdocs/index.html"
+    - *restore_modules_cache
+    - run:
+        name: Installing Dependencies
+        command: npm install
+    - *save_modules_cache
+    - run: npm test
+    - run: npm run codecov
+    - store_artifacts:
+        path: htdocs
+        destination: htdocs
+    - run: npx status-back -s -c circleci/htdocs -r c3js/c3 "preview build succes!" "https://${CIRCLE_BUILD_NUM}-11496279-gh.circle-artifacts.com/0/htdocs/index.html"
+
+jobs:
+  test_on_node8:
+    <<: *node8
+    <<: *install_and_test
+
+  test_on_node10:
+    <<: *node10
+    <<: *install_and_test
+
   docs:
     docker:
       - image: circleci/ruby:2.4-node
@@ -29,7 +59,6 @@ jobs:
           BUNDLE_PATH: vendor/bundle
     steps:
       - checkout
-
       - restore_cache:
           key: deps-bundle-{{ checksum "Gemfile.lock" }}
       - run: bundle install
@@ -37,24 +66,20 @@ jobs:
           key: deps-bundle-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-
-      - restore_cache:
-          key: npm-3-{{ checksum "package.json" }}
+      - *restore_modules_cache
       - run: npm install
-      - save_cache:
-          key: npm-3-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-
+      - *save_modules_cache
       - run: npm run build
       - run: npm run copy-to-docs
       - run: npm run build:docs
       - store_artifacts:
           path: build
           destination: docs
+
 workflows:
   version: 2
   test:
     jobs:
-      - test
+      - test_on_node8
+      - test_on_node10
       - docs
