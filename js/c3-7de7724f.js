@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.0 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.1 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1162,7 +1162,7 @@
   };
 
   var c3 = {
-    version: "0.7.0",
+    version: "0.7.1",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -6361,6 +6361,7 @@
       tooltip_format_title: undefined,
       tooltip_format_name: undefined,
       tooltip_format_value: undefined,
+      tooltip_horizontal: undefined,
       tooltip_position: undefined,
       tooltip_contents: function tooltip_contents(d, defaultTitleFormat, defaultValueFormat, color) {
         return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
@@ -7159,7 +7160,7 @@
     values.filter(function (v) {
       return v && !$$.isBarType(v.id);
     }).forEach(function (v) {
-      var d = $$.dist(v, pos);
+      var d = $$.config.tooltip_horizontal ? $$.horizontalDistance(v, pos) : $$.dist(v, pos);
 
       if (d < minDist) {
         minDist = d;
@@ -7177,6 +7178,14 @@
         y = $$.circleY(data, data.index),
         x = $$.x(data.x);
     return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
+  };
+
+  ChartInternal.prototype.horizontalDistance = function (data, pos) {
+    var $$ = this,
+        config = $$.config,
+        xIndex = config.axis_rotated ? 1 : 0,
+        x = $$.x(data.x);
+    return Math.abs(x - pos[xIndex]);
   };
 
   ChartInternal.prototype.convertValuesToStep = function (values) {
