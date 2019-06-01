@@ -6,6 +6,6 @@ var chart = c3.generate({
         ]
     },
     tooltip: {
-        show: false
+        horizontal: true
     }
 });

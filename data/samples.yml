@@ -198,6 +198,10 @@ tooltip_format:
   title: Tooltip Format
   desc: Set format for title and value on tooltip.
 
+tooltip_horizontal:
+  title: Horizontal Tooltip
+  desc: Show tooltips based on the horizontal position of the mouse.
+
 options_gridline:
   title: Grid Lines
   desc: Show grid lines for x and y axis.
