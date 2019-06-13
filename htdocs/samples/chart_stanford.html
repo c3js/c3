@@ -1,0 +1,89 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="../css/c3.css">
+</head>
+<body>
+<div id="chart"></div>
+
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<script src="../js/c3.js"></script>
+<script>
+  var chart = c3.generate({
+    size: {
+      height: 600,
+      width: 600 * 1.12
+    },
+    data: {
+      url: '/data/c3_stanford_data.json',
+      mimeType: 'json',
+      keys: {
+        x: 'HPE',
+        value: ['HPL', 'epochs']
+      },
+      type: 'stanford'
+    },
+    legend: {
+      hide: true
+    },
+    point: {
+      focus: {
+        expand: {
+          r: 5
+        }
+      },
+      r: 2.5
+    },
+    axis: {
+      x: {
+        show: true,
+        label: {
+          text: 'HPE (m)',
+          position: 'outer-center'
+        },
+        min: 0,
+        max: 61,
+        tick: {
+          values: d3.range(0, 65, 10)
+        },
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
+      },
+      y: {
+        show: true,
+        label: {
+          text: 'HPL (m)',
+          position: 'outer-middle'
+        },
+        min: 0,
+        max: 60,
+        tick: {
+          values: d3.range(0, 65, 10)
+        },
+        padding: {
+          top: 5,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
+      }
+    },
+    stanford: {
+      scaleMin: 1,
+      scaleMax: 10000,
+      scaleFormat: 'pow10',
+      padding: {
+        top: 15,
+        right: 0,
+        bottom: 0,
+        left: 0
+      }
+    }
+  });
+</script>
+</body>
+</html>

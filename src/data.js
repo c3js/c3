@@ -10,6 +10,11 @@ import {
     hasValue
 } from './util';
 
+ChartInternal.prototype.isEpochs = function (key) {
+    var $$ = this,
+        config = $$.config;
+    return (config.data_epochs && key === config.data_epochs);
+};
 ChartInternal.prototype.isX = function (key) {
     var $$ = this,
         config = $$.config;
@@ -17,6 +22,9 @@ ChartInternal.prototype.isX = function (key) {
 };
 ChartInternal.prototype.isNotX = function (key) {
     return !this.isX(key);
+};
+ChartInternal.prototype.isNotXAndNotEpochs = function (key) {
+    return !this.isX(key) && !this.isEpochs(key);
 };
 ChartInternal.prototype.getXKey = function (id) {
     var $$ = this,
@@ -356,7 +364,7 @@ ChartInternal.prototype.findClosest = function (values, pos) {
     values.filter(function (v) {
         return v && !$$.isBarType(v.id);
     }).forEach(function (v) {
-        var d = $$.dist(v, pos);
+        var d = $$.config.tooltip_horizontal ? $$.horizontalDistance(v, pos) : $$.dist(v, pos);
         if (d < minDist) {
             minDist = d;
             closest = v;
@@ -373,6 +381,14 @@ ChartInternal.prototype.dist = function (data, pos) {
         y = $$.circleY(data, data.index),
         x = $$.x(data.x);
     return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2));
+};
+ChartInternal.prototype.horizontalDistance = function(data, pos) {
+    var $$ = this,
+        config = $$.config,
+        xIndex = config.axis_rotated ? 1 : 0,
+        x = $$.x(data.x);
+
+    return Math.abs(x - pos[xIndex]);
 };
 ChartInternal.prototype.convertValuesToStep = function (values) {
     var converted = [].concat(values),
