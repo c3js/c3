@@ -1,0 +1,199 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="../css/c3.css">
+  <style>
+    .test-polygon1 {
+      fill: white;
+    }
+
+    .test-polygon1 text {
+      fill: black;
+    }
+
+    .test-polygon2 {
+      fill: orange;
+    }
+
+    .test-polygon2 text {
+      fill: black;
+    }
+
+    .test-polygon3 {
+      fill: red;
+    }
+
+    .test-polygon3 text {
+      fill: black;
+    }
+
+    .test-polygon4 {
+      fill: gray;
+    }
+
+    .test-polygon4 text {
+      fill: black;
+    }
+
+    .test-polygon5 {
+      fill: orange;
+    }
+
+    .test-polygon5 text {
+      fill: black;
+    }
+  </style>
+</head>
+<body>
+<div id="chart"></div>
+
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<script src="../js/c3.js"></script>
+<script>
+  var chart = c3.generate({
+    size: {
+      height: 600,
+      width: 600 * 1.12
+    },
+    data: {
+      url: '/data/c3_stanford_data.json',
+      mimeType: 'json',
+      keys: {
+        x: 'HPE',
+        value: ['HPL', 'epochs']
+      },
+      type: 'stanford'
+    },
+    legend: {
+      hide: true
+    },
+    point: {
+      focus: {
+        expand: {
+          r: 5
+        }
+      },
+      r: 2.5
+    },
+    axis: {
+      x: {
+        show: true,
+        label: {
+          text: 'HPE (m)',
+          position: 'outer-center'
+        },
+        min: 0,
+        max: 61,
+        tick: {
+          values: d3.range(0, 65, 10)
+        },
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
+      },
+      y: {
+        show: true,
+        label: {
+          text: 'HPL (m)',
+          position: 'outer-middle'
+        },
+        min: 0,
+        max: 60,
+        tick: {
+          values: d3.range(0, 65, 10)
+        },
+        padding: {
+          top: 5,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
+      }
+    },
+    stanford: {
+      scaleMin: 1,
+      scaleMax: 10000,
+      scaleFormat: 'pow10',
+      padding: {
+        top: 15,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
+      regions: [
+        {
+          points: [ // add points counter-clockwise
+            {x: 0, y: 0},
+            {x: 40, y: 40},
+            {x: 0, y: 40},
+          ],
+          text: function (value, percentage) {
+            return `Normal Operations: ${value} (${percentage}%)`;
+          },
+          opacity: 0.2, // 0 to 1
+          class: "test-polygon1"
+        },
+        {
+          points: [
+            {x: 0, y: 0},
+            {x: 40, y: 0},
+            {x: 40, y: 40},
+          ],
+          text: function (value, percentage) {
+            return `MI: ${value} (${percentage}%)`;
+          },
+          opacity: 0.2, // 0 to 1
+          class: "test-polygon2"
+        },
+        {
+          points: [
+            {x: 40, y: 0},
+            {x: 65, y: 0},
+            {x: 65, y: 40},
+            {x: 40, y: 40},
+          ],
+          text: function (value, percentage) {
+            return `HMI: ${value} (${percentage}%)`;
+          },
+          opacity: 0.2, // 0 to 1
+          class: "test-polygon3"
+        },
+        {
+          points: [
+            {x: 0, y: 40},
+            {x: 40, y: 40},
+            {x: 65, y: 65},
+            {x: 0, y: 65},
+          ],
+          text: function (value, percentage) {
+            return `Unavailable Epochs: ${value} (${percentage}%)`;
+          },
+          opacity: 0.2, // 0 to 1
+          class: "test-polygon4"
+        },
+        {
+          points: [
+            {x: 40, y: 40},
+            {x: 65, y: 40},
+            {x: 65, y: 65}
+          ],
+          text: function (value, percentage) {
+            return `MI:\n${value} (${percentage}%)`;
+          },
+          opacity: 0.2, // 0 to 1
+          class: "test-polygon5"
+        }
+      ],
+      lines: [ // value, text, position and class
+        {value_x1: 0, value_y1: 0, value_x2: 65, value_y2: 65, class: "line"},
+        {value_x1: 0, value_x2: 65, value_y1: 40, value_y2: 40, class: "line"},
+        {value_x1: 40, value_x2: 40, value_y1: 0, value_y2: 40, class: "line"}
+      ]
+    }
+  });
+</script>
+</body>
+</html>

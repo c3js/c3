@@ -33,10 +33,12 @@ GEM
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
     eventmachine (1.2.3)
+    eventmachine (1.2.3-x86-mingw32)
     excon (0.55.0)
     execjs (1.4.1)
       multi_json (~> 1.0)
     ffi (1.9.18)
+    ffi (1.9.18-x86-mingw32)
     fission (0.5.0)
       CFPropertyList (~> 2.2)
     fog (1.40.0)
@@ -226,6 +228,8 @@ GEM
     multi_json (1.12.1)
     nokogiri (1.7.2)
       mini_portile2 (~> 2.1.0)
+    nokogiri (1.7.2-x86-mingw32)
+      mini_portile2 (~> 2.1.0)
     rack (1.6.8)
     rack-livereload (0.3.16)
       rack
@@ -262,10 +266,13 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
+    unf_ext (0.0.7.4-x86-mingw32)
+    wdm (0.1.1)
     xml-simple (1.1.5)
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   middleman (~> 3.2.2)
@@ -275,4 +282,4 @@ DEPENDENCIES
   wdm (~> 0.1.0)
 
 BUNDLED WITH
-   1.15.0
+   1.17.3

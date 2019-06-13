@@ -135,7 +135,7 @@ ChartInternal.prototype.convertColumnsToData = (columns) => {
  * @return {!Array}
  */
 ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
-    var $$ = this, config = $$.config, targets, ids, xs, keys;
+    var $$ = this, config = $$.config, targets, ids, xs, keys, epochs;
 
     // handles format where keys are not orderly provided
     if (isArray(data)) {
@@ -145,8 +145,18 @@ ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
         data = data.rows;
     }
 
-    ids = keys.filter($$.isNotX, $$);
     xs = keys.filter($$.isX, $$);
+
+    if(!$$.isStanfordGraphType()) {
+        ids = keys.filter($$.isNotX, $$);
+    } else {
+        epochs = keys.filter($$.isEpochs, $$);
+        ids = keys.filter($$.isNotXAndNotEpochs, $$);
+
+        if(xs.length !== 1 || epochs.length !== 1 || ids.length !== 1) {
+            throw new Error('You must define the \'x\' key name and the \'epochs\' for Stanford Diagrams');
+        }
+    }
 
     // save x for update data by load when custom x and c3.x API
     ids.forEach(function (id) {
@@ -175,7 +185,6 @@ ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
         }
     });
 
-
     // check x is defined
     ids.forEach(function (id) {
         if (!$$.data.xs[id]) {
@@ -191,7 +200,7 @@ ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
             id_org: id,
             values: data.map(function (d, i) {
                 var xKey = $$.getXKey(id), rawX = d[xKey],
-                    value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x;
+                    value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null, x, returnData;
                 // use x as categories if custom x and categorized
                 if ($$.isCustomX() && $$.isCategorized() && !isUndefined(rawX)) {
                     if (index === 0 && i === 0) {
@@ -209,7 +218,14 @@ ChartInternal.prototype.convertDataToTargets = function (data, appendXs) {
                 if (isUndefined(d[id]) || $$.data.xs[id].length <= i) {
                     x = undefined;
                 }
-                return {x: x, value: value, id: convertedId};
+
+                returnData = {x: x, value: value, id: convertedId};
+
+                if($$.isStanfordGraphType()) {
+                    returnData.epochs = d[epochs];
+                }
+
+                return returnData;
             }).filter(function (v) { return isDefined(v.x); })
         };
     });

@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <link href="../css/c3.css" rel="stylesheet" type="text/css">
+    <style>
+        .chartcontainer {
+            background-color: #EEE;
+            height: calc(100% - 150px);
+            width: 90%;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Please drag the window around to watch the chart resize.</h3>
+    <p>
+    This example illustrates the case which the issue <a href="https://github.com/c3js/c3/issues/2467">#2467</a> reports.
+    </p>
+    <div class="chartContainer">
+        <div id="chart"></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="../js/c3.js"></script>
+    <script>
+        var chart = c3.generate({
+            data: {
+                bindto: '#chart',
+                columns: [
+                    ['data1', 30, 200, 100, 400, 150, 250],
+                    ['data2', 130, 100, 140, 200, 150, 50]
+                ],
+                types: {
+                    data1: 'spline',
+                    data2: 'spline'
+                }
+            },
+            spline: {
+                interpolation: {
+                    type: 'monotone', // 'cardinal' is default
+                },
+            },
+        });
+    </script>
+</body>
+
+</html>

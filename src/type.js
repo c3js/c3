@@ -57,6 +57,13 @@ ChartInternal.prototype.isScatterType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'scatter';
 };
+ChartInternal.prototype.isStanfordType = function (d) {
+    var id = isString(d) ? d : d.id;
+    return this.config.data_types[id] === 'stanford';
+};
+ChartInternal.prototype.isScatterOrStanfordType = function (d) {
+    return this.isScatterType(d) || this.isStanfordType(d);
+};
 ChartInternal.prototype.isPieType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'pie';
@@ -86,8 +93,8 @@ ChartInternal.prototype.arcData = function (d) {
 ChartInternal.prototype.barData = function (d) {
     return this.isBarType(d) ? d.values : [];
 };
-ChartInternal.prototype.lineOrScatterData = function (d) {
-    return this.isLineType(d) || this.isScatterType(d) ? d.values : [];
+ChartInternal.prototype.lineOrScatterOrStanfordData = function (d) {
+    return this.isLineType(d) || this.isScatterType(d) || this.isStanfordType(d) ? d.values : [];
 };
 ChartInternal.prototype.barOrLineData = function (d) {
     return this.isBarType(d) || this.isLineType(d) ? d.values : [];
