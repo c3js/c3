@@ -219,6 +219,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         stanford_scaleMax: undefined,
         stanford_scaleWidth: undefined,
         stanford_scaleFormat: undefined,
+        stanford_scaleValues: undefined,
         stanford_colors: undefined,
         stanford_padding: {
             top: 0,

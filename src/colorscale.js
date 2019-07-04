@@ -54,7 +54,6 @@ ChartInternal.prototype.drawColorScale = function () {
     // Legend Axis
     axisScale = d3.scaleLog()
         .domain([target.minEpochs, target.maxEpochs])
-        .domain([target.minEpochs, target.maxEpochs])
         .range([
             points[0] + config.stanford_padding.top + points[points.length - 1] + barHeight - 1,
             points[0] + config.stanford_padding.top
@@ -68,6 +67,10 @@ ChartInternal.prototype.drawColorScale = function () {
         legendAxis.tickFormat(config.stanford_scaleFormat);
     } else {
         legendAxis.tickFormat(d3.format("d"));
+    }
+
+    if(isFunction(config.stanford_scaleValues)) {
+        legendAxis.tickValues(config.stanford_scaleValues(target.minEpochs, target.maxEpochs));
     }
 
     // Draw Axis
