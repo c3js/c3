@@ -3627,6 +3627,30 @@
 
       %section
         %h3
+          = partial :reference_item_link, locals: { id: 'stanford.scaleValues' }
+        %p Set the values for stanford color scale axis tick text.
+        %br
+        %p This option accepts a function that returns an array of numbers.
+        %h5 Default:
+        <code>undefined</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              stanford: {
+              &nbsp;&nbsp;scaleValues: (minValue, maxValue) => {
+              &nbsp;&nbsp;&nbsp;&nbsp;const step = (maxValue - minValue) / 10;
+              &nbsp;&nbsp;&nbsp;&nbsp;return d3.range(minValue, maxValue + step, step);
+              &nbsp;&nbsp;}
+              }
+        %h5 Example:
+        %ul
+          %li
+            %a( href="/samples/chart_stanford.html" ) Stanford Chart
+      %hr
+
+      %section
+        %h3
           = partial :reference_item_link, locals: { id: 'stanford.colors' }
         %p Set the color interpolator for stanford color scale.
         %br
