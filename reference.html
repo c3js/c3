@@ -5186,6 +5186,33 @@ bindto: d3.select('#myContainer')</code></pre>
 <hr>
 <section>
 <h3>
+<a href='#stanford-scaleValues'>stanford.scaleValues</a>
+
+</h3>
+<p>Set the values for stanford color scale axis tick text.</p>
+<br>
+<p>This option accepts a function that returns an array of numbers.</p>
+<h5>Default:</h5>
+<code>undefined</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>stanford: {
+&nbsp;&nbsp;scaleValues: (minValue, maxValue) => {
+&nbsp;&nbsp;&nbsp;&nbsp;const step = (maxValue - minValue) / 10;
+&nbsp;&nbsp;&nbsp;&nbsp;return d3.range(minValue, maxValue + step, step);
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+<h5>Example:</h5>
+<ul>
+<li>
+<a href='/samples/chart_stanford.html'>Stanford Chart</a>
+</li>
+</ul>
+</section>
+<hr>
+<section>
+<h3>
 <a href='#stanford-colors'>stanford.colors</a>
 
 </h3>
@@ -7091,7 +7118,7 @@ chart = chart.destroy();</code></pre>
 <script src="/js/foundation.min-1dfe8110.js" type="text/javascript"></script>
 <script src="/js/highlight.pack-4af5004d.js" type="text/javascript"></script>
 <script src="/js/d3-5.8.2.min-c5268e33.js" type="text/javascript"></script>
-<script src="/js/c3.min-d788628d.js" type="text/javascript"></script>
+<script src="/js/c3.min-009870f5.js" type="text/javascript"></script>
 <script>
   hljs.initHighlightingOnLoad();
   $(document).foundation();
