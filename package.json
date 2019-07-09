@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-env": "^7.5.4",
     "babel-plugin-istanbul": "^5.0.1",
     "babelify": "^10.0.0",
     "browserify": "^16.1.1",
