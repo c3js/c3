@@ -3,6 +3,29 @@ describe('c3 chart title', function () {
 
     var chart, config;
 
+    describe('when given a title too long', function() {
+        beforeEach(function(done) {
+            config = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250]
+                    ]
+                },
+                title: {
+                    text: 'this is a very long title'.repeat(10),
+                    position: 'top-center'
+                }
+            };
+
+            chart = window.initChart(chart, config, done);
+        });
+
+        it('should not use negative x offset', function () {
+            const titleEl = d3.select(".c3-title");
+            expect(+titleEl.attr("x")).toBe(0);
+        });
+    });
+
     describe('when given a title config option', function () {
         describe('with no padding and no position', function () {
             beforeEach(function(done) {
