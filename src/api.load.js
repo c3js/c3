@@ -38,9 +38,9 @@ Chart.prototype.load = function (args) {
         return;
     }
     // unload if needed
-    if ('unload' in args) {
+    if (args.unload) {
         // TODO: do not unload if target will load (included in url/rows/columns)
-        $$.unload($$.mapToTargetIds((typeof args.unload === 'boolean' && args.unload) ? null : args.unload), function () {
+        $$.unload($$.mapToTargetIds(args.unload === true ? null : args.unload), function () {
             $$.loadFromArgs(args);
         });
     } else {
