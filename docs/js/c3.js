@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.2 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.3 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -979,7 +979,7 @@
     if (config.axis_rotated) {
       return position.isInner ? "1.2em" : -25 - ($$.config.axis_x_inner ? 0 : this.getMaxTickWidth('x'));
     } else {
-      return position.isInner ? "-0.5em" : config.axis_x_height ? config.axis_x_height - 10 : "3em";
+      return position.isInner ? "-0.5em" : $$.getHorizontalAxisHeight('x') - 10;
     }
   };
 
@@ -1161,7 +1161,7 @@
   };
 
   var c3 = {
-    version: "0.7.2",
+    version: "0.7.3",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -4863,9 +4863,9 @@
     } // unload if needed
 
 
-    if ('unload' in args) {
+    if (args.unload) {
       // TODO: do not unload if target will load (included in url/rows/columns)
-      $$.unload($$.mapToTargetIds(typeof args.unload === 'boolean' && args.unload ? null : args.unload), function () {
+      $$.unload($$.mapToTargetIds(args.unload === true ? null : args.unload), function () {
         $$.loadFromArgs(args);
       });
     } else {
@@ -6441,7 +6441,7 @@
 
     f(url, headers).then(function (data) {
       done.call($$, converter.call($$, data, keys));
-    }).catch(function (error) {
+    })["catch"](function (error) {
       throw error;
     });
   };
@@ -9103,6 +9103,10 @@
   };
 
   ChartInternal.prototype.isWithinBar = function (mouse, that) {
+    if (that.pathSegList.numberOfItems < 2) {
+      return false;
+    }
+
     var box = that.getBoundingClientRect(),
         seg0 = that.pathSegList.getItem(0),
         seg1 = that.pathSegList.getItem(1),
@@ -10277,7 +10281,7 @@
     if (position.indexOf('right') >= 0) {
       x = $$.currentWidth - $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).width - config.title_padding.right;
     } else if (position.indexOf('center') >= 0) {
-      x = ($$.currentWidth - $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).width) / 2;
+      x = Math.max(($$.currentWidth - $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node()).width) / 2, 0);
     } else {
       // left
       x = config.title_padding.left;
