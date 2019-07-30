@@ -929,6 +929,12 @@
 
 </li>
 
+<li>Spline</li>
+<li>
+<a href='#spline-interpolation-type'>spline.interpolation.type</a>
+
+</li>
+
 <li>Stanford</li>
 <li>
 <a href='#stanford-scaleMin'>stanford.scaleMin</a>
@@ -5088,6 +5094,38 @@ bindto: d3.select('#myContainer')</code></pre>
 <div class='sourcecode'>
 <pre><code class='html javascript'>gauge: {
 &nbsp;&nbsp;width: 10
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#spline-interpolation-type'>spline.interpolation.type</a>
+
+</h3>
+<p>Set type of curve interpolation.</p>
+<h5>Default:</h5>
+<code>cardinal</code>
+<p>Available interpolation are:</p>
+<ul>
+<li>linear</li>
+<li>linear-closed</li>
+<li>basis</li>
+<li>basis-open</li>
+<li>basis-closed</li>
+<li>bundle</li>
+<li>cardinal <code>[default]</code></li>
+<li>cardinal-open</li>
+<li>cardinal-closed</li>
+<li>monotone</li>
+<li>step</li>
+<li>step-before</li>
+<li>step-after</li>
+</ul>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>interpolation: {
+&nbsp;&nbsp;type: "monotone"
 }</code></pre>
 </div>
 </section>
