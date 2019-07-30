@@ -205,6 +205,9 @@
           = partial :reference_menu_item, locals: { id: 'gauge.units' }
           = partial :reference_menu_item, locals: { id: 'gauge.width' }
 
+          %li Spline
+          = partial :reference_menu_item, locals: { id: 'spline.interpolation.type' }
+
           %li Stanford
           = partial :reference_menu_item, locals: { id: 'stanford.scaleMin' }
           = partial :reference_menu_item, locals: { id: 'stanford.scaleMax' }
@@ -3542,6 +3545,36 @@
             %code.html.javascript
               gauge: {
               &nbsp;&nbsp;width: 10
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'spline.interpolation.type' }
+        %p Set type of curve interpolation.
+        %h5 Default:
+        <code>cardinal</code>
+        %p Available interpolation are:
+        %ul
+          %li linear
+          %li linear-closed
+          %li basis
+          %li basis-open
+          %li basis-closed
+          %li bundle
+          %li cardinal <code>[default]</code>
+          %li cardinal-open
+          %li cardinal-closed
+          %li monotone
+          %li step
+          %li step-before
+          %li step-after
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              interpolation: {
+              &nbsp;&nbsp;type: "monotone"
               }
       %hr
 
