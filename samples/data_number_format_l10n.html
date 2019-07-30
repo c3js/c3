@@ -74,7 +74,7 @@
 <h3># data_number_format_l10n.js</h3>
 <div class='c3-editor' id='javascript-editor'>
 // Locale for Russian (ru_RU)
-var d3locale = d3.locale({
+var d3locale = d3.formatDefaultLocale({
     "decimal": ",",
     "thousands": "\u00A0",
     "grouping": [3],
@@ -102,13 +102,13 @@ var chart = c3.generate({
     axis : {
         y : {
             tick: {
-                format: d3locale.numberFormat(",")
+                format: d3locale.format(",")
             }
         },
         y2: {
             show: true,
             tick: {
-                format: d3locale.numberFormat(",")
+                format: d3locale.format(",")
             }
         }
     }
@@ -170,7 +170,7 @@ var chart = c3.generate({
   editor.commands.removeCommand('gotoline') // Disables the override of Command-L
 </script>
 
-<script src="/js/samples/data_number_format_l10n-f820fc77.js" type="text/javascript"></script>
+<script src="/js/samples/data_number_format_l10n-0429ebe5.js" type="text/javascript"></script>
 
 
 </body>

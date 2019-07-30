@@ -1,5 +1,5 @@
 // Locale for Russian (ru_RU)
-var d3locale = d3.locale({
+var d3locale = d3.formatDefaultLocale({
     "decimal": ",",
     "thousands": "\u00A0",
     "grouping": [3],
@@ -27,13 +27,13 @@ var chart = c3.generate({
     axis : {
         y : {
             tick: {
-                format: d3locale.numberFormat(",")
+                format: d3locale.format(",")
             }
         },
         y2: {
             show: true,
             tick: {
-                format: d3locale.numberFormat(",")
+                format: d3locale.format(",")
             }
         }
     }
