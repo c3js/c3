@@ -48,23 +48,28 @@ ChartInternal.prototype.getXKey = function (id) {
 ChartInternal.prototype.getTotalPerIndex = function() {
     const $$ = this;
 
-    // TODO cache result?
-
-    let sum;
-
-    if ($$.isStackNormalized()) {
-        sum = [];
-
-        $$.data.targets.forEach(row => {
-            row.values.forEach((v, i) => {
-                if (!sum[i]) {
-                    sum[i] = 0;
-                }
-
-                sum[i] += isNumber(v.value) ? v.value : 0;
-            });
-        });
+    if (!$$.isStackNormalized()) {
+        return [];
     }
+
+    const cached = $$.getFromCache('getTotalPerIndex');
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    const sum = [];
+
+    $$.data.targets.forEach(row => {
+        row.values.forEach((v, i) => {
+            if (!sum[i]) {
+                sum[i] = 0;
+            }
+
+            sum[i] += isNumber(v.value) ? v.value : 0;
+        });
+    });
+
+    $$.addToCache('getTotalPerIndex', sum);
 
     return sum;
 };
@@ -77,15 +82,17 @@ ChartInternal.prototype.getTotalPerIndex = function() {
  */
 ChartInternal.prototype.getTotalDataSum = function() {
     const $$ = this;
-    let totalDataSum;
 
-    // TODO: cache result?
-
-    if (!totalDataSum) {
-        totalDataSum = mergeArray($$.data.targets.map(t => t.values))
-            .map(v => v.value)
-            .reduce((p, c) => p + c);
+    const cached = $$.getFromCache('getTotalDataSum');
+    if (cached !== undefined) {
+        return cached;
     }
+
+    const totalDataSum = mergeArray($$.data.targets.map(t => t.values))
+        .map(v => v.value)
+        .reduce((p, c) => p + c);
+
+    $$.addToCache('getTotalDataSum', totalDataSum);
 
     return totalDataSum;
 };
