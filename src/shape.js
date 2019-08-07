@@ -28,10 +28,12 @@ ChartInternal.prototype.getShapeX = function (offset, targetsNum, indices, isSub
     };
 };
 ChartInternal.prototype.getShapeY = function (isSub) {
-    var $$ = this;
+    const $$ = this;
+    const isStackNormalized = $$.isStackNormalized();
+
     return function (d) {
-        var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id);
-        return scale(d.value);
+        const scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id);
+        return scale(isStackNormalized ? $$.getRatio('index', d, true) : d.value);
     };
 };
 ChartInternal.prototype.getShapeOffset = function (typeFilter, indices, isSub) {
@@ -42,21 +44,26 @@ ChartInternal.prototype.getShapeOffset = function (typeFilter, indices, isSub) {
         var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
             y0 = scale(0), offset = y0;
         targets.forEach(function (t) {
-            var values = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
+            const rowValues = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
+            const values = rowValues.map(v => ($$.isStackNormalized() ? $$.getRatio("index", v, true) : v.value));
+
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {
                 // check if the x values line up
-                if (typeof values[i] === 'undefined' || +values[i].x !== +d.x) {  // "+" for timeseries
+                if (isUndefined(rowValues[i]) || +rowValues[i].x !== +d.x) {  // "+" for timeseries
                     // if not, try to find the value that does line up
                     i = -1;
-                    values.forEach(function (v, j) {
-                        if (v.x === d.x) {
+                    rowValues.forEach(function (v, j) {
+                        const x1 = v.x.constructor === Date ? +v.x : v.x;
+                        const x2 = d.x.constructor === Date ? +d.x : d.x;
+
+                        if (x1 === x2) {
                             i = j;
                         }
                     });
                 }
-                if (i in values && values[i].value * d.value >= 0) {
-                    offset += scale(values[i].value) - y0;
+                if (i in rowValues && rowValues[i].value * d.value >= 0) {
+                    offset += scale(values[i]) - y0;
                 }
             }
         });

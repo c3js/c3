@@ -147,18 +147,18 @@ ChartInternal.prototype.transformForArcLabel = function (d) {
     return translate;
 };
 
+/**
+ * @deprecated Use `getRatio('arc', d)` instead.
+ */
 ChartInternal.prototype.getArcRatio = function (d) {
-    var $$ = this,
-        config = $$.config,
-        whole = Math.PI * ($$.hasType('gauge') && !config.gauge_fullCircle ? 1 : 2);
-    return d ? (d.endAngle - d.startAngle) / whole : null;
+    return this.getRatio('arc', d);
 };
 
 ChartInternal.prototype.convertToArcData = function (d) {
     return this.addName({
         id: d.data.id,
         value: d.value,
-        ratio: this.getArcRatio(d),
+        ratio: this.getRatio('arc', d),
         index: d.index
     });
 };
@@ -169,7 +169,7 @@ ChartInternal.prototype.textForArcLabel = function (d) {
     if (! $$.shouldShowArcLabel()) { return ""; }
     updated = $$.updateAngle(d);
     value = updated ? updated.value : null;
-    ratio = $$.getArcRatio(updated);
+    ratio = $$.getRatio('arc', updated);
     id = d.data.id;
     if (! $$.hasType('gauge') && ! $$.meetsArcLabelThreshold(ratio)) { return ""; }
     format = $$.getArcLabelFormat();

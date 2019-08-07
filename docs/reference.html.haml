@@ -57,6 +57,7 @@
           = partial :reference_menu_item, locals: { id: 'data.selection.multiple' }
           = partial :reference_menu_item, locals: { id: 'data.selection.draggable' }
           = partial :reference_menu_item, locals: { id: 'data.selection.isselectable' }
+          = partial :reference_menu_item, locals: { id: 'data.stack.normalize' }
           = partial :reference_menu_item, locals: { id: 'data.onclick' }
           = partial :reference_menu_item, locals: { id: 'data.onmouseover' }
           = partial :reference_menu_item, locals: { id: 'data.onmouseout' }
@@ -1271,6 +1272,25 @@
               data: {
               &nbsp;&nbsp;selection: {
               &nbsp;&nbsp;&nbsp;&nbsp;isselectable: function (d) { ... }
+              &nbsp;&nbsp;}
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'data.stack.normalize' }
+        %p Set the stacking to be normalized
+        %br
+        %p For stacking, the `data.groups` option should be set and have positive values. The yAxis will be set in percentage value (0 ~ 100%).
+        %h5 Default:
+        <code>false</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              data: {
+              &nbsp;&nbsp;stack: {
+              &nbsp;&nbsp;&nbsp;&nbsp;normalize: true
               &nbsp;&nbsp;}
               }
       %hr

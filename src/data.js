@@ -5,9 +5,11 @@ import {
 import {
     isValue,
     isFunction,
+    isNumber,
     isArray,
     notEmpty,
-    hasValue
+    hasValue,
+    mergeArray
 } from './util';
 
 ChartInternal.prototype.isEpochs = function (key) {
@@ -26,11 +28,68 @@ ChartInternal.prototype.isNotX = function (key) {
 ChartInternal.prototype.isNotXAndNotEpochs = function (key) {
     return !this.isX(key) && !this.isEpochs(key);
 };
+
+ChartInternal.prototype.isStackNormalized = function() {
+  return this.config.data_stack_normalize && this.config.data_groups.length > 0;
+};
+
 ChartInternal.prototype.getXKey = function (id) {
     var $$ = this,
         config = $$.config;
     return config.data_x ? config.data_x : notEmpty(config.data_xs) ? config.data_xs[id] : null;
 };
+
+/**
+ * Get sum of data per index
+ *
+ * @private
+ * @return {Array}
+ */
+ChartInternal.prototype.getTotalPerIndex = function() {
+    const $$ = this;
+
+    // TODO cache result?
+
+    let sum;
+
+    if ($$.isStackNormalized()) {
+        sum = [];
+
+        $$.data.targets.forEach(row => {
+            row.values.forEach((v, i) => {
+                if (!sum[i]) {
+                    sum[i] = 0;
+                }
+
+                sum[i] += isNumber(v.value) ? v.value : 0;
+            });
+        });
+    }
+
+    return sum;
+};
+
+/**
+ * Get total data sum
+ *
+ * @private
+ * @return {Number}
+ */
+ChartInternal.prototype.getTotalDataSum = function() {
+    const $$ = this;
+    let totalDataSum;
+
+    // TODO: cache result?
+
+    if (!totalDataSum) {
+        totalDataSum = mergeArray($$.data.targets.map(t => t.values))
+            .map(v => v.value)
+            .reduce((p, c) => p + c);
+    }
+
+    return totalDataSum;
+};
+
 ChartInternal.prototype.getXValuesOfXKey = function (key, targets) {
     var $$ = this,
         xValues, ids = targets && notEmpty(targets) ? $$.mapToIds(targets) : [];
@@ -415,6 +474,68 @@ ChartInternal.prototype.convertValuesToStep = function (values) {
 
     return converted;
 };
+
+/**
+ * Get ratio value
+ *
+ * @param {String} type Ratio for given type
+ * @param {Object} d Data value object
+ * @param {Boolean} asPercent Convert the return as percent or not
+ * @return {Number} Ratio value
+ * @private
+ */
+ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
+    const $$ = this;
+    const config = $$.config;
+    const api = $$.api;
+    let ratio = 0;
+
+    if (d && api.data.shown.call(api).length) {
+        const dataValues = api.data.values.bind(api);
+
+        ratio = d.ratio || d.value;
+
+        if (type === "arc") {
+            // if has padAngle set, calculate rate based on value
+            if ($$.pie.padAngle()()) {
+                let total = $$.getTotalDataSum();
+
+                if ($$.hiddenTargetIds.length) {
+                    total -= dataValues($$.hiddenTargetIds).reduce((p, c) => p + c);
+                }
+
+                ratio = d.value / total;
+
+                // otherwise, based on the rendered angle value
+            } else {
+                ratio = (d.endAngle - d.startAngle) / (
+                    Math.PI * ($$.hasType("gauge") && !config.gauge_fullCircle ? 1 : 2)
+                );
+            }
+        } else if (type === "index") {
+            let total = this.getTotalPerIndex();
+
+            if ($$.hiddenTargetIds.length) {
+                let hiddenSum = dataValues($$.hiddenTargetIds, false);
+
+                if (hiddenSum.length) {
+                    hiddenSum = hiddenSum
+                        .reduce((acc, curr) => acc.map((v, i) => (isNumber(v) ? v : 0) + curr[i]));
+
+                    total = total.map((v, i) => v - hiddenSum[i]);
+                }
+            }
+
+            d.ratio = isNumber(d.value) && total && total[d.index] > 0 ?
+                d.value / total[d.index] : 0;
+
+            ratio = d.ratio;
+        }
+    }
+
+    return asPercent && ratio ? ratio * 100 : ratio;
+};
+
 ChartInternal.prototype.updateDataAttributes = function (name, attrs) {
     var $$ = this,
         config = $$.config,
