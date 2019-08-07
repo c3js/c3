@@ -162,6 +162,43 @@ describe('c3 api data', function () {
 
     });
 
+    describe('data.stackNormalized()', function() {
+
+        beforeEach(function(done) {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 500, 850, 1000, 200, 350, 100]
+                    ],
+                    groups: [
+                        [ 'data1', 'data2' ]
+                    ],
+                    stack: {
+                        normalize: true
+                    }
+                }
+            };
+
+            chart = window.initChart(chart, args, done);
+        });
+
+        it('can toggle option', function(done) {
+            expect(chart.data.stackNormalized()).toBe(true);
+            expect(chart.internal.y.domain()).toEqual([0, 100]);
+
+            chart.data.stackNormalized(false);
+
+            setTimeout(function() {
+                expect(chart.data.stackNormalized()).toBe(false);
+                expect(chart.internal.y.domain()).toEqual([0, 1200]);
+                done();
+            }, 100);
+
+        });
+
+
+    });
 });
 
 describe('c3 api data.x', function () {

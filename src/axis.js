@@ -103,7 +103,13 @@ Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValue
             withoutTransition: withoutTransition,
             tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
         },
-        axis = new this.internal(this, axisParams).axis.scale(scale).orient(orient).tickFormat(tickFormat);
+        axis = new this.internal(this, axisParams).axis
+            .scale(scale)
+            .orient(orient)
+            .tickFormat(
+                tickFormat || ($$.isStackNormalized() && (x => `${x}%`))
+            );
+
     if ($$.isTimeSeriesY()) {
         axis.ticks(config.axis_y_tick_time_type, config.axis_y_tick_time_interval);
     } else {

@@ -117,8 +117,12 @@ ChartInternal.prototype.getTooltipContent = function (d, defaultTitleFormat, def
         nameFormat = config.tooltip_format_name || function (name) {
             return name;
         },
-        valueFormat = config.tooltip_format_value || defaultValueFormat,
         text, i, title, value, name, bgcolor;
+
+    var valueFormat = config.tooltip_format_value;
+    if (!valueFormat) {
+        valueFormat = $$.isStackNormalized() ? ((v, ratio) => `${(ratio * 100).toFixed(2)}%`) : defaultValueFormat;
+    }
 
     var tooltipSortFunction = this.getTooltipSortFunction();
     if (tooltipSortFunction) {

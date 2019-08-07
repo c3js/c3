@@ -107,11 +107,14 @@ ChartInternal.prototype.generateGetBarPoints = function (barIndices, isSub) {
         if ($$.config.axis_rotated) {
             if ((0 < d.value && posY < y0) || (d.value < 0 && y0 < posY)) { posY = y0; }
         }
+
+        posY -= (y0 - offset);
+
         // 4 points that make a bar
         return [
             [posX + barSpaceOffset, offset],
-            [posX + barSpaceOffset, posY - (y0 - offset)],
-            [posX + barW - barSpaceOffset, posY - (y0 - offset)],
+            [posX + barSpaceOffset, posY],
+            [posX + barW - barSpaceOffset, posY],
             [posX + barW - barSpaceOffset, offset]
         ];
     };

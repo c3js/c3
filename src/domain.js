@@ -64,8 +64,13 @@ ChartInternal.prototype.getYDomainMax = function (targets) {
     return $$.d3.max(Object.keys(ys).map(function (key) { return $$.d3.max(ys[key]); }));
 };
 ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
-    var $$ = this, config = $$.config,
-        targetsByAxisId = targets.filter(function (t) { return $$.axis.getId(t.id) === axisId; }),
+    var $$ = this, config = $$.config;
+
+    if ($$.isStackNormalized()) {
+        return [0, 100];
+    }
+
+    var targetsByAxisId = targets.filter(function (t) { return $$.axis.getId(t.id) === axisId; }),
         yTargets = xDomain ? $$.filterByXDomain(targetsByAxisId, xDomain) : targetsByAxisId,
         yMin = axisId === 'y2' ? config.axis_y2_min : config.axis_y_min,
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
