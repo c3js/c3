@@ -4,7 +4,7 @@ import { isFunction } from './util';
 
 ChartInternal.prototype.initPie = function () {
     var $$ = this, d3 = $$.d3;
-    $$.pie = d3.pie().value(function (d) {
+    $$.pie = d3.pie().padAngle(this.getPadAngle).value(function (d) {
         return d.values.reduce(function (a, b) { return a + b.value; }, 0);
     });
 
@@ -28,6 +28,16 @@ ChartInternal.prototype.updateRadius = function () {
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
     $$.innerRadius = $$.hasType('donut') || $$.hasType('gauge') ? $$.radius * $$.innerRadiusRatio : 0;
     $$.gaugeArcWidth = w ? w : (gaugeArcWidth <= $$.radius - $$.innerRadius ? $$.radius - $$.innerRadius : (gaugeArcWidth <= $$.radius ? gaugeArcWidth : $$.radius));
+};
+
+ChartInternal.prototype.getPadAngle = function() {
+    if (this.hasType('pie')) {
+        return this.config.pie_padAngle || 0;
+    } else if (this.hasType('donut')) {
+        return this.config.donut_padAngle || 0;
+    } else {
+        return 0;
+    }
 };
 
 ChartInternal.prototype.updateArc = function () {

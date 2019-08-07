@@ -173,6 +173,50 @@ describe('c3 chart arc', function () {
         });
     });
 
+    describe('config donut chart', function() {
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 150],
+                        ['data3', 120]
+                    ],
+                    type: 'donut'
+                },
+                donut: {
+                    padAngle: 0.05
+                }
+            };
+        });
+
+        it('can configure padAngle', function () {
+            expect(chart.internal.pie.padAngle().call(chart.internal)).toBe(0.05);
+        });
+    });
+
+    describe('config pie chart', function() {
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30],
+                        ['data2', 150],
+                        ['data3', 120]
+                    ],
+                    type: 'pie'
+                },
+                pie: {
+                    padAngle: 0.05
+                }
+            };
+        });
+
+        it('can configure padAngle', function () {
+            expect(chart.internal.pie.padAngle().call(chart.internal)).toBe(0.05);
+        });
+    });
+
     describe('show gauge', function () {
 
         describe('with a 180 degree gauge', function(){
