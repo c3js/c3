@@ -38,6 +38,9 @@ ChartInternal.prototype.load = function (targets, args) {
 };
 ChartInternal.prototype.loadFromArgs = function (args) {
     var $$ = this;
+
+    $$.resetCache();
+
     if (args.data) {
         $$.load($$.convertDataToTargets(args.data), args);
     }
@@ -61,6 +64,9 @@ ChartInternal.prototype.loadFromArgs = function (args) {
 };
 ChartInternal.prototype.unload = function (targetIds, done) {
     var $$ = this;
+
+    $$.resetCache();
+
     if (!done) {
         done = function () {};
     }
