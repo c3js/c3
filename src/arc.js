@@ -4,7 +4,7 @@ import { isFunction } from './util';
 
 ChartInternal.prototype.initPie = function () {
     var $$ = this, d3 = $$.d3;
-    $$.pie = d3.pie().padAngle(this.getPadAngle).value(function (d) {
+    $$.pie = d3.pie().padAngle(this.getPadAngle.bind(this)).value(function (d) {
         return d.values.reduce(function (a, b) { return a + b.value; }, 0);
     });
 

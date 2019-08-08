@@ -191,7 +191,7 @@ describe('c3 chart arc', function () {
         });
 
         it('can configure padAngle', function () {
-            expect(chart.internal.pie.padAngle().call(chart.internal)).toBe(0.05);
+            expect(chart.internal.pie.padAngle()()).toBe(0.05);
         });
     });
 
@@ -213,7 +213,7 @@ describe('c3 chart arc', function () {
         });
 
         it('can configure padAngle', function () {
-            expect(chart.internal.pie.padAngle().call(chart.internal)).toBe(0.05);
+            expect(chart.internal.pie.padAngle()()).toBe(0.05);
         });
     });
 
