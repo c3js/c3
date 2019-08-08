@@ -12,7 +12,9 @@ import {
     isUndefined,
     isValue,
     notEmpty,
-    sanitise
+    sanitise,
+    isNumber,
+    mergeArray
 } from '../src/util';
 
 describe('util.js tests', function () {
@@ -24,6 +26,7 @@ describe('util.js tests', function () {
     var empty_string = '';
     var nonempty_string = 'hello there';
     var nonempty_number = 1234.2;
+    var zero_number = 0;
     var null_var = null;
     var empty_object = {};
     var nonempty_object = {
@@ -82,7 +85,21 @@ describe('util.js tests', function () {
         });
     });
 
-    describe('isArray, isDefined, isEmpty, isFunction, isString, isUndefined, isValue and notEmpty functions', function () {
+    describe('mergeArray', function() {
+        it('returns empty array for undefined value', function () {
+            expect(mergeArray(undefined_var)).toEqual([]);
+        });
+
+        it('returns merged arrays (1 array)', function () {
+            expect(mergeArray([[1]])).toEqual([1]);
+        });
+
+        it('returns merged arrays (n arrays)', function () {
+            expect(mergeArray([[1], ['2']])).toEqual([1, '2']);
+        });
+    });
+
+    describe('isArray, isDefined, isEmpty, isFunction, isNumber, isString, isUndefined, isValue and notEmpty functions', function () {
 
         it('isArray should return true for array var', function () {
             expect(isArray(nonempty_array)).toBe(true);
@@ -120,6 +137,22 @@ describe('util.js tests', function () {
         });
         it('isValue should return false for null var', function () {
             expect(isValue(null_var)).toBe(false);
+        });
+
+        it('isNumber should return false for undefined var', function () {
+            expect(isNumber(undefined_var)).toBe(false);
+        });
+        it('isNumber should return false for null var', function () {
+            expect(isNumber(null_var)).toBe(false);
+        });
+        it('isNumber should return false for string var', function () {
+            expect(isNumber(nonempty_string)).toBe(false);
+        });
+        it('isNumber should return true for nonempty_number', function () {
+            expect(isNumber(nonempty_number)).toBe(true);
+        });
+        it('isNumber should return true for zero_number', function () {
+            expect(isNumber(zero_number)).toBe(true);
         });
 
         it('isEmpty should return false for nonempty_array', function () {
