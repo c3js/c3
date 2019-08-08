@@ -11,7 +11,7 @@ export var getOption = function(options, key, defaultValue) {
     return isDefined(options[key]) ? options[key] : defaultValue;
 };
 export var getPathBox = function(path) {
-    var box = path.getBoundingClientRect(),
+    var box = path.getBBox(),
         items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
         minX = items[0].x,
         minY = Math.min(items[0].y, items[1].y);

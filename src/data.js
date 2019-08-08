@@ -310,7 +310,7 @@ ChartInternal.prototype.getDataLabelLength = function (min, max, key) {
             return $$.dataLabelFormat(d.id)(d);
         })
         .each(function (d, i) {
-            lengths[i] = this.getBoundingClientRect()[key] * paddingCoef;
+            lengths[i] = this.getBBox()[key] * paddingCoef;
         })
         .remove();
     return lengths;

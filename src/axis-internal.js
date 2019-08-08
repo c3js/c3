@@ -82,7 +82,7 @@ AxisInternal.prototype.updateTickTextCharSize = function (tick) {
         w: 5.5
     };
     tick.select('text').text(function(d) { return internal.textFormatted(d); }).each(function (d) {
-        var box = this.getBoundingClientRect(),
+        var box = this.getBBox(),
             text = internal.textFormatted(d),
             h = box.height,
             w = text ? (box.width / text.length) : undefined;
