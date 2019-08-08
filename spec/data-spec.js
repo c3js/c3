@@ -1418,7 +1418,7 @@ describe('c3 chart data', function () {
     });
 
     describe('data.stack', function() {
-        beforeEach((done) => {
+        beforeAll(() => {
             args = {
                 data: {
                     columns: [
@@ -1434,8 +1434,6 @@ describe('c3 chart data', function () {
                     }
                 }
             };
-
-            chart = window.initChart(chart, args, done);
         });
 
         const getChartHeight = () =>
@@ -1474,8 +1472,46 @@ describe('c3 chart data', function () {
             }, 500);
         });
 
+        describe('timeseries chart', () => {
+            beforeAll(function () {
+                args = {
+                    data: {
+                        x: 'date',
+                        columns: [
+                            ['date', '2012-12-24', '2012-12-25', '2012-12-26'],
+                            ['data1', 30, 200, 400],
+                            ['data2', 50, 60, 50],
+                        ],
+                        groups: [
+                            ['data1', 'data2'],
+                        ],
+                        type: 'bar',
+                        stack: {
+                            normalize: true
+                        }
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    }
+                };
+            });
+
+            it("check for the normalized bar's height", () => {
+                const chartHeight = getChartHeight();
+                const bars = chart.internal.main.selectAll('.c3-bar').nodes();
+
+                expect(document.hidden).toBeFalsy();
+
+                bars.splice(0, 3).forEach((v, i) => {
+                    expect(v.getBBox().height + bars[i].getBBox().height).toEqual(chartHeight);
+                });
+            });
+        });
+
         describe('area chart', () => {
-            beforeEach((done) => {
+            beforeAll(() => {
                 args = {
                     data: {
                         columns: [
@@ -1491,7 +1527,6 @@ describe('c3 chart data', function () {
                         }
                     }
                 };
-                chart = window.initChart(chart, args, done);
             });
 
             it("check for the normalized area's height", () => {
