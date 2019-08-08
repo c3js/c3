@@ -16,20 +16,20 @@ describe('c3 api donut', function () {
         }
     };
 
-    beforeEach(function (done) {
+    beforeAll(function (done) {
         chart = window.initChart(chart, args, done);
     });
 
     it('can configure padAngle', function (done) {
         expect(chart.donut.padAngle()).toBe(0.5);
 
-        const path = d3.select('.c3-arc-data1').attr('d');
+        const path = chart.internal.main.select('.c3-arc-data1').attr('d');
 
         chart.donut.padAngle(0.2);
 
         setTimeout(function () {
             expect(chart.donut.padAngle()).toBe(0.2);
-            expect(d3.select('.c3-arc-data1').attr('d')).not.toBe(path);
+            expect(chart.internal.main.select('.c3-arc-data1').attr('d')).not.toBe(path);
             done();
         }, 500);
     });
