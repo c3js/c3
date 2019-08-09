@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.3 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.4 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1161,7 +1161,7 @@
   };
 
   var c3 = {
-    version: "0.7.3",
+    version: "0.7.4",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -1806,40 +1806,22 @@
       });
     }
 
-    if ($$.isTabVisible()) {
+    if (duration && $$.isTabVisible()) {
       // Only use transition if tab visible. See #938.
-      if (duration) {
-        // transition should be derived from one transition
-        transition = d3.transition().duration(duration);
-        transitionsToWait = [];
-        [$$.redrawBar(drawBar, true, transition), $$.redrawLine(drawLine, true, transition), $$.redrawArea(drawArea, true, transition), $$.redrawCircle(cx, cy, true, transition), $$.redrawText(xForText, yForText, options.flow, true, transition), $$.redrawRegion(true, transition), $$.redrawGrid(true, transition)].forEach(function (transitions) {
-          transitions.forEach(function (transition) {
-            transitionsToWait.push(transition);
-          });
-        }); // Wait for end of transitions to call flow and onrendered callback
-
-        waitForDraw = $$.generateWait();
-        transitionsToWait.forEach(function (t) {
-          waitForDraw.add(t);
+      // transition should be derived from one transition
+      transition = d3.transition().duration(duration);
+      transitionsToWait = [];
+      [$$.redrawBar(drawBar, true, transition), $$.redrawLine(drawLine, true, transition), $$.redrawArea(drawArea, true, transition), $$.redrawCircle(cx, cy, true, transition), $$.redrawText(xForText, yForText, options.flow, true, transition), $$.redrawRegion(true, transition), $$.redrawGrid(true, transition)].forEach(function (transitions) {
+        transitions.forEach(function (transition) {
+          transitionsToWait.push(transition);
         });
-        waitForDraw(function () {
-          if (flow) {
-            flow();
-          }
+      }); // Wait for end of transitions to call flow and onrendered callback
 
-          if (config.onrendered) {
-            config.onrendered.call($$);
-          }
-        });
-      } else {
-        $$.redrawBar(drawBar);
-        $$.redrawLine(drawLine);
-        $$.redrawArea(drawArea);
-        $$.redrawCircle(cx, cy);
-        $$.redrawText(xForText, yForText, options.flow);
-        $$.redrawRegion();
-        $$.redrawGrid();
-
+      waitForDraw = $$.generateWait();
+      transitionsToWait.forEach(function (t) {
+        waitForDraw.add(t);
+      });
+      waitForDraw(function () {
         if (flow) {
           flow();
         }
@@ -1847,6 +1829,22 @@
         if (config.onrendered) {
           config.onrendered.call($$);
         }
+      });
+    } else {
+      $$.redrawBar(drawBar);
+      $$.redrawLine(drawLine);
+      $$.redrawArea(drawArea);
+      $$.redrawCircle(cx, cy);
+      $$.redrawText(xForText, yForText, options.flow);
+      $$.redrawRegion();
+      $$.redrawGrid();
+
+      if (flow) {
+        flow();
+      }
+
+      if (config.onrendered) {
+        config.onrendered.call($$);
       }
     } // update fadein condition
 
@@ -4390,6 +4388,17 @@
     return this.internal.updateDataAttributes('axes', axes);
   };
 
+  Chart.prototype.donut = function () {};
+
+  Chart.prototype.donut.padAngle = function (padAngle) {
+    if (padAngle === undefined) {
+      return this.internal.config.donut_padAngle;
+    }
+
+    this.internal.config.donut_padAngle = padAngle;
+    this.flush();
+  };
+
   Chart.prototype.flow = function (args) {
     var $$ = this.internal,
         targets,
@@ -4900,6 +4909,17 @@
     });
   };
 
+  Chart.prototype.pie = function () {};
+
+  Chart.prototype.pie.padAngle = function (padAngle) {
+    if (padAngle === undefined) {
+      return this.internal.config.pie_padAngle;
+    }
+
+    this.internal.config.pie_padAngle = padAngle;
+    this.flush();
+  };
+
   Chart.prototype.regions = function (regions) {
     var $$ = this.internal,
         config = $$.config;
@@ -5265,7 +5285,7 @@
   ChartInternal.prototype.initPie = function () {
     var $$ = this,
         d3 = $$.d3;
-    $$.pie = d3.pie().value(function (d) {
+    $$.pie = d3.pie().padAngle(this.getPadAngle.bind(this)).value(function (d) {
       return d.values.reduce(function (a, b) {
         return a + b.value;
       }, 0);
@@ -5293,6 +5313,16 @@
     $$.innerRadiusRatio = w ? ($$.radius - w) / $$.radius : 0.6;
     $$.innerRadius = $$.hasType('donut') || $$.hasType('gauge') ? $$.radius * $$.innerRadiusRatio : 0;
     $$.gaugeArcWidth = w ? w : gaugeArcWidth <= $$.radius - $$.innerRadius ? $$.radius - $$.innerRadius : gaugeArcWidth <= $$.radius ? gaugeArcWidth : $$.radius;
+  };
+
+  ChartInternal.prototype.getPadAngle = function () {
+    if (this.hasType('pie')) {
+      return this.config.pie_padAngle || 0;
+    } else if (this.hasType('donut')) {
+      return this.config.donut_padAngle || 0;
+    } else {
+      return 0;
+    }
   };
 
   ChartInternal.prototype.updateArc = function () {
@@ -6311,6 +6341,7 @@
       pie_label_ratio: undefined,
       pie_expand: {},
       pie_expand_duration: 50,
+      pie_padAngle: 0,
       // gauge
       gauge_fullCircle: false,
       gauge_label_show: true,
@@ -6334,6 +6365,7 @@
       donut_title: "",
       donut_expand: {},
       donut_expand_duration: 50,
+      donut_padAngle: 0,
       // spline
       spline_interpolation_type: 'cardinal',
       // stanford
