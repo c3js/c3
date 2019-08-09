@@ -31,6 +31,10 @@ window.initChart = function (chart, args, done) {
             .style('position', 'absolute')
             .style('width', '640px')
             .style('right', 0);
+
+        // when using Karma debug in browser the `window.chart` reference the DOM element
+        // instead of the actual chart instance here so let's keep it here
+        window.chartInstance = chart;
     }
 
     window.setTimeout(function () {

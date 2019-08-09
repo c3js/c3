@@ -154,6 +154,15 @@ ChartInternal.prototype.filterTargetsToShow = function (targets) {
         return $$.isTargetToShow(t.id);
     });
 };
+
+/**
+ * @return {Array} Returns all the targets attached to the chart, visible or not
+ */
+ChartInternal.prototype.getTargets = function() {
+  const $$ = this;
+  return $$.data.targets;
+};
+
 ChartInternal.prototype.mapTargetsToUniqueXs = function (targets) {
     var $$ = this;
     var xs = $$.d3.set($$.d3.merge(targets.map(function (t) {

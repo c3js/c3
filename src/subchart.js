@@ -256,3 +256,11 @@ ChartInternal.prototype.getDefaultSelection = function () {
     }
     return selection;
 };
+
+ChartInternal.prototype.removeSubchart = function() {
+    const $$ = this;
+
+    $$.brush = null;
+    $$.context.remove();
+    $$.context = null;
+};
