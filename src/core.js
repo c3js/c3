@@ -947,7 +947,7 @@ ChartInternal.prototype.updateSvgSize = function() {
         .attr('height', $$.getYAxisClipHeight.bind($$));
     $$.svg.select('#' + $$.clipIdForSubchart).select('rect')
         .attr('width', $$.width)
-        .attr('height', brush.size() ? brush.attr('height') : 0);
+        .attr('height', brush.size() && brush.attr('height') || 0);
     // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
     $$.selectChart.style('max-height', $$.currentHeight + "px");
 };
