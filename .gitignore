@@ -27,3 +27,7 @@ components
 # IDE related
 .idea
 .iml
+
+# bundle
+.bundle/config
+vendor/bundle
