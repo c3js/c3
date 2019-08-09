@@ -696,51 +696,49 @@ ChartInternal.prototype.redraw = function(options, transitions) {
         });
     }
 
-    if ($$.isTabVisible()) { // Only use transition if tab visible. See #938.
-        if (duration) {
-            // transition should be derived from one transition
-            transition = d3.transition().duration(duration);
-            transitionsToWait = [];
-            [
-                $$.redrawBar(drawBar, true, transition),
-                $$.redrawLine(drawLine, true, transition),
-                $$.redrawArea(drawArea, true, transition),
-                $$.redrawCircle(cx, cy, true, transition),
-                $$.redrawText(xForText, yForText, options.flow, true, transition),
-                $$.redrawRegion(true, transition),
-                $$.redrawGrid(true, transition),
-            ].forEach(function(transitions) {
-                transitions.forEach(function(transition) {
-                    transitionsToWait.push(transition);
-                });
+    if (duration && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
+        // transition should be derived from one transition
+        transition = d3.transition().duration(duration);
+        transitionsToWait = [];
+        [
+            $$.redrawBar(drawBar, true, transition),
+            $$.redrawLine(drawLine, true, transition),
+            $$.redrawArea(drawArea, true, transition),
+            $$.redrawCircle(cx, cy, true, transition),
+            $$.redrawText(xForText, yForText, options.flow, true, transition),
+            $$.redrawRegion(true, transition),
+            $$.redrawGrid(true, transition),
+        ].forEach(function(transitions) {
+            transitions.forEach(function(transition) {
+                transitionsToWait.push(transition);
             });
-            // Wait for end of transitions to call flow and onrendered callback
-            waitForDraw = $$.generateWait();
-            transitionsToWait.forEach(function(t) {
-                waitForDraw.add(t);
-            });
-            waitForDraw(function() {
-                if (flow) {
-                    flow();
-                }
-                if (config.onrendered) {
-                    config.onrendered.call($$);
-                }
-            });
-        } else {
-            $$.redrawBar(drawBar);
-            $$.redrawLine(drawLine);
-            $$.redrawArea(drawArea);
-            $$.redrawCircle(cx, cy);
-            $$.redrawText(xForText, yForText, options.flow);
-            $$.redrawRegion();
-            $$.redrawGrid();
+        });
+        // Wait for end of transitions to call flow and onrendered callback
+        waitForDraw = $$.generateWait();
+        transitionsToWait.forEach(function(t) {
+            waitForDraw.add(t);
+        });
+        waitForDraw(function() {
             if (flow) {
                 flow();
             }
             if (config.onrendered) {
                 config.onrendered.call($$);
             }
+        });
+    } else {
+        $$.redrawBar(drawBar);
+        $$.redrawLine(drawLine);
+        $$.redrawArea(drawArea);
+        $$.redrawCircle(cx, cy);
+        $$.redrawText(xForText, yForText, options.flow);
+        $$.redrawRegion();
+        $$.redrawGrid();
+        if (flow) {
+            flow();
+        }
+        if (config.onrendered) {
+            config.onrendered.call($$);
         }
     }
 
