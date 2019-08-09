@@ -186,6 +186,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         pie_label_ratio: undefined,
         pie_expand: {},
         pie_expand_duration: 50,
+        pie_padAngle: 0,
         // gauge
         gauge_fullCircle: false,
         gauge_label_show: true,
@@ -209,6 +210,7 @@ ChartInternal.prototype.getDefaultConfig = function () {
         donut_title: "",
         donut_expand: {},
         donut_expand_duration: 50,
+        donut_padAngle: 0,
         // spline
         spline_interpolation_type: 'cardinal',
         // stanford

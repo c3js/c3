@@ -187,12 +187,14 @@
           = partial :reference_menu_item, locals: { id: 'pie.label.format' }
           = partial :reference_menu_item, locals: { id: 'pie.label.threshold' }
           = partial :reference_menu_item, locals: { id: 'pie.expand' }
+          = partial :reference_menu_item, locals: { id: 'pie.padAngle' }
 
           %li Donut
           = partial :reference_menu_item, locals: { id: 'donut.label.show' }
           = partial :reference_menu_item, locals: { id: 'donut.label.format' }
           = partial :reference_menu_item, locals: { id: 'donut.label.threshold' }
           = partial :reference_menu_item, locals: { id: 'donut.expand' }
+          = partial :reference_menu_item, locals: { id: 'donut.padAngle' }
           = partial :reference_menu_item, locals: { id: 'donut.width' }
           = partial :reference_menu_item, locals: { id: 'donut.title' }
 
@@ -3337,6 +3339,21 @@
 
       %section
         %h3
+          = partial :reference_item_link, locals: { id: 'pie.padAngle' }
+        %p Sets the angular separation between each adjacent arc.
+        %h5 Default:
+        <code>0</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              pie: {
+              &nbsp;&nbsp;padAngle: .1
+              }
+      %hr
+
+      %section
+        %h3
           = partial :reference_item_link, locals: { id: 'donut.label.show' }
         %p Show or hide label on each donut piece.
         %h5 Default:
@@ -3400,6 +3417,21 @@
             %code.html.javascript
               donut: {
               &nbsp;&nbsp;expand: false
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'donut.padAngle' }
+        %p Sets the angular separation between each adjacent arc.
+        %h5 Default:
+        <code>0</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              donut: {
+              &nbsp;&nbsp;padAngle: .1
               }
       %hr
 
