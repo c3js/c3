@@ -264,7 +264,7 @@ ChartInternal.prototype.initWithData = function(data) {
     if ($$.initDragZoom) {
         $$.initDragZoom();
     }
-    if ($$.initSubchart) {
+    if (config.subchart_show && $$.initSubchart) {
         $$.initSubchart();
     }
     if ($$.initTooltip) {
@@ -285,7 +285,7 @@ ChartInternal.prototype.initWithData = function(data) {
 
     // Update selection based on size and scale
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
-    if ($$.initSubchartBrush) {
+    if (config.subchart_show && $$.initSubchartBrush) {
         $$.initSubchartBrush();
     }
 
@@ -458,7 +458,7 @@ ChartInternal.prototype.updateSizes = function() {
 };
 
 ChartInternal.prototype.updateTargets = function(targets) {
-    var $$ = this;
+    var $$ = this, config = $$.config;
 
     /*-- Main --*/
 
@@ -478,7 +478,7 @@ ChartInternal.prototype.updateTargets = function(targets) {
 
     /*-- Sub --*/
 
-    if ($$.updateTargetsForSubchart) {
+    if (config.subchart_show && $$.updateTargetsForSubchart) {
         $$.updateTargetsForSubchart(targets);
     }
 
@@ -666,7 +666,7 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     }
 
     // subchart
-    if ($$.redrawSubchart) {
+    if (config.subchart_show && $$.redrawSubchart) {
         $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
     }
 
@@ -1148,7 +1148,7 @@ ChartInternal.prototype.generateWait = function() {
                 if (!$$.isTabVisible()) {
                   return;
                 }
-  
+
                 var done = 0;
                 transitionsToWait.forEach(function(t) {
                     if (t.empty()) {
