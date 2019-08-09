@@ -930,7 +930,7 @@ ChartInternal.prototype.transformAll = function(withTransition, transitions) {
 
 ChartInternal.prototype.updateSvgSize = function() {
     var $$ = this,
-        brush = $$.svg.select(".c3-brush .overlay");
+        brush = $$.svg.select(`.${CLASS.brush} .overlay`);
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
     $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect')
         .attr('width', $$.width)
