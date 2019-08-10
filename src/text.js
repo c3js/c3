@@ -64,7 +64,7 @@ ChartInternal.prototype.getTextRect = function (text, cls, element) {
         .classed(cls ? cls : "", true)
         .style('font', font)
         .text(text)
-      .each(function () { rect = this.getBoundingClientRect(); });
+      .each(function () { rect = this.getBBox(); });
     dummy.remove();
     return rect;
 };
@@ -81,7 +81,7 @@ ChartInternal.prototype.generateXYForText = function (areaIndices, barIndices, l
 };
 ChartInternal.prototype.getXForText = function (points, d, textElement) {
     var $$ = this,
-        box = textElement.getBoundingClientRect(), xPos, padding;
+        box = textElement.getBBox(), xPos, padding;
     if ($$.config.axis_rotated) {
         padding = $$.isBarType(d) ? 4 : 6;
         xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
@@ -100,7 +100,7 @@ ChartInternal.prototype.getXForText = function (points, d, textElement) {
 };
 ChartInternal.prototype.getYForText = function (points, d, textElement) {
     var $$ = this,
-        box = textElement.getBoundingClientRect(),
+        box = textElement.getBBox(),
         yPos;
     if ($$.config.axis_rotated) {
         yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
