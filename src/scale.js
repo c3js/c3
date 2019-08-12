@@ -1,7 +1,7 @@
 import { ChartInternal } from './core';
 
 function c3LogScale(d3, linearScale, logScale) {
-    var PROJECTION = [.01, 10];
+    var PROJECTION = [0.01, 10];
 
     if (!linearScale) {
         linearScale = d3.scaleLinear();
