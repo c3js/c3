@@ -108,6 +108,7 @@
           = partial :reference_menu_item, locals: { id: 'axis.y.default' }
           = partial :reference_menu_item, locals: { id: 'axis.y2.show' }
           = partial :reference_menu_item, locals: { id: 'axis.y2.inner' }
+          = partial :reference_menu_item, locals: { id: 'axis.y2.type' }
           = partial :reference_menu_item, locals: { id: 'axis.y2.max' }
           = partial :reference_menu_item, locals: { id: 'axis.y2.min' }
           = partial :reference_menu_item, locals: { id: 'axis.y2.inverted' }
@@ -1921,7 +1922,26 @@
       %section
         %h3
           = partial :reference_item_link, locals: { id: 'axis.y.type' }
-        %p not yet
+        %p Scale type for Y axis.
+        %h5 Available Values:
+        %ul
+          %li linear
+          %li time¹
+          %li timeseries¹
+          %li log² <span class="secondary label">Experimental</span>
+        %p ¹: The <code>timeseries</code> scale is an alias of <code>time</code>.
+        %p ²: The <code>log</code> scale is experimental and may not work in all cases (stacked, etc.)
+        %h5 Default:
+        <code>linear</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              axis: {
+              &nbsp;&nbsp;y: {
+              &nbsp;&nbsp;&nbsp;&nbsp;type: 'linear'
+              &nbsp;&nbsp;}
+              }
       %hr
 
       %section
@@ -2214,6 +2234,31 @@
               axis: {
               &nbsp;&nbsp;y2: {
               &nbsp;&nbsp;&nbsp;&nbsp;inner: true
+              &nbsp;&nbsp;}
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'axis.y2.type' }
+        %p Scale type for Y2 axis.
+        %h5 Available Values:
+        %ul
+          %li linear
+          %li time¹
+          %li timeseries¹
+          %li log² <span class="secondary label">Experimental</span>
+        %p ¹: The <code>timeseries</code> scale is an alias of <code>time</code>.
+        %p ²: The <code>log</code> scale is experimental and may not work in all cases (stacked, etc.)
+        %h5 Default:
+        <code>linear</code>
+        %h5 Format:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              axis: {
+              &nbsp;&nbsp;y2: {
+              &nbsp;&nbsp;&nbsp;&nbsp;type: 'linear'
               &nbsp;&nbsp;}
               }
       %hr
