@@ -288,6 +288,40 @@ describe('c3 chart axis', function() {
         });
     });
 
+    describe('axis.y.type', function() {
+        describe('type=log', function() {
+            beforeAll(function() {
+                args = {
+                    data: {
+                        columns: [
+                            ['linear', 318, 37, 0, 4, 0, 1],
+                            ['log', 318, 37, 0, 4, 0, 1]
+                        ],
+                        type: 'bar',
+                        axes: {
+                            log: 'y',
+                            linear: 'y2'
+                        },
+                    },
+                    axis: {
+                        y: {
+                            type: 'log'
+                        },
+                        y2: {
+                            show: true
+                        }
+                    }
+                };
+            });
+
+            it('should have bars from y bigger than y2', function() {
+                expect(d3.select('.c3-bars-log .c3-bar-5').node().getBBox().height).toBeGreaterThan(
+                    d3.select('.c3-bars-linear .c3-bar-5').node().getBBox().height
+                );
+            });
+        });
+    });
+
     describe('axis.x.tick.values', function() {
         describe('formatted correctly when negative', function() {
             var xValues = [-3.3, -2.2, -1.1, 1.1, 2.2, 3.3];
