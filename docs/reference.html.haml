@@ -261,6 +261,7 @@
           = partial :reference_menu_item, locals: { id: 'api.axis.min' }
           = partial :reference_menu_item, locals: { id: 'api.axis.max' }
           = partial :reference_menu_item, locals: { id: 'api.axis.range' }
+          = partial :reference_menu_item, locals: { id: 'api.axis.types' }
           = partial :reference_menu_item, locals: { id: 'api.legend.show' }
           = partial :reference_menu_item, locals: { id: 'api.legend.hide' }
           = partial :reference_menu_item, locals: { id: 'api.zoom' }
@@ -4931,6 +4932,29 @@
         %ul
           %li
             %a( href="/samples/api_axis_range.html" ) Update Axis Range
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.axis.types' }
+        %p Get and set axis y/y2 types.
+        %h5 Arguments:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \.axis.types(types)
+        %p <span class="code">types</span>&nbsp;&nbsp;<code>Object</code>
+        %p If <span class="code">types</span> is given, specified axis' type value will be updated. If no argument is given, the current types for y/y2 axis will be returned.
+
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Update axis' types
+              chart.axis.types({
+              &nbsp;&nbsp;y: 'linear',
+              &nbsp;&nbsp;y2: 'log'
+              });
       %hr
 
       %section
