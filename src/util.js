@@ -54,6 +54,6 @@ export var notEmpty = function(o) {
 export var sanitise = function(str) {
     return typeof str === 'string' ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : str;
 };
-export var mergeArray = function(arr) {
-    return (arr && arr.length ? arr.reduce((p, c) => p.concat(c)) : []);
+export var flattenArray = function(arr) {
+    return Array.isArray(arr) ? [].concat(...arr) : [];
 };

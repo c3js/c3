@@ -14,7 +14,7 @@ import {
     notEmpty,
     sanitise,
     isNumber,
-    mergeArray
+    flattenArray
 } from '../src/util';
 
 describe('util.js tests', function () {
@@ -85,17 +85,17 @@ describe('util.js tests', function () {
         });
     });
 
-    describe('mergeArray', function() {
+    describe('flattenArray', function() {
         it('returns empty array for undefined value', function () {
-            expect(mergeArray(undefined_var)).toEqual([]);
+            expect(flattenArray(undefined_var)).toEqual([]);
         });
 
-        it('returns merged arrays (1 array)', function () {
-            expect(mergeArray([[1]])).toEqual([1]);
+        it('returns flattened arrays (1 array)', function () {
+            expect(flattenArray([[1]])).toEqual([1]);
         });
 
-        it('returns merged arrays (n arrays)', function () {
-            expect(mergeArray([[1], ['2']])).toEqual([1, '2']);
+        it('returns flatten arrays (n arrays)', function () {
+            expect(flattenArray([[1], ['2']])).toEqual([1, '2']);
         });
     });
 

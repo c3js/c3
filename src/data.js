@@ -9,7 +9,7 @@ import {
     isArray,
     notEmpty,
     hasValue,
-    mergeArray
+    flattenArray
 } from './util';
 
 ChartInternal.prototype.isEpochs = function (key) {
@@ -88,7 +88,7 @@ ChartInternal.prototype.getTotalDataSum = function() {
         return cached;
     }
 
-    const totalDataSum = mergeArray($$.data.targets.map(t => t.values))
+    const totalDataSum = flattenArray($$.data.targets.map(t => t.values))
         .map(v => v.value)
         .reduce((p, c) => p + c);
 
