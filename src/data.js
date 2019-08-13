@@ -130,7 +130,10 @@ ChartInternal.prototype.getTotalPerIndex = function(axisId) {
 };
 
 /**
- * Get total data sum
+ * Get sum of visible data.
+ *
+ * Should be used for normalised data only since all values
+ * are expected to be positive.
  *
  * @private
  * @return {Number}
@@ -143,9 +146,13 @@ ChartInternal.prototype.getTotalDataSum = function() {
         return cached;
     }
 
-    const totalDataSum = flattenArray($$.data.targets.map(t => t.values))
-        .map(v => v.value)
-        .reduce((p, c) => p + c);
+    const totalDataSum = $$.data.targets
+        // keep only target that are visible
+        .filter((target) => $$.isTargetToShow(target.id))
+
+        // compute sum of all values
+        .map((target) => d3.sum(target.values))
+        .reduce((sum, value) => sum + value, 0);
 
     $$.addToCache('getTotalDataSum', totalDataSum);
 
@@ -555,23 +562,17 @@ ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
     let ratio = 0;
 
     if (d && api.data.shown.call(api).length) {
-        const dataValues = api.data.values.bind(api);
-
         ratio = d.ratio || d.value;
 
         if (type === "arc") {
-            // if has padAngle set, calculate rate based on value
             if ($$.pie.padAngle()()) {
-                let total = $$.getTotalDataSum();
-
-                if ($$.hiddenTargetIds.length) {
-                    total -= dataValues($$.hiddenTargetIds).reduce((p, c) => p + c);
-                }
+                // if has padAngle set, calculate rate based on value
+                const total = $$.getTotalDataSum();
 
                 ratio = d.value / total;
 
-                // otherwise, based on the rendered angle value
             } else {
+                // otherwise, based on the rendered angle value
                 ratio = (d.endAngle - d.startAngle) / (
                     Math.PI * ($$.hasType("gauge") && !config.gauge_fullCircle ? 1 : 2)
                 );
