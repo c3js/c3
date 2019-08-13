@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <link href="../css/c3.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="../js/c3.js"></script>
+    <script>
+      const colorScale = d3.scaleLinear()
+        .domain([1, 5])
+        .range(['#a6d96a', '#1a9850'])
+        .interpolate(d3.interpolateHcl);
+
+      const columns = [
+        ['data1', 300, 200, 500, 400, 600, 500],
+        ['data2', 200, 130, 90, 240, 130, 220],
+        ['data3', 300, 200, 160, 400, 250, 250],
+        ['data4', 200, 130, 90, 240, 130, 220],
+        ['data5', 130, 120, 150, 140, 160, 150],
+        ['data6', 90, 70, 20, 50, 60, 120],
+      ];
+
+      var chart = c3.generate({
+        data: {
+          columns: columns,
+          type: 'bar',
+          types: {
+            data6: 'line'
+          },
+          axes: {
+            data6: 'y2'
+          },
+          stack: {
+            normalize: true
+          },
+          groups: [
+            ['data1','data2','data3','data4', 'data5']
+          ],
+          colors: {
+            data1: colorScale(0),
+            data2: colorScale(1),
+            data3: colorScale(2),
+            data4: colorScale(3),
+            data5: colorScale(4),
+            data6: '#FF0000'
+          }
+        },
+        bar: {
+          space: 0,
+          width: {
+            ratio: 1
+          }
+        },
+        axis: {
+          x: {
+            type: 'categorized'
+          },
+          y2: {
+            show: true
+          }
+        }
+    });
+    </script>
+  </body>
+</html>
