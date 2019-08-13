@@ -146,13 +146,12 @@ ChartInternal.prototype.getTotalDataSum = function() {
         return cached;
     }
 
-    const totalDataSum = $$.data.targets
-        // keep only target that are visible
-        .filter((target) => $$.isTargetToShow(target.id))
-
-        // compute sum of all values
-        .map((target) => d3.sum(target.values))
-        .reduce((sum, value) => sum + value, 0);
+    const totalDataSum = flattenArray($$.data.targets
+        .filter(target => $$.isTargetToShow(target.id))
+        .map(target => target.values)
+    )
+        .map(d => d.value)
+        .reduce((p, c) => p + c);
 
     $$.addToCache('getTotalDataSum', totalDataSum);
 
@@ -557,7 +556,6 @@ ChartInternal.prototype.convertValuesToStep = function (values) {
  */
 ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
     const $$ = this;
-    const config = $$.config;
     const api = $$.api;
     let ratio = 0;
 
@@ -565,20 +563,15 @@ ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
         ratio = d.ratio || d.value;
 
         if (type === "arc") {
-            if ($$.pie.padAngle()()) {
-                // if has padAngle set, calculate rate based on value
+            if ($$.hasType('gauge')) {
+                ratio = (d.endAngle - d.startAngle) / (Math.PI * ($$.config.gauge_fullCircle ? 2 : 1));
+            } else {
                 const total = $$.getTotalDataSum();
 
                 ratio = d.value / total;
-
-            } else {
-                // otherwise, based on the rendered angle value
-                ratio = (d.endAngle - d.startAngle) / (
-                    Math.PI * ($$.hasType("gauge") && !config.gauge_fullCircle ? 1 : 2)
-                );
             }
         } else if (type === "index") {
-            const total = this.getTotalPerIndex($$.axis.getId(d.id));
+            const total = $$.getTotalPerIndex($$.axis.getId(d.id));
 
             d.ratio = isNumber(d.value) && total && total[d.index] > 0 ?
                 d.value / total[d.index] : 0;
