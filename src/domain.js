@@ -66,7 +66,7 @@ ChartInternal.prototype.getYDomainMax = function (targets) {
 ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
     var $$ = this, config = $$.config;
 
-    if ($$.isStackNormalized()) {
+    if ($$.isAxisNormalized(axisId)) {
         return [0, 100];
     }
 

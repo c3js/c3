@@ -29,11 +29,10 @@ ChartInternal.prototype.getShapeX = function (offset, targetsNum, indices, isSub
 };
 ChartInternal.prototype.getShapeY = function (isSub) {
     const $$ = this;
-    const isStackNormalized = $$.isStackNormalized();
 
     return function (d) {
         const scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id);
-        return scale(isStackNormalized ? $$.getRatio('index', d, true) : d.value);
+        return scale($$.isTargetNormalized(d.id) ? $$.getRatio('index', d, true) : d.value);
     };
 };
 ChartInternal.prototype.getShapeOffset = function (typeFilter, indices, isSub) {
@@ -45,7 +44,8 @@ ChartInternal.prototype.getShapeOffset = function (typeFilter, indices, isSub) {
             y0 = scale(0), offset = y0;
         targets.forEach(function (t) {
             const rowValues = $$.isStepType(d) ? $$.convertValuesToStep(t.values) : t.values;
-            const values = rowValues.map(v => ($$.isStackNormalized() ? $$.getRatio("index", v, true) : v.value));
+            const isTargetNormalized = $$.isTargetNormalized(d.id);
+            const values = rowValues.map(v => (isTargetNormalized ? $$.getRatio("index", v, true) : v.value));
 
             if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
             if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id)) {

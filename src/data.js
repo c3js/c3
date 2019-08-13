@@ -29,8 +29,51 @@ ChartInternal.prototype.isNotXAndNotEpochs = function (key) {
     return !this.isX(key) && !this.isEpochs(key);
 };
 
+/**
+ * Returns whether the normalized stack option is enabled or not.
+ *
+ * To be enabled it must also have data.groups defined.
+ *
+ * @return {boolean}
+ */
 ChartInternal.prototype.isStackNormalized = function() {
   return this.config.data_stack_normalize && this.config.data_groups.length > 0;
+};
+
+/**
+ * Returns whether the axis is normalized or not.
+ *
+ * An axis is normalized as long as one of its associated target
+ * is normalized.
+ *
+ * @param axisId Axis ID (y or y2)
+ * @return {Boolean}
+ */
+ChartInternal.prototype.isAxisNormalized = function(axisId) {
+    const $$ = this;
+
+    if (!$$.isStackNormalized()) { // shortcut
+        return false;
+    }
+
+    return $$.data.targets
+        .filter((target) => $$.axis.getId(target.id) === axisId)
+        .some((target) => $$.isTargetNormalized(target.id));
+};
+
+/**
+ * Returns whether the values for this target ID is normalized or not.
+ *
+ * To be normalized the option needs to be enabled and target needs
+ * to be defined in `data.groups`.
+ *
+ * @param targetId ID of the target
+ * @return {Boolean} True if the target is normalized, false otherwise.
+ */
+ChartInternal.prototype.isTargetNormalized = function(targetId) {
+    const $$ = this;
+
+    return $$.isStackNormalized() && $$.config.data_groups.some((group) => group.includes(targetId));
 };
 
 ChartInternal.prototype.getXKey = function (id) {
@@ -40,38 +83,50 @@ ChartInternal.prototype.getXKey = function (id) {
 };
 
 /**
- * Get sum of data per index
+ * Get sum of visible data per index for given axis.
+ *
+ * Expect axisId to be either 'y' or 'y2'.
  *
  * @private
+ * @param axisId Compute sum for data associated to given axis.
  * @return {Array}
  */
-ChartInternal.prototype.getTotalPerIndex = function() {
+ChartInternal.prototype.getTotalPerIndex = function(axisId) {
     const $$ = this;
 
     if (!$$.isStackNormalized()) {
-        return [];
+        return null;
     }
 
     const cached = $$.getFromCache('getTotalPerIndex');
     if (cached !== undefined) {
-        return cached;
+        return cached[axisId];
     }
 
-    const sum = [];
+    const sum = { y: [], y2: [] };
 
-    $$.data.targets.forEach(row => {
-        row.values.forEach((v, i) => {
-            if (!sum[i]) {
-                sum[i] = 0;
-            }
+    $$.data.targets
+        // keep only target that are normalized
+        .filter((target) => $$.isTargetNormalized(target.id))
 
-            sum[i] += isNumber(v.value) ? v.value : 0;
+        // keep only target that are visible
+        .filter((target) => $$.isTargetToShow(target.id))
+
+        // compute sum per axis
+        .forEach(target => {
+            const sumByAxis = sum[$$.axis.getId(target.id)];
+
+            target.values.forEach((v, i) => {
+                if (!sumByAxis[i]) {
+                    sumByAxis[i] = 0;
+                }
+                sumByAxis[i] += isNumber(v.value) ? v.value : 0;
+            });
         });
-    });
 
     $$.addToCache('getTotalPerIndex', sum);
 
-    return sum;
+    return sum[axisId];
 };
 
 /**
@@ -243,11 +298,13 @@ ChartInternal.prototype.addHiddenTargetIds = function (targetIds) {
             this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds[i]);
         }
     }
+    this.resetCache();
 };
 ChartInternal.prototype.removeHiddenTargetIds = function (targetIds) {
     this.hiddenTargetIds = this.hiddenTargetIds.filter(function (id) {
         return targetIds.indexOf(id) < 0;
     });
+    this.resetCache();
 };
 ChartInternal.prototype.addHiddenLegendIds = function (targetIds) {
     targetIds = (targetIds instanceof Array) ? targetIds : new Array(targetIds);
@@ -520,18 +577,7 @@ ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
                 );
             }
         } else if (type === "index") {
-            let total = this.getTotalPerIndex();
-
-            if ($$.hiddenTargetIds.length) {
-                let hiddenSum = dataValues($$.hiddenTargetIds, false);
-
-                if (hiddenSum.length) {
-                    hiddenSum = hiddenSum
-                        .reduce((acc, curr) => acc.map((v, i) => (isNumber(v) ? v : 0) + curr[i]));
-
-                    total = total.map((v, i) => v - hiddenSum[i]);
-                }
-            }
+            const total = this.getTotalPerIndex($$.axis.getId(d.id));
 
             d.ratio = isNumber(d.value) && total && total[d.index] > 0 ?
                 d.value / total[d.index] : 0;
