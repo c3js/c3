@@ -121,7 +121,7 @@ ChartInternal.prototype.getTooltipContent = function (d, defaultTitleFormat, def
 
     var valueFormat = config.tooltip_format_value;
     if (!valueFormat) {
-        valueFormat = $$.isStackNormalized() ? ((v, ratio) => `${(ratio * 100).toFixed(2)}%`) : defaultValueFormat;
+        valueFormat = $$.isTargetNormalized(d.id) ? ((v, ratio) => `${(ratio * 100).toFixed(2)}%`) : defaultValueFormat;
     }
 
     var tooltipSortFunction = this.getTooltipSortFunction();

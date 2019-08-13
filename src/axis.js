@@ -95,20 +95,26 @@ Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(targets, a
     }
     return tickValues;
 };
-Axis.prototype.getYAxis = function getYAxis(scale, orient, tickFormat, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
-    var $$ = this.owner,
-        config = $$.config,
-        axisParams = {
+Axis.prototype.getYAxis = function getYAxis(axisId, scale, orient, tickValues, withOuterTick, withoutTransition, withoutRotateTickText) {
+    const $$ = this.owner;
+    const config = $$.config;
+
+    let tickFormat = config[`axis_${axisId}_tick_format`];
+    if (!tickFormat && $$.isAxisNormalized(axisId)) {
+        tickFormat = (x) => `${x}%`;
+    }
+
+    const axis = new this.internal(this, {
             withOuterTick: withOuterTick,
             withoutTransition: withoutTransition,
             tickTextRotate: withoutRotateTickText ? 0 : config.axis_y_tick_rotate
-        },
-        axis = new this.internal(this, axisParams).axis
+        }).axis
             .scale(scale)
-            .orient(orient)
-            .tickFormat(
-                tickFormat || ($$.isStackNormalized() && (x => `${x}%`))
-            );
+            .orient(orient);
+
+    if (tickFormat) {
+        axis.tickFormat(tickFormat);
+    }
 
     if ($$.isTimeSeriesY()) {
         axis.ticks(config.axis_y_tick_time_type, config.axis_y_tick_time_interval);
@@ -305,7 +311,6 @@ Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
 };
 Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
     var $$ = this.owner,
-        config = $$.config,
         maxWidth = 0,
         targetsToShow, scale, axis, dummy, svg;
     if (withoutRecompute && $$.currentMaxTickWidths[id]) {
@@ -315,10 +320,10 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         targetsToShow = $$.filterTargetsToShow($$.data.targets);
         if (id === 'y') {
             scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-            axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true, true);
+            axis = this.getYAxis(id, scale, $$.yOrient, $$.yAxisTickValues, false, true, true);
         } else if (id === 'y2') {
             scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-            axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true, true);
+            axis = this.getYAxis(id, scale, $$.y2Orient, $$.y2AxisTickValues, false, true, true);
         } else {
             scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
             axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
