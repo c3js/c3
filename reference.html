@@ -310,6 +310,11 @@
 </li>
 
 <li>
+<a href='#data-stack-normalize'>data.stack.normalize</a>
+
+</li>
+
+<li>
 <a href='#data-onclick'>data.onclick</a>
 
 </li>
@@ -2603,6 +2608,26 @@ bindto: d3.select('#myContainer')</code></pre>
 <pre><code class='html javascript'>data: {
 &nbsp;&nbsp;selection: {
 &nbsp;&nbsp;&nbsp;&nbsp;isselectable: function (d) { ... }
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#data-stack-normalize'>data.stack.normalize</a>
+
+</h3>
+<p>Set the stacking to be normalized</p>
+<br>
+<p>For stacking, the `data.groups` option should be set and have positive values. The yAxis will be set in percentage value (0 ~ 100%).</p>
+<h5>Default:</h5>
+<code>false</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>data: {
+&nbsp;&nbsp;stack: {
+&nbsp;&nbsp;&nbsp;&nbsp;normalize: true
 &nbsp;&nbsp;}
 }</code></pre>
 </div>
