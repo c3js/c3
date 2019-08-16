@@ -39,7 +39,7 @@ describe('c3 chart arc', function () {
           expect(chart.internal.config).toBeNull();
           done();
         }, 501);
-      })
+      });
     });
 
     describe('show pie chart', function () {
