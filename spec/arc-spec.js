@@ -7,6 +7,41 @@ describe('c3 chart arc', function () {
         chart = window.initChart(chart, args, done);
     });
 
+    describe('unloads correctly', function() {
+
+      beforeAll(function () {
+        args = {
+            data: {
+                columns: [
+                    ['data1', 30],
+                    ['data2', 150],
+                    ['data3', 120]
+                ],
+                type: 'pie'
+            },
+            transition: {
+              duration: 500
+            }
+        };
+      });
+
+      it('unloads without error', function(done) {
+        chart.load({
+          columns: [['data2', 30, 20, 50, 40, 60, 50]]
+        });
+
+      
+        setTimeout(function () {
+            chart.destroy();
+        }, 200);
+
+        setTimeout(function() {
+          expect(chart.internal.config).toBeNull();
+          done();
+        }, 501);
+      });
+    });
+
     describe('show pie chart', function () {
 
         beforeAll(function () {
