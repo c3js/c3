@@ -1,9 +1,18 @@
-var setMouseEvent = window.setMouseEvent;
+const { setMouseEvent } = window;
 
 describe('c3 chart interaction', function () {
     'use strict';
 
     var chart, args;
+
+    const moveMouseOut = () =>
+        setMouseEvent(chart, 'mouseout', 0, 0, d3.select('.c3-event-rect').node());
+
+    const moveMouse = (x = 0, y = 0) =>
+        setMouseEvent(chart, 'mousemove', x, y, d3.select('.c3-event-rect').node());
+
+    const clickMouse = (x = 0, y = 0) =>
+        setMouseEvent(chart, 'click', x, y, d3.select('.c3-event-rect').node());
 
     beforeEach(function (done) {
         chart = window.initChart(chart, args, done);
@@ -37,12 +46,7 @@ describe('c3 chart interaction', function () {
             });
 
             describe('mouseover', function () {
-                const moveMouse = (event, x = 0, y = 0) =>
-                    setMouseEvent(chart, event, x, y, d3.select('.c3-event-rect').node());
-
                 beforeAll(function () {
-                    window.mouseoverCounter = 0;
-                    window.mouseoutCounter = 0;
                     args = {
                         data: {
                             columns: [
@@ -64,8 +68,13 @@ describe('c3 chart interaction', function () {
                     };
                 });
 
+                beforeEach(function() {
+                    window.mouseoverCounter = 0;
+                    window.mouseoutCounter = 0;
+                });
+
                 it('should be undefined when not within bar', function () {
-                    moveMouse('mouseout');
+                    moveMouseOut();
 
                     expect(window.mouseoutCounter).toEqual(0);
                     expect(window.mouseoverCounter).toEqual(0);
@@ -73,7 +82,7 @@ describe('c3 chart interaction', function () {
                 });
 
                 it('should be data value when within bar', function () {
-                    moveMouse('mousemove', 31, 280);
+                    moveMouse(31, 280);
 
                     expect(window.mouseoutCounter).toEqual(0);
                     expect(window.mouseoverCounter).toEqual(1);
@@ -87,8 +96,8 @@ describe('c3 chart interaction', function () {
                 });
 
                 it('should be undefined after leaving chart', function () {
-                    moveMouse('mousemove', 31, 280);
-                    moveMouse('mouseout');
+                    moveMouse(31, 280);
+                    moveMouseOut();
 
                     expect(window.mouseoutCounter).toEqual(1);
                     expect(window.mouseoverCounter).toEqual(1);
@@ -96,9 +105,9 @@ describe('c3 chart interaction', function () {
                 });
 
                 it('should retrigger mouseover event when returning to same value', function () {
-                    moveMouse('mousemove', 31, 280);
-                    moveMouse('mouseout');
-                    moveMouse('mousemove', 31, 280);
+                    moveMouse(31, 280);
+                    moveMouseOut();
+                    moveMouse(31, 280);
 
                     expect(window.mouseoutCounter).toEqual(1);
                     expect(window.mouseoverCounter).toEqual(2);
@@ -184,6 +193,388 @@ describe('c3 chart interaction', function () {
                     });
                 });
             });
+        });
+    });
+
+    describe('bar chart', function() {
+        describe('tooltip_grouped=true', function() {
+            beforeAll(() => {
+                args = {
+                    data: {
+                        columns: [
+                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
+                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                        ],
+                        type: 'bar',
+                        groups: [
+                            [ 'data1', 'data2' ]
+                        ],
+                        hide: [
+                            'data1'
+                        ]
+                    },
+                    tooltip: {
+                        grouped: true
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        },
+                        rotated: true
+                    },
+                    interaction: {
+                        enabled: true
+                    }
+                };
+            });
+
+            it('generate a single rect', () => {
+                const eventRectList = d3.selectAll('.c3-event-rect');
+
+                expect(eventRectList.size()).toBe(1);
+                expect(eventRectList.attr('x')).toEqual('0');
+                expect(eventRectList.attr('y')).toEqual('0');
+                expect(eventRectList.attr('height')).toEqual('' + chart.internal.height);
+                expect(eventRectList.attr('width')).toEqual('' + chart.internal.width);
+            });
+
+            it('shows tooltip with visible data of currently hovered category', () => {
+                moveMouse(20, 20);
+
+                expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                const tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                expect(tooltipData.length).toBe(3); // header + data[123]
+
+                expect(tooltipData[1].querySelector('.name').textContent).toBe('data3');
+                expect(tooltipData[2].querySelector('.name').textContent).toBe('data2');
+            });
+
+            it('shows cursor:pointer only if hovering bar', () => {
+                const eventRect = d3.select('.c3-event-rect');
+
+                moveMouse(1, 1);
+
+                expect(eventRect.style('cursor')).toEqual('auto');
+
+                moveMouse(360, 48);
+
+                expect(eventRect.style('cursor')).toEqual('pointer');
+
+                moveMouse(1, 1);
+
+                expect(eventRect.style('cursor')).toEqual('auto');
+            });
+
+            it('expands all bars of currently hovered category', () => {
+                moveMouse(20, 20);
+
+                const barList = d3.selectAll('.c3-bar');
+
+                expect(barList.size()).toBeGreaterThan(0);
+
+                barList.each(function() {
+                    if (this.classList.contains('c3-bar-0') && !this.parentElement.classList.contains('c3-bars-data1')) {
+                        expect(this.classList.contains('_expanded_')).toBeTruthy();
+                    } else {
+                        expect(this.classList.contains('_expanded_')).toBeFalsy();
+                    }
+                });
+
+                moveMouse(20, chart.internal.x(2.4));
+
+                barList.each(function() {
+                    if (this.classList.contains('c3-bar-2') && !this.parentElement.classList.contains('c3-bars-data1')) {
+                        expect(this.classList.contains('_expanded_')).toBeTruthy();
+                    } else {
+                        expect(this.classList.contains('_expanded_')).toBeFalsy();
+                    }
+                });
+            });
+        });
+
+        describe('tooltip_grouped=false', function() {
+            beforeAll(() => {
+                args = {
+                    data: {
+                        columns: [
+                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
+                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                        ],
+                        type: 'bar',
+                        groups: [
+                            [ 'data1', 'data2' ]
+                        ]
+                    },
+                    tooltip: {
+                        grouped: false
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        }
+                    },
+                    interaction: {
+                        enabled: true
+                    }
+                };
+            });
+
+            it('generate a single rect', () => {
+                const eventRectList = d3.selectAll('.c3-event-rect');
+
+                expect(eventRectList.size()).toBe(1);
+                expect(eventRectList.attr('x')).toEqual('0');
+                expect(eventRectList.attr('y')).toEqual('0');
+                expect(eventRectList.attr('height')).toEqual('' + chart.internal.height);
+                expect(eventRectList.attr('width')).toEqual('' + chart.internal.width);
+            });
+
+            it('shows tooltip with only hovered data', () => {
+                moveMouse(1, 1);
+
+                expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('none');
+
+                moveMouse(35, 268);
+
+                expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                const tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                expect(tooltipData.length).toBe(2); // header + data2
+
+                expect(tooltipData[1].querySelector('.name').textContent).toBe('data2');
+                expect(tooltipData[1].querySelector('.value').textContent).toBe('130');
+            });
+
+            it('expands only hovered bar', () => {
+                moveMouse(20, 20);
+
+                const barList = d3.selectAll('.c3-bar');
+
+                expect(barList.size()).toBeGreaterThan(0);
+
+                // nothing expanded
+                barList.each(function() {
+                    expect(this.classList.contains('_expanded_')).toBeFalsy();
+                });
+
+                moveMouse(38, 258);
+
+                barList.each(function() {
+                    if (this.classList.contains('c3-bar-0') && this.parentElement.classList.contains('c3-bars-data2')) {
+                        expect(this.classList.contains('_expanded_')).toBeTruthy();
+                    } else {
+                        expect(this.classList.contains('_expanded_')).toBeFalsy();
+                    }
+                });
+            });
+        });
+    });
+
+    describe('line chart', function() {
+        describe('tooltip_grouped=false', function() {
+            beforeAll(() => {
+                args = {
+                    data: {
+                        columns: [
+                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
+                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                        ],
+                        type: 'line',
+                        groups: [
+                            [ 'data1', 'data2' ]
+                        ],
+                        onclick: function(d) {
+                            window.clickedData.push(d);
+                        }
+                    },
+                    tooltip: {
+                        grouped: false
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        }
+                    },
+                    interaction: {
+                        enabled: true
+                    },
+                    point: {
+                        r: 2,
+                        sensitivity: 10,
+                        focus: {
+                            expand: {
+                                enabled: true,
+                                r: 8
+                            }
+                        }
+                    }
+                };
+            });
+
+            beforeEach(function() {
+                window.clickedData = [];
+            });
+
+            it('shows tooltip with only hovered data', () => {
+                moveMouse(1, 1);
+
+                expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('none');
+
+                moveMouse(48, 184);
+
+                expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                const tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                expect(tooltipData.length).toBe(2); // header + data3
+
+                expect(tooltipData[1].querySelector('.name').textContent).toBe('data3');
+                expect(tooltipData[1].querySelector('.value').textContent).toBe('230');
+            });
+
+            it('expands only hovered point', () => {
+                moveMouse(1, 1);
+
+                const circleList = d3.selectAll('.c3-circle');
+
+                expect(circleList.size()).toBeGreaterThan(0);
+
+                // nothing expanded
+                circleList.each(function() {
+                    expect(this.classList.contains('_expanded_')).toBeFalsy();
+                });
+
+                moveMouse(45, 233);
+
+                circleList.each(function() {
+                    expect(this.classList.contains('_expanded_')).toEqual(
+                        this.classList.contains('c3-circle-0') && this.parentElement.classList.contains('c3-circles-data2')
+                    );
+                });
+            });
+
+            it('shows cursor:pointer only if hovering point', () => {
+                const eventRect = d3.select('.c3-event-rect');
+
+                moveMouse(1, 1);
+
+                expect(eventRect.style('cursor')).toEqual('auto');
+
+                moveMouse(49, 219);
+
+                expect(eventRect.style('cursor')).toEqual('pointer');
+
+                moveMouse(1, 1);
+
+                expect(eventRect.style('cursor')).toEqual('auto');
+            });
+
+            it('clicks only on hovered point', () => {
+                clickMouse(144, 201);
+
+                expect(window.clickedData).toEqual([{
+                    x: 1,
+                    index: 1,
+                    value: 200,
+                    id: 'data1',
+                    name: 'data1'
+                }]);
+            });
+
+            describe('with selection enabled', () => {
+
+                beforeAll(() => {
+                    args.data.selection = {
+                        enabled: true,
+                        isselectable: function(d) {
+                            return d.id !== 'data3';
+                        }
+                    };
+                });
+
+                it('can toggle selection', () => {
+                    expect(d3.selectAll('.c3-circle _selected_').size()).toEqual(0);
+
+                    clickMouse(144, 201); // index 1 @ data1
+
+                    expect(d3.selectAll('.c3-circle._selected_').size()).toEqual(1);
+                    expect(d3.select('.c3-circles-data1 .c3-circle-1._selected_').size()).toEqual(1);
+
+                    // data3 is not selectable
+                    clickMouse(391, 283); // index 3 @ data3
+
+                    expect(d3.selectAll('.c3-circle._selected_').size()).toEqual(1);
+                    expect(d3.select('.c3-circles-data3 .c3-circle-3._selected_').size()).toEqual(0);
+                    expect(d3.select('.c3-circles-data1 .c3-circle-1._selected_').size()).toEqual(1);
+
+
+                    clickMouse(343, 204); // index 3 @ data2
+
+                    expect(d3.selectAll('.c3-circle._selected_').size()).toEqual(2);
+                    expect(d3.select('.c3-circles-data2 .c3-circle-3._selected_').size()).toEqual(1);
+                    expect(d3.select('.c3-circles-data1 .c3-circle-1._selected_').size()).toEqual(1);
+
+                    clickMouse(144, 201); // index 1 @ data1
+
+                    expect(d3.selectAll('.c3-circle._selected_').size()).toEqual(1);
+                    expect(d3.select('.c3-circles-data2 .c3-circle-3._selected_').size()).toEqual(1);
+                });
+            });
+        });
+    });
+
+    describe('disabled', function() {
+        beforeAll(() => {
+            args = {
+                data: {
+                    columns: [
+                        [ 'data1', 30, 200, 200, 400, 150, -250 ],
+                        [ 'data2', 130, -100, 100, 200, 150, 50 ],
+                        [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                    ],
+                    type: 'bar',
+                    groups: [
+                        [ 'data1', 'data2' ]
+                    ]
+                },
+                axis: {
+                    x: {
+                        type: 'category'
+                    }
+                },
+                interaction: {
+                    enabled: false
+                }
+            };
+        });
+
+        it('generate a single rect', () => {
+            const eventRectList = d3.selectAll('.c3-event-rect');
+
+            expect(eventRectList.size()).toBe(1);
+            expect(eventRectList.attr('x')).toEqual('0');
+            expect(eventRectList.attr('y')).toEqual('0');
+            expect(eventRectList.attr('height')).toEqual('' + chart.internal.height);
+            expect(eventRectList.attr('width')).toEqual('' + chart.internal.width);
+        });
+
+        it('does not show tooltip when hovering data', () => {
+            moveMouse(40, 260);
+
+            expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('none');
+
+        });
+
+        it('does not show cursor:pointer when hovering data', () => {
+            moveMouse(40, 260);
+
+            expect(d3.select('.c3-event-rect').style('cursor')).toEqual('auto');
         });
     });
 });
