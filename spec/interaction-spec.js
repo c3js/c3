@@ -37,9 +37,12 @@ describe('c3 chart interaction', function () {
             });
 
             describe('mouseover', function () {
+                const moveMouse = (event, x = 0, y = 0) =>
+                    setMouseEvent(chart, event, x, y, d3.select('.c3-event-rect').node());
 
                 beforeAll(function () {
                     window.mouseoverCounter = 0;
+                    window.mouseoutCounter = 0;
                     args = {
                         data: {
                             columns: [
@@ -48,7 +51,10 @@ describe('c3 chart interaction', function () {
                                 ['data3', -150, 120, 110, 140, 115, 125]
                             ],
                             type: 'bar',
-                            mouseover: function(){
+                            onmouseout: function() {
+                                window.mouseoutCounter += 1;
+                            },
+                            onmouseover: function() {
                                 window.mouseoverCounter += 1;
                             }
                         },
@@ -58,32 +64,51 @@ describe('c3 chart interaction', function () {
                     };
                 });
 
-                it('should be false when not within bar', function () {
-                    setMouseEvent(chart, 'mousemove', 0, 0);
-                    expect(chart.internal.mouseover).toBeFalsy();
+                it('should be undefined when not within bar', function () {
+                    moveMouse('mouseout');
+
+                    expect(window.mouseoutCounter).toEqual(0);
+                    expect(window.mouseoverCounter).toEqual(0);
+                    expect(chart.internal.mouseover).toBeUndefined();
                 });
 
                 it('should be data value when within bar', function () {
-                    setMouseEvent(chart, 'mousemove', 31, 280);
-                    expect(chart.internal.mouseover).toBe({
+                    moveMouse('mousemove', 31, 280);
+
+                    expect(window.mouseoutCounter).toEqual(0);
+                    expect(window.mouseoverCounter).toEqual(1);
+                    expect(chart.internal.mouseover).toEqual({
                         x: 0,
                         value: 30,
+                        index: 0,
                         id: 'data1',
                         name: 'data1'
                     });
                 });
 
-                it('should be false after leaving chart', function () {
-                    setMouseEvent(chart, 'mousemove', 31, 280);
-                    setMouseEvent(chart, 'mouseout', 0, 0);
-                    expect(chart.internal.mouseover).toBeFalsy();
+                it('should be undefined after leaving chart', function () {
+                    moveMouse('mousemove', 31, 280);
+                    moveMouse('mouseout');
+
+                    expect(window.mouseoutCounter).toEqual(1);
+                    expect(window.mouseoverCounter).toEqual(1);
+                    expect(chart.internal.mouseover).toBeUndefined();
                 });
 
                 it('should retrigger mouseover event when returning to same value', function () {
-                    setMouseEvent(chart, 'mousemove', 31, 280);
-                    setMouseEvent(chart, 'mouseout', 0, 0);
-                    setMouseEvent(chart, 'mousemove', 31, 280);
-                    expect(window.mouseoverCounter).toBe(2);
+                    moveMouse('mousemove', 31, 280);
+                    moveMouse('mouseout');
+                    moveMouse('mousemove', 31, 280);
+
+                    expect(window.mouseoutCounter).toEqual(1);
+                    expect(window.mouseoverCounter).toEqual(2);
+                    expect(chart.internal.mouseover).toEqual({
+                        x: 0,
+                        value: 30,
+                        index: 0,
+                        id: 'data1',
+                        name: 'data1'
+                    });
                 });
             });
 
