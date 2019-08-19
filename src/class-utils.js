@@ -86,8 +86,13 @@ ChartInternal.prototype.classChartArc = function (d) {
     return CLASS.chartArc + this.classTarget(d.data.id);
 };
 ChartInternal.prototype.getTargetSelectorSuffix = function (targetId) {
-    return this.generateTargetClass(targetId)
-        .replace(/([?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
+    const targetClass = this.generateTargetClass(targetId);
+    if (window.CSS && window.CSS.escape) {
+        return window.CSS.escape(targetClass);
+    }
+
+    // fallback on imperfect method for old browsers (does not handles unicode)
+    return targetClass.replace(/([?!@#$%^&*()=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
 };
 ChartInternal.prototype.selectorTarget = function (id, prefix) {
     return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id);
