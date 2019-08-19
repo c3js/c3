@@ -58,12 +58,14 @@ ChartInternal.prototype.redrawEventRect = function () {
             mouseout();
         } : null)
         .on('mousemove', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest, sameXData, selectedData;
+            var mouse, closest, sameXData, selectedData;
 
             if ($$.dragging) { return; } // do nothing when dragging
+
+            const targetsToShow = $$.getTargetsToShow();
+
             if ($$.hasArcType(targetsToShow)) { return; }
 
-            targetsToShow = $$.filterTargetsToShow($$.data.targets);
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
 
@@ -111,10 +113,12 @@ ChartInternal.prototype.redrawEventRect = function () {
             }
         } : null)
         .on('click', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest, sameXData;
+            var mouse, closest, sameXData;
+
+            const targetsToShow = $$.getTargetsToShow();
+
             if ($$.hasArcType(targetsToShow)) { return; }
 
-            targetsToShow = $$.filterTargetsToShow($$.data.targets);
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
             if (! closest) { return; }

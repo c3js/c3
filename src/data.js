@@ -276,6 +276,19 @@ ChartInternal.prototype.isTargetToShow = function (targetId) {
 ChartInternal.prototype.isLegendToShow = function (targetId) {
     return this.hiddenLegendIds.indexOf(targetId) < 0;
 };
+
+/**
+ * Returns only visible targets.
+ *
+ * This is the same as calling {@link filterTargetsToShow} on $$.data.targets.
+ *
+ * @return {Array}
+ */
+ChartInternal.prototype.getTargetsToShow = function() {
+    const $$ = this;
+    return $$.filterTargetsToShow($$.data.targets);
+};
+
 ChartInternal.prototype.filterTargetsToShow = function (targets) {
     var $$ = this;
     return targets.filter(function (t) {
