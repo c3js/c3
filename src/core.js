@@ -88,7 +88,7 @@ ChartInternal.prototype.initParams = function() {
     $$.dragging = false;
     $$.flowing = false;
     $$.cancelClick = false;
-    $$.mouseover = false;
+    $$.mouseover = undefined;
     $$.transiting = false;
 
     $$.color = $$.generateColor();
