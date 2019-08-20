@@ -151,7 +151,7 @@ ChartInternal.prototype.getTotalDataSum = function() {
         .map(target => target.values)
     )
         .map(d => d.value)
-        .reduce((p, c) => p + c);
+        .reduce((p, c) => p + c, 0);
 
     $$.addToCache('getTotalDataSum', totalDataSum);
 
