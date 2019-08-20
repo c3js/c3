@@ -11,11 +11,25 @@ export var getOption = function(options, key, defaultValue) {
     return isDefined(options[key]) ? options[key] : defaultValue;
 };
 export var getPathBox = function(path) {
-    var box = path.getBBox(),
+    var box = getBBox(path),
         items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
         minX = items[0].x,
         minY = Math.min(items[0].y, items[1].y);
     return { x: minX, y: minY, width: box.width, height: box.height };
+};
+export var getBBox = function(element) {
+  try {
+      return element.getBBox();
+  } catch (ignore) {
+      // Firefox will throw an exception if getBBox() is called whereas the
+      // element is rendered with display:none
+      // See https://github.com/c3js/c3/issues/2692
+
+      // The previous code was using `getBoundingClientRect` which was returning
+      // everything at 0 in this case so let's reproduce this behavior here.
+
+      return { x: 0, y: 0, width: 0, height: 0 };
+  }
 };
 export var hasValue = function(dict, value) {
     var found = false;

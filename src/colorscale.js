@@ -1,6 +1,6 @@
 import {ChartInternal} from './core';
 import CLASS from "./class";
-import {isFunction} from './util';
+import {isFunction, getBBox} from './util';
 
 function powerOfTen(d) {
     return d / Math.pow(10, Math.ceil(Math.log(d) / Math.LN10 - 1e-12)) === 1;
@@ -97,7 +97,7 @@ ChartInternal.prototype.drawColorScale = function () {
 ChartInternal.prototype.xForColorScale = function () {
     var $$ = this;
 
-    return $$.config.stanford_padding.right + $$.colorScale.node().getBBox().width;
+    return $$.config.stanford_padding.right + getBBox($$.colorScale.node()).width;
 };
 
 ChartInternal.prototype.getColorScalePadding = function () {

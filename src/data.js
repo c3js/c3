@@ -9,7 +9,8 @@ import {
     isArray,
     notEmpty,
     hasValue,
-    flattenArray
+    flattenArray,
+    getBBox
 } from './util';
 
 ChartInternal.prototype.isEpochs = function (key) {
@@ -439,7 +440,7 @@ ChartInternal.prototype.getDataLabelLength = function (min, max, key) {
             return $$.dataLabelFormat(d.id)(d);
         })
         .each(function (d, i) {
-            lengths[i] = this.getBBox()[key] * paddingCoef;
+            lengths[i] = getBBox(this)[key] * paddingCoef;
         })
         .remove();
     return lengths;
