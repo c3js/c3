@@ -132,7 +132,13 @@ ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
     } else if (showVerticalDataLabel) {
         lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'height');
 
-        const pixelsToAxisPadding = $$.getY(config[`axis_${axisId}_type`], [ 0, domainLength ], [0, config.axis_rotated ? $$.width : $$.height ]);
+        const pixelsToAxisPadding = $$.getY(
+            config[`axis_${axisId}_type`],
+            // input domain as pixels
+            [0, config.axis_rotated ? $$.width : $$.height ],
+            // output range as axis padding
+            [ 0, domainLength ]
+        );
 
         padding_top += pixelsToAxisPadding(lengths[1]);
         padding_bottom += pixelsToAxisPadding(lengths[0]);

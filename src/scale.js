@@ -118,7 +118,7 @@ ChartInternal.prototype.getX = function (min, max, domain, offset) {
     }
     return scale;
 };
-ChartInternal.prototype.getY = function (type, range, domain) {
+ChartInternal.prototype.getY = function (type, domain, range) {
     let scale;
     if (type === 'timeseries' || type === 'time') {
         scale = this.d3.scaleTime();
@@ -160,11 +160,11 @@ ChartInternal.prototype.updateScales = function () {
     $$.subYMax = config.axis_rotated ? $$.width2 : 1;
     // update scales
     $$.x = $$.getX($$.xMin, $$.xMax, forInit ? undefined : $$.x.orgDomain(), function () { return $$.xAxis.tickOffset(); });
-    $$.y = $$.getY(config.axis_y_type, [ $$.yMin, $$.yMax ], forInit ? config.axis_y_default : $$.y.domain());
-    $$.y2 = $$.getY(config.axis_y2_type, [ $$.yMin, $$.yMax ], forInit ? config.axis_y2_default : $$.y2.domain());
+    $$.y = $$.getY(config.axis_y_type, forInit ? config.axis_y_default : $$.y.domain(), [ $$.yMin, $$.yMax ]);
+    $$.y2 = $$.getY(config.axis_y2_type, forInit ? config.axis_y2_default : $$.y2.domain(), [ $$.yMin, $$.yMax ]);
     $$.subX = $$.getX($$.xMin, $$.xMax, $$.orgXDomain, function (d) { return d % 1 ? 0 : $$.subXAxis.tickOffset(); });
-    $$.subY = $$.getY(config.axis_y_type, [ $$.subYMin, $$.subYMax ], forInit ? config.axis_y_default : $$.subY.domain());
-    $$.subY2 = $$.getY(config.axis_y2_type, [ $$.subYMin, $$.subYMax ], forInit ? config.axis_y2_default : $$.subY2.domain());
+    $$.subY = $$.getY(config.axis_y_type, forInit ? config.axis_y_default : $$.subY.domain(), [ $$.subYMin, $$.subYMax ]);
+    $$.subY2 = $$.getY(config.axis_y2_type, forInit ? config.axis_y2_default : $$.subY2.domain(), [ $$.subYMin, $$.subYMax ]);
     // update axes
     $$.xAxisTickFormat = $$.axis.getXAxisTickFormat();
     $$.xAxisTickValues = $$.axis.getXAxisTickValues();
