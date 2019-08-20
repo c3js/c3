@@ -699,6 +699,56 @@ describe('c3 chart data', function () {
                     });
                 });
             });
+
+            describe('with normalized stacked', function () {
+                beforeAll(function() {
+                    args = {
+                        data: {
+                            columns: [
+                                [ 'data1', 250, 500, 700 ],
+                                [ 'data2', 750, 500, 300 ],
+                                [ 'data3', 400, 800, 100 ],
+                                [ 'data4', 600, 200, 900 ],
+                            ],
+                            type: 'bar',
+                            groups: [
+                                [ 'data1', 'data2' ],
+                                [ 'data3', 'data4' ]
+                            ],
+                            stack: {
+                                normalize: true
+                            },
+                            labels: {
+                                format: {
+                                    data1: true,
+                                    data2: true,
+                                    data3: true,
+                                    data4: function (v, ratio) {
+                                        return `${parseInt(ratio * 100)}% (${v})`;
+                                    }
+                                }
+                            },
+                            axes: {
+                                data3: 'y2',
+                                data4: 'y2'
+                            }
+                        }
+                    };
+                });
+
+                it('renders absolute values as data label', function () {
+                    expect(d3.selectAll('.c3-texts-data1 .c3-text').nodes().map((n) => n.textContent))
+                        .toEqual([ '250', '500', '700' ]);
+
+                    expect(d3.selectAll('.c3-texts-data3 .c3-text').nodes().map((n) => n.textContent))
+                        .toEqual([ '400', '800', '100' ]);
+                });
+
+                it('should pass ratio with value to data labels callback', () => {
+                    expect(d3.selectAll('.c3-texts-data4 .c3-text').nodes().map((n) => n.textContent))
+                        .toEqual([ '60% (600)', '20% (200)', '90% (900)' ]);
+                });
+            });
         });
 
         describe('for all targets', function () {

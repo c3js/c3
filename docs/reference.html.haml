@@ -1012,10 +1012,11 @@
           = partial :reference_item_link, locals: { id: 'data.labels.format' }
         %p Set formatter function for data labels.
         %br
-        %p The formatter function receives 4 arguments such as <span class="code">v</span>, <span class="code">id</span>, <span class="code">i</span>, <span class="code">j</span> and it must return a string that will be shown as the label. The arguments are:
+        %p The formatter function receives 5 arguments such as <span class="code">v</span>, <span class="code">ratio</span>, <span class="code">id</span>, <span class="code">i</span>, <span class="code">j</span> and it must return a string that will be shown as the label. The arguments are:
         %br
         %ul
           %li <span class="code">v</span> is the value of the data point where the label is shown.
+          %li <span class="code">ratio</span> is the ratio of the data point where the label is shown, will be <code>undefined</code> if the data point is not normalized.
           %li <span class="code">id</span> is the id of the data where the label is shown.
           %li <span class="code">i</span> is the index of the data point where the label is shown.
           %li <span class="code">j</span> is the sub index of the data point where the label is shown.
@@ -1028,10 +1029,10 @@
             %code.html.javascript
               data: {
               &nbsp;&nbsp;labels: {
-              &nbsp;&nbsp;&nbsp;&nbsp;format: function (v, id, i, j) { ... }
+              &nbsp;&nbsp;&nbsp;&nbsp;format: function (v, ratio, id, i, j) { ... }
               &nbsp;&nbsp;&nbsp;&nbsp;// it's possible to set for each data
               &nbsp;&nbsp;&nbsp;&nbsp;//format: {
-              &nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;data1: function (v, id, i, j) { ... },
+              &nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;data1: function (v, ratio, id, i, j) { ... },
               &nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;...
               &nbsp;&nbsp;&nbsp;&nbsp;//}
               &nbsp;&nbsp;}
