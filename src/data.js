@@ -410,6 +410,18 @@ ChartInternal.prototype.orderTargets = function (targets) {
     }
     return targets;
 };
+
+/**
+ * Returns all the values from the given targets at the given index.
+ *
+ * @param {Array} targets
+ * @param {Number} index
+ * @return {Array}
+ */
+ChartInternal.prototype.filterByIndex = function (targets, index) {
+    return this.d3.merge(targets.map((t) => t.values.filter((v) => v.index === index)));
+};
+
 ChartInternal.prototype.filterByX = function (targets, x) {
     return this.d3.merge(targets.map(function (t) {
         return t.values;

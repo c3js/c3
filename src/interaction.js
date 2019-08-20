@@ -109,7 +109,7 @@ ChartInternal.prototype.redrawEventRect = function () {
             } else {
                 const mouseX = config.axis_rotated ? mouse[1] : mouse[0];
 
-                selectedData = $$.filterByX(targetsToShow, xEventScale(mouseX));
+                selectedData = $$.filterByIndex(targetsToShow, xEventScale(mouseX));
             }
 
             // inject names for each point

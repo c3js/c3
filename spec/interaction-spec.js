@@ -537,9 +537,9 @@ describe('c3 chart interaction', function () {
                         x: 'x',
                         columns: [
                             [ 'x', '2018-01-01', '2018-01-02', '2018-01-03', '2018-01-04', '2018-01-05', '2018-01-06'],
-                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
-                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
-                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                            [ 'data1', 30, 200, 200, 400, 150, 250 ],
+                            [ 'data2', 130, 100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, 200, 200, 0, 250, 250 ]
                         ],
                         type: 'area',
                         groups: [
@@ -552,23 +552,12 @@ describe('c3 chart interaction', function () {
                     axis: {
                         x: {
                             type: 'timeseries'
-                        },
-                        rotated: true
+                        }
                     },
                     interaction: {
                         enabled: true
                     }
                 };
-            });
-
-            it('generate a single rect', () => {
-                const eventRectList = d3.selectAll('.c3-event-rect');
-
-                expect(eventRectList.size()).toBe(1);
-                expect(eventRectList.attr('x')).toEqual('0');
-                expect(eventRectList.attr('y')).toEqual('0');
-                expect(eventRectList.attr('height')).toEqual('' + chart.internal.height);
-                expect(eventRectList.attr('width')).toEqual('' + chart.internal.width);
             });
 
             it('shows tooltip with visible data of currently hovered category', () => {
@@ -578,13 +567,14 @@ describe('c3 chart interaction', function () {
 
                 const tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
 
-                expect(tooltipData.length).toBe(3); // header + data[123]
+                expect(tooltipData.length).toBe(4); // header + data[123]
 
-                expect(tooltipData[1].querySelector('.name').textContent).toBe('data3');
-                expect(tooltipData[2].querySelector('.name').textContent).toBe('data2');
+                expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+                expect(tooltipData[2].querySelector('.name').textContent).toBe('data3');
+                expect(tooltipData[3].querySelector('.name').textContent).toBe('data2');
             });
 
-            it('shows cursor:pointer only if hovering bar', () => {
+            it('shows cursor:pointer only if hovering area', () => {
                 const eventRect = d3.select('.c3-event-rect');
 
                 moveMouse(1, 1);
@@ -599,32 +589,6 @@ describe('c3 chart interaction', function () {
 
                 expect(eventRect.style('cursor')).toEqual('auto');
             });
-
-            it('expands all bars of currently hovered category', () => {
-                moveMouse(20, 20);
-
-                const barList = d3.selectAll('.c3-bar');
-
-                expect(barList.size()).toBeGreaterThan(0);
-
-                barList.each(function() {
-                    if (this.classList.contains('c3-bar-0') && !this.parentElement.classList.contains('c3-bars-data1')) {
-                        expect(this.classList.contains('_expanded_')).toBeTruthy();
-                    } else {
-                        expect(this.classList.contains('_expanded_')).toBeFalsy();
-                    }
-                });
-
-                moveMouse(20, chart.internal.x(2.4));
-
-                barList.each(function() {
-                    if (this.classList.contains('c3-bar-2') && !this.parentElement.classList.contains('c3-bars-data1')) {
-                        expect(this.classList.contains('_expanded_')).toBeTruthy();
-                    } else {
-                        expect(this.classList.contains('_expanded_')).toBeFalsy();
-                    }
-                });
-            });
         });
 
         describe('tooltip_grouped=false', function() {
@@ -634,9 +598,9 @@ describe('c3 chart interaction', function () {
                         x: 'x',
                         columns: [
                             [ 'x', '2018-01-01', '2018-01-02', '2018-01-03', '2018-01-04', '2018-01-05', '2018-01-06'],
-                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
-                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
-                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                            [ 'data1', 30, 200, 200, 400, 150, 250 ],
+                            [ 'data2', 130, 100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, 200, 200, 0, 250, 250 ]
                         ],
                         type: 'area',
                         groups: [
@@ -658,54 +622,21 @@ describe('c3 chart interaction', function () {
                 };
             });
 
-            it('generate a single rect', () => {
-                const eventRectList = d3.selectAll('.c3-event-rect');
-
-                expect(eventRectList.size()).toBe(1);
-                expect(eventRectList.attr('x')).toEqual('0');
-                expect(eventRectList.attr('y')).toEqual('0');
-                expect(eventRectList.attr('height')).toEqual('' + chart.internal.height);
-                expect(eventRectList.attr('width')).toEqual('' + chart.internal.width);
-            });
-
             it('shows tooltip with only hovered data', () => {
                 moveMouse(1, 1);
 
                 expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('none');
 
-                moveMouse(35, 268);
+                moveMouse(5, 174);
 
                 expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
 
                 const tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
 
-                expect(tooltipData.length).toBe(2); // header + data2
+                expect(tooltipData.length).toBe(2); // header + data1
 
-                expect(tooltipData[1].querySelector('.name').textContent).toBe('data2');
-                expect(tooltipData[1].querySelector('.value').textContent).toBe('130');
-            });
-
-            it('expands only hovered bar', () => {
-                moveMouse(20, 20);
-
-                const barList = d3.selectAll('.c3-bar');
-
-                expect(barList.size()).toBeGreaterThan(0);
-
-                // nothing expanded
-                barList.each(function() {
-                    expect(this.classList.contains('_expanded_')).toBeFalsy();
-                });
-
-                moveMouse(38, 258);
-
-                barList.each(function() {
-                    if (this.classList.contains('c3-bar-0') && this.parentElement.classList.contains('c3-bars-data2')) {
-                        expect(this.classList.contains('_expanded_')).toBeTruthy();
-                    } else {
-                        expect(this.classList.contains('_expanded_')).toBeFalsy();
-                    }
-                });
+                expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+                expect(tooltipData[1].querySelector('.value').textContent).toBe('30');
             });
         });
     });
