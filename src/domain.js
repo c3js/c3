@@ -131,8 +131,11 @@ ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
         padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
     } else if (showVerticalDataLabel) {
         lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'height');
-        padding_top += $$.axis.convertPixelsToAxisPadding(lengths[1], domainLength);
-        padding_bottom += $$.axis.convertPixelsToAxisPadding(lengths[0], domainLength);
+
+        const pixelsToAxisPadding = $$.getY(config[`axis_${axisId}_type`], [ 0, domainLength ], [0, config.axis_rotated ? $$.width : $$.height ]);
+
+        padding_top += pixelsToAxisPadding(lengths[1]);
+        padding_bottom += pixelsToAxisPadding(lengths[0]);
     }
     if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
         padding_top = $$.axis.getPadding(config.axis_y_padding, 'top', padding_top, domainLength);

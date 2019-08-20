@@ -302,6 +302,7 @@ describe('c3 chart axis', function() {
                             log: 'y',
                             linear: 'y2'
                         },
+                        labels: true
                     },
                     axis: {
                         y: {
@@ -318,6 +319,16 @@ describe('c3 chart axis', function() {
                 expect(d3.select('.c3-bars-log .c3-bar-5').node().getBBox().height).toBeGreaterThan(
                     d3.select('.c3-bars-linear .c3-bar-5').node().getBBox().height
                 );
+            });
+
+            it('should not have truncated data label', () => {
+                const text = d3.select('.c3-texts-log .c3-text-0').node();
+
+                expect(text).not.toBeUndefined();
+
+                const bbox = text.getBBox();
+
+                expect(Math.abs(bbox.y) - bbox.height).toBeGreaterThan(0);
             });
         });
     });
