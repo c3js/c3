@@ -76,7 +76,7 @@ ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
         yMax = axisId === 'y2' ? config.axis_y2_max : config.axis_y_max,
         yDomainMin = $$.getYDomainMin(yTargets),
         yDomainMax = $$.getYDomainMax(yTargets),
-        domain, domainLength, padding, padding_top, padding_bottom,
+        domain, domainLength, padding_top, padding_bottom,
         center = axisId === 'y2' ? config.axis_y2_center : config.axis_y_center,
         yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
         isZeroBased = ($$.hasType('bar', yTargets) && config.bar_zerobased) || ($$.hasType('area', yTargets) && config.area_zerobased),
@@ -115,7 +115,7 @@ ChartInternal.prototype.getYDomain = function (targets, axisId, xDomain) {
     }
 
     domainLength = Math.abs(yDomainMax - yDomainMin);
-    padding = padding_top = padding_bottom = domainLength * 0.1;
+    padding_top = padding_bottom = domainLength * 0.1;
 
     if (typeof center !== 'undefined') {
         yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
