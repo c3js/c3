@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.5 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.6 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1200,7 +1200,7 @@
   };
 
   var c3 = {
-    version: "0.7.5",
+    version: "0.7.6",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -7049,7 +7049,7 @@
       return d.value;
     }).reduce(function (p, c) {
       return p + c;
-    });
+    }, 0);
     $$.addToCache('getTotalDataSum', totalDataSum);
     return totalDataSum;
   };
