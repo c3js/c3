@@ -488,43 +488,71 @@ ChartInternal.prototype.isArc = function (d) {
     return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
 };
 
+/**
+ * Find the closest point from the given pos among the given targets or
+ * undefined if none satisfies conditions.
+ *
+ * @param {Array} targets
+ * @param {Array} pos An [x,y] coordinate
+ * @return {Object|undefined}
+ */
 ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
-    var $$ = this,
-        candidates;
+    const $$ = this;
 
-    // map to array of closest points of each target
-    candidates = targets.map(function (target) {
-        return $$.findClosest(target.values, pos);
-    });
+    // for each target, find the closest point
+    const candidates = targets
+        .map((t) => $$.findClosest(t.values, pos, $$.config.tooltip_horizontal ? $$.horizontalDistance.bind($$) : $$.dist.bind($$), $$.config.point_sensitivity))
+        .filter((v) => v);
 
-    // decide closest point and return
-    return $$.findClosest(candidates, pos);
+    // returns the closest of candidates
+    if (candidates.length === 0) {
+        return undefined;
+    } else if (candidates.length === 1) {
+        return candidates[0];
+    } else {
+        return $$.findClosest(candidates, pos, $$.dist.bind($$));
+    }
 };
-ChartInternal.prototype.findClosest = function (values, pos) {
-    var $$ = this,
-        minDist = $$.config.point_sensitivity,
-        closest;
 
-    // find mouseovering bar
-    values.filter(function (v) {
-        return v && $$.isBarType(v.id);
-    }).forEach(function (v) {
-        var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
-        if (!closest && $$.isWithinBar($$.d3.mouse(shape), shape)) {
-            closest = v;
-        }
-    });
+/**
+ * Using given compute distance method, returns the closest data point from the
+ * given position.
+ *
+ * Giving optionally a minimum distance to satisfy.
+ *
+ * @param {Array} dataPoints List of DataPoints
+ * @param {Array} pos An [x,y] coordinate
+ * @param {Function} computeDist Function to compute distance between 2 points
+ * @param {Number} minDist Minimal distance to satisfy
+ * @return {Object|undefined} Closest data point
+ */
+ChartInternal.prototype.findClosest = function (dataPoints, pos, computeDist, minDist = Infinity) {
+    const $$ = this;
+
+    let closest;
+
+    // find closest bar
+    dataPoints
+        .filter((v) => v && $$.isBarType(v.id))
+        .forEach(function (v) {
+            if (!closest) {
+                var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+                if ($$.isWithinBar($$.d3.mouse(shape), shape)) {
+                    closest = v;
+                }
+            }
+        });
 
     // find closest point from non-bar
-    values.filter(function (v) {
-        return v && !$$.isBarType(v.id);
-    }).forEach(function (v) {
-        var d = $$.config.tooltip_horizontal ? $$.horizontalDistance(v, pos) : $$.dist(v, pos);
-        if (d < minDist) {
-            minDist = d;
-            closest = v;
-        }
-    });
+    dataPoints
+        .filter((v) => v && !$$.isBarType(v.id))
+        .forEach((v) => {
+            let d = computeDist(v, pos);
+            if (d < minDist) {
+                minDist = d;
+                closest = v;
+            }
+        });
 
     return closest;
 };

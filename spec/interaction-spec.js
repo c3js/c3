@@ -526,6 +526,162 @@ describe('c3 chart interaction', function () {
                     expect(d3.select('.c3-circles-data2 .c3-circle-3._selected_').size()).toEqual(1);
                 });
             });
+
+            describe('with tooltip_horizontal=true', () => {
+                beforeAll(() => {
+                    args.tooltip.horizontal = true;
+                });
+
+                it('can clicks on points', () => {
+                    // out of point sensitivity
+                    clickMouse(146, 46);
+                    clickMouse(343, 263);
+
+                    // click 3 data point
+                    clickMouse(147, 370);
+                    clickMouse(340, 203);
+                    clickMouse(537, 386);
+
+                    expect(window.clickedData).toEqual([
+                        {x: 1, value: -200, id: 'data3', index: 1, name: 'data3'},
+                        {x: 3, value: 200, id: 'data2', index: 3, name: 'data2'},
+                        {x: 5, value: -250, id: 'data1', index: 5, name: 'data1'}
+                    ]);
+                });
+
+                it('shows tooltip with only closest data', () => {
+                    moveMouse(1, 1);
+
+                    expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('none');
+
+                    moveMouse(146, 46);
+
+                    expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                    let tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                    expect(tooltipData.length).toBe(2); // header + data1
+
+                    expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+                    expect(tooltipData[1].querySelector('.value').textContent).toBe('200');
+
+                    moveMouse(343, 263);
+
+                    expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                    tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                    expect(tooltipData.length).toBe(2); // header + data3
+
+                    expect(tooltipData[1].querySelector('.name').textContent).toBe('data3');
+                    expect(tooltipData[1].querySelector('.value').textContent).toBe('0');
+                });
+            });
+        });
+
+        describe('tooltip_grouped=true', function() {
+            beforeAll(() => {
+                args = {
+                    data: {
+                        columns: [
+                            [ 'data1', 30, 200, 200, 400, 150, -250 ],
+                            [ 'data2', 130, -100, 100, 200, 150, 50 ],
+                            [ 'data3', 230, -200, 200, 0, 250, 250 ]
+                        ],
+                        type: 'line',
+                        groups: [
+                            [ 'data1', 'data2' ]
+                        ],
+                        onclick: function(d) {
+                            window.clickedData.push(d);
+                        }
+                    },
+                    tooltip: {
+                        grouped: true
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        }
+                    },
+                    interaction: {
+                        enabled: true
+                    },
+                    point: {
+                        r: 2,
+                        sensitivity: 10,
+                        focus: {
+                            expand: {
+                                enabled: true,
+                                r: 8
+                            }
+                        }
+                    }
+                };
+            });
+
+            beforeEach(function() {
+                window.clickedData = [];
+            });
+
+            describe('with tooltip_horizontal=true', () => {
+                beforeAll(() => {
+                    args.tooltip.horizontal = true;
+                });
+
+                it('can clicks on points', () => {
+                    // out of point sensitivity
+                    clickMouse(146, 46);
+                    clickMouse(343, 263);
+
+                    // click 3 data point
+                    clickMouse(147, 370);
+                    clickMouse(340, 203);
+                    clickMouse(537, 386);
+
+                    expect(window.clickedData).toEqual([
+                        {x: 1, value: -200, id: 'data3', index: 1, name: 'data3'},
+                        {x: 3, value: 200, id: 'data2', index: 3, name: 'data2'},
+                        {x: 5, value: -250, id: 'data1', index: 5, name: 'data1'}
+                    ]);
+                });
+
+                it('shows tooltip with all data', () => {
+                    moveMouse(1, 1);
+
+                    expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                    let tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                    expect(tooltipData.length).toBe(4); // header + data[123]
+
+                    expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+                    expect(tooltipData[1].querySelector('.value').textContent).toBe('30');
+
+                    expect(tooltipData[2].querySelector('.name').textContent).toBe('data3');
+                    expect(tooltipData[2].querySelector('.value').textContent).toBe('230');
+
+                    expect(tooltipData[3].querySelector('.name').textContent).toBe('data2');
+                    expect(tooltipData[3].querySelector('.value').textContent).toBe('130');
+
+                    moveMouse(146, 46);
+
+                    expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+                    tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+                    expect(tooltipData.length).toBe(4); // header + data[123]
+
+                    expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+                    expect(tooltipData[1].querySelector('.value').textContent).toBe('200');
+
+                    expect(tooltipData[2].querySelector('.name').textContent).toBe('data3');
+                    expect(tooltipData[2].querySelector('.value').textContent).toBe('-200');
+
+                    expect(tooltipData[3].querySelector('.name').textContent).toBe('data2');
+                    expect(tooltipData[3].querySelector('.value').textContent).toBe('-100');
+                });
+            });
         });
     });
 
