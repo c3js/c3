@@ -536,8 +536,8 @@ ChartInternal.prototype.findClosest = function (dataPoints, pos, computeDist, mi
         .filter((v) => v && $$.isBarType(v.id))
         .forEach(function (v) {
             if (!closest) {
-                var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
-                if ($$.isWithinBar($$.d3.mouse(shape), shape)) {
+                const shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+                if ($$.isWithinBar(pos, shape)) {
                     closest = v;
                 }
             }
