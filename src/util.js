@@ -71,3 +71,19 @@ export var sanitise = function(str) {
 export var flattenArray = function(arr) {
     return Array.isArray(arr) ? [].concat(...arr) : [];
 };
+/**
+ * Returns whether the point is within the given box.
+ *
+ * @param {Array} point An [x,y] coordinate
+ * @param {Object} box An object with {x, y, width, height} keys
+ * @param {Number} sensitivity An offset to ease check on very small boxes
+ */
+export var isWithinBox = function(point, box, sensitivity = 0) {
+    const xStart = box.x - sensitivity;
+    const xEnd = box.x + box.width + sensitivity;
+    const yStart = box.y + box.height + sensitivity;
+    const yEnd = box.y - sensitivity;
+
+    return xStart < point[0] && point[0] < xEnd && yEnd < point[1] && point[1] < yStart;
+};
+
