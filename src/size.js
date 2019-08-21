@@ -24,16 +24,16 @@ ChartInternal.prototype.getCurrentPaddingBottom = function () {
     var config = this.config;
     return isValue(config.padding_bottom) ? config.padding_bottom : 0;
 };
-ChartInternal.prototype.getCurrentPaddingLeft = function (withoutRecompute) {
+ChartInternal.prototype.getCurrentPaddingLeft = function () {
     var $$ = this, config = $$.config;
     if (isValue(config.padding_left)) {
         return config.padding_left;
     } else if (config.axis_rotated) {
-        return (!config.axis_x_show || config.axis_x_inner) ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x', withoutRecompute)), 40);
+        return (!config.axis_x_show || config.axis_x_inner) ? 1 : Math.max(ceil10($$.getAxisWidthByAxisId('x')), 40);
     } else if (!config.axis_y_show || config.axis_y_inner) { // && !config.axis_rotated
         return $$.axis.getYAxisLabelPosition().isOuter ? 30 : 1;
     } else {
-        return ceil10($$.getAxisWidthByAxisId('y', withoutRecompute));
+        return ceil10($$.getAxisWidthByAxisId('y'));
     }
 };
 ChartInternal.prototype.getCurrentPaddingRight = function () {
@@ -85,7 +85,7 @@ ChartInternal.prototype.getParentHeight = function () {
 };
 
 
-ChartInternal.prototype.getSvgLeft = function (withoutRecompute) {
+ChartInternal.prototype.getSvgLeft = function () {
     var $$ = this, config = $$.config,
         hasLeftAxisRect = config.axis_rotated || (!config.axis_rotated && !config.axis_y_inner),
         leftAxisClass = config.axis_rotated ? CLASS.axisX : CLASS.axisY,
@@ -93,14 +93,14 @@ ChartInternal.prototype.getSvgLeft = function (withoutRecompute) {
         svgRect = leftAxis && hasLeftAxisRect ? leftAxis.getBoundingClientRect() : {right: 0},
         chartRect = $$.selectChart.node().getBoundingClientRect(),
         hasArc = $$.hasArcType(),
-        svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : $$.getCurrentPaddingLeft(withoutRecompute));
+        svgLeft = svgRect.right - chartRect.left - (hasArc ? 0 : $$.getCurrentPaddingLeft());
     return svgLeft > 0 ? svgLeft : 0;
 };
 
 
-ChartInternal.prototype.getAxisWidthByAxisId = function (id, withoutRecompute) {
+ChartInternal.prototype.getAxisWidthByAxisId = function (id) {
     var $$ = this, position = $$.axis.getLabelPositionById(id);
-    return $$.axis.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40);
+    return $$.axis.getMaxTickWidth(id) + (position.isInner ? 20 : 40);
 };
 ChartInternal.prototype.getHorizontalAxisHeight = function (axisId) {
     var $$ = this, config = $$.config, h = 30;

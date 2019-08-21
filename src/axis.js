@@ -309,40 +309,51 @@ Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
     var $$ = this.owner;
     return this.textAnchorForAxisLabel($$.config.axis_rotated, this.getY2AxisLabelPosition());
 };
-Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) {
+Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id) {
     var $$ = this.owner,
         maxWidth = 0,
         targetsToShow, scale, axis, dummy, svg;
-    if (withoutRecompute && $$.currentMaxTickWidths[id]) {
-        return $$.currentMaxTickWidths[id];
+
+    const cacheKey = `MaxTickWidth(${id})`;
+
+    // return cached value if any
+    const cachedMaxTickWidth = $$.getFromCache(cacheKey);
+    if (cachedMaxTickWidth !== undefined) {
+        return cachedMaxTickWidth;
     }
-    if ($$.svg) {
-        targetsToShow = $$.filterTargetsToShow($$.data.targets);
-        if (id === 'y') {
-            scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
-            axis = this.getYAxis(id, scale, $$.yOrient, $$.yAxisTickValues, false, true, true);
-        } else if (id === 'y2') {
-            scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
-            axis = this.getYAxis(id, scale, $$.y2Orient, $$.y2AxisTickValues, false, true, true);
-        } else {
-            scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
-            axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
-            this.updateXAxisTickValues(targetsToShow, axis);
-        }
-        dummy = $$.d3.select('body').append('div').classed('c3', true);
-        svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
-            svg.append('g').call(axis).each(function () {
-                $$.d3.select(this).selectAll('text').each(function () {
-                    var box = this.getBBox();
-                    if (maxWidth < box.width) {
-                        maxWidth = box.width;
-                    }
-                });
-                dummy.remove();
+
+    // bypass if SVG not rendered yet
+    if (!$$.svg) {
+        return 0;
+    }
+
+    targetsToShow = $$.filterTargetsToShow($$.data.targets);
+    if (id === 'y') {
+        scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
+        axis = this.getYAxis(id, scale, $$.yOrient, $$.yAxisTickValues, false, true, true);
+    } else if (id === 'y2') {
+        scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
+        axis = this.getYAxis(id, scale, $$.y2Orient, $$.y2AxisTickValues, false, true, true);
+    } else {
+        scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
+        axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
+        this.updateXAxisTickValues(targetsToShow, axis);
+    }
+    dummy = $$.d3.select('body').append('div').classed('c3', true);
+    svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+        svg.append('g').call(axis).each(function () {
+            $$.d3.select(this).selectAll('text').each(function () {
+                var box = this.getBBox();
+                if (maxWidth < box.width) {
+                    maxWidth = box.width;
+                }
             });
-    }
-    $$.currentMaxTickWidths[id] = maxWidth <= 0 ? $$.currentMaxTickWidths[id] : maxWidth;
-    return $$.currentMaxTickWidths[id];
+            dummy.remove();
+        });
+
+    $$.addToCache(cacheKey, maxWidth);
+
+    return maxWidth;
 };
 
 Axis.prototype.updateLabels = function updateLabels(withTransition) {

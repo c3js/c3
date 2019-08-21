@@ -138,12 +138,6 @@ ChartInternal.prototype.initParams = function() {
     $$.legendItemWidth = 0;
     $$.legendItemHeight = 0;
 
-    $$.currentMaxTickWidths = {
-        x: 0,
-        y: 0,
-        y2: 0
-    };
-
     $$.rotated_padding_left = 30;
     $$.rotated_padding_right = config.axis_rotated && !config.axis_x_show ? 0 : 30;
     $$.rotated_padding_top = 5;
@@ -533,6 +527,9 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     durationForExit = withTransitionForExit ? duration : 0;
     durationForAxis = withTransitionForAxis ? duration : 0;
 
+    // reset caches when we are re-drawing the chart
+    $$.resetCache();
+
     transitions = transitions || $$.axis.generateTransitions(durationForAxis);
 
     // update legend and transform each g
@@ -762,6 +759,8 @@ ChartInternal.prototype.updateAndRedraw = function(options) {
     options.withUpdateOrgXDomain = getOption(options, "withUpdateOrgXDomain", true);
     options.withTransitionForExit = false;
     options.withTransitionForTransform = getOption(options, "withTransitionForTransform", options.withTransition);
+    // clear any cache before we update sizes
+    $$.resetCache();
     // MEMO: this needs to be called before updateLegend and it means this ALWAYS needs to be called)
     $$.updateSizes();
     // MEMO: called in updateLegend in redraw if withLegend
@@ -1148,7 +1147,7 @@ ChartInternal.prototype.generateWait = function() {
                 if (!$$.isTabVisible()) {
                   return;
                 }
-  
+
                 var done = 0;
                 transitionsToWait.forEach(function(t) {
                     if (t.empty()) {
