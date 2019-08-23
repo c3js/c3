@@ -685,6 +685,63 @@ describe('c3 chart interaction', function () {
         });
     });
 
+    describe('scatter chart', function() {
+       describe('tooltip_grouped=true', function() {
+           beforeAll(() => {
+                args = {
+                    data: {
+                        columns: [
+                            ['data1', 30, null, 100, 400, -150, 250],
+                            ['data2', 50, 20, 10, 40, 15, 25],
+                            ['data3', -150, 120, 110, 140, 115, 125]
+                        ],
+                        type: 'scatter'
+                    },
+                    tooltip: {
+                        grouped: true
+                    },
+                    interaction: {
+                        enabled: true
+                    }
+                };
+           });
+
+           it('shows tooltip with visible data of currently hovered category', () => {
+               moveMouse(20, 20);
+
+               let tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+               expect(tooltipData.length).toBe(4); // header + data[123]
+
+               expect(tooltipData[1].querySelector('.name').textContent).toBe('data2');
+               expect(tooltipData[1].querySelector('.value').textContent).toBe('50');
+               expect(tooltipData[2].querySelector('.name').textContent).toBe('data1');
+               expect(tooltipData[2].querySelector('.value').textContent).toBe('30');
+               expect(tooltipData[3].querySelector('.name').textContent).toBe('data3');
+               expect(tooltipData[3].querySelector('.value').textContent).toBe('-150');
+
+               moveMouse(350, 354);
+
+               tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+               expect(tooltipData.length).toBe(4); // header + data[123]
+
+               expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+               expect(tooltipData[1].querySelector('.value').textContent).toBe('400');
+               expect(tooltipData[2].querySelector('.name').textContent).toBe('data3');
+               expect(tooltipData[2].querySelector('.value').textContent).toBe('140');
+               expect(tooltipData[3].querySelector('.name').textContent).toBe('data2');
+               expect(tooltipData[3].querySelector('.value').textContent).toBe('40');
+           });
+
+           it('shows x grid', () => {
+               moveMouse(20, 20);
+
+               expect(d3.select('.c3-xgrid-focus').style('visibility')).toBe('visible');
+           });
+       });
+    });
+
     describe('area chart (timeseries)', function() {
         describe('tooltip_grouped=true', function() {
             beforeAll(() => {
