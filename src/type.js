@@ -33,9 +33,6 @@ ChartInternal.prototype.hasType = function (type, targets) {
 ChartInternal.prototype.hasArcType = function (targets) {
     return this.hasType('pie', targets) || this.hasType('donut', targets) || this.hasType('gauge', targets);
 };
-ChartInternal.prototype.hasScatterOrStanfordType = function(targets) {
-  return this.hasType('scatter', targets) || this.hasType('stanford', targets);
-};
 ChartInternal.prototype.isLineType = function (d) {
     var config = this.config, id = isString(d) ? d : d.id;
     return !config.data_types[id] || ['line', 'spline', 'area', 'area-spline', 'step', 'area-step'].indexOf(config.data_types[id]) >= 0;
@@ -63,9 +60,6 @@ ChartInternal.prototype.isScatterType = function (d) {
 ChartInternal.prototype.isStanfordType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'stanford';
-};
-ChartInternal.prototype.isScatterOrStanfordType = function (d) {
-    return this.isScatterType(d) || this.isStanfordType(d);
 };
 ChartInternal.prototype.isPieType = function (d) {
     var id = isString(d) ? d : d.id;

@@ -96,7 +96,7 @@ ChartInternal.prototype.redrawEventRect = function () {
             $$.svg.select('.' + CLASS.eventRect).style('cursor', isMouseCloseToDataPoint ? 'pointer' :  null);
 
             // if tooltip not grouped, we want to display only data from closest data point
-            const showSingleDataPoint = !config.tooltip_grouped || $$.hasScatterOrStanfordType(targetsToShow);
+            const showSingleDataPoint = !config.tooltip_grouped || $$.hasType('stanford', targetsToShow);
 
             // find data to highlight
             let selectedData;
@@ -151,7 +151,7 @@ ChartInternal.prototype.redrawEventRect = function () {
 
             // select if selection enabled
             let sameXData;
-            if (!config.data_selection_grouped || $$.isScatterOrStanfordType(closest)) {
+            if (!config.data_selection_grouped || $$.isStanfordType(closest)) {
                 sameXData = [closest];
             } else {
                 sameXData = $$.filterByX(targetsToShow, closest.x);
