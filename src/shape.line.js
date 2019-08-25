@@ -308,7 +308,7 @@ ChartInternal.prototype.updateCircle = function (cx, cy) {
         .data($$.lineOrScatterOrStanfordData.bind($$));
 
     var mainCircleEnter = mainCircle.enter().append("circle")
-        .attr('shape-rendering', 'crispEdges')
+        .attr('shape-rendering', $$.isStanfordGraphType() ? 'crispEdges' : '')
         .attr("class", $$.classCircle.bind($$))
         .attr("cx", cx)
         .attr("cy", cy)
