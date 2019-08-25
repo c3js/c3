@@ -1,5 +1,6 @@
 import CLASS from './class';
 import { ChartInternal } from './core';
+import { getBBox } from './util';
 
 ChartInternal.prototype.initText = function () {
     var $$ = this;
@@ -64,7 +65,7 @@ ChartInternal.prototype.getTextRect = function (text, cls, element) {
         .classed(cls ? cls : "", true)
         .style('font', font)
         .text(text)
-      .each(function () { rect = this.getBBox(); });
+      .each(function () { rect = getBBox(this); });
     dummy.remove();
     return rect;
 };
@@ -81,7 +82,7 @@ ChartInternal.prototype.generateXYForText = function (areaIndices, barIndices, l
 };
 ChartInternal.prototype.getXForText = function (points, d, textElement) {
     var $$ = this,
-        box = textElement.getBBox(), xPos, padding;
+        box = getBBox(textElement), xPos, padding;
     if ($$.config.axis_rotated) {
         padding = $$.isBarType(d) ? 4 : 6;
         xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
@@ -100,7 +101,7 @@ ChartInternal.prototype.getXForText = function (points, d, textElement) {
 };
 ChartInternal.prototype.getYForText = function (points, d, textElement) {
     var $$ = this,
-        box = textElement.getBBox(),
+        box = getBBox(textElement),
         yPos;
     if ($$.config.axis_rotated) {
         yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;

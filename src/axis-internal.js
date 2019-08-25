@@ -1,3 +1,5 @@
+import { getBBox } from './util';
+
 function AxisInternal(component, params) {
     var internal = this;
     internal.component = component;
@@ -82,7 +84,7 @@ AxisInternal.prototype.updateTickTextCharSize = function (tick) {
         w: 5.5
     };
     tick.select('text').text(function(d) { return internal.textFormatted(d); }).each(function (d) {
-        var box = this.getBBox(),
+        var box = getBBox(this),
             text = internal.textFormatted(d),
             h = box.height,
             w = text ? (box.width / text.length) : undefined;

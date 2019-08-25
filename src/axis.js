@@ -3,7 +3,8 @@ import {
     isValue,
     isFunction,
     isString,
-    isEmpty
+    isEmpty,
+    getBBox
 } from './util';
 import {
     AxisInternal
@@ -333,7 +334,7 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(id, withoutRecompute) 
         svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
-                    var box = this.getBBox();
+                    var box = getBBox(this);
                     if (maxWidth < box.width) {
                         maxWidth = box.width;
                     }

@@ -1,6 +1,6 @@
 import CLASS from './class';
 import { ChartInternal } from './core';
-import { isValue } from './util';
+import { getBBox, isValue } from './util';
 
 ChartInternal.prototype.initBar = function () {
     var $$ = this;
@@ -123,7 +123,7 @@ ChartInternal.prototype.isWithinBar = function (mouse, that) {
     if (that.pathSegList.numberOfItems < 2) {
         return false;
     }
-    var box = that.getBBox(),
+    var box = getBBox(that),
         seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
         x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
         w = box.width, h = box.height, offset = 2,
