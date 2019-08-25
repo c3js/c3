@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.6 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.7 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1199,7 +1199,7 @@
   };
 
   var c3 = {
-    version: "0.7.6",
+    version: "0.7.7",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -6108,7 +6108,14 @@
   };
 
   ChartInternal.prototype.getTargetSelectorSuffix = function (targetId) {
-    return this.generateTargetClass(targetId).replace(/([?!@#$%^&*()_=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
+    var targetClass = this.generateTargetClass(targetId);
+
+    if (window.CSS && window.CSS.escape) {
+      return window.CSS.escape(targetClass);
+    } // fallback on imperfect method for old browsers (does not handles unicode)
+
+
+    return targetClass.replace(/([?!@#$%^&*()=+,.<>'":;\[\]\/|~`{}\\])/g, '\\$1');
   };
 
   ChartInternal.prototype.selectorTarget = function (id, prefix) {
