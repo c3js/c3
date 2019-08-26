@@ -46,6 +46,9 @@ describe('c3 chart interaction', function () {
             });
 
             describe('mouseover', function () {
+                let mouseoutCounter = 0;
+                let mouseoverCounter = 0;
+
                 beforeAll(function () {
                     args = {
                         data: {
@@ -56,10 +59,10 @@ describe('c3 chart interaction', function () {
                             ],
                             type: 'bar',
                             onmouseout: function() {
-                                window.mouseoutCounter += 1;
+                                mouseoutCounter += 1;
                             },
                             onmouseover: function() {
-                                window.mouseoverCounter += 1;
+                                mouseoverCounter += 1;
                             }
                         },
                         axis: {
@@ -69,23 +72,23 @@ describe('c3 chart interaction', function () {
                 });
 
                 beforeEach(function() {
-                    window.mouseoverCounter = 0;
-                    window.mouseoutCounter = 0;
+                    mouseoverCounter = 0;
+                    mouseoutCounter = 0;
                 });
 
                 it('should be undefined when not within bar', function () {
                     moveMouseOut();
 
-                    expect(window.mouseoutCounter).toEqual(0);
-                    expect(window.mouseoverCounter).toEqual(0);
+                    expect(mouseoutCounter).toEqual(0);
+                    expect(mouseoverCounter).toEqual(0);
                     expect(chart.internal.mouseover).toBeUndefined();
                 });
 
                 it('should be data value when within bar', function () {
                     moveMouse(31, 280);
 
-                    expect(window.mouseoutCounter).toEqual(0);
-                    expect(window.mouseoverCounter).toEqual(1);
+                    expect(mouseoutCounter).toEqual(0);
+                    expect(mouseoverCounter).toEqual(1);
                     expect(chart.internal.mouseover).toEqual({
                         x: 0,
                         value: 30,
@@ -99,8 +102,8 @@ describe('c3 chart interaction', function () {
                     moveMouse(31, 280);
                     moveMouseOut();
 
-                    expect(window.mouseoutCounter).toEqual(1);
-                    expect(window.mouseoverCounter).toEqual(1);
+                    expect(mouseoutCounter).toEqual(1);
+                    expect(mouseoverCounter).toEqual(1);
                     expect(chart.internal.mouseover).toBeUndefined();
                 });
 
@@ -109,8 +112,8 @@ describe('c3 chart interaction', function () {
                     moveMouseOut();
                     moveMouse(31, 280);
 
-                    expect(window.mouseoutCounter).toEqual(1);
-                    expect(window.mouseoverCounter).toEqual(2);
+                    expect(mouseoutCounter).toEqual(1);
+                    expect(mouseoverCounter).toEqual(2);
                     expect(chart.internal.mouseover).toEqual({
                         x: 0,
                         value: 30,
@@ -377,6 +380,8 @@ describe('c3 chart interaction', function () {
 
     describe('line chart', function() {
         describe('tooltip_grouped=false', function() {
+            let clickedData = [];
+
             beforeAll(() => {
                 args = {
                     data: {
@@ -390,7 +395,7 @@ describe('c3 chart interaction', function () {
                             [ 'data1', 'data2' ]
                         ],
                         onclick: function(d) {
-                            window.clickedData.push(d);
+                            clickedData.push(d);
                         }
                     },
                     tooltip: {
@@ -418,7 +423,7 @@ describe('c3 chart interaction', function () {
             });
 
             beforeEach(function() {
-                window.clickedData = [];
+                clickedData = [];
             });
 
             it('shows tooltip with only hovered data', () => {
@@ -478,7 +483,7 @@ describe('c3 chart interaction', function () {
             it('clicks only on hovered point', () => {
                 clickMouse(144, 201);
 
-                expect(window.clickedData).toEqual([{
+                expect(clickedData).toEqual([{
                     x: 1,
                     index: 1,
                     value: 200,
@@ -542,7 +547,7 @@ describe('c3 chart interaction', function () {
                     clickMouse(340, 203);
                     clickMouse(537, 386);
 
-                    expect(window.clickedData).toEqual([
+                    expect(clickedData).toEqual([
                         {x: 1, value: -200, id: 'data3', index: 1, name: 'data3'},
                         {x: 3, value: 200, id: 'data2', index: 3, name: 'data2'},
                         {x: 5, value: -250, id: 'data1', index: 5, name: 'data1'}
@@ -580,6 +585,8 @@ describe('c3 chart interaction', function () {
         });
 
         describe('tooltip_grouped=true', function() {
+            let clickedData = [];
+
             beforeAll(() => {
                 args = {
                     data: {
@@ -593,7 +600,7 @@ describe('c3 chart interaction', function () {
                             [ 'data1', 'data2' ]
                         ],
                         onclick: function(d) {
-                            window.clickedData.push(d);
+                            clickedData.push(d);
                         }
                     },
                     tooltip: {
@@ -621,7 +628,7 @@ describe('c3 chart interaction', function () {
             });
 
             beforeEach(function() {
-                window.clickedData = [];
+                clickedData = [];
             });
 
             describe('with tooltip_horizontal=true', () => {
@@ -639,7 +646,7 @@ describe('c3 chart interaction', function () {
                     clickMouse(340, 203);
                     clickMouse(537, 386);
 
-                    expect(window.clickedData).toEqual([
+                    expect(clickedData).toEqual([
                         {x: 1, value: -200, id: 'data3', index: 1, name: 'data3'},
                         {x: 3, value: 200, id: 'data2', index: 3, name: 'data2'},
                         {x: 5, value: -250, id: 'data1', index: 5, name: 'data1'}
