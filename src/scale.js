@@ -118,6 +118,18 @@ ChartInternal.prototype.getX = function (min, max, domain, offset) {
     }
     return scale;
 };
+
+/**
+ * Creates and configures a D3 scale instance for the given type.
+ *
+ * By defaults it returns a Linear scale.
+ *
+ * @param {String} type Type of d3-scale to create. Type can be 'linear', 'time', 'timeseries' or 'log'.
+ * @param {Array} domain The scale domain such as [from, to]
+ * @param {Array} range The scale's range such as [from, to]
+ *
+ * @return A d3-scale instance
+ */
 ChartInternal.prototype.getY = function (type, domain, range) {
     let scale;
     if (type === 'timeseries' || type === 'time') {
