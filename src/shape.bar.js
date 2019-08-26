@@ -1,6 +1,6 @@
 import CLASS from './class';
 import { ChartInternal } from './core';
-import { getBBox, isValue } from './util';
+import { getBBox, isValue, isWithinBox } from './util';
 
 ChartInternal.prototype.initBar = function () {
     var $$ = this;
@@ -119,14 +119,14 @@ ChartInternal.prototype.generateGetBarPoints = function (barIndices, isSub) {
         ];
     };
 };
-ChartInternal.prototype.isWithinBar = function (mouse, that) {
-    if (that.pathSegList.numberOfItems < 2) {
-        return false;
-    }
-    var box = getBBox(that),
-        seg0 = that.pathSegList.getItem(0), seg1 = that.pathSegList.getItem(1),
-        x = Math.min(seg0.x, seg1.x), y = Math.min(seg0.y, seg1.y),
-        w = box.width, h = box.height, offset = 2,
-        sx = x - offset, ex = x + w + offset, sy = y + h + offset, ey = y - offset;
-    return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
+
+/**
+ * Returns whether the data point is within the given bar shape.
+ *
+ * @param mouse
+ * @param barShape
+ * @return {boolean}
+ */
+ChartInternal.prototype.isWithinBar = function (mouse, barShape) {
+    return isWithinBox(mouse, getBBox(barShape), 2);
 };

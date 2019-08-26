@@ -61,9 +61,6 @@ ChartInternal.prototype.isStanfordType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'stanford';
 };
-ChartInternal.prototype.isScatterOrStanfordType = function (d) {
-    return this.isScatterType(d) || this.isStanfordType(d);
-};
 ChartInternal.prototype.isPieType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'pie';

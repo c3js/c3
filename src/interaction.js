@@ -22,14 +22,7 @@ ChartInternal.prototype.initEventRect = function () {
     }
 };
 ChartInternal.prototype.redrawEventRect = function () {
-    var $$ = this, d3 = $$.d3, config = $$.config,
-        x, y, w, h;
-
-    // TODO: rotated not supported yet
-    x = 0;
-    y = 0;
-    w = $$.width;
-    h = $$.height;
+    const $$ = this, d3 = $$.d3, config = $$.config;
 
     function mouseout() {
         $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
@@ -39,50 +32,90 @@ ChartInternal.prototype.redrawEventRect = function () {
         $$.unexpandBars();
     }
 
+    const isHoveringDataPoint = (mouse, closest) =>
+        closest && ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity);
+
+    // converts 'x' position (in pixel) to category index
+    const maxDataCount = $$.getMaxDataCount();
+
+    const xEventScale = d3.scaleQuantize()
+        // use X range (in pixel) as domain
+        .domain([0, config.axis_rotated ? $$.height : $$.width])
+        // 0 to N evenly distributed
+        .range(maxDataCount ? Array.apply(null, { length: maxDataCount }).map(Function.call, Number) : [0]);
+
+    const withName = (d) =>
+        d ? $$.addName(Object.assign({}, d)) : null;
+
     // rects for mouseover
     $$.main.select('.' + CLASS.eventRects)
         .style('cursor', config.zoom_enabled ? config.axis_rotated ? 'ns-resize' : 'ew-resize' : null);
 
     $$.eventRect
-        .attr('x', x)
-        .attr('y', y)
-        .attr('width', w)
-        .attr('height', h)
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', $$.width)
+        .attr('height', $$.height)
         .on('mouseout',  config.interaction_enabled ? function () {
             if (!config) { return; } // chart is destroyed
             if ($$.hasArcType()) { return; }
+            if ($$.mouseover){
+              config.data_onmouseout.call($$.api, $$.mouseover);
+              $$.mouseover = undefined;
+            }
             mouseout();
         } : null)
         .on('mousemove', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest, sameXData, selectedData;
-
-            if ($$.dragging) { return; } // do nothing when dragging
-            if ($$.hasArcType(targetsToShow)) { return; }
-
-            targetsToShow = $$.filterTargetsToShow($$.data.targets);
-            mouse = d3.mouse(this);
-            closest = $$.findClosestFromTargets(targetsToShow, mouse);
-
-            if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
-                config.data_onmouseout.call($$.api, $$.mouseover);
-                $$.mouseover = undefined;
-            }
-
-            if (!closest) {
-                mouseout();
+            // do nothing when dragging
+            if ($$.dragging) {
                 return;
             }
 
-            if ($$.isScatterOrStanfordType(closest) || !config.tooltip_grouped) {
-                sameXData = [closest];
-            } else {
-                sameXData = $$.filterByX(targetsToShow, closest.x);
+            const targetsToShow = $$.getTargetsToShow();
+
+            // do nothing if arc type
+            if ($$.hasArcType(targetsToShow)) {
+                return;
             }
 
-            // show tooltip when cursor is close to some point
-            selectedData = sameXData.map(function (d) {
-                return $$.addName(d);
-            });
+            const mouse = d3.mouse(this);
+            const closest = withName($$.findClosestFromTargets(targetsToShow, mouse));
+            const isMouseCloseToDataPoint = isHoveringDataPoint(mouse, closest);
+
+            // ensure onmouseout is always called if mousemove switch between 2 targets
+            if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id || closest.index !== $$.mouseover.index)) {
+                config.data_onmouseout.call($$.api, $$.mouseover);
+                $$.mouseover = undefined;
+            }
+            if (closest && !$$.mouseover) {
+                config.data_onmouseover.call($$.api, closest);
+                $$.mouseover = closest;
+            }
+
+            // show cursor as pointer if we're hovering a data point close enough
+            $$.svg.select('.' + CLASS.eventRect).style('cursor', isMouseCloseToDataPoint ? 'pointer' :  null);
+
+            // if tooltip not grouped, we want to display only data from closest data point
+            const showSingleDataPoint = !config.tooltip_grouped || $$.hasType('stanford', targetsToShow);
+
+            // find data to highlight
+            let selectedData;
+            if (showSingleDataPoint) {
+                if (!closest) {
+                    return mouseout();
+                }
+
+                selectedData = [closest];
+            } else {
+                const mouseX = config.axis_rotated ? mouse[1] : mouse[0];
+
+                selectedData = $$.filterByIndex(targetsToShow, xEventScale(mouseX));
+            }
+
+            // inject names for each point
+            selectedData = selectedData.map(withName);
+
+            // show tooltip
             $$.showTooltip(selectedData, this);
 
             // expand points
@@ -92,44 +125,53 @@ ChartInternal.prototype.redrawEventRect = function () {
                     $$.expandCircles(d.index, d.id, false);
                 });
             }
-            $$.expandBars(closest.index, closest.id, true);
+
+            // expand bars
+            $$.unexpandBars();
+            selectedData.forEach(function (d) {
+                $$.expandBars(d.index, d.id, false);
+            });
 
             // Show xgrid focus line
             $$.showXGridFocus(selectedData);
-
-            // Show cursor as pointer if point is close to mouse position
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
-                if (!$$.mouseover) {
-                    config.data_onmouseover.call($$.api, closest);
-                    $$.mouseover = closest;
-                }
-            }
         } : null)
         .on('click', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest, sameXData;
-            if ($$.hasArcType(targetsToShow)) { return; }
+            const targetsToShow = $$.getTargetsToShow();
 
-            targetsToShow = $$.filterTargetsToShow($$.data.targets);
-            mouse = d3.mouse(this);
-            closest = $$.findClosestFromTargets(targetsToShow, mouse);
-            if (! closest) { return; }
-            // select if selection enabled
-            if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-                if ($$.isScatterOrStanfordType(closest) || !config.data_selection_grouped) {
-                    sameXData = [closest];
-                } else {
-                    sameXData = $$.filterByX(targetsToShow, closest.x);
-                }
-                sameXData.forEach(function (d) {
-                    $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
-                        if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
-                            $$.toggleShape(this, d, d.index);
-                            config.data_onclick.call($$.api, d, this);
-                        }
-                    });
-                });
+            if ($$.hasArcType(targetsToShow)) {
+                return;
             }
+
+            const mouse = d3.mouse(this);
+            const closest = withName($$.findClosestFromTargets(targetsToShow, mouse));
+
+            if (!isHoveringDataPoint(mouse, closest)) {
+                return;
+            }
+
+            // select if selection enabled
+            let sameXData;
+            if (!config.data_selection_grouped || $$.isStanfordType(closest)) {
+                sameXData = [closest];
+            } else {
+                sameXData = $$.filterByX(targetsToShow, closest.x);
+            }
+
+            // toggle selected state
+            sameXData.forEach(function (d) {
+                $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
+                    if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+                        $$.toggleShape(this, d, d.index);
+                    }
+                });
+            });
+
+            // call data_onclick on the closest data point
+            if (closest) {
+                const shape = $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index);
+                config.data_onclick.call($$.api, closest, shape.node());
+            }
+
         } : null)
         .call(
             config.interaction_enabled && config.data_selection_draggable && $$.drag ? (

@@ -210,8 +210,8 @@ ChartInternal.prototype.showXGridFocus = function (selectedData) {
         focusEl = $$.main.selectAll('line.' + CLASS.xgridFocus),
         xx = $$.xx.bind($$);
     if (! config.tooltip_show) { return; }
-    // Hide when scatter plot exists
-    if ($$.hasType('scatter') || $$.hasType('stanford') || $$.hasArcType()) { return; }
+    // Hide when stanford plot exists
+    if ($$.hasType('stanford') || $$.hasArcType()) { return; }
     focusEl
         .style("visibility", "visible")
         .data([dataToShow[0]])
