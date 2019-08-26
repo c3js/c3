@@ -157,14 +157,21 @@ ChartInternal.prototype.redrawEventRect = function () {
                 sameXData = $$.filterByX(targetsToShow, closest.x);
             }
 
+            // toggle selected state
             sameXData.forEach(function (d) {
                 $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
                     if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
                         $$.toggleShape(this, d, d.index);
-                        config.data_onclick.call($$.api, d, this);
                     }
                 });
             });
+
+            // call data_onclick on the closest data point
+            if (closest) {
+                const shape = $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index);
+                config.data_onclick.call($$.api, closest, shape.node());
+            }
+
         } : null)
         .call(
             config.interaction_enabled && config.data_selection_draggable && $$.drag ? (
