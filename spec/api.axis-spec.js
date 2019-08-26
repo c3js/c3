@@ -74,4 +74,55 @@ describe('c3 api axis', function () {
 
 
     });
+
+    describe('axis.types', function() {
+
+        beforeAll(function () {
+            args = {
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100],
+                        ['data2', 30, 200, 100]
+                    ],
+                    axes: {
+                        data1: 'y',
+                        data2: 'y2'
+                    }
+                },
+                axis: {
+                    y: {
+                        label: 'Y Axis Label'
+                    },
+                    y2: {
+                        show: true,
+                        type: 'log',
+                        label: 'Y2 Axis Label'
+                    }
+                }
+            };
+        });
+
+        it('retrieves y/y2 axis types', function () {
+            expect(chart.axis.types()).toEqual({
+                y: 'linear',
+                y2: 'log'
+            });
+
+            const linearDomain = chart.internal.y.domain();
+            const logDomain = chart.internal.y2.domain();
+
+            chart.axis.types({
+                y: 'log',
+                y2: 'linear'
+            });
+
+            expect(chart.internal.y2.domain()).toEqual(linearDomain);
+            expect(chart.internal.y.domain()).toEqual(logDomain);
+
+            expect(chart.axis.types()).toEqual({
+                y: 'log',
+                y2: 'linear'
+            });
+        });
+    });
 });

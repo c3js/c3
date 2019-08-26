@@ -61,3 +61,24 @@ Chart.prototype.axis.range = function (range) {
         };
     }
 };
+
+Chart.prototype.axis.types = function (types) {
+    const $$ = this.internal;
+    if (types === undefined) {
+        return {
+            y: $$.config.axis_y_type,
+            y2: $$.config.axis_y2_type
+        };
+    } else {
+        if (isDefined(types.y)) {
+            $$.config.axis_y_type = types.y;
+        }
+
+        if (isDefined(types.y2)) {
+            $$.config.axis_y2_type = types.y2;
+        }
+
+        $$.updateScales();
+        $$.redraw();
+    }
+};
