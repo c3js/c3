@@ -556,6 +556,11 @@
 </li>
 
 <li>
+<a href='#axis-y2-type'>axis.y2.type</a>
+
+</li>
+
+<li>
 <a href='#axis-y2-max'>axis.y2.max</a>
 
 </li>
@@ -1171,6 +1176,11 @@
 
 <li>
 <a href='#api-axis-range'>axis.range</a>
+
+</li>
+
+<li>
+<a href='#api-axis-types'>axis.types</a>
 
 </li>
 
@@ -3325,7 +3335,26 @@ bindto: d3.select('#myContainer')</code></pre>
 <a href='#axis-y-type'>axis.y.type</a>
 
 </h3>
-<p>not yet</p>
+<p>Scale type for Y axis.</p>
+<h5>Available Values:</h5>
+<ul>
+<li>linear</li>
+<li>time¹</li>
+<li>timeseries¹</li>
+<li>log² <span class="secondary label">Experimental</span></li>
+</ul>
+<p>¹: The <code>timeseries</code> scale is an alias of <code>time</code>.</p>
+<p>²: The <code>log</code> scale is experimental and may not work in all cases (stacked, etc.)</p>
+<h5>Default:</h5>
+<code>linear</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y: {
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'linear'
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
 </section>
 <hr>
 <section>
@@ -3644,6 +3673,33 @@ bindto: d3.select('#myContainer')</code></pre>
 <pre><code class='html javascript'>axis: {
 &nbsp;&nbsp;y2: {
 &nbsp;&nbsp;&nbsp;&nbsp;inner: true
+&nbsp;&nbsp;}
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#axis-y2-type'>axis.y2.type</a>
+
+</h3>
+<p>Scale type for Y2 axis.</p>
+<h5>Available Values:</h5>
+<ul>
+<li>linear</li>
+<li>time¹</li>
+<li>timeseries¹</li>
+<li>log² <span class="secondary label">Experimental</span></li>
+</ul>
+<p>¹: The <code>timeseries</code> scale is an alias of <code>time</code>.</p>
+<p>²: The <code>log</code> scale is experimental and may not work in all cases (stacked, etc.)</p>
+<h5>Default:</h5>
+<code>linear</code>
+<h5>Format:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>axis: {
+&nbsp;&nbsp;y2: {
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'linear'
 &nbsp;&nbsp;}
 }</code></pre>
 </div>
@@ -6461,6 +6517,28 @@ chart.axis.range({
 <a href='/samples/api_axis_range.html'>Update Axis Range</a>
 </li>
 </ul>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-axis-types'>axis.types</a>
+
+</h3>
+<p>Get and set axis y/y2 types.</p>
+<h5>Arguments:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>.axis.types(types)</code></pre>
+</div>
+<p><span class="code">types</span>&nbsp;&nbsp;<code>Object</code></p>
+<p>If <span class="code">types</span> is given, specified axis' type value will be updated. If no argument is given, the current types for y/y2 axis will be returned.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Update axis' types
+chart.axis.types({
+&nbsp;&nbsp;y: 'linear',
+&nbsp;&nbsp;y2: 'log'
+});</code></pre>
+</div>
 </section>
 <hr>
 <section>
