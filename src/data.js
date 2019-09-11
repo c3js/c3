@@ -610,31 +610,40 @@ ChartInternal.prototype.convertValuesToStep = function (values) {
  */
 ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
     const $$ = this;
-    const api = $$.api;
-    let ratio = 0;
 
-    if (d && api.data.shown.call(api).length) {
-        ratio = d.ratio || d.value;
-
-        if (type === "arc") {
-            if ($$.hasType('gauge')) {
-                ratio = (d.endAngle - d.startAngle) / (Math.PI * ($$.config.gauge_fullCircle ? 2 : 1));
-            } else {
-                const total = $$.getTotalDataSum();
-
-                ratio = d.value / total;
-            }
-        } else if (type === "index") {
-            const total = $$.getTotalPerIndex($$.axis.getId(d.id));
-
-            d.ratio = isNumber(d.value) && total && total[d.index] > 0 ?
-                d.value / total[d.index] : 0;
-
-            ratio = d.ratio;
-        }
+    if (!d) {
+        return 0;
     }
 
-    return asPercent && ratio ? ratio * 100 : ratio;
+    let ratio;
+    if (type === 'arc') {
+        if ($$.hasType('gauge')) {
+            ratio = (d.endAngle - d.startAngle) / (Math.PI * ($$.config.gauge_fullCircle ? 2 : 1));
+        } else {
+            ratio = d.value / $$.getTotalDataSum();
+        }
+    } else if (type === 'index') {
+        if (isNumber(d.value)) {
+            const total = $$.getTotalPerIndex($$.axis.getId(d.id));
+            if (total && total[d.index] > 0) {
+                ratio = d.value / total[d.index];
+            } else {
+                ratio = 0;
+            }
+        } else {
+            ratio = 0;
+        }
+        // update d with potential new ratio
+        d.ratio = ratio;
+    } else {
+        ratio = d.ratio || d.value;
+    }
+
+    if (asPercent) {
+        ratio *= 100;
+    }
+
+    return ratio;
 };
 
 ChartInternal.prototype.updateDataAttributes = function (name, attrs) {
