@@ -35,15 +35,6 @@ ChartInternal.prototype.redrawEventRect = function () {
     const isHoveringDataPoint = (mouse, closest) =>
         closest && ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity);
 
-    // converts 'x' position (in pixel) to category index
-    const maxDataCount = $$.getMaxDataCount();
-
-    const xEventScale = d3.scaleQuantize()
-        // use X range (in pixel) as domain
-        .domain([0, config.axis_rotated ? $$.height : $$.width])
-        // 0 to N evenly distributed
-        .range(maxDataCount ? Array.apply(null, { length: maxDataCount }).map(Function.call, Number) : [0]);
-
     const withName = (d) =>
         d ? $$.addName(Object.assign({}, d)) : null;
 
@@ -101,15 +92,29 @@ ChartInternal.prototype.redrawEventRect = function () {
             // find data to highlight
             let selectedData;
             if (showSingleDataPoint) {
-                if (!closest) {
-                    return mouseout();
+                if (closest) {
+                    selectedData = [ closest ];
+                }
+            } else {
+                let closestByX;
+                if (closest) {
+                    // reuse closest value
+                    closestByX = closest;
+                } else {
+                    // try to find the closest value by X values from the mouse position
+                    const mouseX = config.axis_rotated ? mouse[1] : mouse[0];
+                    closestByX = $$.findClosestFromTargetsByX(targetsToShow, $$.x.invert(mouseX));
                 }
 
-                selectedData = [closest];
-            } else {
-                const mouseX = config.axis_rotated ? mouse[1] : mouse[0];
+                // highlight all data for this 'x' value
+                if (closestByX) {
+                    selectedData = $$.filterByX(targetsToShow, closestByX.x);
+                }
+            }
 
-                selectedData = $$.filterByIndex(targetsToShow, xEventScale(mouseX));
+            // ensure we have data to show
+            if (!selectedData || selectedData.length === 0) {
+                return mouseout();
             }
 
             // inject names for each point
