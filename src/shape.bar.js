@@ -43,12 +43,14 @@ ChartInternal.prototype.updateBar = function (durationForExit) {
         .style("opacity", 0);
 };
 ChartInternal.prototype.redrawBar = function (drawBar, withTransition, transition) {
+    const $$ = this;
+
     return [
         (withTransition ? this.mainBar.transition(transition) : this.mainBar)
             .attr('d', drawBar)
             .style("stroke", this.color)
             .style("fill", this.color)
-            .style("opacity", 1)
+            .style("opacity", (d) => $$.isTargetToShow(d.id) ? 1 : 0)
     ];
 };
 ChartInternal.prototype.getBarW = function (axis, barTargetsNum) {
