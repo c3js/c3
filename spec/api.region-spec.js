@@ -22,6 +22,7 @@ describe('c3 api region', function () {
                         start: 300,
                         end: 400,
                         class: 'green',
+                        label: 'Region 1',
                     },
                     {
                         axis: 'y',
@@ -40,13 +41,15 @@ describe('c3 api region', function () {
                         axis: 'y',
                         start: 250,
                         end: 350,
-                        class: 'red'
+                        class: 'red',
+                        label: 'Region 1'
                     },
                     {
                         axis: 'y',
                         start: 25,
                         end: 75,
-                        class: 'red'
+                        class: 'red',
+                        label: ''
                     }
                 ],
                 regions;
@@ -59,18 +62,22 @@ describe('c3 api region', function () {
 
                 regions.each(function (d, i) {
                     var region = d3.select(this),
+                        label = region.select('text'),
                         y = +region.attr('y'),
                         height = +region.attr('height'),
                         expectedClass = 'red',
+                        expectedLabel = expectedRegions[i].label,
                         unexpectedClass = 'green',
                         expectedStart = Math.round(chart.internal.y(expectedRegions[i].start)),
                         expectedEnd = Math.round(chart.internal.y(expectedRegions[i].end)),
                         expectedY = expectedEnd,
                         expectedHeight = expectedStart - expectedEnd;
+
                     expect(y).toBeCloseTo(expectedY, -1);
                     expect(height).toBeCloseTo(expectedHeight, -1);
                     expect(region.classed(expectedClass)).toBeTruthy();
                     expect(region.classed(unexpectedClass)).toBeFalsy();
+                    expect(label.text()).toBe(expectedLabel);
                 });
             }, 500);
 
