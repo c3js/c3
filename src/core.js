@@ -838,11 +838,6 @@ ChartInternal.prototype.initialOpacity = function(d) {
 ChartInternal.prototype.initialOpacityForCircle = function(d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
 };
-/* ChartInternal.prototype.opacityForCircle = function(d) {
-    var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
-    var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0;
-    return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
-}; */
 ChartInternal.prototype.opacityForCircle = function (d) {
     var point_show = this.config.point_show;   
     var isAnArray = point_show instanceof Array;    
