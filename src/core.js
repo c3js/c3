@@ -838,10 +838,28 @@ ChartInternal.prototype.initialOpacity = function(d) {
 ChartInternal.prototype.initialOpacityForCircle = function(d) {
     return d.value !== null && this.withoutFadeIn[d.id] ? this.opacityForCircle(d) : 0;
 };
-ChartInternal.prototype.opacityForCircle = function(d) {
+/* ChartInternal.prototype.opacityForCircle = function(d) {
     var isPointShouldBeShown = isFunction(this.config.point_show) ? this.config.point_show(d) : this.config.point_show;
     var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0;
     return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0;
+}; */
+ChartInternal.prototype.opacityForCircle = function (d) {
+    var point_show = this.config.point_show;   
+    var isAnArray = point_show instanceof Array;    
+    var toShow = function(condition){ 
+      return condition ? 1 : 0;
+    };
+    var showPerSerie = function(condition){
+      var matchSerie = d.id === point_show[0];
+      var matchColumn = point_show.indexOf(d.index) >= 0;
+      return condition  ? toShow(matchSerie && matchColumn) : toShow(matchColumn);
+    };
+    
+    var isPointShouldBeShown = isFunction(point_show) ? point_show(d) 
+    : (isAnArray ? showPerSerie(point_show[0]) : point_show);
+
+    var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0;
+    return isValue(d.value) ? this.isScatterType(d) ? 0.5 : opacity : 0;
 };
 ChartInternal.prototype.opacityForText = function() {
     return this.hasDataLabel() ? 1 : 0;
