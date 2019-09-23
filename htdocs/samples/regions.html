@@ -21,12 +21,12 @@
           }
         },
         regions: [
-          {end:1,class:'region1'},
-          {start:2,end:4,class:'region1'},
-          {start:5,class:'region1'},
-          {end:50,axis:'y'},
-          {start:100,end:200,axis:'y'},
-          {start:300,axis:'y'},
+          {end: 1, class: 'region1', label: 'Region 1', paddingY: 15},
+          {start: 2, end: 4, class: 'region1', label: 'Region 2', paddingY: 20, paddingX: 10, vertical: true},
+          {start: 5, class: 'region1', label: 'Region 3', paddingY: 15},
+          {end: 50, axis: 'y'},
+          {start: 100, end: 200, axis: 'y'},
+          {start: 300, axis: 'y'},
         ],
         zoom: {
 //          enabled: true
@@ -64,7 +64,7 @@
       setTimeout(function () {
         chart.regions.add([
           {start:3,end:3.5,class:"region3 hoge"},
-          {start:4,end:4.5,class:"region4 hoge"},
+          {start:4,end:4.5,class:"region4 hoge",label:"Region 4"},
           {start:0,end:0.5,class:"region5 hogehoge"},
         ]);
       }, 7000);

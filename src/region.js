@@ -16,26 +16,37 @@ ChartInternal.prototype.updateRegion = function (duration) {
 
     var mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
         .data(config.regions);
-    var mainRegionEnter = mainRegion.enter().append('rect')
+    var g = mainRegion.enter().append('g');
+    g.append('rect')
         .attr("x", $$.regionX.bind($$))
         .attr("y", $$.regionY.bind($$))
         .attr("width", $$.regionWidth.bind($$))
         .attr("height", $$.regionHeight.bind($$))
-        .style("fill-opacity", 0);
-    $$.mainRegion = mainRegionEnter.merge(mainRegion)
+        .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; });
+    g.append('text')
+        .text($$.labelRegion.bind($$));
+    $$.mainRegion = g.merge(mainRegion)
         .attr('class', $$.classRegion.bind($$));
     mainRegion.exit().transition().duration(duration)
         .style("opacity", 0)
         .remove();
 };
 ChartInternal.prototype.redrawRegion = function (withTransition, transition) {
-    var $$ = this, regions = $$.mainRegion;
-    return [(withTransition ? regions.transition(transition) : regions)
+    var $$ = this,
+        regions = $$.mainRegion,
+        regionLabels = $$.mainRegion.selectAll('text');
+    return [
+        (withTransition ? regions.transition(transition) : regions)
             .attr("x", $$.regionX.bind($$))
             .attr("y", $$.regionY.bind($$))
             .attr("width", $$.regionWidth.bind($$))
             .attr("height", $$.regionHeight.bind($$))
-            .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; })
+            .style("fill-opacity", function (d) { return isValue(d.opacity) ? d.opacity : 0.1; }),
+        (withTransition ? regionLabels.transition(transition) : regionLabels)
+            .attr("x", $$.labelOffsetX.bind($$))
+            .attr("y", $$.labelOffsetY.bind($$))
+            .attr("transform", $$.labelTransform.bind($$))
+            .attr("style", 'text-anchor: left;')
     ];
 };
 ChartInternal.prototype.regionX = function (d) {
@@ -80,4 +91,20 @@ ChartInternal.prototype.regionHeight = function (d) {
 };
 ChartInternal.prototype.isRegionOnX = function (d) {
     return !d.axis || d.axis === 'x';
+};
+ChartInternal.prototype.labelRegion = function (d) {
+    return 'label' in d ? d.label : '';
+};
+ChartInternal.prototype.labelTransform = function (d) {
+    return ('vertical' in d && d.vertical) ? "rotate(90)" : "";
+};
+ChartInternal.prototype.labelOffsetX = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return ('vertical' in d && d.vertical) ? this.regionY(d) + paddingY : (this.regionX(d) + paddingX);
+};
+ChartInternal.prototype.labelOffsetY = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return ('vertical' in d && d.vertical) ? -(this.regionX(d) + paddingX) : this.regionY(d) + 10 + paddingY;
 };

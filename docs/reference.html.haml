@@ -1079,6 +1079,8 @@
         %p The values must be an array for each data and it should include an object that has <span class="code">start</span>, <span class="code">end</span>, <span class="code">style</span>. If <span class="code">start</span> is not set, the start will be the first data point. If <span class="code">end</span> is not set, the end will be the last data point.
         %br
         %p Currently this option supports only line chart and dashed style. If this option specified, the line will be dashed only in the regions.
+        %br
+        %p An optional <span class="code">label</span> property can be provided to display a label for the region. If a label option is not specified, no label will be displayed for the region. For each region, you may also specify the <span class="code">paddingY</span> and <span class="code">paddingX</span> options to control the position of label text. Finally, a <span class="code">vertical</span> option can be used to identify whether or not the label text should be rotated 90 degrees.
         %h5 Default:
         <code>{}</code>
         %h5 Format:
@@ -1087,7 +1089,10 @@
             %code.html.javascript
               data: {
               &nbsp;&nbsp;regions: {
-              &nbsp;&nbsp;&nbsp;&nbsp;data1: [{'start':1, 'end':2, 'style':'dashed'},{'start':3}],
+              &nbsp;&nbsp;&nbsp;&nbsp;data1: [
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'start':1, 'end':2, 'style':'dashed'},
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'start':3, label:"Region 2", paddingX:2, paddingY:2, vertical=true}
+              &nbsp;&nbsp;&nbsp;&nbsp;],
               &nbsp;&nbsp;&nbsp;&nbsp;...
               &nbsp;&nbsp;}
               }
