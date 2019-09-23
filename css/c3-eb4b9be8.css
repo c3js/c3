@@ -106,6 +106,9 @@
   fill: steelblue;
   fill-opacity: 0.1;
 }
+.c3-region text {
+  fill-opacity: 1;
+}
 
 /*-- Brush --*/
 .c3-brush .extent {

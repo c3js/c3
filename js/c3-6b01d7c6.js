@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.8 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.9 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -179,6 +179,22 @@
     var _ref;
 
     return Array.isArray(arr) ? (_ref = []).concat.apply(_ref, _toConsumableArray(arr)) : [];
+  };
+  /**
+   * Returns whether the point is within the given box.
+   *
+   * @param {Array} point An [x,y] coordinate
+   * @param {Object} box An object with {x, y, width, height} keys
+   * @param {Number} sensitivity An offset to ease check on very small boxes
+   */
+
+  var isWithinBox = function isWithinBox(point, box) {
+    var sensitivity = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var xStart = box.x - sensitivity;
+    var xEnd = box.x + box.width + sensitivity;
+    var yStart = box.y + box.height + sensitivity;
+    var yEnd = box.y - sensitivity;
+    return xStart < point[0] && point[0] < xEnd && yEnd < point[1] && point[1] < yStart;
   };
 
   function AxisInternal(component, params) {
@@ -1217,7 +1233,7 @@
   };
 
   var c3 = {
-    version: "0.7.8",
+    version: "0.7.9",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -1278,7 +1294,7 @@
     $$.dragging = false;
     $$.flowing = false;
     $$.cancelClick = false;
-    $$.mouseover = false;
+    $$.mouseover = undefined;
     $$.transiting = false;
     $$.color = $$.generateColor();
     $$.levelColor = $$.generateLevelColor();
@@ -4327,6 +4343,28 @@
     }
   };
 
+  Chart.prototype.axis.types = function (types) {
+    var $$ = this.internal;
+
+    if (types === undefined) {
+      return {
+        y: $$.config.axis_y_type,
+        y2: $$.config.axis_y2_type
+      };
+    } else {
+      if (isDefined(types.y)) {
+        $$.config.axis_y_type = types.y;
+      }
+
+      if (isDefined(types.y2)) {
+        $$.config.axis_y2_type = types.y2;
+      }
+
+      $$.updateScales();
+      $$.redraw();
+    }
+  };
+
   Chart.prototype.category = function (i, category) {
     var $$ = this.internal,
         config = $$.config;
@@ -6412,7 +6450,7 @@
       axis_x_label: {},
       axis_x_inner: undefined,
       axis_y_show: true,
-      axis_y_type: undefined,
+      axis_y_type: 'linear',
       axis_y_max: undefined,
       axis_y_min: undefined,
       axis_y_inverted: false,
@@ -6429,6 +6467,7 @@
       axis_y_padding: {},
       axis_y_default: undefined,
       axis_y2_show: false,
+      axis_y2_type: 'linear',
       axis_y2_max: undefined,
       axis_y2_min: undefined,
       axis_y2_inverted: false,
@@ -7218,6 +7257,19 @@
   ChartInternal.prototype.isLegendToShow = function (targetId) {
     return this.hiddenLegendIds.indexOf(targetId) < 0;
   };
+  /**
+   * Returns only visible targets.
+   *
+   * This is the same as calling {@link filterTargetsToShow} on $$.data.targets.
+   *
+   * @return {Array}
+   */
+
+
+  ChartInternal.prototype.getTargetsToShow = function () {
+    var $$ = this;
+    return $$.filterTargetsToShow($$.data.targets);
+  };
 
   ChartInternal.prototype.filterTargetsToShow = function (targets) {
     var $$ = this;
@@ -7365,6 +7417,22 @@
 
     return targets;
   };
+  /**
+   * Returns all the values from the given targets at the given index.
+   *
+   * @param {Array} targets
+   * @param {Number} index
+   * @return {Array}
+   */
+
+
+  ChartInternal.prototype.filterByIndex = function (targets, index) {
+    return this.d3.merge(targets.map(function (t) {
+      return t.values.filter(function (v) {
+        return v.index === index;
+      });
+    }));
+  };
 
   ChartInternal.prototype.filterByX = function (targets, x) {
     return this.d3.merge(targets.map(function (t) {
@@ -7435,37 +7503,68 @@
   ChartInternal.prototype.isArc = function (d) {
     return 'data' in d && this.hasTarget(this.data.targets, d.data.id);
   };
+  /**
+   * Find the closest point from the given pos among the given targets or
+   * undefined if none satisfies conditions.
+   *
+   * @param {Array} targets
+   * @param {Array} pos An [x,y] coordinate
+   * @return {Object|undefined}
+   */
+
 
   ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
-    var $$ = this,
-        candidates; // map to array of closest points of each target
+    var $$ = this; // for each target, find the closest point
 
-    candidates = targets.map(function (target) {
-      return $$.findClosest(target.values, pos);
-    }); // decide closest point and return
+    var candidates = targets.map(function (t) {
+      return $$.findClosest(t.values, pos, $$.config.tooltip_horizontal ? $$.horizontalDistance.bind($$) : $$.dist.bind($$), $$.config.point_sensitivity);
+    }).filter(function (v) {
+      return v;
+    }); // returns the closest of candidates
 
-    return $$.findClosest(candidates, pos);
+    if (candidates.length === 0) {
+      return undefined;
+    } else if (candidates.length === 1) {
+      return candidates[0];
+    } else {
+      return $$.findClosest(candidates, pos, $$.dist.bind($$));
+    }
   };
+  /**
+   * Using given compute distance method, returns the closest data point from the
+   * given position.
+   *
+   * Giving optionally a minimum distance to satisfy.
+   *
+   * @param {Array} dataPoints List of DataPoints
+   * @param {Array} pos An [x,y] coordinate
+   * @param {Function} computeDist Function to compute distance between 2 points
+   * @param {Number} minDist Minimal distance to satisfy
+   * @return {Object|undefined} Closest data point
+   */
 
-  ChartInternal.prototype.findClosest = function (values, pos) {
-    var $$ = this,
-        minDist = $$.config.point_sensitivity,
-        closest; // find mouseovering bar
 
-    values.filter(function (v) {
+  ChartInternal.prototype.findClosest = function (dataPoints, pos, computeDist) {
+    var minDist = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : Infinity;
+    var $$ = this;
+    var closest; // find closest bar
+
+    dataPoints.filter(function (v) {
       return v && $$.isBarType(v.id);
     }).forEach(function (v) {
-      var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
+      if (!closest) {
+        var shape = $$.main.select('.' + CLASS.bars + $$.getTargetSelectorSuffix(v.id) + ' .' + CLASS.bar + '-' + v.index).node();
 
-      if (!closest && $$.isWithinBar($$.d3.mouse(shape), shape)) {
-        closest = v;
+        if ($$.isWithinBar(pos, shape)) {
+          closest = v;
+        }
       }
     }); // find closest point from non-bar
 
-    values.filter(function (v) {
+    dataPoints.filter(function (v) {
       return v && !$$.isBarType(v.id);
     }).forEach(function (v) {
-      var d = $$.config.tooltip_horizontal ? $$.horizontalDistance(v, pos) : $$.dist(v, pos);
+      var d = computeDist(v, pos);
 
       if (d < minDist) {
         minDist = d;
@@ -7802,7 +7901,6 @@
         yDomainMax = $$.getYDomainMax(yTargets),
         domain,
         domainLength,
-        padding,
         padding_top,
         padding_bottom,
         center = axisId === 'y2' ? config.axis_y2_center : config.axis_y_center,
@@ -7858,7 +7956,7 @@
     }
 
     domainLength = Math.abs(yDomainMax - yDomainMin);
-    padding = padding_top = padding_bottom = domainLength * 0.1;
+    padding_top = padding_bottom = domainLength * 0.1;
 
     if (typeof center !== 'undefined') {
       yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
@@ -7875,8 +7973,11 @@
       padding_bottom += domainLength * (ratio[0] / (1 - ratio[0] - ratio[1]));
     } else if (showVerticalDataLabel) {
       lengths = $$.getDataLabelLength(yDomainMin, yDomainMax, 'height');
-      padding_top += $$.axis.convertPixelsToAxisPadding(lengths[1], domainLength);
-      padding_bottom += $$.axis.convertPixelsToAxisPadding(lengths[0], domainLength);
+      var pixelsToAxisPadding = $$.getY(config["axis_".concat(axisId, "_type")], // input domain as pixels
+      [0, config.axis_rotated ? $$.width : $$.height], // output range as axis padding
+      [0, domainLength]);
+      padding_top += pixelsToAxisPadding(lengths[1]);
+      padding_bottom += pixelsToAxisPadding(lengths[0]);
     }
 
     if (axisId === 'y' && notEmpty(config.axis_y_padding)) {
@@ -8383,10 +8484,10 @@
 
     if (!config.tooltip_show) {
       return;
-    } // Hide when scatter plot exists
+    } // Hide when stanford plot exists
 
 
-    if ($$.hasType('scatter') || $$.hasType('stanford') || $$.hasArcType()) {
+    if ($$.hasType('stanford') || $$.hasArcType()) {
       return;
     }
 
@@ -8487,16 +8588,7 @@
   ChartInternal.prototype.redrawEventRect = function () {
     var $$ = this,
         d3 = $$.d3,
-        config = $$.config,
-        x,
-        y,
-        w,
-        h; // TODO: rotated not supported yet
-
-    x = 0;
-    y = 0;
-    w = $$.width;
-    h = $$.height;
+        config = $$.config;
 
     function mouseout() {
       $$.svg.select('.' + CLASS.eventRect).style('cursor', null);
@@ -8504,11 +8596,27 @@
       $$.hideTooltip();
       $$.unexpandCircles();
       $$.unexpandBars();
-    } // rects for mouseover
+    }
+
+    var isHoveringDataPoint = function isHoveringDataPoint(mouse, closest) {
+      return closest && ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity);
+    }; // converts 'x' position (in pixel) to category index
+
+
+    var maxDataCount = $$.getMaxDataCount();
+    var xEventScale = d3.scaleQuantize() // use X range (in pixel) as domain
+    .domain([0, config.axis_rotated ? $$.height : $$.width]) // 0 to N evenly distributed
+    .range(maxDataCount ? Array.apply(null, {
+      length: maxDataCount
+    }).map(Function.call, Number) : [0]);
+
+    var withName = function withName(d) {
+      return d ? $$.addName(Object.assign({}, d)) : null;
+    }; // rects for mouseover
 
 
     $$.main.select('.' + CLASS.eventRects).style('cursor', config.zoom_enabled ? config.axis_rotated ? 'ns-resize' : 'ew-resize' : null);
-    $$.eventRect.attr('x', x).attr('y', y).attr('width', w).attr('height', h).on('mouseout', config.interaction_enabled ? function () {
+    $$.eventRect.attr('x', 0).attr('y', 0).attr('width', $$.width).attr('height', $$.height).on('mouseout', config.interaction_enabled ? function () {
       if (!config) {
         return;
       } // chart is destroyed
@@ -8518,43 +8626,59 @@
         return;
       }
 
+      if ($$.mouseover) {
+        config.data_onmouseout.call($$.api, $$.mouseover);
+        $$.mouseover = undefined;
+      }
+
       mouseout();
     } : null).on('mousemove', config.interaction_enabled ? function () {
-      var targetsToShow, mouse, closest, sameXData, selectedData;
-
+      // do nothing when dragging
       if ($$.dragging) {
         return;
-      } // do nothing when dragging
+      }
 
+      var targetsToShow = $$.getTargetsToShow(); // do nothing if arc type
 
       if ($$.hasArcType(targetsToShow)) {
         return;
       }
 
-      targetsToShow = $$.filterTargetsToShow($$.data.targets);
-      mouse = d3.mouse(this);
-      closest = $$.findClosestFromTargets(targetsToShow, mouse);
+      var mouse = d3.mouse(this);
+      var closest = withName($$.findClosestFromTargets(targetsToShow, mouse));
+      var isMouseCloseToDataPoint = isHoveringDataPoint(mouse, closest); // ensure onmouseout is always called if mousemove switch between 2 targets
 
-      if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id)) {
+      if ($$.mouseover && (!closest || closest.id !== $$.mouseover.id || closest.index !== $$.mouseover.index)) {
         config.data_onmouseout.call($$.api, $$.mouseover);
         $$.mouseover = undefined;
       }
 
-      if (!closest) {
-        mouseout();
-        return;
-      }
+      if (closest && !$$.mouseover) {
+        config.data_onmouseover.call($$.api, closest);
+        $$.mouseover = closest;
+      } // show cursor as pointer if we're hovering a data point close enough
 
-      if ($$.isScatterOrStanfordType(closest) || !config.tooltip_grouped) {
-        sameXData = [closest];
+
+      $$.svg.select('.' + CLASS.eventRect).style('cursor', isMouseCloseToDataPoint ? 'pointer' : null); // if tooltip not grouped, we want to display only data from closest data point
+
+      var showSingleDataPoint = !config.tooltip_grouped || $$.hasType('stanford', targetsToShow); // find data to highlight
+
+      var selectedData;
+
+      if (showSingleDataPoint) {
+        if (!closest) {
+          return mouseout();
+        }
+
+        selectedData = [closest];
       } else {
-        sameXData = $$.filterByX(targetsToShow, closest.x);
-      } // show tooltip when cursor is close to some point
+        var mouseX = config.axis_rotated ? mouse[1] : mouse[0];
+        selectedData = $$.filterByIndex(targetsToShow, xEventScale(mouseX));
+      } // inject names for each point
 
 
-      selectedData = sameXData.map(function (d) {
-        return $$.addName(d);
-      });
+      selectedData = selectedData.map(withName); // show tooltip
+
       $$.showTooltip(selectedData, this); // expand points
 
       if (config.point_focus_expand_enabled) {
@@ -8562,51 +8686,50 @@
         selectedData.forEach(function (d) {
           $$.expandCircles(d.index, d.id, false);
         });
-      }
+      } // expand bars
 
-      $$.expandBars(closest.index, closest.id, true); // Show xgrid focus line
 
-      $$.showXGridFocus(selectedData); // Show cursor as pointer if point is close to mouse position
+      $$.unexpandBars();
+      selectedData.forEach(function (d) {
+        $$.expandBars(d.index, d.id, false);
+      }); // Show xgrid focus line
 
-      if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-        $$.svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
-
-        if (!$$.mouseover) {
-          config.data_onmouseover.call($$.api, closest);
-          $$.mouseover = closest;
-        }
-      }
+      $$.showXGridFocus(selectedData);
     } : null).on('click', config.interaction_enabled ? function () {
-      var targetsToShow, mouse, closest, sameXData;
+      var targetsToShow = $$.getTargetsToShow();
 
       if ($$.hasArcType(targetsToShow)) {
         return;
       }
 
-      targetsToShow = $$.filterTargetsToShow($$.data.targets);
-      mouse = d3.mouse(this);
-      closest = $$.findClosestFromTargets(targetsToShow, mouse);
+      var mouse = d3.mouse(this);
+      var closest = withName($$.findClosestFromTargets(targetsToShow, mouse));
 
-      if (!closest) {
+      if (!isHoveringDataPoint(mouse, closest)) {
         return;
       } // select if selection enabled
 
 
-      if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
-        if ($$.isScatterOrStanfordType(closest) || !config.data_selection_grouped) {
-          sameXData = [closest];
-        } else {
-          sameXData = $$.filterByX(targetsToShow, closest.x);
-        }
+      var sameXData;
 
-        sameXData.forEach(function (d) {
-          $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
-            if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
-              $$.toggleShape(this, d, d.index);
-              config.data_onclick.call($$.api, d, this);
-            }
-          });
+      if (!config.data_selection_grouped || $$.isStanfordType(closest)) {
+        sameXData = [closest];
+      } else {
+        sameXData = $$.filterByX(targetsToShow, closest.x);
+      } // toggle selected state
+
+
+      sameXData.forEach(function (d) {
+        $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
+          if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
+            $$.toggleShape(this, d, d.index);
+          }
         });
+      }); // call data_onclick on the closest data point
+
+      if (closest) {
+        var shape = $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(closest.id)).select('.' + CLASS.shape + '-' + closest.index);
+        config.data_onclick.call($$.api, closest, shape.node());
       }
     } : null).call(config.interaction_enabled && config.data_selection_draggable && $$.drag ? d3.drag().on('drag', function () {
       $$.drag(d3.mouse(this));
@@ -9045,17 +9168,22 @@
 
     $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
     var mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region).data(config.regions);
-    var mainRegionEnter = mainRegion.enter().append('rect').attr("x", $$.regionX.bind($$)).attr("y", $$.regionY.bind($$)).attr("width", $$.regionWidth.bind($$)).attr("height", $$.regionHeight.bind($$)).style("fill-opacity", 0);
-    $$.mainRegion = mainRegionEnter.merge(mainRegion).attr('class', $$.classRegion.bind($$));
+    var g = mainRegion.enter().append('g');
+    g.append('rect').attr("x", $$.regionX.bind($$)).attr("y", $$.regionY.bind($$)).attr("width", $$.regionWidth.bind($$)).attr("height", $$.regionHeight.bind($$)).style("fill-opacity", function (d) {
+      return isValue(d.opacity) ? d.opacity : 0.1;
+    });
+    g.append('text').text($$.labelRegion.bind($$));
+    $$.mainRegion = g.merge(mainRegion).attr('class', $$.classRegion.bind($$));
     mainRegion.exit().transition().duration(duration).style("opacity", 0).remove();
   };
 
   ChartInternal.prototype.redrawRegion = function (withTransition, transition) {
     var $$ = this,
-        regions = $$.mainRegion;
+        regions = $$.mainRegion,
+        regionLabels = $$.mainRegion.selectAll('text');
     return [(withTransition ? regions.transition(transition) : regions).attr("x", $$.regionX.bind($$)).attr("y", $$.regionY.bind($$)).attr("width", $$.regionWidth.bind($$)).attr("height", $$.regionHeight.bind($$)).style("fill-opacity", function (d) {
       return isValue(d.opacity) ? d.opacity : 0.1;
-    })];
+    }), (withTransition ? regionLabels.transition(transition) : regionLabels).attr("x", $$.labelOffsetX.bind($$)).attr("y", $$.labelOffsetY.bind($$)).attr("transform", $$.labelTransform.bind($$)).attr("style", 'text-anchor: left;')];
   };
 
   ChartInternal.prototype.regionX = function (d) {
@@ -9124,6 +9252,104 @@
     return !d.axis || d.axis === 'x';
   };
 
+  ChartInternal.prototype.labelRegion = function (d) {
+    return 'label' in d ? d.label : '';
+  };
+
+  ChartInternal.prototype.labelTransform = function (d) {
+    return 'vertical' in d && d.vertical ? "rotate(90)" : "";
+  };
+
+  ChartInternal.prototype.labelOffsetX = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return 'vertical' in d && d.vertical ? this.regionY(d) + paddingY : this.regionX(d) + paddingX;
+  };
+
+  ChartInternal.prototype.labelOffsetY = function (d) {
+    var paddingX = 'paddingX' in d ? d.paddingX : 3;
+    var paddingY = 'paddingY' in d ? d.paddingY : 3;
+    return 'vertical' in d && d.vertical ? -(this.regionX(d) + paddingX) : this.regionY(d) + 10 + paddingY;
+  };
+
+  function c3LogScale(d3, linearScale, logScale) {
+    var PROJECTION = [0.01, 10];
+
+    if (!linearScale) {
+      linearScale = d3.scaleLinear();
+      linearScale.range(PROJECTION);
+    }
+
+    if (!logScale) {
+      logScale = d3.scaleLog();
+      logScale.domain(PROJECTION);
+      logScale.nice();
+    } // copied from https://github.com/compute-io/logspace
+
+
+    function logspace(a, b, len) {
+      var arr, end, tmp, d;
+
+      if (arguments.length < 3) {
+        len = 10;
+      } else {
+        if (len === 0) {
+          return [];
+        }
+      } // Calculate the increment:
+
+
+      end = len - 1;
+      d = (b - a) / end; // Build the output array...
+
+      arr = new Array(len);
+      tmp = a;
+      arr[0] = Math.pow(10, tmp);
+
+      for (var i = 1; i < end; i++) {
+        tmp += d;
+        arr[i] = Math.pow(10, tmp);
+      }
+
+      arr[end] = Math.pow(10, b);
+      return arr;
+    }
+
+    function scale(x) {
+      return logScale(linearScale(x));
+    }
+
+    scale.domain = function (x) {
+      if (!arguments.length) {
+        return linearScale.domain();
+      }
+
+      linearScale.domain(x);
+      return scale;
+    };
+
+    scale.range = function (x) {
+      if (!arguments.length) {
+        return logScale.range();
+      }
+
+      logScale.range(x);
+      return scale;
+    };
+
+    scale.ticks = function (m) {
+      return logspace(-2, 1, m || 10).map(function (v) {
+        return linearScale.invert(v);
+      });
+    };
+
+    scale.copy = function () {
+      return c3LogScale(d3, linearScale.copy(), logScale.copy());
+    };
+
+    return scale;
+  }
+
   ChartInternal.prototype.getScale = function (min, max, forTimeseries) {
     return (forTimeseries ? this.d3.scaleTime() : this.d3.scaleLinear()).range([min, max]);
   };
@@ -9177,12 +9403,38 @@
 
     return scale;
   };
+  /**
+   * Creates and configures a D3 scale instance for the given type.
+   *
+   * By defaults it returns a Linear scale.
+   *
+   * @param {String} type Type of d3-scale to create. Type can be 'linear', 'time', 'timeseries' or 'log'.
+   * @param {Array} domain The scale domain such as [from, to]
+   * @param {Array} range The scale's range such as [from, to]
+   *
+   * @return A d3-scale instance
+   */
 
-  ChartInternal.prototype.getY = function (min, max, domain) {
-    var scale = this.getScale(min, max, this.isTimeSeriesY());
+
+  ChartInternal.prototype.getY = function (type, domain, range) {
+    var scale;
+
+    if (type === 'timeseries' || type === 'time') {
+      scale = this.d3.scaleTime();
+    } else if (type === 'log') {
+      scale = c3LogScale(this.d3);
+    } else if (type === 'linear' || type === undefined) {
+      scale = this.d3.scaleLinear();
+    } else {
+      throw new Error("Invalid Y axis type: \"".concat(type, "\""));
+    }
 
     if (domain) {
       scale.domain(domain);
+    }
+
+    if (range) {
+      scale.range(range);
     }
 
     return scale;
@@ -9213,13 +9465,13 @@
     $$.x = $$.getX($$.xMin, $$.xMax, forInit ? undefined : $$.x.orgDomain(), function () {
       return $$.xAxis.tickOffset();
     });
-    $$.y = $$.getY($$.yMin, $$.yMax, forInit ? config.axis_y_default : $$.y.domain());
-    $$.y2 = $$.getY($$.yMin, $$.yMax, forInit ? config.axis_y2_default : $$.y2.domain());
+    $$.y = $$.getY(config.axis_y_type, forInit ? config.axis_y_default : $$.y.domain(), [$$.yMin, $$.yMax]);
+    $$.y2 = $$.getY(config.axis_y2_type, forInit ? config.axis_y2_default : $$.y2.domain(), [$$.yMin, $$.yMax]);
     $$.subX = $$.getX($$.xMin, $$.xMax, $$.orgXDomain, function (d) {
       return d % 1 ? 0 : $$.subXAxis.tickOffset();
     });
-    $$.subY = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y_default : $$.subY.domain());
-    $$.subY2 = $$.getY($$.subYMin, $$.subYMax, forInit ? config.axis_y2_default : $$.subY2.domain()); // update axes
+    $$.subY = $$.getY(config.axis_y_type, forInit ? config.axis_y_default : $$.subY.domain(), [$$.subYMin, $$.subYMax]);
+    $$.subY2 = $$.getY(config.axis_y2_type, forInit ? config.axis_y2_default : $$.subY2.domain(), [$$.subYMin, $$.subYMax]); // update axes
 
     $$.xAxisTickFormat = $$.axis.getXAxisTickFormat();
     $$.xAxisTickValues = $$.axis.getXAxisTickValues();
@@ -9451,25 +9703,17 @@
       return [[posX + barSpaceOffset, offset], [posX + barSpaceOffset, posY], [posX + barW - barSpaceOffset, posY], [posX + barW - barSpaceOffset, offset]];
     };
   };
+  /**
+   * Returns whether the data point is within the given bar shape.
+   *
+   * @param mouse
+   * @param barShape
+   * @return {boolean}
+   */
 
-  ChartInternal.prototype.isWithinBar = function (mouse, that) {
-    if (that.pathSegList.numberOfItems < 2) {
-      return false;
-    }
 
-    var box = getBBox(that),
-        seg0 = that.pathSegList.getItem(0),
-        seg1 = that.pathSegList.getItem(1),
-        x = Math.min(seg0.x, seg1.x),
-        y = Math.min(seg0.y, seg1.y),
-        w = box.width,
-        h = box.height,
-        offset = 2,
-        sx = x - offset,
-        ex = x + w + offset,
-        sy = y + h + offset,
-        ey = y - offset;
-    return sx < mouse[0] && mouse[0] < ex && ey < mouse[1] && mouse[1] < sy;
+  ChartInternal.prototype.isWithinBar = function (mouse, barShape) {
+    return isWithinBox(mouse, getBBox(barShape), 2);
   };
 
   ChartInternal.prototype.getShapeIndices = function (typeFilter) {
@@ -11322,10 +11566,6 @@
   ChartInternal.prototype.isStanfordType = function (d) {
     var id = isString(d) ? d : d.id;
     return this.config.data_types[id] === 'stanford';
-  };
-
-  ChartInternal.prototype.isScatterOrStanfordType = function (d) {
-    return this.isScatterType(d) || this.isStanfordType(d);
   };
 
   ChartInternal.prototype.isPieType = function (d) {
