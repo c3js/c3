@@ -1,6 +1,6 @@
 {
   "name": "c3",
-  "version": "0.7.9",
+  "version": "0.7.10",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "files": [
