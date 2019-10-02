@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.9 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.10 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1233,7 +1233,7 @@
   };
 
   var c3 = {
-    version: "0.7.9",
+    version: "0.7.10",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -4241,6 +4241,39 @@
         return String(this) + padString.slice(0, targetLength);
       }
     };
+  } // Object.assign polyfill for IE11
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
+
+
+  if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+      value: function assign(target, varArgs) {
+
+        if (target === null || target === undefined) {
+          throw new TypeError('Cannot convert undefined or null to object');
+        }
+
+        var to = Object(target);
+
+        for (var index = 1; index < arguments.length; index++) {
+          var nextSource = arguments[index];
+
+          if (nextSource !== null && nextSource !== undefined) {
+            for (var nextKey in nextSource) {
+              // Avoid bugs when hasOwnProperty is shadowed
+              if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                to[nextKey] = nextSource[nextKey];
+              }
+            }
+          }
+        }
+
+        return to;
+      },
+      writable: true,
+      configurable: true
+    });
   }
   /* jshint ignore:end */
 
@@ -9630,7 +9663,10 @@
   };
 
   ChartInternal.prototype.redrawBar = function (drawBar, withTransition, transition) {
-    return [(withTransition ? this.mainBar.transition(transition) : this.mainBar).attr('d', drawBar).style("stroke", this.color).style("fill", this.color).style("opacity", 1)];
+    var $$ = this;
+    return [(withTransition ? this.mainBar.transition(transition) : this.mainBar).attr('d', drawBar).style("stroke", this.color).style("fill", this.color).style("opacity", function (d) {
+      return $$.isTargetToShow(d.id) ? 1 : 0;
+    })];
   };
 
   ChartInternal.prototype.getBarW = function (axis, barTargetsNum) {
