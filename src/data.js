@@ -515,6 +515,32 @@ ChartInternal.prototype.findClosestFromTargets = function (targets, pos) {
 };
 
 /**
+ * Find the closest point from the x value or undefined if none satisfies conditions.
+ *
+ * @param {Array} targets
+ * @param {Array} x A value on X axis
+ * @return {Object|undefined}
+ */
+ChartInternal.prototype.findClosestFromTargetsByX = function (targets, x) {
+    let closest;
+    let diff;
+
+    targets
+        .forEach((t) => {
+            t.values.forEach((d) => {
+                let newDiff = Math.abs(x - d.x);
+
+                if (diff === undefined || newDiff < diff) {
+                    closest = d;
+                    diff = newDiff;
+                }
+            });
+        });
+
+    return closest;
+};
+
+/**
  * Using given compute distance method, returns the closest data point from the
  * given position.
  *

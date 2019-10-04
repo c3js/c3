@@ -286,7 +286,7 @@ describe('c3 chart interaction', function () {
                     }
                 });
 
-                moveMouse(20, chart.internal.x(2.4));
+                moveMouse(20, 170);
 
                 barList.each(function() {
                     if (this.classList.contains('c3-bar-2') && !this.parentElement.classList.contains('c3-bars-data1')) {
@@ -689,6 +689,83 @@ describe('c3 chart interaction', function () {
                     expect(tooltipData[3].querySelector('.value').textContent).toBe('-100');
                 });
             });
+        });
+    });
+
+    describe('line chart (multiple xs)', function() {
+        let clickedData = [];
+
+        beforeAll(() => {
+            args = {
+                data: {
+                    xs: {
+                        'data1': 'x1',
+                        'data2': 'x2',
+                    },
+                    columns: [
+                        ['x1', 10, 30, 45, 50, 70, 100],
+                        ['x2', 30, 50, 75, 100, 120],
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 20, 180, 240, 100, 190]
+                    ],
+                    type: 'line',
+                    onclick: function(d) {
+                        clickedData.push(d);
+                    }
+                },
+                tooltip: {
+                    grouped: true,
+                    horizontal: true
+                },
+                interaction: {
+                    enabled: true
+                }
+            };
+        });
+
+        beforeEach(function() {
+            clickedData = [];
+        });
+
+        it('shows tooltip with all data', () => {
+            moveMouse(1, 1);
+
+            expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+            let tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+            expect(tooltipData.length).toBe(2); // header + data[1]
+
+            expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+            expect(tooltipData[1].querySelector('.value').textContent).toBe('30');
+
+            moveMouse(107, 95);
+
+            expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+            tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+            expect(tooltipData.length).toBe(3); // header + data[12]
+
+            expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+            expect(tooltipData[1].querySelector('.value').textContent).toBe('200');
+
+            expect(tooltipData[2].querySelector('.name').textContent).toBe('data2');
+            expect(tooltipData[2].querySelector('.value').textContent).toBe('20');
+
+            moveMouse(430, 140);
+
+            expect(document.querySelector('.c3-tooltip-container').style.display).toEqual('block');
+
+            tooltipData = [...document.querySelectorAll('.c3-tooltip tr')];
+
+            expect(tooltipData.length).toBe(3); // header + data[12]
+
+            expect(tooltipData[1].querySelector('.name').textContent).toBe('data1');
+            expect(tooltipData[1].querySelector('.value').textContent).toBe('250');
+
+            expect(tooltipData[2].querySelector('.name').textContent).toBe('data2');
+            expect(tooltipData[2].querySelector('.value').textContent).toBe('100');
         });
     });
 
