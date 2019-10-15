@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <link href="../css/c3.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="chart1"></div>
+    <div id="chart2"></div>
+    <div id="chart3"></div>
+
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="../js/c3.js"></script>
+    <script>
+      var chart1 = c3.generate({
+          bindto: '#chart1',
+          data: {
+              columns: [
+                  ['data', 80.0]
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              label: {
+                  show: false
+              },
+              fullCircle: true,
+              min: 0,
+              max: 100
+          }
+      });
+      var chart2 = c3.generate({
+          bindto: '#chart2',
+          data: {
+              columns: [
+                  ['data', 50.0],
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              label: {
+                  show: false
+              },
+              fullCircle: true,
+              min: -100,
+              max: 100
+          }
+      });
+      var chart3 = c3.generate({
+          bindto: '#chart3',
+          data: {
+              columns: [
+                  ['data', -50.0],
+                  ['data2', 0.0],
+                  ['data3', 50.0],
+              ],
+              type: 'gauge',
+          },
+          gauge: {
+              label: {
+                  show: false
+              },
+              fullCircle: true,
+              min: -100,
+              max: 100
+          }
+      });
+    </script>
+  </body>
+</html>
