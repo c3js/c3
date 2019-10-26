@@ -58,4 +58,4 @@ Please fork this fiddle:
 
 ## License
 
-MIT
+>  **MIT**
