@@ -264,6 +264,9 @@
           = partial :reference_menu_item, locals: { id: 'api.axis.types' }
           = partial :reference_menu_item, locals: { id: 'api.legend.show' }
           = partial :reference_menu_item, locals: { id: 'api.legend.hide' }
+          = partial :reference_menu_item, locals: { id: 'api.subchart.isShown' }
+          = partial :reference_menu_item, locals: { id: 'api.subchart.show' }
+          = partial :reference_menu_item, locals: { id: 'api.subchart.hide' }
           = partial :reference_menu_item, locals: { id: 'api.zoom' }
           = partial :reference_menu_item, locals: { id: 'api.unzoom' }
           = partial :reference_menu_item, locals: { id: 'api.zoom.enable' }
@@ -4992,7 +4995,6 @@
         %h3
           = partial :reference_item_link, locals: { id: 'api.legend.hide' }
         %p Hide legend for each target.
-        %h5 Arguments:
         %div.sourcecode
           %pre
             %code.html.javascript
@@ -5012,6 +5014,43 @@
               \
               \// Hide all legend.
               chart.legend.hide();
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.subchart.isShown' }
+        %p Returns <code>true</code> if the sub chart is shown.
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              if (chart.subchart.isShown()) {
+              &nbsp;&nbsp;// Sub chart is shown
+              }
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.subchart.show' }
+        %p Shows sub chart at the bottom of the chart.
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Show sub chart
+              chart.subchart.show();
+      %hr
+
+      %section
+        %h3
+          = partial :reference_item_link, locals: { id: 'api.subchart.hide' }
+        %p Hides sub chart.
+        %h5 Example:
+        %div.sourcecode
+          %pre
+            %code.html.javascript
+              \// Hide sub chart
+              chart.subchart.hide();
       %hr
 
       %section

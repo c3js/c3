@@ -17,6 +17,7 @@ import './api.pie';
 import './api.region';
 import './api.selection';
 import './api.show';
+import './api.subchart';
 import './api.tooltip';
 import './api.transform';
 import './api.x';
