@@ -1195,6 +1195,21 @@
 </li>
 
 <li>
+<a href='#api-subchart-isShown'>subchart.isShown</a>
+
+</li>
+
+<li>
+<a href='#api-subchart-show'>subchart.show</a>
+
+</li>
+
+<li>
+<a href='#api-subchart-hide'>subchart.hide</a>
+
+</li>
+
+<li>
 <a href='#api-zoom'>zoom</a>
 
 </li>
@@ -6577,7 +6592,6 @@ chart.legend.show();</code></pre>
 
 </h3>
 <p>Hide legend for each target.</p>
-<h5>Arguments:</h5>
 <div class='sourcecode'>
 <pre><code class='html javascript'>.legend.hide(targetIds)</code></pre>
 </div>
@@ -6593,6 +6607,46 @@ chart.legend.hide(['data1', 'data2']);
 
 // Hide all legend.
 chart.legend.hide();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-subchart-isShown'>subchart.isShown</a>
+
+</h3>
+<p>Returns <code>true</code> if the sub chart is shown.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>if (chart.subchart.isShown()) {
+&nbsp;&nbsp;// Sub chart is shown
+}</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-subchart-show'>subchart.show</a>
+
+</h3>
+<p>Shows sub chart at the bottom of the chart.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Show sub chart
+chart.subchart.show();</code></pre>
+</div>
+</section>
+<hr>
+<section>
+<h3>
+<a href='#api-subchart-hide'>subchart.hide</a>
+
+</h3>
+<p>Hides sub chart.</p>
+<h5>Example:</h5>
+<div class='sourcecode'>
+<pre><code class='html javascript'>// Hide sub chart
+chart.subchart.hide();</code></pre>
 </div>
 </section>
 <hr>
