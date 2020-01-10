@@ -8,6 +8,7 @@ components
 # build
 /htdocs/js/c3.js
 /htdocs/js/c3.min.js
+/htdocs/js/c3.esm.js
 /htdocs/css/c3.css
 /htdocs/css/c3.min.css
 /build
