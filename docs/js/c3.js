@@ -1,9 +1,9 @@
-/* @license C3.js v0.7.11 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.12 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global.c3 = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -1232,7 +1232,7 @@
   };
 
   var c3 = {
-    version: "0.7.11",
+    version: "0.7.12",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -1471,7 +1471,7 @@
       $$.initDragZoom();
     }
 
-    if ($$.initSubchart) {
+    if (config.subchart_show && $$.initSubchart) {
       $$.initSubchart();
     }
 
@@ -1497,7 +1497,7 @@
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
 
 
-    if ($$.initSubchartBrush) {
+    if (config.subchart_show && $$.initSubchartBrush) {
       $$.initSubchartBrush();
     }
     /*-- Main Region --*/
@@ -1661,7 +1661,8 @@
   };
 
   ChartInternal.prototype.updateTargets = function (targets) {
-    var $$ = this;
+    var $$ = this,
+        config = $$.config;
     /*-- Main --*/
     //-- Text --//
 
@@ -1677,7 +1678,7 @@
     /*-- Sub --*/
 
 
-    if ($$.updateTargetsForSubchart) {
+    if (config.subchart_show && $$.updateTargetsForSubchart) {
       $$.updateTargetsForSubchart(targets);
     } // Fade-in each chart
 
@@ -1850,7 +1851,7 @@
     } // subchart
 
 
-    if ($$.redrawSubchart) {
+    if (config.subchart_show && $$.redrawSubchart) {
       $$.redrawSubchart(withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices);
     }
 
@@ -2140,12 +2141,12 @@
 
   ChartInternal.prototype.updateSvgSize = function () {
     var $$ = this,
-        brush = $$.svg.select(".c3-brush .overlay");
+        brush = $$.svg.select(".".concat(CLASS.brush, " .overlay"));
     $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight);
     $$.svg.selectAll(['#' + $$.clipId, '#' + $$.clipIdForGrid]).select('rect').attr('width', $$.width).attr('height', $$.height);
     $$.svg.select('#' + $$.clipIdForXAxis).select('rect').attr('x', $$.getXAxisClipX.bind($$)).attr('y', $$.getXAxisClipY.bind($$)).attr('width', $$.getXAxisClipWidth.bind($$)).attr('height', $$.getXAxisClipHeight.bind($$));
     $$.svg.select('#' + $$.clipIdForYAxis).select('rect').attr('x', $$.getYAxisClipX.bind($$)).attr('y', $$.getYAxisClipY.bind($$)).attr('width', $$.getYAxisClipWidth.bind($$)).attr('height', $$.getYAxisClipHeight.bind($$));
-    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() ? brush.attr('height') : 0); // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
+    $$.svg.select('#' + $$.clipIdForSubchart).select('rect').attr('width', $$.width).attr('height', brush.size() && brush.attr('height') || 0); // MEMO: parent div's height will be bigger than svg when <!DOCTYPE html>
 
     $$.selectChart.style('max-height', $$.currentHeight + "px");
   };
@@ -5260,6 +5261,53 @@
     });
   };
 
+  Chart.prototype.subchart = function () {};
+
+  Chart.prototype.subchart.isShown = function () {
+    var $$ = this.internal;
+    return $$.config.subchart_show;
+  };
+
+  Chart.prototype.subchart.show = function () {
+    var $$ = this.internal;
+
+    if ($$.config.subchart_show) {
+      return;
+    }
+
+    $$.config.subchart_show = true; // insert DOM
+
+    $$.initSubchart(); // update dimensions with sub chart now visible
+
+    $$.updateDimension(); // insert brush (depends on sizes previously updated)
+
+    $$.initSubchartBrush(); // attach data
+
+    $$.updateTargetsForSubchart($$.getTargets()); // reset fade-in state
+
+    $$.mapToIds($$.data.targets).forEach(function (id) {
+      $$.withoutFadeIn[id] = false;
+    }); // redraw chart !
+
+    $$.updateAndRedraw(); // update visible targets !
+
+    $$.showTargets();
+  };
+
+  Chart.prototype.subchart.hide = function () {
+    var $$ = this.internal;
+
+    if (!$$.config.subchart_show) {
+      return;
+    }
+
+    $$.config.subchart_show = false; // remove DOM
+
+    $$.removeSubchart(); // re-render chart
+
+    $$.redraw();
+  };
+
   Chart.prototype.tooltip = function () {};
 
   Chart.prototype.tooltip.show = function (args) {
@@ -7308,6 +7356,15 @@
     return targets.filter(function (t) {
       return $$.isTargetToShow(t.id);
     });
+  };
+  /**
+   * @return {Array} Returns all the targets attached to the chart, visible or not
+   */
+
+
+  ChartInternal.prototype.getTargets = function () {
+    var $$ = this;
+    return $$.data.targets;
   };
 
   ChartInternal.prototype.mapTargetsToUniqueXs = function (targets) {
@@ -10623,10 +10680,9 @@
   ChartInternal.prototype.initSubchart = function () {
     var $$ = this,
         config = $$.config,
-        context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context')),
-        visibility = config.subchart_show ? 'visible' : 'hidden'; // set style
+        context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context')); // set style
 
-    context.style('visibility', visibility); // Define g for chart area
+    context.style('visibility', 'visible'); // Define g for chart area
 
     context.append('g').attr("clip-path", $$.clipPathForSubchart).attr('class', CLASS.chart); // Define g for bar chart area
 
@@ -10659,26 +10715,23 @@
         classBars = $$.classBars.bind($$),
         classChartLine = $$.classChartLine.bind($$),
         classLines = $$.classLines.bind($$),
-        classAreas = $$.classAreas.bind($$);
+        classAreas = $$.classAreas.bind($$); //-- Bar --//
 
-    if (config.subchart_show) {
-      //-- Bar --//
-      contextBar = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar).data(targets);
-      contextBarEnter = contextBar.enter().append('g').style('opacity', 0);
-      contextBarEnter.merge(contextBar).attr('class', classChartBar); // Bars for each data
+    contextBar = context.select('.' + CLASS.chartBars).selectAll('.' + CLASS.chartBar).data(targets);
+    contextBarEnter = contextBar.enter().append('g').style('opacity', 0);
+    contextBarEnter.merge(contextBar).attr('class', classChartBar); // Bars for each data
 
-      contextBarEnter.append('g').attr("class", classBars); //-- Line --//
+    contextBarEnter.append('g').attr("class", classBars); //-- Line --//
 
-      contextLine = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine).data(targets);
-      contextLineEnter = contextLine.enter().append('g').style('opacity', 0);
-      contextLineEnter.merge(contextLine).attr('class', classChartLine); // Lines for each data
+    contextLine = context.select('.' + CLASS.chartLines).selectAll('.' + CLASS.chartLine).data(targets);
+    contextLineEnter = contextLine.enter().append('g').style('opacity', 0);
+    contextLineEnter.merge(contextLine).attr('class', classChartLine); // Lines for each data
 
-      contextLineEnter.append("g").attr("class", classLines); // Area
+    contextLineEnter.append("g").attr("class", classLines); // Area
 
-      contextLineEnter.append("g").attr("class", classAreas); //-- Brush --//
+    contextLineEnter.append("g").attr("class", classAreas); //-- Brush --//
 
-      context.selectAll('.' + CLASS.brush + ' rect').attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
-    }
+    context.selectAll('.' + CLASS.brush + ' rect').attr(config.axis_rotated ? "width" : "height", config.axis_rotated ? $$.width2 : $$.height2);
   };
 
   ChartInternal.prototype.updateBarForSubchart = function (durationForExit) {
@@ -10724,36 +10777,31 @@
   ChartInternal.prototype.redrawSubchart = function (withSubchart, transitions, duration, durationForExit, areaIndices, barIndices, lineIndices) {
     var $$ = this,
         d3 = $$.d3,
-        config = $$.config,
         drawAreaOnSub,
         drawBarOnSub,
-        drawLineOnSub;
-    $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden'); // subchart
+        drawLineOnSub; // reflect main chart to extent on subchart if zoomed
 
-    if (config.subchart_show) {
-      // reflect main chart to extent on subchart if zoomed
-      if (d3.event && d3.event.type === 'zoom') {
+    if (d3.event && d3.event.type === 'zoom') {
+      $$.brush.selectionAsValue($$.x.orgDomain());
+    } // update subchart elements if needed
+
+
+    if (withSubchart) {
+      // extent rect
+      if (!$$.brush.empty()) {
         $$.brush.selectionAsValue($$.x.orgDomain());
-      } // update subchart elements if needed
+      } // setup drawer - MEMO: this must be called after axis updated
 
 
-      if (withSubchart) {
-        // extent rect
-        if (!$$.brush.empty()) {
-          $$.brush.selectionAsValue($$.x.orgDomain());
-        } // setup drawer - MEMO: this must be called after axis updated
-
-
-        drawAreaOnSub = $$.generateDrawArea(areaIndices, true);
-        drawBarOnSub = $$.generateDrawBar(barIndices, true);
-        drawLineOnSub = $$.generateDrawLine(lineIndices, true);
-        $$.updateBarForSubchart(duration);
-        $$.updateLineForSubchart(duration);
-        $$.updateAreaForSubchart(duration);
-        $$.redrawBarForSubchart(drawBarOnSub, duration, duration);
-        $$.redrawLineForSubchart(drawLineOnSub, duration, duration);
-        $$.redrawAreaForSubchart(drawAreaOnSub, duration, duration);
-      }
+      drawAreaOnSub = $$.generateDrawArea(areaIndices, true);
+      drawBarOnSub = $$.generateDrawBar(barIndices, true);
+      drawLineOnSub = $$.generateDrawLine(lineIndices, true);
+      $$.updateBarForSubchart(duration);
+      $$.updateLineForSubchart(duration);
+      $$.updateAreaForSubchart(duration);
+      $$.redrawBarForSubchart(drawBarOnSub, duration, duration);
+      $$.redrawLineForSubchart(drawLineOnSub, duration, duration);
+      $$.redrawAreaForSubchart(drawAreaOnSub, duration, duration);
     }
   };
 
@@ -10804,6 +10852,13 @@
     }
 
     return selection;
+  };
+
+  ChartInternal.prototype.removeSubchart = function () {
+    var $$ = this;
+    $$.brush = null;
+    $$.context.remove();
+    $$.context = null;
   };
 
   ChartInternal.prototype.initText = function () {
@@ -11856,4 +11911,4 @@
 
   return c3;
 
-}));
+})));
