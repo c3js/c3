@@ -3,9 +3,11 @@
   "version": "0.7.11",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
+  "module": "c3.esm.js",
   "files": [
     "c3.js",
     "c3.min.js",
+    "c3.esm.js",
     "c3.css",
     "c3.min.css",
     "src"
@@ -78,6 +80,7 @@
     "npm-run-all": "^4.1.3",
     "rollup": "^1.27.4",
     "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-modify": "^3.0.0",
     "sass": "^1.10.3",
     "status-back": "^1.1.0",
     "uglify-js": "^3.6.4",
