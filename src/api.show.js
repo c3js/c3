@@ -10,7 +10,7 @@ Chart.prototype.show = function (targetIds, options) {
     targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
     targets.transition()
-        .style('display', 'initial', 'important')
+        .style('display', 'block', 'important')
         .style('opacity', 1, 'important')
         .call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
