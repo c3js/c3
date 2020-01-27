@@ -87,3 +87,38 @@ export var isWithinBox = function(point, box, sensitivity = 0) {
     return xStart < point[0] && point[0] < xEnd && yEnd < point[1] && point[1] < yStart;
 };
 
+/**
+ * Returns Internet Explorer version number (or false if no Internet Explorer used).
+ */
+export var getIEVersion = function() {
+    // https://stackoverflow.com/questions/19999388/check-if-user-is-using-ie
+    const agent = window.navigator.userAgent;
+
+    let pos = agent.indexOf('MSIE '); // up to IE10
+    if (pos > 0) {
+        return parseInt(agent.substring(pos + 5, agent.indexOf('.', pos)), 10);
+    }
+
+    pos = agent.indexOf('Trident/'); // IE11
+    if (pos > 0) {
+        pos = agent.indexOf('rv:');
+        return parseInt(agent.substring(pos + 3, agent.indexOf('.', pos)), 10);
+    }
+
+    return false;
+};
+
+/**
+ * Returns whether the used browser is Internet Explorer.
+ *
+ * @param {Number} version Optional parameter to specify IE version
+ */
+export var isIE = function(version) {
+    const ver = getIEVersion();
+
+    if (typeof version === 'undefined') {
+        return !!ver;
+    }
+
+    return version === ver;
+};

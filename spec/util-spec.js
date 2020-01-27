@@ -14,7 +14,9 @@ import {
     notEmpty,
     sanitise,
     isNumber,
-    flattenArray
+    flattenArray,
+    getIEVersion,
+    isIE
 } from '../src/util';
 
 describe('util.js tests', function () {
@@ -211,6 +213,17 @@ describe('util.js tests', function () {
         });
         it('notEmpty should return true for nonempty_string', function () {
             expect(notEmpty(nonempty_string)).toBe(true);
+        });
+
+    });
+
+    describe('getIEVersion and isIE', function () {
+
+        it('getIEVersion should return a number or false', function () {
+            expect(getIEVersion()).toMatch(/(\d+|false)/);
+        });
+        it('isIE should return true or false', function () {
+            expect(isIE()).toMatch(/(true|false)/);
         });
 
     });
