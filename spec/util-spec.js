@@ -219,10 +219,23 @@ describe('util.js tests', function () {
 
     describe('getIEVersion and isIE', function () {
 
-        it('getIEVersion should return a number or false', function () {
+        it('getIEVersion should return 10 for user agent string "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)"', function () {
+            expect(getIEVersion('Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)')).toBe(10);
+        });
+        it('getIEVersion should return 11 for user agent string "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"', function () {
+            expect(getIEVersion('Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko')).toBe(11);
+        });
+        it('getIEVersion should return false for user agent string "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0"', function () {
+            expect(getIEVersion('Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0')).toBe(false);
+        });
+        it('getIEVersion should return a number or false if parameter "agent" is not used', function () {
             expect(getIEVersion()).toMatch(/(\d+|false)/);
         });
-        it('isIE should return true or false', function () {
+
+        it('isIE should return false for version number 6', function () {
+            expect(isIE(6)).toMatch(/(true|false)/);
+        });
+        it('isIE should return true or false if parameter "version" is not used', function () {
             expect(isIE()).toMatch(/(true|false)/);
         });
 

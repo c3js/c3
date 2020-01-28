@@ -89,10 +89,14 @@ export var isWithinBox = function(point, box, sensitivity = 0) {
 
 /**
  * Returns Internet Explorer version number (or false if no Internet Explorer used).
+ *
+ * @param string agent Optional parameter to specify user agent
  */
-export var getIEVersion = function() {
+export var getIEVersion = function(agent) {
     // https://stackoverflow.com/questions/19999388/check-if-user-is-using-ie
-    const agent = window.navigator.userAgent;
+    if (typeof agent === 'undefined') {
+        agent = window.navigator.userAgent;
+    }
 
     let pos = agent.indexOf('MSIE '); // up to IE10
     if (pos > 0) {
