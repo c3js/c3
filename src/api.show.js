@@ -1,4 +1,5 @@
 import { Chart } from './core';
+import { isIE } from './util';
 
 Chart.prototype.show = function (targetIds, options) {
     var $$ = this.internal, targets;
@@ -10,7 +11,7 @@ Chart.prototype.show = function (targetIds, options) {
     targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
     targets.transition()
-        .style('display', 'initial', 'important')
+        .style('display', isIE() ? 'block' : 'initial', 'important')
         .style('opacity', 1, 'important')
         .call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
