@@ -1,8 +1,8 @@
 import { ChartInternal } from './core';
+import { isIE } from './util';
 
 ChartInternal.prototype.getClipPath = function (id) {
-    var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
-    return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";
+    return "url(" + (isIE(9) ? "" : document.URL.split('#')[0]) + "#" + id + ")";
 };
 ChartInternal.prototype.appendClip = function (parent, id) {
     return parent.append("clipPath").attr("id", id).append("rect");
