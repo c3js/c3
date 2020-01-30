@@ -233,7 +233,7 @@ describe('util.js tests', function () {
         });
 
         it('isIE should return false for version number 6', function () {
-            expect(isIE(6)).toMatch(/(true|false)/);
+            expect(isIE(6)).toBe(false);
         });
         it('isIE should return true or false if parameter "version" is not used', function () {
             expect(isIE()).toMatch(/(true|false)/);
