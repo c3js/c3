@@ -3,7 +3,6 @@
   "version": "0.7.12",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
-  "module": "c3.esm.js",
   "files": [
     "c3.js",
     "c3.min.js",
