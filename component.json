@@ -2,7 +2,7 @@
   "name": "c3",
   "repo": "masayuki0812/c3",
   "description": "A D3-based reusable chart library",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "keywords": [],
   "dependencies": {
     "mbostock/d3": "v5.0.0"
