@@ -435,6 +435,43 @@ describe('c3 chart arc', function () {
                 });
             });
         });
+
+        describe('with more than one data value ', function () {
+            beforeAll(function () {
+                args = {
+                    data: {
+                        columns: [
+                            ['padded1', 40, 60],
+                            ['padded2', 100, -10],
+                            ['padded3', 0, 50],
+                            ['padded4', 20, 0]
+                        ],
+                        type: 'gauge'
+                    },
+                    color: {
+                        pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+                        threshold: {
+                            values: [30, 80, 95]
+                        }
+                    }
+                };
+            });
+            var arcColor = ['rgb(96, 176, 68)', 'rgb(246, 198, 0)', 'rgb(249, 118, 0)', 'rgb(255, 0, 0)'];
+
+            describe('should contain arcs ', function () {
+                it('each data_column should have one arc', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc').each(function (d, i) {
+                        expect(d3.select(this).classed('c3-arc-' + args.data.columns[i][0])).toBeTruthy();
+                    });
+                });
+
+                it('each arc should have the color from color_pattern if color_treshold is given ', function () {
+                    chart.internal.main.selectAll('.c3-chart-arc .c3-arc').each(function (d, i) {
+                        expect(d3.select(this).style('fill')).toBe(arcColor[i]);
+                    });
+                });
+            });
+        });
     });
 
 });

@@ -312,7 +312,7 @@ ChartInternal.prototype.updateLegend = function (targetIds, options, transitions
             .data(targetIds);
         (withTransition ? tiles.transition() : tiles)
             .style('stroke', $$.levelColor ? function(id) {
-                return $$.levelColor($$.cache[id].values[0].value);
+                return $$.levelColor($$.cache[id].values.reduce(function (total, item) { return total + item.value; }, 0));
             } : $$.color)
             .attr('x1', x1ForLegendTile)
             .attr('y1', yForLegendTile)
