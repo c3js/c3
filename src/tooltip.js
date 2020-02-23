@@ -239,4 +239,5 @@ ChartInternal.prototype.showTooltip = function (selectedData, element) {
 };
 ChartInternal.prototype.hideTooltip = function () {
     this.tooltip.style("display", "none");
+    this.config.tooltip_onhide.call(this);
 };
