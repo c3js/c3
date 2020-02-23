@@ -694,6 +694,8 @@ ChartInternal.prototype.redraw = function(options, transitions) {
             xForText: xForText,
             yForText: yForText
         });
+
+        $$.redrawArea(drawArea);
     }
 
     if (duration && $$.isTabVisible()) { // Only use transition if tab visible. See #938.
