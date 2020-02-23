@@ -26,6 +26,12 @@ Chart.prototype.load = function (args) {
             config.data_axes[id] = args.axes[id];
         });
     }
+    // update names if exists
+    if ('names' in args) {
+        Object.keys(args.names).forEach(function (id) {
+            config.data_names[id] = args.names[id];
+        });
+    }
     // update colors if exists
     if ('colors' in args) {
         Object.keys(args.colors).forEach(function (id) {
