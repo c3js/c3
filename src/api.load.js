@@ -20,6 +20,23 @@ Chart.prototype.load = function (args) {
     if ('categories' in args && $$.isCategorized()) {
         config.axis_x_categories = args.categories;
     }
+    // update axis if exists
+    if ('axis' in args) {
+        // update axis values if exists
+        if ('values' in args.axis) {
+            if ('x' in args.axis.values) {
+                config.axis_x_tick_values = args.axis.values.x;
+            }
+
+            if ('y' in args.axis.values) {
+                config.axis_y_tick_values = args.axis.values.y;
+            }
+
+            if ('y2' in args.axis.values) {
+                config.axis_y2_tick_values = args.axis.values.y2;
+            }
+        }
+    }
     // update axes if exists
     if ('axes' in args) {
         Object.keys(args.axes).forEach(function (id) {
