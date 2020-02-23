@@ -506,7 +506,8 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         backgroundArc
             .exit()
             .remove();
-
+        
+        $$.innerRadius = $$.innerRadius || 0;
         $$.arcs.select('.' + CLASS.chartArcsGaugeUnit)
             .attr("dy", ".75em")
             .text(config.gauge_label_show ? config.gauge_units : '');
