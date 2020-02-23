@@ -50,11 +50,11 @@ ChartInternal.prototype.drag = function (mouse) {
                 // line/area selection not supported yet
                 return;
             }
-            if (isWithin ^ isIncluded) {
-                shape.classed(CLASS.INCLUDED, !isIncluded);
+            if (isWithin ^ isSelected || isWithin ^ isIncluded) {
+                shape.classed(CLASS.INCLUDED, isWithin);
                 // TODO: included/unincluded callback here
-                shape.classed(CLASS.SELECTED, !isSelected);
-                toggle.call($$, !isSelected, shape, d, i);
+                shape.classed(CLASS.SELECTED, isWithin);
+                toggle.call($$, isWithin, shape, d, i);
             }
         });
 };
