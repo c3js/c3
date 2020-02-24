@@ -1,8 +1,12 @@
-/* @license C3.js v0.7.12 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.14 | (c) C3 Team and other contributors | http://c3js.org/ */
 import * as d3 from 'd3';
 
 function ChartInternal(api) {
     var $$ = this;
+    // Note: This part will be replaced by rollup-plugin-modify
+    // When bundling esm output. Beware of changing this line.
+    // TODO: Maybe we should check that the modification by rollup-plugin-modify
+    // is valid during unit tests.
     $$.d3 = d3;
     $$.api = api;
     $$.config = $$.getDefaultConfig();
@@ -122,6 +126,46 @@ var isWithinBox = function(point, box, sensitivity = 0) {
     const yEnd = box.y - sensitivity;
 
     return xStart < point[0] && point[0] < xEnd && yEnd < point[1] && point[1] < yStart;
+};
+
+/**
+ * Returns Internet Explorer version number (or false if no Internet Explorer used).
+ *
+ * @param string agent Optional parameter to specify user agent
+ */
+var getIEVersion = function(agent) {
+    // https://stackoverflow.com/questions/19999388/check-if-user-is-using-ie
+    if (typeof agent === 'undefined') {
+        agent = window.navigator.userAgent;
+    }
+
+    let pos = agent.indexOf('MSIE '); // up to IE10
+    if (pos > 0) {
+        return parseInt(agent.substring(pos + 5, agent.indexOf('.', pos)), 10);
+    }
+
+    pos = agent.indexOf('Trident/'); // IE11
+    if (pos > 0) {
+        pos = agent.indexOf('rv:');
+        return parseInt(agent.substring(pos + 3, agent.indexOf('.', pos)), 10);
+    }
+
+    return false;
+};
+
+/**
+ * Returns whether the used browser is Internet Explorer.
+ *
+ * @param {Number} version Optional parameter to specify IE version
+ */
+var isIE = function(version) {
+    const ver = getIEVersion();
+
+    if (typeof version === 'undefined') {
+        return !!ver;
+    }
+
+    return version === ver;
 };
 
 function AxisInternal(component, params) {
@@ -1025,7 +1069,7 @@ Axis.prototype.redraw = function redraw(duration, isHidden) {
 };
 
 var c3 = {
-    version: "0.7.12",
+    version: "0.7.14",
     chart: {
         fn: Chart.prototype,
         internal: {
@@ -4656,7 +4700,7 @@ Chart.prototype.show = function (targetIds, options) {
     targets = $$.svg.selectAll($$.selectorTargets(targetIds));
 
     targets.transition()
-        .style('display', 'initial', 'important')
+        .style('display', isIE() ? 'block' : 'initial', 'important')
         .style('opacity', 1, 'important')
         .call($$.endall, function () {
             targets.style('opacity', null).style('opacity', 1);
@@ -5243,7 +5287,9 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         }
         else {
             mainArcLabelLine
-                .style("fill", function (d) { return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data); })
+                .style("fill", function (d) {
+                    return $$.levelColor ? $$.levelColor(d.data.values.reduce(function (total, item) { return total + item.value; }, 0)) : $$.color(d.data);
+                })
                 .style("display", config.gauge_labelLine_show ? "" : "none")
                 .each(function (d) {
                     var lineLength = 0, lineThickness = 2, x = 0, y = 0, transform = "";
@@ -5352,7 +5398,7 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         })
         .attr("transform", withTransform ? "scale(1)" : "")
         .style("fill", function (d) {
-            return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
+            return $$.levelColor ? $$.levelColor(d.data.values.reduce(function (total, item) { return total + item.value; }, 0)) : $$.color(d.data.id);
         }) // Where gauge reading color would receive customization.
         .call($$.endall, function () {
             $$.transiting = false;
@@ -5596,8 +5642,7 @@ ChartInternal.prototype.selectorLegends = function (ids) {
 };
 
 ChartInternal.prototype.getClipPath = function (id) {
-    var isIE9 = window.navigator.appVersion.toLowerCase().indexOf("msie 9.") >= 0;
-    return "url(" + (isIE9 ? "" : document.URL.split('#')[0]) + "#" + id + ")";
+    return "url(" + (isIE(9) ? "" : document.URL.split('#')[0]) + "#" + id + ")";
 };
 ChartInternal.prototype.appendClip = function (parent, id) {
     return parent.append("clipPath").attr("id", id).append("rect");
@@ -8195,7 +8240,7 @@ ChartInternal.prototype.updateLegend = function (targetIds, options, transitions
             .data(targetIds);
         (withTransition ? tiles.transition() : tiles)
             .style('stroke', $$.levelColor ? function(id) {
-                return $$.levelColor($$.cache[id].values[0].value);
+                return $$.levelColor($$.cache[id].values.reduce(function (total, item) { return total + item.value; }, 0));
             } : $$.color)
             .attr('x1', x1ForLegendTile)
             .attr('y1', yForLegendTile)
