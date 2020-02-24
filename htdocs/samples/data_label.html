@@ -18,6 +18,8 @@
     <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
     <script src="../js/c3.js"></script>
     <script>
+      const currencyFormatter = (v/*, ratio, id*/) =>
+        v === null ? 'Not Applicable' : d3.format('$')(v);
 
       var chart1 = c3.generate({
         bindto: '#chart1',
@@ -27,12 +29,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         }
       });
@@ -45,12 +42,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         }
       });
@@ -63,12 +55,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         }
       });
@@ -81,12 +68,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         },
         axis: {
@@ -102,12 +84,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         },
         axis: {
@@ -123,12 +100,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         },
         axis: {
@@ -178,12 +150,7 @@
           ],
           type: 'bar',
           labels: {
-            format: function (v, id) {
-                if (v === null) {
-                    return 'Not Applicable';
-                }
-                return d3.format('$')(v);
-            }
+            format: currencyFormatter
           }
         },
         axis: {
