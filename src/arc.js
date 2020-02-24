@@ -354,7 +354,9 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         }
         else {
             mainArcLabelLine
-                .style("fill", function (d) { return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data); })
+                .style("fill", function (d) {
+                    return $$.levelColor ? $$.levelColor(d.data.values.reduce(function (total, item) { return total + item.value; }, 0)) : $$.color(d.data);
+                })
                 .style("display", config.gauge_labelLine_show ? "" : "none")
                 .each(function (d) {
                     var lineLength = 0, lineThickness = 2, x = 0, y = 0, transform = "";
@@ -463,7 +465,7 @@ ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTra
         })
         .attr("transform", withTransform ? "scale(1)" : "")
         .style("fill", function (d) {
-            return $$.levelColor ? $$.levelColor(d.data.values[0].value) : $$.color(d.data.id);
+            return $$.levelColor ? $$.levelColor(d.data.values.reduce(function (total, item) { return total + item.value; }, 0)) : $$.color(d.data.id);
         }) // Where gauge reading color would receive customization.
         .call($$.endall, function () {
             $$.transiting = false;
