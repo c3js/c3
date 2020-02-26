@@ -63,7 +63,20 @@ ChartInternal.prototype.convertJsonToData = function (json, keys) {
     }
     return data;
 };
+/**
+ * Finds value from the given nested object by the given path.
+ * If it's not found, then this returns undefined.
+ * @param {Object} object the object
+ * @param {string} path the path
+ */
 ChartInternal.prototype.findValueInJson = function (object, path) {
+    if (path in object) {
+        // If object has a key that contains . or [], return the key's value
+        // instead of searching for an inner object.
+        // See https://github.com/c3js/c3/issues/1691 for details.
+        return object[path];
+    }
+
     path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
     path = path.replace(/^\./, '');           // strip a leading dot
     var pathArray = path.split('.');
