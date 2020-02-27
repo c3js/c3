@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.14 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.15 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1279,7 +1279,7 @@
   };
 
   var c3 = {
-    version: "0.7.14",
+    version: "0.7.15",
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -6845,8 +6845,22 @@
 
     return data;
   };
+  /**
+   * Finds value from the given nested object by the given path.
+   * If it's not found, then this returns undefined.
+   * @param {Object} object the object
+   * @param {string} path the path
+   */
+
 
   ChartInternal.prototype.findValueInJson = function (object, path) {
+    if (path in object) {
+      // If object has a key that contains . or [], return the key's value
+      // instead of searching for an inner object.
+      // See https://github.com/c3js/c3/issues/1691 for details.
+      return object[path];
+    }
+
     path = path.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties (replace [] with .)
 
     path = path.replace(/^\./, ''); // strip a leading dot
