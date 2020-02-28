@@ -34,10 +34,10 @@ install_and_test: &install_and_test
     - *restore_modules_cache
     - run:
         name: Installing Dependencies
-        command: npm install
+        command: yarn
     - *save_modules_cache
-    - run: npm test
-    - run: npm run codecov
+    - run: yarn test
+    - run: yarn codecov
     - store_artifacts:
         path: htdocs
         destination: htdocs
@@ -67,11 +67,11 @@ jobs:
           paths:
             - vendor/bundle
       - *restore_modules_cache
-      - run: npm install
+      - run: yarn
       - *save_modules_cache
-      - run: npm run build
-      - run: npm run copy-to-docs
-      - run: npm run build:docs
+      - run: yarn build
+      - run: yarn copy-to-docs
+      - run: yarn build:docs
       - store_artifacts:
           path: build
           destination: docs
