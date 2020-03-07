@@ -92,12 +92,5 @@
       "src/polyfill.js",
       "spec/"
     ]
-  },
-  "greenkeeper": {
-    "ignore": [
-      "d3",
-      "jasmine-core",
-      "karma-jasmine"
-    ]
   }
 }
