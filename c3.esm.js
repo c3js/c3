@@ -7954,7 +7954,7 @@ ChartInternal.prototype.initLegend = function () {
         return;
     }
     // MEMO: call here to update legend box and tranlate for all
-    // MEMO: translate will be upated by this, so transform not needed in updateLegend()
+    // MEMO: translate will be updated by this, so transform not needed in updateLegend()
     $$.updateLegendWithDefaults();
 };
 ChartInternal.prototype.updateLegendWithDefaults = function () {
