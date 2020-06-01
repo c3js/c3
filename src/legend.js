@@ -366,38 +366,53 @@ ChartInternal.prototype.updateLegend = function(
     .style('visibility', function(id) {
       return $$.isLegendToShow(id) ? 'visible' : 'hidden'
     })
-    .style('cursor', 'pointer')
-    .on('click', function(id) {
-      if (config.legend_item_onclick) {
-        config.legend_item_onclick.call($$, id)
-      } else {
-        if ($$.d3.event.altKey) {
-          $$.api.hide()
-          $$.api.show(id)
-        } else {
-          $$.api.toggle(id)
-          $$.isTargetToShow(id) ? $$.api.focus(id) : $$.api.revert()
-        }
-      }
+    .style('cursor', function() {
+      return config.interaction_enabled ? 'pointer' : 'auto'
     })
-    .on('mouseover', function(id) {
-      if (config.legend_item_onmouseover) {
-        config.legend_item_onmouseover.call($$, id)
-      } else {
-        $$.d3.select(this).classed(CLASS.legendItemFocused, true)
-        if (!$$.transiting && $$.isTargetToShow(id)) {
-          $$.api.focus(id)
-        }
-      }
-    })
-    .on('mouseout', function(id) {
-      if (config.legend_item_onmouseout) {
-        config.legend_item_onmouseout.call($$, id)
-      } else {
-        $$.d3.select(this).classed(CLASS.legendItemFocused, false)
-        $$.api.revert()
-      }
-    })
+    .on('click',
+      config.interaction_enabled
+        ? function(id) {
+            if (config.legend_item_onclick) {
+              config.legend_item_onclick.call($$, id)
+            } else {
+              if ($$.d3.event.altKey) {
+                $$.api.hide()
+                $$.api.show(id)
+              } else {
+                $$.api.toggle(id)
+                $$.isTargetToShow(id) ? $$.api.focus(id) : $$.api.revert()
+              }
+            }
+          }
+        : null
+    )
+    .on('mouseover',
+      config.interaction_enabled
+        ? function(id) {
+            if (config.legend_item_onmouseover) {
+              config.legend_item_onmouseover.call($$, id)
+            } else {
+              $$.d3.select(this).classed(CLASS.legendItemFocused, true)
+              if (!$$.transiting && $$.isTargetToShow(id)) {
+                $$.api.focus(id)
+              }
+            }
+          }
+        : null
+    )
+    .on('mouseout',
+      config.interaction_enabled
+        ? function(id) {
+            if (config.legend_item_onmouseout) {
+              config.legend_item_onmouseout.call($$, id)
+            } else {
+              $$.d3.select(this).classed(CLASS.legendItemFocused, false)
+              $$.api.revert()
+            }
+          }
+        : null
+    );
+
   l.append('text')
     .text(function(id) {
       return isDefined(config.data_names[id]) ? config.data_names[id] : id
@@ -408,11 +423,13 @@ ChartInternal.prototype.updateLegend = function(
     .style('pointer-events', 'none')
     .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendText : -200)
     .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendText)
+
   l.append('rect')
     .attr('class', CLASS.legendItemEvent)
     .style('fill-opacity', 0)
     .attr('x', $$.isLegendRight || $$.isLegendInset ? xForLegendRect : -200)
     .attr('y', $$.isLegendRight || $$.isLegendInset ? -200 : yForLegendRect)
+
   l.append('line')
     .attr('class', CLASS.legendItemTile)
     .style('stroke', $$.color)
