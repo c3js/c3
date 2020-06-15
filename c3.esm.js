@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.16 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.17 | (c) C3 Team and other contributors | http://c3js.org/ */
 import * as d3 from 'd3';
 
 function ChartInternal(api) {
@@ -1407,7 +1407,7 @@ Axis.prototype.redraw = function redraw(duration, isHidden) {
 };
 
 var c3 = {
-  version: '0.7.16',
+  version: '0.7.17',
   chart: {
     fn: Chart.prototype,
     internal: {
@@ -13688,6 +13688,7 @@ ChartInternal.prototype.showTooltip = function(selectedData, element) {
     positionFunction =
       config.tooltip_position || ChartInternal.prototype.tooltipPosition;
   if (dataToShow.length === 0 || !config.tooltip_show) {
+    $$.hideTooltip();
     return
   }
   $$.tooltip
