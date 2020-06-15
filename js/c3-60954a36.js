@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.16 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.17 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1295,7 +1295,7 @@
   };
 
   var c3 = {
-    version: '0.7.16',
+    version: '0.7.17',
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -11672,6 +11672,7 @@
         positionFunction = config.tooltip_position || ChartInternal.prototype.tooltipPosition;
 
     if (dataToShow.length === 0 || !config.tooltip_show) {
+      $$.hideTooltip();
       return;
     }
 
