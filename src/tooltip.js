@@ -270,7 +270,7 @@ ChartInternal.prototype.showTooltip = function(selectedData, element) {
     positionFunction =
       config.tooltip_position || ChartInternal.prototype.tooltipPosition
   if (dataToShow.length === 0 || !config.tooltip_show) {
-    $$.hideTooltip();
+    $$.hideTooltip()
     return
   }
   $$.tooltip

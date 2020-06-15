@@ -369,7 +369,8 @@ ChartInternal.prototype.updateLegend = function(
     .style('cursor', function() {
       return config.interaction_enabled ? 'pointer' : 'auto'
     })
-    .on('click',
+    .on(
+      'click',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onclick) {
@@ -386,7 +387,8 @@ ChartInternal.prototype.updateLegend = function(
           }
         : null
     )
-    .on('mouseover',
+    .on(
+      'mouseover',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onmouseover) {
@@ -400,7 +402,8 @@ ChartInternal.prototype.updateLegend = function(
           }
         : null
     )
-    .on('mouseout',
+    .on(
+      'mouseout',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onmouseout) {
@@ -411,7 +414,7 @@ ChartInternal.prototype.updateLegend = function(
             }
           }
         : null
-    );
+    )
 
   l.append('text')
     .text(function(id) {
