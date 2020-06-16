@@ -1,21 +1,21 @@
 import { ChartInternal } from './core'
 
 ChartInternal.prototype.initTitle = function() {
-  var $$ = this
+  const $$ = this
   $$.title = $$.svg
     .append('text')
     .text($$.config.title_text)
     .attr('class', $$.CLASS.title)
 }
 ChartInternal.prototype.redrawTitle = function() {
-  var $$ = this
+  const $$ = this
   $$.title.attr('x', $$.xForTitle.bind($$)).attr('y', $$.yForTitle.bind($$))
 }
 ChartInternal.prototype.xForTitle = function() {
-  var $$ = this,
-    config = $$.config,
-    position = config.title_position || 'left',
-    x
+  const $$ = this
+  const config = $$.config
+  const position = config.title_position || 'left'
+  let x
   if (position.indexOf('right') >= 0) {
     x =
       $$.currentWidth -
@@ -43,7 +43,7 @@ ChartInternal.prototype.xForTitle = function() {
   return x
 }
 ChartInternal.prototype.yForTitle = function() {
-  var $$ = this
+  const $$ = this
   return (
     $$.config.title_padding.top +
     $$.getTextRect($$.title.node().textContent, $$.CLASS.title, $$.title.node())
@@ -51,6 +51,6 @@ ChartInternal.prototype.yForTitle = function() {
   )
 }
 ChartInternal.prototype.getTitlePadding = function() {
-  var $$ = this
+  const $$ = this
   return $$.yForTitle() + $$.config.title_padding.bottom
 }

@@ -2,7 +2,7 @@ import CLASS from './class'
 import { ChartInternal } from './core'
 
 ChartInternal.prototype.load = function(targets, args) {
-  var $$ = this
+  const $$ = this
   if (targets) {
     // filter loading targets if needed
     if (args.filter) {
@@ -11,13 +11,13 @@ ChartInternal.prototype.load = function(targets, args) {
     // set type if args.types || args.type specified
     if (args.type || args.types) {
       targets.forEach(function(t) {
-        var type = args.types && args.types[t.id] ? args.types[t.id] : args.type
+        const type = args.types && args.types[t.id] ? args.types[t.id] : args.type
         $$.setTargetType(t.id, type)
       })
     }
     // Update/Add data
     $$.data.targets.forEach(function(d) {
-      for (var i = 0; i < targets.length; i++) {
+      for (let i = 0; i < targets.length; i++) {
         if (d.id === targets[i].id) {
           d.values = targets[i].values
           targets.splice(i, 1)
@@ -43,7 +43,7 @@ ChartInternal.prototype.load = function(targets, args) {
   }
 }
 ChartInternal.prototype.loadFromArgs = function(args) {
-  var $$ = this
+  const $$ = this
 
   $$.resetCache()
 
@@ -76,7 +76,7 @@ ChartInternal.prototype.loadFromArgs = function(args) {
   }
 }
 ChartInternal.prototype.unload = function(targetIds, done) {
-  var $$ = this
+  const $$ = this
 
   $$.resetCache()
 

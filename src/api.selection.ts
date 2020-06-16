@@ -3,7 +3,7 @@ import { Chart } from './core'
 import { isDefined } from './util'
 
 Chart.prototype.selected = function(targetId) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     d3 = $$.d3
   return $$.main
     .selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(targetId))
@@ -13,12 +13,12 @@ Chart.prototype.selected = function(targetId) {
     })
     .nodes()
     .map(function(d) {
-      var data = d.__data__
+      const data = d.__data__
       return data.data ? data.data : data
     })
 }
 Chart.prototype.select = function(ids, indices, resetOther) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     d3 = $$.d3,
     config = $$.config
   if (!config.data_selection_enabled) {
@@ -28,7 +28,7 @@ Chart.prototype.select = function(ids, indices, resetOther) {
     .selectAll('.' + CLASS.shapes)
     .selectAll('.' + CLASS.shape)
     .each(function(d, i) {
-      var shape = d3.select(this),
+      const shape = d3.select(this),
         id = d.data ? d.data.id : d.id,
         toggle = $$.getToggle(this, d).bind($$),
         isTargetId =
@@ -51,7 +51,7 @@ Chart.prototype.select = function(ids, indices, resetOther) {
     })
 }
 Chart.prototype.unselect = function(ids, indices) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     d3 = $$.d3,
     config = $$.config
   if (!config.data_selection_enabled) {
@@ -61,7 +61,7 @@ Chart.prototype.unselect = function(ids, indices) {
     .selectAll('.' + CLASS.shapes)
     .selectAll('.' + CLASS.shape)
     .each(function(d, i) {
-      var shape = d3.select(this),
+      const shape = d3.select(this),
         id = d.data ? d.data.id : d.id,
         toggle = $$.getToggle(this, d).bind($$),
         isTargetId =

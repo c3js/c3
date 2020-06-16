@@ -1,7 +1,7 @@
 import { ChartInternal } from './core'
 
 function c3LogScale(d3, linearScale?, logScale?) {
-  var PROJECTION = [0.01, 10]
+  const PROJECTION = [0.01, 10]
 
   if (!linearScale) {
     linearScale = d3.scaleLinear()
@@ -16,7 +16,7 @@ function c3LogScale(d3, linearScale?, logScale?) {
 
   // copied from https://github.com/compute-io/logspace
   function logspace(a, b, len) {
-    var arr, end, tmp, d
+    let arr, end, tmp, d
 
     if (arguments.length < 3) {
       len = 10
@@ -33,7 +33,7 @@ function c3LogScale(d3, linearScale?, logScale?) {
     arr = new Array(len)
     tmp = a
     arr[0] = Math.pow(10, tmp)
-    for (var i = 1; i < end; i++) {
+    for (let i = 1; i < end; i++) {
       tmp += d
       arr[i] = Math.pow(10, tmp)
     }
@@ -81,7 +81,7 @@ ChartInternal.prototype.getScale = function(min, max, forTimeseries) {
   ])
 }
 ChartInternal.prototype.getX = function(min, max, domain, offset) {
-  var $$ = this,
+  let $$ = this,
     scale = $$.getScale(min, max, $$.isTimeSeries()),
     _scale = domain ? scale.domain(domain) : scale,
     key
@@ -93,12 +93,12 @@ ChartInternal.prototype.getX = function(min, max, domain, offset) {
         return 0
       }
     scale = function(d, raw) {
-      var v = _scale(d) + offset(d)
+      const v = _scale(d) + offset(d)
       return raw ? v : Math.ceil(v)
     }
   } else {
     scale = function(d, raw) {
-      var v = _scale(d)
+      const v = _scale(d)
       return raw ? v : Math.ceil(v)
     }
   }
@@ -163,7 +163,7 @@ ChartInternal.prototype.getSubYScale = function(id) {
   return this.axis.getId(id) === 'y2' ? this.subY2 : this.subY
 }
 ChartInternal.prototype.updateScales = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     forInit = !$$.x
   // update edges

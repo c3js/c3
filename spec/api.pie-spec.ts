@@ -3,7 +3,7 @@ import { initChart } from './c3-helper'
 describe('c3 api pie', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   args = {
     data: {

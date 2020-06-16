@@ -3,12 +3,12 @@ import { d3, setMouseEvent, initChart } from './c3-helper'
 describe('c3 chart tooltip', function() {
   'use strict'
 
-  var chart
-  var tooltipConfiguration = {}
-  var dataOrder: any = 'desc'
-  var dataGroups
+  let chart
+  let tooltipConfiguration = {}
+  let dataOrder: any = 'desc'
+  let dataGroups
 
-  var args = function() {
+  const args = function() {
     return {
       data: {
         columns: [
@@ -36,12 +36,12 @@ describe('c3 chart tooltip', function() {
 
     describe('without left margin', function() {
       it('should show tooltip on proper position', function() {
-        var eventRect = d3.select('.c3-event-rect').node(),
+        const eventRect = d3.select('.c3-event-rect').node(),
           x = chart.internal.x(1),
           y = chart.internal.y(200)
         setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-        var tooltipContainer = d3.select('.c3-tooltip-container'),
+        const tooltipContainer = d3.select('.c3-tooltip-container'),
           top = Math.floor(+tooltipContainer.style('top').replace(/px/, '')),
           left = Math.floor(+tooltipContainer.style('left').replace(/px/, ''))
         expect(top).toBeGreaterThan(0)
@@ -55,12 +55,12 @@ describe('c3 chart tooltip', function() {
       })
 
       it('should show tooltip on proper position', function() {
-        var eventRect = d3.select('.c3-event-rect').node(),
+        const eventRect = d3.select('.c3-event-rect').node(),
           x = chart.internal.x(1) + 300, // add margin-left
           y = chart.internal.y(200)
         setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-        var tooltipContainer = d3.select('.c3-tooltip-container'),
+        const tooltipContainer = d3.select('.c3-tooltip-container'),
           top = Math.floor(+tooltipContainer.style('top').replace(/px/, '')),
           left = Math.floor(+tooltipContainer.style('left').replace(/px/, ''))
         expect(top).toBeGreaterThan(0)
@@ -74,7 +74,7 @@ describe('c3 chart tooltip', function() {
   })
 
   describe('tooltip positionFunction', function() {
-    var topExpected = 37,
+    const topExpected = 37,
       leftExpected = 79
 
     beforeAll(function() {
@@ -97,12 +97,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should be set to the coordinate where the function returned', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var tooltipContainer = d3.select('.c3-tooltip-container'),
+      const tooltipContainer = d3.select('.c3-tooltip-container'),
         top = Math.floor(+tooltipContainer.style('top').replace(/px/, '')),
         left = Math.floor(+tooltipContainer.style('left').replace(/px/, ''))
       expect(top).toBeGreaterThan(0)
@@ -118,12 +118,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should sort values desc', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -144,12 +144,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each data in descending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -170,12 +170,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each data in ascending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -196,12 +196,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each data in given order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -217,7 +217,7 @@ describe('c3 chart tooltip', function() {
 
   describe('tooltip with data_order as Function with grouped data', function() {
     beforeAll(function() {
-      var order = ['data2', 'data1', 'data3']
+      const order = ['data2', 'data1', 'data3']
       dataOrder = function(data1, data2) {
         return order.indexOf(data1.id) - order.indexOf(data2.id)
       }
@@ -225,12 +225,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each data in order given by function', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -251,12 +251,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each data in order given by array', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -276,12 +276,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value descending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -301,12 +301,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in ascending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -326,12 +326,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in given data order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -347,19 +347,19 @@ describe('c3 chart tooltip', function() {
 
   describe('tooltip with data_order as Function with un-grouped data', function() {
     beforeAll(function() {
-      var order = ['data2', 'data1', 'data3']
+      const order = ['data2', 'data1', 'data3']
       dataOrder = function(data1, data2) {
         return order.indexOf(data1.id) - order.indexOf(data2.id)
       }
     })
 
     it('should display each tooltip value in data order given by function', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -379,12 +379,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in data order given by array', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -410,12 +410,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value descending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -441,12 +441,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in ascending order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(220)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -468,12 +468,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in given order', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -489,7 +489,7 @@ describe('c3 chart tooltip', function() {
 
   describe('tooltip with tooltip_order as Function', function() {
     beforeAll(function() {
-      var order = ['data2', 'data1', 'data3']
+      const order = ['data2', 'data1', 'data3']
       tooltipConfiguration = {
         order: function(data1, data2) {
           return order.indexOf(data1.id) - order.indexOf(data2.id)
@@ -498,12 +498,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in data order given by function', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {
@@ -525,12 +525,12 @@ describe('c3 chart tooltip', function() {
     })
 
     it('should display each tooltip value in data order given by array', function() {
-      var eventRect = d3.select('.c3-event-rect').node(),
+      const eventRect = d3.select('.c3-event-rect').node(),
         x = chart.internal.x(2),
         y = chart.internal.y(100)
       setMouseEvent(chart, 'mousemove', x, y, eventRect)
 
-      var classes = d3
+      const classes = d3
         .selectAll('.c3-tooltip tr')
         .nodes()
         .map(function(node) {

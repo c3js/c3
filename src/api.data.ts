@@ -2,7 +2,7 @@ import { Chart } from './core'
 import { isArray } from './util'
 
 Chart.prototype.data = function(targetIds) {
-  var targets = this.internal.data.targets
+  const targets = this.internal.data.targets
   return typeof targetIds === 'undefined'
     ? targets
     : targets.filter(function(t) {

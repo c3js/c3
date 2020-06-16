@@ -3,9 +3,9 @@ import { initChart } from './c3-helper'
 describe('c3 chart domain', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  let args = {
     data: {
       columns: [
         ['data1', 30, 200, 100, 400, 150, 250],
@@ -25,11 +25,11 @@ describe('c3 chart domain', function() {
   describe('axis.y.min', function() {
     describe('should change axis.y.min to -100', function() {
       beforeAll(function() {
-        ;(args.axis.y as any).min = -100
+        (args.axis.y as any).min = -100
       })
 
       it('should be set properly when smaller than max of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBe(-150)
         expect(domain[1]).toBe(450)
       })
@@ -37,29 +37,29 @@ describe('c3 chart domain', function() {
 
     describe('should change axis.y.min to 500', function() {
       beforeAll(function() {
-        ;(args.axis.y as any).min = 500
+        (args.axis.y as any).min = 500
       })
 
       it('should be set properly when bigger than max of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBe(499)
         expect(domain[1]).toBe(511)
       })
     })
 
     afterAll(function() {
-      ;(args.axis.y as any).min = undefined
+      (args.axis.y as any).min = undefined
     })
   })
 
   describe('axis.y.max', function() {
     describe('should change axis.y.max to 1000', function() {
       beforeAll(function() {
-        ;(args.axis.y as any).max = 1000
+        (args.axis.y as any).max = 1000
       })
 
       it('should be set properly when bigger than min of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBe(-89)
         expect(domain[1]).toBe(1099)
       })
@@ -67,11 +67,11 @@ describe('c3 chart domain', function() {
 
     describe('should change axis.y.max to 0', function() {
       beforeAll(function() {
-        ;(args.axis.y as any).max = 0
+        (args.axis.y as any).max = 0
       })
 
       it('should be set properly when smaller than min of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBe(-11)
         expect(domain[1]).toBe(1)
       })
@@ -98,7 +98,7 @@ describe('c3 chart domain', function() {
       })
 
       it('should be set properly when bigger than min of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBeCloseTo(-9, -1)
         expect(domain[1]).toBeCloseTo(69, -1)
       })
@@ -126,7 +126,7 @@ describe('c3 chart domain', function() {
       })
 
       it('should be set properly when bigger than min of data', function() {
-        var domain = chart.internal.y.domain()
+        const domain = chart.internal.y.domain()
         expect(domain[0]).toBeCloseTo(-9, -1)
         expect(domain[1]).toBeCloseTo(69, -1)
       })

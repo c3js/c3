@@ -3,24 +3,24 @@ import { ChartInternal } from './core'
 import { isValue } from './util'
 
 ChartInternal.prototype.initRegion = function() {
-  var $$ = this
+  const $$ = this
   $$.region = $$.main
     .append('g')
     .attr('clip-path', $$.clipPath)
     .attr('class', CLASS.regions)
 }
 ChartInternal.prototype.updateRegion = function(duration) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   // hide if arc type
   $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible')
 
-  var mainRegion = $$.main
+  const mainRegion = $$.main
     .select('.' + CLASS.regions)
     .selectAll('.' + CLASS.region)
     .data(config.regions)
-  var g = mainRegion.enter().append('g')
+  const g = mainRegion.enter().append('g')
   g.append('rect')
     .attr('x', $$.regionX.bind($$))
     .attr('y', $$.regionY.bind($$))
@@ -39,7 +39,7 @@ ChartInternal.prototype.updateRegion = function(duration) {
     .remove()
 }
 ChartInternal.prototype.redrawRegion = function(withTransition, transition) {
-  var $$ = this,
+  const $$ = this,
     regions = $$.mainRegion,
     regionLabels = $$.mainRegion.selectAll('text')
   return [
@@ -59,7 +59,7 @@ ChartInternal.prototype.redrawRegion = function(withTransition, transition) {
   ]
 }
 ChartInternal.prototype.regionX = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     xPos,
     yScale = d.axis === 'y' ? $$.y : $$.y2
@@ -75,7 +75,7 @@ ChartInternal.prototype.regionX = function(d) {
   return xPos
 }
 ChartInternal.prototype.regionY = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     yPos,
     yScale = d.axis === 'y' ? $$.y : $$.y2
@@ -91,7 +91,7 @@ ChartInternal.prototype.regionY = function(d) {
   return yPos
 }
 ChartInternal.prototype.regionWidth = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     start = $$.regionX(d),
     end,
@@ -112,7 +112,7 @@ ChartInternal.prototype.regionWidth = function(d) {
   return end < start ? 0 : end - start
 }
 ChartInternal.prototype.regionHeight = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     start = this.regionY(d),
     end,
@@ -142,15 +142,15 @@ ChartInternal.prototype.labelTransform = function(d) {
   return 'vertical' in d && d.vertical ? 'rotate(90)' : ''
 }
 ChartInternal.prototype.labelOffsetX = function(d) {
-  var paddingX = 'paddingX' in d ? d.paddingX : 3
-  var paddingY = 'paddingY' in d ? d.paddingY : 3
+  const paddingX = 'paddingX' in d ? d.paddingX : 3
+  const paddingY = 'paddingY' in d ? d.paddingY : 3
   return 'vertical' in d && d.vertical
     ? this.regionY(d) + paddingY
     : this.regionX(d) + paddingX
 }
 ChartInternal.prototype.labelOffsetY = function(d) {
-  var paddingX = 'paddingX' in d ? d.paddingX : 3
-  var paddingY = 'paddingY' in d ? d.paddingY : 3
+  const paddingX = 'paddingX' in d ? d.paddingX : 3
+  const paddingY = 'paddingY' in d ? d.paddingY : 3
   return 'vertical' in d && d.vertical
     ? -(this.regionX(d) + paddingX)
     : this.regionY(d) + 10 + paddingY

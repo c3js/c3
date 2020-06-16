@@ -13,7 +13,7 @@ import {
   notEmpty
 } from './util'
 
-var c3 = {
+const c3 = {
   version: '0.7.18',
   chart: {
     fn: Chart.prototype,
@@ -41,7 +41,7 @@ ChartInternal.prototype.afterInit = function() {
   // can do something
 }
 ChartInternal.prototype.init = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   $$.initParams()
@@ -66,7 +66,7 @@ ChartInternal.prototype.init = function() {
 }
 
 ChartInternal.prototype.initParams = function() {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3,
     config = $$.config
 
@@ -196,10 +196,10 @@ ChartInternal.prototype.initChartElements = function() {
 }
 
 ChartInternal.prototype.initWithData = function(data) {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3,
     config = $$.config
-  var defs,
+  let defs,
     main,
     binding = true
 
@@ -393,10 +393,10 @@ ChartInternal.prototype.initWithData = function(data) {
 }
 
 ChartInternal.prototype.smoothLines = function(el, type) {
-  var $$ = this
+  const $$ = this
   if (type === 'grid') {
     el.each(function() {
-      var g = $$.d3.select(this),
+      const g = $$.d3.select(this),
         x1 = g.attr('x1'),
         x2 = g.attr('x2'),
         y1 = g.attr('y1'),
@@ -412,9 +412,9 @@ ChartInternal.prototype.smoothLines = function(el, type) {
 }
 
 ChartInternal.prototype.updateSizes = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
-  var legendHeight = $$.legend ? $$.getLegendHeight() : 0,
+  const legendHeight = $$.legend ? $$.getLegendHeight() : 0,
     legendWidth = $$.legend ? $$.getLegendWidth() : 0,
     legendHeightForBottom =
       $$.isLegendRight || $$.isLegendInset ? 0 : legendHeight,
@@ -515,7 +515,7 @@ ChartInternal.prototype.updateSizes = function() {
 }
 
 ChartInternal.prototype.updateTargets = function(targets) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   /*-- Main --*/
@@ -544,7 +544,7 @@ ChartInternal.prototype.updateTargets = function(targets) {
   $$.showTargets()
 }
 ChartInternal.prototype.showTargets = function() {
-  var $$ = this
+  const $$ = this
   $$.svg
     .selectAll('.' + CLASS.target)
     .filter(function(d) {
@@ -556,14 +556,14 @@ ChartInternal.prototype.showTargets = function() {
 }
 
 ChartInternal.prototype.redraw = function(options, transitions) {
-  var $$ = this,
+  const $$ = this,
     main = $$.main,
     d3 = $$.d3,
     config = $$.config
-  var areaIndices = $$.getShapeIndices($$.isAreaType),
+  const areaIndices = $$.getShapeIndices($$.isAreaType),
     barIndices = $$.getShapeIndices($$.isBarType),
     lineIndices = $$.getShapeIndices($$.isLineType)
-  var withY,
+  let withY,
     withSubchart,
     withTransition,
     withTransitionForExit,
@@ -576,16 +576,16 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     withEventRect,
     withDimension,
     withUpdateXAxis
-  var hideAxis = $$.hasArcType()
-  var drawArea, drawBar, drawLine, xForText, yForText
-  var duration, durationForExit, durationForAxis
-  var transitionsToWait, waitForDraw, flow, transition
-  var targetsToShow = $$.filterTargetsToShow($$.data.targets),
+  const hideAxis = $$.hasArcType()
+  let drawArea, drawBar, drawLine, xForText, yForText
+  let duration, durationForExit, durationForAxis
+  let transitionsToWait, waitForDraw, flow, transition
+  let targetsToShow = $$.filterTargetsToShow($$.data.targets),
     tickValues,
     i,
     intervalForCulling,
     xDomainForZoom
-  var xv = $$.xv.bind($$),
+  let xv = $$.xv.bind($$),
     cx,
     cy
 
@@ -681,7 +681,7 @@ ChartInternal.prototype.redraw = function(options, transitions) {
         }
       }
       $$.svg.selectAll('.' + CLASS.axisX + ' .tick text').each(function(e) {
-        var index = tickValues.indexOf(e)
+        const index = tickValues.indexOf(e)
         if (index >= 0) {
           d3.select(this).style(
             'display',
@@ -861,7 +861,7 @@ ChartInternal.prototype.redraw = function(options, transitions) {
 }
 
 ChartInternal.prototype.updateAndRedraw = function(options) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     transitions
   options = options || {}
@@ -914,7 +914,7 @@ ChartInternal.prototype.isCategorized = function() {
   return this.config.axis_x_type.indexOf('categor') >= 0
 }
 ChartInternal.prototype.isCustomX = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return !$$.isTimeSeries() && (config.data_x || notEmpty(config.data_xs))
 }
@@ -924,7 +924,7 @@ ChartInternal.prototype.isTimeSeriesY = function() {
 }
 
 ChartInternal.prototype.getTranslate = function(target) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     x,
     y
@@ -964,10 +964,10 @@ ChartInternal.prototype.initialOpacityForCircle = function(d) {
     : 0
 }
 ChartInternal.prototype.opacityForCircle = function(d) {
-  var isPointShouldBeShown = isFunction(this.config.point_show)
+  const isPointShouldBeShown = isFunction(this.config.point_show)
     ? this.config.point_show(d)
     : this.config.point_show
-  var opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0
+  const opacity = isPointShouldBeShown || this.isStanfordType(d) ? 1 : 0
   return isValue(d.value) ? (this.isScatterType(d) ? 0.5 : opacity) : 0
 }
 ChartInternal.prototype.opacityForText = function() {
@@ -977,7 +977,7 @@ ChartInternal.prototype.xx = function(d) {
   return d ? this.x(d.x) : null
 }
 ChartInternal.prototype.xvCustom = function(d, xyValue) {
-  var $$ = this,
+  let $$ = this,
     value = xyValue ? d[xyValue] : d.value
   if ($$.isTimeSeries()) {
     value = $$.parseDate(d.value)
@@ -987,13 +987,13 @@ ChartInternal.prototype.xvCustom = function(d, xyValue) {
   return Math.ceil($$.x(value))
 }
 ChartInternal.prototype.yvCustom = function(d, xyValue) {
-  var $$ = this,
+  const $$ = this,
     yScale = d.axis && d.axis === 'y2' ? $$.y2 : $$.y,
     value = xyValue ? d[xyValue] : d.value
   return Math.ceil(yScale(value))
 }
 ChartInternal.prototype.xv = function(d) {
-  var $$ = this,
+  let $$ = this,
     value = d.value
   if ($$.isTimeSeries()) {
     value = $$.parseDate(d.value)
@@ -1003,7 +1003,7 @@ ChartInternal.prototype.xv = function(d) {
   return Math.ceil($$.x(value))
 }
 ChartInternal.prototype.yv = function(d) {
-  var $$ = this,
+  const $$ = this,
     yScale = d.axis && d.axis === 'y2' ? $$.y2 : $$.y
   return Math.ceil(yScale(d.value))
 }
@@ -1012,7 +1012,7 @@ ChartInternal.prototype.subxx = function(d) {
 }
 
 ChartInternal.prototype.transformMain = function(withTransition, transitions) {
-  var $$ = this,
+  let $$ = this,
     xAxis,
     yAxis,
     y2Axis
@@ -1040,7 +1040,7 @@ ChartInternal.prototype.transformMain = function(withTransition, transitions) {
       y2Axis = y2Axis.transition()
     }
   }
-  ;(withTransition ? $$.main.transition() : $$.main).attr(
+  (withTransition ? $$.main.transition() : $$.main).attr(
     'transform',
     $$.getTranslate('main')
   )
@@ -1052,7 +1052,7 @@ ChartInternal.prototype.transformMain = function(withTransition, transitions) {
     .attr('transform', $$.getTranslate('arc'))
 }
 ChartInternal.prototype.transformAll = function(withTransition, transitions) {
-  var $$ = this
+  const $$ = this
   $$.transformMain(withTransition, transitions)
   if ($$.config.subchart_show) {
     $$.transformContext(withTransition, transitions)
@@ -1063,7 +1063,7 @@ ChartInternal.prototype.transformAll = function(withTransition, transitions) {
 }
 
 ChartInternal.prototype.updateSvgSize = function() {
-  var $$ = this,
+  const $$ = this,
     brush = $$.svg.select(`.${CLASS.brush} .overlay`)
   $$.svg.attr('width', $$.currentWidth).attr('height', $$.currentHeight)
   $$.svg
@@ -1095,7 +1095,7 @@ ChartInternal.prototype.updateSvgSize = function() {
 }
 
 ChartInternal.prototype.updateDimension = function(withoutAxis) {
-  var $$ = this
+  const $$ = this
   if (!withoutAxis) {
     if ($$.config.axis_rotated) {
       $$.axes.x.call($$.xAxis)
@@ -1112,7 +1112,7 @@ ChartInternal.prototype.updateDimension = function(withoutAxis) {
 }
 
 ChartInternal.prototype.observeInserted = function(selection) {
-  var $$ = this,
+  let $$ = this,
     observer
   if (typeof MutationObserver === 'undefined') {
     window.console.error('MutationObserver not defined.')
@@ -1157,7 +1157,7 @@ ChartInternal.prototype.observeInserted = function(selection) {
  * Binds handlers to the window resize event.
  */
 ChartInternal.prototype.bindResize = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   $$.resizeFunction = $$.generateResize() // need to call .remove
@@ -1226,7 +1226,7 @@ ChartInternal.prototype.unbindWindowFocus = function() {
 }
 
 ChartInternal.prototype.generateResize = function() {
-  var resizeFunctions = []
+  const resizeFunctions = []
 
   function callResizeFunctions() {
     resizeFunctions.forEach(function(f) {
@@ -1237,7 +1237,7 @@ ChartInternal.prototype.generateResize = function() {
     resizeFunctions.push(f)
   }
   callResizeFunctions.remove = function(f) {
-    for (var i = 0; i < resizeFunctions.length; i++) {
+    for (let i = 0; i < resizeFunctions.length; i++) {
       if (resizeFunctions[i] === f) {
         resizeFunctions.splice(i, 1)
         break
@@ -1248,7 +1248,7 @@ ChartInternal.prototype.generateResize = function() {
 }
 
 ChartInternal.prototype.endall = function(transition, callback) {
-  var n = 0
+  let n = 0
   transition
     .each(function() {
       ++n
@@ -1260,15 +1260,15 @@ ChartInternal.prototype.endall = function(transition, callback) {
     })
 }
 ChartInternal.prototype.generateWait = function() {
-  var $$ = this
-  var transitionsToWait = [],
+  const $$ = this
+  const transitionsToWait = [],
     f = function(callback) {
       var timer = setInterval(function() {
         if (!$$.isTabVisible()) {
           return
         }
 
-        var done = 0
+        let done = 0
         transitionsToWait.forEach(function(t) {
           if (t.empty()) {
             done += 1
@@ -1295,7 +1295,7 @@ ChartInternal.prototype.generateWait = function() {
 }
 
 ChartInternal.prototype.parseDate = function(date) {
-  var $$ = this,
+  let $$ = this,
     parsedDate
   if (date instanceof Date) {
     parsedDate = date

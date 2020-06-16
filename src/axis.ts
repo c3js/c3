@@ -17,7 +17,7 @@ export default class AxisClass {
 const Axis = AxisClass as any
 
 Axis.prototype.init = function init() {
-  var $$ = this.owner,
+  const $$ = this.owner,
     config = $$.config,
     main = $$.main
   $$.axes.x = main
@@ -64,7 +64,7 @@ Axis.prototype.getXAxis = function getXAxis(
   withoutTransition,
   withoutRotateTickText
 ) {
-  var $$ = this.owner,
+  const $$ = this.owner,
     config = $$.config,
     axisParams = {
       isCategory: $$.isCategorized(),
@@ -100,7 +100,7 @@ Axis.prototype.updateXAxisTickValues = function updateXAxisTickValues(
   targets,
   axis
 ) {
-  var $$ = this.owner,
+  let $$ = this.owner,
     config = $$.config,
     tickValues
   if (config.axis_x_tick_fit || config.axis_x_tick_count) {
@@ -155,13 +155,13 @@ Axis.prototype.getYAxis = function getYAxis(
   return axis
 }
 Axis.prototype.getId = function getId(id) {
-  var config = this.owner.config
+  const config = this.owner.config
   return id in config.data_axes ? config.data_axes[id] : 'y'
 }
 Axis.prototype.getXAxisTickFormat = function getXAxisTickFormat() {
   // #2251 previously set any negative values to a whole number,
   // however both should be truncated according to the users format specification
-  var $$ = this.owner,
+  const $$ = this.owner,
     config = $$.config
   let format = $$.isTimeSeries()
     ? $$.defaultAxisTimeFormat
@@ -210,7 +210,7 @@ Axis.prototype.getY2AxisTickValues = function getY2AxisTickValues() {
 Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(
   axisId
 ) {
-  var $$ = this.owner,
+  let $$ = this.owner,
     config = $$.config,
     option
   if (axisId === 'y') {
@@ -223,11 +223,11 @@ Axis.prototype.getLabelOptionByAxisId = function getLabelOptionByAxisId(
   return option
 }
 Axis.prototype.getLabelText = function getLabelText(axisId) {
-  var option = this.getLabelOptionByAxisId(axisId)
+  const option = this.getLabelOptionByAxisId(axisId)
   return isString(option) ? option : option ? option.text : null
 }
 Axis.prototype.setLabelText = function setLabelText(axisId, text) {
-  var $$ = this.owner,
+  const $$ = this.owner,
     config = $$.config,
     option = this.getLabelOptionByAxisId(axisId)
   if (isString(option)) {
@@ -246,7 +246,7 @@ Axis.prototype.getLabelPosition = function getLabelPosition(
   axisId,
   defaultPosition
 ) {
-  var option = this.getLabelOptionByAxisId(axisId),
+  const option = this.getLabelOptionByAxisId(axisId),
     position =
       option && typeof option === 'object' && option.position
         ? option.position
@@ -297,7 +297,7 @@ Axis.prototype.textForY2AxisLabel = function textForY2AxisLabel() {
   return this.getLabelText('y2')
 }
 Axis.prototype.xForAxisLabel = function xForAxisLabel(forHorizontal, position) {
-  var $$ = this.owner
+  const $$ = this.owner
   if (forHorizontal) {
     return position.isLeft ? 0 : position.isCenter ? $$.width / 2 : $$.width
   } else {
@@ -365,7 +365,7 @@ Axis.prototype.dxForY2AxisLabel = function dxForY2AxisLabel() {
   )
 }
 Axis.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
-  var $$ = this.owner,
+  const $$ = this.owner,
     config = $$.config,
     position = this.getXAxisLabelPosition()
   if (config.axis_rotated) {
@@ -377,7 +377,7 @@ Axis.prototype.dyForXAxisLabel = function dyForXAxisLabel() {
   }
 }
 Axis.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
-  var $$ = this.owner,
+  const $$ = this.owner,
     position = this.getYAxisLabelPosition()
   if ($$.config.axis_rotated) {
     return position.isInner ? '-0.5em' : '3em'
@@ -388,7 +388,7 @@ Axis.prototype.dyForYAxisLabel = function dyForYAxisLabel() {
   }
 }
 Axis.prototype.dyForY2AxisLabel = function dyForY2AxisLabel() {
-  var $$ = this.owner,
+  const $$ = this.owner,
     position = this.getY2AxisLabelPosition()
   if ($$.config.axis_rotated) {
     return position.isInner ? '1.2em' : '-2.2em'
@@ -399,21 +399,21 @@ Axis.prototype.dyForY2AxisLabel = function dyForY2AxisLabel() {
   }
 }
 Axis.prototype.textAnchorForXAxisLabel = function textAnchorForXAxisLabel() {
-  var $$ = this.owner
+  const $$ = this.owner
   return this.textAnchorForAxisLabel(
     !$$.config.axis_rotated,
     this.getXAxisLabelPosition()
   )
 }
 Axis.prototype.textAnchorForYAxisLabel = function textAnchorForYAxisLabel() {
-  var $$ = this.owner
+  const $$ = this.owner
   return this.textAnchorForAxisLabel(
     $$.config.axis_rotated,
     this.getYAxisLabelPosition()
   )
 }
 Axis.prototype.textAnchorForY2AxisLabel = function textAnchorForY2AxisLabel() {
-  var $$ = this.owner
+  const $$ = this.owner
   return this.textAnchorForAxisLabel(
     $$.config.axis_rotated,
     this.getY2AxisLabelPosition()
@@ -423,7 +423,7 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(
   id,
   withoutRecompute
 ) {
-  var $$ = this.owner,
+  let $$ = this.owner,
     maxWidth = 0,
     targetsToShow,
     scale,
@@ -488,7 +488,7 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(
             .select(this)
             .selectAll('text')
             .each(function() {
-              var box = getBBox(this)
+              const box = getBBox(this)
               if (maxWidth < box.width) {
                 maxWidth = box.width
               }
@@ -502,8 +502,8 @@ Axis.prototype.getMaxTickWidth = function getMaxTickWidth(
 }
 
 Axis.prototype.updateLabels = function updateLabels(withTransition) {
-  var $$ = this.owner
-  var axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
+  const $$ = this.owner
+  const axisXLabel = $$.main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
     axisYLabel = $$.main.select('.' + CLASS.axisY + ' .' + CLASS.axisYLabel),
     axisY2Label = $$.main.select('.' + CLASS.axisY2 + ' .' + CLASS.axisY2Label)
   ;(withTransition ? axisXLabel.transition() : axisXLabel)
@@ -528,7 +528,7 @@ Axis.prototype.getPadding = function getPadding(
   defaultValue,
   domainLength
 ) {
-  var p = typeof padding === 'number' ? padding : padding[key]
+  const p = typeof padding === 'number' ? padding : padding[key]
   if (!isValue(p)) {
     return defaultValue
   }
@@ -542,7 +542,7 @@ Axis.prototype.convertPixelsToAxisPadding = function convertPixelsToAxisPadding(
   pixels,
   domainLength
 ) {
-  var $$ = this.owner,
+  const $$ = this.owner,
     length = $$.config.axis_rotated ? $$.width : $$.height
   return domainLength * (pixels / length)
 }
@@ -551,7 +551,7 @@ Axis.prototype.generateTickValues = function generateTickValues(
   tickCount,
   forTimeSeries
 ) {
-  var tickValues = values,
+  let tickValues = values,
     targetCount,
     start,
     end,
@@ -588,7 +588,7 @@ Axis.prototype.generateTickValues = function generateTickValues(
   return tickValues
 }
 Axis.prototype.generateTransitions = function generateTransitions(duration) {
-  var $$ = this.owner,
+  const $$ = this.owner,
     axes = $$.axes
   return {
     axisX: duration ? axes.x.transition().duration(duration) : axes.x,
@@ -598,7 +598,7 @@ Axis.prototype.generateTransitions = function generateTransitions(duration) {
   }
 }
 Axis.prototype.redraw = function redraw(duration, isHidden) {
-  var $$ = this.owner,
+  const $$ = this.owner,
     transition = duration ? $$.d3.transition().duration(duration) : null
   $$.axes.x.style('opacity', isHidden ? 0 : 1).call($$.xAxis, transition)
   $$.axes.y.style('opacity', isHidden ? 0 : 1).call($$.yAxis, transition)

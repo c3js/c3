@@ -2,7 +2,7 @@ import { Chart } from './core'
 
 Chart.prototype.tooltip = function() {}
 Chart.prototype.tooltip.show = function(args) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     targets,
     data,
     mouse = {}

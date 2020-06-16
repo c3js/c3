@@ -3,14 +3,14 @@ import { ChartInternal } from './core'
 import { getBBox, isValue, isWithinBox } from './util'
 
 ChartInternal.prototype.initBar = function() {
-  var $$ = this
+  const $$ = this
   $$.main
     .select('.' + CLASS.chart)
     .append('g')
     .attr('class', CLASS.chartBars)
 }
 ChartInternal.prototype.updateTargetsForBar = function(targets) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     mainBars,
     mainBarEnter,
@@ -38,18 +38,18 @@ ChartInternal.prototype.updateTargetsForBar = function(targets) {
     })
 }
 ChartInternal.prototype.updateBar = function(durationForExit) {
-  var $$ = this,
+  const $$ = this,
     barData = $$.barData.bind($$),
     classBar = $$.classBar.bind($$),
     initialOpacity = $$.initialOpacity.bind($$),
     color = function(d) {
       return $$.color(d.id)
     }
-  var mainBar = $$.main
+  const mainBar = $$.main
     .selectAll('.' + CLASS.bars)
     .selectAll('.' + CLASS.bar)
     .data(barData)
-  var mainBarEnter = mainBar
+  const mainBarEnter = mainBar
     .enter()
     .append('path')
     .attr('class', classBar)
@@ -78,7 +78,7 @@ ChartInternal.prototype.redrawBar = function(
   ]
 }
 ChartInternal.prototype.getBarW = function(axis, barTargetsNum) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     w =
       typeof config.bar_width === 'number'
@@ -91,36 +91,36 @@ ChartInternal.prototype.getBarW = function(axis, barTargetsNum) {
     : w
 }
 ChartInternal.prototype.getBars = function(i, id) {
-  var $$ = this
+  const $$ = this
   return (id
     ? $$.main.selectAll('.' + CLASS.bars + $$.getTargetSelectorSuffix(id))
     : $$.main
   ).selectAll('.' + CLASS.bar + (isValue(i) ? '-' + i : ''))
 }
 ChartInternal.prototype.expandBars = function(i, id, reset) {
-  var $$ = this
+  const $$ = this
   if (reset) {
     $$.unexpandBars()
   }
   $$.getBars(i, id).classed(CLASS.EXPANDED, true)
 }
 ChartInternal.prototype.unexpandBars = function(i) {
-  var $$ = this
+  const $$ = this
   $$.getBars(i).classed(CLASS.EXPANDED, false)
 }
 ChartInternal.prototype.generateDrawBar = function(barIndices, isSub) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     getPoints = $$.generateGetBarPoints(barIndices, isSub)
   return function(d, i) {
     // 4 points that make a bar
-    var points = getPoints(d, i)
+    const points = getPoints(d, i)
 
     // switch points if axis is rotated, not applicable for sub chart
-    var indexX = config.axis_rotated ? 1 : 0
-    var indexY = config.axis_rotated ? 0 : 1
+    const indexX = config.axis_rotated ? 1 : 0
+    const indexY = config.axis_rotated ? 0 : 1
 
-    var path =
+    const path =
       'M ' +
       points[0][indexX] +
       ',' +
@@ -147,7 +147,7 @@ ChartInternal.prototype.generateDrawBar = function(barIndices, isSub) {
   }
 }
 ChartInternal.prototype.generateGetBarPoints = function(barIndices, isSub) {
-  var $$ = this,
+  const $$ = this,
     axis = isSub ? $$.subXAxis : $$.xAxis,
     barTargetsNum = barIndices.__max__ + 1,
     barW = $$.getBarW(axis, barTargetsNum),
@@ -157,7 +157,7 @@ ChartInternal.prototype.generateGetBarPoints = function(barIndices, isSub) {
     barSpaceOffset = barW * ($$.config.bar_space / 2),
     yScale = isSub ? $$.getSubYScale : $$.getYScale
   return function(d, i) {
-    var y0 = yScale.call($$, d.id)(0),
+    let y0 = yScale.call($$, d.id)(0),
       offset = barOffset(d, i) || y0, // offset is for stacked bar chart
       posX = barX(d),
       posY = barY(d)

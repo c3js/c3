@@ -2,7 +2,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 chart grid', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -37,7 +37,7 @@ describe('c3 chart grid', function() {
       })
 
       it('should show y grids', function() {
-        var ygrids = chart.internal.main.select('.c3-ygrids')
+        const ygrids = chart.internal.main.select('.c3-ygrids')
         expect(ygrids.size()).toBe(1)
         expect(ygrids.selectAll('.c3-ygrid').size()).toBe(9)
       })
@@ -49,7 +49,7 @@ describe('c3 chart grid', function() {
       })
 
       it('should show only 3 y grids', function() {
-        var ygrids = chart.internal.main.select('.c3-ygrids')
+        const ygrids = chart.internal.main.select('.c3-ygrids')
         expect(ygrids.size()).toBe(1)
         expect(ygrids.selectAll('.c3-ygrid').size()).toBe(3)
       })
@@ -61,7 +61,7 @@ describe('c3 chart grid', function() {
       })
 
       it('should show grids depending on y axis ticks', function() {
-        var ygrids = chart.internal.main.select('.c3-ygrids'),
+        const ygrids = chart.internal.main.select('.c3-ygrids'),
           expectedYs = []
         ygrids.selectAll('.c3-ygrid').each(function(d, i) {
           expectedYs[i] = Math.ceil(+d3.select(this).attr('y1'))
@@ -72,7 +72,7 @@ describe('c3 chart grid', function() {
           .select('.c3-axis-y')
           .selectAll('.tick')
           .each(function(d, i) {
-            var t = d3.select(this).attr('transform')
+            const t = d3.select(this).attr('transform')
             expect(t).toBe('translate(0,' + expectedYs[i] + ')')
           })
       })
@@ -113,12 +113,12 @@ describe('c3 chart grid', function() {
       })
 
       it('should locate grid lines properly', function() {
-        var lines = chart.internal.main.selectAll(
+        const lines = chart.internal.main.selectAll(
             '.c3-ygrid-lines .c3-ygrid-line'
           ),
           expectedY1s = [373, 268, 196]
         lines.each(function(d, i) {
-          var y1 = d3
+          const y1 = d3
             .select(this)
             .select('line')
             .attr('y1')
@@ -127,13 +127,13 @@ describe('c3 chart grid', function() {
       })
 
       it('should locate grid texts properly', function() {
-        var lines = chart.internal.main.selectAll(
+        const lines = chart.internal.main.selectAll(
             '.c3-ygrid-lines .c3-ygrid-line'
           ),
           expectedPositions = ['start', 'middle', 'end'],
           expectedDxs = [4, 0, -4]
         lines.each(function(d, i) {
-          var text = d3.select(this).select('text'),
+          const text = d3.select(this).select('text'),
             textAnchor = text.attr('text-anchor'),
             dx = text.attr('dx')
           expect(textAnchor).toBe(expectedPositions[i])
@@ -179,12 +179,12 @@ describe('c3 chart grid', function() {
         })
 
         it('should locate grid lines properly', function() {
-          var lines = chart.internal.main.selectAll(
+          const lines = chart.internal.main.selectAll(
               '.c3-ygrid-lines .c3-ygrid-line'
             ),
             expectedX1s = [75, 220, 321]
           lines.each(function(d, i) {
-            var x1 = d3
+            const x1 = d3
               .select(this)
               .select('line')
               .attr('x1')
@@ -193,13 +193,13 @@ describe('c3 chart grid', function() {
         })
 
         it('should locate grid texts properly', function() {
-          var lines = chart.internal.main.selectAll(
+          const lines = chart.internal.main.selectAll(
               '.c3-ygrid-lines .c3-ygrid-line'
             ),
             expectedPositions = ['start', 'middle', 'end'],
             expectedDxs = [4, 0, -4]
           lines.each(function(d, i) {
-            var text = d3.select(this).select('text'),
+            const text = d3.select(this).select('text'),
               textAnchor = text.attr('text-anchor'),
               dx = text.attr('dx')
             expect(textAnchor).toBe(expectedPositions[i])
@@ -245,12 +245,12 @@ describe('c3 chart grid', function() {
       })
 
       it('should locate grid lines properly', function() {
-        var lines = chart.internal.main.selectAll(
+        const lines = chart.internal.main.selectAll(
             '.c3-xgrid-lines .c3-xgrid-line'
           ),
           expectedX1s = [202, 397, 593]
         lines.each(function(d, i) {
-          var x1 = d3
+          const x1 = d3
             .select(this)
             .select('line')
             .attr('x1')
@@ -259,13 +259,13 @@ describe('c3 chart grid', function() {
       })
 
       it('should locate grid texts properly', function() {
-        var lines = chart.internal.main.selectAll(
+        const lines = chart.internal.main.selectAll(
             '.c3-xgrid-lines .c3-xgrid-line'
           ),
           expectedPositions = ['start', 'middle', 'end'],
           expectedDxs = [4, 0, -4]
         lines.each(function(d, i) {
-          var text = d3.select(this).select('text'),
+          const text = d3.select(this).select('text'),
             textAnchor = text.attr('text-anchor'),
             dx = text.attr('dx')
           expect(textAnchor).toBe(expectedPositions[i])
@@ -311,12 +311,12 @@ describe('c3 chart grid', function() {
         })
 
         it('should locate grid lines properly', function() {
-          var lines = chart.internal.main.selectAll(
+          const lines = chart.internal.main.selectAll(
               '.c3-xgrid-lines .c3-xgrid-line'
             ),
             expectedY1s = [144, 283, 421]
           lines.each(function(d, i) {
-            var y1 = d3
+            const y1 = d3
               .select(this)
               .select('line')
               .attr('y1')
@@ -325,13 +325,13 @@ describe('c3 chart grid', function() {
         })
 
         it('should locate grid texts properly', function() {
-          var lines = chart.internal.main.selectAll(
+          const lines = chart.internal.main.selectAll(
               '.c3-xgrid-lines .c3-xgrid-line'
             ),
             expectedPositions = ['start', 'middle', 'end'],
             expectedDxs = [4, 0, -4]
           lines.each(function(d, i) {
-            var text = d3.select(this).select('text'),
+            const text = d3.select(this).select('text'),
               textAnchor = text.attr('text-anchor'),
               dx = text.attr('dx')
             expect(textAnchor).toBe(expectedPositions[i])
@@ -360,13 +360,13 @@ describe('c3 chart grid', function() {
         })
 
         it('should show x grid lines', function() {
-          var lines = chart.internal.main.select(
+          const lines = chart.internal.main.select(
               '.c3-xgrid-lines .c3-xgrid-line'
             ),
             expectedX1 = 593,
             expectedText = ['Label 3']
           lines.each(function(id, i) {
-            var line = d3.select(this),
+            const line = d3.select(this),
               l = line.select('line'),
               t = line.select('text')
             expect(+l.attr('x1')).toBeCloseTo(expectedX1, -2)
@@ -403,13 +403,13 @@ describe('c3 chart grid', function() {
       })
 
       it('should show x grid lines', function() {
-        var lines = chart.internal.main.selectAll(
+        const lines = chart.internal.main.selectAll(
             '.c3-xgrid-lines .c3-xgrid-line'
           ),
           expectedX1 = [515, 74],
           expectedText = ['Label 3', 'Label a']
         lines.each(function(id, i) {
-          var line = d3.select(this),
+          const line = d3.select(this),
             l = line.select('line'),
             t = line.select('text')
           expect(+l.attr('x1')).toBeCloseTo(expectedX1[i], -2)

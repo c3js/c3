@@ -1,7 +1,7 @@
 import { Chart, ChartInternal } from './core'
 
 Chart.prototype.transform = function(type, targetIds) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     options =
       ['pie', 'donut'].indexOf(type) >= 0 ? { withTransform: true } : null
   $$.transformTo(targetIds, type, options)
@@ -12,7 +12,7 @@ ChartInternal.prototype.transformTo = function(
   type,
   optionsForRedraw
 ) {
-  var $$ = this,
+  const $$ = this,
     withTransitionForAxis = !$$.hasArcType(),
     options = optionsForRedraw || {
       withTransitionForAxis: withTransitionForAxis

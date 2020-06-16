@@ -2,10 +2,10 @@ import { ChartInternal } from './core'
 import CLASS from './class'
 
 ChartInternal.prototype.initZoom = function() {
-  var $$ = this,
-    d3 = $$.d3,
-    config = $$.config,
-    startEvent
+  const $$ = this
+  const d3 = $$.d3
+  const config = $$.config
+  let startEvent
 
   $$.zoom = d3
     .zoom()
@@ -14,7 +14,7 @@ ChartInternal.prototype.initZoom = function() {
         return
       }
 
-      var e = d3.event.sourceEvent
+      const e = d3.event.sourceEvent
       if (e && e.type === 'brush') {
         return
       }
@@ -26,7 +26,7 @@ ChartInternal.prototype.initZoom = function() {
         return
       }
 
-      var e = d3.event.sourceEvent
+      const e = d3.event.sourceEvent
       if (e && e.type === 'brush') {
         return
       }
@@ -40,7 +40,7 @@ ChartInternal.prototype.initZoom = function() {
         return
       }
 
-      var e = d3.event.sourceEvent
+      const e = d3.event.sourceEvent
       if (e && e.type === 'brush') {
         return
       }
@@ -80,7 +80,7 @@ ChartInternal.prototype.initZoom = function() {
   return $$.zoom.updateExtent()
 }
 ChartInternal.prototype.zoomTransform = function(range) {
-  var $$ = this,
+  const $$ = this,
     s = [$$.x(range[0]), $$.x(range[1])]
   return $$.d3.zoomIdentity.scale($$.width / (s[1] - s[0])).translate(-s[0], 0)
 }
@@ -137,7 +137,7 @@ ChartInternal.prototype.initDragZoom = function() {
 }
 
 ChartInternal.prototype.getZoomDomain = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3,
     min = d3.min([$$.orgXDomain[0], config.zoom_x_min]),
@@ -145,7 +145,7 @@ ChartInternal.prototype.getZoomDomain = function() {
   return [min, max]
 }
 ChartInternal.prototype.redrawForZoom = function() {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3,
     config = $$.config,
     zoom = $$.zoom,

@@ -3,7 +3,7 @@ import { ChartInternal } from './core'
 import { getBBox } from './util'
 
 ChartInternal.prototype.initText = function() {
-  var $$ = this
+  const $$ = this
   $$.main
     .select('.' + CLASS.chart)
     .append('g')
@@ -11,15 +11,15 @@ ChartInternal.prototype.initText = function() {
   $$.mainText = $$.d3.selectAll([])
 }
 ChartInternal.prototype.updateTargetsForText = function(targets) {
-  var $$ = this,
+  const $$ = this,
     classChartText = $$.classChartText.bind($$),
     classTexts = $$.classTexts.bind($$),
     classFocus = $$.classFocus.bind($$)
-  var mainText = $$.main
+  const mainText = $$.main
     .select('.' + CLASS.chartTexts)
     .selectAll('.' + CLASS.chartText)
     .data(targets)
-  var mainTextEnter = mainText
+  const mainTextEnter = mainText
     .enter()
     .append('g')
     .attr('class', classChartText)
@@ -35,15 +35,15 @@ ChartInternal.prototype.updateText = function(
   yForText,
   durationForExit
 ) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     barOrLineData = $$.barOrLineData.bind($$),
     classText = $$.classText.bind($$)
-  var mainText = $$.main
+  const mainText = $$.main
     .selectAll('.' + CLASS.texts)
     .selectAll('.' + CLASS.text)
     .data(barOrLineData)
-  var mainTextEnter = mainText
+  const mainTextEnter = mainText
     .enter()
     .append('text')
     .attr('class', classText)
@@ -83,18 +83,18 @@ ChartInternal.prototype.redrawText = function(
   ]
 }
 ChartInternal.prototype.getTextRect = function(text, cls, element) {
-  var dummy = this.d3
+  const dummy = this.d3
       .select('body')
       .append('div')
-      .classed('c3', true),
-    svg = dummy
+      .classed('c3', true)
+  const svg = dummy
       .append('svg')
       .style('visibility', 'hidden')
       .style('position', 'fixed')
       .style('top', 0)
-      .style('left', 0),
-    font = this.d3.select(element).style('font'),
-    rect
+      .style('left', 0)
+  const font = this.d3.select(element).style('font')
+  let rect
   svg
     .selectAll('.dummy')
     .data([text])
@@ -115,13 +115,13 @@ ChartInternal.prototype.generateXYForText = function(
   lineIndices,
   forX
 ) {
-  var $$ = this,
+  const $$ = this,
     getAreaPoints = $$.generateGetAreaPoints(areaIndices, false),
     getBarPoints = $$.generateGetBarPoints(barIndices, false),
     getLinePoints = $$.generateGetLinePoints(lineIndices, false),
     getter = forX ? $$.getXForText : $$.getYForText
   return function(d, i) {
-    var getPoints = $$.isAreaType(d)
+    const getPoints = $$.isAreaType(d)
       ? getAreaPoints
       : $$.isBarType(d)
       ? getBarPoints
@@ -130,9 +130,9 @@ ChartInternal.prototype.generateXYForText = function(
   }
 }
 ChartInternal.prototype.getXForText = function(points, d, textElement) {
-  var $$ = this,
-    box = getBBox(textElement),
-    xPos,
+  const $$ = this
+  const box = getBBox(textElement)
+  let xPos,
     padding
   if ($$.config.axis_rotated) {
     padding = $$.isBarType(d) ? 4 : 6
@@ -151,9 +151,9 @@ ChartInternal.prototype.getXForText = function(points, d, textElement) {
   return xPos
 }
 ChartInternal.prototype.getYForText = function(points, d, textElement) {
-  var $$ = this,
-    box = getBBox(textElement),
-    yPos
+  const $$ = this
+  const box = getBBox(textElement)
+  let yPos
   if ($$.config.axis_rotated) {
     yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2
   } else {

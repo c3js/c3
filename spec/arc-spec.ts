@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 chart arc', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -57,7 +57,7 @@ describe('c3 chart arc', function() {
     })
 
     it('should have correct classes', function() {
-      var chartArc = d3.select('.c3-chart-arcs'),
+      const chartArc = d3.select('.c3-chart-arcs'),
         arcs = {
           data1: chartArc
             .select('.c3-chart-arc.c3-target.c3-target-data1')
@@ -122,7 +122,7 @@ describe('c3 chart arc', function() {
         })
 
         it('should have correct d attribute', function() {
-          var chartArc = d3.select('.c3-chart-arcs'),
+          const chartArc = d3.select('.c3-chart-arcs'),
             arcs = {
               data1: chartArc
                 .select('.c3-chart-arc.c3-target.c3-target-data1')
@@ -146,7 +146,7 @@ describe('c3 chart arc', function() {
   })
 
   describe('sort pie chart', function() {
-    var createPie = function(order) {
+    const createPie = function(order) {
       return {
         data: {
           order: order,
@@ -160,7 +160,7 @@ describe('c3 chart arc', function() {
       }
     }
 
-    var collectArcs = function() {
+    const collectArcs = function() {
       return d3
         .selectAll('.c3-arc')
         .data()
@@ -209,7 +209,7 @@ describe('c3 chart arc', function() {
     })
 
     it('should update data_order to Function', function() {
-      var names = ['data2', 'data1', 'data3']
+      const names = ['data2', 'data1', 'data3']
       args = createPie(function(a, b) {
         return names.indexOf(a.id) - names.indexOf(b.id)
       })
@@ -282,7 +282,7 @@ describe('c3 chart arc', function() {
       })
 
       it('should have correct d for Pi radian gauge', function() {
-        var chartArc = d3.select('.c3-chart-arcs'),
+        const chartArc = d3.select('.c3-chart-arcs'),
           data = chartArc
             .select('.c3-chart-arc.c3-target.c3-target-data')
             .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
@@ -312,7 +312,7 @@ describe('c3 chart arc', function() {
       })
 
       it('should have correct d for 2 Pi radian gauge starting at Pi/2', function() {
-        var chartArc = d3.select('.c3-chart-arcs'),
+        const chartArc = d3.select('.c3-chart-arcs'),
           data = chartArc
             .select('.c3-chart-arc.c3-target.c3-target-data')
             .select('g.c3-shapes.c3-shapes-data.c3-arcs.c3-arcs-data')
@@ -345,7 +345,7 @@ describe('c3 chart arc', function() {
           }
         })
         it('should show custom min/max guage labels', function() {
-          var chartArc = d3.select('.c3-chart-arcs'),
+          const chartArc = d3.select('.c3-chart-arcs'),
             min = chartArc.select('.c3-chart-arcs-gauge-min'),
             max = chartArc.select('.c3-chart-arcs-gauge-max')
 
@@ -375,7 +375,7 @@ describe('c3 chart arc', function() {
           }
         }
       })
-      var arcColor = [
+      const arcColor = [
         'rgb(96, 176, 68)',
         'rgb(246, 198, 0)',
         'rgb(249, 118, 0)',
@@ -445,13 +445,13 @@ describe('c3 chart arc', function() {
         })
 
         it('if only one data_column is visible the label should have "" for transform', function(done) {
-          var textBeforeHide = chart.internal.main.select(
+          const textBeforeHide = chart.internal.main.select(
             '.c3-chart-arc.c3-target.c3-target-padded4 text'
           )
           expect(textBeforeHide.attr('transform')).not.toBe('')
           chart.hide(['padded1', 'padded2', 'padded3'])
           setTimeout(function() {
-            var textAfterHide = chart.internal.main.select(
+            const textAfterHide = chart.internal.main.select(
               '.c3-chart-arc.c3-target.c3-target-padded4 text'
             )
             expect(textAfterHide.attr('transform')).toBe('')
@@ -501,7 +501,7 @@ describe('c3 chart arc', function() {
           }
         }
       })
-      var arcColor = [
+      const arcColor = [
         'rgb(96, 176, 68)',
         'rgb(246, 198, 0)',
         'rgb(249, 118, 0)',

@@ -3,9 +3,9 @@ import { initChart } from './c3-helper'
 describe('c3 chart class', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       columns: [
         ['data1', 30, 200, 100, 400, 150, 250],
@@ -22,28 +22,28 @@ describe('c3 chart class', function() {
 
   describe('internal.generateTargetClass', function() {
     it('should not replace any characters', function() {
-      var input = 'data1',
+      const input = 'data1',
         expected = '-' + input,
         suffix = chart.internal.generateTargetClass(input)
       expect(suffix).toBe(expected)
     })
 
     it('should replace space to "-"', function() {
-      var input = 'data1 suffix',
+      const input = 'data1 suffix',
         expected = '-data1-suffix',
         suffix = chart.internal.generateTargetClass(input)
       expect(suffix).toBe(expected)
     })
 
     it('should replace space to "-" with multibyte characters', function() {
-      var input = 'data1 suffix 日本語',
+      const input = 'data1 suffix 日本語',
         expected = '-data1-suffix-日本語',
         suffix = chart.internal.generateTargetClass(input)
       expect(suffix).toBe(expected)
     })
 
     it('should not replace special characters', function() {
-      var input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
+      const input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
         expected = '-data1-!@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
         suffix = chart.internal.generateTargetClass(input)
       expect(suffix).toBe(expected)
@@ -52,7 +52,7 @@ describe('c3 chart class', function() {
 
   describe('internal.getTargetSelectorSuffix', function() {
     it('should escape special characters', function() {
-      var input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
+      const input = 'data1 !@#$%^&*()_=+,.<>"\':;[]/|?~`{}\\',
         expected =
           '-data1-\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)_\\=\\+\\,\\.\\<\\>\\"\\\'\\:\\;\\[\\]\\/\\|\\?\\~\\`\\{\\}\\\\',
         suffix = chart.internal.getTargetSelectorSuffix(input)
@@ -62,7 +62,7 @@ describe('c3 chart class', function() {
 
   describe('select target in chart', function() {
     it('should replace space to "-" with multibyte characters', function() {
-      var selector = '.c3-target-data3-мужчины'
+      const selector = '.c3-target-data3-мужчины'
       expect(chart.internal.main.select(selector).size()).toBe(1)
     })
 

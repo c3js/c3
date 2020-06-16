@@ -2,7 +2,7 @@ import { ChartInternal } from './core'
 import { isDefined } from './util'
 
 ChartInternal.prototype.getDefaultConfig = function() {
-  var config = {
+  const config = {
     bindto: '#chart',
     svg_classname: undefined,
     size_width: undefined,
@@ -286,12 +286,12 @@ ChartInternal.prototype.getDefaultConfig = function() {
 ChartInternal.prototype.additionalConfig = {}
 
 ChartInternal.prototype.loadConfig = function(config) {
-  var this_config = this.config,
+  let this_config = this.config,
     target,
     keys,
     read
   function find() {
-    var key = keys.shift()
+    const key = keys.shift()
     //        console.log("key =>", key, ", target =>", target);
     if (key && target && typeof target === 'object' && key in target) {
       target = target[key]

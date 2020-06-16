@@ -3,11 +3,11 @@ import { ChartInternal } from './core'
 import { getPathBox } from './util'
 
 ChartInternal.prototype.drag = function(mouse) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     main = $$.main,
     d3 = $$.d3
-  var sx, sy, mx, my, minX, maxX, minY, maxY
+  let sx, sy, mx, my, minX, maxX, minY, maxY
 
   if ($$.hasArcType()) {
     return
@@ -42,7 +42,7 @@ ChartInternal.prototype.drag = function(mouse) {
       if (!config.data_selection_isselectable(d)) {
         return
       }
-      var shape = d3.select(this),
+      let shape = d3.select(this),
         isSelected = shape.classed(CLASS.SELECTED),
         isIncluded = shape.classed(CLASS.INCLUDED),
         _x,
@@ -80,7 +80,7 @@ ChartInternal.prototype.drag = function(mouse) {
 }
 
 ChartInternal.prototype.dragstart = function(mouse) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   if ($$.hasArcType()) {
     return
@@ -98,7 +98,7 @@ ChartInternal.prototype.dragstart = function(mouse) {
 }
 
 ChartInternal.prototype.dragend = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   if ($$.hasArcType()) {
     return

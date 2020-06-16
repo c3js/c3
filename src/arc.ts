@@ -3,7 +3,7 @@ import { ChartInternal } from './core'
 import { isFunction } from './util'
 
 ChartInternal.prototype.initPie = function() {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
   $$.pie = d3
     .pie()
@@ -18,7 +18,7 @@ ChartInternal.prototype.initPie = function() {
 
   // we need to reverse the returned order if asc or desc to have the slice in expected order.
   if (orderFct && ($$.isOrderAsc() || $$.isOrderDesc())) {
-    let defaultSort = orderFct
+    const defaultSort = orderFct
     orderFct = (t1, t2) => defaultSort(t1, t2) * -1
   }
 
@@ -26,7 +26,7 @@ ChartInternal.prototype.initPie = function() {
 }
 
 ChartInternal.prototype.updateRadius = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     w = config.gauge_width || config.donut_width,
     gaugeArcWidth =
@@ -60,14 +60,14 @@ ChartInternal.prototype.getPadAngle = function() {
 }
 
 ChartInternal.prototype.updateArc = function() {
-  var $$ = this
+  const $$ = this
   $$.svgArc = $$.getSvgArc()
   $$.svgArcExpanded = $$.getSvgArcExpanded()
   $$.svgArcExpandedSub = $$.getSvgArcExpanded(0.98)
 }
 
 ChartInternal.prototype.updateAngle = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     found = false,
     index = 0,
@@ -106,7 +106,7 @@ ChartInternal.prototype.updateAngle = function(d) {
 }
 
 ChartInternal.prototype.getSvgArc = function() {
-  var $$ = this,
+  const $$ = this,
     hasGaugeType = $$.hasType('gauge'),
     singleArcWidth =
       $$.gaugeArcWidth / $$.filterTargetsToShow($$.data.targets).length,
@@ -121,7 +121,7 @@ ChartInternal.prototype.getSvgArc = function() {
           : $$.innerRadius
       }),
     newArc = function(d, withoutUpdate) {
-      var updated
+      let updated
       if (withoutUpdate) {
         return arc(d)
       } // for interpolate
@@ -135,7 +135,7 @@ ChartInternal.prototype.getSvgArc = function() {
 
 ChartInternal.prototype.getSvgArcExpanded = function(rate) {
   rate = rate || 1
-  var $$ = this,
+  const $$ = this,
     hasGaugeType = $$.hasType('gauge'),
     singleArcWidth =
       $$.gaugeArcWidth / $$.filterTargetsToShow($$.data.targets).length,
@@ -156,7 +156,7 @@ ChartInternal.prototype.getSvgArcExpanded = function(rate) {
           : $$.innerRadius
       })
   return function(d) {
-    var updated = $$.updateAngle(d)
+    const updated = $$.updateAngle(d)
     return updated ? arc(updated) : 'M 0 0'
   }
 }
@@ -168,7 +168,7 @@ ChartInternal.prototype.getArc = function(d, withoutUpdate, force) {
 }
 
 ChartInternal.prototype.transformForArcLabel = function(d) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     updated = $$.updateAngle(d),
     c,
@@ -205,7 +205,7 @@ ChartInternal.prototype.transformForArcLabel = function(d) {
     hasGauge &&
     $$.filterTargetsToShow($$.data.targets).length > 1
   ) {
-    var y1 = Math.sin(updated.endAngle - Math.PI / 2)
+    const y1 = Math.sin(updated.endAngle - Math.PI / 2)
     x = Math.cos(updated.endAngle - Math.PI / 2) * ($$.radiusExpanded + 25)
     y = y1 * ($$.radiusExpanded + 15 - Math.abs(y1 * 10)) + 3
     translate = 'translate(' + x + ',' + y + ')'
@@ -230,7 +230,7 @@ ChartInternal.prototype.convertToArcData = function(d) {
 }
 
 ChartInternal.prototype.textForArcLabel = function(d) {
-  var $$ = this,
+  let $$ = this,
     updated,
     value,
     ratio,
@@ -253,14 +253,14 @@ ChartInternal.prototype.textForArcLabel = function(d) {
 }
 
 ChartInternal.prototype.textForGaugeMinMax = function(value, isMax) {
-  var $$ = this,
+  const $$ = this,
     format = $$.getGaugeLabelExtents()
 
   return format ? format(value, isMax) : value
 }
 
 ChartInternal.prototype.expandArc = function(targetIds) {
-  var $$ = this,
+  let $$ = this,
     interval
 
   // MEMO: avoid to cancel transition
@@ -302,7 +302,7 @@ ChartInternal.prototype.expandArc = function(targetIds) {
 }
 
 ChartInternal.prototype.unexpandArc = function(targetIds) {
-  var $$ = this
+  const $$ = this
 
   if ($$.transiting) {
     return
@@ -322,7 +322,7 @@ ChartInternal.prototype.unexpandArc = function(targetIds) {
 }
 
 ChartInternal.prototype.expandDuration = function(id) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   if ($$.isDonutType(id)) {
@@ -337,7 +337,7 @@ ChartInternal.prototype.expandDuration = function(id) {
 }
 
 ChartInternal.prototype.shouldExpand = function(id) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return (
     ($$.isDonutType(id) && config.donut_expand) ||
@@ -347,7 +347,7 @@ ChartInternal.prototype.shouldExpand = function(id) {
 }
 
 ChartInternal.prototype.shouldShowArcLabel = function() {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     shouldShow = true
   if ($$.hasType('donut')) {
@@ -360,7 +360,7 @@ ChartInternal.prototype.shouldShowArcLabel = function() {
 }
 
 ChartInternal.prototype.meetsArcLabelThreshold = function(ratio) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     threshold = $$.hasType('donut')
       ? config.donut_label_threshold
@@ -369,7 +369,7 @@ ChartInternal.prototype.meetsArcLabelThreshold = function(ratio) {
 }
 
 ChartInternal.prototype.getArcLabelFormat = function() {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     format = config.pie_label_format
   if ($$.hasType('gauge')) {
@@ -381,18 +381,18 @@ ChartInternal.prototype.getArcLabelFormat = function() {
 }
 
 ChartInternal.prototype.getGaugeLabelExtents = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return config.gauge_label_extents
 }
 
 ChartInternal.prototype.getArcTitle = function() {
-  var $$ = this
+  const $$ = this
   return $$.hasType('donut') ? $$.config.donut_title : ''
 }
 
 ChartInternal.prototype.updateTargetsForArc = function(targets) {
-  var $$ = this,
+  let $$ = this,
     main = $$.main,
     mainPies,
     mainPieEnter,
@@ -422,7 +422,7 @@ ChartInternal.prototype.updateTargetsForArc = function(targets) {
 }
 
 ChartInternal.prototype.initArc = function() {
-  var $$ = this
+  const $$ = this
   $$.arcs = $$.main
     .select('.' + CLASS.chart)
     .append('g')
@@ -440,7 +440,7 @@ ChartInternal.prototype.redrawArc = function(
   durationForExit,
   withTransform
 ) {
-  var $$ = this,
+  let $$ = this,
     d3 = $$.d3,
     config = $$.config,
     main = $$.main,
@@ -508,13 +508,13 @@ ChartInternal.prototype.redrawArc = function(
         })
         .style('display', config.gauge_labelLine_show ? '' : 'none')
         .each(function(d) {
-          var lineLength = 0,
+          let lineLength = 0,
             lineThickness = 2,
             x = 0,
             y = 0,
             transform = ''
           if ($$.hiddenTargetIds.indexOf(d.data.id) < 0) {
-            var updated = $$.updateAngle(d),
+            const updated = $$.updateAngle(d),
               innerLineLength =
                 ($$.gaugeArcWidth /
                   $$.filterTargetsToShow($$.data.targets).length) *
@@ -556,7 +556,7 @@ ChartInternal.prototype.redrawArc = function(
       'mouseover',
       config.interaction_enabled
         ? function(d) {
-            var updated, arcData
+            let updated, arcData
             if ($$.transiting) {
               // skip while transiting
               return
@@ -577,11 +577,11 @@ ChartInternal.prototype.redrawArc = function(
       'mousemove',
       config.interaction_enabled
         ? function(d) {
-            var updated = $$.updateAngle(d),
+            let updated = $$.updateAngle(d),
               arcData,
               selectedData
             if (updated) {
-              ;(arcData = $$.convertToArcData(updated)),
+              (arcData = $$.convertToArcData(updated)),
                 (selectedData = [arcData])
               $$.showTooltip(selectedData, this)
             }
@@ -592,7 +592,7 @@ ChartInternal.prototype.redrawArc = function(
       'mouseout',
       config.interaction_enabled
         ? function(d) {
-            var updated, arcData
+            let updated, arcData
             if ($$.transiting) {
               // skip while transiting
               return
@@ -614,7 +614,7 @@ ChartInternal.prototype.redrawArc = function(
       'click',
       config.interaction_enabled
         ? function(d, i) {
-            var updated = $$.updateAngle(d),
+            let updated = $$.updateAngle(d),
               arcData
             if (updated) {
               arcData = $$.convertToArcData(updated)
@@ -632,7 +632,7 @@ ChartInternal.prototype.redrawArc = function(
     .transition()
     .duration(duration)
     .attrTween('d', function(d) {
-      var updated = $$.updateAngle(d),
+      let updated = $$.updateAngle(d),
         interpolate
       if (!updated) {
         return function() {
@@ -658,7 +658,7 @@ ChartInternal.prototype.redrawArc = function(
         if ($$.config === null) {
           return 'M 0 0'
         }
-        var interpolated = interpolate(t)
+        const interpolated = interpolate(t)
         interpolated.data = d.data // data.id will be updated by interporator
         return $$.getArc(interpolated, true)
       }
@@ -727,7 +727,7 @@ ChartInternal.prototype.redrawArc = function(
           return 'M 0 0'
         }
 
-        var d = {
+        const d = {
           data: [{ value: config.gauge_max }],
           startAngle: config.gauge_startingAngle,
           endAngle:
@@ -777,7 +777,7 @@ ChartInternal.prototype.redrawArc = function(
   }
 }
 ChartInternal.prototype.initGauge = function() {
-  var arcs = this.arcs
+  const arcs = this.arcs
   if (this.hasType('gauge')) {
     arcs.append('g').attr('class', CLASS.chartArcsBackground)
     arcs

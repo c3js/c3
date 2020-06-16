@@ -2,18 +2,18 @@ import { ChartInternal } from './core'
 import { isValue } from './util'
 
 ChartInternal.prototype.getYFormat = function(forArc) {
-  var $$ = this,
+  const $$ = this,
     formatForY =
       forArc && !$$.hasType('gauge') ? $$.defaultArcValueFormat : $$.yFormat,
     formatForY2 =
       forArc && !$$.hasType('gauge') ? $$.defaultArcValueFormat : $$.y2Format
   return function(v, ratio, id) {
-    var format = $$.axis.getId(id) === 'y2' ? formatForY2 : formatForY
+    const format = $$.axis.getId(id) === 'y2' ? formatForY2 : formatForY
     return format.call($$, v, ratio)
   }
 }
 ChartInternal.prototype.yFormat = function(v) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     format = config.axis_y_tick_format
       ? config.axis_y_tick_format
@@ -21,7 +21,7 @@ ChartInternal.prototype.yFormat = function(v) {
   return format(v)
 }
 ChartInternal.prototype.y2Format = function(v) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     format = config.axis_y2_tick_format
       ? config.axis_y2_tick_format
@@ -35,7 +35,7 @@ ChartInternal.prototype.defaultArcValueFormat = function(v, ratio) {
   return (ratio * 100).toFixed(1) + '%'
 }
 ChartInternal.prototype.dataLabelFormat = function(targetId) {
-  var $$ = this,
+  let $$ = this,
     data_labels = $$.config.data_labels,
     format,
     defaultFormat = function(v) {

@@ -7,13 +7,13 @@ export function parseSvgPath(d) {
   //jshint ignore:line
   'use strict'
 
-  var commands = []
-  var commandTokens = ['M', 'L', 'I', 'H', 'V', 'C', 'S', 'Q', 'T', 'A']
-  var command
-  var in_x = false
-  var in_y = false
-  var x = ''
-  var y = ''
+  const commands = []
+  const commandTokens = ['M', 'L', 'I', 'H', 'V', 'C', 'S', 'Q', 'T', 'A']
+  let command
+  let in_x = false
+  let in_y = false
+  let x = ''
+  let y = ''
   for (var i = 0; i <= d.length; i++) {
     if (commandTokens.indexOf(d[i]) !== -1) {
       if (in_x || in_y) {

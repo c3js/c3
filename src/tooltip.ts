@@ -3,9 +3,9 @@ import { ChartInternal } from './core'
 import { isValue, isFunction, isArray, isString, sanitise } from './util'
 
 ChartInternal.prototype.initTooltip = function() {
-  var $$ = this,
-    config = $$.config,
-    i
+  const $$ = this
+  const config = $$.config
+  let i
   $$.tooltip = $$.selectChart
     .style('position', 'relative')
     .append('div')
@@ -42,19 +42,19 @@ ChartInternal.prototype.initTooltip = function() {
   }
 }
 ChartInternal.prototype.getTooltipSortFunction = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   if (config.data_groups.length === 0 || config.tooltip_order !== undefined) {
     // if data are not grouped or if an order is specified
     // for the tooltip values we sort them by their values
 
-    var order = config.tooltip_order
+    let order = config.tooltip_order
     if (order === undefined) {
       order = config.data_order
     }
 
-    var valueOf = function(obj) {
+    const valueOf = function(obj) {
       return obj ? obj.value : null
     }
 
@@ -72,7 +72,7 @@ ChartInternal.prototype.getTooltipSortFunction = function() {
       // to wrap the returned function in order to format
       // the sorted value to the expected format
 
-      var sortFunction = order
+      let sortFunction = order
 
       if (config.tooltip_order === undefined) {
         sortFunction = function(a, b) {
@@ -101,7 +101,7 @@ ChartInternal.prototype.getTooltipSortFunction = function() {
     }
   } else {
     // if data are grouped, we follow the order of grouped targets
-    var ids = $$.orderTargets($$.data.targets).map(function(i) {
+    let ids = $$.orderTargets($$.data.targets).map(function(i) {
       return i.id
     })
 
@@ -122,29 +122,29 @@ ChartInternal.prototype.getTooltipContent = function(
   defaultValueFormat,
   color
 ) {
-  var $$ = this,
-    config = $$.config,
-    titleFormat = config.tooltip_format_title || defaultTitleFormat,
-    nameFormat =
+  const $$ = this
+  const config = $$.config
+  const titleFormat = config.tooltip_format_title || defaultTitleFormat
+  const nameFormat =
       config.tooltip_format_name ||
       function(name) {
         return name
-      },
-    text,
+      }
+  let text,
     i,
     title,
     value,
     name,
     bgcolor
 
-  var valueFormat = config.tooltip_format_value
+  let valueFormat = config.tooltip_format_value
   if (!valueFormat) {
     valueFormat = $$.isTargetNormalized(d.id)
       ? (v, ratio) => `${(ratio * 100).toFixed(2)}%`
       : defaultValueFormat
   }
 
-  var tooltipSortFunction = this.getTooltipSortFunction()
+  const tooltipSortFunction = this.getTooltipSortFunction()
   if (tooltipSortFunction) {
     d.sort(tooltipSortFunction)
   }
@@ -216,11 +216,11 @@ ChartInternal.prototype.tooltipPosition = function(
   tHeight,
   element
 ) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3
-  var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight
-  var forArc = $$.hasArcType(),
+  let svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight
+  const forArc = $$.hasArcType(),
     mouse = d3.mouse(element)
   // Determin tooltip position
   if (forArc) {
@@ -260,10 +260,9 @@ ChartInternal.prototype.tooltipPosition = function(
   }
 }
 ChartInternal.prototype.showTooltip = function(selectedData, element) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
-  var tWidth, tHeight, position
-  var forArc = $$.hasArcType(),
+  const forArc = $$.hasArcType(),
     dataToShow = selectedData.filter(function(d) {
       return d && isValue(d.value)
     }),
@@ -286,10 +285,9 @@ ChartInternal.prototype.showTooltip = function(selectedData, element) {
     .style('display', 'block')
 
   // Get tooltip dimensions
-  tWidth = $$.tooltip.property('offsetWidth')
-  tHeight = $$.tooltip.property('offsetHeight')
-
-  position = positionFunction.call(this, dataToShow, tWidth, tHeight, element)
+  const tWidth = $$.tooltip.property('offsetWidth')
+  const tHeight = $$.tooltip.property('offsetHeight')
+  const position = positionFunction.call(this, dataToShow, tWidth, tHeight, element)
   // Set tooltip
   $$.tooltip
     .style('top', position.top + 'px')

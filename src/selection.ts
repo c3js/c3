@@ -2,7 +2,7 @@ import CLASS from './class'
 import { ChartInternal } from './core'
 
 ChartInternal.prototype.selectPoint = function(target, d, i) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
     cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
@@ -31,7 +31,7 @@ ChartInternal.prototype.selectPoint = function(target, d, i) {
     .attr('r', r)
 }
 ChartInternal.prototype.unselectPoint = function(target, d, i) {
-  var $$ = this
+  const $$ = this
   $$.config.data_onunselected.call($$.api, d, target.node())
   // remove selected-circle from low layer g
   $$.main
@@ -46,7 +46,7 @@ ChartInternal.prototype.togglePoint = function(selected, target, d, i) {
   selected ? this.selectPoint(target, d, i) : this.unselectPoint(target, d, i)
 }
 ChartInternal.prototype.selectPath = function(target, d) {
-  var $$ = this
+  const $$ = this
   $$.config.data_onselected.call($$, d, target.node())
   if ($$.config.interaction_brighten) {
     target
@@ -58,7 +58,7 @@ ChartInternal.prototype.selectPath = function(target, d) {
   }
 }
 ChartInternal.prototype.unselectPath = function(target, d) {
-  var $$ = this
+  const $$ = this
   $$.config.data_onunselected.call($$, d, target.node())
   if ($$.config.interaction_brighten) {
     target
@@ -73,7 +73,7 @@ ChartInternal.prototype.togglePath = function(selected, target, d, i) {
   selected ? this.selectPath(target, d, i) : this.unselectPath(target, d, i)
 }
 ChartInternal.prototype.getToggle = function(that, d) {
-  var $$ = this,
+  let $$ = this,
     toggle
   if (that.nodeName === 'circle') {
     if ($$.isStepType(d)) {
@@ -88,7 +88,7 @@ ChartInternal.prototype.getToggle = function(that, d) {
   return toggle
 }
 ChartInternal.prototype.toggleShape = function(that, d, i) {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3,
     config = $$.config,
     shape = d3.select(that),
@@ -107,7 +107,7 @@ ChartInternal.prototype.toggleShape = function(that, d, i) {
         )
         .selectAll('.' + CLASS.shape)
         .each(function(d, i) {
-          var shape = d3.select(this)
+          const shape = d3.select(this)
           if (shape.classed(CLASS.SELECTED)) {
             toggle(false, shape.classed(CLASS.SELECTED, false), d, i)
           }

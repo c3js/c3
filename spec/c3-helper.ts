@@ -3,7 +3,7 @@ import c3 from '../src/index'
 const d3 = (window.d3 = require('d3'))
 
 const initDom = ((window as any).initDom = function() {
-  var div = document.createElement('div')
+  const div = document.createElement('div')
   div.id = 'chart'
   div.style.width = '640px'
   div.style.height = '480px'
@@ -18,7 +18,7 @@ const setMouseEvent = ((window as any).setMouseEvent = function(
   y,
   element
 ) {
-  var paddingLeft = chart.internal.main.node().transform.baseVal.getItem(0)
+  const paddingLeft = chart.internal.main.node().transform.baseVal.getItem(0)
       .matrix.e,
     event = document.createEvent('MouseEvents')
   event.initMouseEvent(

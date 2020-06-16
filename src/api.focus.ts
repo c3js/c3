@@ -2,7 +2,7 @@ import CLASS from './class'
 import { Chart } from './core'
 
 Chart.prototype.focus = function(targetIds) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     candidates
 
   targetIds = $$.mapToTargetIds(targetIds)
@@ -24,7 +24,7 @@ Chart.prototype.focus = function(targetIds) {
 }
 
 Chart.prototype.defocus = function(targetIds) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     candidates
 
   targetIds = $$.mapToTargetIds(targetIds)
@@ -44,7 +44,7 @@ Chart.prototype.defocus = function(targetIds) {
 }
 
 Chart.prototype.revert = function(targetIds) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     candidates
 
   targetIds = $$.mapToTargetIds(targetIds)

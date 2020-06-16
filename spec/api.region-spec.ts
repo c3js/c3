@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 api region', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -34,7 +34,7 @@ describe('c3 api region', function() {
     })
 
     it('updates regions', function(done) {
-      var main = chart.internal.main,
+      let main = chart.internal.main,
         expectedRegions = [
           {
             axis: 'y',
@@ -60,7 +60,7 @@ describe('c3 api region', function() {
         expect(regions.size()).toBe(expectedRegions.length)
 
         regions.each(function(d, i) {
-          var region = d3.select(this),
+          const region = d3.select(this),
             label = region.select('text'),
             y = +region.attr('y'),
             height = +region.attr('height'),
@@ -112,7 +112,7 @@ describe('c3 api region', function() {
     })
 
     it('should add regions', function(done) {
-      var main = chart.internal.main,
+      let main = chart.internal.main,
         expectedRegions = [
           {
             axis: 'y',
@@ -149,7 +149,7 @@ describe('c3 api region', function() {
         expect(regions.size()).toBe(expectedRegions.length)
 
         regions.each(function(d, i) {
-          var region = d3.select(this),
+          const region = d3.select(this),
             y = +region.attr('y'),
             height = +region.attr('height'),
             expectedClass = expectedClasses[i],
@@ -201,7 +201,7 @@ describe('c3 api region', function() {
     })
 
     it('should remove regions', function(done) {
-      var main = chart.internal.main,
+      let main = chart.internal.main,
         expectedRegions = [
           {
             axis: 'y',
@@ -220,7 +220,7 @@ describe('c3 api region', function() {
         expect(regions.size()).toBe(expectedRegions.length)
 
         regions.each(function(d, i) {
-          var region = d3.select(this),
+          const region = d3.select(this),
             y = +region.attr('y'),
             height = +region.attr('height'),
             expectedClass = expectedClasses[i],

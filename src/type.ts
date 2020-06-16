@@ -2,7 +2,7 @@ import { ChartInternal } from './core'
 import { isString } from './util'
 
 ChartInternal.prototype.setTargetType = function(targetIds, type) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   $$.mapToTargetIds(targetIds).forEach(function(id) {
     $$.withoutFadeIn[id] = type === config.data_types[id]
@@ -13,13 +13,13 @@ ChartInternal.prototype.setTargetType = function(targetIds, type) {
   }
 }
 ChartInternal.prototype.hasType = function(type, targets) {
-  var $$ = this,
-    types = $$.config.data_types,
-    has = false
+  const $$ = this
+  const types = $$.config.data_types
+  let has = false
   targets = targets || $$.data.targets
   if (targets && targets.length) {
     targets.forEach(function(target) {
-      var t = types[target.id]
+      const t = types[target.id]
       if ((t && t.indexOf(type) >= 0) || (!t && type === 'line')) {
         has = true
       }
@@ -43,7 +43,7 @@ ChartInternal.prototype.hasArcType = function(targets) {
   )
 }
 ChartInternal.prototype.isLineType = function(d) {
-  var config = this.config,
+  const config = this.config,
     id = isString(d) ? d : d.id
   return (
     !config.data_types[id] ||
@@ -53,42 +53,42 @@ ChartInternal.prototype.isLineType = function(d) {
   )
 }
 ChartInternal.prototype.isStepType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return ['step', 'area-step'].indexOf(this.config.data_types[id]) >= 0
 }
 ChartInternal.prototype.isSplineType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return ['spline', 'area-spline'].indexOf(this.config.data_types[id]) >= 0
 }
 ChartInternal.prototype.isAreaType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return (
     ['area', 'area-spline', 'area-step'].indexOf(this.config.data_types[id]) >=
     0
   )
 }
 ChartInternal.prototype.isBarType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'bar'
 }
 ChartInternal.prototype.isScatterType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'scatter'
 }
 ChartInternal.prototype.isStanfordType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'stanford'
 }
 ChartInternal.prototype.isPieType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'pie'
 }
 ChartInternal.prototype.isGaugeType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'gauge'
 }
 ChartInternal.prototype.isDonutType = function(d) {
-  var id = isString(d) ? d : d.id
+  const id = isString(d) ? d : d.id
   return this.config.data_types[id] === 'donut'
 }
 ChartInternal.prototype.isArcType = function(d) {

@@ -1,7 +1,7 @@
 import { Chart } from './core'
 
 Chart.prototype.resize = function(size) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   config.size_width = size ? size.width : null
   config.size_height = size ? size.height : null
@@ -9,7 +9,7 @@ Chart.prototype.resize = function(size) {
 }
 
 Chart.prototype.flush = function() {
-  var $$ = this.internal
+  const $$ = this.internal
   $$.updateAndRedraw({
     withLegend: true,
     withTransition: false,
@@ -18,7 +18,7 @@ Chart.prototype.flush = function() {
 }
 
 Chart.prototype.destroy = function() {
-  var $$ = this.internal
+  const $$ = this.internal
 
   window.clearInterval($$.intervalForObserveInserted)
 

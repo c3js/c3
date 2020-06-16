@@ -3,7 +3,7 @@ import { ChartInternal } from './core'
 import { isUndefined } from './util'
 
 ChartInternal.prototype.getShapeIndices = function(typeFilter) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     indices = {},
     i = 0,
@@ -36,10 +36,10 @@ ChartInternal.prototype.getShapeX = function(
   indices,
   isSub
 ) {
-  var $$ = this,
+  const $$ = this,
     scale = isSub ? $$.subX : $$.x
   return function(d) {
-    var index = d.id in indices ? indices[d.id] : 0
+    const index = d.id in indices ? indices[d.id] : 0
     return d.x || d.x === 0 ? scale(d.x) - offset * (targetsNum / 2 - index) : 0
   }
 }
@@ -54,7 +54,7 @@ ChartInternal.prototype.getShapeY = function(isSub) {
   }
 }
 ChartInternal.prototype.getShapeOffset = function(typeFilter, indices, isSub) {
-  var $$ = this,
+  const $$ = this,
     targets = $$.orderTargets(
       $$.filterTargetsToShow($$.data.targets.filter(typeFilter, $$))
     ),
@@ -62,7 +62,7 @@ ChartInternal.prototype.getShapeOffset = function(typeFilter, indices, isSub) {
       return t.id
     })
   return function(d, i) {
-    var scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
+    let scale = isSub ? $$.getSubYScale(d.id) : $$.getYScale(d.id),
       y0 = scale(0),
       offset = y0
     targets.forEach(function(t) {
@@ -101,7 +101,7 @@ ChartInternal.prototype.getShapeOffset = function(typeFilter, indices, isSub) {
   }
 }
 ChartInternal.prototype.isWithinShape = function(that, d) {
-  var $$ = this,
+  let $$ = this,
     shape = $$.d3.select(that),
     isWithin
   if (!$$.isTargetToShow(d.id)) {
@@ -119,7 +119,7 @@ ChartInternal.prototype.isWithinShape = function(that, d) {
 }
 
 ChartInternal.prototype.getInterpolate = function(d) {
-  var $$ = this,
+  let $$ = this,
     d3 = $$.d3,
     types = {
       linear: d3.curveLinear,

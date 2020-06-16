@@ -4,7 +4,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 chart shape line', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -31,10 +31,10 @@ describe('c3 chart shape line', function() {
 
     it('Should render the lines correctly', function(done) {
       setTimeout(function() {
-        var target = chart.internal.main.select(
+        const target = chart.internal.main.select(
           '.c3-chart-line.c3-target-data1'
         )
-        var commands = parseSvgPath(target.select('.c3-line-data1').attr('d'))
+        const commands = parseSvgPath(target.select('.c3-line-data1').attr('d'))
         expect(commands.length).toBe(6)
         done()
       }, 500)
@@ -42,7 +42,7 @@ describe('c3 chart shape line', function() {
 
     it("should not have shape-rendering when it's line chart", function() {
       d3.selectAll('.c3-line').each(function() {
-        var style = d3.select(this).style('shape-rendering')
+        const style = d3.select(this).style('shape-rendering')
         expect(style).toBe('auto')
       })
     })
@@ -54,7 +54,7 @@ describe('c3 chart shape line', function() {
 
       it("should have shape-rendering = crispedges when it's step chart", function() {
         d3.selectAll('.c3-line').each(function() {
-          var style = d3
+          const style = d3
             .select(this)
             .style('shape-rendering')
             .toLowerCase()
@@ -69,7 +69,7 @@ describe('c3 chart shape line', function() {
       })
       it("should have shape-rendering = crispedges when it's step chart", function() {
         d3.selectAll('.c3-line').each(function() {
-          var style = d3
+          const style = d3
             .select(this)
             .style('shape-rendering')
             .toLowerCase()
@@ -84,7 +84,7 @@ describe('c3 chart shape line', function() {
       })
       it("should have shape-rendering = crispedges when it's step chart", function() {
         d3.selectAll('.c3-line').each(function() {
-          var style = d3
+          const style = d3
             .select(this)
             .style('shape-rendering')
             .toLowerCase()
@@ -121,7 +121,7 @@ describe('c3 chart shape line', function() {
 
       it('should not show the circle for null', function(done) {
         setTimeout(function() {
-          var target = chart.internal.main.select(
+          const target = chart.internal.main.select(
             '.c3-chart-line.c3-target-data1'
           )
           expect(+target.select('.c3-circle-0').style('opacity')).toBe(1)
@@ -133,12 +133,12 @@ describe('c3 chart shape line', function() {
 
       it('should not draw a line segment for null data', function(done) {
         setTimeout(function() {
-          var target = chart.internal.main.select(
+          const target = chart.internal.main.select(
             '.c3-chart-line.c3-target-data1'
           )
-          var commands = parseSvgPath(target.select('.c3-line-data1').attr('d'))
-          var segments = 0
-          for (var i = 0; i < commands.length; i++) {
+          const commands = parseSvgPath(target.select('.c3-line-data1').attr('d'))
+          let segments = 0
+          for (let i = 0; i < commands.length; i++) {
             commands[i].command === 'L' ? segments++ : null
           }
           expect(segments).toBe(3)
@@ -187,7 +187,7 @@ describe('c3 chart shape line', function() {
       })
 
       it('should show point if function returns true', function() {
-        var target = chart.internal.main.select(
+        const target = chart.internal.main.select(
           '.c3-chart-line.c3-target-data1'
         )
         expect(+target.select('.c3-circle-0').style('opacity')).toBe(0)

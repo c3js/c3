@@ -12,30 +12,30 @@ ChartInternal.prototype.appendClip = function(parent, id) {
 }
 ChartInternal.prototype.getAxisClipX = function(forHorizontal) {
   // axis line width + padding for left
-  var left = Math.max(30, this.margin.left)
+  const left = Math.max(30, this.margin.left)
   return forHorizontal ? -(1 + left) : -(left - 1)
 }
 ChartInternal.prototype.getAxisClipY = function(forHorizontal) {
   return forHorizontal ? -20 : -this.margin.top
 }
 ChartInternal.prototype.getXAxisClipX = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipX(!$$.config.axis_rotated)
 }
 ChartInternal.prototype.getXAxisClipY = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipY(!$$.config.axis_rotated)
 }
 ChartInternal.prototype.getYAxisClipX = function() {
-  var $$ = this
+  const $$ = this
   return $$.config.axis_y_inner ? -1 : $$.getAxisClipX($$.config.axis_rotated)
 }
 ChartInternal.prototype.getYAxisClipY = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipY($$.config.axis_rotated)
 }
 ChartInternal.prototype.getAxisClipWidth = function(forHorizontal) {
-  var $$ = this,
+  const $$ = this,
     left = Math.max(30, $$.margin.left),
     right = Math.max(30, $$.margin.right)
   // width + axis line width + padding for left/right
@@ -48,21 +48,21 @@ ChartInternal.prototype.getAxisClipHeight = function(forHorizontal) {
   )
 }
 ChartInternal.prototype.getXAxisClipWidth = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipWidth(!$$.config.axis_rotated)
 }
 ChartInternal.prototype.getXAxisClipHeight = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipHeight(!$$.config.axis_rotated)
 }
 ChartInternal.prototype.getYAxisClipWidth = function() {
-  var $$ = this
+  const $$ = this
   return (
     $$.getAxisClipWidth($$.config.axis_rotated) +
     ($$.config.axis_y_inner ? 20 : 0)
   )
 }
 ChartInternal.prototype.getYAxisClipHeight = function() {
-  var $$ = this
+  const $$ = this
   return $$.getAxisClipHeight($$.config.axis_rotated)
 }

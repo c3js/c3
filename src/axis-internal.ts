@@ -1,7 +1,7 @@
 import { getBBox } from './util'
 
 function AxisInternal(component, params) {
-  var internal = this
+  const internal = this
   internal.component = component
   internal.params = params || {}
 
@@ -37,13 +37,13 @@ AxisInternal.prototype.axisY = function(selection, y) {
   })
 }
 AxisInternal.prototype.scaleExtent = function(domain) {
-  var start = domain[0],
+  const start = domain[0],
     stop = domain[domain.length - 1]
   return start < stop ? [start, stop] : [stop, start]
 }
 AxisInternal.prototype.generateTicks = function(scale) {
-  var internal = this
-  var i,
+  const internal = this
+  let i,
     domain,
     ticks = []
   if (scale.ticks) {
@@ -59,8 +59,8 @@ AxisInternal.prototype.generateTicks = function(scale) {
   return ticks
 }
 AxisInternal.prototype.copyScale = function() {
-  var internal = this
-  var newScale = internal.scale.copy(),
+  const internal = this
+  let newScale = internal.scale.copy(),
     domain
   if (internal.params.isCategory) {
     domain = internal.scale.domain()
@@ -69,23 +69,23 @@ AxisInternal.prototype.copyScale = function() {
   return newScale
 }
 AxisInternal.prototype.textFormatted = function(v) {
-  var internal = this,
+  const internal = this,
     formatted = internal.tickFormat ? internal.tickFormat(v) : v
   return typeof formatted !== 'undefined' ? formatted : ''
 }
 AxisInternal.prototype.updateRange = function() {
-  var internal = this
+  const internal = this
   internal.range = internal.scale.rangeExtent
     ? internal.scale.rangeExtent()
     : internal.scaleExtent(internal.scale.range())
   return internal.range
 }
 AxisInternal.prototype.updateTickTextCharSize = function(tick) {
-  var internal = this
+  const internal = this
   if (internal.tickTextCharSize) {
     return internal.tickTextCharSize
   }
-  var size = {
+  const size = {
     h: 11.5,
     w: 5.5
   }
@@ -95,7 +95,7 @@ AxisInternal.prototype.updateTickTextCharSize = function(tick) {
       return internal.textFormatted(d)
     })
     .each(function(d) {
-      var box = getBBox(this),
+      const box = getBBox(this),
         text = internal.textFormatted(d),
         h = box.height,
         w = text ? box.width / text.length : undefined
@@ -112,8 +112,8 @@ AxisInternal.prototype.isVertical = function() {
   return this.orient === 'left' || this.orient === 'right'
 }
 AxisInternal.prototype.tspanData = function(d, i, scale) {
-  var internal = this
-  var splitted = internal.params.tickMultiline
+  const internal = this
+  let splitted = internal.params.tickMultiline
     ? internal.splitTickText(d, scale)
     : [].concat(internal.textFormatted(d))
 
@@ -126,7 +126,7 @@ AxisInternal.prototype.tspanData = function(d, i, scale) {
   })
 }
 AxisInternal.prototype.splitTickText = function(d, scale) {
-  var internal = this,
+  let internal = this,
     tickText = internal.textFormatted(d),
     maxWidth = internal.params.tickWidth,
     subtext,
@@ -148,7 +148,7 @@ AxisInternal.prototype.splitTickText = function(d, scale) {
 
   function split(splitted, text) {
     spaceIndex = undefined
-    for (var i = 1; i < text.length; i++) {
+    for (let i = 1; i < text.length; i++) {
       if (text.charAt(i) === ' ') {
         spaceIndex = i
       }
@@ -172,10 +172,10 @@ AxisInternal.prototype.ellipsify = function(splitted, max) {
     return splitted
   }
 
-  var ellipsified = splitted.slice(0, max)
-  var remaining = 3
-  for (var i = max - 1; i >= 0; i--) {
-    var available = ellipsified[i].length
+  const ellipsified = splitted.slice(0, max)
+  let remaining = 3
+  for (let i = max - 1; i >= 0; i--) {
+    const available = ellipsified[i].length
 
     ellipsified[i] = ellipsified[i]
       .substr(0, available - remaining)
@@ -191,12 +191,12 @@ AxisInternal.prototype.ellipsify = function(splitted, max) {
   return ellipsified
 }
 AxisInternal.prototype.updateTickLength = function() {
-  var internal = this
+  const internal = this
   internal.tickLength =
     Math.max(internal.innerTickSize, 0) + internal.tickPadding
 }
 AxisInternal.prototype.lineY2 = function(d) {
-  var internal = this,
+  const internal = this,
     tickPosition =
       internal.scale(d) + (internal.tickCentered ? 0 : internal.tickOffset)
   return internal.range[0] < tickPosition && tickPosition < internal.range[1]
@@ -204,29 +204,29 @@ AxisInternal.prototype.lineY2 = function(d) {
     : 0
 }
 AxisInternal.prototype.textY = function() {
-  var internal = this,
+  const internal = this,
     rotate = internal.tickTextRotate
   return rotate
     ? 11.5 - 2.5 * (rotate / 15) * (rotate > 0 ? 1 : -1)
     : internal.tickLength
 }
 AxisInternal.prototype.textTransform = function() {
-  var internal = this,
+  const internal = this,
     rotate = internal.tickTextRotate
   return rotate ? 'rotate(' + rotate + ')' : ''
 }
 AxisInternal.prototype.textTextAnchor = function() {
-  var internal = this,
+  const internal = this,
     rotate = internal.tickTextRotate
   return rotate ? (rotate > 0 ? 'start' : 'end') : 'middle'
 }
 AxisInternal.prototype.tspanDx = function() {
-  var internal = this,
+  const internal = this,
     rotate = internal.tickTextRotate
   return rotate ? 8 * Math.sin(Math.PI * (rotate / 180)) : 0
 }
 AxisInternal.prototype.tspanDy = function(d, i) {
-  var internal = this,
+  let internal = this,
     dy = internal.tickTextCharSize.h
   if (i === 0) {
     if (internal.isVertical()) {
@@ -239,18 +239,18 @@ AxisInternal.prototype.tspanDy = function(d, i) {
 }
 
 AxisInternal.prototype.generateAxis = function() {
-  var internal = this,
+  const internal = this,
     d3 = internal.d3,
     params = internal.params
   function axis(g, transition) {
-    var self
+    let self
     g.each(function() {
-      var g = ((axis as any).g = d3.select(this))
+      const g = ((axis as any).g = d3.select(this))
 
-      var scale0 = this.__chart__ || internal.scale,
+      let scale0 = this.__chart__ || internal.scale,
         scale1 = (this.__chart__ = internal.copyScale())
 
-      var ticksValues = internal.tickValues
+      let ticksValues = internal.tickValues
           ? internal.tickValues
           : internal.generateTicks(scale1),
         ticks = g.selectAll('.tick').data(ticksValues, scale1),
@@ -278,12 +278,12 @@ AxisInternal.prototype.generateAxis = function() {
       internal.updateTickLength()
       internal.updateTickTextCharSize(g.select('.tick'))
 
-      var lineUpdate = tickUpdate
+      const lineUpdate = tickUpdate
           .select('line')
           .merge(tickEnter.append('line')),
         textUpdate = tickUpdate.select('text').merge(tickEnter.append('text'))
 
-      var tspans = tickUpdate
+      const tspans = tickUpdate
           .selectAll('text')
           .selectAll('tspan')
           .data(function(d, i) {
@@ -295,7 +295,7 @@ AxisInternal.prototype.generateAxis = function() {
         })
       tspans.exit().remove()
 
-      var path = g.selectAll('.domain').data([0]),
+      const path = g.selectAll('.domain').data([0]),
         pathUpdate = path
           .enter()
           .append('path')
@@ -444,7 +444,7 @@ AxisInternal.prototype.generateAxis = function() {
         }
       }
       if (scale1.rangeBand) {
-        var x = scale1,
+        const x = scale1,
           dx = x.rangeBand() / 2
         scale0 = scale1 = function(d) {
           return x(d) + dx
@@ -494,7 +494,7 @@ AxisInternal.prototype.generateAxis = function() {
     return internal.tickOffset
   }
   axis.tickInterval = function() {
-    var interval, length
+    let interval, length
     if (params.isCategory) {
       interval = internal.tickOffset * 2
     } else {

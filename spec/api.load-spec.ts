@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 api load', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -23,13 +23,13 @@ describe('c3 api load', function() {
       })
 
       it('should load additional data', function(done) {
-        var main = chart.internal.main,
+        const main = chart.internal.main,
           legend = chart.internal.legend
         chart.load({
           columns: [['data3', 800, 500, 900, 500, 1000, 700]]
         })
         setTimeout(function() {
-          var target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
+          const target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
             legendItem = legend.select('.c3-legend-item.c3-legend-item-data3')
           expect(target.size()).toBe(1)
           expect(legendItem.size()).toBe(1)
@@ -60,20 +60,20 @@ describe('c3 api load', function() {
 
     describe('as column', function() {
       it('should load additional data', function(done) {
-        var main = chart.internal.main,
+        const main = chart.internal.main,
           legend = chart.internal.legend
         chart.load({
           columns: [['data3', 800, 500, 900, 500, 1000, 700]]
         })
         setTimeout(function() {
-          var target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
+          const target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
             legendItem = legend.select('.c3-legend-item.c3-legend-item-data3'),
             tickTexts = main.selectAll('.c3-axis-x g.tick text'),
             expected = ['cat1', 'cat2', 'cat3', 'cat4', 'cat5', 'cat6']
           expect(target.size()).toBe(1)
           expect(legendItem.size()).toBe(1)
           tickTexts.each(function(d, i) {
-            var text = d3
+            const text = d3
               .select(this)
               .select('tspan')
               .text()
@@ -84,7 +84,7 @@ describe('c3 api load', function() {
       })
 
       it('should load additional data', function(done) {
-        var main = chart.internal.main,
+        const main = chart.internal.main,
           legend = chart.internal.legend
         chart.load({
           columns: [
@@ -93,14 +93,14 @@ describe('c3 api load', function() {
           ]
         })
         setTimeout(function() {
-          var target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
+          const target = main.select('.c3-chart-line.c3-target.c3-target-data3'),
             legendItem = legend.select('.c3-legend-item.c3-legend-item-data3'),
             tickTexts = main.selectAll('.c3-axis-x g.tick text'),
             expected = ['new1', 'new2', 'new3', 'new4', 'new5', 'new6']
           expect(target.size()).toBe(1)
           expect(legendItem.size()).toBe(1)
           tickTexts.each(function(d, i) {
-            var text = d3
+            const text = d3
               .select(this)
               .select('tspan')
               .text()

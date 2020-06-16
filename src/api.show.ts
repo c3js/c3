@@ -2,7 +2,7 @@ import { Chart } from './core'
 import { isIE } from './util'
 
 Chart.prototype.show = function(targetIds, options) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     targets
 
   targetIds = $$.mapToTargetIds(targetIds)
@@ -31,7 +31,7 @@ Chart.prototype.show = function(targetIds, options) {
 }
 
 Chart.prototype.hide = function(targetIds, options) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     targets
 
   targetIds = $$.mapToTargetIds(targetIds)
@@ -60,7 +60,7 @@ Chart.prototype.hide = function(targetIds, options) {
 }
 
 Chart.prototype.toggle = function(targetIds, options) {
-  var that = this,
+  const that = this,
     $$ = this.internal
   $$.mapToTargetIds(targetIds).forEach(function(targetId) {
     $$.isTargetToShow(targetId)

@@ -3,9 +3,9 @@ import { initChart } from './c3-helper'
 describe('c3 cache', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       columns: [
         ['data1', 30, 200, 100, 400, 150, 250],

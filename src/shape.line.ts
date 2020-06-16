@@ -3,14 +3,14 @@ import { ChartInternal } from './core'
 import { isValue, isFunction, isUndefined, isDefined } from './util'
 
 ChartInternal.prototype.initLine = function() {
-  var $$ = this
+  const $$ = this
   $$.main
     .select('.' + CLASS.chart)
     .append('g')
     .attr('class', CLASS.chartLines)
 }
 ChartInternal.prototype.updateTargetsForLine = function(targets) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     mainLines,
     mainLineEnter,
@@ -59,12 +59,12 @@ ChartInternal.prototype.updateTargetsForLine = function(targets) {
   //mainLineUpdate.exit().remove();
 }
 ChartInternal.prototype.updateLine = function(durationForExit) {
-  var $$ = this
-  var mainLine = $$.main
+  const $$ = this
+  const mainLine = $$.main
     .selectAll('.' + CLASS.lines)
     .selectAll('.' + CLASS.line)
     .data($$.lineData.bind($$))
-  var mainLineEnter = mainLine
+  const mainLineEnter = mainLine
     .enter()
     .append('path')
     .attr('class', $$.classLine.bind($$))
@@ -95,7 +95,7 @@ ChartInternal.prototype.redrawLine = function(
   ]
 }
 ChartInternal.prototype.generateDrawLine = function(lineIndices, isSub) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     line = $$.d3.line(),
     getPoints = $$.generateGetLinePoints(lineIndices, isSub),
@@ -118,7 +118,7 @@ ChartInternal.prototype.generateDrawLine = function(lineIndices, isSub) {
     })
   }
   return function(d) {
-    var values = config.line_connectNull
+    let values = config.line_connectNull
         ? $$.filterRemoveNull(d.values)
         : d.values,
       x = isSub ? $$.subX : $$.x,
@@ -147,7 +147,7 @@ ChartInternal.prototype.generateDrawLine = function(lineIndices, isSub) {
 }
 ChartInternal.prototype.generateGetLinePoints = function(lineIndices, isSub) {
   // partial duplication of generateGetBarPoints
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     lineTargetsNum = lineIndices.__max__ + 1,
     x = $$.getShapeX(0, lineTargetsNum, lineIndices, !!isSub),
@@ -155,7 +155,7 @@ ChartInternal.prototype.generateGetLinePoints = function(lineIndices, isSub) {
     lineOffset = $$.getShapeOffset($$.isLineType, lineIndices, !!isSub),
     yScale = isSub ? $$.getSubYScale : $$.getYScale
   return function(d, i) {
-    var y0 = yScale.call($$, d.id)(0),
+    let y0 = yScale.call($$, d.id)(0),
       offset = lineOffset(d, i) || y0, // offset is for stacked area chart
       posX = x(d),
       posY = y(d)
@@ -176,7 +176,7 @@ ChartInternal.prototype.generateGetLinePoints = function(lineIndices, isSub) {
 }
 
 ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     prev = -1,
     i,
@@ -196,7 +196,7 @@ ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
     regions = []
 
   function isWithinRegions(x, regions) {
-    var i
+    let i
     for (i = 0; i < regions.length; i++) {
       if (regions[i].start < x && x <= regions[i].end) {
         return true
@@ -257,7 +257,7 @@ ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
   }
   if ($$.isTimeSeries()) {
     sWithRegion = function(d0, d1, j, diff) {
-      var x0 = d0.x.getTime(),
+      let x0 = d0.x.getTime(),
         x_diff = d1.x - d0.x,
         xv0 = new Date(x0 + x_diff * j),
         xv1 = new Date(x0 + x_diff * (j + diff)),
@@ -277,7 +277,7 @@ ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
     }
   } else {
     sWithRegion = function(d0, d1, j, diff) {
-      var points
+      let points
       if (config.axis_rotated) {
         points = [
           [y(yp(j), true), x(xp(j))],
@@ -325,13 +325,13 @@ ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
 }
 
 ChartInternal.prototype.updateArea = function(durationForExit) {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
-  var mainArea = $$.main
+  const mainArea = $$.main
     .selectAll('.' + CLASS.areas)
     .selectAll('.' + CLASS.area)
     .data($$.lineData.bind($$))
-  var mainAreaEnter = mainArea
+  const mainAreaEnter = mainArea
     .enter()
     .append('path')
     .attr('class', $$.classArea.bind($$))
@@ -362,7 +362,7 @@ ChartInternal.prototype.redrawArea = function(
   ]
 }
 ChartInternal.prototype.generateDrawArea = function(areaIndices, isSub) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     area = $$.d3.area(),
     getPoints = $$.generateGetAreaPoints(areaIndices, isSub),
@@ -397,7 +397,7 @@ ChartInternal.prototype.generateDrawArea = function(areaIndices, isSub) {
   }
 
   return function(d) {
-    var values = config.line_connectNull
+    let values = config.line_connectNull
         ? $$.filterRemoveNull(d.values)
         : d.values,
       x0 = 0,
@@ -423,7 +423,7 @@ ChartInternal.prototype.getAreaBaseValue = function() {
 }
 ChartInternal.prototype.generateGetAreaPoints = function(areaIndices, isSub) {
   // partial duplication of generateGetBarPoints
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     areaTargetsNum = areaIndices.__max__ + 1,
     x = $$.getShapeX(0, areaTargetsNum, areaIndices, !!isSub),
@@ -431,7 +431,7 @@ ChartInternal.prototype.generateGetAreaPoints = function(areaIndices, isSub) {
     areaOffset = $$.getShapeOffset($$.isAreaType, areaIndices, !!isSub),
     yScale = isSub ? $$.getSubYScale : $$.getYScale
   return function(d, i) {
-    var y0 = yScale.call($$, d.id)(0),
+    let y0 = yScale.call($$, d.id)(0),
       offset = areaOffset(d, i) || y0, // offset is for stacked area chart
       posX = x(d),
       posY = y(d)
@@ -452,13 +452,13 @@ ChartInternal.prototype.generateGetAreaPoints = function(areaIndices, isSub) {
 }
 
 ChartInternal.prototype.updateCircle = function(cx, cy) {
-  var $$ = this
-  var mainCircle = $$.main
+  const $$ = this
+  const mainCircle = $$.main
     .selectAll('.' + CLASS.circles)
     .selectAll('.' + CLASS.circle)
     .data($$.lineOrScatterOrStanfordData.bind($$))
 
-  var mainCircleEnter = mainCircle
+  const mainCircleEnter = mainCircle
     .enter()
     .append('circle')
     .attr('shape-rendering', $$.isStanfordGraphType() ? 'crispEdges' : '')
@@ -486,7 +486,7 @@ ChartInternal.prototype.redrawCircle = function(
   withTransition,
   transition
 ) {
-  var $$ = this,
+  const $$ = this,
     selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle)
   return [
     (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
@@ -506,11 +506,11 @@ ChartInternal.prototype.circleX = function(d) {
   return d.x || d.x === 0 ? this.x(d.x) : null
 }
 ChartInternal.prototype.updateCircleY = function() {
-  var $$ = this,
+  let $$ = this,
     lineIndices,
     getPoints
   if ($$.config.data_groups.length > 0) {
-    ;(lineIndices = $$.getShapeIndices($$.isLineType)),
+    (lineIndices = $$.getShapeIndices($$.isLineType)),
       (getPoints = $$.generateGetLinePoints(lineIndices))
     $$.circleY = function(d, i) {
       return getPoints(d, i)[0][1]
@@ -522,14 +522,14 @@ ChartInternal.prototype.updateCircleY = function() {
   }
 }
 ChartInternal.prototype.getCircles = function(i, id) {
-  var $$ = this
+  const $$ = this
   return (id
     ? $$.main.selectAll('.' + CLASS.circles + $$.getTargetSelectorSuffix(id))
     : $$.main
   ).selectAll('.' + CLASS.circle + (isValue(i) ? '-' + i : ''))
 }
 ChartInternal.prototype.expandCircles = function(i, id, reset) {
-  var $$ = this,
+  const $$ = this,
     r = $$.pointExpandedR.bind($$)
   if (reset) {
     $$.unexpandCircles()
@@ -539,7 +539,7 @@ ChartInternal.prototype.expandCircles = function(i, id, reset) {
     .attr('r', r)
 }
 ChartInternal.prototype.unexpandCircles = function(i) {
-  var $$ = this,
+  const $$ = this,
     r = $$.pointR.bind($$)
   $$.getCircles(i)
     .filter(function() {
@@ -549,7 +549,7 @@ ChartInternal.prototype.unexpandCircles = function(i) {
     .attr('r', r)
 }
 ChartInternal.prototype.pointR = function(d) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return $$.isStepType(d)
     ? 0
@@ -558,7 +558,7 @@ ChartInternal.prototype.pointR = function(d) {
     : config.point_r
 }
 ChartInternal.prototype.pointExpandedR = function(d) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   if (config.point_focus_expand_enabled) {
     return isFunction(config.point_focus_expand_r)
@@ -571,7 +571,7 @@ ChartInternal.prototype.pointExpandedR = function(d) {
   }
 }
 ChartInternal.prototype.pointSelectR = function(d) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return isFunction(config.point_select_r)
     ? config.point_select_r(d)
@@ -580,7 +580,7 @@ ChartInternal.prototype.pointSelectR = function(d) {
     : $$.pointR(d) * 4
 }
 ChartInternal.prototype.isWithinCircle = function(that, r) {
-  var d3 = this.d3,
+  const d3 = this.d3,
     mouse = d3.mouse(that),
     d3_this = d3.select(that),
     cx = +d3_this.attr('cx'),

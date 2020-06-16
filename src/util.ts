@@ -1,23 +1,23 @@
-export var asHalfPixel = function(n) {
+export const asHalfPixel = function(n: number): number {
   return Math.ceil(n) + 0.5
 }
-export var ceil10 = function(v) {
+export const ceil10 = function(v) {
   return Math.ceil(v / 10) * 10
 }
-export var diffDomain = function(d) {
+export const diffDomain = function(d) {
   return d[1] - d[0]
 }
-export var getOption = function(options, key, defaultValue) {
+export const getOption = function(options, key, defaultValue) {
   return isDefined(options[key]) ? options[key] : defaultValue
 }
-export var getPathBox = function(path) {
-  var box = getBBox(path),
+export const getPathBox = function(path) {
+  const box = getBBox(path),
     items = [path.pathSegList.getItem(0), path.pathSegList.getItem(1)],
     minX = items[0].x,
     minY = Math.min(items[0].y, items[1].y)
   return { x: minX, y: minY, width: box.width, height: box.height }
 }
-export var getBBox = function(element) {
+export const getBBox = function(element) {
   try {
     return element.getBBox()
   } catch (ignore) {
@@ -31,8 +31,8 @@ export var getBBox = function(element) {
     return { x: 0, y: 0, width: 0, height: 0 }
   }
 }
-export var hasValue = function(dict, value) {
-  var found = false
+export const hasValue = function(dict, value): boolean {
+  let found = false
   Object.keys(dict).forEach(function(key) {
     if (dict[key] === value) {
       found = true
@@ -40,13 +40,13 @@ export var hasValue = function(dict, value) {
   })
   return found
 }
-export var isArray = function(o) {
+export const isArray = function(o: unknown): boolean {
   return Array.isArray(o)
 }
-export var isDefined = function(v) {
+export const isDefined = function(v) {
   return typeof v !== 'undefined'
 }
-export var isEmpty = function(o) {
+export const isEmpty = function(o) {
   return (
     typeof o === 'undefined' ||
     o === null ||
@@ -54,30 +54,30 @@ export var isEmpty = function(o) {
     (typeof o === 'object' && Object.keys(o).length === 0)
   )
 }
-export var isFunction = function(o) {
+export const isFunction = function(o) {
   return typeof o === 'function'
 }
-export var isNumber = function(o) {
+export const isNumber = function(o) {
   return typeof o === 'number'
 }
-export var isString = function(o) {
+export const isString = function(o) {
   return typeof o === 'string'
 }
-export var isUndefined = function(v) {
+export const isUndefined = function(v) {
   return typeof v === 'undefined'
 }
-export var isValue = function(v) {
-  return v || v === 0
+export const isValue = function(v: unknown): boolean {
+  return Boolean(v || v === 0)
 }
-export var notEmpty = function(o) {
+export const notEmpty = function(o) {
   return !isEmpty(o)
 }
-export var sanitise = function(str) {
+export const sanitise = function(str: string): string {
   return typeof str === 'string'
     ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
     : str
 }
-export var flattenArray = function(arr) {
+export const flattenArray = function(arr: any): any[] {
   return Array.isArray(arr) ? [].concat(...arr) : []
 }
 /**
@@ -87,7 +87,7 @@ export var flattenArray = function(arr) {
  * @param {Object} box An object with {x, y, width, height} keys
  * @param {Number} sensitivity An offset to ease check on very small boxes
  */
-export var isWithinBox = function(point, box, sensitivity = 0) {
+export const isWithinBox = function(point, box, sensitivity = 0): boolean {
   const xStart = box.x - sensitivity
   const xEnd = box.x + box.width + sensitivity
   const yStart = box.y + box.height + sensitivity
@@ -103,7 +103,7 @@ export var isWithinBox = function(point, box, sensitivity = 0) {
  *
  * @param string agent Optional parameter to specify user agent
  */
-export var getIEVersion = function(agent?: string) {
+export const getIEVersion = function(agent?: string): number | undefined {
   // https://stackoverflow.com/questions/19999388/check-if-user-is-using-ie
   if (typeof agent === 'undefined') {
     agent = window.navigator.userAgent
@@ -119,8 +119,6 @@ export var getIEVersion = function(agent?: string) {
     pos = agent.indexOf('rv:')
     return parseInt(agent.substring(pos + 3, agent.indexOf('.', pos)), 10)
   }
-
-  return false
 }
 
 /**
@@ -128,7 +126,7 @@ export var getIEVersion = function(agent?: string) {
  *
  * @param version Optional parameter to specify IE version
  */
-export var isIE = function(version?: number) {
+export const isIE = function(version?: number): boolean {
   const ver = getIEVersion()
 
   if (typeof version === 'undefined') {

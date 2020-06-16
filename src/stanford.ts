@@ -2,13 +2,13 @@ import { ChartInternal } from './core'
 import { isFunction, sanitise } from './util'
 
 ChartInternal.prototype.isStanfordGraphType = function() {
-  var $$ = this
+  const $$ = this
 
   return $$.config.data_type === 'stanford'
 }
 
 ChartInternal.prototype.initStanfordData = function() {
-  var $$ = this,
+  let $$ = this,
     d3 = $$.d3,
     config = $$.config,
     target = $$.data.targets[0],
@@ -46,7 +46,7 @@ ChartInternal.prototype.initStanfordData = function() {
 }
 
 ChartInternal.prototype.getStanfordPointColor = function(d) {
-  var $$ = this,
+  const $$ = this,
     target = $$.data.targets[0]
 
   return target.colorscale(d.epochs)
@@ -54,9 +54,9 @@ ChartInternal.prototype.getStanfordPointColor = function(d) {
 
 // http://jsfiddle.net/Xotic750/KtzLq/
 ChartInternal.prototype.getCentroid = function(points) {
-  var area = getRegionArea(points)
+  const area = getRegionArea(points)
 
-  var x = 0,
+  let x = 0,
     y = 0,
     i,
     j,
@@ -81,7 +81,7 @@ ChartInternal.prototype.getCentroid = function(points) {
 }
 
 ChartInternal.prototype.getStanfordTooltipTitle = function(d) {
-  var $$ = this,
+  const $$ = this,
     labelX = $$.axis.getLabelText('x'),
     labelY = $$.axis.getLabelText('y')
 
@@ -96,7 +96,7 @@ ChartInternal.prototype.getStanfordTooltipTitle = function(d) {
 }
 
 ChartInternal.prototype.countEpochsInRegion = function(region) {
-  var $$ = this,
+  let $$ = this,
     target = $$.data.targets[0],
     total,
     count
@@ -122,7 +122,7 @@ ChartInternal.prototype.countEpochsInRegion = function(region) {
 
 export var getRegionArea = function(points) {
   // thanks to: https://stackoverflow.com/questions/16282330/find-centerpoint-of-polygon-in-javascript
-  var area = 0,
+  let area = 0,
     i,
     j,
     point1,

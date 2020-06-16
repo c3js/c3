@@ -3,7 +3,7 @@ import { ChartInternal } from './core'
 import { isValue } from './util'
 
 ChartInternal.prototype.initGrid = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3
   $$.grid = $$.main
@@ -29,7 +29,7 @@ ChartInternal.prototype.initGrid = function() {
   }
 }
 ChartInternal.prototype.initGridLines = function() {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
   $$.gridLines = $$.main
     .append('g')
@@ -40,7 +40,7 @@ ChartInternal.prototype.initGridLines = function() {
   $$.xgridLines = d3.selectAll([])
 }
 ChartInternal.prototype.updateXGrid = function(withoutUpdate) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3,
     xgridData = $$.generateGridData(config.grid_x_type, $$.x),
@@ -68,15 +68,15 @@ ChartInternal.prototype.updateXGrid = function(withoutUpdate) {
         y2: $$.height
       }
   $$.xgridAttr.opacity = function() {
-    var pos = +d3.select(this).attr(config.axis_rotated ? 'y1' : 'x1')
+    const pos = +d3.select(this).attr(config.axis_rotated ? 'y1' : 'x1')
     return pos === (config.axis_rotated ? $$.height : 0) ? 0 : 1
   }
 
-  var xgrid = $$.main
+  const xgrid = $$.main
     .select('.' + CLASS.xgrids)
     .selectAll('.' + CLASS.xgrid)
     .data(xgridData)
-  var xgridEnter = xgrid
+  const xgridEnter = xgrid
     .enter()
     .append('line')
     .attr('class', CLASS.xgrid)
@@ -98,14 +98,14 @@ ChartInternal.prototype.updateXGrid = function(withoutUpdate) {
 }
 
 ChartInternal.prototype.updateYGrid = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     gridValues = $$.yAxis.tickValues() || $$.y.ticks(config.grid_y_ticks)
-  var ygrid = $$.main
+  const ygrid = $$.main
     .select('.' + CLASS.ygrids)
     .selectAll('.' + CLASS.ygrid)
     .data(gridValues)
-  var ygridEnter = ygrid
+  const ygridEnter = ygrid
     .enter()
     .append('line')
     // TODO: x1, x2, y1, y2, opacity need to be set here maybe
@@ -141,7 +141,7 @@ ChartInternal.prototype.yGridTextX = function(d) {
     : this.width
 }
 ChartInternal.prototype.updateGrid = function(duration) {
-  var $$ = this,
+  let $$ = this,
     main = $$.main,
     config = $$.config,
     xgridLine,
@@ -262,7 +262,7 @@ ChartInternal.prototype.updateGrid = function(duration) {
     .remove()
 }
 ChartInternal.prototype.redrawGrid = function(withTransition, transition) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     xv = $$.xv.bind($$),
     lines = $$.xgridLines.select('line'),
@@ -287,7 +287,7 @@ ChartInternal.prototype.redrawGrid = function(withTransition, transition) {
   ]
 }
 ChartInternal.prototype.showXGridFocus = function(selectedData) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     dataToShow = selectedData.filter(function(d) {
       return d && isValue(d.value)
@@ -312,7 +312,7 @@ ChartInternal.prototype.hideXGridFocus = function() {
   this.main.select('line.' + CLASS.xgridFocus).style('visibility', 'hidden')
 }
 ChartInternal.prototype.updateXgridFocus = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   $$.main
     .select('line.' + CLASS.xgridFocus)
@@ -322,7 +322,7 @@ ChartInternal.prototype.updateXgridFocus = function() {
     .attr('y2', config.axis_rotated ? -10 : $$.height)
 }
 ChartInternal.prototype.generateGridData = function(type, scale) {
-  var $$ = this,
+  let $$ = this,
     gridData = [],
     xDomain,
     firstYear,
@@ -353,7 +353,7 @@ ChartInternal.prototype.generateGridData = function(type, scale) {
 ChartInternal.prototype.getGridFilterToRemove = function(params) {
   return params
     ? function(line) {
-        var found = false
+        let found = false
         ;[].concat(params).forEach(function(param) {
           if (
             ('value' in param && line.value === param.value) ||
@@ -369,7 +369,7 @@ ChartInternal.prototype.getGridFilterToRemove = function(params) {
       }
 }
 ChartInternal.prototype.removeGridLines = function(params, forX) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     toRemove = $$.getGridFilterToRemove(params),
     toShow = function(line) {

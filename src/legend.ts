@@ -3,7 +3,7 @@ import { ChartInternal } from './core'
 import { isDefined, isEmpty, getOption } from './util'
 
 ChartInternal.prototype.initLegend = function() {
-  var $$ = this
+  const $$ = this
   $$.legendItemTextBox = {}
   $$.legendHasRendered = false
   $$.legend = $$.svg.append('g').attr('transform', $$.getTranslate('legend'))
@@ -17,7 +17,7 @@ ChartInternal.prototype.initLegend = function() {
   $$.updateLegendWithDefaults()
 }
 ChartInternal.prototype.updateLegendWithDefaults = function() {
-  var $$ = this
+  const $$ = this
   $$.updateLegend($$.mapToIds($$.data.targets), {
     withTransform: false,
     withTransitionForTransform: false,
@@ -28,7 +28,7 @@ ChartInternal.prototype.updateSizeForLegend = function(
   legendHeight,
   legendWidth
 ) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     insetLegendPosition = {
       top: $$.isLegendTop
@@ -62,7 +62,7 @@ ChartInternal.prototype.updateSizeForLegend = function(
   }
 }
 ChartInternal.prototype.transformLegend = function(withTransition) {
-  var $$ = this
+  const $$ = this
   ;(withTransition ? $$.legend.transition() : $$.legend).attr(
     'transform',
     $$.getTranslate('legend')
@@ -78,7 +78,7 @@ ChartInternal.prototype.updateLegendItemHeight = function(h) {
   this.legendItemHeight = h
 }
 ChartInternal.prototype.getLegendWidth = function() {
-  var $$ = this
+  const $$ = this
   return $$.config.legend_show
     ? $$.isLegendRight || $$.isLegendInset
       ? $$.legendItemWidth * ($$.legendStep + 1)
@@ -86,7 +86,7 @@ ChartInternal.prototype.getLegendWidth = function() {
     : 0
 }
 ChartInternal.prototype.getLegendHeight = function() {
-  var $$ = this,
+  let $$ = this,
     h = 0
   if ($$.config.legend_show) {
     if ($$.isLegendRight) {
@@ -104,7 +104,7 @@ ChartInternal.prototype.opacityForUnfocusedLegend = function(legendItem) {
   return legendItem.classed(CLASS.legendItemHidden) ? null : 0.3
 }
 ChartInternal.prototype.toggleFocusLegend = function(targetIds, focus) {
-  var $$ = this
+  const $$ = this
   targetIds = $$.mapToTargetIds(targetIds)
   $$.legend
     .selectAll('.' + CLASS.legendItem)
@@ -115,12 +115,12 @@ ChartInternal.prototype.toggleFocusLegend = function(targetIds, focus) {
     .transition()
     .duration(100)
     .style('opacity', function() {
-      var opacity = focus ? $$.opacityForLegend : $$.opacityForUnfocusedLegend
+      const opacity = focus ? $$.opacityForLegend : $$.opacityForUnfocusedLegend
       return opacity.call($$, $$.d3.select(this))
     })
 }
 ChartInternal.prototype.revertLegend = function() {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
   $$.legend
     .selectAll('.' + CLASS.legendItem)
@@ -132,7 +132,7 @@ ChartInternal.prototype.revertLegend = function() {
     })
 }
 ChartInternal.prototype.showLegend = function(targetIds) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   if (!config.legend_show) {
     config.legend_show = true
@@ -151,7 +151,7 @@ ChartInternal.prototype.showLegend = function(targetIds) {
     })
 }
 ChartInternal.prototype.hideLegend = function(targetIds) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   if (config.legend_show && isEmpty(targetIds)) {
     config.legend_show = false
@@ -171,9 +171,9 @@ ChartInternal.prototype.updateLegend = function(
   options,
   transitions
 ) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
-  var xForLegend,
+  let xForLegend,
     xForLegendText,
     xForLegendRect,
     yForLegend,
@@ -182,13 +182,13 @@ ChartInternal.prototype.updateLegend = function(
     x1ForLegendTile,
     x2ForLegendTile,
     yForLegendTile
-  var paddingTop = 4,
+  let paddingTop = 4,
     paddingRight = 10,
     maxWidth = 0,
     maxHeight = 0,
     posMin = 10,
     tileWidth = config.legend_item_tile_width + 5
-  var l,
+  let l,
     totalLength = 0,
     offsets = {},
     widths = {},
@@ -196,8 +196,8 @@ ChartInternal.prototype.updateLegend = function(
     margins = [0],
     steps = {},
     step = 0
-  var withTransition, withTransitionForTransform
-  var texts, rects, tiles, background
+  let withTransition, withTransitionForTransform
+  let texts, rects, tiles, background
 
   // Skip elements when their name is set to null
   targetIds = targetIds.filter(function(id) {
@@ -224,7 +224,7 @@ ChartInternal.prototype.updateLegend = function(
   }
 
   function updatePositions(textElement, id, index) {
-    var reset = index === 0,
+    let reset = index === 0,
       isLast = index === targetIds.length - 1,
       box = getTextBox(textElement, id),
       itemWidth =
@@ -496,7 +496,7 @@ ChartInternal.prototype.updateLegend = function(
     .attr('y2', yForLegendTile)
 
   if (background) {
-    ;(withTransition ? background.transition() : background)
+    (withTransition ? background.transition() : background)
       .attr('height', $$.getLegendHeight() - 12)
       .attr('width', maxWidth * (step + 1) + 10)
   }

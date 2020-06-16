@@ -2,7 +2,7 @@ import { Chart } from './core'
 import { isUndefined } from './util'
 
 Chart.prototype.groups = function(groups) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   if (isUndefined(groups)) {
     return config.data_groups

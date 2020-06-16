@@ -8,7 +8,7 @@
 // SVG2 (https://lists.w3.org/Archives/Public/www-svg/2015Jun/0044.html), including the latest spec
 // changes which were implemented in Firefox 43 and Chrome 46.
 
-;(function() {
+(function() {
   'use strict'
   if (!('SVGPathSeg' in window)) {
     // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSeg
@@ -1545,12 +1545,12 @@
         if (distance === undefined || !isFinite(distance))
           throw 'Invalid arguments.'
 
-        var measurementElement = document.createElementNS(
+        const measurementElement = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'path'
         )
         measurementElement.setAttribute('d', this.getAttribute('d'))
-        var lastPathSegment = measurementElement.pathSegList.numberOfItems - 1
+        let lastPathSegment = measurementElement.pathSegList.numberOfItems - 1
 
         // If the path is empty, return 0.
         if (lastPathSegment <= 0) return 0
@@ -1650,7 +1650,7 @@
       mutationRecords
     ) {
       if (!this._pathElement) return
-      var hasPathMutations = false
+      let hasPathMutations = false
       mutationRecords.forEach(function(record) {
         if (record.attributeName == 'd') hasPathMutations = true
       })
@@ -1743,7 +1743,7 @@
       this._checkPathSynchronizedToList()
 
       this._checkValidIndex(index)
-      var item = this._list[index]
+      const item = this._list[index]
       this._list.splice(index, 1)
       this._writeListToPath()
       return item
@@ -1764,8 +1764,8 @@
     }
 
     window.SVGPathSegList._pathSegArrayAsString = function(pathSegArray) {
-      var string = ''
-      var first = true
+      let string = ''
+      let first = true
       pathSegArray.forEach(function(pathSeg) {
         if (first) {
           first = false
@@ -1781,9 +1781,9 @@
     window.SVGPathSegList.prototype._parsePath = function(string) {
       if (!string || string.length == 0) return []
 
-      var owningPathSegList = this
+      const owningPathSegList = this
 
-      var Builder = function() {
+      const Builder = function() {
         this.pathSegList = []
       }
 
@@ -1791,7 +1791,7 @@
         this.pathSegList.push(pathSeg)
       }
 
-      var Source = function(string) {
+      const Source = function(string) {
         this._string = string
         this._currentIndex = 0
         this._endIndex = this._string.length
@@ -1801,7 +1801,7 @@
       }
 
       Source.prototype._isCurrentSpace = function() {
-        var character = this._string[this._currentIndex]
+        const character = this._string[this._currentIndex]
         return (
           character <= ' ' &&
           (character == ' ' ||
@@ -1842,7 +1842,7 @@
       }
 
       Source.prototype.peekSegmentType = function() {
-        var lookahead = this._string[this._currentIndex]
+        const lookahead = this._string[this._currentIndex]
         return this._pathSegTypeFromChar(lookahead)
       }
 
@@ -1916,7 +1916,7 @@
       Source.prototype.initialCommandIsMoveTo = function() {
         // If the path is empty it is still valid, so return true.
         if (!this.hasMoreData()) return true
-        var command = this.peekSegmentType()
+        const command = this.peekSegmentType()
         // Path must start with moveTo.
         return (
           command == window.SVGPathSeg.PATHSEG_MOVETO_ABS ||
@@ -1927,14 +1927,14 @@
       // Parse a number from an SVG path. This very closely follows genericParseNumber(...) from Source/core/svg/SVGParserUtilities.cpp.
       // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-PathDataBNF
       Source.prototype._parseNumber = function() {
-        var exponent = 0
-        var integer = 0
-        var frac = 1
-        var decimal = 0
-        var sign = 1
-        var expsign = 1
+        let exponent = 0
+        let integer = 0
+        let frac = 1
+        let decimal = 0
+        let sign = 1
+        let expsign = 1
 
-        var startIndex = this._currentIndex
+        const startIndex = this._currentIndex
 
         this._skipOptionalSpaces()
 
@@ -1962,7 +1962,7 @@
           return undefined
 
         // Read the integer part, build right-to-left.
-        var startIntPartIndex = this._currentIndex
+        const startIntPartIndex = this._currentIndex
         while (
           this._currentIndex < this._endIndex &&
           this._string.charAt(this._currentIndex) >= '0' &&
@@ -1971,8 +1971,8 @@
           this._currentIndex++ // Advance to first non-digit.
 
         if (this._currentIndex != startIntPartIndex) {
-          var scanIntPartIndex = this._currentIndex - 1
-          var multiplier = 1
+          let scanIntPartIndex = this._currentIndex - 1
+          let multiplier = 1
           while (scanIntPartIndex >= startIntPartIndex) {
             integer +=
               multiplier * (this._string.charAt(scanIntPartIndex--) - '0')
@@ -2043,7 +2043,7 @@
           }
         }
 
-        var number = integer + decimal
+        let number = integer + decimal
         number *= sign
 
         if (exponent) number *= Math.pow(10, expsign * exponent)
@@ -2057,8 +2057,8 @@
 
       Source.prototype._parseArcFlag = function() {
         if (this._currentIndex >= this._endIndex) return undefined
-        var flag = false
-        var flagChar = this._string.charAt(this._currentIndex++)
+        let flag = false
+        const flagChar = this._string.charAt(this._currentIndex++)
         if (flagChar == '0') flag = false
         else if (flagChar == '1') flag = true
         else return undefined
@@ -2068,8 +2068,8 @@
       }
 
       Source.prototype.parseSegment = function() {
-        var lookahead = this._string[this._currentIndex]
-        var command = this._pathSegTypeFromChar(lookahead)
+        const lookahead = this._string[this._currentIndex]
+        let command = this._pathSegTypeFromChar(lookahead)
         if (command == window.SVGPathSeg.PATHSEG_UNKNOWN) {
           // Possibly an implicit command. Not allowed if this is the first command.
           if (this._previousCommand == window.SVGPathSeg.PATHSEG_UNKNOWN)
@@ -2279,12 +2279,12 @@
         }
       }
 
-      var builder = new Builder()
-      var source = new Source(string)
+      const builder = new Builder()
+      const source = new Source(string)
 
       if (!source.initialCommandIsMoveTo()) return []
       while (source.hasMoreData()) {
-        var pathSeg = source.parseSegment()
+        const pathSeg = source.parseSegment()
         if (!pathSeg) return []
         builder.appendSegment(pathSeg)
       }
@@ -2326,13 +2326,13 @@ if (typeof Object.assign !== 'function') {
         throw new TypeError('Cannot convert undefined or null to object')
       }
 
-      var to = Object(target)
+      const to = Object(target)
 
-      for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index]
+      for (let index = 1; index < arguments.length; index++) {
+        const nextSource = arguments[index]
 
         if (nextSource !== null && nextSource !== undefined) {
-          for (var nextKey in nextSource) {
+          for (const nextKey in nextSource) {
             // Avoid bugs when hasOwnProperty is shadowed
             if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
               to[nextKey] = nextSource[nextKey]

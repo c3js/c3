@@ -2,7 +2,7 @@ import { ChartInternal } from './core'
 import { isValue, isDefined, diffDomain, notEmpty } from './util'
 
 ChartInternal.prototype.getYDomainMin = function(targets) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     ids = $$.mapToIds(targets),
     ys = $$.getValuesAsIdKeyed(targets),
@@ -54,7 +54,7 @@ ChartInternal.prototype.getYDomainMin = function(targets) {
   )
 }
 ChartInternal.prototype.getYDomainMax = function(targets) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     ids = $$.mapToIds(targets),
     ys = $$.getValuesAsIdKeyed(targets),
@@ -106,14 +106,14 @@ ChartInternal.prototype.getYDomainMax = function(targets) {
   )
 }
 ChartInternal.prototype.getYDomain = function(targets, axisId, xDomain) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   if ($$.isAxisNormalized(axisId)) {
     return [0, 100]
   }
 
-  var targetsByAxisId = targets.filter(function(t) {
+  let targetsByAxisId = targets.filter(function(t) {
       return $$.axis.getId(t.id) === axisId
     }),
     yTargets = xDomain
@@ -261,7 +261,7 @@ ChartInternal.prototype.getYDomain = function(targets, axisId, xDomain) {
   return isInverted ? domain.reverse() : domain
 }
 ChartInternal.prototype.getXDomainMin = function(targets) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return isDefined(config.axis_x_min)
     ? $$.isTimeSeries()
@@ -274,7 +274,7 @@ ChartInternal.prototype.getXDomainMin = function(targets) {
       })
 }
 ChartInternal.prototype.getXDomainMax = function(targets) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return isDefined(config.axis_x_max)
     ? $$.isTimeSeries()
@@ -287,7 +287,7 @@ ChartInternal.prototype.getXDomainMax = function(targets) {
       })
 }
 ChartInternal.prototype.getXDomainPadding = function(domain) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     diff = domain[1] - domain[0],
     maxDataCount,
@@ -320,7 +320,7 @@ ChartInternal.prototype.getXDomainPadding = function(domain) {
   return { left: paddingLeft, right: paddingRight }
 }
 ChartInternal.prototype.getXDomain = function(targets) {
-  var $$ = this,
+  let $$ = this,
     xDomain = [$$.getXDomainMin(targets), $$.getXDomainMax(targets)],
     firstX = xDomain[0],
     lastX = xDomain[1],
@@ -356,7 +356,7 @@ ChartInternal.prototype.updateXDomain = function(
   withTrim,
   domain
 ) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   if (withUpdateOrgXDomain) {
@@ -388,7 +388,7 @@ ChartInternal.prototype.updateXDomain = function(
   return $$.x.domain()
 }
 ChartInternal.prototype.trimXDomain = function(domain) {
-  var zoomDomain = this.getZoomDomain(),
+  const zoomDomain = this.getZoomDomain(),
     min = zoomDomain[0],
     max = zoomDomain[1]
   if (domain[0] <= min) {

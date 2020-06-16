@@ -3,7 +3,7 @@ import { isValue, isDefined } from './util'
 
 Chart.prototype.axis = function() {}
 Chart.prototype.axis.labels = function(labels) {
-  var $$ = this.internal
+  const $$ = this.internal
   if (arguments.length) {
     Object.keys(labels).forEach(function(axisId) {
       $$.axis.setLabelText(axisId, labels[axisId])
@@ -13,7 +13,7 @@ Chart.prototype.axis.labels = function(labels) {
   // TODO: return some values?
 }
 Chart.prototype.axis.max = function(max) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   if (arguments.length) {
     if (typeof max === 'object') {
@@ -39,7 +39,7 @@ Chart.prototype.axis.max = function(max) {
   }
 }
 Chart.prototype.axis.min = function(min) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   if (arguments.length) {
     if (typeof min === 'object') {

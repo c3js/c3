@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 chart title', function() {
   'use strict'
 
-  var chart, config
+  let chart, config
 
   describe('when given a title too long', function() {
     beforeEach(function(done) {
@@ -41,7 +41,7 @@ describe('c3 chart title', function() {
       })
 
       it('renders the title at the default config position', function() {
-        var titleEl = d3.select('.c3-title')
+        const titleEl = d3.select('.c3-title')
         expect(+titleEl.attr('x')).toBeCloseTo(294, -2)
         expect(+titleEl.attr('y')).toEqual(
           (titleEl.node() as any).getBBox().height
@@ -49,13 +49,13 @@ describe('c3 chart title', function() {
       })
 
       it('renders the title text', function() {
-        var titleEl = d3.select('.c3-title')
+        const titleEl = d3.select('.c3-title')
         expect((titleEl.node() as any).textContent).toEqual('new title')
       })
     })
 
     describe('with padding', function() {
-      var config,
+      let config,
         getConfig = function(titlePosition) {
           return {
             data: {
@@ -80,7 +80,7 @@ describe('c3 chart title', function() {
           chart = initChart(chart, config, done)
         })
         it('renders the title at the default config position', function() {
-          var titleEl = d3.select('.c3-title')
+          const titleEl = d3.select('.c3-title')
           expect(+titleEl.attr('x')).toBeCloseTo(275, -2)
           expect(+titleEl.attr('y')).toBeCloseTo(34, -1)
         })
@@ -99,7 +99,7 @@ describe('c3 chart title', function() {
           chart = initChart(chart, config, done)
         })
         it('renders the title at the default config position', function() {
-          var titleEl = d3.select('.c3-title')
+          const titleEl = d3.select('.c3-title')
           expect(+titleEl.attr('x')).toBeCloseTo(50, -1)
           expect(+titleEl.attr('y')).toBeCloseTo(34, -1)
         })
@@ -111,7 +111,7 @@ describe('c3 chart title', function() {
           chart = initChart(chart, config, done)
         })
         it('renders the title at the default config position', function() {
-          var titleEl = d3.select('.c3-title')
+          const titleEl = d3.select('.c3-title')
           expect(+titleEl.attr('x')).toBeCloseTo(520, -2)
           expect(+titleEl.attr('y')).toBeCloseTo(34, -1)
         })

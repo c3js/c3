@@ -3,19 +3,19 @@ import { ChartInternal } from './core'
 import { isFunction } from './util'
 
 ChartInternal.prototype.initBrush = function(scale) {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
   // TODO: dynamically change brushY/brushX according to axis_rotated.
   $$.brush = ($$.config.axis_rotated ? d3.brushY() : d3.brushX())
     .on('brush', function() {
-      var event = d3.event.sourceEvent
+      const event = d3.event.sourceEvent
       if (event && event.type === 'zoom') {
         return
       }
       $$.redrawForBrush()
     })
     .on('end', function() {
-      var event = d3.event.sourceEvent
+      const event = d3.event.sourceEvent
       if (event && event.type === 'zoom') {
         return
       }
@@ -24,8 +24,8 @@ ChartInternal.prototype.initBrush = function(scale) {
       }
     })
   $$.brush.updateExtent = function() {
-    var range = this.scale.range(),
-      extent
+    const range = this.scale.range()
+    let extent
     if ($$.config.axis_rotated) {
       extent = [
         [0, range[0]],
@@ -55,7 +55,7 @@ ChartInternal.prototype.initBrush = function(scale) {
     return d3.brushSelection($$.context.select('.' + CLASS.brush).node())
   }
   $$.brush.selectionAsValue = function(selectionAsValue, withTransition) {
-    var selection, brush
+    let selection, brush
     if (selectionAsValue) {
       if ($$.context) {
         selection = [
@@ -74,13 +74,13 @@ ChartInternal.prototype.initBrush = function(scale) {
     return [this.scale.invert(selection[0]), this.scale.invert(selection[1])]
   }
   $$.brush.empty = function() {
-    var selection = $$.brush.selection()
+    const selection = $$.brush.selection()
     return !selection || selection[0] === selection[1]
   }
   return $$.brush.updateScale(scale)
 }
 ChartInternal.prototype.initSubchart = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     context = ($$.context = $$.svg
       .append('g')
@@ -122,31 +122,27 @@ ChartInternal.prototype.initSubchart = function() {
     .attr('clip-path', config.axis_rotated ? '' : $$.clipPathForXAxis)
 }
 ChartInternal.prototype.initSubchartBrush = function() {
-  var $$ = this
+  const $$ = this
   // Add extent rect for Brush
   $$.initBrush($$.subX).updateExtent()
   $$.context.select('.' + CLASS.brush).call($$.brush)
 }
 ChartInternal.prototype.updateTargetsForSubchart = function(targets) {
-  var $$ = this,
-    context = $$.context,
-    config = $$.config,
-    contextLineEnter,
-    contextLine,
-    contextBarEnter,
-    contextBar,
-    classChartBar = $$.classChartBar.bind($$),
-    classBars = $$.classBars.bind($$),
-    classChartLine = $$.classChartLine.bind($$),
-    classLines = $$.classLines.bind($$),
-    classAreas = $$.classAreas.bind($$)
+  const $$ = this
+  const context = $$.context
+  const config = $$.config
+  const classChartBar = $$.classChartBar.bind($$)
+  const classBars = $$.classBars.bind($$)
+  const classChartLine = $$.classChartLine.bind($$)
+  const classLines = $$.classLines.bind($$)
+  const classAreas = $$.classAreas.bind($$)
 
   //-- Bar --//
-  contextBar = context
+  const contextBar = context
     .select('.' + CLASS.chartBars)
     .selectAll('.' + CLASS.chartBar)
     .data(targets)
-  contextBarEnter = contextBar
+  const contextBarEnter = contextBar
     .enter()
     .append('g')
     .style('opacity', 0)
@@ -155,11 +151,11 @@ ChartInternal.prototype.updateTargetsForSubchart = function(targets) {
   contextBarEnter.append('g').attr('class', classBars)
 
   //-- Line --//
-  contextLine = context
+  const contextLine = context
     .select('.' + CLASS.chartLines)
     .selectAll('.' + CLASS.chartLine)
     .data(targets)
-  contextLineEnter = contextLine
+  const contextLineEnter = contextLine
     .enter()
     .append('g')
     .style('opacity', 0)
@@ -178,12 +174,12 @@ ChartInternal.prototype.updateTargetsForSubchart = function(targets) {
     )
 }
 ChartInternal.prototype.updateBarForSubchart = function(durationForExit) {
-  var $$ = this
-  var contextBar = $$.context
+  const $$ = this
+  const contextBar = $$.context
     .selectAll('.' + CLASS.bars)
     .selectAll('.' + CLASS.bar)
     .data($$.barData.bind($$))
-  var contextBarEnter = contextBar
+  const contextBarEnter = contextBar
     .enter()
     .append('path')
     .attr('class', $$.classBar.bind($$))
@@ -204,7 +200,7 @@ ChartInternal.prototype.redrawBarForSubchart = function(
   withTransition,
   duration
 ) {
-  ;(withTransition
+  (withTransition
     ? this.contextBar.transition(Math.random().toString()).duration(duration)
     : this.contextBar
   )
@@ -212,12 +208,12 @@ ChartInternal.prototype.redrawBarForSubchart = function(
     .style('opacity', 1)
 }
 ChartInternal.prototype.updateLineForSubchart = function(durationForExit) {
-  var $$ = this
-  var contextLine = $$.context
+  const $$ = this
+  const contextLine = $$.context
     .selectAll('.' + CLASS.lines)
     .selectAll('.' + CLASS.line)
     .data($$.lineData.bind($$))
-  var contextLineEnter = contextLine
+  const contextLineEnter = contextLine
     .enter()
     .append('path')
     .attr('class', $$.classLine.bind($$))
@@ -237,7 +233,7 @@ ChartInternal.prototype.redrawLineForSubchart = function(
   withTransition,
   duration
 ) {
-  ;(withTransition
+  (withTransition
     ? this.contextLine.transition(Math.random().toString()).duration(duration)
     : this.contextLine
   )
@@ -245,13 +241,13 @@ ChartInternal.prototype.redrawLineForSubchart = function(
     .style('opacity', 1)
 }
 ChartInternal.prototype.updateAreaForSubchart = function(durationForExit) {
-  var $$ = this,
+  const $$ = this,
     d3 = $$.d3
-  var contextArea = $$.context
+  const contextArea = $$.context
     .selectAll('.' + CLASS.areas)
     .selectAll('.' + CLASS.area)
     .data($$.lineData.bind($$))
-  var contextAreaEnter = contextArea
+  const contextAreaEnter = contextArea
     .enter()
     .append('path')
     .attr('class', $$.classArea.bind($$))
@@ -273,7 +269,7 @@ ChartInternal.prototype.redrawAreaForSubchart = function(
   withTransition,
   duration
 ) {
-  ;(withTransition
+  (withTransition
     ? this.contextArea.transition(Math.random().toString()).duration(duration)
     : this.contextArea
   )
@@ -290,9 +286,9 @@ ChartInternal.prototype.redrawSubchart = function(
   barIndices,
   lineIndices
 ) {
-  var $$ = this,
-    d3 = $$.d3,
-    drawAreaOnSub,
+  const $$ = this
+  const d3 = $$.d3
+  let drawAreaOnSub,
     drawBarOnSub,
     drawLineOnSub
 
@@ -321,10 +317,9 @@ ChartInternal.prototype.redrawSubchart = function(
   }
 }
 ChartInternal.prototype.redrawForBrush = function() {
-  var $$ = this,
-    x = $$.x,
-    d3 = $$.d3,
-    s
+  const $$ = this
+  const x = $$.x
+  const d3 = $$.d3
   $$.redraw({
     withTransition: false,
     withY: $$.config.zoom_rescale,
@@ -334,7 +329,7 @@ ChartInternal.prototype.redrawForBrush = function() {
     withDimension: false
   })
   // update zoom transation binded to event rect
-  s = d3.event.selection || $$.brush.scale.range()
+  const s = d3.event.selection || $$.brush.scale.range()
   $$.main
     .select('.' + CLASS.eventRect)
     .call(
@@ -347,8 +342,8 @@ ChartInternal.prototype.transformContext = function(
   withTransition,
   transitions
 ) {
-  var $$ = this,
-    subXAxis
+  const $$ = this
+  let subXAxis
   if (transitions && transitions.axisSubX) {
     subXAxis = transitions.axisSubX
   } else {
@@ -361,9 +356,9 @@ ChartInternal.prototype.transformContext = function(
   subXAxis.attr('transform', $$.getTranslate('subx'))
 }
 ChartInternal.prototype.getDefaultSelection = function() {
-  var $$ = this,
-    config = $$.config,
-    selection = isFunction(config.axis_x_selection)
+  const $$ = this
+  const config = $$.config
+  let selection = isFunction(config.axis_x_selection)
       ? config.axis_x_selection($$.getXDomain($$.data.targets))
       : config.axis_x_selection
   if ($$.isTimeSeries()) {

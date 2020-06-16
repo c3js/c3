@@ -7,7 +7,7 @@ function powerOfTen(d) {
 }
 
 ChartInternal.prototype.drawColorScale = function() {
-  var $$ = this,
+  let $$ = this,
     d3 = $$.d3,
     config = $$.config,
     target = $$.data.targets[0],
@@ -119,12 +119,12 @@ ChartInternal.prototype.drawColorScale = function() {
 }
 
 ChartInternal.prototype.xForColorScale = function() {
-  var $$ = this
+  const $$ = this
 
   return $$.config.stanford_padding.right + getBBox($$.colorScale.node()).width
 }
 
 ChartInternal.prototype.getColorScalePadding = function() {
-  var $$ = this
+  const $$ = this
   return $$.xForColorScale() + $$.config.stanford_padding.left + 20
 }

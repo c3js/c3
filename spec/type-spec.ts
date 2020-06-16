@@ -3,7 +3,7 @@ import { initChart } from './c3-helper'
 describe('c3 chart types', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)

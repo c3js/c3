@@ -2,7 +2,7 @@ import CLASS from './class'
 import { ChartInternal } from './core'
 
 ChartInternal.prototype.initEventRect = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
 
   $$.main
@@ -257,11 +257,11 @@ ChartInternal.prototype.redrawEventRect = function() {
     )
 }
 ChartInternal.prototype.getMousePosition = function(data) {
-  var $$ = this
+  const $$ = this
   return [$$.x(data.x), $$.getYScale(data.id)(data.value)]
 }
 ChartInternal.prototype.dispatchEvent = function(type, mouse) {
-  var $$ = this,
+  const $$ = this,
     selector = '.' + CLASS.eventRect,
     eventRect = $$.main.select(selector).node(),
     box = eventRect.getBoundingClientRect(),

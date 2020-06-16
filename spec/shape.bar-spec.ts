@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 chart shape bar', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -25,18 +25,18 @@ describe('c3 chart shape bar', function() {
     })
 
     it('bars should have expected Path Box', function() {
-      var expected = {
+      const expected = {
         x: 279,
         y: 40,
         width: 40,
         height: 387
       }
 
-      var shapes = chart.internal.main
+      const shapes = chart.internal.main
         .selectAll('.' + chart.internal.CLASS.shapes)
         .selectAll('.' + chart.internal.CLASS.shape)
       shapes.each(function() {
-        var pathBox = chart.internal.getPathBox(this)
+        const pathBox = chart.internal.getPathBox(this)
         expect(pathBox.x).toBeCloseTo(expected.x, -1)
         expect(pathBox.y).toBeCloseTo(expected.y, -1)
         expect(pathBox.width).toBeCloseTo(expected.width, -1)
@@ -60,11 +60,11 @@ describe('c3 chart shape bar', function() {
         }
       })
       it('should be stacked', function() {
-        var expectedBottom = [275, 293, 365, 281, 395, 290]
+        const expectedBottom = [275, 293, 365, 281, 395, 290]
         chart.internal.main
           .selectAll('.c3-bars-data1 .c3-bar')
           .each(function(d, i) {
-            var rect = d3
+            const rect = d3
               .select(this)
               .node()
               .getBoundingClientRect()
@@ -102,11 +102,11 @@ describe('c3 chart shape bar', function() {
         }
       })
       it('should be stacked', function() {
-        var expectedBottom = [275, 293, 365, 281, 395, 290]
+        const expectedBottom = [275, 293, 365, 281, 395, 290]
         chart.internal.main
           .selectAll('.c3-bars-data1 .c3-bar')
           .each(function(d, i) {
-            var rect = d3
+            const rect = d3
               .select(this)
               .node()
               .getBoundingClientRect()
@@ -145,11 +145,11 @@ describe('c3 chart shape bar', function() {
       })
 
       it('should be stacked', function() {
-        var expectedBottom = [275, 293, 365, 281, 395, 290]
+        const expectedBottom = [275, 293, 365, 281, 395, 290]
         chart.internal.main
           .selectAll('.c3-bars-data1 .c3-bar')
           .each(function(d, i) {
-            var rect = d3
+            const rect = d3
               .select(this)
               .node()
               .getBoundingClientRect()
@@ -178,22 +178,22 @@ describe('c3 chart shape bar', function() {
       })
 
       it('should not be within bar', function() {
-        var bar = d3.select('.c3-target-data1 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data1 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([0, 0], bar)).toBeFalsy()
       })
 
       it('should be within bar', function() {
-        var bar = d3.select('.c3-target-data1 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data1 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([31, 280], bar)).toBeTruthy()
       })
 
       it('should not be within bar of negative value', function() {
-        var bar = d3.select('.c3-target-data3 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data3 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([68, 280], bar)).toBeFalsy()
       })
 
       it('should be within bar of negative value', function() {
-        var bar = d3.select('.c3-target-data3 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data3 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([68, 350], bar)).toBeTruthy()
       })
     })
@@ -204,24 +204,24 @@ describe('c3 chart shape bar', function() {
       })
 
       it('should not be within bar', function() {
-        var bar = d3.select('.c3-target-data1 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data1 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([0, 0], bar)).toBeFalsy()
       })
 
       it('should be within bar', function() {
-        var bar = d3.select('.c3-target-data1 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data1 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([190, 20], bar)).toBeTruthy()
       })
 
       it('should be within bar of negative value', function() {
-        var bar = d3.select('.c3-target-data3 .c3-bar-0').node()
+        const bar = d3.select('.c3-target-data3 .c3-bar-0').node()
         expect(chart.internal.isWithinBar([68, 50], bar)).toBeTruthy()
       })
     })
   })
 
   describe('bar spacing', function() {
-    var createArgs = function(spacing) {
+    const createArgs = function(spacing) {
       return {
         size: {
           width: 500
@@ -242,32 +242,32 @@ describe('c3 chart shape bar', function() {
       }
     }
 
-    var getBBox = function(selector) {
+    const getBBox = function(selector) {
       return d3
         .select(selector)
         .node()
         .getBBox()
     }
 
-    var getBarContainerWidth = function() {
+    const getBarContainerWidth = function() {
       return parseInt(getBBox('.c3-chart-bars').width)
     }
 
-    var getBarContainerOffset = function() {
+    const getBarContainerOffset = function() {
       return parseInt(getBBox('.c3-chart-bars').x)
     }
 
-    var getBarBBox = function(name, idx) {
+    const getBarBBox = function(name, idx) {
       return getBBox('.c3-target-' + name + ' .c3-bar-' + (idx || 0))
     }
 
-    var getBarWidth = function(name, idx) {
+    const getBarWidth = function(name, idx) {
       return parseInt(getBarBBox(name, idx).width)
     }
 
-    var getBarOffset = function(name1, name2, idx) {
-      var bbox1 = getBarBBox(name1, idx)
-      var bbox2 = getBarBBox(name2, idx)
+    const getBarOffset = function(name1, name2, idx) {
+      const bbox1 = getBarBBox(name1, idx)
+      const bbox2 = getBarBBox(name2, idx)
       return Math.floor(bbox2.x - (bbox1.x + bbox1.width))
     }
 

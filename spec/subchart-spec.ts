@@ -4,7 +4,7 @@ describe('c3 subchart', function() {
 
   let chart
 
-  let args = {
+  const args = {
     data: {
       x: 'date',
       columns: [

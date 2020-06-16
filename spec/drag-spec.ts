@@ -3,9 +3,9 @@ import { d3, initChart } from './c3-helper'
 describe('drag behavior', function() {
   'use strict'
 
-  var chart, shapes, $$, totalshapes
+  let chart, shapes, $$, totalshapes
 
-  var args = {
+  const args = {
     data: {
       x: 'x',
       columns: [
@@ -36,7 +36,7 @@ describe('drag behavior', function() {
   })
 
   it('should have no selected shapes', function() {
-    var selected = shapes
+    const selected = shapes
       .filter(function() {
         return d3.select(this).classed($$.CLASS.SELECTED)
       })
@@ -47,7 +47,7 @@ describe('drag behavior', function() {
 
   describe('Trigger drag events', function() {
     beforeAll(function() {
-      var s = chart.internal.eventRect,
+      const s = chart.internal.eventRect,
         coords1 = [
           (s.attr('width') - s.attr('x')) / 3,
           (s.attr('height') - s.attr('y')) / 3
@@ -62,7 +62,7 @@ describe('drag behavior', function() {
     })
 
     it('should select 6 shapes', function() {
-      var selected = shapes
+      const selected = shapes
         .filter(function() {
           return d3.select(this).classed($$.CLASS.SELECTED)
         })
@@ -72,7 +72,7 @@ describe('drag behavior', function() {
     })
 
     it('should select 9 unselected shapes', function() {
-      var unselected = shapes
+      const unselected = shapes
         .filter(function() {
           return !d3.select(this).classed($$.CLASS.SELECTED)
         })
@@ -83,12 +83,12 @@ describe('drag behavior', function() {
 
     describe('Selected api', function() {
       it('should return 6 selected shapes', function() {
-        var selected = chart.selected()
+        const selected = chart.selected()
         expect(selected.length).toBe(6)
       })
 
       it('should return 3 selected shapes with targetId = data1', function() {
-        var selected = chart.selected('data1')
+        const selected = chart.selected('data1')
         expect(selected.length).toBe(3)
       })
     })

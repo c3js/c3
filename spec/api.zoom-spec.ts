@@ -3,7 +3,7 @@ import { initChart } from './c3-helper'
 describe('c3 api zoom', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -26,7 +26,7 @@ describe('c3 api zoom', function() {
     })
 
     it('should return the correct extent', function() {
-      var zoomDomain = chart.zoom(),
+      const zoomDomain = chart.zoom(),
         expectedDomain = chart.internal.x.domain()
 
       expect(+zoomDomain[0]).toBe(+expectedDomain[0])
@@ -34,7 +34,7 @@ describe('c3 api zoom', function() {
     })
 
     it('should be zoomed properly', function() {
-      var target = [3, 5],
+      let target = [3, 5],
         domain
       chart.zoom(target)
       domain = chart.internal.x.domain()
@@ -43,7 +43,7 @@ describe('c3 api zoom', function() {
     })
 
     it('should be zoomed properly again', function() {
-      var target = [1, 4],
+      let target = [1, 4],
         domain
       chart.zoom(target)
       domain = chart.internal.x.domain()
@@ -83,7 +83,7 @@ describe('c3 api zoom', function() {
       })
 
       it('should be zoomed properly', function() {
-        var target = [new Date(2014, 7, 1), new Date(2014, 8, 1)],
+        let target = [new Date(2014, 7, 1), new Date(2014, 8, 1)],
           domain
         chart.zoom(target)
         domain = chart.internal.x.domain()
@@ -92,7 +92,7 @@ describe('c3 api zoom', function() {
       })
 
       it('should be zoomed properly', function() {
-        var target = ['2014-08-01', '2014-09-01'],
+        let target = ['2014-08-01', '2014-09-01'],
           domain
         chart.zoom(target)
         domain = chart.internal.x.domain()
@@ -115,7 +115,7 @@ describe('c3 api zoom', function() {
     })
 
     it('should be unzoomed properly', function() {
-      var target = [1, 4],
+      let target = [1, 4],
         orginal = chart.internal.x.domain(),
         domain
 

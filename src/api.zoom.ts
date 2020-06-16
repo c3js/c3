@@ -2,7 +2,7 @@ import { Chart } from './core'
 import { isDefined } from './util'
 
 Chart.prototype.zoom = function(domain) {
-  var $$ = this.internal
+  const $$ = this.internal
   if (domain) {
     if ($$.isTimeSeries()) {
       domain = domain.map(function(x) {
@@ -22,12 +22,12 @@ Chart.prototype.zoom = function(domain) {
   }
 }
 Chart.prototype.zoom.enable = function(enabled) {
-  var $$ = this.internal
+  const $$ = this.internal
   $$.config.zoom_enabled = enabled
   $$.updateAndRedraw()
 }
 Chart.prototype.unzoom = function() {
-  var $$ = this.internal
+  const $$ = this.internal
   if ($$.config.subchart_show) {
     $$.brush.clear()
   } else {
@@ -37,7 +37,7 @@ Chart.prototype.unzoom = function() {
 }
 
 Chart.prototype.zoom.max = function(max) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config,
     d3 = $$.d3
   if (max === 0 || max) {
@@ -48,7 +48,7 @@ Chart.prototype.zoom.max = function(max) {
 }
 
 Chart.prototype.zoom.min = function(min) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config,
     d3 = $$.d3
   if (min === 0 || min) {

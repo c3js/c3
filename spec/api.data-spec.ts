@@ -3,9 +3,9 @@ import { d3, initChart } from './c3-helper'
 describe('c3 api data', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args: any = {
+  let args: any = {
     data: {
       columns: [
         ['data1', 30, 200, 100, 400, 150, 250],
@@ -38,7 +38,7 @@ describe('c3 api data', function() {
 
   describe('data()', function() {
     it('should return all of data if no argument given', function() {
-      var results = chart.data(),
+      const results = chart.data(),
         expected = ['data1', 'data2']
       results.forEach(function(result, i) {
         expect(result.id).toBe(expected[i])
@@ -46,13 +46,13 @@ describe('c3 api data', function() {
     })
 
     it('should return specified data if string argument given', function() {
-      var results = chart.data('data1')
+      const results = chart.data('data1')
       expect(results.length).toBe(1)
       expect(results[0].id).toBe('data1')
     })
 
     it('should return specified data if array argument given', function() {
-      var results = chart.data(['data1', 'data2'])
+      const results = chart.data(['data1', 'data2'])
       expect(results.length).toBe(2)
       expect(results[0].id).toBe('data1')
       expect(results[1].id).toBe('data2')
@@ -61,7 +61,7 @@ describe('c3 api data', function() {
 
   describe('data.shown()', function() {
     it('should return only shown targets', function() {
-      var results
+      let results
       chart.hide('data1')
       results = chart.data.shown()
       expect(results.length).toBe(1)
@@ -71,7 +71,7 @@ describe('c3 api data', function() {
 
   describe('data.values()', function() {
     it('should return values for specified target', function() {
-      var values = chart.data.values('data1'),
+      const values = chart.data.values('data1'),
         expectedValues = [30, 200, 100, 400, 150, 250]
       expect(values.length).toBe(6)
       values.forEach(function(v, i) {
@@ -80,20 +80,20 @@ describe('c3 api data', function() {
     })
 
     it('should return null when no args', function() {
-      var values = chart.data.values()
+      const values = chart.data.values()
       expect(values).toBeNull()
     })
   })
 
   describe('data.names()', function() {
     it('should return data.names specified as argument', function() {
-      var results = chart.data.names()
+      const results = chart.data.names()
       expect(results.data1).toBe('Data Name 1')
       expect(results.data2).toBe('Data Name 2')
     })
 
     it('should return data.names specified as api', function() {
-      var results = chart.data.names({
+      const results = chart.data.names({
         data1: 'New Data Name 1',
         data2: 'New Data Name 2'
       })
@@ -113,13 +113,13 @@ describe('c3 api data', function() {
 
   describe('data.colors()', function() {
     it('should return data.colors specified as argument', function() {
-      var results = chart.data.colors()
+      const results = chart.data.colors()
       ;(expect(results.data1) as any).toBeHexOrRGB('#FF0000')
       ;(expect(results.data2) as any).toBeHexOrRGB('#00FF00')
     })
 
     it('should return data.colors specified as api', function() {
-      var results = chart.data.colors({
+      const results = chart.data.colors({
         data1: '#00FF00',
         data2: '#FF0000'
       })
@@ -128,7 +128,7 @@ describe('c3 api data', function() {
     })
 
     it('should set data.colors specified as api', function() {
-      ;(expect(
+      (expect(
         d3.select('.c3-line-data1').style('stroke')
       ) as any).toBeHexOrRGB('#00ff00')
       ;(expect(
@@ -145,7 +145,7 @@ describe('c3 api data', function() {
 
   describe('data.axes()', function() {
     it('should return data.axes specified as argument', function() {
-      var results = chart.data.axes()
+      const results = chart.data.axes()
       expect(results.data1).toBe('y')
       expect(results.data2).toBe('y2')
       expect(d3.select('.c3-axis-y g.tick text').text()).toBe('0')
@@ -153,7 +153,7 @@ describe('c3 api data', function() {
     })
 
     it('should return data.axes specified as api', function() {
-      var results = chart.data.axes({
+      const results = chart.data.axes({
         data1: 'y2',
         data2: 'y'
       })
@@ -200,9 +200,9 @@ describe('c3 api data', function() {
 describe('c3 api data.x', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       x: 'x',
       columns: [
@@ -218,7 +218,7 @@ describe('c3 api data.x', function() {
   })
 
   it('should return values for target data1', function() {
-    var values = chart.data.values('data1'),
+    const values = chart.data.values('data1'),
       expectedValues = [30, 200, 100, 400, 150, 250]
     expect(values.length).toBe(6)
     values.forEach(function(v, i) {
@@ -227,18 +227,18 @@ describe('c3 api data.x', function() {
   })
 
   it('should return null when no args', function() {
-    var values = chart.data.values()
+    const values = chart.data.values()
     expect(values).toBeNull()
   })
 
   it('should return data values for  data if string argument given', function() {
-    var results = chart.data('data1')
+    const results = chart.data('data1')
     expect(results.length).toBe(1)
     expect(results[0].id).toBe('data1')
   })
 
   it('should return specified data if array argument given', function() {
-    var results = chart.data(['data1', 'data2'])
+    const results = chart.data(['data1', 'data2'])
     expect(results.length).toBe(2)
     expect(results[0].id).toBe('data1')
     expect(results[1].id).toBe('data2')
@@ -248,9 +248,9 @@ describe('c3 api data.x', function() {
 describe('c3 api data.xs', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       xs: {
         data1: 'x1',
@@ -270,7 +270,7 @@ describe('c3 api data.xs', function() {
   })
 
   it('should return values for target data1', function() {
-    var values = chart.data.values('data1'),
+    const values = chart.data.values('data1'),
       expectedValues = [30, 200, 100, 400, 150, 250]
     expect(values.length).toBe(6)
     values.forEach(function(v, i) {
@@ -279,18 +279,18 @@ describe('c3 api data.xs', function() {
   })
 
   it('should return null when no args', function() {
-    var values = chart.data.values()
+    const values = chart.data.values()
     expect(values).toBeNull()
   })
 
   it('should return data values for  data if string argument given', function() {
-    var results = chart.data('data1')
+    const results = chart.data('data1')
     expect(results.length).toBe(1)
     expect(results[0].id).toBe('data1')
   })
 
   it('should return specified data if array argument given', function() {
-    var results = chart.data(['data1', 'data2'])
+    const results = chart.data(['data1', 'data2'])
     expect(results.length).toBe(2)
     expect(results[0].id).toBe('data1')
     expect(results[1].id).toBe('data2')
@@ -319,7 +319,7 @@ var customMatchers = {
           expected = ''
         }
 
-        var result: any = {}
+        const result: any = {}
         actual = actual.match('rgb') ? rgb2hex(actual) : actual
         expected = expected.match('rgb') ? rgb2hex(expected) : expected
 

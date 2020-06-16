@@ -2,7 +2,7 @@ import { ChartInternal } from './core'
 import { notEmpty } from './util'
 
 ChartInternal.prototype.generateColor = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3,
     colors = config.data_colors,
@@ -13,7 +13,7 @@ ChartInternal.prototype.generateColor = function() {
     ids = []
 
   return function(d) {
-    var id = d.id || (d.data && d.data.id) || d,
+    let id = d.id || (d.data && d.data.id) || d,
       color
 
     // if callback function is provided
@@ -36,7 +36,7 @@ ChartInternal.prototype.generateColor = function() {
   }
 }
 ChartInternal.prototype.generateLevelColor = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     colors = config.color_pattern,
     threshold = config.color_threshold,
@@ -46,7 +46,7 @@ ChartInternal.prototype.generateLevelColor = function() {
     max = threshold.max || 100
   return notEmpty(threshold) && notEmpty(colors)
     ? function(value) {
-        var i,
+        let i,
           v,
           color = colors[colors.length - 1]
         for (i = 0; i < values.length; i++) {

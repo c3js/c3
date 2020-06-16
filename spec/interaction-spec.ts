@@ -3,7 +3,7 @@ import { d3, setMouseEvent, initChart } from './c3-helper'
 describe('c3 chart interaction', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   const moveMouseOut = () =>
     setMouseEvent(chart, 'mouseout', 0, 0, d3.select('.c3-event-rect').node())
@@ -34,10 +34,10 @@ describe('c3 chart interaction', function() {
       })
 
       it('should have only 1 event rect properly', function() {
-        var eventRects = d3.selectAll('.c3-event-rect')
+        const eventRects = d3.selectAll('.c3-event-rect')
         expect(eventRects.size()).toBe(1)
         eventRects.each(function() {
-          var box = (d3.select(this).node() as any).getBoundingClientRect()
+          const box = (d3.select(this).node() as any).getBoundingClientRect()
           expect(box.left).toBeCloseTo(40.5, -2)
           expect(box.width).toBeCloseTo(598, -2)
         })
@@ -137,10 +137,10 @@ describe('c3 chart interaction', function() {
         })
 
         it('should have 1 event rects properly', function() {
-          var eventRects = d3.selectAll('.c3-event-rect')
+          const eventRects = d3.selectAll('.c3-event-rect')
           expect(eventRects.size()).toBe(1)
           eventRects.each(function() {
-            var box = (d3.select(this).node() as any).getBoundingClientRect()
+            const box = (d3.select(this).node() as any).getBoundingClientRect()
             expect(box.left).toBeCloseTo(40.5, -2)
             expect(box.width).toBeCloseTo(598, -2)
           })
@@ -162,10 +162,10 @@ describe('c3 chart interaction', function() {
       })
 
       it('should have only 1 event rect properly', function() {
-        var eventRects = d3.selectAll('.c3-event-rect')
+        const eventRects = d3.selectAll('.c3-event-rect')
         expect(eventRects.size()).toBe(1)
         eventRects.each(function() {
-          var box = (d3.select(this).node() as any).getBoundingClientRect()
+          const box = (d3.select(this).node() as any).getBoundingClientRect()
           expect(box.left).toBeCloseTo(40.5, -2)
           expect(box.width).toBeCloseTo(598, -2)
         })
@@ -185,10 +185,10 @@ describe('c3 chart interaction', function() {
         })
 
         it('should have 1 event rects properly', function() {
-          var eventRects = d3.selectAll('.c3-event-rect')
+          const eventRects = d3.selectAll('.c3-event-rect')
           expect(eventRects.size()).toBe(1)
           eventRects.each(function() {
-            var box = (d3.select(this).node() as any).getBoundingClientRect()
+            const box = (d3.select(this).node() as any).getBoundingClientRect()
             expect(box.left).toBeCloseTo(40.5, -2)
             expect(box.width).toBeCloseTo(598, -2)
           })

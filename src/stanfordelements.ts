@@ -2,7 +2,7 @@ import { ChartInternal } from './chart-internal'
 import CLASS from './class'
 
 ChartInternal.prototype.initStanfordElements = function() {
-  var $$ = this
+  const $$ = this
 
   // Avoid blocking eventRect
   $$.stanfordElements = $$.main
@@ -16,28 +16,22 @@ ChartInternal.prototype.initStanfordElements = function() {
 }
 
 ChartInternal.prototype.updateStanfordElements = function(duration) {
-  var $$ = this,
-    main = $$.main,
-    config = $$.config,
-    stanfordLine,
-    stanfordLineEnter,
-    stanfordRegion,
-    stanfordRegionEnter,
-    stanfordText,
-    stanfordTextEnter,
-    xvCustom = $$.xvCustom.bind($$),
-    yvCustom = $$.yvCustom.bind($$),
-    countPointsInRegion = $$.countEpochsInRegion.bind($$)
+  const $$ = this
+  const main = $$.main
+  const config = $$.config
+  const xvCustom = $$.xvCustom.bind($$)
+  const yvCustom = $$.yvCustom.bind($$)
+  const countPointsInRegion = $$.countEpochsInRegion.bind($$)
 
   // Stanford-Lines
-  stanfordLine = main
+  const stanfordLine = main
     .select('.' + CLASS.stanfordLines)
     .style('shape-rendering', 'geometricprecision')
     .selectAll('.' + CLASS.stanfordLine)
     .data(config.stanford_lines)
 
   // enter
-  stanfordLineEnter = stanfordLine
+  const stanfordLineEnter = stanfordLine
     .enter()
     .append('g')
     .attr('class', function(d) {
@@ -88,13 +82,13 @@ ChartInternal.prototype.updateStanfordElements = function(duration) {
     .remove()
 
   // Stanford-Text
-  stanfordText = main
+  const stanfordText = main
     .select('.' + CLASS.stanfordTexts)
     .selectAll('.' + CLASS.stanfordText)
     .data(config.stanford_texts)
 
   // enter
-  stanfordTextEnter = stanfordText
+  const stanfordTextEnter = stanfordText
     .enter()
     .append('g')
     .attr('class', function(d) {
@@ -128,13 +122,13 @@ ChartInternal.prototype.updateStanfordElements = function(duration) {
     .remove()
 
   // Stanford-Regions
-  stanfordRegion = main
+  const stanfordRegion = main
     .select('.' + CLASS.stanfordRegions)
     .selectAll('.' + CLASS.stanfordRegion)
     .data(config.stanford_regions)
 
   // enter
-  stanfordRegionEnter = stanfordRegion
+  const stanfordRegionEnter = stanfordRegion
     .enter()
     .append('g')
     .attr('class', function(d) {
@@ -194,7 +188,7 @@ ChartInternal.prototype.updateStanfordElements = function(duration) {
     )
     .text(function(d) {
       if (d.text) {
-        var value, percentage, temp
+        let value, percentage, temp
 
         if ($$.isStanfordGraphType()) {
           temp = countPointsInRegion(d.points)

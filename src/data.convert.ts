@@ -8,7 +8,7 @@ ChartInternal.prototype.convertUrlToData = function(
   keys,
   done
 ) {
-  var $$ = this,
+  let $$ = this,
     type = mimeType ? mimeType : 'csv',
     f,
     converter
@@ -33,7 +33,7 @@ ChartInternal.prototype.convertUrlToData = function(
     })
 }
 ChartInternal.prototype.convertXsvToData = function(xsv) {
-  var keys = xsv.columns,
+  const keys = xsv.columns,
     rows = xsv
   if (rows.length === 0) {
     return {
@@ -47,7 +47,7 @@ ChartInternal.prototype.convertXsvToData = function(xsv) {
   }
 }
 ChartInternal.prototype.convertJsonToData = function(json, keys) {
-  var $$ = this,
+  let $$ = this,
     new_rows = [],
     targetKeys,
     data
@@ -61,10 +61,10 @@ ChartInternal.prototype.convertJsonToData = function(json, keys) {
     }
     new_rows.push(targetKeys)
     json.forEach(function(o) {
-      var new_row = []
+      const new_row = []
       targetKeys.forEach(function(key) {
         // convert undefined to null because undefined data will be removed in convertDataToTargets()
-        var v = $$.findValueInJson(o, key)
+        let v = $$.findValueInJson(o, key)
         if (isUndefined(v)) {
           v = null
         }
@@ -97,9 +97,9 @@ ChartInternal.prototype.findValueInJson = function(object, path) {
 
   path = path.replace(/\[(\w+)\]/g, '.$1') // convert indexes to properties (replace [] with .)
   path = path.replace(/^\./, '') // strip a leading dot
-  var pathArray = path.split('.')
-  for (var i = 0; i < pathArray.length; ++i) {
-    var k = pathArray[i]
+  const pathArray = path.split('.')
+  for (let i = 0; i < pathArray.length; ++i) {
+    const k = pathArray[i]
     if (k in object) {
       object = object[k]
     } else {
@@ -170,7 +170,7 @@ ChartInternal.prototype.convertColumnsToData = columns => {
  * @return {!Array}
  */
 ChartInternal.prototype.convertDataToTargets = function(data, appendXs) {
-  var $$ = this,
+  let $$ = this,
     config = $$.config,
     targets,
     ids,
@@ -203,7 +203,7 @@ ChartInternal.prototype.convertDataToTargets = function(data, appendXs) {
 
   // save x for update data by load when custom x and c3.x API
   ids.forEach(function(id) {
-    var xKey = $$.getXKey(id)
+    const xKey = $$.getXKey(id)
 
     if ($$.isCustomX() || $$.isTimeSeries()) {
       // if included in input data
@@ -247,13 +247,13 @@ ChartInternal.prototype.convertDataToTargets = function(data, appendXs) {
 
   // convert to target
   targets = ids.map(function(id, index) {
-    var convertedId = config.data_idConverter(id)
+    const convertedId = config.data_idConverter(id)
     return {
       id: convertedId,
       id_org: id,
       values: data
         .map(function(d, i) {
-          var xKey = $$.getXKey(id),
+          let xKey = $$.getXKey(id),
             rawX = d[xKey],
             value = d[id] !== null && !isNaN(d[id]) ? +d[id] : null,
             x,
@@ -292,11 +292,11 @@ ChartInternal.prototype.convertDataToTargets = function(data, appendXs) {
 
   // finish targets
   targets.forEach(function(t) {
-    var i
+    let i
     // sort values by its x
     if (config.data_xSort) {
       t.values = t.values.sort(function(v1, v2) {
-        var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
+        const x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
           x2 = v2.x || v2.x === 0 ? v2.x : Infinity
         return x1 - x2
       })

@@ -58,8 +58,8 @@ ChartInternal.prototype.classEvent = function(d) {
   return this.generateClass(CLASS.eventRect, d.index)
 }
 ChartInternal.prototype.classTarget = function(id) {
-  var $$ = this
-  var additionalClassSuffix = $$.config.data_classes[id],
+  const $$ = this
+  let additionalClassSuffix = $$.config.data_classes[id],
     additionalClass = ''
   if (additionalClassSuffix) {
     additionalClass = ' ' + CLASS.target + '-' + additionalClassSuffix
@@ -102,7 +102,7 @@ ChartInternal.prototype.selectorTarget = function(id, prefix) {
   return (prefix || '') + '.' + CLASS.target + this.getTargetSelectorSuffix(id)
 }
 ChartInternal.prototype.selectorTargets = function(ids, prefix) {
-  var $$ = this
+  const $$ = this
   ids = ids || []
   return ids.length
     ? ids.map(function(id) {
@@ -114,7 +114,7 @@ ChartInternal.prototype.selectorLegend = function(id) {
   return '.' + CLASS.legendItem + this.getTargetSelectorSuffix(id)
 }
 ChartInternal.prototype.selectorLegends = function(ids) {
-  var $$ = this
+  const $$ = this
   return ids && ids.length
     ? ids.map(function(id) {
         return $$.selectorLegend(id)

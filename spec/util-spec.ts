@@ -22,21 +22,21 @@ import {
 describe('util.js tests', function() {
   'use strict'
 
-  var undefined_var
-  var html_str = '<div>Hello there</div>'
-  var html_entities_str = '&lt;div&gt;Hello there&lt;/div&gt;'
-  var empty_string = ''
-  var nonempty_string = 'hello there'
-  var nonempty_number = 1234.2
-  var zero_number = 0
-  var null_var = null
-  var empty_object = {}
-  var nonempty_object = {
+  let undefined_var
+  const html_str = '<div>Hello there</div>'
+  const html_entities_str = '&lt;div&gt;Hello there&lt;/div&gt;'
+  const empty_string = ''
+  const nonempty_string = 'hello there'
+  const nonempty_number = 1234.2
+  const zero_number = 0
+  const null_var = null
+  const empty_object = {}
+  const nonempty_object = {
     a: 1
   }
-  var empty_array = []
-  var nonempty_array = [1, 3]
-  var nonempty_function = function(a) {
+  const empty_array = []
+  const nonempty_array = [1, 3]
+  const nonempty_function = function(a) {
     return a
   }
 

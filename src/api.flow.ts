@@ -3,7 +3,7 @@ import { Chart, ChartInternal } from './core'
 import { isValue, isDefined, diffDomain } from './util'
 
 Chart.prototype.flow = function(args) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     targets,
     data,
     notfoundIds = [],
@@ -30,7 +30,7 @@ Chart.prototype.flow = function(args) {
 
   // Update/Add data
   $$.data.targets.forEach(function(t) {
-    var found = false,
+    let found = false,
       i,
       j
     for (i = 0; i < targets.length; i++) {
@@ -61,7 +61,7 @@ Chart.prototype.flow = function(args) {
 
   // Append null for not found targets
   $$.data.targets.forEach(function(t) {
-    var i, j
+    let i, j
     for (i = 0; i < notfoundIds.length; i++) {
       if (t.id === notfoundIds[i]) {
         tail = t.values[t.values.length - 1].index + 1
@@ -80,7 +80,7 @@ Chart.prototype.flow = function(args) {
   // Generate null values for new target
   if ($$.data.targets.length) {
     targets.forEach(function(t) {
-      var i,
+      let i,
         missing = []
       for (i = $$.data.targets[0].values[0].index; i < tail; i++) {
         missing.push({
@@ -163,12 +163,12 @@ Chart.prototype.flow = function(args) {
 }
 
 ChartInternal.prototype.generateFlow = function(args) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     d3 = $$.d3
 
   return function() {
-    var targets = args.targets,
+    const targets = args.targets,
       flow = args.flow,
       drawBar = args.drawBar,
       drawLine = args.drawLine,
@@ -180,7 +180,7 @@ ChartInternal.prototype.generateFlow = function(args) {
       yForText = args.yForText,
       duration = args.duration
 
-    var translateX,
+    let translateX,
       scaleX = 1,
       transform,
       flowIndex = flow.index,
@@ -196,7 +196,7 @@ ChartInternal.prototype.generateFlow = function(args) {
       done = flow.done || function() {},
       wait = $$.generateWait()
 
-    var xgrid,
+    let xgrid,
       xgridLines,
       mainRegion,
       mainText,
@@ -263,7 +263,7 @@ ChartInternal.prototype.generateFlow = function(args) {
 
     $$.hideXGridFocus()
 
-    var flowTransition = d3
+    const flowTransition = d3
       .transition()
       .ease(d3.easeLinear)
       .duration(durationForFlow)
@@ -282,7 +282,7 @@ ChartInternal.prototype.generateFlow = function(args) {
     wait.add(xgrid.transition(flowTransition).attr('transform', transform))
     wait.add(xgridLines.transition(flowTransition).attr('transform', transform))
     wait(function() {
-      var i,
+      let i,
         shapes = [],
         texts = []
 

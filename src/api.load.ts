@@ -1,7 +1,7 @@
 import { Chart } from './core'
 
 Chart.prototype.load = function(args) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   // update xs if specified
   if (args.xs) {
@@ -53,7 +53,7 @@ Chart.prototype.load = function(args) {
 }
 
 Chart.prototype.unload = function(args) {
-  var $$ = this.internal
+  const $$ = this.internal
   args = args || {}
   if (args instanceof Array) {
     args = { ids: args }

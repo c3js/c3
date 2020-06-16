@@ -3,9 +3,9 @@ import { d3, initChart } from './c3-helper'
 describe('c3 api.x', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       x: 'x',
       columns: [
@@ -21,11 +21,11 @@ describe('c3 api.x', function() {
   })
 
   it('should return initial ticks for axis x', function() {
-    var expectedValues = [10, 30, 45, 50, 70, 100]
+    const expectedValues = [10, 30, 45, 50, 70, 100]
     d3.select('.c3-axis-x')
       .selectAll('g.tick')
       .each(function(d, i) {
-        var text = d3
+        const text = d3
           .select(this)
           .select('text')
           .text()
@@ -34,12 +34,12 @@ describe('c3 api.x', function() {
   })
 
   it('should return new ticks for axis x after calling chart.x', function() {
-    var expectedValues = [16, 26, 55, 60, 75, 90]
+    const expectedValues = [16, 26, 55, 60, 75, 90]
     chart.x(expectedValues)
     d3.select('.c3-axis-x')
       .selectAll('g.tick')
       .each(function(d, i) {
-        var text = d3
+        const text = d3
           .select(this)
           .select('text')
           .text()
@@ -51,9 +51,9 @@ describe('c3 api.x', function() {
 describe('c3 api.xs', function() {
   'use strict'
 
-  var chart
+  let chart
 
-  var args = {
+  const args = {
     data: {
       xs: {
         data1: 'x1',
@@ -73,7 +73,7 @@ describe('c3 api.xs', function() {
   })
 
   it('should return initial ticks for axis x', function() {
-    var expectedValues = [
+    const expectedValues = [
       '10',
       '20',
       '30',
@@ -89,7 +89,7 @@ describe('c3 api.xs', function() {
     d3.select('.c3-axis-x')
       .selectAll('g.tick')
       .each(function(d, i) {
-        var text = d3
+        const text = d3
           .select(this)
           .select('text')
           .text()
@@ -98,7 +98,7 @@ describe('c3 api.xs', function() {
   })
 
   it('should return new ticks for axis x after calling chart.xs', function() {
-    var expectedValues = [
+    const expectedValues = [
       '15',
       '25',
       '35',
@@ -118,7 +118,7 @@ describe('c3 api.xs', function() {
     d3.select('.c3-axis-x')
       .selectAll('g.tick')
       .each(function(d, i) {
-        var text = d3
+        const text = d3
           .select(this)
           .select('text')
           .text()

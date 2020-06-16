@@ -3,7 +3,7 @@ import { Chart } from './core'
 import { getOption } from './util'
 
 Chart.prototype.regions = function(regions) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   if (!regions) {
     return config.regions
@@ -13,7 +13,7 @@ Chart.prototype.regions = function(regions) {
   return config.regions
 }
 Chart.prototype.regions.add = function(regions) {
-  var $$ = this.internal,
+  const $$ = this.internal,
     config = $$.config
   if (!regions) {
     return config.regions
@@ -23,7 +23,7 @@ Chart.prototype.regions.add = function(regions) {
   return config.regions
 }
 Chart.prototype.regions.remove = function(options) {
-  var $$ = this.internal,
+  let $$ = this.internal,
     config = $$.config,
     duration,
     classes,
@@ -43,7 +43,7 @@ Chart.prototype.regions.remove = function(options) {
     .remove()
 
   config.regions = config.regions.filter(function(region) {
-    var found = false
+    let found = false
     if (!region['class']) {
       return true
     }

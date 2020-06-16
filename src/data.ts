@@ -12,12 +12,12 @@ import {
 } from './util'
 
 ChartInternal.prototype.isEpochs = function(key) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return config.data_epochs && key === config.data_epochs
 }
 ChartInternal.prototype.isX = function(key) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return (
     (config.data_x && key === config.data_x) ||
@@ -83,7 +83,7 @@ ChartInternal.prototype.isTargetNormalized = function(targetId) {
 }
 
 ChartInternal.prototype.getXKey = function(id) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config
   return config.data_x
     ? config.data_x
@@ -170,7 +170,7 @@ ChartInternal.prototype.getTotalDataSum = function() {
 }
 
 ChartInternal.prototype.getXValuesOfXKey = function(key, targets) {
-  var $$ = this,
+  let $$ = this,
     xValues,
     ids = targets && notEmpty(targets) ? $$.mapToIds(targets) : []
   ids.forEach(function(id) {
@@ -181,28 +181,28 @@ ChartInternal.prototype.getXValuesOfXKey = function(key, targets) {
   return xValues
 }
 ChartInternal.prototype.getXValue = function(id, i) {
-  var $$ = this
+  const $$ = this
   return id in $$.data.xs && $$.data.xs[id] && isValue($$.data.xs[id][i])
     ? $$.data.xs[id][i]
     : i
 }
 ChartInternal.prototype.getOtherTargetXs = function() {
-  var $$ = this,
+  const $$ = this,
     idsForX = Object.keys($$.data.xs)
   return idsForX.length ? $$.data.xs[idsForX[0]] : null
 }
 ChartInternal.prototype.getOtherTargetX = function(index) {
-  var xs = this.getOtherTargetXs()
+  const xs = this.getOtherTargetXs()
   return xs && index < xs.length ? xs[index] : null
 }
 ChartInternal.prototype.addXs = function(xs) {
-  var $$ = this
+  const $$ = this
   Object.keys(xs).forEach(function(id) {
     $$.config.data_xs[id] = xs[id]
   })
 }
 ChartInternal.prototype.addName = function(data) {
-  var $$ = this,
+  let $$ = this,
     name
   if (data) {
     name = $$.config.data_names[data.id]
@@ -211,13 +211,13 @@ ChartInternal.prototype.addName = function(data) {
   return data
 }
 ChartInternal.prototype.getValueOnIndex = function(values, index) {
-  var valueOnIndex = values.filter(function(v) {
+  const valueOnIndex = values.filter(function(v) {
     return v.index === index
   })
   return valueOnIndex.length ? valueOnIndex[0] : null
 }
 ChartInternal.prototype.updateTargetX = function(targets, x) {
-  var $$ = this
+  const $$ = this
   targets.forEach(function(t) {
     t.values.forEach(function(v, i) {
       v.x = $$.generateTargetX(x[i], t.id, i)
@@ -226,7 +226,7 @@ ChartInternal.prototype.updateTargetX = function(targets, x) {
   })
 }
 ChartInternal.prototype.updateTargetXs = function(targets, xs) {
-  var $$ = this
+  const $$ = this
   targets.forEach(function(t) {
     if (xs[t.id]) {
       $$.updateTargetX([t], xs[t.id])
@@ -234,7 +234,7 @@ ChartInternal.prototype.updateTargetXs = function(targets, xs) {
   })
 }
 ChartInternal.prototype.generateTargetX = function(rawX, id, index) {
-  var $$ = this,
+  let $$ = this,
     x
   if ($$.isTimeSeries()) {
     x = rawX ? $$.parseDate(rawX) : $$.parseDate($$.getXValue(id, index))
@@ -259,7 +259,7 @@ ChartInternal.prototype.cloneTarget = function(target) {
   }
 }
 ChartInternal.prototype.getMaxDataCount = function() {
-  var $$ = this
+  const $$ = this
   return $$.d3.max($$.data.targets, function(t) {
     return t.values.length
   })
@@ -270,11 +270,11 @@ ChartInternal.prototype.mapToIds = function(targets) {
   })
 }
 ChartInternal.prototype.mapToTargetIds = function(ids) {
-  var $$ = this
+  const $$ = this
   return ids ? [].concat(ids) : $$.mapToIds($$.data.targets)
 }
 ChartInternal.prototype.hasTarget = function(targets, id) {
-  var ids = this.mapToIds(targets),
+  let ids = this.mapToIds(targets),
     i
   for (i = 0; i < ids.length; i++) {
     if (ids[i] === id) {
@@ -303,7 +303,7 @@ ChartInternal.prototype.getTargetsToShow = function() {
 }
 
 ChartInternal.prototype.filterTargetsToShow = function(targets) {
-  var $$ = this
+  const $$ = this
   return targets.filter(function(t) {
     return $$.isTargetToShow(t.id)
   })
@@ -318,8 +318,8 @@ ChartInternal.prototype.getTargets = function() {
 }
 
 ChartInternal.prototype.mapTargetsToUniqueXs = function(targets) {
-  var $$ = this
-  var xs = $$.d3
+  const $$ = this
+  let xs = $$.d3
     .set(
       $$.d3.merge(
         targets.map(function(t) {
@@ -343,7 +343,7 @@ ChartInternal.prototype.mapTargetsToUniqueXs = function(targets) {
 }
 ChartInternal.prototype.addHiddenTargetIds = function(targetIds) {
   targetIds = targetIds instanceof Array ? targetIds : new Array(targetIds)
-  for (var i = 0; i < targetIds.length; i++) {
+  for (let i = 0; i < targetIds.length; i++) {
     if (this.hiddenTargetIds.indexOf(targetIds[i]) < 0) {
       this.hiddenTargetIds = this.hiddenTargetIds.concat(targetIds[i])
     }
@@ -358,7 +358,7 @@ ChartInternal.prototype.removeHiddenTargetIds = function(targetIds) {
 }
 ChartInternal.prototype.addHiddenLegendIds = function(targetIds) {
   targetIds = targetIds instanceof Array ? targetIds : new Array(targetIds)
-  for (var i = 0; i < targetIds.length; i++) {
+  for (let i = 0; i < targetIds.length; i++) {
     if (this.hiddenLegendIds.indexOf(targetIds[i]) < 0) {
       this.hiddenLegendIds = this.hiddenLegendIds.concat(targetIds[i])
     }
@@ -370,7 +370,7 @@ ChartInternal.prototype.removeHiddenLegendIds = function(targetIds) {
   })
 }
 ChartInternal.prototype.getValuesAsIdKeyed = function(targets) {
-  var ys = {}
+  const ys = {}
   targets.forEach(function(t) {
     ys[t.id] = []
     t.values.forEach(function(v) {
@@ -380,7 +380,7 @@ ChartInternal.prototype.getValuesAsIdKeyed = function(targets) {
   return ys
 }
 ChartInternal.prototype.checkValueInTargets = function(targets, checker) {
-  var ids = Object.keys(targets),
+  let ids = Object.keys(targets),
     i,
     j,
     values
@@ -405,44 +405,44 @@ ChartInternal.prototype.hasPositiveValueInTargets = function(targets) {
   })
 }
 ChartInternal.prototype.isOrderDesc = function() {
-  var config = this.config
+  const config = this.config
   return (
     typeof config.data_order === 'string' &&
     config.data_order.toLowerCase() === 'desc'
   )
 }
 ChartInternal.prototype.isOrderAsc = function() {
-  var config = this.config
+  const config = this.config
   return (
     typeof config.data_order === 'string' &&
     config.data_order.toLowerCase() === 'asc'
   )
 }
 ChartInternal.prototype.getOrderFunction = function() {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     orderAsc = $$.isOrderAsc(),
     orderDesc = $$.isOrderDesc()
   if (orderAsc || orderDesc) {
-    var reducer = function(p, c) {
+    const reducer = function(p, c) {
       return p + Math.abs(c.value)
     }
     return function(t1, t2) {
-      var t1Sum = t1.values.reduce(reducer, 0),
+      const t1Sum = t1.values.reduce(reducer, 0),
         t2Sum = t2.values.reduce(reducer, 0)
       return orderAsc ? t2Sum - t1Sum : t1Sum - t2Sum
     }
   } else if (isFunction(config.data_order)) {
     return config.data_order
   } else if (isArray(config.data_order)) {
-    var order = config.data_order
+    const order = config.data_order
     return function(t1, t2) {
       return order.indexOf(t1.id) - order.indexOf(t2.id)
     }
   }
 }
 ChartInternal.prototype.orderTargets = function(targets) {
-  var fct = this.getOrderFunction()
+  const fct = this.getOrderFunction()
   if (fct) {
     targets.sort(fct)
   }
@@ -490,7 +490,7 @@ ChartInternal.prototype.filterByXDomain = function(targets, xDomain) {
   })
 }
 ChartInternal.prototype.hasDataLabel = function() {
-  var config = this.config
+  const config = this.config
   if (typeof config.data_labels === 'boolean' && config.data_labels) {
     return true
   } else if (
@@ -502,7 +502,7 @@ ChartInternal.prototype.hasDataLabel = function() {
   return false
 }
 ChartInternal.prototype.getDataLabelLength = function(min, max, key) {
-  var $$ = this,
+  const $$ = this,
     lengths = [0, 0],
     paddingCoef = 1.3
   $$.selectChart
@@ -586,7 +586,7 @@ ChartInternal.prototype.findClosestFromTargetsByX = function(targets, x) {
 
   targets.forEach(t => {
     t.values.forEach(d => {
-      let newDiff = Math.abs(x - d.x)
+      const newDiff = Math.abs(x - d.x)
 
       if (diff === undefined || newDiff < diff) {
         closest = d
@@ -646,7 +646,7 @@ ChartInternal.prototype.findClosest = function(
   dataPoints
     .filter(v => v && !$$.isBarType(v.id))
     .forEach(v => {
-      let d = computeDist(v, pos)
+      const d = computeDist(v, pos)
       if (d < minDist) {
         minDist = d
         closest = v
@@ -656,7 +656,7 @@ ChartInternal.prototype.findClosest = function(
   return closest
 }
 ChartInternal.prototype.dist = function(data, pos) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     xIndex = config.axis_rotated ? 1 : 0,
     yIndex = config.axis_rotated ? 0 : 1,
@@ -665,7 +665,7 @@ ChartInternal.prototype.dist = function(data, pos) {
   return Math.sqrt(Math.pow(x - pos[xIndex], 2) + Math.pow(y - pos[yIndex], 2))
 }
 ChartInternal.prototype.horizontalDistance = function(data, pos) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     xIndex = config.axis_rotated ? 1 : 0,
     x = $$.x(data.x)
@@ -673,7 +673,7 @@ ChartInternal.prototype.horizontalDistance = function(data, pos) {
   return Math.abs(x - pos[xIndex])
 }
 ChartInternal.prototype.convertValuesToStep = function(values) {
-  var converted = [].concat(values),
+  let converted = [].concat(values),
     i
 
   if (!this.isCategorized()) {
@@ -741,7 +741,7 @@ ChartInternal.prototype.getRatio = function(type, d, asPercent = false) {
 }
 
 ChartInternal.prototype.updateDataAttributes = function(name, attrs) {
-  var $$ = this,
+  const $$ = this,
     config = $$.config,
     current = config['data_' + name]
   if (typeof attrs === 'undefined') {

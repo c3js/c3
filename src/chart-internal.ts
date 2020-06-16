@@ -1,5 +1,5 @@
 export function ChartInternal(api) {
-  var $$ = this
+  const $$ = this
   // Note: This part will be replaced by rollup-plugin-modify
   // When bundling esm output. Beware of changing this line.
   // TODO: Maybe we should check that the modification by rollup-plugin-modify

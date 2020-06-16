@@ -3,7 +3,7 @@ import { d3, initChart } from './c3-helper'
 describe('c3 api grid', function() {
   'use strict'
 
-  var chart, args
+  let chart, args
 
   beforeEach(function(done) {
     chart = initChart(chart, args, done)
@@ -19,7 +19,7 @@ describe('c3 api grid', function() {
     })
 
     it('updates y grids', function(done) {
-      var main = chart.internal.main,
+      let main = chart.internal.main,
         expectedGrids = [
           {
             value: 100,
@@ -38,7 +38,7 @@ describe('c3 api grid', function() {
         grids = main.selectAll('.c3-ygrid-line')
         expect(grids.size()).toBe(expectedGrids.length)
         grids.each(function(d, i) {
-          var y = +d3
+          const y = +d3
               .select(this)
               .select('line')
               .attr('y1'),
@@ -66,7 +66,7 @@ describe('c3 api grid', function() {
     })
 
     it('updates x ygrids even if zoomed', function(done) {
-      var main = chart.internal.main,
+      let main = chart.internal.main,
         expectedGrids = [
           {
             value: 0,
@@ -88,7 +88,7 @@ describe('c3 api grid', function() {
           grids = main.selectAll('.c3-xgrid-line')
           expect(grids.size()).toBe(expectedGrids.length)
           grids.each(function(d, i) {
-            var x = +d3
+            const x = +d3
                 .select(this)
                 .select('line')
                 .attr('x1'),
