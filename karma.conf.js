@@ -13,8 +13,8 @@ module.exports = config =>
         exclude: /spec/
       },
       reports: {
-        lcov: 'coverage',
-      },
+        lcov: 'coverage'
+      }
     },
     reporters: ['spec', 'karma-typescript'],
     browsers: ['Chrome'],
