@@ -38,10 +38,10 @@ ChartInternal.prototype.drag = function(mouse) {
   main
     .selectAll('.' + CLASS.shapes)
     .selectAll('.' + CLASS.shape)
-    .filter(function(d) {
-      return config.data_selection_isselectable(d)
-    })
     .each(function(d, i) {
+      if (!config.data_selection_isselectable(d)) {
+        return
+      }
       var shape = d3.select(this),
         isSelected = shape.classed(CLASS.SELECTED),
         isIncluded = shape.classed(CLASS.INCLUDED),
