@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.17 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.18 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1294,7 +1294,7 @@
   };
 
   var c3 = {
-    version: '0.7.17',
+    version: '0.7.18',
     chart: {
       fn: Chart.prototype,
       internal: {
@@ -8354,9 +8354,11 @@
     maxY = config.data_selection_grouped ? $$.height : Math.max(sy, my);
     main.select('.' + CLASS.dragarea).attr('x', minX).attr('y', minY).attr('width', maxX - minX).attr('height', maxY - minY); // TODO: binary search when multiple xs
 
-    main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).filter(function (d) {
-      return config.data_selection_isselectable(d);
-    }).each(function (d, i) {
+    main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
+      if (!config.data_selection_isselectable(d)) {
+        return;
+      }
+
       var shape = d3.select(this),
           isSelected = shape.classed(CLASS.SELECTED),
           isIncluded = shape.classed(CLASS.INCLUDED),

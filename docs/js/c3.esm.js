@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.17 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.18 | (c) C3 Team and other contributors | http://c3js.org/ */
 import * as d3 from 'd3';
 
 function ChartInternal(api) {
@@ -1407,7 +1407,7 @@ Axis.prototype.redraw = function redraw(duration, isHidden) {
 };
 
 var c3 = {
-  version: '0.7.17',
+  version: '0.7.18',
   chart: {
     fn: Chart.prototype,
     internal: {
@@ -9341,10 +9341,10 @@ ChartInternal.prototype.drag = function(mouse) {
   main
     .selectAll('.' + CLASS.shapes)
     .selectAll('.' + CLASS.shape)
-    .filter(function(d) {
-      return config.data_selection_isselectable(d)
-    })
     .each(function(d, i) {
+      if (!config.data_selection_isselectable(d)) {
+        return
+      }
       var shape = d3.select(this),
         isSelected = shape.classed(CLASS.SELECTED),
         isIncluded = shape.classed(CLASS.INCLUDED),
@@ -10524,7 +10524,8 @@ ChartInternal.prototype.updateLegend = function(
     .style('cursor', function() {
       return config.interaction_enabled ? 'pointer' : 'auto'
     })
-    .on('click',
+    .on(
+      'click',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onclick) {
@@ -10541,7 +10542,8 @@ ChartInternal.prototype.updateLegend = function(
           }
         : null
     )
-    .on('mouseover',
+    .on(
+      'mouseover',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onmouseover) {
@@ -10555,7 +10557,8 @@ ChartInternal.prototype.updateLegend = function(
           }
         : null
     )
-    .on('mouseout',
+    .on(
+      'mouseout',
       config.interaction_enabled
         ? function(id) {
             if (config.legend_item_onmouseout) {
