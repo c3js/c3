@@ -1,27 +1,22 @@
-const path = require('path');
+const path = require('path')
 
-module.exports = function(config) {
+module.exports = config =>
   config.set({
-    frameworks: ['jasmine', 'browserify'],
-    files: [
-      'c3.css',
-      'spec/*-helper.js',
-      'spec/*-spec.js'
-    ],
+    frameworks: ['jasmine', 'karma-typescript'],
+    files: ['htdocs/css/c3.css', 'src/**/*.ts', 'spec/**/*'],
     preprocessors: {
-      'spec/*.js': ['browserify']
+      'spec/**/*.ts': ['karma-typescript'],
+      'src/**/*.ts': ['karma-typescript']
     },
-    browserify: {
-      debug: true,
-      transform: [['babelify', { presets: ['@babel/preset-env'], plugins: ['istanbul'] }]]
+    karmaTypescriptConfig: {
+      coverageOptions: {
+        exclude: /spec/
+      },
+      reports: {
+        lcov: 'coverage',
+      },
     },
-    reporters: ['spec', 'coverage-istanbul'],
-    coverageIstanbulReporter: {
-      reports: ['html', 'lcovonly', 'text-summary']
-    },
-    autoWatch: true,
+    reporters: ['spec', 'karma-typescript'],
     browsers: ['Chrome'],
-    singleRun: true,
-    browserNoActivityTimeout: 120000,
+    singleRun: true
   })
-};
