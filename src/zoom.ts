@@ -57,7 +57,12 @@ ChartInternal.prototype.initZoom = function() {
 
   $$.zoom.updateDomain = function() {
     if (d3.event && d3.event.transform) {
-      $$.x.domain(d3.event.transform.rescaleX($$.subX).domain())
+      if (config.axis_rotated && config.zoom_type === 'scroll' && d3.event.sourceEvent.type === 'mousemove') {
+        // we're moving the mouse in a rotated chart with zoom = "scroll", so we need rescaleY (i.e. vertical)
+        $$.x.domain(d3.event.transform.rescaleY($$.subX).domain());
+      } else {
+        $$.x.domain(d3.event.transform.rescaleX($$.subX).domain());
+      }
     }
     return this
   }
