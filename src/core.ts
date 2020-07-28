@@ -421,9 +421,10 @@ ChartInternal.prototype.updateSizes = function() {
     hasArc = $$.hasArcType(),
     xAxisHeight =
       config.axis_rotated || hasArc ? 0 : $$.getHorizontalAxisHeight('x'),
+    subchartXAxisHeight = config.axis_rotated || hasArc ? 0 : $$.getHorizontalAxisHeight('x',true),
     subchartHeight =
       config.subchart_show && !hasArc
-        ? config.subchart_size_height + xAxisHeight
+        ? config.subchart_size_height + subchartXAxisHeight
         : 0
 
   $$.currentWidth = $$.getCurrentWidth()
@@ -462,7 +463,7 @@ ChartInternal.prototype.updateSizes = function() {
     : {
         top: $$.currentHeight - subchartHeight - legendHeightForBottom,
         right: NaN,
-        bottom: xAxisHeight + legendHeightForBottom,
+        bottom: subchartXAxisHeight + legendHeightForBottom,
         left: $$.margin.left
       }
 

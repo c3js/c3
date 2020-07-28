@@ -1,6 +1,6 @@
 import CLASS from './class'
 import { ChartInternal } from './core'
-import { isValue, ceil10 } from './util'
+import { isValue, ceil10, isDefined } from './util'
 
 ChartInternal.prototype.getCurrentWidth = function() {
   var $$ = this,
@@ -127,11 +127,11 @@ ChartInternal.prototype.getAxisWidthByAxisId = function(id, withoutRecompute) {
     $$.axis.getMaxTickWidth(id, withoutRecompute) + (position.isInner ? 20 : 40)
   )
 }
-ChartInternal.prototype.getHorizontalAxisHeight = function(axisId) {
+ChartInternal.prototype.getHorizontalAxisHeight = function(axisId, isSubchart) {
   var $$ = this,
     config = $$.config,
     h = 30
-  if (axisId === 'x' && !config.axis_x_show) {
+  if (axisId === 'x' && !(isDefined(isSubchart) && isSubchart ? config.subchart_axis_x_show : config.axis_x_show)) {
     return 8
   }
   if (axisId === 'x' && config.axis_x_height) {
