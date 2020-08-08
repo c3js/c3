@@ -120,6 +120,7 @@ ChartInternal.prototype.initSubchart = function() {
     .attr('class', CLASS.axisX)
     .attr('transform', $$.getTranslate('subx'))
     .attr('clip-path', config.axis_rotated ? '' : $$.clipPathForXAxis)
+    .style('visibility', config.subchart_axis_x_show ? 'visible' : 'hidden');
 }
 ChartInternal.prototype.initSubchartBrush = function() {
   var $$ = this
