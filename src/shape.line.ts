@@ -295,6 +295,9 @@ ChartInternal.prototype.lineWithRegions = function(d, x, y, _regions) {
 
   // Generate
   for (i = 0; i < d.length; i++) {
+    if (!d[i].value) {
+      continue;
+    }
     // Draw as normal
     if (isUndefined(regions) || !isWithinRegions(d[i].x, regions)) {
       s += ' ' + xValue(d[i]) + ' ' + yValue(d[i])
