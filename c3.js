@@ -4175,7 +4175,7 @@
                   length = targets[i].values.length;
                   for (j = 0; j < length; j++) {
                       targets[i].values[j].index = tail + j;
-                      if (!$$.isTimeSeries()) {
+                      if (targets[i].values[j].x === null) {
                           targets[i].values[j].x = tail + j;
                       }
                   }
