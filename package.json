@@ -67,7 +67,7 @@
     "jasmine-core": "^2.3.4",
     "jshint": "^2.9.7",
     "jshint-stylish": "^2.1.0",
-    "karma": "^4.4.1",
+    "karma": "^6.3.14",
     "karma-chrome-launcher": "^3.0.0",
     "karma-jasmine": "^1.1.0",
     "karma-spec-reporter": "^0.0.32",
