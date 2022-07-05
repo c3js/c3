@@ -300,6 +300,10 @@ ChartInternal.prototype.getDefaultConfig = function () {
         donut_title: "",
         donut_expand: {},
         donut_expand_duration: 50,
+        donut_subtitles: [],
+        donut_showArcTitle: true,
+        donut_midTextY: 0,
+        donut_midTextDY: 0,
         // spline
         spline_interpolation_type: 'cardinal',
         // stanford

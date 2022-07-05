@@ -281,6 +281,16 @@ ChartInternal.prototype.getArcTitle = function () {
     return $$.hasType('donut') ? $$.config.donut_title : "";
 };
 
+ChartInternal.prototype.getArcSubTitles = function () {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_subtitles : [];
+};
+
+ChartInternal.prototype.isArcTitleVisible = function() {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_showArcTitle : true;
+};
+
 ChartInternal.prototype.updateTargetsForArc = function (targets) {
     var $$ = this, main = $$.main,
         mainPies, mainPieEnter,
@@ -294,11 +304,13 @@ ChartInternal.prototype.updateTargetsForArc = function (targets) {
         .attr("class", classChartArc);
     mainPieEnter.append('g')
         .attr('class', classArcs);
-    mainPieEnter.append("text")
-        .attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em")
-        .style("opacity", 0)
-        .style("text-anchor", "middle")
-        .style("pointer-events", "none");
+    if ($$.isArcTitleVisible()) {
+        mainPieEnter.append("text")
+            .attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em")
+            .style("opacity", 0)
+            .style("text-anchor", "middle")
+            .style("pointer-events", "none");
+    }
     // MEMO: can not keep same color..., but not bad to update color in redraw
     //mainPieUpdate.exit().remove();
 };
@@ -311,7 +323,16 @@ ChartInternal.prototype.initArc = function () {
     $$.arcs.append('text')
         .attr('class', CLASS.chartArcsTitle)
         .style("text-anchor", "middle")
+        .attr('y', $$.config.donut_midTextY)
         .text($$.getArcTitle());
+    const subtitles = $$.getArcSubTitles();
+    if (subtitles && subtitles.length) {
+        let dy = $$.config.donut_midTextDY;
+        for (let i = 0; i < subtitles.length; i++) {
+            $$.arcs.append('text').attr('class', CLASS.chartArcsSubTitle).style("text-anchor", "middle").attr('y', 0).attr('dy', dy).text(subtitles[i]);
+            dy += $$.config.donut_midTextDY;
+        }
+    }
 };
 
 ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTransform) {
