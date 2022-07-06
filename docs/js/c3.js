@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.1 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.2 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -165,6 +165,7 @@
 
   AxisInternal.prototype.updateTickTextCharSize = function (tick) {
     var internal = this;
+    var config = internal.component.owner.config;
 
     if (internal.tickTextCharSize) {
       return internal.tickTextCharSize;
@@ -174,6 +175,13 @@
       h: 11.5,
       w: 5.5
     };
+
+    if (config.axis_predefinedTextCharSize && config.axis_predefinedTextCharSize[internal.orient]) {
+      size = config.axis_predefinedTextCharSize[internal.orient];
+      internal.tickTextCharSize = size;
+      return size;
+    }
+
     tick.select('text').text(function (d) {
       return internal.textFormatted(d);
     }).each(function (d) {
@@ -326,6 +334,7 @@
     var internal = this,
         d3 = internal.d3,
         params = internal.params;
+    var config = internal.component.owner.config;
 
     function axis(g, transition) {
       var self;
@@ -378,9 +387,14 @@
                 return internal.textY(d, i);
               }).attr("transform", function (d, i) {
                 return internal.textTransform(d, i);
-              }).style("text-anchor", function (d, i) {
-                return internal.textTextAnchor(d, i);
               });
+
+              if (config.axis_appendTextAnchor) {
+                textUpdate.style("text-anchor", function (d, i) {
+                  return internal.textTextAnchor(d, i);
+                });
+              }
+
               tspanUpdate.attr('x', 0).attr("dy", function (d, i) {
                 return internal.tspanDy(d, i);
               }).attr('dx', function (d, i) {
@@ -404,6 +418,13 @@
               }).style("text-anchor", function (d, i) {
                 return internal.textTextAnchor(d, i);
               });
+
+              if (config.axis_appendTextAnchor) {
+                textUpdate.style("text-anchor", function (d, i) {
+                  return internal.textTextAnchor(d, i);
+                });
+              }
+
               tspanUpdate.attr('x', 0).attr("dy", function (d, i) {
                 return internal.tspanDy(d, i);
               }).attr('dx', function (d, i) {
@@ -417,7 +438,12 @@
             {
               tickTransform = internal.axisY;
               lineUpdate.attr("x2", -internal.innerTickSize).attr("y1", tickY).attr("y2", tickY);
-              textUpdate.attr("x", -internal.tickLength).attr("y", internal.tickOffset).style("text-anchor", "end");
+              textUpdate.attr("x", -internal.tickLength).attr("y", internal.tickOffset);
+
+              if (config.axis_appendTextAnchor) {
+                textUpdate.style("text-anchor", "end");
+              }
+
               tspanUpdate.attr('x', -internal.tickLength).attr("dy", function (d, i) {
                 return internal.tspanDy(d, i);
               });
@@ -429,7 +455,12 @@
             {
               tickTransform = internal.axisY;
               lineUpdate.attr("x2", internal.innerTickSize).attr("y1", tickY).attr("y2", tickY);
-              textUpdate.attr("x", internal.tickLength).attr("y", internal.tickOffset).style("text-anchor", "start");
+              textUpdate.attr("x", internal.tickLength).attr("y", internal.tickOffset);
+
+              if (config.axis_appendTextAnchor) {
+                textUpdate.style("text-anchor", "start");
+              }
+
               tspanUpdate.attr('x', internal.tickLength).attr("dy", function (d, i) {
                 return internal.tspanDy(d, i);
               });
@@ -564,6 +595,7 @@
     chartArc: 'c3-chart-arc',
     chartArcs: 'c3-chart-arcs',
     chartArcsTitle: 'c3-chart-arcs-title',
+    chartArcsSubTitle: 'c3-chart-arcs-subtitle',
     chartArcsBackground: 'c3-chart-arcs-background',
     chartArcsGaugeUnit: 'c3-chart-arcs-gauge-unit',
     chartArcsGaugeMax: 'c3-chart-arcs-gauge-max',
@@ -1024,13 +1056,16 @@
     var $$ = this.owner,
         config = $$.config,
         maxWidth = 0,
+        textWithMaxLength,
+        textMaxLength,
         targetsToShow,
         scale,
         axis,
         dummy,
-        svg;
+        svg,
+        useBBox;
 
-    if (withoutRecompute && $$.currentMaxTickWidths[id]) {
+    if ((withoutRecompute || config.axis_cacheTickWidths) && $$.currentMaxTickWidths[id]) {
       return $$.currentMaxTickWidths[id];
     }
 
@@ -1040,24 +1075,43 @@
       if (id === 'y') {
         scale = $$.y.copy().domain($$.getYDomain(targetsToShow, 'y'));
         axis = this.getYAxis(scale, $$.yOrient, config.axis_y_tick_format, $$.yAxisTickValues, false, true, true);
+        useBBox = config.axis_y_tick_optimizeWidthCalculation;
       } else if (id === 'y2') {
         scale = $$.y2.copy().domain($$.getYDomain(targetsToShow, 'y2'));
         axis = this.getYAxis(scale, $$.y2Orient, config.axis_y2_tick_format, $$.y2AxisTickValues, false, true, true);
+        useBBox = config.axis_y2_tick_optimizeWidthCalculation;
       } else {
         scale = $$.x.copy().domain($$.getXDomain(targetsToShow));
         axis = this.getXAxis(scale, $$.xOrient, $$.xAxisTickFormat, $$.xAxisTickValues, false, true, true);
+        useBBox = config.axis_x_tick_optimizeWidthCalculation;
         this.updateXAxisTickValues(targetsToShow, axis);
       }
 
       dummy = $$.d3.select('body').append('div').classed('c3', true);
       svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0), svg.append('g').call(axis).each(function () {
         $$.d3.select(this).selectAll('text').each(function () {
-          var box = this.getBoundingClientRect();
+          if (config.axis_optimizeMaxTickWidthCalculation) {
+            var currentTextLength = this.childNodes[0].innerHTML.length;
+
+            if (!textWithMaxLength || currentTextLength > textMaxLength) {
+              textMaxLength = currentTextLength;
+              textWithMaxLength = this;
+            }
+
+            return;
+          }
+
+          var box = useBBox ? this.getBBox() : this.getBoundingClientRect();
 
           if (maxWidth < box.width) {
             maxWidth = box.width;
           }
         });
+
+        if (config.axis_optimizeMaxTickWidthCalculation && textWithMaxLength) {
+          maxWidth = useBBox ? textWithMaxLength.getBBox().width : textWithMaxLength.getBoundingClientRect().width;
+        }
+
         dummy.remove();
       });
     }
@@ -1179,7 +1233,15 @@
     }
   };
 
-  ChartInternal.prototype.beforeInit = function () {// can do something
+  ChartInternal.prototype.beforeInit = function () {
+    var $$ = this;
+
+    if ($$.config.size_cacheContainerSize) {
+      $$.cachedParentSize = null;
+      window.addEventListener('resize', function () {
+        $$.cachedParentSize = null;
+      });
+    }
   };
 
   ChartInternal.prototype.afterInit = function () {// can do something
@@ -1426,7 +1488,7 @@
     // TODO: currently this must be called after initLegend because of update of sizes, but it should be done in initSubchart.
 
 
-    if ($$.initSubchartBrush) {
+    if ($$.initSubchartBrush && config.subchart_brushEnabled) {
       $$.initSubchartBrush();
     }
     /*-- Main Region --*/
@@ -1546,7 +1608,7 @@
       left: 0
     };
 
-    if ($$.updateSizeForLegend) {
+    if ($$.updateSizeForLegend && !config.legend_ignore) {
       $$.updateSizeForLegend(legendHeight, legendWidth);
     }
 
@@ -1661,7 +1723,7 @@
     durationForAxis = withTransitionForAxis ? duration : 0;
     transitions = transitions || $$.axis.generateTransitions(durationForAxis); // update legend and transform each g
 
-    if (withLegend && config.legend_show) {
+    if (withLegend && config.legend_show && !config.legend_ignore) {
       $$.updateLegend($$.mapToIds($$.data.targets), options, transitions);
     } else if (withDimension) {
       // need to update dimension (e.g. axis.y.tick.values) because y tick values should change
@@ -1769,7 +1831,7 @@
     } // title
 
 
-    if ($$.redrawTitle) {
+    if ($$.redrawTitle && !config.title_ignore) {
       $$.redrawTitle();
     } // arc
 
@@ -2239,6 +2301,10 @@
     }
 
     this.windowFocusHandler = function () {
+      if (_this.api == null || !_this.api.element.offsetParent) {
+        return;
+      }
+
       _this.redraw();
     };
 
@@ -5588,6 +5654,16 @@
     return $$.hasType('donut') ? $$.config.donut_title : "";
   };
 
+  ChartInternal.prototype.getArcSubTitles = function () {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_subtitles : [];
+  };
+
+  ChartInternal.prototype.isArcTitleVisible = function () {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_showArcTitle : true;
+  };
+
   ChartInternal.prototype.updateTargetsForArc = function (targets) {
     var $$ = this,
         main = $$.main,
@@ -5601,14 +5677,28 @@
     });
     mainPieEnter = mainPies.enter().append("g").attr("class", classChartArc);
     mainPieEnter.append('g').attr('class', classArcs);
-    mainPieEnter.append("text").attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em").style("opacity", 0).style("text-anchor", "middle").style("pointer-events", "none"); // MEMO: can not keep same color..., but not bad to update color in redraw
+
+    if ($$.isArcTitleVisible()) {
+      mainPieEnter.append("text").attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em").style("opacity", 0).style("text-anchor", "middle").style("pointer-events", "none");
+    } // MEMO: can not keep same color..., but not bad to update color in redraw
     //mainPieUpdate.exit().remove();
+
   };
 
   ChartInternal.prototype.initArc = function () {
     var $$ = this;
     $$.arcs = $$.main.select('.' + CLASS.chart).append("g").attr("class", CLASS.chartArcs).attr("transform", $$.getTranslate('arc'));
-    $$.arcs.append('text').attr('class', CLASS.chartArcsTitle).style("text-anchor", "middle").text($$.getArcTitle());
+    $$.arcs.append('text').attr('class', CLASS.chartArcsTitle).style("text-anchor", "middle").attr('y', $$.config.donut_midTextY).text($$.getArcTitle());
+    var subtitles = $$.getArcSubTitles();
+
+    if (subtitles && subtitles.length) {
+      var dy = $$.config.donut_midTextDY;
+
+      for (var i = 0; i < subtitles.length; i++) {
+        $$.arcs.append('text').attr('class', CLASS.chartArcsSubTitle).style("text-anchor", "middle").attr('y', 0).attr('dy', dy).text(subtitles[i]);
+        dy += $$.config.donut_midTextDY;
+      }
+    }
   };
 
   ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTransform) {
@@ -6128,6 +6218,13 @@
       svg_classname: undefined,
       size_width: undefined,
       size_height: undefined,
+
+      /*
+      * If set to true, enables caching of chart parent rect in ChartInternal.prototype.getParentRectValue.
+      * Cache invalidates on every window resized event.
+      * MS Edge performance optimization.
+      */
+      size_cacheContainerSize: false,
       padding_left: undefined,
       padding_right: undefined,
       padding_top: undefined,
@@ -6201,6 +6298,11 @@
       subchart_size_height: 60,
       subchart_axis_x_show: true,
       subchart_onbrush: function subchart_onbrush() {},
+
+      /*
+      * IF set to false, prevents subchart d3 brush from initialization and rendering
+      */
+      subchart_brushEnabled: true,
       // color
       color_pattern: [],
       color_threshold: {},
@@ -6219,8 +6321,74 @@
       legend_padding: 0,
       legend_item_tile_width: 10,
       legend_item_tile_height: 10,
+
+      /*
+      * If set to true, makes any resize/redraw operations carried over chart legend ignored.
+      * MS Edge performance optimization, use it if the chart doesn't have legend.
+      */
+      legend_ignore: false,
       // axis
       axis_rotated: false,
+
+      /*
+      * If not empty, prevents recalculating of text ticks rect sizes in AxisInternal.prototype.updateTickTextCharSize.
+      * MS Edge performance optimization, use it if text ticks of the chart do not change dynamically.
+      * Example:
+      * bottom: {
+      *     h: 13,
+      *     w: 5.6
+      * },
+      * left: {
+      *     h: 11.5,
+      *     w: 5.5
+      * },
+      * right: {
+      *     h: 11.5,
+      *     w: 5.5
+      * },
+      * top: {
+      *     h: 11.5,
+      *     w: 5.5
+      * }
+      */
+      axis_predefinedTextCharSize: null,
+
+      /*
+      * If set to false, prevent "text-anchor" class from appending to text ticks of the chart axis.
+      * Used in AxisInternal.prototype.generateAxis.
+      * MS Edge performance optimization.
+      * In most of the cases, you can replace "text-anchor" class with your own CSS.
+      * For example:
+      * .c3-axis-y {
+      *     text {
+      *         text-anchor: end;
+      *     }
+      * }
+      *
+      * .c3-axis-x {
+      *     text {
+      *         text-anchor: middle;
+      *     }
+      * }
+      * MS Edge permormance optimization.
+      */
+      axis_appendTextAnchor: true,
+
+      /*
+      * If set to true, forces taking text tick widths from cache, instead of recalculating them every time the chart is redrawn.
+      * Used in Axis.prototype.getMaxTickWidth.
+      * MS Edge performance optimization.
+      * Use it if width of text ticks is not changed during chart lifecycle.
+      */
+      axis_cacheTickWidths: false,
+
+      /*
+      * If set to true, makes taking max text ticks width depending on their inner html, instead of recalculating box size for each text tick.
+      * Used in Axis.prototype.getMaxTickWidth.
+      * MS Edge performance optimization.
+      * Use it if width of text ticks depends on their inner html only.
+      */
+      axis_optimizeMaxTickWidthCalculation: false,
       axis_x_show: true,
       axis_x_type: 'indexed',
       axis_x_localtime: true,
@@ -6233,6 +6401,13 @@
       axis_x_tick_fit: true,
       axis_x_tick_values: null,
       axis_x_tick_rotate: 0,
+
+      /*
+      * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+      * for text tick width calculation on x axis.
+      * MS Edge performance optimization.
+      */
+      axis_x_tick_optimizeWidthCalculation: false,
       axis_x_tick_outer: true,
       axis_x_tick_multiline: true,
       axis_x_tick_multilineMax: 0,
@@ -6253,6 +6428,13 @@
       axis_y_inner: undefined,
       axis_y_label: {},
       axis_y_tick_format: undefined,
+
+      /*
+      * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+      * for text tick width calculation on y axis.
+      * MS Edge performance optimization.
+      */
+      axis_y_tick_optimizeWidthCalculation: false,
       axis_y_tick_outer: true,
       axis_y_tick_values: null,
       axis_y_tick_rotate: 0,
@@ -6269,6 +6451,13 @@
       axis_y2_inner: undefined,
       axis_y2_label: {},
       axis_y2_tick_format: undefined,
+
+      /*
+      * If set to true, forces Axis.prototype.getMaxTickWidth use getBBox instead of getBoundingClientRect
+      * for text tick width calculation on y2 axis.
+      * MS Edge performance optimization.
+      */
+      axis_y2_tick_optimizeWidthCalculation: false,
       axis_y2_tick_outer: true,
       axis_y2_tick_values: null,
       axis_y2_tick_count: undefined,
@@ -6334,6 +6523,10 @@
       donut_title: "",
       donut_expand: {},
       donut_expand_duration: 50,
+      donut_subtitles: [],
+      donut_showArcTitle: true,
+      donut_midTextY: 0,
+      donut_midTextDY: 0,
       // spline
       spline_interpolation_type: 'cardinal',
       // stanford
@@ -6375,6 +6568,12 @@
       tooltip_onhide: function tooltip_onhide() {},
       // title
       title_text: undefined,
+
+      /*
+      * If set to true, makes any resize/redraw operations carried over chart title ignored.
+      * MS Edge performance optimization, use it if the chart doesn't have title.
+      */
+      title_ignore: false,
       title_padding: {
         top: 0,
         right: 0,
@@ -6440,7 +6639,7 @@
 
     f(url, headers).then(function (data) {
       done.call($$, converter.call($$, data, keys));
-    })["catch"](function (error) {
+    }).catch(function (error) {
       throw error;
     });
   };
@@ -7266,7 +7465,7 @@
     $$.redraw({
       withUpdateOrgXDomain: true,
       withUpdateXDomain: true,
-      withLegend: true
+      withLegend: !$$.config.legend_ignore
     });
 
     if (args.done) {
@@ -9719,7 +9918,7 @@
         config = $$.config,
         padding = isValue(config.padding_top) ? config.padding_top : 0;
 
-    if ($$.title && $$.title.node()) {
+    if ($$.title && $$.title.node() && !config.title_ignore) {
       padding += $$.getTitlePadding();
     }
 
@@ -9774,11 +9973,20 @@
 
   ChartInternal.prototype.getParentRectValue = function (key) {
     var parent = this.selectChart.node(),
-        v;
+        v,
+        cacheContainerSize = this.config.size_cacheContainerSize;
 
     while (parent && parent.tagName !== 'BODY') {
       try {
-        v = parent.getBoundingClientRect()[key];
+        if (cacheContainerSize) {
+          if (!this.cachedParentSize) {
+            this.cachedParentSize = parent.getBoundingClientRect();
+          }
+
+          v = this.cachedParentSize[key];
+        } else {
+          v = parent.getBoundingClientRect()[key];
+        }
       } catch (e) {
         if (key === 'width') {
           // In IE in certain cases getBoundingClientRect

@@ -32,7 +32,7 @@
     "test": "run-s build lint karma",
     "dist": "run-s build copy-to-root copy-to-docs",
     "copy-to-docs": "cp htdocs/js/c3.* docs/js/ && cp htdocs/css/c3.* docs/css/",
-    "copy-to-root": "cp htdocs/{css,js}/c3.* ./",
+    "copy-to-root": "cp htdocs/css/c3.* ./ && cp htdocs/js/c3.* ./",
     "codecov": "codecov"
   },
   "repository": {

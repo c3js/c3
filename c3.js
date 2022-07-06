@@ -1,9 +1,9 @@
-/* @license C3.js v0.7.1 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.2 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.c3 = factory());
-}(this, (function () { 'use strict';
+  (global = global || self, global.c3 = factory());
+}(this, function () { 'use strict';
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -595,6 +595,7 @@
     chartArc: 'c3-chart-arc',
     chartArcs: 'c3-chart-arcs',
     chartArcsTitle: 'c3-chart-arcs-title',
+    chartArcsSubTitle: 'c3-chart-arcs-subtitle',
     chartArcsBackground: 'c3-chart-arcs-background',
     chartArcsGaugeUnit: 'c3-chart-arcs-gauge-unit',
     chartArcsGaugeMax: 'c3-chart-arcs-gauge-max',
@@ -5653,6 +5654,16 @@
     return $$.hasType('donut') ? $$.config.donut_title : "";
   };
 
+  ChartInternal.prototype.getArcSubTitles = function () {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_subtitles : [];
+  };
+
+  ChartInternal.prototype.isArcTitleVisible = function () {
+    var $$ = this;
+    return $$.hasType('donut') ? $$.config.donut_showArcTitle : true;
+  };
+
   ChartInternal.prototype.updateTargetsForArc = function (targets) {
     var $$ = this,
         main = $$.main,
@@ -5666,14 +5677,28 @@
     });
     mainPieEnter = mainPies.enter().append("g").attr("class", classChartArc);
     mainPieEnter.append('g').attr('class', classArcs);
-    mainPieEnter.append("text").attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em").style("opacity", 0).style("text-anchor", "middle").style("pointer-events", "none"); // MEMO: can not keep same color..., but not bad to update color in redraw
+
+    if ($$.isArcTitleVisible()) {
+      mainPieEnter.append("text").attr("dy", $$.hasType('gauge') ? "-.1em" : ".35em").style("opacity", 0).style("text-anchor", "middle").style("pointer-events", "none");
+    } // MEMO: can not keep same color..., but not bad to update color in redraw
     //mainPieUpdate.exit().remove();
+
   };
 
   ChartInternal.prototype.initArc = function () {
     var $$ = this;
     $$.arcs = $$.main.select('.' + CLASS.chart).append("g").attr("class", CLASS.chartArcs).attr("transform", $$.getTranslate('arc'));
-    $$.arcs.append('text').attr('class', CLASS.chartArcsTitle).style("text-anchor", "middle").text($$.getArcTitle());
+    $$.arcs.append('text').attr('class', CLASS.chartArcsTitle).style("text-anchor", "middle").attr('y', $$.config.donut_midTextY).text($$.getArcTitle());
+    var subtitles = $$.getArcSubTitles();
+
+    if (subtitles && subtitles.length) {
+      var dy = $$.config.donut_midTextDY;
+
+      for (var i = 0; i < subtitles.length; i++) {
+        $$.arcs.append('text').attr('class', CLASS.chartArcsSubTitle).style("text-anchor", "middle").attr('y', 0).attr('dy', dy).text(subtitles[i]);
+        dy += $$.config.donut_midTextDY;
+      }
+    }
   };
 
   ChartInternal.prototype.redrawArc = function (duration, durationForExit, withTransform) {
@@ -6498,6 +6523,10 @@
       donut_title: "",
       donut_expand: {},
       donut_expand_duration: 50,
+      donut_subtitles: [],
+      donut_showArcTitle: true,
+      donut_midTextY: 0,
+      donut_midTextDY: 0,
       // spline
       spline_interpolation_type: 'cardinal',
       // stanford
@@ -11355,4 +11384,4 @@
 
   return c3;
 
-})));
+}));
