@@ -63,7 +63,7 @@
     "@types/jasmine": "^3.5.10",
     "clean-css-cli": "^4.1.11",
     "codecov": "^3.0.4",
-    "gh-pages": "^2.0.0",
+    "gh-pages": "^5.0.0",
     "jasmine-core": "^2.3.4",
     "jshint": "^2.9.7",
     "jshint-stylish": "^2.1.0",
