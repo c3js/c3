@@ -27,3 +27,6 @@ components
 # IDE related
 .idea
 .iml
+
+# Miscellaneous
+/*/.angular/cache
