@@ -159,7 +159,7 @@ ChartInternal.prototype.updateGrid = function (duration) {
         .attr("y2", config.axis_rotated ? $$.height : yv)
         .style("opacity", 0)
         .style("stroke", function(d) {
-          return d.color ?? '' // Add y grid line color
+          return d.color ? d.color : ''; // Add y grid line color
         });
     ygridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
@@ -170,7 +170,7 @@ ChartInternal.prototype.updateGrid = function (duration) {
         .attr('dy', -5)
         .style("opacity", 0)
         .style("fill", function(d) {
-          return d.color ?? '' // Add y grid text color
+          return d.color ? d.color : ''; // Add y grid text color
         });
     // update
     $$.ygridLines = ygridLineEnter.merge(ygridLine);

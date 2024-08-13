@@ -353,7 +353,8 @@ ChartInternal.prototype.getDefaultConfig = function () {
             bottom: 0,
             left: 0
         },
-        title_position: 'top-center'
+        title_position: 'top-center',
+      context: {}
     };
 
     Object.keys(this.additionalConfig).forEach(function (key) {
@@ -390,26 +391,26 @@ ChartInternal.prototype.loadConfig = function (config) {
         }
     });
     if (config.context) {
-      this_config.context = config.context
+      this_config.context = config.context || {};
     }
 };
 
 ChartInternal.prototype.isSelectByClickDisabled = function (d) {
   const config = this.config
-  return !!(config.context?.isSelectByClickDisabled && config.context?.isSelectByClickDisabled(d));
+  return !!(config.context.isSelectByClickDisabled && config.context.isSelectByClickDisabled(d));
 }
 
 ChartInternal.prototype.isMouseOverDisabled = function (d) {
   const config = this.config
-  return !!(config.context?.isMouseOverDisabled && config.context?.isMouseOverDisabled(d));
+  return !!(config.context.isMouseOverDisabled && config.context.isMouseOverDisabled(d));
 }
 
 ChartInternal.prototype.isDataDisabled = function (id) {
   const config = this.config
-  return !!(config.context?.isDataDisabled && config.context?.isDataDisabled(id));
+  return !!(config.context.isDataDisabled && config.context.isDataDisabled(id));
 }
 
 ChartInternal.prototype.isShowXGridFocusDisabled = function (d) {
   const config = this.config
-  return !!(config.context?.isShowXGridFocusDisabled && config.context?.isShowXGridFocusDisabled(d));
+  return !!(config.context.isShowXGridFocusDisabled && config.context.isShowXGridFocusDisabled(d));
 }

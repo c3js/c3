@@ -341,14 +341,14 @@ ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transit
             .attr("cx", cx)
             .attr("cy", cy)
     ];
-    if (config?.context?.customPointsHandler?.redraw) {
-        result.push(config?.context?.customPointsHandler?.redraw({
+    if (config.context.customPointsHandler && config.context.customPointsHandler.redraw) {
+        result.push(config.context.customPointsHandler.redraw({
           selection: withTransition ? customPoints.transition(transition) : customPoints,
           cx,
           cy
-        }))
+        }));
     }
-    return result
+    return result;
 };
 ChartInternal.prototype.circleX = function (d) {
     return d.x || d.x === 0 ? this.x(d.x) : null;
