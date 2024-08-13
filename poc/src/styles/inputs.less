@@ -1,0 +1,645 @@
+@import 'constants.less';
+
+.input,
+.select,
+.textarea {
+  &-main {
+    border: @borderSmall solid @borderDarkColor;
+    height: @gridSmall;
+    padding: 0 @gridExtraSmall;
+    cursor: pointer;
+    line-height: @lineHeightSmall;
+    resize: none;
+
+    &.input-main--left-validation-strip {
+      border-left-width: @borderXxl;
+      &:hover,
+      &:focus {
+        border-left-width: @borderXxl;
+      }
+
+      &.ng-invalid.ng-dirty {
+        padding-left: @gridSuperSmall + @gridExtraSmall;
+      }
+    }
+
+    &--disabled {
+      height: @gridSmall + (@borderSmall*2);
+      display: flex;
+      align-items: center;
+    }
+
+    &--icon-left {
+      padding-left: @iconSizeLarge;
+      font-size: @fontSizeSmall;
+    }
+
+    &--grey {
+      background-color: @panelColor;
+    }
+  }
+
+  &-main:hover {
+    border: @borderSmall solid @borderHoverColor;
+  }
+
+  &-main:focus {
+    border: @borderSmall solid @accentColor;
+  }
+
+  &-main::-ms-clear {
+    display: none;
+  }
+
+  &-big {
+    height: @gridSmall + @gridExtraSmall;
+    border: none;
+    background-color: @backgroundLightColor;
+    font-size: @fontSizeMedium;
+    &--no-reaction-on-hover-if-disabled {
+      &:disabled:hover {
+        border: none;
+      }
+    }
+  }
+
+  &-calendar {
+    padding: 0 @gridSmall 0 @gridExtraSmall;
+
+    &--full-width {
+      width: ~'calc(100% - @{gridExtraSmall} - @{gridSmall})';
+    }
+  }
+
+  &-transparent {
+    background-color: transparent;
+  }
+
+  &:placeholder-shown {
+    text-overflow: ellipsis;
+  }
+}
+
+textarea.textarea {
+  &-main {
+    padding: 0 @gridExtraSmall;
+    line-height: @gridSmall;
+
+    &--default-height {
+      height: @gridMedium;
+    }
+  }
+}
+
+.select {
+  &-main {
+    font-size: @fontSizeMedium;
+    background: url(/assets/select-arrow.png) no-repeat right @gridSuperSmall center transparent;
+    background-size: @gridExtraSmall*2;
+    color: @mainColor;
+    max-width: @gridExtraSmall*18;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 0 @gridSmall 0 @gridExtraSmall;
+
+    &--disabled {
+      height: @gridSmall + (@borderSmall*2);
+      display: flex;
+      align-items: center;
+    }
+
+    &--white {
+      background: url(/assets/select-arrow-white.png) no-repeat right @gridSuperSmall center transparent;
+    }
+
+    // fix for specific case when select's width exceeds parent container's width due to certain min-width value
+    &--unset-width {
+      min-width: 0;
+    }
+
+    &--full-width {
+      width: calc(~'100% - @{borderSmall}*2');
+      max-width: calc(~'100% - @{borderSmall}*2');
+    }
+  }
+}
+
+input,
+.select,
+textarea:focus {
+  outline: none !important;
+}
+
+.select:disabled {
+  background-color: @grayLightColor;
+  cursor: default;
+
+  &:hover {
+    border: @borderSmall solid @borderDarkColor;
+  }
+}
+
+input:disabled {
+  background-color: @grayLightColor;
+  cursor: default;
+
+  &:hover {
+    border: @borderSmall solid @borderDarkColor;
+  }
+}
+
+input.ng-invalid.ng-dirty,
+input.input-calendar.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-dirty,
+.select.ng-invalid.ng-dirty,
+.input.ng-invalid.ng-dirty {
+  border: @borderSmall solid @redColor !important;
+  box-shadow: none;
+}
+
+input.invalid,
+select.invalid {
+  border: @borderSmall solid @redColor !important;
+  box-shadow: none;
+}
+
+.checkbox {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    .checkbox__text {
+      color: @accentColor;
+    }
+  }
+
+  &__marker {
+    display: inline-block;
+    border: @borderSmall solid @borderDarkColor;
+    height: @checkboxSize;
+    width: @checkboxSize;
+    min-width: @checkboxSize;
+    box-sizing: border-box;
+  }
+
+  &__text {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    font-size: @fontSizeSmall;
+    color: @labelColor;
+    font-weight: @fontBold;
+    padding-left: @gridExtraSmall;
+    width: calc(~'100% - @{checkboxSize}');
+
+    &--regular-font {
+      color: @mainColor;
+      padding-left: @gridSmall;
+      font-weight: @fontRegular;
+      font-size: @fontSizeMedium;
+    }
+
+    &--padding-normal {
+      padding-left: (@gridSmall / 2);
+    }
+
+    &--font-semi-bold {
+      font-weight: @fontSemiBold;
+    }
+
+    &--colored {
+      display: flex;
+      align-items: center;
+
+      .color {
+        width: @borderXxl;
+        min-width: @borderXxl;
+        height: @gridSmall;
+        margin-right: @gridExtraSmall;
+      }
+    }
+  }
+
+  input {
+    + .checkbox__marker.disabled {
+      background-color: @disabledColor;
+      border-color: @disabledColor;
+    }
+
+    &:checked + .checkbox__marker {
+      background-color: @orangeColor;
+      border-color: @orangeColor;
+
+      .checkbox__icon {
+        color: @mainColor;
+      }
+    }
+    &:focus-within + .checkbox__marker {
+      border-color: @accentColor;
+    }
+  }
+}
+
+.checkbox.disabled {
+  cursor: default;
+}
+
+.radio {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &__marker {
+    display: inline-block;
+    border: @borderSmall solid @borderDarkColor;
+    height: @checkboxSize;
+    width: @checkboxSize;
+    min-width: @checkboxSize;
+    box-sizing: border-box;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &__text {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    padding-left: @gridSmall;
+    &--disabled {
+      color: @greyTextColor;
+    }
+  }
+
+  input {
+    &:checked + .radio__marker {
+      background-color: @orangeColor;
+      border-color: @orangeColor;
+
+      .checkbox__icon {
+        color: @mainColor;
+      }
+    }
+
+    &:focus-within + .radio__marker {
+      border-color: @accentColor;
+    }
+  }
+}
+
+.input-hidden {
+  position: absolute;
+  opacity: 0;
+  z-index: -@zIndexLarge;
+}
+
+.input-label {
+  font-size: @fontSizeSmall;
+  color: @labelColor;
+}
+
+.dropdown {
+  position: absolute;
+  background: @whiteColor;
+  box-shadow: @boxShadowLight;
+  list-style-type: none;
+  margin: 0;
+  padding: @gridExtraSmall 0;
+  z-index: @zIndexDropDownComponents;
+  font-size: @fontSizeMedium;
+
+  max-height: @gridLarge * 3.75;
+  overflow: auto;
+  &--height-large {
+    max-height: var(--drop-down-max-height);
+  }
+
+  .dropdown-item {
+    padding-left: @gridExtraSmall;
+    padding-right: @gridExtraSmall;
+    height: @gridSmall;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    max-width: @gridLarge * 2;
+    text-decoration: none;
+    text-transform: none;
+    color: initial;
+
+    &:hover {
+      background: @backgroundHoverColor;
+    }
+
+    &--disabled {
+      color: @labelColor;
+      cursor: default;
+
+      &:hover {
+        background: @whiteColor;
+      }
+    }
+  }
+
+  &--grey {
+    background-color: @backgroundIconColor;
+    box-shadow: @boxShadowGrey;
+
+    .dropdown-item {
+      &--disabled {
+        &:hover {
+          background-color: @backgroundIconColor;
+        }
+      }
+    }
+  }
+
+  &--to-the-left {
+    right: 0;
+    white-space: nowrap;
+  }
+}
+
+.switch {
+  width: @gridSmall + @gridSuperSmall;
+  height: @gridExtraSmall;
+  background: @hoverColor;
+  border-color: @hoverColor;
+
+  small {
+    width: @gridExtraSmall*2;
+    height: @gridExtraSmall*2;
+    top: -@gridSuperSmall;
+    left: -@smallIndentation;
+  }
+}
+
+.switch.checked {
+  background: @orangeOpacityColor;
+  border-color: @orangeOpacityColor;
+
+  small {
+    background: @orangeColor;
+    left: @smallIndentation*16;
+  }
+}
+
+.switcher-span {
+  color: @labelColor;
+  font-size: @fontSizeMedium;
+  width: @gridSmall + (@gridSuperSmall*3);
+  margin-left: @gridSuperSmall;
+
+  &.active {
+    color: @mainColor;
+  }
+}
+
+.search {
+  .input-search {
+    font-size: @fontSizeSmall;
+    height: @gridSmall;
+    padding: 0 @gridSmall 0 @gridExtraSmall;
+    cursor: pointer;
+    line-height: @lineHeightSmall;
+    width: calc(~'100% - @{gridSmall} - @{gridExtraSmall}');
+    background: transparent;
+  }
+
+  .input-search::-ms-clear {
+    display: none;
+  }
+
+  .icon-search {
+    position: absolute;
+    right: @gridSmall + @gridSuperSmall;
+    top: @gridSuperSmall + @smallIndentation;
+  }
+}
+
+.labeled-input {
+  &--column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-label {
+    padding-bottom: @gridSuperSmall;
+  }
+
+  .select {
+    width: 100%;
+    min-width: 100%;
+
+    &-main {
+      &--unset-width {
+        min-width: 0;
+      }
+    }
+  }
+
+  .input {
+    width: calc(~'100% - @{gridExtraSmall} * 2 - @{borderSmall} * 2');
+
+    &.input-main--left-validation-strip {
+      width: calc(~'100% - @{gridExtraSmall}*2 - @{borderSmall} - @{borderXxl}');
+
+      &.ng-invalid.ng-dirty {
+        width: calc(~'100% - @{gridExtraSmall}*2 - @{gridSuperSmall} - @{borderSmall}*2');
+      }
+    }
+  }
+
+  .textarea {
+    width: calc(~'100% - @{gridExtraSmall} * 2 - @{borderSmall} * 2');
+  }
+
+  &--two-cols {
+    display: flex;
+
+    .input-label {
+      flex: 30%;
+      padding-bottom: 0;
+      padding-top: ((@gridSmall - @gridExtraSmall*2)/2);
+      &--flex {
+        display: flex;
+      }
+    }
+
+    .input-value {
+      flex: 70%;
+      position: relative;
+
+      &--readonly {
+        padding-top: @gridSuperSmall;
+      }
+      &--flex {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  .revert-block {
+    .input {
+      width: calc(~'100% - @{gridSmall} - @{gridExtraSmall} - @{borderSmall} * 2');
+    }
+  }
+}
+
+.revert-block {
+  position: relative;
+
+  input {
+    padding-right: @gridSmall;
+    background-color: @changedBlockBackground;
+  }
+
+  textarea {
+    background-color: @changedBlockBackground;
+  }
+
+  nz-time-picker {
+    background-color: @changedBlockBackground;
+  }
+
+  .select-main {
+    background-color: @changedBlockBackground;
+
+    .ng-select__label {
+      background-color: @changedBlockBackground;
+    }
+  }
+
+  .icon-revert {
+    display: block;
+  }
+
+  &.date-block,
+  &.dropdown-block {
+    input {
+      padding-right: @gridMedium - @gridSuperSmall;
+    }
+
+    .icon-revert {
+      right: @gridSmall;
+    }
+  }
+
+  &.column__container--user {
+    background-color: @changedBlockBackground;
+  }
+
+  &.column__container--date {
+    input {
+      padding-right: @gridMedium - @gridSuperSmall;
+    }
+
+    .icon-revert {
+      right: @gridSmall;
+    }
+  }
+
+  &--irrecoverable {
+    input {
+      padding-right: @gridExtraSmall;
+    }
+  }
+}
+
+.input-full-width {
+  width: calc(~'100% - @{gridExtraSmall} - @{gridExtraSmall} - @{borderSmall} - @{borderSmall}');
+}
+
+.input-number {
+  width: @gridMedium + (@borderSmall * 2);
+  box-sizing: border-box;
+  padding-right: @gridExtraSmall + @gridSuperSmall;
+}
+
+/*
+	Inline edit styles
+ */
+
+.inline-edit {
+  position: relative;
+  display: flex;
+  width: 100%;
+
+  .inline-icon {
+    position: absolute;
+    height: @iconSizeMedium;
+    font-size: @iconSizeMedium;
+    cursor: pointer;
+  }
+
+  .close-icon {
+    right: (@gridExtraSmall * 3) - @gridSuperSmall;
+    color: @redColor;
+  }
+
+  .caret-icon {
+    right: @gridExtraSmall - @gridSuperSmall;
+    color: @accentColor;
+  }
+
+  &--disabled {
+    opacity: @opacityLess;
+    cursor: default;
+    color: @iconColor;
+
+    .inline-icon {
+      color: @grayColor;
+      cursor: default;
+    }
+
+    .input-main,
+    .input-main:hover,
+    .input-main:focus {
+      border-color: @borderDarkColor;
+      cursor: default;
+    }
+  }
+
+  @media (max-width: @screenSm) {
+    .inline-icon {
+      position: absolute;
+      top: @gridSuperSmall;
+    }
+
+    .close-icon {
+      margin-left: -(@iconSizeMedium + @gridSuperSmall);
+    }
+
+    .caret-icon {
+      margin-left: -(@iconSizeMedium + @gridSuperSmall);
+    }
+  }
+}
+
+.disabled-input-with-transparent-opaque-background {
+  &:disabled {
+    opacity: @opacityFull;
+    background: @whiteOpaqueColor;
+    color: @mainColor;
+  }
+}
+
+/*
+* Global override of text transformation applied to input placeholders
+*/
+::-webkit-input-placeholder {
+  text-transform: initial;
+}
+
+::-moz-placeholder {
+  text-transform: initial;
+}
+
+:-ms-input-placeholder {
+  text-transform: initial;
+}

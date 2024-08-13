@@ -1,0 +1,41 @@
+<div class="select-points-sandbox">
+  <div class="select-points-sandbox__chart-content chart-content">
+    <lw-chart-wrapper
+      [dataSet]="dataSet"
+      [useSelection]="true"
+      [yGridLines]="yGridLines"
+      [selectedPoints]="selectedPoints"
+      [customPoints]="customPoints"
+      [customPointsHandler]="customPointsHandler"
+      [size]="chartSize"
+    ></lw-chart-wrapper>
+  </div>
+  <br />
+  <br />
+  <br />
+  <button class="input-container__button mat-button mat-raised-button" (click)="yLinesShuffle()">Y lines shuffle</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="resizeHeight()">Resize height</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="resizeWidth()">Resize width</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="addTopLimit()">Add top limit</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="removeTopLimit()">Remove top limit</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="addCustomPoints()">Add custom points</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="clearCustomPoints()">Clear custom points</button>
+  <br />
+  <br />
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(0)">Select 0</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(1)">Select 1</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(2)">Select 2</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(3)">Select 3</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(4)">Select 4</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="select(5)">Select 5</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="selectAll()">Select All</button>
+
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(0)">Unselect 0</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(1)">Unselect 1</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(2)">Unselect 2</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(3)">Unselect 3</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(4)">Unselect 4</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(5)">Unselect 5</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselect(5)">Unselect 5</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="unselectAll()">Unselect All</button>
+</div>

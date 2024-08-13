@@ -1,0 +1,369 @@
+@import 'constants.less';
+
+.button {
+	cursor: pointer;
+	outline: none;
+	display: block;
+	position: relative;
+	text-decoration: none;
+
+	&-main {
+		border-radius: @borderRadiusMedium;
+		background-color: @orangeColor;
+		color: @whiteColor;
+		font-weight: @fontBold;
+		text-align: center;
+		height: @gridSmall;
+		padding: 0 (@gridSmall / 2);
+		font-size: @fontSizeMedium;
+
+		&:hover {
+			background-color: @orangeHoverColor;
+		}
+
+		&:disabled {
+			cursor: default;
+			background-color: mix(@orangeColor, contrast(@orangeColor), 50%);
+		}
+	}
+
+	&-cancel {
+		border-radius: @borderRadiusMedium;
+		background-color: @backgroundChipColor;
+		color: @whiteColor;
+		font-weight: @fontBold;
+		text-align: center;
+		height: @gridSmall;
+		padding: 0 (@gridSmall / 2);
+		font-size: @fontSizeMedium;
+
+		&:hover {
+			background-color: @backgroundDarkLightHoverColor;
+		}
+
+		&:disabled {
+			cursor: default;
+			background-color: @labelColor;
+			color: @disabledColor;
+		}
+	}
+
+	&-gray {
+		border-radius: @borderRadiusMedium;
+		font-weight: @fontBold;
+		text-align: center;
+		height: @gridSmall;
+		padding: 0 (@gridSmall / 2);
+		font-size: @fontSizeMedium;
+
+		&:hover {
+			background-color: @backgroundDarkLightHoverColor;
+		}
+
+		&:disabled {
+			cursor: default;
+			background-color: @labelColor;
+			color: @disabledColor;
+		}
+	}
+
+	&-white {
+		border-radius: @borderRadiusMedium;
+		background-color: @whiteColor;
+		color: @mainColor;
+		font-weight: @fontBold;
+		text-align: center;
+		height: @gridSmall;
+		padding: 0 (@gridSmall / 2);
+		font-size: @fontSizeMedium;
+
+		&:hover {
+			background-color: @backgroundIconColor;
+		}
+
+		&:disabled {
+			cursor: default;
+			background-color: @panelColor;
+			color: @disabledColor;
+		}
+	}
+
+	&-add {
+		display: flex;
+		flex-direction: row;
+		font-size: @fontSizeMedium;
+		cursor: pointer;
+		align-items: center;
+		text-transform: none;
+
+		svg-icon,
+		lw-svg-icon {
+			color: @iconColor;
+			height: @gridExtraSmall*2;
+			&.button-add {
+				&__icon {
+					&--accent {
+						color: @accentColor;
+					}
+				}
+			}
+		}
+
+		&__icon {
+			color: @iconColor;
+			height: @gridExtraSmall*2;
+
+			&--accent {
+				color: @accentColor;
+			}
+		}
+
+		&__text {
+			padding-left: @gridExtraSmall;
+			font-weight: @fontRegular;
+			line-height: @gridExtraSmall*2;
+		}
+
+		&:hover {
+			color: @accentColor;
+
+			svg-icon,
+			lw-svg-icon {
+				color: @accentColor;
+			}
+		}
+
+		&--accent {
+			svg-icon,
+			lw-svg-icon {
+				color: @accentColor;
+			}
+		}
+	}
+
+	&-with-icon {
+		display: flex;
+		flex-direction: row;
+		font-size: @fontSizeMedium;
+		font-weight: @fontRegular;
+		cursor: pointer;
+		align-items: center;
+
+		svg-icon,
+		lw-svg-icon {
+			color: @iconColor;
+			height: @gridExtraSmall*2;
+		}
+
+		&__text {
+			padding-left: @gridExtraSmall;
+		}
+
+		&--accent {
+			svg-icon,
+			lw-svg-icon {
+				color: @accentColor;
+			}
+
+			&:hover {
+				color: @accentColor;
+			}
+		}
+
+		&--red {
+			svg-icon,
+			lw-svg-icon {
+				color: @redColor;
+			}
+
+			&:hover {
+				color: @redColor;
+			}
+		}
+	}
+
+	&-accent {
+		background-color: @accentColor;
+		color: @whiteColor;
+	}
+
+	&-accent:hover {
+		background-color: @accentHoverColor;
+	}
+
+	&-accent:disabled {
+		cursor: default;
+		background-color: @accentDisabledColor;
+	}
+
+	&-transparent:hover {
+		background-color: @backgroundColor;
+	}
+
+	&-transparent:disabled {
+		cursor: default;
+		background-color: transparent;
+		color: @disabledColor;
+	}
+
+	&-transparent {
+		border-radius: @borderRadiusMedium;
+		color: @mainColor;
+		height: @gridSmall;
+		font-weight: @fontBold;
+		text-align: center;
+		padding: 0 (@gridSmall / 2);
+		font-size: @fontSizeMedium;
+		background-color: transparent;
+	}
+
+	&-big {
+		height: @gridMedium;
+		cursor: pointer;
+		background-color: @accentColor;
+		color: @whiteColor;
+		font-size: @fontSizeMedium;
+		border-radius: @borderRadiusMedium;
+		&:hover {
+			background-color: @accentHoverColor;
+		}
+		&--orange {
+			background-color: @orangeColor;
+			&:hover {
+				background-color: @orangeHoverColor;
+			}
+		}
+	}
+
+	&-round {
+		border-radius: 50%;
+		background-color: @accentColor;
+		color: @whiteColor;
+		text-transform: uppercase;
+		font-weight: @fontBold;
+		text-align: center;
+
+		&-big {
+			width: @gridLarge*2;
+			height: @gridLarge*2;
+		}
+	}
+
+	&-round:hover {
+		background-color: @accentHoverColor;
+	}
+
+	&-square {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: @accentColor;
+		color: @whiteColor;
+		width: @gridSmall;
+		height: @gridSmall;
+		font-size: @iconSizeMedium;
+		line-height: @lineHeightNormal;
+
+		&--transparent {
+			background-color: transparent;
+			color: @iconColor;
+		}
+
+		&.button-square--transparent:hover,
+		&.button-square--transparent-active {
+			background-color: @whiteColor;
+		}
+
+		&.button-square--transparent.button-square--grey:hover,
+		&.button-square--transparent-active.button-square--grey {
+			background-color: @backgroundIconColor;
+		}
+
+		svg-icon,
+		lw-svg-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+			height: @iconSizeSmallLarge;
+			width: @iconSizeSmallLarge;
+		}
+	}
+
+	&-square:hover {
+		background-color: @accentHoverColor;
+	}
+
+	&-reset {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+
+		svg-icon,
+		lw-svg-icon {
+			margin-right: @gridExtraSmall;
+			color: @redColor;
+			font-size: @fontSizeMedium;
+			height: @fontSizeLarge;
+		}
+	}
+
+	// Reusing header icon button styles from explorer
+	&-icon {
+		cursor: pointer;
+		margin: 0 (@gridSmall / 2);
+		color: @iconColor;
+		display: flex;
+		align-items: center;
+
+		&:hover {
+			color: @accentColor;
+		}
+
+		&--disabled {
+			color: @disabledColor;
+
+			&:hover {
+				color: @disabledColor;
+				cursor: default;
+			}
+		}
+	}
+
+	&-icon-label {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		height: @gridSmall;
+
+		.icon {
+			color: @accentColor;
+			margin-right: @gridExtraSmall;
+		}
+
+		&__label {
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		&:hover {
+			color: @accentColor;
+		}
+	}
+}
+
+.buttons-header-section {
+	height: @gridSmall*1.5;
+	padding: 0 @gridMedium;
+	display: flex;
+	border-bottom: @borderSmall solid @borderColor;
+	justify-content: flex-end;
+
+	.button-add {
+		margin-left: @gridSmall;
+	}
+
+	@media (max-width: @screenSm) {
+		padding: 0 (@gridExtraSmall*2);
+	}
+}

@@ -1,0 +1,86 @@
+@import 'normalize.css/normalize.css';
+@import 'constants.less';
+@import 'base.less';
+@import 'inputs.less';
+@import 'buttons.less';
+@import 'c3js-override.less';
+@import 'themes/lw-theme.css';
+
+:root {
+  --mdc-switch-selected-track-color: @mdcSwitchSelectedTrackColor;
+  --mdc-switch-selected-hover-track-color: @mdcSwitchSelectedTrackColor;
+  --mdc-switch-selected-focus-track-color: @mdcSwitchSelectedTrackColor;
+  --mdc-switch-selected-pressed-track-color: @mdcSwitchSelectedTrackColor;
+
+  --mdc-switch-unselected-track-color: @mdcSwitchUnSelectedTrackColor;
+  --mdc-switch-unselected-hover-track-color: @mdcSwitchUnSelectedTrackColor;
+  --mdc-switch-unselected-focus-track-color: @mdcSwitchUnSelectedTrackColor;
+  --mdc-switch-unselected-pressed-track-color: @mdcSwitchUnSelectedTrackColor;
+  --mdc-switch-unselected-pressed-state-layer-opacity: @mdcOpacity;
+
+  --mdc-switch-selected-handle-color: @orangeColor;
+  --mdc-switch-selected-hover-handle-color: @orangeColor;
+  --mdc-switch-selected-focus-handle-color: @orangeColor;
+  --mdc-switch-selected-pressed-handle-color: @orangeColor;
+  --mdc-switch-selected-pressed-state-layer-opacity: @mdcOpacity;
+
+  --mdc-switch-unselected-handle-color: @mdcSwitchUnSelectedHandleColor;
+  --mdc-switch-unselected-hover-handle-color: @mdcSwitchUnSelectedHandleColor;
+  --mdc-switch-unselected-focus-handle-color: @mdcSwitchUnSelectedHandleColor;
+  --mdc-switch-unselected-pressed-handle-color: @mdcSwitchUnSelectedHandleColor;
+  --mdc-switch-unselected-pressed-state-layer-color: @mdcSwitchUnSelectedFocusHandleColor;
+  --mdc-switch-unselected-focus-state-layer-color: @mdcSwitchUnSelectedFocusHandleColor;
+
+  --mdc-switch-selected-hover-state-layer-color: @orangeColor;
+  --mdc-switch-selected-focus-state-layer-color: @orangeColor;
+  --mdc-switch-selected-pressed-state-layer-color: @orangeColor;
+
+  --mdc-switch-state-layer-size: @mdcSwitchLayerSize;
+
+  --mdc-linear-progress-active-indicator-color: @labelColor;
+
+  /* mat-slide-toggle constants */
+  --mdc-switch-disabled-selected-handle-color: @mdcSwitchSelectedTrackColor;
+  --mdc-switch-disabled-selected-track-color: @mdcSwitchSelectedTrackColor;
+  --mdc-switch-disabled-unselected-handle-color: @mdcSwitchUnSelectedHandleColor;
+  --mdc-switch-disabled-unselected-track-color: @mdcSwitchUnSelectedTrackColor;
+  --mdc-switch-disabled-handle-opacity: 0.78;
+  --mdc-switch-disabled-track-opacity: 0.38;
+
+  --mdc-switch-disabled-handle-elevation: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+  0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+
+  --mdc-switch-track-width: @mdcTrackWidth;
+  --mdc-switch-track-shape: @mdcTrackShapeWidth;
+  --mdc-switch-track-height: @mdcTrackShapeHeight;
+  --mat-switch-track-outline-color: transparent;
+  --mat-switch-with-icon-handle-size: @mdcIconSize;
+  --mat-switch-pressed-handle-size: @mdcIconSize;
+  --mdc-switch-handle-shape: 50%;
+  --mdc-switch-handle-width: @mdcIconSize;
+}
+
+.mdc-switch__icons {
+  display: none;
+}
+
+/* This overwrites the wrapper styles */
+div.block-ui-wrapper {
+  background-color: rgba(0, 0, 0, 0);
+  z-index: @zIndexSuperLarge;
+  &.context-menu-wrapper {
+    z-index: @zIndexBlockUIDefault + 1;
+  }
+}
+
+.resize-handle {
+  height: 100%;
+  width: 20px;
+  position: absolute;
+  right: 0;
+  cursor: ew-resize;
+
+  &--left {
+    left: 0;
+  }
+}

@@ -1,0 +1,53 @@
+@import 'constants.less';
+
+html {
+	overflow-x: hidden;
+}
+
+body.block-ui {
+	position: relative;
+}
+
+body,
+html {
+	width: 100%;
+	min-height: 100%;
+	font-size: @fontSizeMedium;
+	color: @mainColor;
+	font-family: 'Roboto', sans-serif !important;
+	min-width: (@gridMedium * 5) + (@gridExtraSmall * 2);
+	box-sizing: border-box;
+	background-color: @backgroundColor;
+	text-align: left;
+	line-height: 1;
+	overflow-x: initial;
+}
+
+button {
+	border: 0;
+	padding: 0;
+}
+
+p {
+	margin: 0;
+}
+
+hr {
+	height: 1px;
+	width: 100%;
+}
+
+::-webkit-scrollbar {
+	width: @gridExtraSmall;
+	height: @gridExtraSmall;
+}
+
+::-webkit-scrollbar-track {
+	background: @disabledColor;
+	border-radius: @borderRadiusMedium;
+}
+
+::-webkit-scrollbar-thumb {
+	background: @labelColor;
+	border-radius: @borderRadiusMedium;
+}
