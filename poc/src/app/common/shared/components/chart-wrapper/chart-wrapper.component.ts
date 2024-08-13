@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core'
-import { DataPoint, PrimitiveArray } from 'c3'
+import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import {
   ChartSize,
   CustomPoint,
@@ -33,6 +33,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() size: ChartSize
   @Input() customPoints: CustomPoint[] = []
   @Input() customPointsHandler: CustomPointsHandler
+  @Input() yGridLinesTopLimitEnabled = false
 
   @ViewChild(ChartComponent) chart: ChartComponent
 
@@ -122,25 +123,34 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     if (changes.yGridLines && !changes.yGridLines.firstChange) {
       this.refreshYGrids()
     }
+    if (changes.yGridLinesTopLimitEnabled && !changes.yGridLinesTopLimitEnabled.firstChange) {
+      this.refreshYGrids()
+    }
     if (changes.size && !changes.size.firstChange) {
       this.resize(this.size)
     }
   }
 
-  flush(): void {
-    const domain = this.chart.getInstance().internal.x.domain()
-    this.chart.getInstance()?.flush()
-    this.chart.getInstance()?.zoom(domain)
-  }
-
   private resize(size?: ChartSize): void {
-    const domain = this.chart.getInstance().internal.x.domain()
+    const domain = this.getCurrentXDomain()
     this.chart.getInstance()?.resize(size)
     this.chart.getInstance()?.zoom(domain)
   }
 
   private refreshYGrids(): void {
     this.chart.getInstance()?.ygrids(this.yGridLines)
+    const maxYLine = this.getMaxYLine()
+    if (this.yGridLinesTopLimitEnabled && maxYLine) {
+      this.topLimitEnable(maxYLine)
+    } else {
+      this.topLimitDisable()
+    }
+  }
+
+  private getMaxYLine(): number | undefined {
+    if (this.yGridLines?.length > 0) {
+      return Math.max(...this.yGridLines.map((l) => l.value))
+    }
   }
 
   private selectPoints(points: SelectedPoint[]): void {
@@ -157,6 +167,18 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     )
   }
 
+  private topLimitEnable(limit: number) {
+    const domain = this.getCurrentXDomain()
+    this.chart.getInstance().load({ columns: [[TOP_LIMIT_DATA_SET, ...this.dataSet.map(() => limit)]] })
+    this.chart.getInstance()?.zoom(domain)
+  }
+
+  private topLimitDisable() {
+    const domain = this.getCurrentXDomain()
+    this.chart.getInstance().unload([TOP_LIMIT_DATA_SET])
+    this.chart.getInstance()?.zoom(domain)
+  }
+
   private brushSelectedPoints() {
     const selectedPoints = arrayToObject(this.selectedPoints, 'index')
     const selection = this.chart.getInstance().internal.main.selectAll('.c3-selected-circles').selectAll('.c3-selected-circle')
@@ -165,15 +187,13 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     })
   }
 
-  topLimitEnable(limit: number) {
-    const domain = this.chart.getInstance().internal.x.domain()
-    this.chart.getInstance().load({ columns: [[TOP_LIMIT_DATA_SET, ...this.dataSet.map(() => limit)]] })
-    this.chart.getInstance()?.zoom(domain)
+  private getCurrentXDomain(): Domain {
+    return this.chart.getInstance().internal.x.domain()
   }
 
-  topLimitDisable() {
-    const domain = this.chart.getInstance().internal.x.domain()
-    this.chart.getInstance().unload([TOP_LIMIT_DATA_SET])
+  flush(): void {
+    const domain = this.getCurrentXDomain()
+    this.chart.getInstance()?.flush()
     this.chart.getInstance()?.zoom(domain)
   }
 }
