@@ -389,4 +389,27 @@ ChartInternal.prototype.loadConfig = function (config) {
             this_config[key] = read;
         }
     });
+    if (config.context) {
+      this_config.context = config.context
+    }
 };
+
+ChartInternal.prototype.isSelectByClickDisabled = function (d) {
+  const config = this.config
+  return !!(config.context?.isSelectByClickDisabled && config.context?.isSelectByClickDisabled(d));
+}
+
+ChartInternal.prototype.isMouseOverDisabled = function (d) {
+  const config = this.config
+  return !!(config.context?.isMouseOverDisabled && config.context?.isMouseOverDisabled(d));
+}
+
+ChartInternal.prototype.isDataDisabled = function (id) {
+  const config = this.config
+  return !!(config.context?.isDataDisabled && config.context?.isDataDisabled(id));
+}
+
+ChartInternal.prototype.isShowXGridFocusDisabled = function (d) {
+  const config = this.config
+  return !!(config.context?.isShowXGridFocusDisabled && config.context?.isShowXGridFocusDisabled(d));
+}

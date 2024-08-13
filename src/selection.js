@@ -69,6 +69,10 @@ ChartInternal.prototype.toggleShape = function (that, d, i) {
         shape = d3.select(that), isSelected = shape.classed(CLASS.SELECTED),
         toggle = $$.getToggle(that, d).bind($$);
 
+    if ($$.isSelectByClickDisabled(d)) {
+      return
+    }
+
     if (config.data_selection_enabled && config.data_selection_isselectable(d)) {
         if (!config.data_selection_multiple) {
             $$.main.selectAll('.' + CLASS.shapes + (config.data_selection_grouped ? $$.getTargetSelectorSuffix(d.id) : "")).selectAll('.' + CLASS.shape).each(function (d, i) {

@@ -11,6 +11,7 @@ Chart.prototype.zoom = function (domain) {
             $$.brush.selectionAsValue(domain, true);
         }
         else {
+            $$.brush.selectionAsValue(domain, false); // Zoom bug fix (AT 8/7/2024)
             $$.updateXDomain(null, true, false, false, domain);
             $$.redraw({withY: $$.config.zoom_rescale, withSubchart: false});
         }

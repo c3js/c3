@@ -19,6 +19,7 @@ import './api.tooltip';
 import './api.transform';
 import './api.x';
 import './api.zoom';
+import './api.custom-point';
 import './arc';
 import './axis';
 import './cache';
@@ -55,5 +56,6 @@ import './type';
 import './ua';
 import './util';
 import './zoom';
+import './custom-point'
 
 export default c3;

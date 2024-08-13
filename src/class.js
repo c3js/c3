@@ -17,6 +17,8 @@ export default {
     chartArcsGaugeMin: 'c3-chart-arcs-gauge-min',
     selectedCircle: 'c3-selected-circle',
     selectedCircles: 'c3-selected-circles',
+    customPoints: 'c3-custom-points',
+    customPoint: 'c3-custom-point',
     eventRect: 'c3-event-rect',
     eventRects: 'c3-event-rects',
     eventRectsSingle: 'c3-event-rects-single',
@@ -84,5 +86,6 @@ export default {
     dragarea: 'c3-dragarea',
     EXPANDED: '_expanded_',
     SELECTED: '_selected_',
-    INCLUDED: '_included_'
+    INCLUDED: '_included_',
+    CUSTOM: '_custom_'
 };

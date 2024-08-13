@@ -73,6 +73,11 @@ ChartInternal.prototype.redrawEventRect = function () {
                 return;
             }
 
+            if ($$.isMouseOverDisabled(closest)) {
+              mouseout();
+              return
+            }
+
             if ($$.isScatterOrStanfordType(closest) || !config.tooltip_grouped) {
                 sameXData = [closest];
             } else {
@@ -95,7 +100,9 @@ ChartInternal.prototype.redrawEventRect = function () {
             $$.expandBars(closest.index, closest.id, true);
 
             // Show xgrid focus line
-            $$.showXGridFocus(selectedData);
+            if (!$$.isShowXGridFocusDisabled(closest)) {
+              $$.showXGridFocus(selectedData);
+            }
 
             // Show cursor as pointer if point is close to mouse position
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {

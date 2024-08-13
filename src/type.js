@@ -94,6 +94,9 @@ ChartInternal.prototype.barData = function (d) {
     return this.isBarType(d) ? d.values : [];
 };
 ChartInternal.prototype.lineOrScatterOrStanfordData = function (d) {
+    if (this.isDataDisabled(d.id)) {
+      return []
+    }
     return this.isLineType(d) || this.isScatterType(d) || this.isStanfordType(d) ? d.values : [];
 };
 ChartInternal.prototype.barOrLineData = function (d) {

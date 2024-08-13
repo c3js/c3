@@ -34,6 +34,11 @@ ChartInternal.prototype.updateTargetsForLine = function (targets) {
     mainLineEnter.append('g')
         .attr("class", classCircles)
         .style("cursor", function (d) { return config.data_selection_isselectable(d) ? "pointer" : null; });
+
+    // Custom points
+    mainLineEnter.append('g')
+        .attr("class", function (d) { return $$.generateClass(CLASS.customPoints, d.id); });
+
     // Update date for selected circles
     targets.forEach(function (t) {
         $$.main.selectAll('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(t.id)).selectAll('.' + CLASS.selectedCircle).each(function (d) {
@@ -323,8 +328,10 @@ ChartInternal.prototype.updateCircle = function (cx, cy) {
 };
 ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transition) {
     var $$ = this,
-        selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle);
-    return [
+        config = $$.config,
+        selectedCircles = $$.main.selectAll('.' + CLASS.selectedCircle),
+        customPoints = $$.main.selectAll('.' + CLASS.customPoint);
+    const result =  [
         (withTransition ? $$.mainCircle.transition(transition) : $$.mainCircle)
             .style('opacity', this.opacityForCircle.bind($$))
             .style("fill", $$.isStanfordGraphType() ? $$.getStanfordPointColor.bind($$) : $$.color)
@@ -334,6 +341,14 @@ ChartInternal.prototype.redrawCircle = function (cx, cy, withTransition, transit
             .attr("cx", cx)
             .attr("cy", cy)
     ];
+    if (config?.context?.customPointsHandler?.redraw) {
+        result.push(config?.context?.customPointsHandler?.redraw({
+          selection: withTransition ? customPoints.transition(transition) : customPoints,
+          cx,
+          cy
+        }))
+    }
+    return result
 };
 ChartInternal.prototype.circleX = function (d) {
     return d.x || d.x === 0 ? this.x(d.x) : null;
