@@ -1,0 +1,24 @@
+@import 'constants.less';
+
+::ng-deep {
+  .c3-grid-lines {
+    .c3-ygrid-line.custom-dotted-line line {
+      stroke-width: @borderSmall;
+      stroke-dasharray: 7;
+    }
+  }
+  .c3-chart-lines {
+    .c3-shapes.c3-areas-data path {
+      fill: #E2F4F9 !important; // This is necessary for library style overload
+    }
+    .c3-shapes.c3-circles-data circle {
+      fill: #39B2CF !important; // This is necessary for library style overload
+    }
+    .c3-target-top-limit {
+      .c3-line-top-limit {
+        stroke: lightgrey !important;
+      }
+      //display: none;
+    }
+  }
+}

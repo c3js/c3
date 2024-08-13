@@ -1,0 +1,87 @@
+@import 'constants.less';
+
+.lw-number-input {
+	position: relative;
+
+	&__input {
+		width: ~'calc(100% - 2 * @{gridExtraSmall})';
+	}
+
+	&__arrows {
+		position: absolute;
+		top: 0;
+		right: @gridExtraSmall;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		padding-top: @gridSuperSmall;
+	}
+
+	&__arrow {
+		border: 0;
+		padding: 0;
+		width: 0;
+		height: 0;
+		background-color: transparent;
+		cursor: pointer;
+		outline: none;
+		border-left: 4px solid transparent;
+		border-right: 4px solid transparent;
+
+		&--increment {
+			margin-bottom: @gridSuperSmall;
+			border-bottom: 8px solid @mainColor;
+
+			&:hover {
+				border-bottom-color: @accentColor;
+			}
+		}
+
+		&--decrement {
+			border-top: 8px solid @mainColor;
+
+			&:hover {
+				border-top-color: @accentColor;
+			}
+		}
+	}
+
+	&--invalid {
+		border: @borderSmall solid @redColor;
+		box-shadow: none;
+	}
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+.lw-number-input.disabled {
+	.lw-number-input__arrow {
+		cursor: default;
+
+		&--increment:hover {
+			border-bottom-color: @mainColor;
+		}
+
+		&--decrement:hover {
+			border-top-color: @mainColor;
+		}
+	}
+
+	.input-main {
+		background-color: inherit;
+	}
+
+	.input-main:hover {
+		border: @borderSmall solid @borderDarkColor;
+		cursor: default;
+	}
+}

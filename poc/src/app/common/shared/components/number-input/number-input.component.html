@@ -1,0 +1,15 @@
+<article class="lw-number-input" [class]="{ disabled: isDisabled }">
+  <input
+    class="input-main lw-number-input__input"
+    [disabled]="isDisabled"
+    [class]="{ 'lw-number-input--invalid': invalid && dirty }"
+    type="number"
+    (change)="onChange($event.target['value'])"
+    (blur)="onTouched()"
+    #numberInput
+  />
+  <div *ngIf="!hideArrows" class="lw-number-input__arrows">
+    <button type="button" (click)="increment($event)" class="lw-number-input__arrow lw-number-input__arrow--increment"></button>
+    <button type="button" (click)="decrement($event)" class="lw-number-input__arrow lw-number-input__arrow--decrement"></button>
+  </div>
+</article>
