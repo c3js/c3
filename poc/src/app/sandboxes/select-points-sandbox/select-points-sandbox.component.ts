@@ -31,6 +31,8 @@ export class SelectPointsSandboxComponent {
     { value: 800, text: 'UCL', class: 'custom-dotted-line', color: '#BA191C' },
   ]
 
+  yGridLinesTopLimitEnabled = false
+
   selectedPoints: SelectedPoint[] = [{ index: 1, color: 'red' }]
 
   customPoints: CustomPoint[] = [
@@ -89,7 +91,7 @@ export class SelectPointsSandboxComponent {
   }
 
   yLinesShuffle() {
-    this.yGridLines = this.yGridLines.map((l) => ({ ...l, value: getRandomInt(50, 1000) }))
+    this.yGridLines = this.yGridLines.map((l) => ({ ...l, value: getRandomInt(50, 2000) }))
   }
 
   resizeHeight() {
@@ -100,11 +102,11 @@ export class SelectPointsSandboxComponent {
     this.chartSize = { width: getRandomInt(480, 1900) }
   }
 
-  addTopLimit() {
-    this.chartWrapper.topLimitEnable(getRandomInt(900, 2000))
+  topLimitEnable() {
+    this.yGridLinesTopLimitEnabled = true
   }
-  removeTopLimit() {
-    this.chartWrapper.topLimitDisable()
+  topLimitDisable() {
+    this.yGridLinesTopLimitEnabled = false
   }
 
   addCustomPoints() {

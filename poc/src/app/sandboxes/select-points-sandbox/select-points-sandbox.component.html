@@ -4,6 +4,7 @@
       [dataSet]="dataSet"
       [useSelection]="true"
       [yGridLines]="yGridLines"
+      [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
       [selectedPoints]="selectedPoints"
       [customPoints]="customPoints"
       [customPointsHandler]="customPointsHandler"
@@ -16,8 +17,8 @@
   <button class="input-container__button mat-button mat-raised-button" (click)="yLinesShuffle()">Y lines shuffle</button>
   <button class="input-container__button mat-button mat-raised-button" (click)="resizeHeight()">Resize height</button>
   <button class="input-container__button mat-button mat-raised-button" (click)="resizeWidth()">Resize width</button>
-  <button class="input-container__button mat-button mat-raised-button" (click)="addTopLimit()">Add top limit</button>
-  <button class="input-container__button mat-button mat-raised-button" (click)="removeTopLimit()">Remove top limit</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="topLimitEnable()">Top limit enable</button>
+  <button class="input-container__button mat-button mat-raised-button" (click)="topLimitDisable()">Top limit disable</button>
   <button class="input-container__button mat-button mat-raised-button" (click)="addCustomPoints()">Add custom points</button>
   <button class="input-container__button mat-button mat-raised-button" (click)="clearCustomPoints()">Clear custom points</button>
   <br />
