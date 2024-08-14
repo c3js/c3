@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import {
   ChartSize,
@@ -24,8 +24,8 @@ import {
 })
 export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   params: any
-  chartId = 'chart'
 
+  @Input() chartId = 'chart'
   @Input() dataSet: PrimitiveArray
   @Input() useSelection = false
   @Input() yGridLines: GridLine[] = []
@@ -34,6 +34,13 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() customPoints: CustomPoint[] = []
   @Input() customPointsHandler: CustomPointsHandler
   @Input() yGridLinesTopLimitEnabled = false
+  @Input() hideXTicks = false
+
+  @Output() showXGridFocus = new EventEmitter<DataPoint>()
+  @Output() hideXGridFocus = new EventEmitter<void>()
+  @Output() zoom = new EventEmitter<Domain>()
+  @Output() zoomStart = new EventEmitter<void>()
+  @Output() zoomEnd = new EventEmitter<Domain>()
 
   @ViewChild(ChartComponent) chart: ChartComponent
 
@@ -55,6 +62,15 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
       zoom: {
         enabled: true,
         rescale: true,
+        onzoom: (domain: Domain) => {
+          this.zoom.emit(domain)
+        },
+        onzoomstart: () => {
+          this.zoomStart.emit()
+        },
+        onzoomend: (domain: Domain) => {
+          this.zoomEnd.emit(domain)
+        },
       },
       legend: {
         show: false,
@@ -73,6 +89,18 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
       transition: {
         duration: 0, // Disable animation
       },
+      axis: {
+        x: {
+          tick: {
+            format: (x: number) => {
+              return this.hideXTicks ? '' : x
+            },
+            values: Array(this.dataSet.length)
+              .fill(0)
+              .map((v, i) => i),
+          },
+        },
+      },
       context: {
         isSelectByClickDisabled: (d: DataPoint) => {
           return d?.id === MAIN_DATA_SET
@@ -86,13 +114,19 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         isShowXGridFocusDisabled: (d: DataPoint) => {
           return d?.id === TOP_LIMIT_DATA_SET
         },
+        onShowXGridFocus: (d: DataPoint) => {
+          this.showXGridFocus.emit(d)
+        },
+        onHideXGridFocus: () => {
+          this.hideXGridFocus.emit()
+        },
         customPointsHandler: {
           append: (context: CustomPointContext) => {
             const { d } = context
             this.customPointsHandler?.append({ ...context, getTag: () => this.customPointsMap[d.index]?.tag })
           },
           redraw: (context: CustomPointContext) => {
-            this.customPointsHandler.redraw({
+            this.customPointsHandler?.redraw({
               ...context,
               getTag: (d: DataPoint) => {
                 return this.customPointsMap[d.index]?.tag
@@ -100,7 +134,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
             })
           },
           remove: (context: CustomPointContext) => {
-            this.customPointsHandler.remove(context)
+            this.customPointsHandler?.remove(context)
           },
         },
       },

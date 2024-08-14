@@ -19,7 +19,6 @@ import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-po
 })
 export class SelectPointsSandboxComponent {
   dataSet = [300, 500, 200, 1000, 400, 150, 250, null, 350, 350]
-  x: ChartConfiguration
 
   yGridLines: GridLine[] = [
     { value: 100, text: 'LSL', class: 'custom-dotted-line', color: '#ED2024' },

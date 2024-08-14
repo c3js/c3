@@ -1,0 +1,29 @@
+<div class="vertical-line-sync-sandbox">
+  <div class="vertical-line-sync-sandbox__chart-content chart-content">
+    <lw-chart-wrapper
+      chartId="chartTop"
+      [dataSet]="dataSet1"
+      [size]="chartSize"
+      [hideXTicks]="true"
+      (showXGridFocus)="onShowXGridFocusTop($event)"
+      (hideXGridFocus)="onHideXGridFocusTop()"
+      (zoom)="onZoomTop($event)"
+      (zoomStart)="onZoomStartTop()"
+      (zoomEnd)="onZoomEndTop($event)"
+      #chartWrapperTop
+    ></lw-chart-wrapper>
+  </div>
+  <div class="vertical-line-sync-sandbox__chart-content chart-content">
+    <lw-chart-wrapper
+      chartId="chartBottom"
+      [dataSet]="dataSet2"
+      [size]="chartSize"
+      (showXGridFocus)="onShowXGridFocusBottom($event)"
+      (hideXGridFocus)="onHideXGridFocusBottom()"
+      (zoom)="onZoomBottom($event)"
+      (zoomStart)="onZoomStartBottom()"
+      (zoomEnd)="onZoomEndBottom($event)"
+      #chartWrapperBottom
+    ></lw-chart-wrapper>
+  </div>
+</div>
