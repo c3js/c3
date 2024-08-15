@@ -2,6 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Outpu
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import {
   ChartSize,
+  CheckDomainPredicate,
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
@@ -35,6 +36,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() customPointsHandler: CustomPointsHandler
   @Input() yGridLinesTopLimitEnabled = false
   @Input() hideXTicks = false
+  @Input() isDomainCorrect?: CheckDomainPredicate
 
   @Output() showXGridFocus = new EventEmitter<DataPoint>()
   @Output() hideXGridFocus = new EventEmitter<void>()
@@ -45,6 +47,8 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild(ChartComponent) chart: ChartComponent
 
   customPointsMap: Record<number, CustomPoint> = {}
+
+  currentDomain: Domain = null
 
   ngOnInit(): void {
     this.params = {
@@ -63,13 +67,13 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         enabled: true,
         rescale: true,
         onzoom: (domain: Domain) => {
-          this.zoom.emit(domain)
+          this.onZoom(domain)
         },
         onzoomstart: () => {
-          this.zoomStart.emit()
+          this.onZoomStart()
         },
         onzoomend: (domain: Domain) => {
-          this.zoomEnd.emit(domain)
+          this.onZoomEnd(domain)
         },
       },
       legend: {
@@ -142,6 +146,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
+    this.currentDomain = this.getCurrentXDomain()
     this.refreshYGrids()
     this.selectPoints(this.selectedPoints)
     this.customizePoints(this.customPoints)
@@ -163,6 +168,23 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     if (changes.size && !changes.size.firstChange) {
       this.resize(this.size)
     }
+  }
+
+  private onZoom(domain: Domain): void {
+    if (this.isDomainCorrect && !this.isDomainCorrect(domain) && !this.isSameDomain(domain, this.currentDomain)) {
+      this.chart.getInstance()?.zoom(this.currentDomain)
+      return
+    }
+    this.currentDomain = domain
+    this.zoom.emit(domain)
+  }
+  private onZoomStart(): void {
+    this.zoomStart.emit()
+  }
+  private onZoomEnd(domain: Domain): void {
+    this.currentDomain = domain
+    this.chart.getInstance()?.zoom(this.currentDomain)
+    this.zoomEnd.emit(domain)
   }
 
   private resize(size?: ChartSize): void {
@@ -223,6 +245,10 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
 
   private getCurrentXDomain(): Domain {
     return this.chart.getInstance().internal.x.domain()
+  }
+
+  private isSameDomain(domain: Domain, domainNew: Domain): boolean {
+    return domain[0] === domainNew[0] && domain[1] === domainNew[1]
   }
 
   flush(): void {

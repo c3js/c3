@@ -1,7 +1,8 @@
 import { Component, ViewChild } from '@angular/core'
-import { ChartConfiguration, DataPoint } from 'c3'
+import { ChartConfiguration, DataPoint, Domain } from 'c3'
 import {
   ChartSize,
+  CheckDomainPredicate,
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
@@ -11,6 +12,7 @@ import {
 import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
 import { getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
 import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
+import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
 
 @Component({
   selector: 'lw-select-points-sandbox',
@@ -66,6 +68,10 @@ export class SelectPointsSandboxComponent {
   chartSize: ChartSize = { height: 420 }
 
   @ViewChild(ChartWrapperComponent) chartWrapper: ChartWrapperComponent
+
+  isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
+    return !(Math.abs(domain[0] - domain[1]) <= MIN_DOMAIN_RANGE)
+  }
 
   select(idx: number) {
     const point = this.selectedPoints.find((p) => p.index === idx)
