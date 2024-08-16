@@ -1,10 +1,19 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
-import { ChartSize, CheckDomainPredicate, GridLine } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
+import {
+  ChartSize,
+  CheckDomainPredicate,
+  CustomPoint,
+  CustomPointContext,
+  CustomPointsHandler,
+  GridLine,
+  SelectedPoint,
+} from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
-import { getRandomArbitrary } from '@src/app/common/utils/helpers'
+import { getRandomArbitrary, getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
 import { fromEvent } from 'rxjs'
+import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
 
 @Component({
   selector: 'lw-vertical-line-sync-sandbox',
@@ -37,6 +46,33 @@ export class VerticalLineSyncSandboxComponent {
     { value: 800, text: 'UCL', class: 'custom-dotted-line', color: '#BA191C' },
   ]
   yGridLinesTopLimitEnabled = true
+
+  selectedPoints: SelectedPoint[] = []
+
+  customPoints: CustomPoint[] = []
+
+  customPointsHandler: CustomPointsHandler = {
+    append: (context: CustomPointContext) => {
+      CustomPointsHelper[context.getTag()].append(context)
+    },
+    redraw: (context: CustomPointContext) => {
+      const { selection, cx, cy, getTag } = context
+      return selection
+        .attr('x', (d: DataPoint) => {
+          return CustomPointsHelper[context.getTag(d)].reCalcX(d, cx)
+        })
+        .attr('y', (d: DataPoint) => {
+          return CustomPointsHelper[context.getTag(d)].reCalcY(d, cy)
+        })
+    },
+    remove: (context: CustomPointContext) => {
+      const { chartInternal, d, containerClass, customPointClass } = context
+      chartInternal.main
+        .select('.' + containerClass)
+        .selectAll('.' + customPointClass)
+        .remove()
+    },
+  }
 
   @ViewChild('chartWrapperTop', { read: ChartWrapperComponent }) chartWrapperTop: ChartWrapperComponent
   @ViewChild('chartWrapperBottom', { read: ChartWrapperComponent }) chartWrapperBottom: ChartWrapperComponent
@@ -113,6 +149,27 @@ export class VerticalLineSyncSandboxComponent {
   zoomReset(): void {
     this.masterChart = this.chartWrapperTop
     this.chartWrapperTop.resetZoom()
+  }
+
+  addCustomPoints(): void {
+    const tags = Object.values(CustomPointTag)
+    this.customPoints = Array(getRandomInt(0, this.pCount - 1))
+      .fill(0)
+      .map(() => ({ index: getRandomInt(0, this.pCount - 1), tag: tags[getRandomInt(0, 3)] }))
+  }
+
+  clearCustomPoints(): void {
+    this.customPoints = []
+  }
+
+  addSelectedPoints(): void {
+    this.selectedPoints = Array(getRandomInt(0, this.pCount - 1))
+      .fill(0)
+      .map(() => ({ index: getRandomInt(0, this.pCount - 1), color: getRandomColor() }))
+  }
+
+  clearSelectedPoints(): void {
+    this.selectedPoints = []
   }
 
   protected zoomChart = (chartWrapper: ChartWrapperComponent, domain: number[]) => {
