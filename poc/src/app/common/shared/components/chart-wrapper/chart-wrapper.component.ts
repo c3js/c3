@@ -109,6 +109,10 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         isSelectByClickDisabled: (d: DataPoint) => {
           return d?.id === MAIN_DATA_SET
         },
+        isHideXLabelIfNotVisibleDisabled: (id: string) => {
+          // TODO: add chart types in which we could disable this functionality
+          return false
+        },
         isMouseOverDisabled: (d: DataPoint) => {
           return d?.value === null || d?.id === TOP_LIMIT_DATA_SET
         },
