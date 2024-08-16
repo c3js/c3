@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ElementRef, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core'
-import c3 from '@src/app/c3/src/index.js'
 import { ChartComponent } from '@src/app/common/shared/components/chart/chart.component'
 import { SubscriptionHandler } from '@src/app/common/utils/subscription-handler'
 import { waitBlock, WaitBlock } from '@src/app/common/utils/helpers'

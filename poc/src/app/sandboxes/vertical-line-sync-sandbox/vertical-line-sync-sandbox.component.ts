@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, ElementRef, ViewChild } from '@angular/core'
 import { ChartSize, CheckDomainPredicate, GridLine } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
 import { getRandomArbitrary } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
+import { fromEvent } from 'rxjs'
 
 @Component({
   selector: 'lw-vertical-line-sync-sandbox',
@@ -11,7 +12,7 @@ import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrappe
   styleUrls: ['./vertical-line-sync-sandbox.component.less'],
 })
 export class VerticalLineSyncSandboxComponent {
-  pCount = 10
+  pCount = 100
   dataSetTop = [
     ...Array(this.pCount)
       .fill(0)
@@ -39,6 +40,13 @@ export class VerticalLineSyncSandboxComponent {
 
   @ViewChild('chartWrapperTop', { read: ChartWrapperComponent }) chartWrapperTop: ChartWrapperComponent
   @ViewChild('chartWrapperBottom', { read: ChartWrapperComponent }) chartWrapperBottom: ChartWrapperComponent
+  @ViewChild('chartsContainer', { read: ElementRef }) chartsContainer: ElementRef<HTMLDivElement>
+
+  constructor() {
+    fromEvent(window, 'resize').subscribe(() => {
+      this.windowResize()
+    })
+  }
 
   isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
     return !(Math.abs(domain[0] - domain[1]) <= MIN_DOMAIN_RANGE)
@@ -92,15 +100,39 @@ export class VerticalLineSyncSandboxComponent {
     }
   }
 
-  private zoomChart = (chartWrapper: ChartWrapperComponent, domain: number[]) => {
+  zoomIn(): void {
+    this.masterChart = this.chartWrapperTop
+    this.chartWrapperTop.zoomStep('in')
+  }
+
+  zoomOut(): void {
+    this.masterChart = this.chartWrapperTop
+    this.chartWrapperTop.zoomStep('out')
+  }
+
+  zoomReset(): void {
+    this.masterChart = this.chartWrapperTop
+    this.chartWrapperTop.resetZoom()
+  }
+
+  protected zoomChart = (chartWrapper: ChartWrapperComponent, domain: number[]) => {
     chartWrapper.chart.getInstance().zoom(domain)
   }
 
-  private xFocusShow(chartWrapper: ChartWrapperComponent, d: DataPoint): void {
+  protected xFocusShow(chartWrapper: ChartWrapperComponent, d: DataPoint): void {
     chartWrapper?.chart.getInstance().xgrids([{ value: d.x }])
   }
 
-  private xFocusHide(chartWrapper: ChartWrapperComponent): void {
+  protected xFocusHide(chartWrapper: ChartWrapperComponent): void {
     chartWrapper?.chart.getInstance().xgrids.remove()
+  }
+
+  protected windowResize(): void {
+    this.adjustChartWidth()
+  }
+
+  protected adjustChartWidth(): void {
+    const width = this.chartsContainer.nativeElement.offsetWidth
+    this.chartSize = { ...this.chartSize, width }
   }
 }
