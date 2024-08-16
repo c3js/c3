@@ -1,0 +1,22 @@
+@import 'constants.less';
+
+:host {
+  display: block;
+  padding: @gridExtraSmall;
+  height: 100%;
+  background-color: @whiteColor;
+}
+
+.vertical-line-sync-sandbox {
+  &__chart-content {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: @gridExtraSmall;
+
+    lw-chart {
+      display: inline-block;
+    }
+  }
+}
+

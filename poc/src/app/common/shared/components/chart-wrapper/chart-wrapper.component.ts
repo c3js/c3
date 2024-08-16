@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import {
   ChartSize,
+  CheckDomainPredicate,
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
@@ -24,8 +25,8 @@ import {
 })
 export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   params: any
-  chartId = 'chart'
 
+  @Input() chartId = 'chart'
   @Input() dataSet: PrimitiveArray
   @Input() useSelection = false
   @Input() yGridLines: GridLine[] = []
@@ -34,10 +35,20 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() customPoints: CustomPoint[] = []
   @Input() customPointsHandler: CustomPointsHandler
   @Input() yGridLinesTopLimitEnabled = false
+  @Input() hideXTicks = false
+  @Input() isDomainCorrect?: CheckDomainPredicate
+
+  @Output() showXGridFocus = new EventEmitter<DataPoint>()
+  @Output() hideXGridFocus = new EventEmitter<void>()
+  @Output() zoom = new EventEmitter<Domain>()
+  @Output() zoomStart = new EventEmitter<void>()
+  @Output() zoomEnd = new EventEmitter<Domain>()
 
   @ViewChild(ChartComponent) chart: ChartComponent
 
   customPointsMap: Record<number, CustomPoint> = {}
+
+  currentDomain: Domain = null
 
   ngOnInit(): void {
     this.params = {
@@ -55,6 +66,15 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
       zoom: {
         enabled: true,
         rescale: true,
+        onzoom: (domain: Domain) => {
+          this.onZoom(domain)
+        },
+        onzoomstart: () => {
+          this.onZoomStart()
+        },
+        onzoomend: (domain: Domain) => {
+          this.onZoomEnd(domain)
+        },
       },
       legend: {
         show: false,
@@ -73,6 +93,18 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
       transition: {
         duration: 0, // Disable animation
       },
+      axis: {
+        x: {
+          tick: {
+            format: (x: number) => {
+              return this.hideXTicks ? '' : x
+            },
+            values: Array(this.dataSet.length)
+              .fill(0)
+              .map((v, i) => i),
+          },
+        },
+      },
       context: {
         isSelectByClickDisabled: (d: DataPoint) => {
           return d?.id === MAIN_DATA_SET
@@ -86,13 +118,19 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         isShowXGridFocusDisabled: (d: DataPoint) => {
           return d?.id === TOP_LIMIT_DATA_SET
         },
+        onShowXGridFocus: (d: DataPoint) => {
+          this.showXGridFocus.emit(d)
+        },
+        onHideXGridFocus: () => {
+          this.hideXGridFocus.emit()
+        },
         customPointsHandler: {
           append: (context: CustomPointContext) => {
             const { d } = context
             this.customPointsHandler?.append({ ...context, getTag: () => this.customPointsMap[d.index]?.tag })
           },
           redraw: (context: CustomPointContext) => {
-            this.customPointsHandler.redraw({
+            this.customPointsHandler?.redraw({
               ...context,
               getTag: (d: DataPoint) => {
                 return this.customPointsMap[d.index]?.tag
@@ -100,7 +138,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
             })
           },
           remove: (context: CustomPointContext) => {
-            this.customPointsHandler.remove(context)
+            this.customPointsHandler?.remove(context)
           },
         },
       },
@@ -108,6 +146,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
+    this.currentDomain = this.getCurrentXDomain()
     this.refreshYGrids()
     this.selectPoints(this.selectedPoints)
     this.customizePoints(this.customPoints)
@@ -129,6 +168,23 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     if (changes.size && !changes.size.firstChange) {
       this.resize(this.size)
     }
+  }
+
+  private onZoom(domain: Domain): void {
+    if (this.isDomainCorrect && !this.isDomainCorrect(domain) && !this.isSameDomain(domain, this.currentDomain)) {
+      this.chart.getInstance()?.zoom(this.currentDomain)
+      return
+    }
+    this.currentDomain = domain
+    this.zoom.emit(domain)
+  }
+  private onZoomStart(): void {
+    this.zoomStart.emit()
+  }
+  private onZoomEnd(domain: Domain): void {
+    this.currentDomain = domain
+    this.chart.getInstance()?.zoom(this.currentDomain)
+    this.zoomEnd.emit(domain)
   }
 
   private resize(size?: ChartSize): void {
@@ -189,6 +245,10 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
 
   private getCurrentXDomain(): Domain {
     return this.chart.getInstance().internal.x.domain()
+  }
+
+  private isSameDomain(domain: Domain, domainNew: Domain): boolean {
+    return domain[0] === domainNew[0] && domain[1] === domainNew[1]
   }
 
   flush(): void {

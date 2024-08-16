@@ -1,4 +1,4 @@
-import { ChartInternal, DataPoint } from 'c3'
+import { ChartInternal, DataPoint, Domain } from 'c3'
 import { Selection } from 'd3'
 
 export interface GridLine {
@@ -40,3 +40,5 @@ export interface CustomPointsHandler {
   redraw: (context: CustomPointContext) => void
   remove: (context: CustomPointContext) => void
 }
+
+export type CheckDomainPredicate = (domain: Domain) => boolean

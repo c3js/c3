@@ -9,9 +9,16 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { SelectPointsSandboxComponent } from '@src/app/sandboxes/select-points-sandbox/select-points-sandbox.component'
+import { VerticalLineSyncSandboxComponent } from '@src/app/sandboxes/vertical-line-sync-sandbox/vertical-line-sync-sandbox.component'
 
 @NgModule({
-  declarations: [MainPageComponent, TestSandboxComponent, ChartPocStoryComponent, SelectPointsSandboxComponent],
+  declarations: [
+    MainPageComponent,
+    TestSandboxComponent,
+    ChartPocStoryComponent,
+    SelectPointsSandboxComponent,
+    VerticalLineSyncSandboxComponent,
+  ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MainPageRoutingModule, RouterModule, SharedModule, MatSlideToggleModule],
   providers: [],
 })

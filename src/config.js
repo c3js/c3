@@ -414,3 +414,13 @@ ChartInternal.prototype.isShowXGridFocusDisabled = function (d) {
   const config = this.config
   return !!(config.context.isShowXGridFocusDisabled && config.context.isShowXGridFocusDisabled(d));
 }
+
+ChartInternal.prototype.onShowXGridFocus = function (d) {
+  const config = this.config
+  return !!(config.context.onShowXGridFocus && config.context.onShowXGridFocus(d));
+}
+
+ChartInternal.prototype.onHideXGridFocus = function () {
+  const config = this.config
+  return !!(config.context.onHideXGridFocus && config.context.onHideXGridFocus());
+}

@@ -224,9 +224,11 @@ ChartInternal.prototype.showXGridFocus = function (selectedData) {
         .attr(config.axis_rotated ? 'y1' : 'x1', xx)
         .attr(config.axis_rotated ? 'y2' : 'x2', xx);
     $$.smoothLines(focusEl, 'grid');
+    $$.onShowXGridFocus(dataToShow[0])
 };
 ChartInternal.prototype.hideXGridFocus = function () {
     this.main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
+    this.onHideXGridFocus()
 };
 ChartInternal.prototype.updateXgridFocus = function () {
     var $$ = this, config = $$.config;
