@@ -108,6 +108,11 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
           },
         },
       },
+      grid: {
+        lines: {
+          front: false,
+        },
+      },
       context: {
         isSelectByClickDisabled: (d: DataPoint) => {
           return d?.id === MAIN_DATA_SET
