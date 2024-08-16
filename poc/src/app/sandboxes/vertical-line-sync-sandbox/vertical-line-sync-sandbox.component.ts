@@ -12,8 +12,10 @@ import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-w
 import { getRandomArbitrary, getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
-import { fromEvent } from 'rxjs'
 import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
+import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
+// import debounce from 'lodash/debounce'
+import { debounce, debounceTime, fromEvent } from 'rxjs'
 
 @Component({
   selector: 'lw-vertical-line-sync-sandbox',
@@ -79,9 +81,11 @@ export class VerticalLineSyncSandboxComponent {
   @ViewChild('chartsContainer', { read: ElementRef }) chartsContainer: ElementRef<HTMLDivElement>
 
   constructor() {
-    fromEvent(window, 'resize').subscribe(() => {
-      this.windowResize()
-    })
+    fromEvent(window, 'resize')
+      .pipe(debounceTime(DEBOUNCE_TIME_SMALL))
+      .subscribe(() => {
+        this.windowResize()
+      })
   }
 
   isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {

@@ -10,7 +10,7 @@ import {
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { ChartComponent } from '@src/app/common/shared/components/chart/chart.component'
-import { arrayToObject } from '@src/app/common/utils/helpers'
+import { arrayToObject, generateId } from '@src/app/common/utils/helpers'
 import {
   MAIN_DATA_SET,
   POINT_R,
@@ -27,7 +27,7 @@ import {
 export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   params: any
 
-  @Input() chartId = 'chart'
+  @Input() chartId = `chart_${generateId()}`
   @Input() dataSet: PrimitiveArray
   @Input() useSelection = false
   @Input() yGridLines: GridLine[] = []
