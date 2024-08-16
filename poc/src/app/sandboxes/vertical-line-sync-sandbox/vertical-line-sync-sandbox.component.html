@@ -2,9 +2,12 @@
   <div class="vertical-line-sync-sandbox__chart-content chart-content">
     <lw-chart-wrapper
       chartId="chartTop"
-      [dataSet]="dataSet1"
+      [dataSet]="dataSetTop"
       [size]="chartSize"
       [hideXTicks]="true"
+      [yGridLines]="yGridLines"
+      [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
+      [isDomainCorrect]="isDomainCorrect"
       (showXGridFocus)="onShowXGridFocusTop($event)"
       (hideXGridFocus)="onHideXGridFocusTop()"
       (zoom)="onZoomTop($event)"
@@ -16,8 +19,11 @@
   <div class="vertical-line-sync-sandbox__chart-content chart-content">
     <lw-chart-wrapper
       chartId="chartBottom"
-      [dataSet]="dataSet2"
+      [dataSet]="dataSetBottom"
       [size]="chartSize"
+      [yGridLines]="yGridLines"
+      [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
+      [isDomainCorrect]="isDomainCorrect"
       (showXGridFocus)="onShowXGridFocusBottom($event)"
       (hideXGridFocus)="onHideXGridFocusBottom()"
       (zoom)="onZoomBottom($event)"
