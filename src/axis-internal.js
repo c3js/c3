@@ -24,9 +24,18 @@ function AxisInternal(component, params) {
     internal.axis = internal.generateAxis();
 }
 
-AxisInternal.prototype.axisX = function (selection, x, tickOffset) {
+AxisInternal.prototype.axisX = function (selection, x, tickOffset, internal) {
     selection.attr("transform", function (d) {
         return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+    });
+    // TODO: add chart types in which we could disable this functionality
+    var context = internal.component.owner.config.context
+    if (context.isHideXLabelIfNotVisibleDisabled && context.isHideXLabelIfNotVisibleDisabled('id')) {
+        return
+    }
+    selection.attr('style', function (d) {
+        const offset = Math.ceil(x(d) + tickOffset)
+        return 'opacity: ' + (offset < 0 ? '0' : '1')
     });
 };
 AxisInternal.prototype.axisY = function (selection, y) {
@@ -338,12 +347,12 @@ AxisInternal.prototype.generateAxis = function () {
             } else if (scale0.rangeBand) {
                 scale0 = scale1;
             } else {
-                tickExit.call(tickTransform, scale1, internal.tickOffset);
+                tickExit.call(tickTransform, scale1, internal.tickOffset, internal);
             }
-            tickEnter.call(tickTransform, scale0, internal.tickOffset);
+            tickEnter.call(tickTransform, scale0, internal.tickOffset, internal);
             self = (transition ? tickUpdate.transition(transition) : tickUpdate)
                 .style('opacity', 1)
-                .call(tickTransform, scale1, internal.tickOffset);
+                .call(tickTransform, scale1, internal.tickOffset, internal);
         });
         return self;
     }

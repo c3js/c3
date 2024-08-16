@@ -400,6 +400,11 @@ ChartInternal.prototype.isSelectByClickDisabled = function (d) {
   return !!(config.context.isSelectByClickDisabled && config.context.isSelectByClickDisabled(d));
 }
 
+ChartInternal.prototype.isHideXLabelIfNotVisibleDisabled = function (id) {
+  const config = this.config
+  return !!(config.context?.isHideXLabelIfNotVisibleDisabled && config.context?.isHideXLabelIfNotVisibleDisabled(id));
+}
+
 ChartInternal.prototype.isMouseOverDisabled = function (d) {
   const config = this.config
   return !!(config.context.isMouseOverDisabled && config.context.isMouseOverDisabled(d));
