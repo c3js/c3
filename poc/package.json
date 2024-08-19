@@ -27,7 +27,8 @@
     "tslib": "^2.3.0",
     "zone.js": "0.14.7",
     "webfontloader": "^1.6.28",
-    "normalize.css": "8.0.1"
+    "normalize.css": "8.0.1",
+    "lodash": "4.17.21"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "18.1.1",

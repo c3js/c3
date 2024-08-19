@@ -8,15 +8,30 @@
 }
 
 .vertical-line-sync-sandbox {
+  display: flex;
+  flex-direction: row;
+  &__chart-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: @gridExtraSmall;
+    min-width: @gridExtraSmall*15;
+    flex: 0;
+  }
+  &__charts {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
   &__chart-content {
     display: flex;
     justify-content: center;
     position: relative;
-    top: @gridExtraSmall;
+  }
 
-    lw-chart {
-      display: inline-block;
-    }
+  .mat-raised-button {
+    padding: 0;
+    margin: 0;
   }
 }
 

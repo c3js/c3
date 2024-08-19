@@ -1,35 +1,54 @@
 <div class="vertical-line-sync-sandbox">
-  <div class="vertical-line-sync-sandbox__chart-content chart-content">
-    <lw-chart-wrapper
-      chartId="chartTop"
-      [dataSet]="dataSetTop"
-      [size]="chartSize"
-      [hideXTicks]="true"
-      [yGridLines]="yGridLines"
-      [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
-      [isDomainCorrect]="isDomainCorrect"
-      (showXGridFocus)="onShowXGridFocusTop($event)"
-      (hideXGridFocus)="onHideXGridFocusTop()"
-      (zoom)="onZoomTop($event)"
-      (zoomStart)="onZoomStartTop()"
-      (zoomEnd)="onZoomEndTop($event)"
-      #chartWrapperTop
-    ></lw-chart-wrapper>
+  <div class="vertical-line-sync-sandbox__chart-toolbar">
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomIn()">Zoom in</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomOut()">Zoom Out</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomReset()">Zoom Reset</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="addCustomPoints()">Custom points</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="clearCustomPoints()">Clear custom points</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="addSelectedPoints()">Select points</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="clearSelectedPoints()">Clear selection</button>
   </div>
-  <div class="vertical-line-sync-sandbox__chart-content chart-content">
-    <lw-chart-wrapper
-      chartId="chartBottom"
-      [dataSet]="dataSetBottom"
-      [size]="chartSize"
-      [yGridLines]="yGridLines"
-      [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
-      [isDomainCorrect]="isDomainCorrect"
-      (showXGridFocus)="onShowXGridFocusBottom($event)"
-      (hideXGridFocus)="onHideXGridFocusBottom()"
-      (zoom)="onZoomBottom($event)"
-      (zoomStart)="onZoomStartBottom()"
-      (zoomEnd)="onZoomEndBottom($event)"
-      #chartWrapperBottom
-    ></lw-chart-wrapper>
+  <div class="vertical-line-sync-sandbox__charts" #chartsContainer>
+    <div class="vertical-line-sync-sandbox__chart-content chart-content">
+      <lw-chart-wrapper
+        chartId="chartTop"
+        [dataSet]="dataSetTop"
+        [size]="chartSize"
+        [hideXTicks]="true"
+        [yGridLines]="yGridLines"
+        [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
+        [isDomainCorrect]="isDomainCorrect"
+        [customPoints]="customPoints"
+        [customPointsHandler]="customPointsHandler"
+        [selectedPoints]="selectedPoints"
+        [useSelection]="true"
+        (showXGridFocus)="onShowXGridFocusTop($event)"
+        (hideXGridFocus)="onHideXGridFocusTop()"
+        (zoom)="onZoomTop($event)"
+        (zoomStart)="onZoomStartTop()"
+        (zoomEnd)="onZoomEndTop($event)"
+        #chartWrapperTop
+      ></lw-chart-wrapper>
+    </div>
+    <div class="vertical-line-sync-sandbox__chart-content chart-content">
+      <lw-chart-wrapper
+        chartId="chartBottom"
+        [dataSet]="dataSetBottom"
+        [size]="chartSize"
+        [yGridLines]="yGridLines"
+        [yGridLinesTopLimitEnabled]="yGridLinesTopLimitEnabled"
+        [isDomainCorrect]="isDomainCorrect"
+        [customPoints]="customPoints"
+        [customPointsHandler]="customPointsHandler"
+        [selectedPoints]="selectedPoints"
+        [useSelection]="true"
+        (showXGridFocus)="onShowXGridFocusBottom($event)"
+        (hideXGridFocus)="onHideXGridFocusBottom()"
+        (zoom)="onZoomBottom($event)"
+        (zoomStart)="onZoomStartBottom()"
+        (zoomEnd)="onZoomEndBottom($event)"
+        #chartWrapperBottom
+      ></lw-chart-wrapper>
+    </div>
   </div>
 </div>
