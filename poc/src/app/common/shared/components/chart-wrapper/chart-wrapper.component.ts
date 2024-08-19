@@ -36,6 +36,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() customPointsHandler: CustomPointsHandler
   @Input() yGridLinesTopLimitEnabled = false
   @Input() hideXTicks = false
+  @Input() xAxisMaxLength = 10
   @Input() isDomainCorrect?: CheckDomainPredicate
 
   @Output() showXGridFocus = new EventEmitter<DataPoint>()
@@ -97,7 +98,9 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         x: {
           tick: {
             format: (x: number) => {
-              return this.hideXTicks ? '' : x
+              if (this.hideXTicks)
+                return ''
+              return `Sample ${x} long label`
             },
             values: Array(this.dataSet.length)
               .fill(0)
@@ -127,6 +130,9 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         },
         onHideXGridFocus: () => {
           this.hideXGridFocus.emit()
+        },
+        limitAxisMaxLength: (x: string) => {
+          return x.length < this.xAxisMaxLength ? x : `${x.substring(0, this.xAxisMaxLength)}\u2026`
         },
         customPointsHandler: {
           append: (context: CustomPointContext) => {
