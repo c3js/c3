@@ -420,6 +420,11 @@ ChartInternal.prototype.isShowXGridFocusDisabled = function (d) {
   return !!(config.context.isShowXGridFocusDisabled && config.context.isShowXGridFocusDisabled(d));
 }
 
+ChartInternal.prototype.limitAxisMaxLength = function (x) {
+  const config = this.config
+  return !!(config.context.limitAxisMaxLength && config.context.limitAxisMaxLength(x));
+}
+
 ChartInternal.prototype.onShowXGridFocus = function (d) {
   const config = this.config
   return !!(config.context.onShowXGridFocus && config.context.onShowXGridFocus(d));

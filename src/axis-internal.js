@@ -37,6 +37,20 @@ AxisInternal.prototype.axisX = function (selection, x, tickOffset, internal) {
         const offset = Math.ceil(x(d) + tickOffset)
         return 'opacity: ' + (offset < 0 ? '0' : '1')
     });
+
+    selection
+        .select('text')
+        .select('tspan')
+        .text(function (d) {
+            if (context.limitAxisMaxLength) {
+                return context.limitAxisMaxLength(internal.textFormatted(d))
+            }
+            return internal.textFormatted(d)
+        })
+        .append("title")
+        .text(function (d) {
+            return internal.textFormatted(d)
+        })
 };
 AxisInternal.prototype.axisY = function (selection, y) {
     selection.attr("transform", function (d) {
