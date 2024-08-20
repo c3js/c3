@@ -57,3 +57,22 @@ export function getRandomInt(min: number, max: number): number {
 export function getRandomArbitrary(min: number, max: number): number {
   return Math.random() * (max - min) + min
 }
+
+export function getNearestPowerOf10(num: number): number {
+  return Math.pow(10, Math.floor(Math.log10(num)))
+}
+
+export function getMaxElementLength(items: unknown[]): number {
+  return Math.max(
+    ...items.map((item) => {
+      if (typeof item === 'number') item = getNearestPowerOf10(Math.floor(item))
+      return String(item).length
+    })
+  )
+}
+
+export function getMaxLengthOfElementsAndGetDifferences(...items: unknown[][]): number[] {
+  const lengths = items.map((arr) => getMaxElementLength(arr))
+  const maxLength = Math.max(...lengths)
+  return lengths.map((length) => maxLength - length)
+}
