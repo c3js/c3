@@ -63,14 +63,16 @@ export function getNearestPowerOf10(num: number): number {
 }
 
 export function getMaxElementLength(items: unknown[]): number {
-  return Math.max(...items.map((item) => {
-    if (typeof item === 'number') item = getNearestPowerOf10(Math.floor(item))
-    return String(item).length
-  }))
+  return Math.max(
+    ...items.map((item) => {
+      if (typeof item === 'number') item = getNearestPowerOf10(Math.floor(item))
+      return String(item).length
+    })
+  )
 }
 
 export function getMaxLengthOfElementsAndGetDifferences(...items: unknown[][]): number[] {
-  var lengths = items.map(arr => getMaxElementLength(arr))
-  var maxLength = Math.max(...lengths)
-  return lengths.map(length => maxLength - length)
+  const lengths = items.map((arr) => getMaxElementLength(arr))
+  const maxLength = Math.max(...lengths)
+  return lengths.map((length) => maxLength - length)
 }

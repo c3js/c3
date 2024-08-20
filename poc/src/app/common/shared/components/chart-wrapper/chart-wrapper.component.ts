@@ -102,8 +102,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         x: {
           tick: {
             format: (x: number) => {
-              if (this.hideXTicks)
-                return ''
+              if (this.hideXTicks) return ''
               return `Sample ${x} long label`
             },
             values: Array(this.dataSet.length)
@@ -114,8 +113,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
         y: {
           tick: {
             format: (x: number) => {
-              if (!this.maxDataSetValueLength)
-                return x
+              if (!this.maxDataSetValueLength) return x
               return new Array(this.maxDataSetValueLength + 1).fill('').join('\u00a0\u00a0') + x
             },
           },
