@@ -9,7 +9,12 @@ import {
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
-import { getRandomArbitrary, getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
+import {
+  getMaxLengthOfElementsAndGetDifferences,
+  getRandomArbitrary,
+  getRandomColor,
+  getRandomInt
+} from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
 import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
@@ -35,6 +40,7 @@ export class VerticalLineSyncSandboxComponent {
       .map((v, i) => getRandomArbitrary(10, 1000)),
   ]
   chartSize: ChartSize = { height: 420 }
+  maxDataSetValueLengths: number[]
 
   private masterChart: ChartWrapperComponent = null
 
@@ -86,6 +92,7 @@ export class VerticalLineSyncSandboxComponent {
       .subscribe(() => {
         this.windowResize()
       })
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(this.dataSetTop, this.dataSetBottom)
   }
 
   isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {

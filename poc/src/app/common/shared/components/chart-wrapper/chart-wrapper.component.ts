@@ -40,6 +40,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() xAxisMaxLength = 10
   @Input() isDomainCorrect: CheckDomainPredicate
   @Input() initialDomain: Domain
+  @Input() maxDataSetValueLength: number
 
   @Output() showXGridFocus = new EventEmitter<DataPoint>()
   @Output() hideXGridFocus = new EventEmitter<void>()
@@ -108,6 +109,15 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
             values: Array(this.dataSet.length)
               .fill(0)
               .map((v, i) => i),
+          },
+        },
+        y: {
+          tick: {
+            format: (x: number) => {
+              if (!this.maxDataSetValueLength)
+                return x
+              return new Array(this.maxDataSetValueLength + 1).fill('').join('\u00a0\u00a0') + x
+            },
           },
         },
       },
