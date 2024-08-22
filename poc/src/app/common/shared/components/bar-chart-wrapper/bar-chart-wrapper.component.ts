@@ -1,6 +1,11 @@
 import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
-import { MAIN_DATA_SET, NDC_DATA_SET, X_DATA_SET } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
+import {
+  MAIN_DATA_SET,
+  NDC_DATA_SET,
+  X2_DATA_SET,
+  X_DATA_SET,
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
 import { ChartWrapperBaseComponent } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.component'
 import { BarChartDataSet } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 
@@ -21,16 +26,27 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
     const xTickDataSet = this.dataSet.map((item) => item.xTick)
     const yDataSet = this.dataSet.map((item) => item.y)
     const ndcDataSet = this.dataSet.map((item) => item.ndcValue)
+    const x2DataSet = [...xDataSet]
+    const padding = (x2DataSet[1] - x2DataSet[0]) / 2
+    /* TODO: Need to think about a more accurate calculation of the NDC data set
+    const xDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    const ndcDataSet =[3, 4,    5,  6,     7,  8, 15, 70, 15, 10, 7, 7, 5, 5, 5, 4, 4, 4, 4, 3, 2]
+    const x2DataSet = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55]
+    const xTickDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    const yDataSet = [1, 4, 5, 60, 80, 70, 60, 25, 5, null, 5]
+    const padding = (x2DataSet[1] - x2DataSet[0])
+     */
     this.params = {
       bindto: `#${this.chartId}`,
       size: this.size,
       data: {
         xs: {
           [MAIN_DATA_SET]: X_DATA_SET,
-          [NDC_DATA_SET]: X_DATA_SET,
+          [NDC_DATA_SET]: X2_DATA_SET,
         },
         columns: [
           [X_DATA_SET, ...xDataSet],
+          [X2_DATA_SET, ...x2DataSet],
           [MAIN_DATA_SET, ...yDataSet],
           [NDC_DATA_SET, ...ndcDataSet],
         ],
@@ -76,8 +92,11 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
             format: (x: number) => {
               return `${x}`
             },
-            // values: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65],
             values: xTickDataSet,
+          },
+          padding: {
+            left: padding,
+            right: padding,
           },
         },
         y: {

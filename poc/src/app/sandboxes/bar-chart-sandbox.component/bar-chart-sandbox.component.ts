@@ -76,7 +76,7 @@ export class BarChartSandboxComponent {
     const configs = [
       {
         dataSet: [
-          { x: 5, y: 10, xTick: 5, ndcValue: 5 },
+          { x: 5, y: 10, xTick: 5, ndcValue: 2 },
           { x: 10, y: 10, xTick: 10, ndcValue: 7 },
           { x: 15, y: 50, xTick: 15, ndcValue: 55 },
           { x: 20, y: 60, xTick: 20, ndcValue: 7 },
@@ -123,8 +123,8 @@ export class BarChartSandboxComponent {
           { x: 6.5, y: 70, xTick: 6.5, ndcValue: 32 },
           { x: 7.5, y: null, xTick: 7.5, ndcValue: 30 },
           { x: 8.5, y: null, xTick: 8.5, ndcValue: 23 },
-          { x: 9.5, y: null, xTick: 9.5, ndcValue: 12 },
-          { x: 10.5, y: null, xTick: 10.5, ndcValue: 7 },
+          { x: 9.5, y: 10, xTick: 9.5, ndcValue: 12 },
+          { x: 10.5, y: 15, xTick: 10.5, ndcValue: 7 },
           { x: 11.5, y: null, xTick: 11.5, ndcValue: 5 },
           { x: 12.5, y: 80, xTick: 12.5, ndcValue: 1 },
         ],
