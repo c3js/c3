@@ -1,0 +1,20 @@
+<div class="bar-chart-sandbox">
+  <div class="bar-chart-sandbox__chart-toolbar">
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomIn()">Zoom In</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomOut()">Zoom Out</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomReset()">Zoom Reset</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="newData()">New data</button>
+  </div>
+  <div class="bar-chart-sandbox__charts" #chartsContainer>
+    <div class="bar-chart-sandbox__chart-content chart-content">
+      <lw-bar-chart-wrapper
+        chartId="chartTop"
+        [dataSet]="dataSet"
+        [size]="chartSize"
+        [isDomainCorrect]="isDomainCorrect"
+        [xGridLines]="xGridLines"
+        #chartWrapper
+      ></lw-bar-chart-wrapper>
+    </div>
+  </div>
+</div>

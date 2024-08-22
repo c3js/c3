@@ -1,10 +1,17 @@
 @import 'constants.less';
 
+@strokeWidth: @borderSmall*1.5;
+@strokeDasharray: 5;
+
 ::ng-deep {
   .c3-grid-lines {
     .c3-ygrid-line.custom-dotted-line line {
-      stroke-width: @borderSmall;
-      stroke-dasharray: 7;
+      stroke-width: @strokeWidth;
+      stroke-dasharray: @strokeDasharray;
+    }
+    .c3-xgrid-line.custom-dotted-line line {
+      stroke-width: @strokeWidth;
+      stroke-dasharray: @strokeDasharray;
     }
   }
   .c3-chart-lines {
@@ -19,6 +26,14 @@
         stroke: lightgrey !important;
       }
       //display: none;
+    }
+
+    .c3-target-normal-distribution-curve {
+      .c3-line-normal-distribution-curve {
+        stroke: @resultWarningColor !important;
+        stroke-width: @strokeWidth;
+        stroke-dasharray: @strokeDasharray;
+      }
     }
   }
 }

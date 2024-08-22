@@ -1,8 +1,10 @@
 export const MAIN_DATA_SET = 'data'
+export const X_DATA_SET = 'x'
+export const X2_DATA_SET = 'x2'
+export const NDC_DATA_SET = 'normal-distribution-curve'
 export const TOP_LIMIT_DATA_SET = 'top-limit'
 export const POINT_R = 5
 export const SELECTED_POINT_R = 10
-
 export const MIN_DOMAIN_RANGE = 1.5
-
 export const ZOOM_COEFFICIENT_DEFAULT = 0.85
+export const X_AXIS_MAX_LENGTH_DEFAULT = 10

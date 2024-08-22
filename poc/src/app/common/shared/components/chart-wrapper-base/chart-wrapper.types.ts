@@ -44,3 +44,12 @@ export interface CustomPointsHandler {
 export type CheckDomainPredicate = (domain: Domain) => boolean
 
 export type FormatPredicate = (str: string) => string
+
+export interface BarChartDataPoint {
+  x: number
+  y: number
+  xTick: number
+  ndcValue?: number
+}
+
+export type BarChartDataSet = BarChartDataPoint[]

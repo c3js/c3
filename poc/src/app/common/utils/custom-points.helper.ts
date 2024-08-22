@@ -1,5 +1,5 @@
-import { CustomPointContext } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { DataPoint } from 'c3'
+import { CustomPointContext } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 
 export enum CustomPointTag {
   WE = 'WesternElectricViolation',

@@ -1,6 +1,6 @@
 <div class="vertical-line-sync-sandbox">
   <div class="vertical-line-sync-sandbox__chart-toolbar">
-    <button class="input-container__button mat-button mat-raised-button" (click)="zoomIn()">Zoom in</button>
+    <button class="input-container__button mat-button mat-raised-button" (click)="zoomIn()">Zoom In</button>
     <button class="input-container__button mat-button mat-raised-button" (click)="zoomOut()">Zoom Out</button>
     <button class="input-container__button mat-button mat-raised-button" (click)="zoomReset()">Zoom Reset</button>
     <button class="input-container__button mat-button mat-raised-button" (click)="addCustomPoints()">Custom points</button>
@@ -38,7 +38,7 @@
   </div>
   <div class="vertical-line-sync-sandbox__charts" #chartsContainer>
     <div class="vertical-line-sync-sandbox__chart-content chart-content">
-      <lw-chart-wrapper
+      <lw-line-chart-wrapper
         chartId="chartTop"
         [dataSet]="dataSetTop"
         [size]="chartSize"
@@ -59,10 +59,10 @@
         [formatX]="formatX"
         [formatY]="formatY"
         #chartWrapperTop
-      ></lw-chart-wrapper>
+      ></lw-line-chart-wrapper>
     </div>
     <div class="vertical-line-sync-sandbox__chart-content chart-content">
-      <lw-chart-wrapper
+      <lw-line-chart-wrapper
         chartId="chartBottom"
         [dataSet]="dataSetBottom"
         [size]="chartSize"
@@ -83,7 +83,7 @@
         [formatX]="formatX"
         [formatY]="formatY"
         #chartWrapperBottom
-      ></lw-chart-wrapper>
+      ></lw-line-chart-wrapper>
     </div>
   </div>
 </div>
