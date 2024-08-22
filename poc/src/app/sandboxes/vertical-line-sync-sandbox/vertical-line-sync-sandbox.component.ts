@@ -24,20 +24,43 @@ import { debounce, debounceTime, fromEvent } from 'rxjs'
 })
 export class VerticalLineSyncSandboxComponent {
   pCount = 100
-  dataSetTop = [
-    ...Array(this.pCount)
-      .fill(0)
-      .map((v, i) => getRandomArbitrary(10, 1000)),
-  ]
-  dataSetBottom = [
-    ...Array(this.pCount)
-      .fill(0)
-      .map((v, i) => getRandomArbitrary(10, 1000)),
-  ]
+
+  minY1 = 10
+  maxY1 = 1000
+  minY2 = 10
+  maxY2 = 1000
+
+  updateY1Range(): void {
+    this.dataSetTop = this.dataSetUpdate(this.minY1, this.maxY1)
+
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(...this.dataSets)
+  }
+  updateY2Range(): void {
+    this.dataSetBottom = this.dataSetUpdate(this.minY2, this.maxY2)
+
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(...this.dataSets)
+  }
+
+  dataSetTop: number[] = this.dataSetUpdate(this.minY1, this.maxY1)
+  dataSetBottom: number[] = this.dataSetUpdate(this.minY2, this.maxY2)
+
   chartSize: ChartSize = { height: 420 }
   maxDataSetValueLengths: number[]
 
+  rotated = true
+
+  formatX(x: string): string {
+    return `Sample ${x} long label`
+  }
+  formatY(y: string): string {
+    return y
+  }
+
   private masterChart: ChartWrapperComponent = null
+
+  get dataSets(): number[][] {
+    return [this.dataSetTop, this.dataSetBottom]
+  }
 
   yGridLines: GridLine[] = [
     { value: 100, text: 'LSL', class: 'custom-dotted-line', color: '#ED2024' },
@@ -197,5 +220,13 @@ export class VerticalLineSyncSandboxComponent {
   protected adjustChartWidth(): void {
     const width = this.chartsContainer.nativeElement.offsetWidth
     this.chartSize = { ...this.chartSize, width }
+  }
+
+  private dataSetUpdate(min: number, max: number): number[] {
+    return [
+      ...Array(this.pCount)
+        .fill(0)
+        .map((v, i) => getRandomArbitrary(min, max)),
+    ]
   }
 }

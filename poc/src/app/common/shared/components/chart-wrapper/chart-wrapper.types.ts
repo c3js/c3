@@ -42,3 +42,5 @@ export interface CustomPointsHandler {
 }
 
 export type CheckDomainPredicate = (domain: Domain) => boolean
+
+export type FormatPredicate = (str: string) => string

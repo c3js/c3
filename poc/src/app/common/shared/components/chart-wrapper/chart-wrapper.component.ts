@@ -6,11 +6,12 @@ import {
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
+  FormatPredicate,
   GridLine,
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
 import { ChartComponent } from '@src/app/common/shared/components/chart/chart.component'
-import { arrayToObject, generateId } from '@src/app/common/utils/helpers'
+import { arrayToObject, generateId, getNeededSpaces } from '@src/app/common/utils/helpers'
 import {
   MAIN_DATA_SET,
   POINT_R,
@@ -41,6 +42,9 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() isDomainCorrect: CheckDomainPredicate
   @Input() initialDomain: Domain
   @Input() maxDataSetValueLength: number
+  @Input() xAxisRotated: boolean
+  @Input() formatX: FormatPredicate
+  @Input() formatY: FormatPredicate
 
   @Output() showXGridFocus = new EventEmitter<DataPoint>()
   @Output() hideXGridFocus = new EventEmitter<void>()
@@ -56,6 +60,10 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
   originDomain: Domain = null
 
   ngOnInit(): void {
+    this.updateParams()
+  }
+
+  updateParams(): void {
     this.params = {
       bindto: `#${this.chartId}`,
       size: this.size,
@@ -103,18 +111,22 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
           tick: {
             format: (x: number) => {
               if (this.hideXTicks) return ''
-              return `Sample ${x} long label`
+              if (this.formatX) return this.formatX(String(x))
+              return x
             },
             values: Array(this.dataSet.length)
               .fill(0)
               .map((v, i) => i),
+            rotate: this.xAxisRotated ? -90 : 0,
           },
         },
         y: {
           tick: {
-            format: (x: number) => {
-              if (!this.maxDataSetValueLength) return x
-              return new Array(this.maxDataSetValueLength + 1).fill('').join('\u00a0\u00a0') + x
+            format: (y: number) => {
+              const spaces = this.maxDataSetValueLength ? getNeededSpaces(this.maxDataSetValueLength + 1) : ''
+              const yString = spaces + y
+              if (this.formatY) return this.formatY(String(yString))
+              return yString
             },
           },
         },
@@ -148,6 +160,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
           this.hideXGridFocus.emit()
         },
         limitAxisMaxLength: (x: string) => {
+          x = String(x)
           return x.length < this.xAxisMaxLength ? x : `${x.substring(0, this.xAxisMaxLength)}\u2026`
         },
         customPointsHandler: {
@@ -195,6 +208,16 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     }
     if (changes.size && !changes.size.firstChange) {
       this.resize(this.size)
+    }
+    // TODO: temporary dataset updates
+    if (changes.dataSet && !changes.dataSet.firstChange) {
+      this.updateParams()
+    }
+    if (changes.maxDataSetValueLength && !changes.maxDataSetValueLength.firstChange) {
+      this.updateParams()
+    }
+    if (changes.xAxisRotated && !changes.xAxisRotated.firstChange) {
+      this.updateParams()
     }
   }
 

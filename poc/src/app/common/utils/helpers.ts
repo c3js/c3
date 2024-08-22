@@ -1,3 +1,5 @@
+import { NBSP } from '@src/app/common/constants/constants'
+
 const RANDOM_STRING_RADIX = 36
 const RANDOM_STRING_START = 2
 const RANDOM_STRING_END = 15
@@ -59,13 +61,19 @@ export function getRandomArbitrary(min: number, max: number): number {
 }
 
 export function getNearestPowerOf10(num: number): number {
-  return Math.pow(10, Math.floor(Math.log10(num)))
+  return Math.pow(10, Math.ceil(Math.log10(num)))
+}
+
+export function getMinPowerOf10(num: number): number {
+  const pow = getNearestPowerOf10(num)
+  return num > pow - Math.floor(pow / 10) ? pow : num
 }
 
 export function getMaxElementLength(items: unknown[]): number {
   return Math.max(
     ...items.map((item) => {
-      if (typeof item === 'number') item = getNearestPowerOf10(Math.floor(item))
+      const parsedNumber = Number(item)
+      if (typeof parsedNumber === 'number') item = getMinPowerOf10(Math.floor(parsedNumber))
       return String(item).length
     })
   )
@@ -74,5 +82,10 @@ export function getMaxElementLength(items: unknown[]): number {
 export function getMaxLengthOfElementsAndGetDifferences(...items: unknown[][]): number[] {
   const lengths = items.map((arr) => getMaxElementLength(arr))
   const maxLength = Math.max(...lengths)
+  console.log(lengths, maxLength)
   return lengths.map((length) => maxLength - length)
+}
+
+export function getNeededSpaces(len: number): string {
+  return new Array(len).fill('').join(`${NBSP}${NBSP}`)
 }
