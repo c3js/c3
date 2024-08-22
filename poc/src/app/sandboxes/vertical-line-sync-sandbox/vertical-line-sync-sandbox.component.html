@@ -7,6 +7,34 @@
     <button class="input-container__button mat-button mat-raised-button" (click)="clearCustomPoints()">Clear custom points</button>
     <button class="input-container__button mat-button mat-raised-button" (click)="addSelectedPoints()">Select points</button>
     <button class="input-container__button mat-button mat-raised-button" (click)="clearSelectedPoints()">Clear selection</button>
+    <div class="vertical-line-sync-sandbox__row">
+      <label class="row__label">minY1</label>
+      <div class="row__value"><lw-number-input [minValue]="1" [(ngModel)]="minY1" (ngModelChange)="updateY1Range()"></lw-number-input></div>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <label class="row__label">maxY1</label>
+      <div class="row__value"><lw-number-input [minValue]="1" [(ngModel)]="maxY1" (ngModelChange)="updateY1Range()"></lw-number-input></div>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <label class="row__label">minY2</label>
+      <div class="row__value"><lw-number-input [minValue]="1" [(ngModel)]="minY2" (ngModelChange)="updateY2Range()"></lw-number-input></div>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <label class="row__label">maxY2</label>
+      <div class="row__value"><lw-number-input [minValue]="1" [(ngModel)]="maxY2" (ngModelChange)="updateY2Range()"></lw-number-input></div>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <label class="row__label">Top limit</label>
+      <div class="row__value">
+        <lw-number-input [minValue]="1" [(ngModel)]="topLimitValue" (ngModelChange)="topLimitValueChange()"></lw-number-input>
+      </div>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <mat-slide-toggle [(ngModel)]="rotated">Toggle rotate</mat-slide-toggle>
+    </div>
+    <div class="vertical-line-sync-sandbox__row">
+      <mat-slide-toggle [(ngModel)]="yGridLinesTopLimitEnabled" (change)="toggleTopLimit()">Toggle top limit</mat-slide-toggle>
+    </div>
   </div>
   <div class="vertical-line-sync-sandbox__charts" #chartsContainer>
     <div class="vertical-line-sync-sandbox__chart-content chart-content">
@@ -28,6 +56,8 @@
         (zoom)="onZoomTop($event)"
         (zoomStart)="onZoomStartTop()"
         (zoomEnd)="onZoomEndTop($event)"
+        [formatX]="formatX"
+        [formatY]="formatY"
         #chartWrapperTop
       ></lw-chart-wrapper>
     </div>
@@ -44,11 +74,14 @@
         [selectedPoints]="selectedPoints"
         [useSelection]="true"
         [maxDataSetValueLength]="maxDataSetValueLengths[1]"
+        [xAxisRotated]="rotated"
         (showXGridFocus)="onShowXGridFocusBottom($event)"
         (hideXGridFocus)="onHideXGridFocusBottom()"
         (zoom)="onZoomBottom($event)"
         (zoomStart)="onZoomStartBottom()"
         (zoomEnd)="onZoomEndBottom($event)"
+        [formatX]="formatX"
+        [formatY]="formatY"
         #chartWrapperBottom
       ></lw-chart-wrapper>
     </div>

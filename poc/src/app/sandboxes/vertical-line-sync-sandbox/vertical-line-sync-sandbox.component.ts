@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core'
 import {
   ChartSize,
   CheckDomainPredicate,
@@ -15,31 +15,94 @@ import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrappe
 import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
 import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
 // import debounce from 'lodash/debounce'
-import { debounce, debounceTime, fromEvent } from 'rxjs'
+import { debounceTime, fromEvent } from 'rxjs'
 
 @Component({
   selector: 'lw-vertical-line-sync-sandbox',
   templateUrl: './vertical-line-sync-sandbox.component.html',
   styleUrls: ['./vertical-line-sync-sandbox.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerticalLineSyncSandboxComponent {
   pCount = 100
-  dataSetTop = [
-    ...Array(this.pCount)
-      .fill(0)
-      .map((v, i) => getRandomArbitrary(10, 1000)),
-  ]
-  dataSetBottom = [
-    ...Array(this.pCount)
-      .fill(0)
-      .map((v, i) => getRandomArbitrary(10, 1000)),
-  ]
+
+  minY1 = 10
+  maxY1 = 1000
+  minY2 = 10
+  maxY2 = 1000
+
+  topLimitValue = 1000
+
+  updateY1Range(): void {
+    this.dataSetTop = this.dataSetUpdate(this.minY1, this.maxY1)
+
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(
+      ...(this.yGridLinesTopLimitEnabled ? this.dataSetsWithTopLimit : this.dataSets)
+    )
+  }
+  updateY2Range(): void {
+    this.dataSetBottom = this.dataSetUpdate(this.minY2, this.maxY2)
+
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(
+      ...(this.yGridLinesTopLimitEnabled ? this.dataSetsWithTopLimit : this.dataSets)
+    )
+  }
+  toggleTopLimit(): void {
+    this.setYGridLines()
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(
+      ...(this.yGridLinesTopLimitEnabled ? this.dataSetsWithTopLimit : this.dataSets)
+    )
+  }
+  topLimitValueChange(): void {
+    this.yGridLineTopLimit.value = this.topLimitValue
+    this.setYGridLines()
+    this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(
+      ...(this.yGridLinesTopLimitEnabled ? this.dataSetsWithTopLimit : this.dataSets)
+    )
+  }
+
+  dataSetTop: number[] = this.dataSetUpdate(this.minY1, this.maxY1)
+  dataSetBottom: number[] = this.dataSetUpdate(this.minY2, this.maxY2)
+
   chartSize: ChartSize = { height: 420 }
   maxDataSetValueLengths: number[]
 
+  rotated = true
+
+  formatX(x: string): string {
+    return `Sample ${x} long label`
+  }
+  formatY(y: string): string {
+    return y
+  }
+
   private masterChart: ChartWrapperComponent = null
 
-  yGridLines: GridLine[] = [
+  get dataSets(): number[][] {
+    return [this.dataSetTop, this.dataSetBottom]
+  }
+
+  get dataSetsWithTopLimit(): number[][] {
+    return [
+      [...this.dataSetTop, this.yGridLineTopLimit.value],
+      [...this.dataSetBottom, this.yGridLineTopLimit.value],
+    ]
+  }
+
+  setYGridLines(): void {
+    const yLines = [...this._yGridLines]
+    if (this.yGridLinesTopLimitEnabled) yLines.push(this.yGridLineTopLimit)
+    this.yGridLines = yLines
+  }
+
+  yGridLineTopLimit: GridLine = {
+    value: this.topLimitValue,
+    text: 'TL',
+    class: 'custom-dotted-line',
+    color: '#333333',
+  }
+
+  _yGridLines: GridLine[] = [
     { value: 100, text: 'LSL', class: 'custom-dotted-line', color: '#ED2024' },
     { value: 200, text: 'LWL', class: 'custom-dotted-line', color: '#FF9900' },
     { value: 300, text: 'LCL', class: 'custom-dotted-line', color: '#BA191C' },
@@ -48,7 +111,9 @@ export class VerticalLineSyncSandboxComponent {
     { value: 700, text: 'UWL', class: 'custom-dotted-line', color: '#FF9900' },
     { value: 800, text: 'UCL', class: 'custom-dotted-line', color: '#BA191C' },
   ]
-  yGridLinesTopLimitEnabled = true
+  yGridLines: GridLine[] = this._yGridLines
+
+  yGridLinesTopLimitEnabled = false
 
   selectedPoints: SelectedPoint[] = []
 
@@ -87,6 +152,7 @@ export class VerticalLineSyncSandboxComponent {
       .subscribe(() => {
         this.windowResize()
       })
+
     this.maxDataSetValueLengths = getMaxLengthOfElementsAndGetDifferences(this.dataSetTop, this.dataSetBottom)
   }
 
@@ -197,5 +263,13 @@ export class VerticalLineSyncSandboxComponent {
   protected adjustChartWidth(): void {
     const width = this.chartsContainer.nativeElement.offsetWidth
     this.chartSize = { ...this.chartSize, width }
+  }
+
+  private dataSetUpdate(min: number, max: number): number[] {
+    return [
+      ...Array(this.pCount)
+        .fill(0)
+        .map((v, i) => getRandomArbitrary(min, max)),
+    ]
   }
 }
