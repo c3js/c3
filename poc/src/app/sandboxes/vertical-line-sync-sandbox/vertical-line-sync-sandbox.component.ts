@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import {
   ChartSize,
   CheckDomainPredicate,
@@ -7,14 +7,13 @@ import {
   CustomPointsHandler,
   GridLine,
   SelectedPoint,
-} from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
-import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { LineChartWrapperComponent } from '@src/app/common/shared/components/line-chart-wrapper/line-chart-wrapper.component'
 import { getMaxLengthOfElementsAndGetDifferences, getRandomArbitrary, getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
-import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
-import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
+import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
+import { CustomPointsHelper, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
 import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
-// import debounce from 'lodash/debounce'
 import { debounceTime, fromEvent } from 'rxjs'
 
 @Component({
@@ -76,7 +75,7 @@ export class VerticalLineSyncSandboxComponent {
     return y
   }
 
-  private masterChart: ChartWrapperComponent = null
+  private masterChart: LineChartWrapperComponent = null
 
   get dataSets(): number[][] {
     return [this.dataSetTop, this.dataSetBottom]
@@ -142,11 +141,11 @@ export class VerticalLineSyncSandboxComponent {
     },
   }
 
-  @ViewChild('chartWrapperTop', { read: ChartWrapperComponent }) chartWrapperTop: ChartWrapperComponent
-  @ViewChild('chartWrapperBottom', { read: ChartWrapperComponent }) chartWrapperBottom: ChartWrapperComponent
+  @ViewChild('chartWrapperTop', { read: LineChartWrapperComponent }) chartWrapperTop: LineChartWrapperComponent
+  @ViewChild('chartWrapperBottom', { read: LineChartWrapperComponent }) chartWrapperBottom: LineChartWrapperComponent
   @ViewChild('chartsContainer', { read: ElementRef }) chartsContainer: ElementRef<HTMLDivElement>
 
-  constructor() {
+  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {
     fromEvent(window, 'resize')
       .pipe(debounceTime(DEBOUNCE_TIME_SMALL))
       .subscribe(() => {
@@ -244,20 +243,21 @@ export class VerticalLineSyncSandboxComponent {
     this.selectedPoints = []
   }
 
-  protected zoomChart = (chartWrapper: ChartWrapperComponent, domain: number[]) => {
+  protected zoomChart = (chartWrapper: LineChartWrapperComponent, domain: number[]) => {
     chartWrapper.chart.getInstance().zoom(domain)
   }
 
-  protected xFocusShow(chartWrapper: ChartWrapperComponent, d: DataPoint): void {
+  protected xFocusShow(chartWrapper: LineChartWrapperComponent, d: DataPoint): void {
     chartWrapper?.chart.getInstance().xgrids([{ value: d.x }])
   }
 
-  protected xFocusHide(chartWrapper: ChartWrapperComponent): void {
+  protected xFocusHide(chartWrapper: LineChartWrapperComponent): void {
     chartWrapper?.chart.getInstance().xgrids.remove()
   }
 
   protected windowResize(): void {
     this.adjustChartWidth()
+    this.changeDetectorRef.markForCheck()
   }
 
   protected adjustChartWidth(): void {

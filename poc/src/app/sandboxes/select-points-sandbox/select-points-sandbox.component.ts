@@ -8,11 +8,11 @@ import {
   CustomPointsHandler,
   GridLine,
   SelectedPoint,
-} from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
-import { ChartWrapperComponent } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.component'
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { LineChartWrapperComponent } from '@src/app/common/shared/components/line-chart-wrapper/line-chart-wrapper.component'
 import { getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
-import { CustomPointsHelper, CustomPointTag } from '@src/app/sandboxes/select-points-sandbox/custom-points.helper'
-import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
+import { CustomPointsHelper, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
+import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
 
 @Component({
   selector: 'lw-select-points-sandbox',
@@ -67,7 +67,7 @@ export class SelectPointsSandboxComponent {
 
   chartSize: ChartSize = { height: 420 }
 
-  @ViewChild(ChartWrapperComponent) chartWrapper: ChartWrapperComponent
+  @ViewChild(LineChartWrapperComponent) chartWrapper: LineChartWrapperComponent
 
   isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
     return !(Math.abs(domain[0] - domain[1]) <= MIN_DOMAIN_RANGE)

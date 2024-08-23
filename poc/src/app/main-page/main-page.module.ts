@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { SelectPointsSandboxComponent } from '@src/app/sandboxes/select-points-sandbox/select-points-sandbox.component'
 import { VerticalLineSyncSandboxComponent } from '@src/app/sandboxes/vertical-line-sync-sandbox/vertical-line-sync-sandbox.component'
+import { BarChartSandboxComponent } from '@src/app/sandboxes/bar-chart-sandbox.component/bar-chart-sandbox.component'
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { VerticalLineSyncSandboxComponent } from '@src/app/sandboxes/vertical-li
     ChartPocStoryComponent,
     SelectPointsSandboxComponent,
     VerticalLineSyncSandboxComponent,
+    BarChartSandboxComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MainPageRoutingModule, RouterModule, SharedModule, MatSlideToggleModule],
   providers: [],

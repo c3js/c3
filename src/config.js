@@ -396,41 +396,41 @@ ChartInternal.prototype.loadConfig = function (config) {
 };
 
 ChartInternal.prototype.isSelectByClickDisabled = function (d) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.isSelectByClickDisabled && config.context.isSelectByClickDisabled(d));
-}
+};
 
 ChartInternal.prototype.isHideXLabelIfNotVisibleDisabled = function (id) {
-  const config = this.config
-  return !!(config.context?.isHideXLabelIfNotVisibleDisabled && config.context?.isHideXLabelIfNotVisibleDisabled(id));
-}
+  const config = this.config;
+  return !!(config.context.isHideXLabelIfNotVisibleDisabled && config.context.isHideXLabelIfNotVisibleDisabled(id));
+};
 
 ChartInternal.prototype.isMouseOverDisabled = function (d) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.isMouseOverDisabled && config.context.isMouseOverDisabled(d));
-}
+};
 
 ChartInternal.prototype.isDataDisabled = function (id) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.isDataDisabled && config.context.isDataDisabled(id));
-}
+};
 
 ChartInternal.prototype.isShowXGridFocusDisabled = function (d) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.isShowXGridFocusDisabled && config.context.isShowXGridFocusDisabled(d));
-}
+};
 
 ChartInternal.prototype.limitAxisMaxLength = function (x) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.limitAxisMaxLength && config.context.limitAxisMaxLength(x));
-}
+};
 
 ChartInternal.prototype.onShowXGridFocus = function (d) {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.onShowXGridFocus && config.context.onShowXGridFocus(d));
-}
+};
 
 ChartInternal.prototype.onHideXGridFocus = function () {
-  const config = this.config
+  const config = this.config;
   return !!(config.context.onHideXGridFocus && config.context.onHideXGridFocus());
-}
+};

@@ -1,0 +1,40 @@
+@import 'constants.less';
+
+:host {
+  display: block;
+  padding: @gridExtraSmall;
+  height: 100%;
+  background-color: @whiteColor;
+}
+
+.bar-chart-sandbox {
+  display: flex;
+  flex-direction: row;
+  &__chart-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: @gridExtraSmall;
+    min-width: @gridExtraSmall*15;
+    flex: 0;
+  }
+  &__charts {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  &__chart-content {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  &__row {
+    margin-top: @gridExtraSmall;
+  }
+
+  .mat-raised-button {
+    padding: 0;
+    margin: 0;
+  }
+}

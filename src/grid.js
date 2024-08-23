@@ -126,7 +126,10 @@ ChartInternal.prototype.updateGrid = function (duration) {
         .attr("x2", config.axis_rotated ? $$.width : xv)
         .attr("y1", config.axis_rotated ? xv : 0)
         .attr("y2", config.axis_rotated ? xv : $$.height)
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("stroke", function(d) {
+          return d.color ? d.color : ''; // Add x grid line color
+        });
     xgridLineEnter.append('text')
         .attr("text-anchor", $$.gridTextAnchor)
         .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
@@ -134,7 +137,10 @@ ChartInternal.prototype.updateGrid = function (duration) {
         .attr("y", xv)
         .attr('dx', $$.gridTextDx)
         .attr('dy', -5)
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .style("fill", function(d) {
+          return d.color ? d.color : ''; // Add x grid text color
+        });
     // udpate
     $$.xgridLines = xgridLineEnter.merge(xgridLine);
     // done in d3.transition() of the end of this function

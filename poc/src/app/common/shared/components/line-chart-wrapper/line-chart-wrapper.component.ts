@@ -1,66 +1,39 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
+import { arrayToObject, getNeededSpaces } from '@src/app/common/utils/helpers'
+import { ChartWrapperBaseComponent } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.component'
 import {
-  ChartSize,
-  CheckDomainPredicate,
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
-  FormatPredicate,
   GridLine,
   SelectedPoint,
-} from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.types'
-import { ChartComponent } from '@src/app/common/shared/components/chart/chart.component'
-import { arrayToObject, generateId, getNeededSpaces } from '@src/app/common/utils/helpers'
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import {
   MAIN_DATA_SET,
   POINT_R,
   SELECTED_POINT_R,
   TOP_LIMIT_DATA_SET,
-  ZOOM_COEFFICIENT_DEFAULT,
-} from '@src/app/common/shared/components/chart-wrapper/chart-wrapper.consts'
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
 
 @Component({
-  selector: 'lw-chart-wrapper',
-  templateUrl: './chart-wrapper.component.html',
-  styleUrls: ['./chart-wrapper.component.less'],
+  selector: 'lw-line-chart-wrapper',
+  templateUrl: '../chart-wrapper-base/chart-wrapper-base.component.html',
+  styleUrls: ['../chart-wrapper-base/chart-wrapper-base.component.less', './line-chart-wrapper.component.less'],
 })
-export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
-  params: any
-
-  @Input() chartId = `chart_${generateId()}`
+export class LineChartWrapperComponent extends ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() dataSet: PrimitiveArray
   @Input() useSelection = false
-  @Input() yGridLines: GridLine[] = []
   @Input() selectedPoints: SelectedPoint[] = []
-  @Input() size: ChartSize
   @Input() customPoints: CustomPoint[] = []
   @Input() customPointsHandler: CustomPointsHandler
   @Input() yGridLinesTopLimitEnabled = false
-  @Input() hideXTicks = false
-  @Input() xAxisMaxLength = 10
-  @Input() isDomainCorrect: CheckDomainPredicate
-  @Input() initialDomain: Domain
   @Input() maxDataSetValueLength: number
-  @Input() xAxisRotated: boolean
-  @Input() formatX: FormatPredicate
-  @Input() formatY: FormatPredicate
-
-  @Output() showXGridFocus = new EventEmitter<DataPoint>()
-  @Output() hideXGridFocus = new EventEmitter<void>()
-  @Output() zoom = new EventEmitter<Domain>()
-  @Output() zoomStart = new EventEmitter<void>()
-  @Output() zoomEnd = new EventEmitter<Domain>()
-
-  @ViewChild(ChartComponent) chart: ChartComponent
 
   customPointsMap: Record<number, CustomPoint> = {}
 
-  currentDomain: Domain = null
-  originDomain: Domain = null
-
-  ngOnInit(): void {
-    this.updateParams()
+  override ngOnInit(): void {
+    super.ngOnInit()
   }
 
   updateParams(): void {
@@ -184,30 +157,24 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  ngAfterViewInit(): void {
-    this.currentDomain = this.getCurrentXDomain()
-    this.originDomain = this.currentDomain
-    this.refreshYGrids()
+  override ngAfterViewInit(): void {
+    super.ngAfterViewInit()
+    // this.refreshYGrids()
     this.selectPoints(this.selectedPoints)
     this.customizePoints(this.customPoints)
     this.setInitialZoom()
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes)
     if (changes.selectedPoints && !changes.selectedPoints.firstChange) {
       this.selectPoints(this.selectedPoints)
     }
     if (changes.customPoints && !changes.customPoints.firstChange) {
       this.customizePoints(this.customPoints)
     }
-    if (changes.yGridLines && !changes.yGridLines.firstChange) {
-      this.refreshYGrids()
-    }
     if (changes.yGridLinesTopLimitEnabled && !changes.yGridLinesTopLimitEnabled.firstChange) {
       this.refreshYGrids()
-    }
-    if (changes.size && !changes.size.firstChange) {
-      this.resize(this.size)
     }
     // TODO: temporary dataset updates
     if (changes.dataSet && !changes.dataSet.firstChange) {
@@ -221,30 +188,7 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  protected onZoom(domain: Domain): void {
-    if (this.isDomainCorrect && !this.isDomainCorrect(domain) && !this.isSameDomain(domain, this.currentDomain)) {
-      this.chart.getInstance()?.zoom(this.currentDomain)
-      return
-    }
-    this.currentDomain = domain
-    this.zoom.emit(domain)
-  }
-  protected onZoomStart(): void {
-    this.zoomStart.emit()
-  }
-  protected onZoomEnd(domain: Domain): void {
-    this.currentDomain = domain
-    this.chart.getInstance()?.zoom(this.currentDomain)
-    this.zoomEnd.emit(domain)
-  }
-
-  protected resize(size?: ChartSize): void {
-    const domain = this.getCurrentXDomain()
-    this.chart.getInstance()?.resize(size)
-    this.chart.getInstance()?.zoom(domain)
-  }
-
-  protected refreshYGrids(): void {
+  protected override refreshYGrids(): void {
     this.chart.getInstance()?.ygrids(this.yGridLines)
     const maxYLine = this.getMaxYLine()
     if (this.yGridLinesTopLimitEnabled && maxYLine) {
@@ -292,54 +236,5 @@ export class ChartWrapperComponent implements OnInit, AfterViewInit, OnChanges {
     selection.attr('stroke', ({ index }) => {
       return selectedPoints[index]?.color
     })
-  }
-
-  protected getCurrentXDomain(): Domain {
-    return this.chart.getInstance().internal.x.domain()
-  }
-
-  protected isSameDomain(domain: Domain, domainNew: Domain): boolean {
-    return domain[0] === domainNew[0] && domain[1] === domainNew[1]
-  }
-
-  protected setInitialZoom(): void {
-    if (this.initialDomain) {
-      this.chart.getInstance()?.zoom(this.initialDomain)
-    }
-  }
-
-  zoomStep(zoomType: 'in' | 'out'): void {
-    const zoomCoef = ZOOM_COEFFICIENT_DEFAULT
-    const domain = this.getCurrentXDomain()
-    const midX = (domain[0] + domain[1]) / 2
-    if (!midX || domain?.length !== 2 || midX < domain[0] || midX > domain[1]) {
-      return
-    }
-    let lPart = midX - domain[0]
-    let rPart = domain[1] - midX
-    if (zoomType === 'in') {
-      lPart = lPart * zoomCoef
-      rPart = rPart * zoomCoef
-    } else {
-      lPart = lPart / zoomCoef
-      rPart = rPart / zoomCoef
-    }
-    const newDomain = [midX - lPart, midX + rPart]
-    this.chart.getInstance().zoom(newDomain)
-    const curDomain = this.getCurrentXDomain()
-    if (curDomain[0] < this.originDomain[0] || curDomain[1] > this.originDomain[1]) {
-      this.resetZoom()
-    }
-  }
-
-  resetZoom(): void {
-    this.chart.getInstance().unzoom()
-    this.chart.getInstance()?.zoom(this.getCurrentXDomain())
-  }
-
-  flush(): void {
-    const domain = this.getCurrentXDomain()
-    this.chart.getInstance()?.flush()
-    this.chart.getInstance()?.zoom(domain)
   }
 }

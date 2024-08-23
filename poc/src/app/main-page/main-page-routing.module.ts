@@ -5,6 +5,7 @@ import { TestSandboxComponent } from '@src/app/sandboxes/test-sandbox/test-sandb
 import { ChartPocStoryComponent } from '@src/app/sandboxes/chart-poc-story/chart-poc-story.component'
 import { SelectPointsSandboxComponent } from '@src/app/sandboxes/select-points-sandbox/select-points-sandbox.component'
 import { VerticalLineSyncSandboxComponent } from '@src/app/sandboxes/vertical-line-sync-sandbox/vertical-line-sync-sandbox.component'
+import { BarChartSandboxComponent } from '@src/app/sandboxes/bar-chart-sandbox.component/bar-chart-sandbox.component'
 
 const routes: Routes = [
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'vertical-line-sync-sandbox',
     component: VerticalLineSyncSandboxComponent,
+  },
+  {
+    path: 'bar-chart-sandbox',
+    component: BarChartSandboxComponent,
   },
 ]
 
