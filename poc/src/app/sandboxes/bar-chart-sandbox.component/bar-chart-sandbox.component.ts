@@ -19,6 +19,7 @@ export class BarChartSandboxComponent {
   dataSet: BarChartDataSet = []
   chartSize: ChartSize = { height: 420 }
   num = 0
+  normalDistributionCurveEnabled = true
 
   initialDataSet = [
     { x: 5, y: null, xTick: 5, ndcValue: 3 },

@@ -16,26 +16,34 @@ import { BarChartDataSet } from '@src/app/common/shared/components/chart-wrapper
 })
 export class BarChartWrapperComponent extends ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() dataSet: BarChartDataSet
+  @Input() normalDistributionCurveEnabled = true
+
+  private xDataSet: number[] = []
+  private xTickDataSet: number[] = []
+  private yDataSet: number[] = []
+  private ndcDataSet: number[] = []
+  private x2DataSet: number[] = []
+  private chartPadding: number
 
   override ngOnInit(): void {
     super.ngOnInit()
   }
 
   updateParams(): void {
-    const xDataSet = this.dataSet.map((item) => item.x)
-    const xTickDataSet = this.dataSet.map((item) => item.xTick)
-    const yDataSet = this.dataSet.map((item) => item.y)
-    const ndcDataSet = this.dataSet.map((item) => item.ndcValue)
-    const x2DataSet = [...xDataSet]
-    const padding = (x2DataSet[1] - x2DataSet[0]) / 2
+    this.xDataSet = this.dataSet.map((item) => item.x)
+    this.xTickDataSet = this.dataSet.map((item) => item.xTick)
+    this.yDataSet = this.dataSet.map((item) => item.y)
+    this.ndcDataSet = this.dataSet.map((item) => item.ndcValue)
+    this.x2DataSet = this.dataSet.map((item) => item.x)
+    this.chartPadding = (this.x2DataSet[1] - this.x2DataSet[0]) / 2
     /* TODO: Need to think about a more accurate calculation of the NDC data set
-    const xDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-    const ndcDataSet =[3, 4,    5,  6,     7,  8, 15, 70, 15, 10, 7, 7, 5, 5, 5, 4, 4, 4, 4, 3, 2]
-    const x2DataSet = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55]
-    const xTickDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-    const yDataSet = [1, 4, 5, 60, 80, 70, 60, 25, 5, null, 5]
-    const padding = (x2DataSet[1] - x2DataSet[0])
-     */
+    this.xDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    this.ndcDataSet =[3, 4,    5,  6,     7,  8, 15, 70, 15, 10, 7, 7, 5, 5, 5, 4, 4, 4, 4, 3, 2]
+    this.x2DataSet = [5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55]
+    this.xTickDataSet = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    this.yDataSet = [1, 4, 5, 60, 80, 70, 60, 25, 5, null, 5]
+    this.chartPadding = (this.x2DataSet[1] - this.x2DataSet[0])
+    */
     this.params = {
       bindto: `#${this.chartId}`,
       size: this.size,
@@ -45,10 +53,8 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
           [NDC_DATA_SET]: X2_DATA_SET,
         },
         columns: [
-          [X_DATA_SET, ...xDataSet],
-          [X2_DATA_SET, ...x2DataSet],
-          [MAIN_DATA_SET, ...yDataSet],
-          [NDC_DATA_SET, ...ndcDataSet],
+          [X_DATA_SET, ...this.xDataSet],
+          [MAIN_DATA_SET, ...this.yDataSet],
         ],
         types: {
           [MAIN_DATA_SET]: 'bar',
@@ -92,11 +98,11 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
             format: (x: number) => {
               return `${x}`
             },
-            values: xTickDataSet,
+            values: this.xTickDataSet,
           },
           padding: {
-            left: padding,
-            right: padding,
+            left: this.chartPadding,
+            right: this.chartPadding,
           },
         },
         y: {
@@ -130,6 +136,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
   override ngAfterViewInit(): void {
     super.ngAfterViewInit()
     this.setInitialZoom()
+    this.toggleNDC()
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
@@ -140,9 +147,33 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
         this.ngAfterViewInit()
       })
     }
+    if (changes.normalDistributionCurveEnabled && !changes.normalDistributionCurveEnabled.firstChange) {
+      this.toggleNDC()
+    }
   }
 
   protected override refreshXGrids(): void {
     this.chart.getInstance()?.xgrids(this.xGridLines)
+  }
+
+  private enableNDC(): void {
+    this.chart.getInstance().load({
+      columns: [
+        [NDC_DATA_SET, ...this.ndcDataSet],
+        [X2_DATA_SET, ...this.x2DataSet],
+      ],
+    })
+  }
+
+  private disableNDC(): void {
+    this.chart.getInstance().unload([NDC_DATA_SET])
+  }
+
+  private toggleNDC(): void {
+    if (this.normalDistributionCurveEnabled) {
+      this.enableNDC()
+    } else {
+      this.disableNDC()
+    }
   }
 }
