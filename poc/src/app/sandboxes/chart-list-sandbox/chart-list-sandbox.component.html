@@ -1,0 +1,25 @@
+<div class="chart-list" #chartList>
+  <div class="chart-list__content">
+    <div
+      *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index"
+      class="chart-list__item"
+      [mwlResizable]="{ forbid: false }"
+      [enableGhostResize]="true"
+      [style.height.px]="panel.height"
+      [validateResize]="validateResize(panel)"
+      [lwTrackVisibility]="true"
+      [lwTrackVisibilityOptions]="visibleTrackOptions"
+      [lwTrackVisibilityScrollContainer]="chartList"
+      (resizeStart)="onResizeStart($event)"
+      (resizeEnd)="onResizeEnd(itemIndex, $event)"
+      (resizing)="onResizing($event)"
+      (visible)="onVisibleChange(panel, $event)"
+    >
+      <lw-chart-panel [data]="panel"></lw-chart-panel>
+      <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
+    </div>
+  </div>
+  <div class="chart-list__visible-items">
+    <div class="chart-list__visible-item" *ngFor="let panel of visiblePanels; let itemIndex = index">{{ panel.id }}</div>
+  </div>
+</div>

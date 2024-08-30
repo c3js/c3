@@ -16,7 +16,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "app",
+            "prefix": ["app", "lw"],
             "style": "camelCase"
           }
         ],

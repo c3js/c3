@@ -1,0 +1,59 @@
+@import 'constants.less';
+
+.chart-list {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: @zIndexSuperLarge;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding-top: @mainHeaderHeight;
+
+  &__content {
+    width: 95%;
+    z-index: @zIndexExtraLarge;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0;
+    color: @mainColor;
+    margin-bottom: @gridLarge;
+    background-color: @panelColor;
+    padding: @gridExtraSmall;
+  }
+
+  &__item {
+    min-height: 100px;
+    background-color: @whiteColor;
+    margin-bottom: @gridExtraSmall;
+    position: relative;
+
+    &:nth-last-child(1 of :not(.resize-ghost-element)) {
+      margin-bottom: 0;
+    }
+  }
+
+  &__visible-items {
+    background-color: @greyTextColor;
+    bottom: 0;
+    left: 0;
+    height: @gridSmall;
+    position: fixed;
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__visible-item {
+    min-width: @gridSmall;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .resize-ghost-element {
+    border-bottom: @borderSmall solid @blackColor;
+  }
+}
+
