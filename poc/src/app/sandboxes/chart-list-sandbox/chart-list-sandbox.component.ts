@@ -18,7 +18,7 @@ export class ChartListSandboxComponent {
 
   visiblePanels: ChartPanelData[] = []
 
-  visibleTrackOptions: IntersectionObserverInit = { threshold: [0, 1] }
+  visibleTrackOptions: IntersectionObserverInit = { threshold: [0, 1], rootMargin: '0px 0px 0px 0px' }
 
   constructor(private changeDetection: ChangeDetectorRef) {}
 
