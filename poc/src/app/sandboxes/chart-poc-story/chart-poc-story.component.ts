@@ -65,8 +65,6 @@ export class ChartPocStoryComponent extends SubscriptionHandler implements After
 
   constructor() {
     super()
-    //@ts-ignore
-    window.X = this
     this.params1 = {
       oninit: () => {
         this.waitChart1Create?.wakeUp()

@@ -15,11 +15,11 @@
       (resizing)="onResizing($event)"
       (visible)="onVisibleChange(panel, $event)"
     >
-      <lw-chart-panel [data]="panel"></lw-chart-panel>
+      <lw-chart-panel [data]="panel" [eventBus]="eventBus" (zoomEnd)="onZoomEnd(panel, $event)"></lw-chart-panel>
       <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
     </div>
   </div>
-  <div class="chart-list__visible-items">
-    <div class="chart-list__visible-item" *ngFor="let panel of visiblePanels; let itemIndex = index">{{ panel.id }}</div>
+  <div class="visibility-indicator">
+    <div class="visibility-indicator__visible-item" *ngFor="let panel of visiblePanels; let itemIndex = index">{{ panel.id }}</div>
   </div>
 </div>

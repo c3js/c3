@@ -35,21 +35,22 @@
     }
   }
 
-  &__visible-items {
+  .visibility-indicator {
     background-color: @greyTextColor;
-    bottom: 0;
+    top: 0;
     left: 0;
-    height: @gridSmall;
+    width: @gridSmall;
     position: fixed;
     display: flex;
-    flex-direction: row;
-  }
+    flex-direction: column;
 
-  &__visible-item {
-    min-width: @gridSmall;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    &__visible-item {
+      height: @gridSmall;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: @borderSmall solid @backgroundDarkColor;
+    }
   }
 
   .resize-ghost-element {

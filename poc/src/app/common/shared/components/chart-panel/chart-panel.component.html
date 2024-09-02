@@ -1,1 +1,16 @@
-<div class="chart-panel" #chartPanel>CHART PANEL {{ data.id }}</div>
+<div class="chart-panel" #chartPanel>
+  <lw-line-chart-wrapper
+    *ngIf="isVisible"
+    [dataSet]="data.dataSet"
+    [size]="chartSize"
+    [isDomainCorrect]="isDomainCorrect"
+    [useSelection]="true"
+    [selectedPoints]="data.selectedPoints"
+    [customPoints]="data.customPoints"
+    [customPointsHandler]="customPointsHandler"
+    [yGridLines]="data.yGridLines"
+    [yGridLinesTopLimitEnabled]="true"
+    [initialDomain]="data.domain"
+    (zoomEnd)="zoomEnd.emit($event)"
+  ></lw-line-chart-wrapper>
+</div>
