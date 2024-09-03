@@ -7,6 +7,7 @@ import { BarChartWrapperComponent } from '@src/app/common/shared/components/bar-
 import { LineChartWrapperComponent } from '@src/app/common/shared/components/line-chart-wrapper/line-chart-wrapper.component'
 import { ChartPanelComponent } from '@src/app/common/shared/components/chart-panel/chart-panel.component'
 import { TrackVisibilityDirective } from '@src/app/common/shared/directives/track-visibility.directive'
+import { ResizeVHandleComponent } from '@src/app/common/shared/components/resize-handle/resize-v-handle.component'
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { TrackVisibilityDirective } from '@src/app/common/shared/directives/trac
     NumberInputComponent,
     ChartPanelComponent,
     TrackVisibilityDirective,
+    ResizeVHandleComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   exports: [
@@ -25,6 +27,7 @@ import { TrackVisibilityDirective } from '@src/app/common/shared/directives/trac
     BarChartWrapperComponent,
     ChartPanelComponent,
     TrackVisibilityDirective,
+    ResizeVHandleComponent,
   ],
   providers: [],
 })

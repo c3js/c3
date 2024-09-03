@@ -1,10 +1,10 @@
-<div class="chart-list" #chartList>
+<div class="chart-list" #chartList [class]="{ 'chart-list--resizing': resizeInProgress }">
   <div class="chart-list__content">
+    <lw-resize-v-handle></lw-resize-v-handle>
     <div
       *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index"
       class="chart-list__item"
       [mwlResizable]="{ forbid: false }"
-      [enableGhostResize]="true"
       [style.height.px]="panel.height"
       [validateResize]="validateResize(panel)"
       [lwTrackVisibility]="true"
@@ -15,7 +15,12 @@
       (resizing)="onResizing($event)"
       (visible)="onVisibleChange(panel, $event)"
     >
-      <lw-chart-panel [data]="panel" [eventBus]="eventBus" (zoomEnd)="onZoomEnd(panel, $event)"></lw-chart-panel>
+      <lw-chart-panel
+        [data]="panel"
+        [eventBus]="eventBus"
+        (zoomEnd)="onZoomEnd(panel, $event)"
+        (chartInitFinished)="onChartInitFinished(panel)"
+      ></lw-chart-panel>
       <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
     </div>
   </div>

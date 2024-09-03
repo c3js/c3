@@ -15,7 +15,6 @@ import { Subject } from 'rxjs'
 import {
   ChartSize,
   CheckDomainPredicate,
-  CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
@@ -35,6 +34,7 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   @Input() eventBus: EventEmitter<ChartPanelEvent>
 
   @Output() zoomEnd = new EventEmitter<Domain>()
+  @Output() chartInitFinished = new EventEmitter<ChartPanelData>()
 
   resizeObserver: ResizeObserver
   @ViewChild('chartPanel', { static: true }) chartPanel: ElementRef<HTMLDivElement>
@@ -89,7 +89,6 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
 
   private createResizeObserver(): void {
     this.resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[], observer: ResizeObserver) => {
-      console.log('Panel resize', entries)
       this.chartSize = {
         height: entries?.[0]?.contentRect.height,
         width: entries?.[0].contentRect.width,
@@ -113,8 +112,8 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   }
 
   private processEvent(event: ChartPanelEvent): void {
-    const { type, panelId, payload } = event
-    if (this.data.id !== panelId) {
+    const { type, id, payload } = event
+    if (this.data.id !== id) {
       return
     }
     switch (event?.type) {

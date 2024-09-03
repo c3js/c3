@@ -27,6 +27,8 @@ export class ChartComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   @Input() params!: any
 
+  @Input() createOnAfterViewInit = true
+
   @Output() pointer = new EventEmitter<ChartPoint>()
 
   @ViewChild('chart', { static: true }) chart!: ElementRef
@@ -35,7 +37,9 @@ export class ChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   private timeout!: ReturnType<typeof setTimeout>
 
   ngAfterViewInit(): void {
-    this.init()
+    if (this.createOnAfterViewInit) {
+      this.init()
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

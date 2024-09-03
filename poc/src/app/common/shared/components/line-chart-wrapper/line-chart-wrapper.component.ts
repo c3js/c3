@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import { arrayToObject, getNeededSpaces } from '@src/app/common/utils/helpers'
 import { ChartWrapperBaseComponent } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.component'
@@ -6,7 +6,6 @@ import {
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
-  GridLine,
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import {
@@ -20,6 +19,7 @@ import {
   selector: 'lw-line-chart-wrapper',
   templateUrl: '../chart-wrapper-base/chart-wrapper-base.component.html',
   styleUrls: ['../chart-wrapper-base/chart-wrapper-base.component.less', './line-chart-wrapper.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LineChartWrapperComponent extends ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() dataSet: PrimitiveArray
@@ -163,6 +163,7 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
     this.selectPoints(this.selectedPoints)
     this.customizePoints(this.customPoints)
     this.setInitialZoom()
+    this.initFinished.emit()
   }
 
   override ngOnChanges(changes: SimpleChanges): void {

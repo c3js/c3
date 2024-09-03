@@ -12,5 +12,6 @@
     [yGridLinesTopLimitEnabled]="true"
     [initialDomain]="data.domain"
     (zoomEnd)="zoomEnd.emit($event)"
+    (initFinished)="chartInitFinished.emit(data)"
   ></lw-line-chart-wrapper>
 </div>

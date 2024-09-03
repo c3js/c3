@@ -12,6 +12,15 @@
   background: rgba(0, 0, 0, 0.4);
   padding-top: @mainHeaderHeight;
 
+  &--resizing {
+    cursor: row-resize !important;
+    ::ng-deep {
+      .c3-event-rects {
+        cursor: row-resize !important;
+      }
+    }
+  }
+
   &__content {
     width: 95%;
     z-index: @zIndexExtraLarge;

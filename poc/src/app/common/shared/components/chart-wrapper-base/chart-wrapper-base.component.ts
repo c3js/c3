@@ -32,6 +32,7 @@ export abstract class ChartWrapperBaseComponent implements OnInit, AfterViewInit
   @Output() zoom = new EventEmitter<Domain>()
   @Output() zoomStart = new EventEmitter<void>()
   @Output() zoomEnd = new EventEmitter<Domain>()
+  @Output() initFinished = new EventEmitter()
 
   @ViewChild(ChartComponent) chart: ChartComponent
 

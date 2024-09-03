@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import {
   MAIN_DATA_SET,
@@ -13,6 +13,7 @@ import { BarChartDataSet } from '@src/app/common/shared/components/chart-wrapper
   selector: 'lw-bar-chart-wrapper',
   templateUrl: '../chart-wrapper-base/chart-wrapper-base.component.html',
   styleUrls: ['../chart-wrapper-base/chart-wrapper-base.component.less', './bar-chart-wrapper.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BarChartWrapperComponent extends ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() dataSet: BarChartDataSet
@@ -137,6 +138,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
     super.ngAfterViewInit()
     this.setInitialZoom()
     this.toggleNDC()
+    this.initFinished.emit()
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
