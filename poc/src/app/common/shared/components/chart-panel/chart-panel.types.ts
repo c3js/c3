@@ -1,18 +1,31 @@
-import { CustomPoint, GridLine, SelectedPoint } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
-import { Domain } from 'c3'
+import {
+  BarChartDataSet,
+  CustomPoint,
+  GridLine,
+  SelectedPoint,
+} from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { ChartType, Domain } from 'c3'
 
 export type ChartId = string | number
+
+export enum ChartWrapperType {
+  LINE = 'line',
+  BAR = 'bar',
+}
+
 export interface ChartPanelData {
   id: ChartId
-  height: number
+  panelHeight: number
   isVisible?: boolean
   disabled?: boolean
-  dataSet?: number[]
+  dataSet?: number[] | BarChartDataSet
   selectedPoints?: SelectedPoint[]
   customPoints?: CustomPoint[]
   yGridLines?: GridLine[]
+  xGridLines?: GridLine[]
   domain?: Domain
   rendered?: boolean
+  chartType?: ChartWrapperType
 }
 
 export enum ChartPanelInnerEvent {}

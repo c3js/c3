@@ -14,14 +14,16 @@ import {
   ChartPanelData,
   ChartPanelEvent,
   ChartPanelOuterEvent,
+  ChartWrapperType,
 } from '@src/app/common/shared/components/chart-panel/chart-panel.types'
 import { generateCustomPoints, generateDataset, generateSelectedPoints, getRandomInt, wait } from '@src/app/common/utils/helpers'
 import { fromEvent, Observable, Subject } from 'rxjs'
 import { SubscriptionHandler } from '@src/app/common/utils/subscription-handler'
-import { GridLine } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { BarChartDataSet, GridLine } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import { Domain } from 'c3'
 import { ChartPanelTrackingService } from '@src/app/common/shared/services/chart-panel-tracking.service'
 import { ResizeVHandleComponent } from '@src/app/common/shared/components/resize-handle/resize-v-handle.component'
+import { barChartConfigs } from '@src/app/sandboxes/chart-list-sandbox/chart-list-helper'
 
 @Component({
   selector: 'lw-chart-list-sandbox',
@@ -44,21 +46,42 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
   private chartInitFinished$ = new Subject<ChartId>()
   resizeInProgress = false
 
+  private barChartConfigs = barChartConfigs
+
   @ViewChild('chartList', { static: true }) chartList: ElementRef<HTMLDivElement>
   @ViewChild(ResizeVHandleComponent) resizeHandle: ResizeVHandleComponent
 
   panels: ChartPanelData[] = Array(this.chartsCount)
     .fill(0)
-    .map((_, idx) => ({
-      id: idx,
-      height: this.getInitialChartPanelHeight(),
-      disabled: false,
-      dataSet: generateDataset(this.minVal, this.maxVal, this.pCount),
-      selectedPoints: generateSelectedPoints(this.pCount),
-      customPoints: generateCustomPoints(this.pCount),
-      yGridLines: this.generateYLines(),
-      isVisible: true,
-    }))
+    .map((_, idx) => {
+      const rndVal = getRandomInt(0, 100)
+      if (rndVal >= 0 && rndVal < 80) {
+        return {
+          id: idx,
+          panelHeight: this.getInitialChartPanelHeight(),
+          disabled: false,
+          dataSet: generateDataset(this.minVal, this.maxVal, this.pCount),
+          selectedPoints: generateSelectedPoints(this.pCount),
+          customPoints: generateCustomPoints(this.pCount),
+          yGridLines: this.generateYLines(),
+          isVisible: true,
+          chartType: ChartWrapperType.LINE,
+        }
+      } else {
+        const barConfig = this.getBarConfig()
+        return {
+          id: idx,
+          panelHeight: this.getInitialChartPanelHeight(),
+          disabled: false,
+          dataSet: barConfig.dataSet,
+          selectedPoints: generateSelectedPoints(this.pCount),
+          customPoints: generateCustomPoints(this.pCount),
+          xGridLines: barConfig.lines,
+          isVisible: true,
+          chartType: ChartWrapperType.BAR,
+        }
+      }
+    })
 
   visiblePanels: ChartPanelData[] = []
 
@@ -94,7 +117,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
 
   validateResize(panel: ChartPanelData): (resizeEvent: ResizeEvent) => boolean {
     return (resizeEvent: ResizeEvent) => {
-      return panel.height + (resizeEvent.edges.bottom as number) >= this.minHeight
+      return panel.panelHeight + (resizeEvent.edges.bottom as number) >= this.minHeight
     }
   }
 
@@ -121,7 +144,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     this.resizeInProgress = false
     this.resizeHandle.visibility = 'hidden'
     const item = this.panels[index]
-    item.height += event.edges.bottom as number
+    item.panelHeight += event.edges.bottom as number
   }
 
   onVisibleChange(panel: ChartPanelData, observerEntry: IntersectionObserverEntry) {
@@ -153,5 +176,9 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
       { value: getRandomInt(this.minVal, this.maxVal + 200), text: 'UWL', class: 'custom-dotted-line', color: '#FF9900' },
       { value: getRandomInt(this.minVal, this.maxVal + 200), text: 'UCL', class: 'custom-dotted-line', color: '#BA191C' },
     ]
+  }
+
+  getBarConfig(): { dataSet: BarChartDataSet; lines: GridLine[] } {
+    return barChartConfigs[getRandomInt(0, 4)]
   }
 }

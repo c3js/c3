@@ -10,9 +10,15 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { ChartPanelData, ChartPanelEvent, ChartPanelOuterEvent } from '@src/app/common/shared/components/chart-panel/chart-panel.types'
+import {
+  ChartPanelData,
+  ChartPanelEvent,
+  ChartPanelOuterEvent,
+  ChartWrapperType,
+} from '@src/app/common/shared/components/chart-panel/chart-panel.types'
 import { Subject } from 'rxjs'
 import {
+  BarChartDataSet,
   ChartSize,
   CheckDomainPredicate,
   CustomPointContext,
@@ -39,9 +45,14 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   resizeObserver: ResizeObserver
   @ViewChild('chartPanel', { static: true }) chartPanel: ElementRef<HTMLDivElement>
 
+  ChartWrapperType = ChartWrapperType
+
   chartSize: ChartSize = {}
 
   isVisible = false
+
+  lineDataSet: number[]
+  barDataSet: BarChartDataSet
 
   private initComplete = new Subject<ChartPanelData>()
 
@@ -76,6 +87,11 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   ngOnInit(): void {
     this.createResizeObserver()
     this.setupEventBusListeners()
+    if (this.data.chartType === ChartWrapperType.LINE) {
+      this.lineDataSet = this.data.dataSet as number[]
+    } else {
+      this.barDataSet = this.data.dataSet as BarChartDataSet
+    }
   }
 
   override ngOnDestroy(): void {
@@ -83,8 +99,12 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
     this.destroyResizeObserver()
   }
 
-  isDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
+  isLineDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
     return !(Math.abs(domain[0] - domain[1]) <= MIN_DOMAIN_RANGE)
+  }
+
+  isBarDomainCorrect: CheckDomainPredicate = (domain: Domain) => {
+    return true
   }
 
   private createResizeObserver(): void {

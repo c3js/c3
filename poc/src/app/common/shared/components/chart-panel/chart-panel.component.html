@@ -1,9 +1,9 @@
 <div class="chart-panel" #chartPanel>
   <lw-line-chart-wrapper
-    *ngIf="isVisible"
-    [dataSet]="data.dataSet"
+    *ngIf="isVisible && data.chartType === ChartWrapperType.LINE"
+    [dataSet]="lineDataSet"
     [size]="chartSize"
-    [isDomainCorrect]="isDomainCorrect"
+    [isDomainCorrect]="isLineDomainCorrect"
     [useSelection]="true"
     [selectedPoints]="data.selectedPoints"
     [customPoints]="data.customPoints"
@@ -14,4 +14,14 @@
     (zoomEnd)="zoomEnd.emit($event)"
     (initFinished)="chartInitFinished.emit(data)"
   ></lw-line-chart-wrapper>
+  <lw-bar-chart-wrapper
+    *ngIf="isVisible && data.chartType === ChartWrapperType.BAR"
+    [dataSet]="barDataSet"
+    [size]="chartSize"
+    [isDomainCorrect]="isBarDomainCorrect"
+    [xGridLines]="data.xGridLines"
+    [initialDomain]="data.domain"
+    (zoomEnd)="zoomEnd.emit($event)"
+    (initFinished)="chartInitFinished.emit(data)"
+  ></lw-bar-chart-wrapper>
 </div>

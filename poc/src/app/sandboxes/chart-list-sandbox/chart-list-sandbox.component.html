@@ -5,7 +5,7 @@
       *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index"
       class="chart-list__item"
       [mwlResizable]="{ forbid: false }"
-      [style.height.px]="panel.height"
+      [style.height.px]="panel.panelHeight"
       [validateResize]="validateResize(panel)"
       [lwTrackVisibility]="true"
       [lwTrackVisibilityOptions]="visibleTrackOptions"
