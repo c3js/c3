@@ -33,7 +33,7 @@ export class ChartPanelTrackingService extends SubscriptionHandler {
       visibility$
         .pipe(
           tap(({ id, isVisible }) => (this.panelsMap[id].isVisible = isVisible)),
-          debounceTime(DEBOUNCE_TIME_SMALL)
+          debounceTime(DEBOUNCE_TIME_SMALL / 2)
         )
         .subscribe(() => {
           this.visiblePanelsQueue = this.panels.filter((panel) => panel.isVisible)
