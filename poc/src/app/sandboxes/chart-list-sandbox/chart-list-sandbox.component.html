@@ -1,4 +1,10 @@
-<div class="chart-list" #chartList [class]="{ 'chart-list--resizing': resizeInProgress }">
+<div
+  class="chart-list"
+  [class]="{ 'chart-list--resizing': resizeInProgress }"
+  lwScrollDirection
+  (directionChange)="onScrollDirection($event)"
+  #chartList
+>
   <div class="chart-list__content">
     <lw-resize-v-handle></lw-resize-v-handle>
     <div

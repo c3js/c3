@@ -24,6 +24,7 @@ import { Domain } from 'c3'
 import { ChartPanelTrackingService } from '@src/app/common/shared/services/chart-panel-tracking.service'
 import { ResizeVHandleComponent } from '@src/app/common/shared/components/resize-handle/resize-v-handle.component'
 import { barChartConfigs } from '@src/app/sandboxes/chart-list-sandbox/chart-list-helper'
+import { ScrollDirection } from '@src/app/common/shared/directives/scroll-direction.directive'
 
 @Component({
   selector: 'lw-chart-list-sandbox',
@@ -44,6 +45,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
 
   private visibility$ = new Subject<{ id: ChartId; isVisible: boolean }>()
   private chartInitFinished$ = new Subject<ChartId>()
+  private scrollDirection$ = new Subject<ScrollDirection>()
   resizeInProgress = false
 
   private barChartConfigs = barChartConfigs
@@ -99,7 +101,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
       panels: this.panels,
       visibility$: this.visibility$,
       chartInitFinished$: this.chartInitFinished$,
-      containerScroll$: fromEvent(this.chartList.nativeElement, 'scroll'),
+      scrollDirection$: this.scrollDirection$,
       hideChart: (id: ChartId) => {
         this.eventBus.emit({ type: ChartPanelOuterEvent.HIDE_CHART, id })
       },
@@ -166,6 +168,10 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     this.chartInitFinished$.next(panel.id)
   }
 
+  onScrollDirection(direction: 'up' | 'down'): void {
+    this.scrollDirection$.next(direction)
+  }
+
   private generateYLines(): GridLine[] {
     return [
       { value: getRandomInt(this.minVal, this.maxVal + 200), text: 'LSL', class: 'custom-dotted-line', color: '#ED2024' },
@@ -178,7 +184,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     ]
   }
 
-  getBarConfig(): { dataSet: BarChartDataSet; lines: GridLine[] } {
+  private getBarConfig(): { dataSet: BarChartDataSet; lines: GridLine[] } {
     return barChartConfigs[getRandomInt(0, 4)]
   }
 }

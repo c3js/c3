@@ -4,6 +4,7 @@ import { debounceTime, Observable, tap } from 'rxjs'
 import { ChartId, ChartPanelData } from '@src/app/common/shared/components/chart-panel/chart-panel.types'
 import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
 import { arrayToObject } from '@src/app/common/utils/helpers'
+import { ScrollDirection } from '@src/app/common/shared/directives/scroll-direction.directive'
 
 @Injectable()
 export class ChartPanelTrackingService extends SubscriptionHandler {
@@ -11,7 +12,6 @@ export class ChartPanelTrackingService extends SubscriptionHandler {
   private panelsMap: Record<string, ChartPanelData>
   private visiblePanelsQueue: ChartPanelData[] = []
   private inVisiblePanelsQueue: ChartPanelData[] = []
-  private currentScroll = 0
   private scrollDirection: 'up' | 'down' = 'down'
   private hideChart: (id: ChartId) => void
   private showChart: (id: ChartId) => void
@@ -20,11 +20,11 @@ export class ChartPanelTrackingService extends SubscriptionHandler {
     panels: ChartPanelData[]
     visibility$: Observable<{ id: ChartId; isVisible: boolean }>
     chartInitFinished$: Observable<ChartId>
-    containerScroll$: Observable<Event>
+    scrollDirection$: Observable<ScrollDirection>
     hideChart: (id: ChartId) => void
     showChart: (id: ChartId) => void
   }) {
-    const { panels, visibility$, chartInitFinished$, containerScroll$, hideChart, showChart } = data
+    const { panels, visibility$, chartInitFinished$, scrollDirection$, hideChart, showChart } = data
     this.panels = structuredClone(panels)
     this.panelsMap = arrayToObject(this.panels, 'id')
     this.hideChart = hideChart
@@ -52,14 +52,8 @@ export class ChartPanelTrackingService extends SubscriptionHandler {
       })
     )
     this.subscriptions.push(
-      containerScroll$.subscribe((event: Event) => {
-        const scrollTop = (event.srcElement as Element).scrollTop
-        if (scrollTop - this.currentScroll < 0) {
-          this.scrollDirection = 'up'
-        } else {
-          this.scrollDirection = 'down'
-        }
-        this.currentScroll = scrollTop
+      scrollDirection$.subscribe((direction: ScrollDirection) => {
+        this.scrollDirection = direction
       })
     )
   }
