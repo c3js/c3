@@ -202,7 +202,7 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
 
   protected selectPoints(points: SelectedPoint[]): void {
     const indices = points.map((p) => p.index)
-    this.instance?.select(MAIN_DATA_SET, indices, true)
+    this.instance?.select(MAIN_DATA_SET, indices, true, 0)
     this.brushSelectedPoints()
   }
 

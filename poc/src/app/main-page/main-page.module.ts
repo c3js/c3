@@ -4,7 +4,6 @@ import { MainPageRoutingModule } from '@src/app/main-page/main-page-routing.modu
 import { RouterModule } from '@angular/router'
 import { TestSandboxComponent } from '@src/app/sandboxes/test-sandbox/test-sandbox.component'
 import { SharedModule } from '@src/app/common/shared/shared.module'
-import { ChartPocStoryComponent } from '@src/app/sandboxes/chart-poc-story/chart-poc-story.component'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -18,7 +17,6 @@ import { ResizableModule } from 'angular-resizable-element-labworks'
   declarations: [
     MainPageComponent,
     TestSandboxComponent,
-    ChartPocStoryComponent,
     SelectPointsSandboxComponent,
     VerticalLineSyncSandboxComponent,
     BarChartSandboxComponent,

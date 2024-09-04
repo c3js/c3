@@ -39,6 +39,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
   readonly minVal = 50
   readonly maxVal = 1000
   readonly chartsCount = 100
+  readonly rootMargin = 0
   getInitialChartPanelHeight = () => getRandomInt(100, 450)
 
   eventBus = new EventEmitter<ChartPanelEvent>()
@@ -87,7 +88,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
 
   visiblePanels: ChartPanelData[] = []
 
-  visibleTrackOptions: IntersectionObserverInit = { threshold: [0, 1], rootMargin: '0px 0px 0px 0px' }
+  visibleTrackOptions: IntersectionObserverInit = { threshold: [0, 1], rootMargin: `${this.rootMargin}px 0px ${this.rootMargin}px 0px` }
 
   constructor(
     private changeDetection: ChangeDetectorRef,
