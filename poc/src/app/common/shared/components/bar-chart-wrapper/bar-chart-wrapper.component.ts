@@ -30,7 +30,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
     super.ngOnInit()
   }
 
-  updateParams(): void {
+  protected override getParams(): any {
     this.xDataSet = this.dataSet.map((item) => item.x)
     this.xTickDataSet = this.dataSet.map((item) => item.xTick)
     this.yDataSet = this.dataSet.map((item) => item.y)
@@ -45,7 +45,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
     this.yDataSet = [1, 4, 5, 60, 80, 70, 60, 25, 5, null, 5]
     this.chartPadding = (this.x2DataSet[1] - this.x2DataSet[0])
     */
-    this.params = {
+    return {
       bindto: `#${this.chartId}`,
       size: this.size,
       data: {
@@ -136,9 +136,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
 
   override ngAfterViewInit(): void {
     super.ngAfterViewInit()
-    this.setInitialZoom()
     this.toggleNDC()
-    this.initFinished.emit()
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
@@ -155,11 +153,11 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
   }
 
   protected override refreshXGrids(): void {
-    this.chart.getInstance()?.xgrids(this.xGridLines)
+    this.instance?.xgrids(this.xGridLines)
   }
 
   private enableNDC(): void {
-    this.chart.getInstance().load({
+    this.instance?.load({
       columns: [
         [NDC_DATA_SET, ...this.ndcDataSet],
         [X2_DATA_SET, ...this.x2DataSet],
@@ -168,7 +166,7 @@ export class BarChartWrapperComponent extends ChartWrapperBaseComponent implemen
   }
 
   private disableNDC(): void {
-    this.chart.getInstance().unload([NDC_DATA_SET])
+    this.instance?.unload([NDC_DATA_SET])
   }
 
   private toggleNDC(): void {

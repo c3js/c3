@@ -244,15 +244,15 @@ export class VerticalLineSyncSandboxComponent {
   }
 
   protected zoomChart = (chartWrapper: LineChartWrapperComponent, domain: number[]) => {
-    chartWrapper.chart.getInstance().zoom(domain)
+    chartWrapper.getInstance().zoom(domain)
   }
 
   protected xFocusShow(chartWrapper: LineChartWrapperComponent, d: DataPoint): void {
-    chartWrapper?.chart.getInstance().xgrids([{ value: d.x }])
+    chartWrapper?.getInstance().xgrids([{ value: d.x }])
   }
 
   protected xFocusHide(chartWrapper: LineChartWrapperComponent): void {
-    chartWrapper?.chart.getInstance().xgrids.remove()
+    chartWrapper?.getInstance().xgrids.remove()
   }
 
   protected windowResize(): void {

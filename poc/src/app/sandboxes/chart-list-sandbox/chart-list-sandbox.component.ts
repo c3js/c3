@@ -57,7 +57,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     .fill(0)
     .map((_, idx) => {
       const rndVal = getRandomInt(0, 100)
-      if (rndVal >= 0 && rndVal < 80) {
+      if (rndVal >= 0 && rndVal < 50) {
         return {
           id: idx,
           panelHeight: this.getInitialChartPanelHeight(),
