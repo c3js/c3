@@ -17,7 +17,7 @@ import {
 } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
-import { CustomPointsHelper, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
+import { customPointsHandler } from '@src/app/common/utils/custom-points.helper'
 import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
 import { debounceTime, fromEvent } from 'rxjs'
 
@@ -123,28 +123,7 @@ export class VerticalLineSyncSandboxComponent {
 
   customPoints: CustomPoint[] = []
 
-  customPointsHandler: CustomPointsHandler = {
-    append: (context: CustomPointContext) => {
-      CustomPointsHelper[context.getTag()].append(context)
-    },
-    redraw: (context: CustomPointContext) => {
-      const { selection, cx, cy, getTag } = context
-      return selection
-        .attr('x', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcX(d, cx)
-        })
-        .attr('y', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcY(d, cy)
-        })
-    },
-    remove: (context: CustomPointContext) => {
-      const { chartInternal, d, containerClass, customPointClass } = context
-      chartInternal.main
-        .select('.' + containerClass)
-        .selectAll('.' + customPointClass)
-        .remove()
-    },
-  }
+  customPointsHandler = customPointsHandler
 
   @ViewChild('chartWrapperTop', { read: LineChartWrapperComponent }) chartWrapperTop: LineChartWrapperComponent
   @ViewChild('chartWrapperBottom', { read: LineChartWrapperComponent }) chartWrapperBottom: LineChartWrapperComponent

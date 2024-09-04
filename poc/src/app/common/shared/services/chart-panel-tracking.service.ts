@@ -68,7 +68,7 @@ export class ChartPanelTrackingService extends SubscriptionHandler {
       while (panel.rendered && this.visiblePanelsQueue.length) {
         panel = this.getNextPanel()
       }
-      if (!panel.rendered) {
+      if (panel && !panel.rendered) {
         requestAnimationFrame(() => {
           this.showChart(panel.id)
         })

@@ -1,5 +1,5 @@
 import { DataPoint } from 'c3'
-import { CustomPointContext } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { CustomPointContext, CustomPointsHandler } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 
 export enum CustomPointTag {
   WE = 'WesternElectricViolation',
@@ -28,7 +28,7 @@ const CL_CIRCLE_X = 6
 const CL_CIRCLE_Y = 8
 const CL_CIRCLE_R = 5
 
-export const CustomPointsHelper: Record<
+export const customPointsConfig: Record<
   CustomPointTag,
   {
     append: (context: CustomPointContext) => void
@@ -46,8 +46,8 @@ export const CustomPointsHelper: Record<
         .enter()
         .append('svg')
         .attr('class', customPointClasses)
-        .attr('x', (d: DataPoint) => CustomPointsHelper[CustomPointTag.WE].reCalcX(d, cx))
-        .attr('y', (d: DataPoint) => CustomPointsHelper[CustomPointTag.WE].reCalcY(d, cy))
+        .attr('x', (d: DataPoint) => customPointsConfig[CustomPointTag.WE].reCalcX(d, cx))
+        .attr('y', (d: DataPoint) => customPointsConfig[CustomPointTag.WE].reCalcY(d, cy))
         .attr('width', WE_WIDTH)
         .attr('height', WE_HEIGHT)
         .attr('viewBox', '0 0 16 16')
@@ -109,8 +109,8 @@ export const CustomPointsHelper: Record<
         .enter()
         .append('svg')
         .attr('class', customPointClasses)
-        .attr('x', (d: DataPoint) => CustomPointsHelper[CustomPointTag.S].reCalcX(d, cx))
-        .attr('y', (d: DataPoint) => CustomPointsHelper[CustomPointTag.S].reCalcY(d, cy))
+        .attr('x', (d: DataPoint) => customPointsConfig[CustomPointTag.S].reCalcX(d, cx))
+        .attr('y', (d: DataPoint) => customPointsConfig[CustomPointTag.S].reCalcY(d, cy))
         .attr('width', S_WIDTH)
         .attr('height', S_HEIGHT)
         .attr('viewBox', '0 0 16 16')
@@ -140,8 +140,8 @@ export const CustomPointsHelper: Record<
         .enter()
         .append('svg')
         .attr('class', customPointClasses)
-        .attr('x', (d: DataPoint) => CustomPointsHelper[CustomPointTag.CL].reCalcX(d, cx))
-        .attr('y', (d: DataPoint) => CustomPointsHelper[CustomPointTag.CL].reCalcY(d, cy))
+        .attr('x', (d: DataPoint) => customPointsConfig[CustomPointTag.CL].reCalcX(d, cx))
+        .attr('y', (d: DataPoint) => customPointsConfig[CustomPointTag.CL].reCalcY(d, cy))
         .attr('width', CL_WIDTH)
         .attr('height', CL_HEIGHT)
         .attr('viewBox', '0 0 12 10')
@@ -167,5 +167,28 @@ export const CustomPointsHelper: Record<
     reCalcY: (d: DataPoint, cy: (d: DataPoint) => number) => {
       return cy(d) - CL_DELTA_Y
     },
+  },
+}
+
+export const customPointsHandler: CustomPointsHandler = {
+  append: (context: CustomPointContext) => {
+    customPointsConfig[context.getTag()].append(context)
+  },
+  redraw: (context: CustomPointContext) => {
+    const { selection, cx, cy, getTag } = context
+    return selection
+      .attr('x', (d: DataPoint) => {
+        return customPointsConfig[context.getTag(d)].reCalcX(d, cx)
+      })
+      .attr('y', (d: DataPoint) => {
+        return customPointsConfig[context.getTag(d)].reCalcY(d, cy)
+      })
+  },
+  remove: (context: CustomPointContext) => {
+    const { chartInternal, d, containerClass, customPointClass } = context
+    chartInternal.main
+      .select('.' + containerClass)
+      .selectAll('.' + customPointClass)
+      .remove()
   },
 }

@@ -49,8 +49,6 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
   private scrollDirection$ = new Subject<ScrollDirection>()
   resizeInProgress = false
 
-  private barChartConfigs = barChartConfigs
-
   @ViewChild('chartList', { static: true }) chartList: ElementRef<HTMLDivElement>
   @ViewChild(ResizeVHandleComponent) resizeHandle: ResizeVHandleComponent
 

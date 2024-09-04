@@ -16,7 +16,7 @@ import {
   ChartPanelOuterEvent,
   ChartWrapperType,
 } from '@src/app/common/shared/components/chart-panel/chart-panel.types'
-import { Subject } from 'rxjs'
+import { debounceTime, Subject } from 'rxjs'
 import {
   BarChartDataSet,
   ChartSize,
@@ -27,7 +27,8 @@ import {
 import { SubscriptionHandler } from '@src/app/common/utils/subscription-handler'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
-import { CustomPointsHelper } from '@src/app/common/utils/custom-points.helper'
+import { customPointsHandler } from '@src/app/common/utils/custom-points.helper'
+import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
 
 @Component({
   selector: 'lw-chart-panel',
@@ -42,7 +43,6 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   @Output() zoomEnd = new EventEmitter<Domain>()
   @Output() chartInitFinished = new EventEmitter<ChartPanelData>()
 
-  resizeObserver: ResizeObserver
   @ViewChild('chartPanel', { static: true }) chartPanel: ElementRef<HTMLDivElement>
 
   ChartWrapperType = ChartWrapperType
@@ -54,32 +54,11 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
   lineDataSet: number[]
   barDataSet: BarChartDataSet
 
-  private initComplete = new Subject<ChartPanelData>()
+  private resizeObserver: ResizeObserver
+  private resizeSubject = new Subject<ChartSize>()
+  private resize$ = this.resizeSubject.asObservable().pipe(debounceTime(DEBOUNCE_TIME_SMALL))
 
-  initComplete$ = this.initComplete.asObservable()
-
-  customPointsHandler: CustomPointsHandler = {
-    append: (context: CustomPointContext) => {
-      CustomPointsHelper[context.getTag()].append(context)
-    },
-    redraw: (context: CustomPointContext) => {
-      const { selection, cx, cy, getTag } = context
-      return selection
-        .attr('x', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcX(d, cx)
-        })
-        .attr('y', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcY(d, cy)
-        })
-    },
-    remove: (context: CustomPointContext) => {
-      const { chartInternal, d, containerClass, customPointClass } = context
-      chartInternal.main
-        .select('.' + containerClass)
-        .selectAll('.' + customPointClass)
-        .remove()
-    },
-  }
+  customPointsHandler = customPointsHandler
 
   constructor(private cdr: ChangeDetectorRef) {
     super()
@@ -91,6 +70,10 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
       this.lineDataSet = this.data.dataSet as number[]
     } else {
       this.barDataSet = this.data.dataSet as BarChartDataSet
+    }
+    this.chartSize = {
+      height: this.chartPanel.nativeElement.offsetHeight,
+      width: this.chartPanel.nativeElement.offsetWidth,
     }
   }
 
@@ -109,11 +92,10 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
 
   private createResizeObserver(): void {
     this.resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[], observer: ResizeObserver) => {
-      this.chartSize = {
+      this.resizeSubject.next({
         height: entries?.[0]?.contentRect.height,
         width: entries?.[0].contentRect.width,
-      }
-      this.cdr.markForCheck()
+      })
     })
     this.resizeObserver.observe(this.chartPanel.nativeElement)
   }
@@ -127,6 +109,11 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
     this.subscriptions.push(
       this.eventBus?.subscribe((event: ChartPanelEvent) => {
         this.processEvent(event)
+      })
+    )
+    this.subscriptions.push(
+      this.resize$.subscribe((size: ChartSize) => {
+        this.processResize(size)
       })
     )
   }
@@ -146,5 +133,15 @@ export class ChartPanelComponent extends SubscriptionHandler implements OnInit, 
         this.cdr.markForCheck()
         break
     }
+  }
+
+  private processResize(size: ChartSize): void {
+    this.chartSize = this.calcChartSize(size)
+    this.cdr.markForCheck()
+  }
+
+  private calcChartSize(size: ChartSize): ChartSize {
+    // TODO: implement calculation logic
+    return { ...size }
   }
 }
