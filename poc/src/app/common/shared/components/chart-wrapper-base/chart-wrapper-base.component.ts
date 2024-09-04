@@ -14,6 +14,7 @@ import {
 import { generateId } from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import {
+  ChartPoint,
   ChartSize,
   CheckDomainPredicate,
   FormatPredicate,
@@ -25,7 +26,6 @@ import {
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
 import c3 from '@src/app/c3/src/index.js'
 import * as d3 from 'd3'
-import { ChartPoint } from '@src/app/common/shared/components/chart/chart.types'
 
 @Component({ template: '' })
 export abstract class ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {

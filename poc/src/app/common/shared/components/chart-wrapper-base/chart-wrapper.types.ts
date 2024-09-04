@@ -53,3 +53,8 @@ export interface BarChartDataPoint {
 }
 
 export type BarChartDataSet = BarChartDataPoint[]
+
+export type ChartPoint = {
+  x: number
+  y: number
+}
