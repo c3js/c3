@@ -2,35 +2,31 @@
   class="chart-list"
   [class]="{ 'chart-list--resizing': resizeInProgress }"
   lwScrollDirection
+  lwIntersectionRoot
+  [lwIntersectionObserver]="intersectionObserverOptions"
   (directionChange)="onScrollDirection($event)"
   #chartList
 >
   <div class="chart-list__content">
     <lw-resize-v-handle></lw-resize-v-handle>
-    <div
-      *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index"
-      class="chart-list__item"
-      [mwlResizable]="{ forbid: false }"
-      [style.height.px]="panel.panelHeight"
-      [validateResize]="validateResize(panel)"
-      [lwTrackVisibility]="true"
-      [lwTrackVisibilityOptions]="visibleTrackOptions"
-      [lwTrackVisibilityScrollContainer]="chartList"
-      (resizeStart)="onResizeStart($event)"
-      (resizeEnd)="onResizeEnd(itemIndex, $event)"
-      (resizing)="onResizing($event)"
-      (visible)="onVisibleChange(panel, $event)"
-    >
+    <ng-container *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index">
       <lw-chart-panel
+        (chartInitFinished)="onChartInitFinished(panel)"
+        (resizeEnd)="onResizeEnd($event)"
+        (resizeStart)="onResizeStart($event)"
+        (resizing)="onResizing($event)"
+        (visible)="onVisibleChange(panel, $event)"
+        (zoomEnd)="onZoomEnd(panel, $event)"
         [data]="panel"
         [eventBus]="eventBus"
-        (zoomEnd)="onZoomEnd(panel, $event)"
-        (chartInitFinished)="onChartInitFinished(panel)"
+        [resizeHandle]="resizeHandle"
+        [scrollContainer]="chartList"
       ></lw-chart-panel>
-      <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
-    </div>
+    </ng-container>
   </div>
   <div class="visibility-indicator">
-    <div class="visibility-indicator__visible-item" *ngFor="let panel of visiblePanels; let itemIndex = index">{{ panel.id }}</div>
+    <div *ngFor="let panel of visiblePanels; let itemIndex = index" class="visibility-indicator__visible-item">
+      {{ panel.id }}
+    </div>
   </div>
 </div>
