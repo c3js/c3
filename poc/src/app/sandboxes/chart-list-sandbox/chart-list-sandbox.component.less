@@ -1,0 +1,73 @@
+@import 'constants.less';
+
+.chart-list {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: @zIndexSuperLarge;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding-top: @mainHeaderHeight;
+
+  &--resizing {
+    cursor: row-resize !important;
+    ::ng-deep {
+      .c3-event-rects {
+        cursor: row-resize !important;
+        .c3-event-rect {
+          cursor: row-resize !important;
+        }
+      }
+    }
+  }
+
+  &__content {
+    width: 95%;
+    z-index: @zIndexExtraLarge;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0;
+    color: @mainColor;
+    margin-bottom: @gridLarge;
+    background-color: @panelColor;
+    padding: @gridExtraSmall;
+    overflow-x: hidden;
+  }
+
+  &__item {
+    min-height: 100px;
+    background-color: @whiteColor;
+    margin-bottom: @gridExtraSmall;
+    position: relative;
+
+    &:nth-last-child(1 of :not(.resize-ghost-element)) {
+      margin-bottom: 0;
+    }
+  }
+
+  .visibility-indicator {
+    background-color: @greyTextColor;
+    top: 0;
+    left: 0;
+    width: @gridSmall;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+
+    &__visible-item {
+      height: @gridSmall;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: @borderSmall solid @backgroundDarkColor;
+    }
+  }
+
+  .resize-ghost-element {
+    border-bottom: @borderSmall solid @blackColor;
+  }
+}
+

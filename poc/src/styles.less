@@ -75,12 +75,19 @@ div.block-ui-wrapper {
 
 .resize-handle {
   height: 100%;
-  width: 20px;
+  width: @gridExtraSmall*2;
   position: absolute;
   right: 0;
   cursor: ew-resize;
 
   &--left {
     left: 0;
+  }
+
+  &--bottom {
+    height: @gridExtraSmall;
+    width: 100%;
+    bottom: 0;
+    cursor: ns-resize;
   }
 }

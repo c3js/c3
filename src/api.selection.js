@@ -9,7 +9,7 @@ Chart.prototype.selected = function (targetId) {
 			.nodes()
             .map(function (d) { var data = d.__data__; return data.data ? data.data : data;});
 };
-Chart.prototype.select = function (ids, indices, resetOther) {
+Chart.prototype.select = function (ids, indices, resetOther, duration) {
     var $$ = this.internal, d3 = $$.d3, config = $$.config;
     if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
@@ -24,16 +24,16 @@ Chart.prototype.select = function (ids, indices, resetOther) {
         }
         if (isTargetId && isTargetIndex) {
             if (config.data_selection_isselectable(d) && !isSelected) {
-                toggle(true, shape.classed(CLASS.SELECTED, true), d, i);
+                toggle(true, shape.classed(CLASS.SELECTED, true), d, i, duration);
             }
         } else if (isDefined(resetOther) && resetOther) {
             if (isSelected) {
-                toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
+                toggle(false, shape.classed(CLASS.SELECTED, false), d, i, duration);
             }
         }
     });
 };
-Chart.prototype.unselect = function (ids, indices) {
+Chart.prototype.unselect = function (ids, indices, duration) {
     var $$ = this.internal, d3 = $$.d3, config = $$.config;
     if (! config.data_selection_enabled) { return; }
     $$.main.selectAll('.' + CLASS.shapes).selectAll('.' + CLASS.shape).each(function (d, i) {
@@ -49,7 +49,7 @@ Chart.prototype.unselect = function (ids, indices) {
         if (isTargetId && isTargetIndex) {
             if (config.data_selection_isselectable(d)) {
                 if (isSelected) {
-                    toggle(false, shape.classed(CLASS.SELECTED, false), d, i);
+                    toggle(false, shape.classed(CLASS.SELECTED, false), d, i, duration);
                 }
             }
         }

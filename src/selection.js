@@ -1,7 +1,7 @@
 import CLASS from './class';
 import { ChartInternal } from './core';
 
-ChartInternal.prototype.selectPoint = function (target, d, i) {
+ChartInternal.prototype.selectPoint = function (target, d, i, duration) {
     var $$ = this, config = $$.config,
         cx = (config.axis_rotated ? $$.circleY : $$.circleX).bind($$),
         cy = (config.axis_rotated ? $$.circleX : $$.circleY).bind($$),
@@ -16,19 +16,19 @@ ChartInternal.prototype.selectPoint = function (target, d, i) {
         .attr("cy", cy)
         .attr("stroke", function () { return $$.color(d); })
         .attr("r", function (d) { return $$.pointSelectR(d) * 1.4; })
-        .transition().duration(100)
+        .transition().duration(isNaN(duration) ? 100 : duration)
         .attr("r", r);
 };
-ChartInternal.prototype.unselectPoint = function (target, d, i) {
+ChartInternal.prototype.unselectPoint = function (target, d, i, duration) {
     var $$ = this;
     $$.config.data_onunselected.call($$.api, d, target.node());
     // remove selected-circle from low layer g
     $$.main.select('.' + CLASS.selectedCircles + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.selectedCircle + '-' + i)
-        .transition().duration(100).attr('r', 0)
+        .transition().duration(isNaN(duration) ? 100 : duration).attr('r', 0)
         .remove();
 };
-ChartInternal.prototype.togglePoint = function (selected, target, d, i) {
-    selected ? this.selectPoint(target, d, i) : this.unselectPoint(target, d, i);
+ChartInternal.prototype.togglePoint = function (selected, target, d, i, duration) {
+    selected ? this.selectPoint(target, d, i, duration) : this.unselectPoint(target, d, i, duration);
 };
 ChartInternal.prototype.selectPath = function (target, d) {
     var $$ = this;

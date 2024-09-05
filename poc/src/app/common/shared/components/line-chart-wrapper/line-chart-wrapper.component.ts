@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { DataPoint, Domain, PrimitiveArray } from 'c3'
 import { arrayToObject, getNeededSpaces } from '@src/app/common/utils/helpers'
 import { ChartWrapperBaseComponent } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.component'
@@ -6,7 +6,6 @@ import {
   CustomPoint,
   CustomPointContext,
   CustomPointsHandler,
-  GridLine,
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import {
@@ -20,6 +19,7 @@ import {
   selector: 'lw-line-chart-wrapper',
   templateUrl: '../chart-wrapper-base/chart-wrapper-base.component.html',
   styleUrls: ['../chart-wrapper-base/chart-wrapper-base.component.less', './line-chart-wrapper.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LineChartWrapperComponent extends ChartWrapperBaseComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() dataSet: PrimitiveArray
@@ -27,7 +27,6 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
   @Input() selectedPoints: SelectedPoint[] = []
   @Input() customPoints: CustomPoint[] = []
   @Input() customPointsHandler: CustomPointsHandler
-  @Input() yGridLinesTopLimitEnabled = false
   @Input() maxDataSetValueLength: number
 
   customPointsMap: Record<number, CustomPoint> = {}
@@ -36,8 +35,8 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
     super.ngOnInit()
   }
 
-  updateParams(): void {
-    this.params = {
+  protected override getParams(): any {
+    return {
       bindto: `#${this.chartId}`,
       size: this.size,
       data: {
@@ -159,10 +158,8 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
 
   override ngAfterViewInit(): void {
     super.ngAfterViewInit()
-    // this.refreshYGrids()
     this.selectPoints(this.selectedPoints)
     this.customizePoints(this.customPoints)
-    this.setInitialZoom()
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
@@ -172,9 +169,6 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
     }
     if (changes.customPoints && !changes.customPoints.firstChange) {
       this.customizePoints(this.customPoints)
-    }
-    if (changes.yGridLinesTopLimitEnabled && !changes.yGridLinesTopLimitEnabled.firstChange) {
-      this.refreshYGrids()
     }
     // TODO: temporary dataset updates
     if (changes.dataSet && !changes.dataSet.firstChange) {
@@ -188,8 +182,16 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
     }
   }
 
+  protected override patchParams(params: any): any {
+    super.patchParams(params)
+    if (this.yGridLines && this.yGridLinesTopLimitEnabled) {
+      const maxYLine = this.getMaxYLine()
+      this.params.data.columns.push([TOP_LIMIT_DATA_SET, ...this.dataSet.map(() => maxYLine)])
+    }
+  }
+
   protected override refreshYGrids(): void {
-    this.chart.getInstance()?.ygrids(this.yGridLines)
+    this.instance?.ygrids(this.yGridLines)
     const maxYLine = this.getMaxYLine()
     if (this.yGridLinesTopLimitEnabled && maxYLine) {
       this.topLimitEnable(maxYLine)
@@ -198,21 +200,15 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
     }
   }
 
-  protected getMaxYLine(): number | undefined {
-    if (this.yGridLines?.length > 0) {
-      return Math.max(...this.yGridLines.map((l) => l.value))
-    }
-  }
-
   protected selectPoints(points: SelectedPoint[]): void {
     const indices = points.map((p) => p.index)
-    this.chart.getInstance()?.select(MAIN_DATA_SET, indices, true)
+    this.instance?.select(MAIN_DATA_SET, indices, true, 0)
     this.brushSelectedPoints()
   }
 
   protected customizePoints(points: CustomPoint[]): void {
     this.customPointsMap = arrayToObject(this.customPoints, 'index')
-    this.chart.getInstance()?.setCustomPoint(
+    this.instance?.setCustomPoint(
       MAIN_DATA_SET,
       this.customPoints.map((p) => p.index)
     )
@@ -220,19 +216,19 @@ export class LineChartWrapperComponent extends ChartWrapperBaseComponent impleme
 
   protected topLimitEnable(limit: number) {
     const domain = this.getCurrentXDomain()
-    this.chart.getInstance().load({ columns: [[TOP_LIMIT_DATA_SET, ...this.dataSet.map(() => limit)]] })
-    this.chart.getInstance()?.zoom(domain)
+    this.instance?.load({ columns: [[TOP_LIMIT_DATA_SET, ...this.dataSet.map(() => limit)]] })
+    this.instance?.zoom(domain)
   }
 
   protected topLimitDisable() {
     const domain = this.getCurrentXDomain()
-    this.chart.getInstance().unload([TOP_LIMIT_DATA_SET])
-    this.chart.getInstance()?.zoom(domain)
+    this.instance?.unload([TOP_LIMIT_DATA_SET])
+    this.instance?.zoom(domain)
   }
 
   protected brushSelectedPoints() {
     const selectedPoints = arrayToObject(this.selectedPoints, 'index')
-    const selection = this.chart.getInstance().internal.main.selectAll('.c3-selected-circles').selectAll('.c3-selected-circle')
+    const selection = this.instance?.internal.main.selectAll('.c3-selected-circles').selectAll('.c3-selected-circle')
     selection.attr('stroke', ({ index }) => {
       return selectedPoints[index]?.color
     })

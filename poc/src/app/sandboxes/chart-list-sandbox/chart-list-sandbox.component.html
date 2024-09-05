@@ -1,0 +1,36 @@
+<div
+  class="chart-list"
+  [class]="{ 'chart-list--resizing': resizeInProgress }"
+  lwScrollDirection
+  (directionChange)="onScrollDirection($event)"
+  #chartList
+>
+  <div class="chart-list__content">
+    <lw-resize-v-handle></lw-resize-v-handle>
+    <div
+      *ngFor="let panel of panels; trackBy: trackItem; let itemIndex = index"
+      class="chart-list__item"
+      [mwlResizable]="{ forbid: false }"
+      [style.height.px]="panel.panelHeight"
+      [validateResize]="validateResize(panel)"
+      [lwTrackVisibility]="true"
+      [lwTrackVisibilityOptions]="visibleTrackOptions"
+      [lwTrackVisibilityScrollContainer]="chartList"
+      (resizeStart)="onResizeStart($event)"
+      (resizeEnd)="onResizeEnd(itemIndex, $event)"
+      (resizing)="onResizing($event)"
+      (visible)="onVisibleChange(panel, $event)"
+    >
+      <lw-chart-panel
+        [data]="panel"
+        [eventBus]="eventBus"
+        (zoomEnd)="onZoomEnd(panel, $event)"
+        (chartInitFinished)="onChartInitFinished(panel)"
+      ></lw-chart-panel>
+      <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
+    </div>
+  </div>
+  <div class="visibility-indicator">
+    <div class="visibility-indicator__visible-item" *ngFor="let panel of visiblePanels; let itemIndex = index">{{ panel.id }}</div>
+  </div>
+</div>

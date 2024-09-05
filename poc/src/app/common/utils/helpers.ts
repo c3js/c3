@@ -1,4 +1,6 @@
 import { NBSP } from '@src/app/common/constants/constants'
+import { CustomPoint, SelectedPoint } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
+import { CustomPointTag } from '@src/app/common/utils/custom-points.helper'
 
 const RANDOM_STRING_RADIX = 36
 const RANDOM_STRING_START = 2
@@ -88,4 +90,25 @@ export function getMaxLengthOfElementsAndGetDifferences(...items: unknown[][]): 
 
 export function getNeededSpaces(len: number): string {
   return new Array(len).fill('').join(`${NBSP}${NBSP}`)
+}
+
+export function generateDataset(minVal: number, maxVal: number, pointsCount: number): number[] {
+  return [
+    ...Array(pointsCount)
+      .fill(0)
+      .map((v, i) => getRandomArbitrary(minVal, maxVal)),
+  ]
+}
+
+export function generateSelectedPoints(pointsCount: number): SelectedPoint[] {
+  return Array(getRandomInt(0, pointsCount - 1))
+    .fill(0)
+    .map(() => ({ index: getRandomInt(0, pointsCount - 1), color: getRandomColor() }))
+}
+
+export function generateCustomPoints(pointsCount: number): CustomPoint[] {
+  const tags = Object.values(CustomPointTag)
+  return Array(getRandomInt(0, pointsCount - 1))
+    .fill(0)
+    .map(() => ({ index: getRandomInt(0, pointsCount - 1), tag: tags[getRandomInt(0, 3)] }))
 }

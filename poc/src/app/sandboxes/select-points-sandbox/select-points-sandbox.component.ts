@@ -11,7 +11,7 @@ import {
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import { LineChartWrapperComponent } from '@src/app/common/shared/components/line-chart-wrapper/line-chart-wrapper.component'
 import { getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
-import { CustomPointsHelper, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
+import { customPointsHandler, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
 
 @Component({
@@ -42,28 +42,7 @@ export class SelectPointsSandboxComponent {
     { index: 5, tag: CustomPointTag.CL },
   ]
 
-  customPointsHandler: CustomPointsHandler = {
-    append: (context: CustomPointContext) => {
-      CustomPointsHelper[context.getTag()].append(context)
-    },
-    redraw: (context: CustomPointContext) => {
-      const { selection, cx, cy, getTag } = context
-      return selection
-        .attr('x', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcX(d, cx)
-        })
-        .attr('y', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcY(d, cy)
-        })
-    },
-    remove: (context: CustomPointContext) => {
-      const { chartInternal, d, containerClass, customPointClass } = context
-      chartInternal.main
-        .select('.' + containerClass)
-        .selectAll('.' + customPointClass)
-        .remove()
-    },
-  }
+  customPointsHandler = customPointsHandler
 
   chartSize: ChartSize = { height: 420 }
 

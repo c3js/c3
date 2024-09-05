@@ -9,10 +9,15 @@ import {
   SelectedPoint,
 } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import { LineChartWrapperComponent } from '@src/app/common/shared/components/line-chart-wrapper/line-chart-wrapper.component'
-import { getMaxLengthOfElementsAndGetDifferences, getRandomArbitrary, getRandomColor, getRandomInt } from '@src/app/common/utils/helpers'
+import {
+  generateCustomPoints,
+  generateDataset,
+  generateSelectedPoints,
+  getMaxLengthOfElementsAndGetDifferences,
+} from '@src/app/common/utils/helpers'
 import { DataPoint, Domain } from 'c3'
 import { MIN_DOMAIN_RANGE } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper-base.consts'
-import { CustomPointsHelper, CustomPointTag } from '@src/app/common/utils/custom-points.helper'
+import { customPointsHandler } from '@src/app/common/utils/custom-points.helper'
 import { DEBOUNCE_TIME_SMALL } from '@src/app/common/constants/constants'
 import { debounceTime, fromEvent } from 'rxjs'
 
@@ -118,28 +123,7 @@ export class VerticalLineSyncSandboxComponent {
 
   customPoints: CustomPoint[] = []
 
-  customPointsHandler: CustomPointsHandler = {
-    append: (context: CustomPointContext) => {
-      CustomPointsHelper[context.getTag()].append(context)
-    },
-    redraw: (context: CustomPointContext) => {
-      const { selection, cx, cy, getTag } = context
-      return selection
-        .attr('x', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcX(d, cx)
-        })
-        .attr('y', (d: DataPoint) => {
-          return CustomPointsHelper[context.getTag(d)].reCalcY(d, cy)
-        })
-    },
-    remove: (context: CustomPointContext) => {
-      const { chartInternal, d, containerClass, customPointClass } = context
-      chartInternal.main
-        .select('.' + containerClass)
-        .selectAll('.' + customPointClass)
-        .remove()
-    },
-  }
+  customPointsHandler = customPointsHandler
 
   @ViewChild('chartWrapperTop', { read: LineChartWrapperComponent }) chartWrapperTop: LineChartWrapperComponent
   @ViewChild('chartWrapperBottom', { read: LineChartWrapperComponent }) chartWrapperBottom: LineChartWrapperComponent
@@ -223,10 +207,7 @@ export class VerticalLineSyncSandboxComponent {
   }
 
   addCustomPoints(): void {
-    const tags = Object.values(CustomPointTag)
-    this.customPoints = Array(getRandomInt(0, this.pCount - 1))
-      .fill(0)
-      .map(() => ({ index: getRandomInt(0, this.pCount - 1), tag: tags[getRandomInt(0, 3)] }))
+    this.customPoints = generateCustomPoints(this.pCount)
   }
 
   clearCustomPoints(): void {
@@ -234,9 +215,7 @@ export class VerticalLineSyncSandboxComponent {
   }
 
   addSelectedPoints(): void {
-    this.selectedPoints = Array(getRandomInt(0, this.pCount - 1))
-      .fill(0)
-      .map(() => ({ index: getRandomInt(0, this.pCount - 1), color: getRandomColor() }))
+    this.selectedPoints = generateSelectedPoints(this.pCount)
   }
 
   clearSelectedPoints(): void {
@@ -244,15 +223,15 @@ export class VerticalLineSyncSandboxComponent {
   }
 
   protected zoomChart = (chartWrapper: LineChartWrapperComponent, domain: number[]) => {
-    chartWrapper.chart.getInstance().zoom(domain)
+    chartWrapper.getInstance().zoom(domain)
   }
 
   protected xFocusShow(chartWrapper: LineChartWrapperComponent, d: DataPoint): void {
-    chartWrapper?.chart.getInstance().xgrids([{ value: d.x }])
+    chartWrapper?.getInstance().xgrids([{ value: d.x }])
   }
 
   protected xFocusHide(chartWrapper: LineChartWrapperComponent): void {
-    chartWrapper?.chart.getInstance().xgrids.remove()
+    chartWrapper?.getInstance().xgrids.remove()
   }
 
   protected windowResize(): void {
@@ -266,10 +245,6 @@ export class VerticalLineSyncSandboxComponent {
   }
 
   private dataSetUpdate(min: number, max: number): number[] {
-    return [
-      ...Array(this.pCount)
-        .fill(0)
-        .map((v, i) => getRandomArbitrary(min, max)),
-    ]
+    return generateDataset(min, max, this.pCount)
   }
 }
