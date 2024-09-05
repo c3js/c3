@@ -17,10 +17,9 @@ export class IntersectionObserverDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
-        this.callbacks.forEach((callback, element) => {
-          const filtered = entries.filter(({ target }) => target === element)
-
-          return filtered.length && callback(filtered, this.intersectionObserver)
+        entries.forEach((entry) => {
+          const callback = this.callbacks.get(entry.target)
+          return callback && callback([entry], this.intersectionObserver)
         })
       },
       {
