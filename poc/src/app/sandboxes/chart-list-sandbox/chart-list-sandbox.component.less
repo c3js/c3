@@ -37,17 +37,6 @@
     overflow-x: hidden;
   }
 
-  &__item {
-    min-height: 100px;
-    background-color: @whiteColor;
-    margin-bottom: @gridExtraSmall;
-    position: relative;
-
-    &:nth-last-child(1 of :not(.resize-ghost-element)) {
-      margin-bottom: 0;
-    }
-  }
-
   .visibility-indicator {
     background-color: @greyTextColor;
     top: 0;
@@ -64,10 +53,6 @@
       align-items: center;
       border-bottom: @borderSmall solid @backgroundDarkColor;
     }
-  }
-
-  .resize-ghost-element {
-    border-bottom: @borderSmall solid @blackColor;
   }
 }
 

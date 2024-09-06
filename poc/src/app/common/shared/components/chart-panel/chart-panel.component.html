@@ -1,4 +1,15 @@
-<div class="chart-panel" #chartPanel>
+<div
+  class="chart-panel"
+  [style.height.px]="getPanelHeight | createPipeFromFunction: data.panelHeight"
+  [mwlResizable]="{ forbid: false }"
+  [validateResize]="validateResize()"
+  (resizeStart)="onResizeStart($event)"
+  (resizeEnd)="onResizeEnd($event)"
+  (resizing)="onResizing($event)"
+  lwIntersectionObservee
+  (visible)="visible.emit($event)"
+  #chartPanel
+>
   <lw-line-chart-wrapper
     *ngIf="isVisible && data.chartType === ChartWrapperType.LINE"
     [dataSet]="lineDataSet"
@@ -24,4 +35,5 @@
     (zoomEnd)="zoomEnd.emit($event)"
     (afterInit)="chartInitFinished.emit(data)"
   ></lw-bar-chart-wrapper>
+  <div class="resize-handle resize-handle--bottom" mwlResizeHandle [resizeEdges]="{ bottom: true }"></div>
 </div>

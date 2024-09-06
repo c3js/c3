@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnInit,
-  ViewChild,
-} from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core'
 import { ResizeEvent } from 'angular-resizable-element-labworks'
 import {
   ChartId,
@@ -16,8 +7,8 @@ import {
   ChartPanelOuterEvent,
   ChartWrapperType,
 } from '@src/app/common/shared/components/chart-panel/chart-panel.types'
-import { generateCustomPoints, generateDataset, generateSelectedPoints, getRandomInt, wait } from '@src/app/common/utils/helpers'
-import { fromEvent, Observable, Subject } from 'rxjs'
+import { generateCustomPoints, generateDataset, generateSelectedPoints, getRandomInt } from '@src/app/common/utils/helpers'
+import { Subject } from 'rxjs'
 import { SubscriptionHandler } from '@src/app/common/utils/subscription-handler'
 import { BarChartDataSet, GridLine } from '@src/app/common/shared/components/chart-wrapper-base/chart-wrapper.types'
 import { Domain } from 'c3'
@@ -25,6 +16,7 @@ import { ChartPanelTrackingService } from '@src/app/common/shared/services/chart
 import { ResizeVHandleComponent } from '@src/app/common/shared/components/resize-handle/resize-v-handle.component'
 import { barChartConfigs } from '@src/app/sandboxes/chart-list-sandbox/chart-list-helper'
 import { ScrollDirection } from '@src/app/common/shared/directives/scroll-direction.directive'
+import { IntersectionObserverOptions } from '@src/app/common/shared/directives/intersection-observer/intersection-observer.types'
 
 @Component({
   selector: 'lw-chart-list-sandbox',
@@ -33,14 +25,18 @@ import { ScrollDirection } from '@src/app/common/shared/directives/scroll-direct
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ChartPanelTrackingService],
 })
-export class ChartListSandboxComponent extends SubscriptionHandler implements OnInit, AfterViewInit {
-  readonly minHeight = 100
+export class ChartListSandboxComponent extends SubscriptionHandler implements OnInit {
   readonly pCount = 50
   readonly minVal = 50
   readonly maxVal = 1000
   readonly chartsCount = 100
   readonly rootMargin = 0
   getInitialChartPanelHeight = () => getRandomInt(100, 450)
+
+  intersectionObserverOptions: IntersectionObserverOptions = {
+    threshold: [0, 1],
+    rootMargin: `${this.rootMargin}px 0px ${this.rootMargin}px 0px`,
+  }
 
   eventBus = new EventEmitter<ChartPanelEvent>()
 
@@ -86,12 +82,7 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
 
   visiblePanels: ChartPanelData[] = []
 
-  visibleTrackOptions: IntersectionObserverInit = { threshold: [0, 1], rootMargin: `${this.rootMargin}px 0px ${this.rootMargin}px 0px` }
-
-  constructor(
-    private changeDetection: ChangeDetectorRef,
-    private chartPanelTrackingService: ChartPanelTrackingService
-  ) {
+  constructor(private chartPanelTrackingService: ChartPanelTrackingService) {
     super()
   }
 
@@ -110,47 +101,28 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     })
   }
 
-  ngAfterViewInit(): void {}
-
   trackItem = (index: number, panel: ChartPanelData) => {
     return panel.id
   }
 
-  validateResize(panel: ChartPanelData): (resizeEvent: ResizeEvent) => boolean {
-    return (resizeEvent: ResizeEvent) => {
-      return panel.panelHeight + (resizeEvent.edges.bottom as number) >= this.minHeight
-    }
-  }
-
   onResizeStart(event?: ResizeEvent): void {
-    if (this.resizeInProgress) {
-      return
-    }
     this.resizeInProgress = true
     this.resizeHandle.top = `${event.rectangle.bottom}px`
     this.resizeHandle.visibility = 'visible'
   }
 
   onResizing(event?: ResizeEvent): void {
-    if (!this.resizeInProgress) {
-      return
-    }
     this.resizeHandle.top = `${event.rectangle.bottom}px`
   }
 
-  onResizeEnd(index: number, event?: ResizeEvent): void {
-    if (!this.resizeInProgress) {
-      return
-    }
+  onResizeEnd(event?: ResizeEvent): void {
     this.resizeInProgress = false
     this.resizeHandle.visibility = 'hidden'
-    const item = this.panels[index]
-    item.panelHeight += event.edges.bottom as number
   }
 
   onVisibleChange(panel: ChartPanelData, observerEntry: IntersectionObserverEntry) {
     panel.isVisible = observerEntry.isIntersecting
-    this.updateVisibleItems()
+    this.updateVisibleIndicators()
     this.visibility$.next({ id: panel.id, isVisible: panel.isVisible })
   }
 
@@ -158,9 +130,8 @@ export class ChartListSandboxComponent extends SubscriptionHandler implements On
     panel.domain = domain
   }
 
-  private updateVisibleItems(): void {
+  private updateVisibleIndicators(): void {
     this.visiblePanels = this.panels.filter((panel) => panel.isVisible)
-    this.changeDetection.markForCheck()
   }
 
   onChartInitFinished(panel: ChartPanelData) {
