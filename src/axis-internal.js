@@ -29,28 +29,30 @@ AxisInternal.prototype.axisX = function (selection, x, tickOffset, internal) {
         return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
     });
     // TODO: add chart types in which we could disable this functionality
-    var context = internal.component.owner.config.context
+    var context = internal.component.owner.config.context;
     if (context.isHideXLabelIfNotVisibleDisabled && context.isHideXLabelIfNotVisibleDisabled('id')) {
-        return
+        return;
     }
     selection.attr('style', function (d) {
-        const offset = Math.ceil(x(d) + tickOffset)
-        return 'opacity: ' + (offset < 0 ? '0' : '1')
+        const offset = Math.ceil(x(d) + tickOffset);
+        return 'opacity: ' + (offset < 0 ? '0' : '1');
     });
 
-    selection
+    var tspans = selection
         .select('text')
         .select('tspan')
         .text(function (d) {
             if (context.limitAxisMaxLength) {
-                return context.limitAxisMaxLength(internal.textFormatted(d))
+                return context.limitAxisMaxLength(internal.textFormatted(d));
             }
-            return internal.textFormatted(d)
-        })
-        .append("title")
-        .text(function (d) {
-            return internal.textFormatted(d)
-        })
+            return internal.textFormatted(d);
+        });
+    if (tspans && tspans.append) {
+        tspans.append("title")
+            .text(function (d) {
+                return internal.textFormatted(d);
+            });
+    }
 };
 AxisInternal.prototype.axisY = function (selection, y) {
     selection.attr("transform", function (d) {
@@ -298,7 +300,7 @@ AxisInternal.prototype.generateAxis = function () {
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + internal.outerTickSize + "V0H" + internal.range[1] + "V" + internal.outerTickSize);
                     break;
                 }
-      
+
                 case "top": {
                     // TODO: rotated tick text
                     tickTransform = internal.axisX;
@@ -320,7 +322,7 @@ AxisInternal.prototype.generateAxis = function () {
                     pathUpdate.attr("d", "M" + internal.range[0] + "," + -internal.outerTickSize + "V0H" + internal.range[1] + "V" + -internal.outerTickSize);
                     break;
                 }
-      
+
                 case "left": {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", -internal.innerTickSize)
@@ -336,7 +338,7 @@ AxisInternal.prototype.generateAxis = function () {
                     pathUpdate.attr("d", "M" + -internal.outerTickSize + "," + internal.range[0] + "H0V" + internal.range[1] + "H" + -internal.outerTickSize);
                     break;
                 }
-      
+
                 case "right": {
                     tickTransform = internal.axisY;
                     lineUpdate.attr("x2", internal.innerTickSize)
