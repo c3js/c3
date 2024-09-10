@@ -26,3 +26,6 @@ d3.min.js
 # IDE related
 .idea
 .iml
+
+# Miscellaneous
+/*/.angular/cache

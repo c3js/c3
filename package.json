@@ -1,6 +1,6 @@
 {
   "name": "c3-labworks",
-  "version": "0.7.2",
+  "version": "0.7.4",
   "description": "D3-based reusable chart library",
   "main": "c3.js",
   "files": [

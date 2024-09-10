@@ -114,12 +114,15 @@ ChartInternal.prototype.redrawEventRect = function () {
             }
         } : null)
         .on('click', config.interaction_enabled ? function () {
-            var targetsToShow, mouse, closest, sameXData;
+            var targetsToShow, mouse, closest, sameXData, candidates;
             if ($$.hasArcType(targetsToShow)) { return; }
 
             targetsToShow = $$.filterTargetsToShow($$.data.targets);
             mouse = d3.mouse(this);
             closest = $$.findClosestFromTargets(targetsToShow, mouse);
+            candidates = targetsToShow.map(function (target) { // AT 9/9/2024
+              return $$.findClosest(target.values, mouse);
+            });
             if (! closest) { return; }
             // select if selection enabled
             if ($$.isBarType(closest.id) || $$.dist(closest, mouse) < config.point_sensitivity) {
@@ -132,7 +135,7 @@ ChartInternal.prototype.redrawEventRect = function () {
                     $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
                         if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
                             $$.toggleShape(this, d, d.index);
-                            config.data_onclick.call($$.api, d, this);
+                            config.data_onclick.call($$.api, d, this, candidates);
                         }
                     });
                 });
