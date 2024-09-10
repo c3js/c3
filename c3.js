@@ -1,4 +1,4 @@
-/* @license C3.js v0.7.2 | (c) C3 Team and other contributors | http://c3js.org/ */
+/* @license C3.js v0.7.4 | (c) C3 Team and other contributors | http://c3js.org/ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -5253,6 +5253,8 @@
       if ($$.config.subchart_show) {
         $$.brush.selectionAsValue(domain, true);
       } else {
+        $$.brush.selectionAsValue(domain, false); // Zoom bug fix (AT 8/7/2024)
+
         $$.updateXDomain(null, true, false, false, domain);
         $$.redraw({
           withY: $$.config.zoom_rescale,
@@ -8426,7 +8428,7 @@
         }
       }
     } : null).on('click', config.interaction_enabled ? function () {
-      var targetsToShow, mouse, closest, sameXData;
+      var targetsToShow, mouse, closest, sameXData, candidates;
 
       if ($$.hasArcType(targetsToShow)) {
         return;
@@ -8435,6 +8437,10 @@
       targetsToShow = $$.filterTargetsToShow($$.data.targets);
       mouse = d3.mouse(this);
       closest = $$.findClosestFromTargets(targetsToShow, mouse);
+      candidates = targetsToShow.map(function (target) {
+        // AT 9/9/2024
+        return $$.findClosest(target.values, mouse);
+      });
 
       if (!closest) {
         return;
@@ -8452,7 +8458,7 @@
           $$.main.selectAll('.' + CLASS.shapes + $$.getTargetSelectorSuffix(d.id)).selectAll('.' + CLASS.shape + '-' + d.index).each(function () {
             if (config.data_selection_grouped || $$.isWithinShape(this, d)) {
               $$.toggleShape(this, d, d.index);
-              config.data_onclick.call($$.api, d, this);
+              config.data_onclick.call($$.api, d, this, candidates);
             }
           });
         });
