@@ -88,7 +88,7 @@ ChartInternal.prototype.redrawEventRect = function () {
             selectedData = sameXData.map(function (d) {
                 return $$.addName(d);
             });
-            $$.showTooltip(selectedData, this);
+            $$.showTooltip(selectedData, this, closest);
 
             // expand points
             if (config.point_focus_expand_enabled) {

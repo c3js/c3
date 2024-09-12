@@ -209,7 +209,7 @@ ChartInternal.prototype.tooltipPosition = function (dataToShow, tWidth, tHeight,
         left: tooltipLeft
     };
 };
-ChartInternal.prototype.showTooltip = function (selectedData, element) {
+ChartInternal.prototype.showTooltip = function (selectedData, element, closest) {
     var $$ = this,
         config = $$.config;
     var tWidth, tHeight, position;
@@ -221,7 +221,7 @@ ChartInternal.prototype.showTooltip = function (selectedData, element) {
     if (dataToShow.length === 0 || !config.tooltip_show) {
         return;
     }
-    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.axis.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+    $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.axis.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color, closest)).style("display", "block");
 
     // Get tooltip dimensions
     tWidth = $$.tooltip.property('offsetWidth');
