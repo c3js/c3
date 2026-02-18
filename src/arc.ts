@@ -702,10 +702,7 @@ ChartInternal.prototype.redrawArc = function(
     .style('opacity', function(d) {
       return $$.isTargetToShow(d.data.id) && $$.isArcType(d.data) ? 1 : 0
     })
-  main
-    .select('.' + CLASS.chartArcsTitle)
-    .style('opacity', $$.hasType('donut') || hasGaugeType ? 1 : 0)
-
+    
   if (hasGaugeType) {
     let index = 0
     const backgroundArc = $$.arcs

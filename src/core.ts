@@ -732,6 +732,11 @@ ChartInternal.prototype.redraw = function(options, transitions) {
     .transition()
     .style('opacity', targetsToShow.length ? 0 : 1)
 
+  // Only show arc title if chart type is donut or gauge and if there are any data to show
+  main
+    .select('.' + CLASS.chartArcsTitle)
+    .style('opacity', ($$.hasType('donut') || $$.hasType('gauge')) && targetsToShow.length > 0 ? 1 : 0)
+    
   // event rect
   if (withEventRect) {
     $$.redrawEventRect()
