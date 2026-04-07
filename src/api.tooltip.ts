@@ -36,5 +36,5 @@ Chart.prototype.tooltip.hide = function() {
   // TODO: get target data by checking the state of focus
   this.internal.dispatchEvent('mouseout', 0)
 
-  this.internal.config.tooltip_onhide.call(this)
+  this.internal.config.tooltip_onhide.call(this.internal)
 }
