@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7.8'
+          ruby-version: '2.4.10'
           bundler: '1.17.3'
           bundler-cache: true
       - uses: actions/setup-node@v4

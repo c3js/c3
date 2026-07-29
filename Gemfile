@@ -10,6 +10,7 @@ gem "middleman-livereload", "~> 3.1.0"
 # Sync plugin
 gem 'middleman-sync', '3.0.12'
 gem 'unf'
+gem 'racc', '~> 1.5.2'
 
 # For faster file watcher updates on Windows:
 gem "wdm", "~> 0.1.0", :platforms => [:mswin, :mingw]
