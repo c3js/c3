@@ -17,6 +17,12 @@ module.exports = config =>
       }
     },
     reporters: ['spec', 'karma-typescript'],
-    browsers: ['Chrome'],
+    customLaunchers: {
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-gpu']
+      }
+    },
+    browsers: [process.env.CI ? 'ChromeHeadlessCI' : 'Chrome'],
     singleRun: true
   })
