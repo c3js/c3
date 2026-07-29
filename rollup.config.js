@@ -11,7 +11,7 @@ export default [
       banner: `/* @license C3.js v${pkg.version} | (c) C3 Team and other contributors | http://c3js.org/ */`,
       globals: { d3: 'd3' }
     },
-    plugins: [typescript()],
+    plugins: [typescript({ include: ['*.ts', '*.tsx', '**/*.ts', '**/*.tsx'] })],
     external: ['d3']
   }
 ]
