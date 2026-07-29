@@ -23,7 +23,7 @@ helpers do
 end
 
 set :source, 'docs'
-set :haml, { :ugly => true, :format => :html5 }
+set :haml, { :format => :html5 }
 set :css_dir, 'css'
 set :js_dir, 'js'
 set :images_dir, 'img'
