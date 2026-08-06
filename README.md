@@ -12,6 +12,8 @@ Follow the link for more information: [http://c3js.org](http://c3js.org/)
 
 ## Documentation
 
++ [Open letter from billboards.js](https://github.com/c3js/c3/issues/2831)
++ [c3.js to billboards.js](https://github.com/c3js/c3/issues/2831)
 + [Getting Started](http://c3js.org/gettingstarted.html)
 + [Examples](http://c3js.org/examples.html)
 + [Full API Reference](https://c3js.org/reference.html)
